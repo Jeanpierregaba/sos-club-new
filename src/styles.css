@@ -62,15 +62,15 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --radius: 1rem;
+  --background: oklch(0.985 0.008 300);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.45 0.24 295);
+  --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
@@ -132,6 +132,30 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+@theme inline {
+  --color-sun: var(--sun);
+  --color-tangerine: var(--tangerine);
+  --color-leaf: var(--leaf);
+  --color-sky: var(--sky);
+  --color-rose: var(--rose);
+  --color-lilac: var(--lilac);
+  --color-ink: var(--ink);
+  --font-display: "Lilita One", system-ui, sans-serif;
+  --font-hand: "Caveat Brush", cursive;
+  --font-sans: "Nunito", system-ui, sans-serif;
+}
+:root {
+  --sun: oklch(0.86 0.17 88);
+  --tangerine: oklch(0.7 0.19 45);
+  --leaf: oklch(0.62 0.17 150);
+  --sky: oklch(0.62 0.17 245);
+  --rose: oklch(0.6 0.21 15);
+  --lilac: oklch(0.95 0.035 300);
+  --ink: oklch(0.25 0.08 290);
+  --gradient-hero: linear-gradient(110deg, var(--lilac) 0%, oklch(0.97 0.02 300) 50%, transparent 75%);
+  --gradient-cta: linear-gradient(110deg, oklch(0.4 0.24 290), oklch(0.5 0.25 305));
+  --shadow-card: 0 12px 30px -14px oklch(0.45 0.24 295 / 0.35);
+}
 @layer base {
   * {
     border-color: var(--color-border);
@@ -140,5 +164,11 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
   }
+  h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0.01em; }
 }
+
+@utility bg-hero { background: var(--gradient-hero); }
+@utility bg-cta { background: var(--gradient-cta); }
+@utility shadow-card { box-shadow: var(--shadow-card); }
