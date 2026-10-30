@@ -129,19 +129,36 @@ function Index() {
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-lilac">
-        <img src={hero} alt="Lycéens souriants" width={1600} height={912} className="absolute inset-y-0 right-0 h-full w-full object-cover object-right md:w-3/4" />
+        <div className="absolute inset-y-0 right-0 h-full w-full md:w-3/4">
+          {heroSlides.map((s, i) => (
+            <img key={i} src={s.img} alt={s.alt} width={1600} height={912} aria-hidden={i !== active}
+              className={`absolute inset-0 h-full w-full object-cover object-right transition-opacity duration-700 ${i === active ? "opacity-100" : "opacity-0"}`} />
+          ))}
+        </div>
         <div className="absolute inset-0 bg-hero" />
         <div className="relative mx-auto grid max-w-7xl items-center px-5 py-16 md:grid-cols-2 md:py-24">
           <div>
             <h1 className="text-5xl leading-[0.95] md:text-7xl">
-              <span className="text-primary">TON CLUB.</span><br />
-              <span className="text-tangerine">TES TALENTS.</span><br />
-              <span className="text-leaf">TES DÉFIS.</span>
+              {heroSlides[active].lines.map((l) => (
+                <span key={l.t}><span className={l.c}>{l.t}</span><br /></span>
+              ))}
             </h1>
-            <p className="mt-5 text-xl font-bold">Apprends, joue et fais bouger ton établissement !</p>
+            <p className="mt-5 text-xl font-bold">{heroSlides[active].sub}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="#" className="flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground shadow-card"><Trophy className="h-5 w-5" /> Je relève un défi <ArrowRight className="h-4 w-4" /></a>
               <a href="#univers" className="flex items-center gap-2 rounded-full bg-card px-6 py-3 font-bold shadow-card">Découvrir les univers <ArrowRight className="h-4 w-4" /></a>
+            </div>
+            <div className="mt-8 flex items-center gap-4">
+              <div className="flex gap-2">
+                <button aria-label="Diapositive précédente" onClick={prev} className="flex h-10 w-10 items-center justify-center rounded-full bg-card text-ink shadow-card transition hover:bg-lilac"><ChevronLeft className="h-5 w-5" /></button>
+                <button aria-label="Diapositive suivante" onClick={next} className="flex h-10 w-10 items-center justify-center rounded-full bg-card text-ink shadow-card transition hover:bg-lilac"><ChevronRight className="h-5 w-5" /></button>
+              </div>
+              <div className="flex gap-2">
+                {heroSlides.map((_, i) => (
+                  <button key={i} aria-label={`Aller à la diapositive ${i + 1}`} onClick={() => setActive(i)}
+                    className={`h-2.5 rounded-full transition-all ${i === active ? "w-8 bg-primary" : "w-2.5 bg-primary/30 hover:bg-primary/50"}`} />
+                ))}
+              </div>
             </div>
           </div>
           <div className="relative hidden h-full md:block">
