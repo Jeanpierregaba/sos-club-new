@@ -104,6 +104,7 @@ function Index() {
   const count = heroSlides.length;
   const next = () => setActive((a) => (a + 1) % count);
   const prev = () => setActive((a) => (a - 1 + count) % count);
+  const slide = heroSlides[active] ?? heroSlides[0]!;
 
   useEffect(() => {
     const t = setInterval(() => setActive((a) => (a + 1) % count), 6000);
@@ -139,11 +140,11 @@ function Index() {
         <div className="relative mx-auto grid max-w-7xl items-center px-5 py-16 md:grid-cols-2 md:py-24">
           <div>
             <h1 className="text-5xl leading-[0.95] md:text-7xl">
-              {heroSlides[active].lines.map((l) => (
+              {slide.lines.map((l) => (
                 <span key={l.t}><span className={l.c}>{l.t}</span><br /></span>
               ))}
             </h1>
-            <p className="mt-5 text-xl font-bold">{heroSlides[active].sub}</p>
+            <p className="mt-5 text-xl font-bold">{slide.sub}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="#" className="flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground shadow-card"><Trophy className="h-5 w-5" /> Je relève un défi <ArrowRight className="h-4 w-4" /></a>
               <a href="#univers" className="flex items-center gap-2 rounded-full bg-card px-6 py-3 font-bold shadow-card">Découvrir les univers <ArrowRight className="h-4 w-4" /></a>
