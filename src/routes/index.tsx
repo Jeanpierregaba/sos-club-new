@@ -1,9 +1,11 @@
+import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, Search, Users, Play, BookOpen, ClipboardCheck, Gamepad2, Award, Trophy } from "lucide-react";
+import { ArrowRight, Search, Users, Play, BookOpen, ClipboardCheck, Gamepad2, Award, Trophy, ChevronLeft, ChevronRight } from "lucide-react";
 import hero from "@/assets/hero.jpg";
 import mascot from "@/assets/mascot.png";
 import story1 from "@/assets/story1.jpg";
 import story2 from "@/assets/story2.jpg";
+import quiz from "@/assets/quiz.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -35,11 +37,47 @@ const stars = [
   { img: hero, tag: "Vie des clubs", tc: "bg-leaf", t: "Une journée verte pour un meilleur cadre de vie", d: "Les clubs se mobilisent pour l'environnement." },
 ];
 
-const steps = [
-  { i: BookOpen, t: "Apprends", d: "Des contenus simples et interactifs sur la santé.", c: "text-sky" },
-  { i: ClipboardCheck, t: "Révise", d: "Teste tes connaissances avec quiz et jeux.", c: "text-leaf" },
-  { i: Gamepad2, t: "Relève les défis", d: "Gagne des points à ton rythme.", c: "text-tangerine" },
-  { i: Award, t: "Certifie-toi", d: "Obtiens la certification officielle du Club Santé.", c: "text-primary" },
+const heroSlides = [
+  {
+    img: hero,
+    alt: "Lycéens souriants",
+    lines: [
+      { t: "TON CLUB.", c: "text-primary" },
+      { t: "TES TALENTS.", c: "text-tangerine" },
+      { t: "TES DÉFIS.", c: "text-leaf" },
+    ],
+    sub: "Apprends, joue et fais bouger ton établissement !",
+  },
+  {
+    img: quiz,
+    alt: "Lycéens réunis autour du quiz santé",
+    lines: [
+      { t: "APPRENDS.", c: "text-sky" },
+      { t: "RÉVISE.", c: "text-tangerine" },
+      { t: "GAGNE DES POINTS.", c: "text-leaf" },
+    ],
+    sub: "Le défi du jour t'attend : teste tes connaissances !",
+  },
+  {
+    img: story1,
+    alt: "Initiation aux premiers secours",
+    lines: [
+      { t: "BOUGE.", c: "text-sky" },
+      { t: "APPRENDS.", c: "text-tangerine" },
+      { t: "SAUVE DES VIES.", c: "text-leaf" },
+    ],
+    sub: "Initiation aux premiers secours avec les clubs santé.",
+  },
+  {
+    img: story2,
+    alt: "Reportage du Club Santé du Lycée de Lomé",
+    lines: [
+      { t: "CRÉE.", c: "text-sky" },
+      { t: "INFORME.", c: "text-tangerine" },
+      { t: "PASSE À LA TV.", c: "text-leaf" },
+    ],
+    sub: "Reportages et talents des jeunes des Clubs Santé.",
+  },
 ];
 
 function Logo() {
