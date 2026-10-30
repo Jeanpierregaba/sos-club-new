@@ -147,7 +147,7 @@ function Index() {
           {stars.map((s) => (
             <article key={s.t} className="overflow-hidden rounded-3xl bg-card shadow-card">
               <div className="relative">
-                <img src={s.img} alt={s.t} loading="lazy" className="aspect-[3/2] w-full object-cover" />
+                <img src={s.img} alt={s.t} loading="lazy" className="aspect-[3/2] w-full object-cover object-right" />
                 <span className="absolute -bottom-5 right-5 rounded-full bg-primary p-3 text-primary-foreground"><Play className="h-5 w-5 fill-current" /></span>
               </div>
               <div className="p-5">
