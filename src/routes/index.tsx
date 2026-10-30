@@ -1,9 +1,11 @@
+import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, Search, Users, Play, BookOpen, ClipboardCheck, Gamepad2, Award, Trophy } from "lucide-react";
+import { ArrowRight, Search, Users, Play, BookOpen, ClipboardCheck, Gamepad2, Award, Trophy, ChevronLeft, ChevronRight } from "lucide-react";
 import hero from "@/assets/hero.jpg";
 import mascot from "@/assets/mascot.png";
 import story1 from "@/assets/story1.jpg";
 import story2 from "@/assets/story2.jpg";
+import quiz from "@/assets/quiz.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -35,6 +37,49 @@ const stars = [
   { img: hero, tag: "Vie des clubs", tc: "bg-leaf", t: "Une journée verte pour un meilleur cadre de vie", d: "Les clubs se mobilisent pour l'environnement." },
 ];
 
+const heroSlides = [
+  {
+    img: hero,
+    alt: "Lycéens souriants",
+    lines: [
+      { t: "TON CLUB.", c: "text-primary" },
+      { t: "TES TALENTS.", c: "text-tangerine" },
+      { t: "TES DÉFIS.", c: "text-leaf" },
+    ],
+    sub: "Apprends, joue et fais bouger ton établissement !",
+  },
+  {
+    img: quiz,
+    alt: "Lycéens réunis autour du quiz santé",
+    lines: [
+      { t: "APPRENDS.", c: "text-sky" },
+      { t: "RÉVISE.", c: "text-tangerine" },
+      { t: "GAGNE DES POINTS.", c: "text-leaf" },
+    ],
+    sub: "Le défi du jour t'attend : teste tes connaissances !",
+  },
+  {
+    img: story1,
+    alt: "Initiation aux premiers secours",
+    lines: [
+      { t: "BOUGE.", c: "text-sky" },
+      { t: "APPRENDS.", c: "text-tangerine" },
+      { t: "SAUVE DES VIES.", c: "text-leaf" },
+    ],
+    sub: "Initiation aux premiers secours avec les clubs santé.",
+  },
+  {
+    img: story2,
+    alt: "Reportage du Club Santé du Lycée de Lomé",
+    lines: [
+      { t: "CRÉE.", c: "text-sky" },
+      { t: "INFORME.", c: "text-tangerine" },
+      { t: "PASSE À LA TV.", c: "text-leaf" },
+    ],
+    sub: "Reportages et talents des jeunes des Clubs Santé.",
+  },
+];
+
 const steps = [
   { i: BookOpen, t: "Apprends", d: "Des contenus simples et interactifs sur la santé.", c: "text-sky" },
   { i: ClipboardCheck, t: "Révise", d: "Teste tes connaissances avec quiz et jeux.", c: "text-leaf" },
@@ -55,6 +100,17 @@ function Logo() {
 }
 
 function Index() {
+  const [active, setActive] = useState(0);
+  const count = heroSlides.length;
+  const next = () => setActive((a) => (a + 1) % count);
+  const prev = () => setActive((a) => (a - 1 + count) % count);
+  const slide = heroSlides[active] ?? heroSlides[0]!;
+
+  useEffect(() => {
+    const t = setInterval(() => setActive((a) => (a + 1) % count), 6000);
+    return () => clearInterval(t);
+  }, [active, count]);
+
   return (
     <div className="min-h-screen text-ink">
       <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
@@ -74,19 +130,36 @@ function Index() {
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-lilac">
-        <img src={hero} alt="Lycéens souriants" width={1600} height={912} className="absolute inset-y-0 right-0 h-full w-full object-cover object-right md:w-3/4" />
+        <div className="absolute inset-y-0 right-0 h-full w-full md:w-3/4">
+          {heroSlides.map((s, i) => (
+            <img key={i} src={s.img} alt={s.alt} width={1600} height={912} aria-hidden={i !== active}
+              className={`absolute inset-0 h-full w-full object-cover object-right transition-opacity duration-700 ${i === active ? "opacity-100" : "opacity-0"}`} />
+          ))}
+        </div>
         <div className="absolute inset-0 bg-hero" />
         <div className="relative mx-auto grid max-w-7xl items-center px-5 py-16 md:grid-cols-2 md:py-24">
           <div>
             <h1 className="text-5xl leading-[0.95] md:text-7xl">
-              <span className="text-primary">TON CLUB.</span><br />
-              <span className="text-tangerine">TES TALENTS.</span><br />
-              <span className="text-leaf">TES DÉFIS.</span>
+              {slide.lines.map((l) => (
+                <span key={l.t}><span className={l.c}>{l.t}</span><br /></span>
+              ))}
             </h1>
-            <p className="mt-5 text-xl font-bold">Apprends, joue et fais bouger ton établissement !</p>
+            <p className="mt-5 text-xl font-bold">{slide.sub}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="#" className="flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground shadow-card"><Trophy className="h-5 w-5" /> Je relève un défi <ArrowRight className="h-4 w-4" /></a>
               <a href="#univers" className="flex items-center gap-2 rounded-full bg-card px-6 py-3 font-bold shadow-card">Découvrir les univers <ArrowRight className="h-4 w-4" /></a>
+            </div>
+            <div className="mt-8 flex items-center gap-4">
+              <div className="flex gap-2">
+                <button aria-label="Diapositive précédente" onClick={prev} className="flex h-10 w-10 items-center justify-center rounded-full bg-card text-ink shadow-card transition hover:bg-lilac"><ChevronLeft className="h-5 w-5" /></button>
+                <button aria-label="Diapositive suivante" onClick={next} className="flex h-10 w-10 items-center justify-center rounded-full bg-card text-ink shadow-card transition hover:bg-lilac"><ChevronRight className="h-5 w-5" /></button>
+              </div>
+              <div className="flex gap-2">
+                {heroSlides.map((_, i) => (
+                  <button key={i} aria-label={`Aller à la diapositive ${i + 1}`} onClick={() => setActive(i)}
+                    className={`h-2.5 rounded-full transition-all ${i === active ? "w-8 bg-primary" : "w-2.5 bg-primary/30 hover:bg-primary/50"}`} />
+                ))}
+              </div>
             </div>
           </div>
           <div className="relative hidden h-full md:block">
