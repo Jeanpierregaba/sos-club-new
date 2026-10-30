@@ -80,6 +80,13 @@ const heroSlides = [
   },
 ];
 
+const steps = [
+  { i: BookOpen, t: "Apprends", d: "Des contenus simples et interactifs sur la santé.", c: "text-sky" },
+  { i: ClipboardCheck, t: "Révise", d: "Teste tes connaissances avec quiz et jeux.", c: "text-leaf" },
+  { i: Gamepad2, t: "Relève les défis", d: "Gagne des points à ton rythme.", c: "text-tangerine" },
+  { i: Award, t: "Certifie-toi", d: "Obtiens la certification officielle du Club Santé.", c: "text-primary" },
+];
+
 function Logo() {
   return (
     <div className="flex items-center gap-2">
@@ -93,6 +100,16 @@ function Logo() {
 }
 
 function Index() {
+  const [active, setActive] = useState(0);
+  const count = heroSlides.length;
+  const next = () => setActive((a) => (a + 1) % count);
+  const prev = () => setActive((a) => (a - 1 + count) % count);
+
+  useEffect(() => {
+    const t = setInterval(() => setActive((a) => (a + 1) % count), 6000);
+    return () => clearInterval(t);
+  }, [active, count]);
+
   return (
     <div className="min-h-screen text-ink">
       <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur">
