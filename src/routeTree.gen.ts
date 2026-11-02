@@ -10,33 +10,59 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConnecteRouteImport } from './routes/_connecte'
+import { Route as ConnexionRouteImport } from './routes/connexion'
+import { Route as ConnecteMonEspaceRouteImport } from './routes/_connecte/mon-espace'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConnecteRoute = ConnecteRouteImport.update({
+  id: '/_connecte',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnexionRoute = ConnexionRouteImport.update({
+  id: '/connexion',
+  path: '/connexion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnecteMonEspaceRoute = ConnecteMonEspaceRouteImport.update({
+  id: '/mon-espace',
+  path: '/mon-espace',
+  getParentRoute: () => ConnecteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/connexion': typeof ConnexionRoute
+  '/mon-espace': typeof ConnecteMonEspaceRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/connexion': typeof ConnexionRoute
+  '/mon-espace': typeof ConnecteMonEspaceRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_connecte': typeof ConnecteRouteWithChildren
+  '/connexion': typeof ConnexionRoute
+  '/_connecte/mon-espace': typeof ConnecteMonEspaceRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/connexion' | '/mon-espace'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/connexion' | '/mon-espace'
+  id: '__root__' | '/' | '/_connecte' | '/connexion' | '/_connecte/mon-espace'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ConnecteRoute: typeof ConnecteRouteWithChildren
+  ConnexionRoute: typeof ConnexionRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +74,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_connecte': {
+      id: '/_connecte'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof ConnecteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/connexion': {
+      id: '/connexion'
+      path: '/connexion'
+      fullPath: '/connexion'
+      preLoaderRoute: typeof ConnexionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_connecte/mon-espace': {
+      id: '/_connecte/mon-espace'
+      path: '/mon-espace'
+      fullPath: '/mon-espace'
+      preLoaderRoute: typeof ConnecteMonEspaceRouteImport
+      parentRoute: typeof ConnecteRoute
+    }
   }
 }
 
+interface ConnecteRouteChildren {
+  ConnecteMonEspaceRoute: typeof ConnecteMonEspaceRoute
+}
+
+const ConnecteRouteChildren: ConnecteRouteChildren = {
+  ConnecteMonEspaceRoute: ConnecteMonEspaceRoute,
+}
+
+const ConnecteRouteWithChildren = ConnecteRoute._addFileChildren(
+  ConnecteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ConnecteRoute: ConnecteRouteWithChildren,
+  ConnexionRoute: ConnexionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,0 +1,15 @@
+# Mises à jour automatiques des dépendances : https://docs.github.com/code-security/dependabot
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: uv
+    directory: /backend
+    schedule:
+      interval: weekly

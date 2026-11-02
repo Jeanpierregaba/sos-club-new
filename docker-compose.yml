@@ -1,0 +1,26 @@
+# Base PostgreSQL de développement. Elle n'écoute que sur cette machine et n'a pas de mot de passe :
+# cette configuration ne doit jamais servir en production.
+name: sos-club-new
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: sosclub
+      POSTGRES_DB: sosclub
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      # 5432 à 5434 sont déjà pris sur cette machine par d'autres projets.
+      - "127.0.0.1:5435:5432"
+    volumes:
+      # Depuis PostgreSQL 18, l'image attend le volume sur ce dossier et non plus sur .../data.
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sosclub -d sosclub"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgdata:

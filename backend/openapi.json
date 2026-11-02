@@ -1,0 +1,284 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API Club Santé SOS Docteur TV",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/comptes/connexion": {
+      "post": {
+        "tags": [
+          "comptes"
+        ],
+        "summary": "Connexion",
+        "operationId": "connexion_api_comptes_connexion_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnexionEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Moi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/comptes/deconnexion": {
+      "post": {
+        "tags": [
+          "comptes"
+        ],
+        "summary": "Deconnexion",
+        "operationId": "deconnexion_api_comptes_deconnexion_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
+    "/api/comptes/moi": {
+      "get": {
+        "tags": [
+          "comptes"
+        ],
+        "summary": "Moi",
+        "operationId": "moi_api_comptes_moi_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Moi"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/chiffres": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Chiffres",
+        "operationId": "chiffres_api_admin_chiffres_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChiffresAdmin"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChiffresAdmin": {
+        "properties": {
+          "comptes": {
+            "$ref": "#/components/schemas/ComptesParRole"
+          }
+        },
+        "type": "object",
+        "required": [
+          "comptes"
+        ],
+        "title": "ChiffresAdmin"
+      },
+      "ComptesParRole": {
+        "properties": {
+          "eleve": {
+            "type": "integer",
+            "title": "Eleve"
+          },
+          "encadreur": {
+            "type": "integer",
+            "title": "Encadreur"
+          },
+          "admin": {
+            "type": "integer",
+            "title": "Admin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "eleve",
+          "encadreur",
+          "admin"
+        ],
+        "title": "ComptesParRole"
+      },
+      "ConnexionEntree": {
+        "properties": {
+          "identifiant": {
+            "type": "string",
+            "maxLength": 254,
+            "minLength": 1,
+            "title": "Identifiant"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Mot De Passe"
+          }
+        },
+        "type": "object",
+        "required": [
+          "identifiant",
+          "mot_de_passe"
+        ],
+        "title": "ConnexionEntree"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Moi": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "identifiant": {
+            "type": "string",
+            "title": "Identifiant"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "identifiant",
+          "prenom",
+          "nom",
+          "role"
+        ],
+        "title": "Moi"
+      },
+      "Role": {
+        "type": "string",
+        "enum": [
+          "eleve",
+          "encadreur",
+          "admin"
+        ],
+        "title": "Role"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

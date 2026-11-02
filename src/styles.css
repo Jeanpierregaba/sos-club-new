@@ -63,13 +63,13 @@
 
 :root {
   --radius: 1rem;
-  --background: oklch(0.985 0.008 300);
+  --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.45 0.24 295);
+  --primary: oklch(0.652 0.171 152.1);
   --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
@@ -138,11 +138,32 @@
   --color-leaf: var(--leaf);
   --color-sky: var(--sky);
   --color-rose: var(--rose);
+  --color-bark: var(--bark);
   --color-lilac: var(--lilac);
+  --color-mist: var(--mist);
+  --color-mist-soft: var(--mist-soft);
+  --color-logo-blue: var(--logo-blue);
+  --color-logo-red: var(--logo-red);
+  --color-grape: var(--grape);
   --color-ink: var(--ink);
+  --color-night: var(--night);
   --font-display: "Lilita One", system-ui, sans-serif;
   --font-hand: "Caveat Brush", cursive;
-  --font-sans: "Nunito", system-ui, sans-serif;
+  --font-sans: "Outfit", system-ui, sans-serif;
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-float: float 5s ease-in-out infinite;
+  --animate-shake: shake 0.45s ease-in-out;
+
+  @keyframes marquee {
+    to { transform: translateX(-50%); }
+  }
+  @keyframes float {
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes shake {
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
 }
 :root {
   --sun: oklch(0.86 0.17 88);
@@ -150,10 +171,16 @@
   --leaf: oklch(0.62 0.17 150);
   --sky: oklch(0.62 0.17 245);
   --rose: oklch(0.6 0.21 15);
+  --bark: oklch(0.5 0.11 50);
   --lilac: oklch(0.95 0.035 300);
+  --mist: oklch(0.95 0.035 257.6);
+  --mist-soft: oklch(0.98 0.014 257.6);
+  --logo-blue: oklch(0.405 0.122 257.6);
+  --logo-red: oklch(0.558 0.223 28.7);
+  --grape: oklch(0.45 0.24 295);
   --ink: oklch(0.25 0.08 290);
-  --gradient-hero: linear-gradient(110deg, var(--lilac) 0%, oklch(0.97 0.02 300) 50%, transparent 75%);
-  --gradient-cta: linear-gradient(110deg, oklch(0.4 0.24 290), oklch(0.5 0.25 305));
+  --night: oklch(0.215 0.04 265);
+  --gradient-hero: linear-gradient(110deg, var(--mist) 0%, oklch(0.97 0.02 257.6) 50%, transparent 75%);
   --shadow-card: 0 12px 30px -14px oklch(0.45 0.24 295 / 0.35);
 }
 @layer base {
@@ -167,8 +194,70 @@
     font-family: var(--font-sans);
   }
   h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0.01em; }
+
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+}
+
+/*
+ * Apparition au défilement : SiteMotion pose `reveal-ready` sur la page une fois prête, puis `data-visible` sur chaque élément.
+ * Sans JavaScript, ou tant qu'il charge, rien n'est masqué. Les images clés utilisent `transform` : les survols, eux, passent par
+ * `translate` et `scale`, et les deux se cumulent sans conflit.
+ */
+.reveal-ready [data-reveal]:not([data-visible]) { opacity: 0; }
+[data-visible="anim"] {
+  animation: reveal-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: var(--delay, 0ms);
+}
+[data-reveal="left"][data-visible="anim"] { animation-name: reveal-left; }
+[data-reveal="right"][data-visible="anim"] { animation-name: reveal-right; }
+[data-reveal="zoom"][data-visible="anim"] { animation-name: reveal-zoom; }
+
+@keyframes reveal-up { from { opacity: 0; transform: translateY(28px); } }
+@keyframes reveal-left { from { opacity: 0; transform: translateX(-36px); } }
+@keyframes reveal-right { from { opacity: 0; transform: translateX(36px); } }
+@keyframes reveal-zoom { from { opacity: 0; transform: scale(0.92); } }
+
+@media print {
+  .reveal-ready [data-reveal]:not([data-visible]) { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Survols communs. Les écrans tactiles ne gardent que la réaction à l'appui. */
+@utility btn-fx {
+  transition: translate 0.2s ease, scale 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+  &:active { scale: 0.96; }
+  @media (hover: hover) {
+    &:hover { translate: 0 -2px; filter: brightness(1.07); box-shadow: 0 14px 26px -12px oklch(0.25 0.05 257 / 0.5); }
+  }
+}
+@utility card-fx {
+  transition: translate 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+  @media (hover: hover) {
+    &:hover { translate: 0 -6px; box-shadow: 0 24px 40px -18px oklch(0.25 0.05 257 / 0.45); }
+  }
 }
 
 @utility bg-hero { background: var(--gradient-hero); }
-@utility bg-cta { background: var(--gradient-cta); }
+/* Feuille de carnet : posée sur le conteneur de la page pour que les carreaux restent alignés d'une section à l'autre. */
+@utility bg-carnet {
+  background-color: var(--background);
+  background-image:
+    linear-gradient(color-mix(in oklch, var(--logo-blue) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, var(--logo-blue) 10%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
 @utility shadow-card { box-shadow: var(--shadow-card); }

@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+      - uses: oven-sh/setup-bun@v2.2.0
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - name: Types de l'API à jour
+        run: npm run api:types && git diff --exit-code src/lib/api/schema.gen.ts
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm test
+      - run: npm run build
+      # Non bloquant tant que les failles connues ne sont pas corrigées (voir TASKS.md).
+      - run: bun audit --audit-level=high
+        continue-on-error: true
+
+  api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      db:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: sosclub
+          POSTGRES_DB: sosclub
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5435:5432
+        options: >-
+          --health-cmd "pg_isready -U sosclub -d sosclub"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.3.3
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run alembic upgrade head
+      - run: uv run alembic check
+      - run: uv run pytest
+      - run: uv export --frozen --no-dev --no-hashes --quiet -o requirements-audit.txt
+      - run: uvx pip-audit -r requirements-audit.txt

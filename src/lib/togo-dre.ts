@@ -1,0 +1,100 @@
+// `d` : contour de la région, retracé d'après la carte de découpage scolaire (repère de 250 × 640).
+// `label` : position de l'étiquette sur la carte, en % de sa largeur et de sa hauteur.
+// `iesg` : vide tant que le détail des inspections de la région n'est pas renseigné.
+
+export type Dre = {
+  id: string;
+  nom: string;
+  complet: string;
+  couleur: string;
+  clubs: number;
+  nbIesg: number;
+  iesg: { zone: string; nom: string; clubs: number }[];
+  d: string;
+  label: { x: number; y: number };
+};
+
+export const grandLome: Dre = {
+  id: "grand-lome",
+  nom: "Grand Lomé",
+  complet: "Direction Régionale de l’Éducation du Grand Lomé",
+  couleur: "oklch(0.652 0.171 152.1)",
+  clubs: 47,
+  nbIesg: 2,
+  iesg: [
+    { zone: "Golfe (Lomé)", nom: "IESG Golfe", clubs: 29 },
+    { zone: "Agoényivé", nom: "IESG Agoényivé", clubs: 18 },
+  ],
+  d: "M227 572L241 575L241 593L236 607L231 612L231 614L223 621L178 633L175 633L174 626L158 624L150 619L147 615L145 615L141 611L133 594L137 584L211 582L221 578Z",
+  label: { x: 79, y: 94 },
+};
+
+export const dres: Dre[] = [
+  {
+    id: "savanes",
+    nom: "Savanes",
+    complet: "Direction Régionale de l’Éducation des Savanes",
+    couleur: "oklch(0.509 0.179 256.9)",
+    clubs: 173,
+    nbIesg: 3,
+    iesg: [],
+    d: "M15 9L88 25L94 32L107 27L116 26L142 27L142 35L138 52L121 59L113 76L120 93L125 95L126 101L141 113L142 118L135 125L125 128L116 137L113 142L114 157L109 162L96 162L92 156L83 155L80 151L82 148L82 141L73 133L73 115L63 106L61 102L49 100L41 83L30 79L29 77L25 77L20 73L18 66L18 55L23 49L23 39L26 33L31 28L32 24L26 19L18 19L12 17L11 13Z",
+    label: { x: 32.4, y: 11.4 },
+  },
+  {
+    id: "kara",
+    nom: "Kara",
+    complet: "Direction Régionale de l’Éducation de la Kara",
+    couleur: "oklch(0.514 0.210 29.0)",
+    clubs: 152,
+    nbIesg: 3,
+    iesg: [],
+    d: "M141 118L149 118L153 120L161 127L169 131L171 134L195 149L196 200L194 206L201 214L203 230L200 234L201 236L195 241L184 241L181 244L177 244L174 241L157 242L156 244L154 244L151 250L150 265L143 270L132 271L127 269L122 263L116 263L110 269L110 271L101 278L98 287L95 289L84 272L86 256L92 248L92 239L95 235L95 226L85 215L79 213L72 214L71 217L67 220L61 219L61 217L66 212L65 206L67 204L73 204L76 201L76 198L73 194L73 187L69 181L70 171L76 158L75 150L80 150L83 155L92 156L96 162L107 163L114 157L113 142L116 137L128 126L135 125Z",
+    label: { x: 54.2, y: 30.6 },
+  },
+  {
+    id: "centrale",
+    nom: "Centrale",
+    complet: "Direction Régionale de l’Éducation de la Centrale",
+    couleur: "oklch(0.472 0.240 297.9)",
+    clubs: 78,
+    nbIesg: 2,
+    iesg: [],
+    d: "M200 236L210 240L220 249L228 265L226 279L231 286L233 324L233 344L231 350L226 352L226 354L210 352L182 353L179 357L179 362L182 368L182 392L177 398L165 401L165 403L157 403L157 401L155 400L131 401L124 403L111 411L108 411L107 408L103 406L101 401L101 371L105 366L116 363L118 357L115 354L114 350L108 346L107 339L104 339L104 335L97 334L93 329L86 327L81 323L72 303L74 301L81 301L88 298L90 294L94 292L94 290L98 287L101 278L107 272L109 272L116 263L120 262L127 269L132 271L143 270L150 265L151 250L154 244L156 244L157 242L174 241L177 244L181 244L184 241L195 241Z",
+    label: { x: 63.8, y: 49.6 },
+  },
+  {
+    id: "plateaux-est",
+    nom: "Plateaux Est",
+    complet: "Direction Régionale de l’Éducation des Plateaux Est",
+    couleur: "oklch(0.673 0.216 38.9)",
+    clubs: 121,
+    nbIesg: 3,
+    iesg: [],
+    d: "M137 400L155 400L157 401L157 403L161 403L161 407L163 408L163 420L161 424L163 445L165 454L172 465L177 484L173 499L171 499L166 510L162 524L160 526L160 530L158 530L156 533L141 533L136 535L133 547L137 547L137 550L126 555L119 571L117 571L116 568L110 565L109 551L104 549L101 544L95 539L96 532L93 529L93 525L101 520L102 509L108 498L107 493L92 462L92 450L101 442L101 436L105 431L104 417L107 412L119 407L124 403Z",
+    label: { x: 52.2, y: 74.4 },
+  },
+  {
+    id: "plateaux-ouest",
+    nom: "Plateaux Ouest",
+    complet: "Direction Régionale de l’Éducation des Plateaux Ouest",
+    couleur: "oklch(0.742 0.175 58.9)",
+    clubs: 75,
+    nbIesg: 3,
+    iesg: [],
+    d: "M189 352L225 353L226 357L232 363L233 513L231 516L225 519L223 523L224 529L222 531L222 535L218 538L200 542L195 541L186 548L178 549L168 542L159 541L155 534L158 530L160 530L164 515L171 499L173 499L177 484L172 465L165 454L163 445L161 433L163 408L161 407L161 403L165 403L165 401L177 398L181 394L182 368L179 362L179 357L180 354Z",
+    label: { x: 79.8, y: 70.2 },
+  },
+  {
+    id: "maritime",
+    nom: "Maritime",
+    complet: "Direction Régionale de l’Éducation de la Maritime",
+    couleur: "oklch(0.474 0.098 45.9)",
+    clubs: 198,
+    nbIesg: 3,
+    iesg: [],
+    d: "M141 533L155 533L159 541L168 542L178 549L186 548L195 541L200 542L204 540L214 540L219 536L225 535L230 541L227 547L227 560L239 567L240 570L228 570L227 573L225 573L221 578L211 582L135 583L132 588L127 591L119 585L114 576L116 575L117 571L119 571L126 555L137 550L137 547L133 547L133 544L136 535Z",
+    label: { x: 67.6, y: 88.5 },
+  },
+  grandLome,
+];
