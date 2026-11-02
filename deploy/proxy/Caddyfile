@@ -33,9 +33,7 @@
 
 {$DOMAINE_PREPROD} {
 	import securite
+	# Publique, mais hors des moteurs de recherche : c'est un environnement de test.
 	header X-Robots-Tag "noindex, nofollow"
-	basic_auth {
-		{$PREPROD_UTILISATEUR} {$PREPROD_MOT_DE_PASSE_HASH}
-	}
 	import application preprod
 }

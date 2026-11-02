@@ -3,10 +3,10 @@
 Un seul VPS héberge la preprod et la prod, derrière un même proxy HTTPS. La décision est expliquée dans
 [l'ADR 0007](../docs/decisions/0007-deploiement-vps-docker-compose.md).
 
-| Branche   | Environnement | Accès                       |
-| --------- | ------------- | --------------------------- |
-| `develop` | preprod       | Protégé par un mot de passe |
-| `main`    | prod          | Public                      |
+| Branche   | Environnement | Accès              |
+| --------- | ------------- | ------------------ |
+| `develop` | preprod       | Public, non indexé |
+| `main`    | prod          | Public             |
 
 À chaque push, GitHub Actions vérifie le code, construit les images, les publie sur GitHub Container Registry,
 puis lance `deployer.sh` sur le VPS : sauvegarde, migrations, nouveaux conteneurs, et retour automatique à la
@@ -190,7 +190,7 @@ cd /opt/sosclub/prod && docker compose logs --tail 100 api site
 ## Ce qui a été vérifié, et ce qui ne l'a pas été
 
 Testé en local, avec les vraies images, un registre local et le vrai Caddyfile : déploiement des deux
-environnements, accès et en-têtes via le proxy, mot de passe de la preprod, connexion et rendu serveur en HTTPS,
+environnements, accès et en-têtes via le proxy, connexion et rendu serveur en HTTPS,
 séparation des bases et des réseaux (la preprod ne joint pas l'API de prod), adresse réseau non falsifiable,
 refus d'une origine en http://, sauvegarde et restauration suivant la procédure ci-dessus, retour automatique après
 une version cassée, et retour arrière manuel sans migrations.

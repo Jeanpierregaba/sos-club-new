@@ -73,10 +73,10 @@ fi
 echo "$version" > .version
 
 # Une fois publiée, la version doit répondre derrière le proxy. Sans DNS ou proxy prêts, on prévient sans annuler :
-# les conteneurs, eux, sont sains. La preprod répond 401 tant que le mot de passe n'est pas fourni.
+# les conteneurs, eux, sont sains.
 origine="$(docker compose exec -T api printenv SITE_ORIGINE || true)"
 code="$(curl --silent --output /dev/null --max-time 20 --write-out '%{http_code}' "$origine/" || true)"
-if [[ "$code" != "200" && "$code" != "401" ]]; then
+if [[ "$code" != "200" ]]; then
   echo "ATTENTION : $origine répond $code. Vérifie le proxy et le DNS." >&2
 fi
 

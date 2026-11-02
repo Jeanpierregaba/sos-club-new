@@ -18,8 +18,6 @@ services:
       ACME_EMAIL: ${ACME_EMAIL:?}
       DOMAINE_PROD: ${DOMAINE_PROD:?}
       DOMAINE_PREPROD: ${DOMAINE_PREPROD:?}
-      PREPROD_UTILISATEUR: ${PREPROD_UTILISATEUR:?}
-      PREPROD_MOT_DE_PASSE_HASH: ${PREPROD_MOT_DE_PASSE_HASH:?}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
