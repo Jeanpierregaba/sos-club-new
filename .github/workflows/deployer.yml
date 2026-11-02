@@ -1,0 +1,132 @@
+# develop déploie sur la preprod, main sur la prod. Pour revenir en arrière : lancer ce workflow à la main
+# avec une version déjà déployée. Inactif tant que la variable DEPLOIEMENT_ACTIF ne vaut pas « true ».
+# Les actions qui manipulent un jeton ou la clé SSH sont épinglées par SHA : Dependabot les tient à jour.
+name: Déploiement
+
+on:
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+    inputs:
+      environnement:
+        description: Environnement
+        required: true
+        type: choice
+        options: [preprod, prod]
+      version:
+        description: Commit à redéployer (SHA complet, ses images doivent exister)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  ENVIRONNEMENT: ${{ github.event_name == 'workflow_dispatch' && inputs.environnement || (github.ref_name == 'main' && 'prod' || 'preprod') }}
+
+jobs:
+  verifier:
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/ci.yml
+
+  images:
+    needs: verifier
+    if: github.event_name == 'push' && vars.DEPLOIEMENT_ACTIF == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        include:
+          - nom: site
+            contexte: .
+          - nom: api
+            contexte: backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ${{ matrix.contexte }}
+          push: true
+          # Change-le si le VPS n'est pas en x86 : linux/arm64.
+          platforms: linux/amd64
+          tags: ghcr.io/jeanpierregaba/sos-club-new/${{ matrix.nom }}:${{ github.sha }}
+          cache-from: type=gha,scope=${{ matrix.nom }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.nom }}
+
+  deployer:
+    needs: images
+    # Un retour en arrière ne reconstruit rien : verifier et images sont alors ignorés.
+    if: >-
+      !cancelled() && vars.DEPLOIEMENT_ACTIF == 'true' &&
+      (needs.images.result == 'success' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
+    # Un déploiement à la fois par environnement, qu'il vienne d'un push ou d'un retour arrière.
+    concurrency:
+      group: deploiement-${{ github.event_name == 'workflow_dispatch' && inputs.environnement || (github.ref_name == 'main' && 'prod' || 'preprod') }}
+      cancel-in-progress: false
+    env:
+      VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.sha }}
+      BRANCHE: ${{ github.event_name == 'workflow_dispatch' && (inputs.environnement == 'prod' && 'main' || 'develop') || github.ref_name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Vérifier la version demandée
+        id: version
+        run: |
+          [[ "$ENVIRONNEMENT" =~ ^(preprod|prod)$ ]] || { echo "::error::Environnement invalide"; exit 1; }
+          [[ "$VERSION" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::Version invalide : SHA complet attendu"; exit 1; }
+          git merge-base --is-ancestor "$VERSION" "origin/$BRANCHE" \
+            || { echo "::error::Ce commit n'appartient pas à la branche $BRANCHE"; exit 1; }
+          # Un push plus récent est passé entre-temps : il se déploiera lui-même, celui-ci ne doit pas l'écraser.
+          if [[ "${{ github.event_name }}" == "push" && "$(git rev-parse "origin/$BRANCHE")" != "$VERSION" ]]; then
+            echo "::notice::Version dépassée par un commit plus récent sur $BRANCHE : déploiement ignoré"
+            echo "depassee=true" >> "$GITHUB_OUTPUT"
+          fi
+          # Le fichier compose de la version déployée, mais les scripts actuels, avec leurs corrections.
+          git show "$VERSION:deploy/compose.yaml" > "$RUNNER_TEMP/compose.yaml"
+
+      - name: Préparer SSH
+        if: steps.version.outputs.depassee != 'true'
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_deploiement
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_deploiement ~/.ssh/known_hosts
+
+      - name: Déployer
+        if: steps.version.outputs.depassee != 'true'
+        env:
+          VPS_CIBLE: ${{ secrets.VPS_UTILISATEUR }}@${{ secrets.VPS_HOTE }}
+          VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+          JETON: ${{ github.token }}
+          MODE: ${{ github.event_name == 'workflow_dispatch' && '--retour-arriere' || '' }}
+        run: |
+          dossier="/opt/sosclub/$ENVIRONNEMENT"
+          options=(-i ~/.ssh/id_deploiement -o BatchMode=yes -o StrictHostKeyChecking=yes -o ServerAliveInterval=30)
+          scp -P "$VPS_PORT" "${options[@]}" "$RUNNER_TEMP/compose.yaml" deploy/deployer.sh deploy/sauvegarder.sh \
+            "$VPS_CIBLE:$dossier/"
+          # shellcheck disable=SC2029 # Les variables sont volontairement développées ici, avant l'envoi.
+          printf '%s' "$JETON" | ssh -p "$VPS_PORT" "${options[@]}" "$VPS_CIBLE" \
+            "chmod +x $dossier/deployer.sh $dossier/sauvegarder.sh && $dossier/deployer.sh $ENVIRONNEMENT $VERSION $MODE"
+
+      - name: Effacer la clé SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploiement

@@ -12,7 +12,8 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 Ordre : dépendances, puis valeur. Les questions Q renvoient à `docs/PRD.md`.
 
-- [ ] 002 — Préproduction en ligne : site, API, base, sauvegardes (bloqué par Q10)
+- [ ] 002 — Préproduction en ligne : fichiers de déploiement prêts (`deploy/`), reste à préparer le VPS et à vérifier le premier déploiement
+- [ ] Sauvegardes hors du VPS, chiffrées : choisir le service, avant toute donnée réelle
 - [ ] 003 — Enregistrement d'un club avec 3 encadreurs, validation par l'admin, régions et axes en base (Q1, Q2, Q5, Q6, Q16)
 - [ ] 004 — Inscription d'un élève, retrait par l'encadreur, réinitialisation du mot de passe, journal de points (Q7, Q8)
 - [ ] 005 — Passeport Santé et score du club (Q15)

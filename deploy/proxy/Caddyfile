@@ -1,0 +1,41 @@
+{
+	email {$ACME_EMAIL}
+}
+
+(securite) {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+}
+
+# L'API est servie sur le domaine du site (ADR-0006). /health et /docs restent inaccessibles depuis l'extérieur.
+(application) {
+	handle /api/* {
+		request_body {
+			max_size 20MB
+		}
+		reverse_proxy {args[0]}-api:8000
+	}
+	handle {
+		reverse_proxy {args[0]}-site:3000
+	}
+}
+
+{$DOMAINE_PROD} {
+	import securite
+	import application prod
+}
+
+{$DOMAINE_PREPROD} {
+	import securite
+	header X-Robots-Tag "noindex, nofollow"
+	basic_auth {
+		{$PREPROD_UTILISATEUR} {$PREPROD_MOT_DE_PASSE_HASH}
+	}
+	import application preprod
+}

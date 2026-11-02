@@ -1,0 +1,96 @@
+# Pile d'un environnement (preprod ou prod) sur le VPS, lancée par deployer.sh.
+# Les secrets sont dans le fichier d'environnement posé à côté de ce fichier : voir env.example.
+name: sosclub-${ENVIRONNEMENT:?preprod ou prod}
+
+x-journaux: &journaux
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: "5"
+
+x-durci: &durci
+  read_only: true
+  tmpfs:
+    - /tmp
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+
+x-base: &base
+  DATABASE_URL: postgresql+asyncpg://sosclub:${POSTGRES_PASSWORD:?}@db:5432/sosclub
+  SITE_ORIGINE: ${SITE_ORIGINE:?}
+
+services:
+  db:
+    # Ne pas changer la version majeure sans migrer les données : voir deploy/README.md.
+    image: postgres:18-alpine
+    restart: unless-stopped
+    <<: *journaux
+    environment:
+      POSTGRES_USER: sosclub
+      POSTGRES_DB: sosclub
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+    volumes:
+      # Depuis PostgreSQL 18, l'image attend le volume sur ce dossier et non plus sur .../data.
+      - pgdata:/var/lib/postgresql
+    networks:
+      - interne
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sosclub -d sosclub"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migrations:
+    image: ${IMAGE_PREFIX:-ghcr.io/jeanpierregaba/sos-club-new}/api:${IMAGE_TAG:-indefini}
+    profiles:
+      - migrations
+    <<: [*journaux, *durci]
+    command: ["alembic", "upgrade", "head"]
+    environment: *base
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - interne
+
+  api:
+    image: ${IMAGE_PREFIX:-ghcr.io/jeanpierregaba/sos-club-new}/api:${IMAGE_TAG:-indefini}
+    restart: unless-stopped
+    <<: [*journaux, *durci]
+    environment:
+      <<: *base
+      # Le port n'est pas publié : seul le proxy peut joindre ce conteneur, et il écrase X-Forwarded-For.
+      FORWARDED_ALLOW_IPS: "*"
+      WEB_CONCURRENCY: ${API_PROCESSUS:-2}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      interne:
+      web:
+        aliases:
+          - ${ENVIRONNEMENT}-api
+
+  site:
+    image: ${IMAGE_PREFIX:-ghcr.io/jeanpierregaba/sos-club-new}/site:${IMAGE_TAG:-indefini}
+    restart: unless-stopped
+    <<: [*journaux, *durci]
+    environment:
+      API_URL_INTERNE: http://${ENVIRONNEMENT}-api:8000
+    networks:
+      web:
+        aliases:
+          - ${ENVIRONNEMENT}-site
+
+volumes:
+  pgdata:
+
+networks:
+  interne:
+  # Réseau propre à l'environnement, partagé avec le proxy HTTPS seulement : la preprod ne peut pas joindre la prod.
+  web:
+    external: true
+    name: web-${ENVIRONNEMENT}

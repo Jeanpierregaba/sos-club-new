@@ -1,0 +1,9 @@
+# Liste blanche : rien n'entre dans l'image de l'API sans figurer ici, surtout pas un fichier de secrets.
+*
+!app
+!alembic
+!alembic.ini
+!pyproject.toml
+!uv.lock
+!.python-version
+**/__pycache__

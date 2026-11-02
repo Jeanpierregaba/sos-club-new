@@ -128,17 +128,16 @@ utilisateur. Sur les pages publiques, un élève apparaît en prénom, initiale 
 
 - **Local** : `docker-compose.yml` pour PostgreSQL, site sur le port 3000, API sur le port 8000 ;
   commandes dans `AGENTS.md`.
-- **Préproduction et production** : non décidées (Q9, Q10). Proposition : un serveur virtuel avec Docker
-  Compose et un proxy HTTPS qui sert le site et oriente `/api` vers l'API, sur la même origine (ADR-0006).
-  Coût faible et simple à reprendre ; en contrepartie, l'équipe gère elle-même les mises à
-  jour et les sauvegardes. Une plateforme gérée coûterait plus cher pour moins d'exploitation. Le choix
-  fera l'objet d'un ADR dans la spec 002, en intégrant l'avis de l'IPDCP si le serveur est hors du Togo.
-- **Migrations** : `alembic upgrade head` au déploiement, avant le démarrage de la nouvelle API.
-- **Retour arrière** : redéployer l'image précédente ; les migrations doivent rester compatibles avec
-  la version précédente.
-- **Sauvegardes** : `pg_dump` quotidien chiffré hors du serveur, et une restauration testée avant
-  l'ouverture.
-- **Secrets** : variables d'environnement propres à chaque environnement, jamais dans le dépôt.
+- **Préproduction et production** : un seul VPS, un projet Docker Compose et une base par environnement, derrière un
+  même proxy Caddy qui sert le site et oriente `/api` vers l'API (ADR-0006, ADR-0007). `develop` déploie la preprod,
+  `main` la prod. Procédure complète : `deploy/README.md`.
+- **Migrations** : `alembic upgrade head` au déploiement, après une sauvegarde, avant le démarrage de la nouvelle API.
+- **Retour arrière** : automatique si les nouveaux conteneurs ne démarrent pas, ou par le workflow lancé à la main
+  avec un SHA. Les migrations doivent rester compatibles avec la version précédente.
+- **Sauvegardes** : `pg_dump` quotidien, gardé 14 jours sur le VPS. La copie chiffrée hors du serveur reste à mettre en
+  place avant l'ouverture.
+- **Secrets** : un fichier par environnement sur le VPS, en droits `600`, jamais dans le dépôt. GitHub ne connaît que
+  l'accès SSH.
 
 ## Observabilité
 
@@ -155,6 +154,7 @@ utilisateur. Sur les pages publiques, un élève apparaît en prénom, initiale 
 - [ADR-0004](decisions/0004-journal-de-points-et-quiz-cote-serveur.md) — Journal de points immuable, quiz arbitré par le serveur (proposé)
 - [ADR-0005](decisions/0005-videos-youtube-et-fichiers-s3.md) — Vidéos sur YouTube, photos et PDF en stockage S3 (proposé)
 - [ADR-0006](decisions/0006-site-et-api-sur-la-meme-origine.md) — Site et API sur la même origine, API sous `/api`
+- [ADR-0007](decisions/0007-deploiement-vps-docker-compose.md) — VPS unique, Docker Compose, Caddy et images GHCR
 
 ## Points d'attention
 

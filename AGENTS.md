@@ -34,6 +34,7 @@ des points et des classements. Détail : `docs/PRD.md`.
 - `backend/app/<domaine>/` : l'API, avec `router.py`, `schemas.py`, `models.py`, `service.py`
 - `backend/alembic/` : les migrations ; `backend/tests/` : les tests de l'API
 - `docker-compose.yml` : la base PostgreSQL de développement
+- `deploy/` : le déploiement sur le VPS (voir `deploy/README.md`), `Dockerfile` et `backend/Dockerfile` : les images
 - `docs/cahier-des-charges.md` : le document source ; `docs/PRD.md` fait foi en cas d'écart
 
 ## Commandes
@@ -65,6 +66,10 @@ des points et des classements. Détail : `docs/PRD.md`.
   compréhensible, sans détail interne.
 - Dates stockées en UTC. Identifiants en UUID.
 - Toute évolution de la base passe par une migration Alembic.
+
+## Branches
+
+On travaille sur `develop`, qui déploie la preprod. `main` déploie la prod à chaque push : n'y fusionner qu'à la demande.
 
 ## Workflow de l'agent
 

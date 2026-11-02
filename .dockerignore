@@ -1,0 +1,10 @@
+# Liste blanche : rien n'entre dans l'image du site sans figurer ici, surtout pas un fichier de secrets.
+*
+!src
+!public
+!package.json
+!bun.lock
+!bunfig.toml
+!tsconfig.json
+!vite.config.ts
+!components.json

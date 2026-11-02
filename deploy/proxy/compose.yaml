@@ -1,0 +1,39 @@
+# Proxy HTTPS du VPS, partagé par la preprod et la prod. Lancé une seule fois, puis quand le Caddyfile change.
+name: sosclub-proxy
+
+services:
+  caddy:
+    image: caddy:2.11.7-alpine
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "5"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL:?}
+      DOMAINE_PROD: ${DOMAINE_PROD:?}
+      DOMAINE_PREPROD: ${DOMAINE_PREPROD:?}
+      PREPROD_UTILISATEUR: ${PREPROD_UTILISATEUR:?}
+      PREPROD_MOT_DE_PASSE_HASH: ${PREPROD_MOT_DE_PASSE_HASH:?}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - web-prod
+      - web-preprod
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  web-prod:
+    external: true
+  web-preprod:
+    external: true

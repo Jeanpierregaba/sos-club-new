@@ -22,3 +22,7 @@ npm run dev
 ### API et base de données
 
 Voir [backend/README.md](backend/README.md).
+
+## Déployer
+
+`develop` déploie la preprod et `main` la prod : voir [deploy/README.md](deploy/README.md).

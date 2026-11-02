@@ -9,7 +9,7 @@ par la spec indiquée.
 - [ ] Aucun secret dans le code ni dans l'historique git (scan gitleaks avant la mise en ligne, spec 002).
 - [ ] Aucun secret exposé au navigateur : les variables `VITE_*` ne contiennent que du public.
 - [ ] Clés différentes entre développement et production.
-- [ ] La production refuse de démarrer avec la `DATABASE_URL` de développement (spec 002).
+- [x] La production refuse de démarrer avec la `DATABASE_URL` de développement.
 
 ## Authentification et accès
 

@@ -1,15 +1,38 @@
 # Mises à jour automatiques des dépendances : https://docs.github.com/code-security/dependabot
+# Toutes les PR visent develop : une PR vers main partirait en production dès sa fusion.
 version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
+    target-branch: develop
     schedule:
       interval: weekly
   - package-ecosystem: bun
     directory: /
+    target-branch: develop
     schedule:
       interval: weekly
   - package-ecosystem: uv
     directory: /backend
+    target-branch: develop
     schedule:
       interval: weekly
+  - package-ecosystem: docker
+    directories:
+      - /
+      - /backend
+    target-branch: develop
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker-compose
+    directories:
+      - /deploy
+      - /deploy/proxy
+    target-branch: develop
+    schedule:
+      interval: weekly
+    ignore:
+      # Une nouvelle version majeure de PostgreSQL démarre sur une base vide : elle se migre à la main
+      # (voir deploy/README.md).
+      - dependency-name: postgres
+        update-types: ["version-update:semver-major"]

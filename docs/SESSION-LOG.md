@@ -14,6 +14,13 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-02 — Préparation du déploiement sur VPS
+
+- Fait : branche `develop` créée, tout poussé sur `develop` et `main` (`f07a23e`), première CI au vert. Images Docker, pile `deploy/`, workflow `deployer.yml`.
+- Pièges rencontrés : les secrets d'environnement GitHub ne sont pas disponibles sur un dépôt privé en Free, d'où des secrets au niveau du dépôt et un seul VPS.
+- Décisions : [ADR-0007](decisions/0007-deploiement-vps-docker-compose.md).
+- Prochaine étape : préparer le VPS en suivant `deploy/README.md`, puis vérifier le premier déploiement en preprod.
+
 ### 2026-11-02 — Spec 001 : connexion et rôles
 
 - Fait : API (`backend/app/comptes/`), page `/connexion`, page `/mon-espace`, en-tête de l'accueil, commande de création de compte. Rien n'est commité.

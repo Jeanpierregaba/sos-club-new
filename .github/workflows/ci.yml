@@ -1,9 +1,9 @@
 name: CI
 
+# Sur develop et main, cette vérification est lancée par le workflow de déploiement, avant les images.
 on:
-  push:
-    branches: [main]
   pull_request:
+  workflow_call:
 
 permissions:
   contents: read

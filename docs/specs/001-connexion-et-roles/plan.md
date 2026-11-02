@@ -171,8 +171,8 @@ Résultat du stress-test :
 - **Échecs par adresse** (mineur) : le seuil de 50 ne compte que les échecs confirmés et peut donc être
   légèrement dépassé pendant une rafale. Il reste une protection grossière, le seuil par compte est le vrai rempart.
 - **Adresse réseau derrière le proxy** (important) : sans configuration du proxy, tous les utilisateurs
-  partageraient une seule adresse, et le seuil de 50 bloquerait tout le monde. À traiter dans la spec 002
-  avec `--forwarded-allow-ips` d'uvicorn. Un test le vérifiera alors.
+  partageraient une seule adresse, et le seuil de 50 bloquerait tout le monde. Traité avec
+  `FORWARDED_ALLOW_IPS` dans `deploy/compose.yaml`, et vérifié derrière Caddy : un en-tête falsifié est ignoré.
 - **Mémoire d'Argon2** (important) : 40 élèves simultanés et 4 hachages à la fois donnent une attente de
   quelques secondes, à mesurer sur le serveur retenu.
 - **Mise en production** (important) : l'API ne répond sous `/api` que derrière le proxy. Le build Node seul

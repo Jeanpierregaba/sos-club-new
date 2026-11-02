@@ -28,7 +28,7 @@ ne doit JAMAIS enfreindre, quelle que soit la demande. Les règles déjà impos�
 ## Git
 
 - Ne jamais réécrire l'historique partagé (`push --force`, `reset --hard` sur une branche poussée). [bloqué]
-- Ne jamais committer directement sur la branche principale une fois le projet en production.
+- Ne jamais committer directement sur `main` : tout passe par `develop` (un push sur `main` déploie en production).
 
 ## Spécifiques au projet
 
