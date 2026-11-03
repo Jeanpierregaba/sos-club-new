@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Quote, UserRound } from "lucide-react";
+import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import mascotte from "@/assets/mascotte-leadership.webp";
 
 // Emplacements à remplacer par de vrais témoignages, avec l'accord de leurs auteurs.
@@ -32,27 +32,6 @@ export function TemoignagesSection() {
             Découvre ce que les Clubs Santé ont changé pour celles et ceux qui les font vivre au
             quotidien.
           </p>
-          <div className="mt-6 grid gap-3">
-            {temoignages.map((p, i) => (
-              <button
-                key={i}
-                type="button"
-                aria-pressed={i === actif}
-                onClick={() => setActif(i)}
-                className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition duration-300 active:scale-[0.98] ${i === actif ? "border-primary bg-card shadow-card" : "border-transparent hover:translate-x-1 hover:bg-card"}`}
-              >
-                <span
-                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition duration-300 ${i === actif ? "bg-primary text-primary-foreground" : "bg-mist text-logo-blue"}`}
-                >
-                  <UserRound className="h-5 w-5" />
-                </span>
-                <span className="min-w-0">
-                  <span className="block font-extrabold leading-tight">{p.nom}</span>
-                  <span className="block text-xs font-medium text-muted-foreground">{p.role}</span>
-                </span>
-              </button>
-            ))}
-          </div>
         </div>
 
         <figure

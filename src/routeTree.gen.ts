@@ -17,10 +17,12 @@ import { Route as CarteDesClubsRouteImport } from './routes/carte-des-clubs'
 import { Route as CertificationRouteImport } from './routes/certification'
 import { Route as ClubSanteRouteImport } from './routes/club-sante'
 import { Route as ConnexionRouteImport } from './routes/connexion'
+import { Route as GalerieRouteImport } from './routes/galerie'
 import { Route as JeuxRouteImport } from './routes/jeux'
 import { Route as Les7AxesRouteImport } from './routes/les-7-axes'
 import { Route as MagazineRouteImport } from './routes/magazine'
 import { Route as ConnecteMonEspaceRouteImport } from './routes/_connecte/mon-espace'
+import { Route as GenieImhotepDescriptionRouteImport } from './routes/genie-imhotep/description'
 import { Route as GenieImhotepHallOfFameRouteImport } from './routes/genie-imhotep/hall-of-fame'
 import { Route as GenieImhotepInscriptionRouteImport } from './routes/genie-imhotep/inscription'
 
@@ -63,6 +65,11 @@ const ConnexionRoute = ConnexionRouteImport.update({
   path: '/connexion',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GalerieRoute = GalerieRouteImport.update({
+  id: '/galerie',
+  path: '/galerie',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JeuxRoute = JeuxRouteImport.update({
   id: '/jeux',
   path: '/jeux',
@@ -83,6 +90,11 @@ const ConnecteMonEspaceRoute = ConnecteMonEspaceRouteImport.update({
   path: '/mon-espace',
   getParentRoute: () => ConnecteRoute,
 } as any)
+const GenieImhotepDescriptionRoute = GenieImhotepDescriptionRouteImport.update({
+  id: '/genie-imhotep/description',
+  path: '/genie-imhotep/description',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GenieImhotepHallOfFameRoute = GenieImhotepHallOfFameRouteImport.update({
   id: '/genie-imhotep/hall-of-fame',
   path: '/genie-imhotep/hall-of-fame',
@@ -102,10 +114,12 @@ export interface FileRoutesByFullPath {
   '/certification': typeof CertificationRoute
   '/club-sante': typeof ClubSanteRoute
   '/connexion': typeof ConnexionRoute
+  '/galerie': typeof GalerieRoute
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
   '/mon-espace': typeof ConnecteMonEspaceRoute
+  '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
 }
@@ -117,10 +131,12 @@ export interface FileRoutesByTo {
   '/certification': typeof CertificationRoute
   '/club-sante': typeof ClubSanteRoute
   '/connexion': typeof ConnexionRoute
+  '/galerie': typeof GalerieRoute
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
   '/mon-espace': typeof ConnecteMonEspaceRoute
+  '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
 }
@@ -134,10 +150,12 @@ export interface FileRoutesById {
   '/certification': typeof CertificationRoute
   '/club-sante': typeof ClubSanteRoute
   '/connexion': typeof ConnexionRoute
+  '/galerie': typeof GalerieRoute
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
   '/_connecte/mon-espace': typeof ConnecteMonEspaceRoute
+  '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
 }
@@ -151,10 +169,12 @@ export interface FileRouteTypes {
     | '/certification'
     | '/club-sante'
     | '/connexion'
+    | '/galerie'
     | '/jeux'
     | '/les-7-axes'
     | '/magazine'
     | '/mon-espace'
+    | '/genie-imhotep/description'
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/inscription'
   fileRoutesByTo: FileRoutesByTo
@@ -166,10 +186,12 @@ export interface FileRouteTypes {
     | '/certification'
     | '/club-sante'
     | '/connexion'
+    | '/galerie'
     | '/jeux'
     | '/les-7-axes'
     | '/magazine'
     | '/mon-espace'
+    | '/genie-imhotep/description'
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/inscription'
   id:
@@ -182,10 +204,12 @@ export interface FileRouteTypes {
     | '/certification'
     | '/club-sante'
     | '/connexion'
+    | '/galerie'
     | '/jeux'
     | '/les-7-axes'
     | '/magazine'
     | '/_connecte/mon-espace'
+    | '/genie-imhotep/description'
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/inscription'
   fileRoutesById: FileRoutesById
@@ -199,9 +223,11 @@ export interface RootRouteChildren {
   CertificationRoute: typeof CertificationRoute
   ClubSanteRoute: typeof ClubSanteRoute
   ConnexionRoute: typeof ConnexionRoute
+  GalerieRoute: typeof GalerieRoute
   JeuxRoute: typeof JeuxRoute
   Les7AxesRoute: typeof Les7AxesRoute
   MagazineRoute: typeof MagazineRoute
+  GenieImhotepDescriptionRoute: typeof GenieImhotepDescriptionRoute
   GenieImhotepHallOfFameRoute: typeof GenieImhotepHallOfFameRoute
   GenieImhotepInscriptionRoute: typeof GenieImhotepInscriptionRoute
 }
@@ -264,6 +290,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnexionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/galerie': {
+      id: '/galerie'
+      path: '/galerie'
+      fullPath: '/galerie'
+      preLoaderRoute: typeof GalerieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/jeux': {
       id: '/jeux'
       path: '/jeux'
@@ -291,6 +324,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/mon-espace'
       preLoaderRoute: typeof ConnecteMonEspaceRouteImport
       parentRoute: typeof ConnecteRoute
+    }
+    '/genie-imhotep/description': {
+      id: '/genie-imhotep/description'
+      path: '/genie-imhotep/description'
+      fullPath: '/genie-imhotep/description'
+      preLoaderRoute: typeof GenieImhotepDescriptionRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/genie-imhotep/hall-of-fame': {
       id: '/genie-imhotep/hall-of-fame'
@@ -330,9 +370,11 @@ const rootRouteChildren: RootRouteChildren = {
   CertificationRoute: CertificationRoute,
   ClubSanteRoute: ClubSanteRoute,
   ConnexionRoute: ConnexionRoute,
+  GalerieRoute: GalerieRoute,
   JeuxRoute: JeuxRoute,
   Les7AxesRoute: Les7AxesRoute,
   MagazineRoute: MagazineRoute,
+  GenieImhotepDescriptionRoute: GenieImhotepDescriptionRoute,
   GenieImhotepHallOfFameRoute: GenieImhotepHallOfFameRoute,
   GenieImhotepInscriptionRoute: GenieImhotepInscriptionRoute,
 }

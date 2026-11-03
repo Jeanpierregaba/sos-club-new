@@ -12,11 +12,10 @@ import {
 } from "lucide-react";
 import { retard } from "@/components/SiteMotion";
 import { TikTokIcon } from "@/components/TikTokIcon";
-import logo from "@/assets/logo.webp";
 
 const SITE = "https://www.sos-docteur.tv";
 
-// Facebook, YouTube et LinkedIn : adresses à renseigner, elles pointent vers « # » en attendant.
+// Facebook et LinkedIn : adresses reprises du site de référence. YouTube : adresse de la chaîne à renseigner, elle pointe vers « # » en attendant.
 const medias = [
   {
     i: TikTokIcon,
@@ -32,9 +31,21 @@ const medias = [
     href: "https://www.instagram.com/clubsantesosdocteurtv",
     c: "text-rose",
   },
-  { i: Facebook, t: "Facebook", d: "Clubs Santé SOS DOCTEUR TV", href: "#", c: "text-sky" },
-  { i: Youtube, t: "YouTube TV", d: "SOS DOCTEUR TV", href: "#", c: "text-logo-red" },
-  { i: Linkedin, t: "LinkedIn", d: "Club Santé Docteur SOS TV", href: "#", c: "text-logo-blue" },
+  {
+    i: Facebook,
+    t: "Facebook",
+    d: "Clubs Santé SOS DOCTEUR TV",
+    href: "https://web.facebook.com/profile.php?id=61591819257886",
+    c: "text-sky",
+  },
+  { i: Youtube, t: "YouTube TV", d: "@ClubSantéSOSDocteurTV", href: "#", c: "text-logo-red" },
+  {
+    i: Linkedin,
+    t: "LinkedIn",
+    d: "Club Santé Docteur SOS TV",
+    href: "https://www.linkedin.com/company/club-sant%C3%A9-docteur-sos-tv/about/",
+    c: "text-logo-blue",
+  },
   { i: Tv, t: "SOS Docteur TV", d: "www.sos-docteur.tv", href: SITE, c: "text-logo-red" },
 ];
 
@@ -52,9 +63,40 @@ export function SiteFooter() {
   return (
     <footer className="bg-night pt-16 text-primary-foreground">
       <div className="mx-auto max-w-7xl px-5">
+        <div>
+          <div data-reveal className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl uppercase text-primary md:text-4xl">Nos médias officiels</h2>
+            <p className="mt-2 text-white/70">
+              Suis les reportages, émissions télévisées et activités des Clubs Santé et de SOS
+              DOCTEUR TV.
+            </p>
+          </div>
+          <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {medias.map((m, n) => (
+              <li key={m.t} data-reveal="zoom" style={retard(n)}>
+                <a
+                  href={m.href}
+                  {...externe(m.href)}
+                  className="card-fx group flex h-full flex-col items-center rounded-2xl border border-white/10 bg-white/5 p-4 text-center hover:border-white/30 hover:bg-white/10"
+                >
+                  <span
+                    className={`${m.c} flex h-12 w-12 items-center justify-center rounded-full bg-white transition duration-300 group-hover:-rotate-6 group-hover:scale-110`}
+                  >
+                    <m.i className="h-6 w-6" />
+                  </span>
+                  <span className="mt-3 font-extrabold leading-tight">{m.t}</span>
+                  <span className="mt-1 max-w-full break-words text-[11px] text-white/70 sm:text-xs">
+                    {m.d}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <div
           data-reveal
-          className="grid items-center gap-6 rounded-[2rem] border border-white/15 bg-white/5 p-6 md:p-10 lg:grid-cols-2 lg:gap-12"
+          className="mt-14 grid items-center gap-6 rounded-[2rem] border border-white/15 bg-white/5 p-6 md:p-10 lg:grid-cols-2 lg:gap-12"
         >
           <div>
             <h2 className="text-3xl uppercase text-primary md:text-4xl">Newsletter</h2>
@@ -91,49 +133,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-14">
-          <div data-reveal className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl uppercase text-primary md:text-4xl">Nos médias officiels</h2>
-            <p className="mt-2 text-white/70">
-              Suis les reportages, émissions télévisées et activités des Clubs Santé et de SOS
-              DOCTEUR TV.
-            </p>
-          </div>
-          <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {medias.map((m, n) => (
-              <li key={m.t} data-reveal="zoom" style={retard(n)}>
-                <a
-                  href={m.href}
-                  {...externe(m.href)}
-                  className="card-fx group flex h-full flex-col items-center rounded-2xl border border-white/10 bg-white/5 p-4 text-center hover:border-white/30 hover:bg-white/10"
-                >
-                  <span
-                    className={`${m.c} flex h-12 w-12 items-center justify-center rounded-full bg-white transition duration-300 group-hover:-rotate-6 group-hover:scale-110`}
-                  >
-                    <m.i className="h-6 w-6" />
-                  </span>
-                  <span className="mt-3 font-extrabold leading-tight">{m.t}</span>
-                  <span className="mt-1 max-w-full break-words text-[11px] text-white/70 sm:text-xs">
-                    {m.d}
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="mt-14 flex flex-wrap items-center justify-between gap-6 border-t border-white/10 py-8">
-          {/* Le logo bleu foncé disparaîtrait sur le fond nuit : il garde sa plaque blanche. */}
-          <a href="/" className="btn-fx rounded-xl bg-white px-3 py-2">
-            <img
-              src={logo}
-              alt="Club Santé SOS Docteur TV"
-              width={1014}
-              height={195}
-              loading="lazy"
-              className="h-8 w-auto"
-            />
-          </a>
+        <div className="mt-14 border-t border-white/10 py-8">
           <div className="min-w-0">
             <h2 className="text-lg uppercase tracking-wide text-primary">AIMES-AFRIQUE</h2>
             <ul className="mt-2 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/70">

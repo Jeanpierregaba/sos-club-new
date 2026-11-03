@@ -21,13 +21,14 @@ const menu: { t: string; items: { t: string; href: string }[] }[] = [
       { t: "Les 7 axes", href: "/les-7-axes" },
       { t: "Carte des clubs", href: "/carte-des-clubs" },
       { t: "Bibliothèque", href: "/bibliotheque" },
+      { t: "Galerie", href: "/galerie" },
     ],
   },
   {
     t: "Génie Imhotep",
     items: [
       { t: "Hall of Fame", href: "/genie-imhotep/hall-of-fame" },
-      { t: "Inscription", href: "/genie-imhotep/inscription" },
+      { t: "Description", href: "/genie-imhotep/description" },
     ],
   },
   {

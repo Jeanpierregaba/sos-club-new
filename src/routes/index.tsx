@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
-  Play,
   ChevronLeft,
   ChevronRight,
   Earth,
@@ -17,6 +16,8 @@ import {
   MapPinned,
   SearchCheck,
   Landmark,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { ClubsSection } from "@/components/ClubsSection";
 import { AgendaSidebar } from "@/components/AgendaSidebar";
@@ -196,7 +197,7 @@ const chiffresCles = [
   },
   {
     plus: false,
-    n: 18,
+    n: 19,
     t: "Inspections pédagogiques",
     i: SearchCheck,
     place: "",
@@ -288,6 +289,7 @@ const stars = [
 const heroSlides = [
   {
     img: slideMascottes,
+    video: "0eflxy2KLRQ",
     onglet: "Mascottes",
     fond: "from-logo-blue to-grape",
     accent: "bg-sun",
@@ -531,7 +533,10 @@ function CarteAxe({ u, i }: { u: (typeof univers)[number]; i: number }) {
             height={2000}
             className="absolute inset-x-0 bottom-0 mx-auto h-[94%] w-auto object-contain object-bottom"
           />
-          {/* Seul indice au recto, sans texte : la carte se retourne. */}
+          <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 font-display text-sm uppercase text-ink shadow-card">
+            Axe {i + 1}
+          </span>
+          {/* Indice au recto : la carte se retourne. */}
           <span className="absolute bottom-3 right-3 rounded-full bg-white/25 p-2 backdrop-blur-sm">
             <RotateCw className="h-5 w-5" />
           </span>
@@ -670,7 +675,7 @@ function ActualitesSection() {
       </div>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+        <div className="min-w-0 lg:col-span-2">
           <div data-reveal className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
             <h3 className="text-3xl">
               <span className="text-logo-blue">C'est toi</span>{" "}
@@ -685,9 +690,10 @@ function ActualitesSection() {
             </a>
           </div>
 
+          {/* À la une : la photo occupe toute la carte ; le texte est posé sur un verre bleu, assez opaque pour rester lisible sur n'importe quelle zone de la photo. */}
           <article
             data-reveal="zoom"
-            className="group relative isolate mt-5 flex min-h-[28rem] items-end overflow-hidden rounded-[2rem] shadow-card md:aspect-video md:min-h-0"
+            className="group relative isolate mt-5 flex min-h-[30rem] items-end overflow-hidden rounded-[2rem] shadow-card md:aspect-video md:min-h-0"
           >
             <img
               src={aLaUne.img}
@@ -695,65 +701,66 @@ function ActualitesSection() {
               loading="lazy"
               width={2000}
               height={963}
-              className="absolute inset-0 -z-20 size-full object-cover transition duration-1000 group-hover:scale-105"
+              className="absolute inset-0 -z-10 size-full object-cover transition duration-1000 group-hover:scale-105"
             />
-            <div className="absolute inset-0 -z-10 bg-linear-to-t from-night from-15% via-night/50 to-transparent" />
             <span className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-sun px-3 py-1.5 text-xs font-extrabold uppercase text-ink shadow-card">
               <Sparkles className="size-3.5" /> À la une
             </span>
-            <div className="p-6 text-white md:p-9">
-              <span className="rounded-full border border-white/40 bg-white/10 px-3 py-1 text-xs font-extrabold uppercase backdrop-blur">
+            <div className="relative m-3 max-w-lg overflow-hidden rounded-[1.5rem] border border-white/30 bg-logo-blue/80 p-5 text-white shadow-[0_20px_50px_-12px] shadow-night/50 backdrop-blur-xl backdrop-saturate-150 md:m-5 md:p-7">
+              <div
+                aria-hidden
+                className="absolute inset-x-0 top-0 -z-10 h-1/2 bg-linear-to-b from-white/15 to-transparent"
+              />
+              <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-extrabold uppercase text-sun ring-1 ring-white/25">
                 {aLaUne.tag}
               </span>
-              <h4 className="mt-4 max-w-xl font-display text-3xl leading-tight md:text-4xl">
-                {aLaUne.t}
-              </h4>
-              <p className="mt-2 max-w-lg font-medium text-white/80">{aLaUne.d}</p>
+              <h4 className="mt-3 font-display text-2xl leading-tight md:text-3xl">{aLaUne.t}</h4>
+              <p className="mt-2 font-medium text-white/90">{aLaUne.d}</p>
               <a
                 href="/magazine"
-                className="btn-fx mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-[15px] font-bold after:absolute after:inset-0"
+                className="btn-fx mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-[15px] font-bold text-primary-foreground after:absolute after:inset-0"
               >
                 Lire l'article <ArrowRight className="size-4" />
               </a>
             </div>
           </article>
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-3 md:gap-5">
-            {stars.map((s, i) => (
-              <article
-                key={s.t}
-                data-reveal
-                style={retard(i)}
-                className="card-fx group relative flex gap-4 rounded-3xl bg-card p-2.5 shadow-card sm:flex-col sm:gap-0"
-              >
-                <div className="relative w-28 shrink-0 overflow-hidden rounded-2xl sm:w-auto">
+          {/* Carrousel continu : la liste est doublée pour boucler sans saut, et s'arrête au survol.
+              Chaque article est une photo pleine, son titre posé sur un bandeau de verre blanc. */}
+          <div className="group/defile mt-5 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+            <ul className="flex w-max gap-4 py-2 motion-safe:animate-marquee group-hover/defile:[animation-play-state:paused] md:gap-5">
+              {[...stars, ...stars].map((s, i) => (
+                <li
+                  key={i}
+                  aria-hidden={i >= stars.length}
+                  className="card-fx group relative isolate flex aspect-[4/5] w-60 shrink-0 items-end overflow-hidden rounded-3xl shadow-card sm:w-64"
+                >
                   <img
                     src={s.img}
                     alt=""
                     loading="lazy"
-                    className="aspect-square w-full object-cover object-right transition duration-500 group-hover:scale-110 sm:aspect-[4/3]"
+                    className="absolute inset-0 -z-10 size-full object-cover object-right transition duration-500 group-hover:scale-110"
                   />
-                  <span className="absolute bottom-2 right-2 rounded-full bg-primary p-2 text-primary-foreground transition duration-300 group-hover:scale-110">
-                    <Play className="size-3.5 fill-current" />
-                  </span>
-                </div>
-                <div className="flex flex-1 flex-col py-1 pr-2 sm:p-3 sm:pt-4">
-                  <span
-                    className={`${s.tc} self-start rounded-full px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-primary-foreground`}
-                  >
-                    {s.tag}
-                  </span>
-                  <h4 className="mt-2 font-sans font-extrabold leading-snug">
-                    <a href="/magazine" className="after:absolute after:inset-0">
-                      {s.t}
-                    </a>
-                  </h4>
-                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground max-sm:hidden">
-                    {s.d}
-                  </p>
-                </div>
-              </article>
-            ))}
+                  <div className="m-2.5 w-full rounded-2xl border border-white/60 bg-white/80 p-3.5 shadow-card backdrop-blur-lg backdrop-saturate-150">
+                    <span
+                      className={`${s.tc} rounded-full px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-primary-foreground`}
+                    >
+                      {s.tag}
+                    </span>
+                    <h4 className="mt-2 font-sans font-extrabold leading-snug text-ink">
+                      <a
+                        href="/magazine"
+                        tabIndex={i >= stars.length ? -1 : undefined}
+                        className="after:absolute after:inset-0"
+                      >
+                        {s.t}
+                      </a>
+                    </h4>
+                    <p className="mt-1 line-clamp-2 text-sm font-medium text-ink/70">{s.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
@@ -763,52 +770,35 @@ function ActualitesSection() {
   );
 }
 
-// Carte du jeu concours, à cheval sur le bas du hero : le liseré blanc la détache du fond coloré.
+// Carte du jeu concours, à cheval sur le bas du hero : remontée de la moitié de sa propre hauteur, quelle que soit la largeur.
+// La marge négative du bas rend une partie de la place libérée ; le liseré blanc la détache du fond coloré.
 function JeuConcours() {
   return (
-    <section className="mx-auto -mt-6 max-w-7xl px-5">
+    <section className="relative z-10 mx-auto -mb-28 max-w-6xl -translate-y-1/2 px-5 sm:-mb-24 sm:px-8">
       <div
         data-reveal
-        className="relative isolate overflow-hidden rounded-3xl bg-linear-to-br from-logo-blue via-logo-blue to-night p-5 text-white sm:p-6 shadow-card ring-4 ring-white md:p-10"
+        className="relative isolate grid items-center gap-6 overflow-hidden rounded-3xl bg-logo-red p-5 text-white shadow-card ring-4 ring-white sm:p-6 md:p-10 lg:grid-cols-[1fr_auto] lg:gap-10"
       >
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -right-24 -top-24 size-80 rounded-full bg-sun/25 blur-3xl" />
-          <div className="absolute -bottom-32 left-1/3 size-80 rounded-full bg-primary/25 blur-3xl" />
-          <div className="absolute inset-0 bg-[radial-gradient(oklch(1_0_0/0.1)_1.5px,transparent_1.5px)] bg-size-[22px_22px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-          <Trophy className="absolute -bottom-10 -right-6 size-72 -rotate-12 text-white/5 md:size-96" />
-        </div>
+        <Trophy
+          aria-hidden
+          className="pointer-events-none absolute -bottom-10 -right-6 -z-10 size-72 -rotate-12 text-white/10 md:size-96"
+        />
 
-        <h2 className="text-[1.75rem] uppercase leading-[1.05] min-[400px]:text-4xl md:text-6xl">
-          Obtiens ta <span className="text-primary">certification</span> & gagne jusqu'à{" "}
-          <span className="mt-2 inline-block -rotate-2 whitespace-nowrap rounded-2xl bg-linear-to-r from-sun to-tangerine px-3 py-1 text-ink sm:px-4 shadow-[0_12px_30px_-8px] shadow-tangerine/70">
+        <h2 className="text-[1.75rem] uppercase leading-[1.05] min-[400px]:text-4xl xl:text-5xl">
+          Obtiens ta <span className="text-sun">certification</span> & gagne jusqu'à{" "}
+          <span className="mt-2 inline-block -rotate-2 whitespace-nowrap rounded-2xl bg-sun px-3 py-1 text-ink shadow-[0_12px_30px_-8px] shadow-black/40 sm:px-4">
             1 million FCFA !
           </span>
         </h2>
 
-        <div className="mt-8 grid items-center gap-6 lg:grid-cols-[1.3fr_1fr]">
-          <div>
-            <p className="text-lg font-bold md:text-xl">
-              Inscription 100 % gratuite, ouverte à tous les élèves des Clubs Santé ainsi qu'aux
-              visiteurs et particuliers du Togo.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-end">
-            <a
-              href="/certification"
-              className="btn-fx group flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-primary px-4 text-sm font-bold text-primary-foreground shadow-card sm:px-6 sm:text-[15px] lg:w-88"
-            >
-              <Trophy className="hidden h-5 w-5 sm:block" />
-              Obtenir ma certification & jouer
-              <ArrowRight className="hidden h-4 w-4 transition-transform group-hover:translate-x-1 sm:block" />
-            </a>
-            <a
-              href="/jeux"
-              className="btn-fx flex h-12 items-center justify-center rounded-full border-2 border-white/60 bg-white/10 px-6 lg:w-88 text-[15px] font-bold backdrop-blur-sm"
-            >
-              S'inscrire aux quiz
-            </a>
-          </div>
-        </div>
+        <a
+          href="/certification"
+          className="btn-fx group flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground shadow-card sm:text-[15px] lg:h-14 lg:px-8"
+        >
+          <Trophy className="hidden h-5 w-5 sm:block" />
+          Obtenir ma certification & jouer
+          <ArrowRight className="hidden h-4 w-4 transition-transform group-hover:translate-x-1 sm:block" />
+        </a>
       </div>
     </section>
   );
@@ -816,14 +806,28 @@ function JeuConcours() {
 
 function Index() {
   const [active, setActive] = useState(0);
+  const [son, setSon] = useState(false);
+  const lecteur = useRef<HTMLIFrameElement>(null);
   const count = heroSlides.length;
-  const next = () => setActive((a) => (a + 1) % count);
-  const prev = () => setActive((a) => (a - 1 + count) % count);
 
   useEffect(() => {
+    if (son) return;
     const t = setInterval(() => setActive((a) => (a + 1) % count), 6000);
     return () => clearInterval(t);
-  }, [active, count]);
+  }, [active, count, son]);
+
+  // Le lecteur YouTube se pilote par messages (API IFrame) : la vidéo démarre muette, le bouton coupe ou rétablit le son.
+  const basculerSon = () => {
+    lecteur.current?.contentWindow?.postMessage(
+      JSON.stringify({ event: "command", func: son ? "mute" : "unMute", args: [] }),
+      "https://www.youtube-nocookie.com",
+    );
+    setSon(!son);
+  };
+  const changer = (i: number) => {
+    if (son) basculerSon();
+    setActive(i);
+  };
 
   return (
     <div className="min-h-screen overflow-x-clip bg-carnet text-ink">
@@ -846,7 +850,7 @@ function Index() {
           <div className="absolute -bottom-32 -left-24 size-[22rem] rounded-full bg-white/5" />
         </div>
 
-        <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-5 pb-24 pt-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-16 xl:px-16 xl:pb-20">
+        <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-5 pb-52 pt-8 sm:pb-48 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-16 xl:px-16 xl:pb-36">
           {/* Toutes les slides partagent la même cellule : la hauteur reste celle de la plus longue. */}
           <div className="grid">
             {heroSlides.map((s, i) => {
@@ -914,6 +918,33 @@ function Index() {
                   className={`absolute inset-0 h-full w-full object-cover ${s.cadrage} ${i === active ? "z-10 scale-105 opacity-100 [transition:opacity_700ms_ease-in-out,scale_7000ms_linear]" : "scale-100 opacity-0 [transition:opacity_500ms_ease-in-out_300ms,scale_0s_linear_800ms]"}`}
                 />
               ))}
+              {/* La vidéo couvre le cadre comme une photo : en 16/9 sur toute la hauteur, ses côtés sont rognés, et le zoom masque le titre et les sous-titres de YouTube. */}
+              {heroSlides.map(
+                (s, i) =>
+                  s.video && (
+                    <iframe
+                      key={s.video}
+                      ref={lecteur}
+                      src={`https://www.youtube-nocookie.com/embed/${s.video}?autoplay=1&mute=1&loop=1&playlist=${s.video}&controls=0&rel=0&playsinline=1&modestbranding=1&cc_load_policy=0&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1`}
+                      title="Vidéo de présentation des Clubs Santé SOS Docteur TV"
+                      allow="autoplay; encrypted-media; picture-in-picture"
+                      tabIndex={-1}
+                      aria-hidden={i !== active}
+                      className={`pointer-events-none absolute left-1/2 top-1/2 aspect-video h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.35] transition-opacity duration-700 ${i === active ? "z-20 opacity-100" : "opacity-0"}`}
+                    />
+                  ),
+              )}
+              {heroSlides[active]?.video && (
+                <button
+                  type="button"
+                  onClick={basculerSon}
+                  aria-pressed={son}
+                  className="absolute bottom-4 right-4 z-30 inline-flex items-center gap-2 rounded-full bg-night/70 px-4 py-2 text-sm font-bold backdrop-blur-sm transition hover:bg-night"
+                >
+                  {son ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
+                  {son ? "Couper le son" : "Activer le son"}
+                </button>
+              )}
             </div>
             {heroSlides.map((s, i) => (
               <img
@@ -929,18 +960,18 @@ function Index() {
           </div>
         </div>
 
-        {/* Flèches centrées sur les bords à partir de 1280 px ; en dessous, la marge latérale est trop étroite et elles passent en bas. */}
+        {/* Flèches centrées sur les bords à partir de 1280 px ; en dessous, elles passent en bas, au-dessus du bandeau de certification qui chevauche le hero. */}
         <button
           aria-label="Diapositive précédente"
-          onClick={prev}
-          className="absolute bottom-10 left-5 z-10 flex size-10 items-center justify-center rounded-full border-2 border-white/40 bg-white/10 backdrop-blur-sm transition hover:scale-110 hover:bg-white hover:text-ink active:scale-95 xl:bottom-auto xl:left-4 xl:top-1/2 xl:-translate-y-1/2"
+          onClick={() => changer((active - 1 + count) % count)}
+          className="absolute bottom-36 left-5 z-10 sm:bottom-32 flex size-10 items-center justify-center rounded-full border-2 border-white/40 bg-white/10 backdrop-blur-sm transition hover:scale-110 hover:bg-white hover:text-ink active:scale-95 xl:bottom-auto xl:left-4 xl:top-1/2 xl:-translate-y-1/2"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
         <button
           aria-label="Diapositive suivante"
-          onClick={next}
-          className="absolute bottom-10 right-5 z-10 flex size-10 items-center justify-center rounded-full border-2 border-white/40 bg-white/10 backdrop-blur-sm transition hover:scale-110 hover:bg-white hover:text-ink active:scale-95 xl:bottom-auto xl:right-4 xl:top-1/2 xl:-translate-y-1/2"
+          onClick={() => changer((active + 1) % count)}
+          className="absolute bottom-36 right-5 z-10 sm:bottom-32 flex size-10 items-center justify-center rounded-full border-2 border-white/40 bg-white/10 backdrop-blur-sm transition hover:scale-110 hover:bg-white hover:text-ink active:scale-95 xl:bottom-auto xl:right-4 xl:top-1/2 xl:-translate-y-1/2"
         >
           <ChevronRight className="h-5 w-5" />
         </button>
@@ -980,14 +1011,12 @@ function Index() {
 
       <ClubsSection />
       <ActualitesSection />
-
-      <DefiDuJour />
-
-      <PartenairesSection />
-      <GalerieSection />
-      <InitiateurSection />
       <CampagnesSection />
+      <DefiDuJour />
+      <GalerieSection />
+      <PartenairesSection />
       <TemoignagesSection />
+      <InitiateurSection />
 
       <SiteFooter />
     </div>

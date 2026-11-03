@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion } from "@/components/SiteMotion";
 import { dres, grandLome, type Dre } from "@/lib/togo-dre";
 import { etablissements, type TypeEtablissement } from "@/lib/etablissements";
+import mascottesEquipe from "@/assets/mascottes-equipe.webp";
 
 export const Route = createFileRoute("/carte-des-clubs")({
   head: () => ({
@@ -73,6 +74,10 @@ function CarteDesClubs() {
     setRecherche("");
   };
 
+  // Amène sous les yeux la colonne où s'affichent la région choisie ou les résultats d'une recherche lancée dans la bannière.
+  const montrerExplorateur = () =>
+    document.getElementById("explorateur")?.scrollIntoView({ behavior: "smooth" });
+
   const liste = etablissements[iesg] ?? [];
   const filtres = (Object.keys(types) as TypeEtablissement[])
     .map((t) => ({ t, n: liste.filter((e) => e.type === t).length }))
@@ -91,67 +96,96 @@ function CarteDesClubs() {
       <SiteMotion />
       <SiteHeader />
 
-      {/* En-tête : le titre, trois chiffres et la recherche, sans décor. */}
-      <section className="mx-auto max-w-7xl px-5 pb-10 pt-8 md:pt-12">
-        <FilAriane rubrique="Vie du club" page="Carte des clubs" />
-
-        <div className="mt-10 grid items-end gap-10 lg:grid-cols-[1.25fr_1fr]">
-          <div data-reveal>
-            <p className="flex items-center gap-3 text-sm font-extrabold uppercase tracking-widest text-logo-red">
-              <span className="h-1 w-8 rounded-full bg-primary" />
-              Réseau national · Togo
-            </p>
-            <h1 className="mt-3 text-5xl leading-[0.95] md:text-6xl">
-              <span className="text-logo-blue">La carte</span>{" "}
-              <span className="text-primary">des clubs santé</span>
-            </h1>
-            <p className="mt-5 max-w-xl text-lg font-medium text-muted-foreground">
-              Les clubs santé de chaque Direction Régionale de l’Éducation et de chaque Inspection
-              (IESG). Choisis ta région sur la carte, ou cherche directement ton établissement.
-            </p>
-          </div>
-          <dl data-reveal className="grid grid-cols-3 divide-x divide-border border-y py-5">
-            {chiffres.map((c) => (
-              <div key={c.t} className="flex flex-col-reverse px-3 first:pl-0 sm:px-5">
-                <dt className="mt-2 text-xs font-bold leading-tight text-muted-foreground sm:text-sm">
-                  {c.t}
-                </dt>
-                <dd className="font-display text-4xl leading-none text-logo-blue md:text-5xl">
-                  {c.n}
-                </dd>
-              </div>
-            ))}
-          </dl>
+      {/* Bannière : titre, recherche et chiffres à gauche ; les mascottes à droite. */}
+      <section className="relative isolate overflow-hidden bg-linear-to-br from-logo-blue to-night text-white">
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-[radial-gradient(oklch(1_0_0/0.14)_1.5px,transparent_1.5px)] bg-size-[22px_22px] [mask-image:linear-gradient(to_right,black,transparent_55%)]" />
+          <div className="absolute -right-40 top-1/2 size-[46rem] -translate-y-1/2 rounded-full border-[3rem] border-white/5" />
+          <div className="absolute -right-8 top-1/2 size-[30rem] -translate-y-1/2 rounded-full border-2 border-dashed border-white/15" />
+          <div className="absolute -bottom-24 left-1/4 size-80 rounded-full bg-primary/25 blur-3xl" />
         </div>
 
-        <div data-reveal className="relative mt-10">
-          <Search
-            aria-hidden
-            className="pointer-events-none absolute left-5 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 pb-16 pt-8 md:pt-12 lg:grid-cols-[1.2fr_1fr] lg:pb-20">
+          <div>
+            <FilAriane rubrique="Vie du club" page="Carte des clubs" clair />
+            <div data-reveal="left" className="pt-10 lg:pt-14">
+              <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-bold backdrop-blur-sm">
+                <MapPin className="size-4 text-sun" /> Réseau national · Togo
+              </p>
+              <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
+                <span className="block">La carte</span>
+                <span className="block text-sun">des clubs santé</span>
+              </h1>
+              <p className="mt-6 max-w-xl text-lg font-medium text-white/80">
+                Les clubs santé de chaque Direction Régionale de l’Éducation et de chaque Inspection
+                (IESG). Choisis ta région sur la carte, ou cherche directement ton établissement.
+              </p>
+
+              {/* Entrée amène les résultats, affichés dans l'explorateur, sous les yeux. */}
+              <form
+                role="search"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  montrerExplorateur();
+                }}
+                className="relative mt-8 max-w-xl"
+              >
+                <Search
+                  aria-hidden
+                  className="pointer-events-none absolute left-5 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
+                />
+                <input
+                  type="text"
+                  enterKeyHint="search"
+                  value={recherche}
+                  onChange={(e) => setRecherche(e.target.value)}
+                  placeholder="Cherche ton collège ou lycée…"
+                  aria-label="Rechercher un établissement"
+                  className="h-14 w-full rounded-full border-2 border-transparent bg-white pl-14 pr-14 text-base font-semibold text-ink shadow-card outline-none transition placeholder:font-medium placeholder:text-muted-foreground focus:border-sun"
+                />
+                {recherche && (
+                  <button
+                    type="button"
+                    onClick={() => setRecherche("")}
+                    aria-label="Effacer la recherche"
+                    className="absolute right-3 top-1/2 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition hover:bg-mist hover:text-ink"
+                  >
+                    <X className="size-4" />
+                  </button>
+                )}
+              </form>
+
+              <dl className="mt-8 grid max-w-xl grid-cols-3 gap-2 sm:gap-3">
+                {chiffres.map((c) => (
+                  <div
+                    key={c.t}
+                    className="flex flex-col-reverse rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur-sm sm:p-4"
+                  >
+                    <dt className="mt-1.5 text-xs font-bold leading-tight text-white/75 sm:text-sm">
+                      {c.t}
+                    </dt>
+                    <dd className="font-display text-3xl leading-none text-sun md:text-4xl">
+                      {c.n}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+
+          {/* Les sept mascottes, posées sur le bas de la bannière. */}
+          <img
+            data-reveal="right"
+            src={mascottesEquipe}
+            alt="Les sept mascottes des Clubs Santé, en polo du club : trophée, trousse de secours, plante, mégaphone, micro"
+            width={1122}
+            height={1402}
+            className="mx-auto -mb-16 w-full max-w-xs self-end drop-shadow-[0_24px_40px_oklch(0_0_0/0.35)] sm:max-w-sm lg:-mb-24 lg:max-w-md"
           />
-          <input
-            type="text"
-            enterKeyHint="search"
-            value={recherche}
-            onChange={(e) => setRecherche(e.target.value)}
-            placeholder="Cherche ton collège ou ton lycée…"
-            aria-label="Rechercher un établissement"
-            className="h-14 w-full rounded-full border bg-white pl-14 pr-14 text-base font-semibold shadow-sm outline-none transition placeholder:font-medium placeholder:text-muted-foreground focus:border-logo-blue focus:shadow-card"
-          />
-          {recherche && (
-            <button
-              type="button"
-              onClick={() => setRecherche("")}
-              aria-label="Effacer la recherche"
-              className="absolute right-3 top-1/2 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition hover:bg-mist hover:text-ink"
-            >
-              <X className="size-4" />
-            </button>
-          )}
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-5 pb-20 lg:grid-cols-[19rem_1fr]">
+      <section className="mx-auto grid max-w-7xl gap-8 px-5 pb-20 pt-12 lg:grid-cols-[19rem_1fr]">
         {/* Carte et liste des régions : la liste sert aussi au clavier et aux lecteurs d'écran. */}
         <aside
           data-reveal="left"
@@ -205,7 +239,7 @@ function CarteDesClubs() {
           </ul>
         </aside>
 
-        <div data-reveal="right" className="min-w-0">
+        <div id="explorateur" data-reveal="right" className="min-w-0 scroll-mt-24">
           {q.length >= 2 ? (
             <div className="rounded-[2rem] border bg-white p-6 md:p-8">
               <p aria-live="polite" className="font-bold">

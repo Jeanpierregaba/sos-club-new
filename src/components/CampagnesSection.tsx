@@ -65,7 +65,7 @@ export function CampagnesSection() {
   }, [actif, n]);
 
   return (
-    <section id="campagnes" className="mx-auto max-w-7xl scroll-mt-16 px-5 pb-20">
+    <section id="campagnes" className="mx-auto max-w-7xl scroll-mt-16 px-5 pb-20 pt-8">
       <div data-reveal>
         <p className="text-sm font-extrabold uppercase text-primary">Campagnes</p>
         <h2 className="mt-2 text-4xl md:text-5xl">
