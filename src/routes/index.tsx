@@ -3,20 +3,23 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import {
   ArrowRight,
-  Users,
   Play,
-  ClipboardCheck,
-  Award,
-  Medal,
-  Gift,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Earth,
+  Pyramid,
+  RotateCw,
+  Sparkles,
+  Trophy,
   Menu,
   HeartPulse,
-  GraduationCap,
+  Users,
   School,
-  UserCheck,
+  Backpack,
+  MapPinned,
+  SearchCheck,
+  Landmark,
 } from "lucide-react";
 import {
   Accordion,
@@ -26,7 +29,7 @@ import {
 } from "@/components/ui/accordion";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ClubsSection } from "@/components/ClubsSection";
-import { AgendaSection } from "@/components/AgendaSection";
+import { AgendaSidebar } from "@/components/AgendaSidebar";
 import { PartenairesSection } from "@/components/PartenairesSection";
 import { GalerieSection } from "@/components/GalerieSection";
 import { InitiateurSection } from "@/components/InitiateurSection";
@@ -46,6 +49,7 @@ import mascotteEnvironnement from "@/assets/mascotte-environnement.webp";
 import mascottesLivres from "@/assets/mascottes-livres.webp";
 import mascottesVs from "@/assets/mascottes-vs.webp";
 import mascottesAxes from "@/assets/mascottes-axes.webp";
+import grandesFinales from "@/assets/agenda-grandes-finales.jpg";
 import story1 from "@/assets/story1.jpg";
 import story2 from "@/assets/story2.jpg";
 import slideMascottes from "@/assets/slide-mascottes.jpg";
@@ -73,64 +77,153 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+// Les 7 axes stratégiques. `t` : nom de l'axe, au dos de la carte ; `s` : slogan ; `c` : couleur de la carte.
 const univers = [
   {
-    t: "Académie Génie Imhotep",
-    d: "Apprendre, se former, réussir",
+    t: "Académie GENIE IMHOTEP : jeu de culture générale en santé publique dans les collèges et lycées du Togo",
+    s: "Génie Imhotep, c’est ici et maintenant",
     c: "bg-sky",
-    a: "text-sky",
     img: mascotteImhotep,
   },
   {
-    t: "Santé sexuelle & valeurs",
-    d: "S'informer, se respecter",
+    t: "Sensibilisation, Information et Communication sur l’éducation aux valeurs et à la santé sexuelle (EVSS), les Journées Mondiales en lien avec la Santé (JMS)",
+    s: "EVSS, Un élève bien informé est un élève serein et engagé dans sa communauté",
     c: "bg-rose",
-    a: "text-rose",
     img: mascotteValeurs,
   },
   {
-    t: "TV & Médias",
-    d: "Créer, informer, partager",
+    t: "Production et diffusion des émissions de santé par les élèves sur SOS DOCTEUR TV",
+    s: "La voix des jeunes au cœur des ondes de santé",
     c: "bg-grape",
-    a: "text-grape",
     img: mascotteMedias,
   },
   {
-    t: "Sports & Secourisme",
-    d: "Bouger, sauver des vies",
+    t: "Organisation et soutien des activités sportives, culturelles et de secourisme dans les établissements scolaires",
+    s: "Un esprit sain dans un corps sain et agile",
     c: "bg-tangerine",
-    a: "text-tangerine",
     img: mascotteSecourisme,
   },
   {
-    t: "Jeux & Bourses",
-    d: "Jouer, gagner, saisir sa chance",
+    t: "Bourses d’excellence, gamification, parrainage des orphelins et distinctions des meilleurs acteurs",
+    s: "L’excellence récompensée, l’émulation stimulée",
     c: "bg-sun",
-    a: "text-tangerine",
     img: mascotteBourses,
   },
   {
-    t: "Leadership",
-    d: "S'engager, impacter",
+    t: "Développement personnel, leadership transformationnel, promotion du genre et mentorat",
+    s: "Oser grandir, inspirer et diriger avec intégrité",
     c: "bg-bark",
-    a: "text-bark",
     img: mascotteLeadership,
   },
   {
-    t: "Bien-être & Environnement",
-    d: "Vivre mieux, protéger la planète",
+    t: "Promotion de la santé, cadre de vie et cohésion sociale (Santé environnementale, nutrition & PEVPAH)",
+    s: "Un environnement scolaire sain pour une jeunesse épanouie",
     c: "bg-leaf",
-    a: "text-leaf",
     img: mascotteEnvironnement,
   },
 ];
 
-const chiffres = [
-  { i: HeartPulse, n: 800, t: "Clubs de santé actifs" },
-  { i: GraduationCap, n: 714, t: "Lycées" },
-  { i: School, n: 2396, t: "Collèges" },
-  { i: Users, n: 50000, t: "Jeunes mobilisés" },
-  { i: UserCheck, n: 3500, t: "Encadreurs pédagogiques & pairs éducateurs" },
+// Socle et valeurs du programme. `c` : fond de l'icône et filet du bas ; `tc` : couleur du mot clé.
+const valeurs = [
+  {
+    i: Sparkles,
+    mot: "Confiance",
+    titre: "Découverte et confiance en soi",
+    d: "École, un lieu de révélation de talents et de vocations & Leadership transformationnel",
+    c: "bg-logo-blue",
+    tc: "text-logo-blue",
+  },
+  {
+    i: Earth,
+    mot: "Citoyenneté",
+    titre: "Culture de la citoyenneté et du panafricanisme",
+    d: "Engagement citoyen et Ouverture sur l’Afrique",
+    c: "bg-primary",
+    tc: "text-primary",
+  },
+  {
+    i: Pyramid,
+    mot: "Bâtisseur",
+    titre: "Esprit bâtisseur et polyvalence (Imhotep)",
+    d: "Innovation & Impact communautaire",
+    c: "bg-tangerine",
+    tc: "text-tangerine",
+  },
+];
+
+// `plus` : le chiffre est un minimum, affiché « +800 ». Grille bento : l'ordre remplit la grille ligne par ligne,
+// `place` fixe l'emprise de la case (2 colonnes sur mobile, 4 sur grand écran) et `taille` celle du chiffre.
+const chiffresCles = [
+  {
+    plus: true,
+    n: 800,
+    t: "Clubs de santé actifs",
+    i: HeartPulse,
+    place: "col-span-2 lg:row-span-2",
+    fond: "bg-linear-to-br from-logo-blue to-night text-white",
+    chiffre: "text-primary",
+    taille: "text-7xl md:text-8xl lg:text-9xl",
+  },
+  {
+    plus: true,
+    n: 3500,
+    t: "Encadreurs pédagogiques & pairs éducateurs",
+    i: Users,
+    place: "col-span-2",
+    fond: "bg-primary text-white",
+    chiffre: "",
+    taille: "text-5xl md:text-6xl",
+  },
+  {
+    plus: true,
+    n: 2396,
+    t: "Établissements du secondaire 1",
+    i: Backpack,
+    place: "",
+    fond: "bg-sun text-ink",
+    chiffre: "",
+    taille: "text-4xl md:text-5xl",
+  },
+  {
+    plus: true,
+    n: 714,
+    t: "Établissements du secondaire 2",
+    i: School,
+    place: "",
+    fond: "bg-mist text-ink",
+    chiffre: "text-logo-blue",
+    taille: "text-4xl md:text-5xl",
+  },
+  {
+    plus: false,
+    n: 7,
+    t: "Directions régionales de l'éducation",
+    i: MapPinned,
+    place: "",
+    fond: "bg-card text-ink ring-1 ring-logo-blue/15",
+    chiffre: "text-logo-blue",
+    taille: "text-4xl md:text-5xl",
+  },
+  {
+    plus: false,
+    n: 18,
+    t: "Inspections pédagogiques",
+    i: SearchCheck,
+    place: "",
+    fond: "bg-tangerine text-white",
+    chiffre: "",
+    taille: "text-4xl md:text-5xl",
+  },
+  {
+    plus: false,
+    n: 1,
+    t: "Cabinet ministériel",
+    i: Landmark,
+    place: "col-span-2",
+    fond: "bg-logo-red text-white",
+    chiffre: "",
+    taille: "text-5xl md:text-6xl",
+  },
 ];
 
 // Le rendu serveur affiche le vrai chiffre (sans JavaScript, ou si l'utilisateur limite les animations) ; le compte part de 0 quand le chiffre devient visible.
@@ -167,6 +260,14 @@ function Compteur({ value }: { value: number }) {
   return <span ref={ref}>{String(current).replace(/\B(?=(\d{3})+$)/g, " ")}</span>;
 }
 
+// Section Actualités : un article à la une, puis les autres en ligne.
+const aLaUne = {
+  img: grandesFinales,
+  tag: "Génie Imhotep",
+  t: "Grandes finales du Championnat national Génie Imhotep",
+  d: "Retour sur la 1re édition : champions, finalistes et demi-finalistes des clubs santé récompensés sur scène.",
+};
+
 const stars = [
   {
     img: story2,
@@ -191,23 +292,22 @@ const stars = [
   },
 ];
 
-// `pos` : cadrage de la photo, à préciser quand le cadrage par défaut couperait le sujet.
-// `fullPhoto` : photo en portrait affichée entière sur grand écran, sans le dégradé qui en masquerait la moitié.
-// `place` : emplacement de la mascotte à droite ; `mobile` : son emplacement sous 768 px, selon la place laissée par le texte.
+// `onglet` : nom court affiché en étiquette au-dessus du titre. `fond` : dégradé de la section, assez sombre pour le texte blanc.
+// `accent` : couleur du cadre décalé derrière la photo. `cadrage` : point de la photo à garder visible.
 
 const heroSlides = [
   {
     img: slideMascottes,
-    pos: "object-right-top lg:left-auto lg:w-auto lg:max-w-[50vw] lg:[mask-composite:intersect] lg:[mask-image:linear-gradient(110deg,transparent_10%,black_30%),linear-gradient(to_right,transparent,black_10%)]",
-    fullPhoto: true,
+    onglet: "Mascottes",
+    fond: "from-logo-blue to-grape",
+    accent: "bg-sun",
+    cadrage: "object-[50%_25%]",
     alt: "Remise du trophée de champion national Génie Imhotep 2026 à une élève en t-shirt orange",
     mascot: {
       src: mascottesAxes,
       alt: "Quatre mascottes caméléons avec une caméra, un mégaphone et un arrosoir",
       width: 1122,
       height: 1402,
-      place: "-bottom-24 left-0 w-80 drop-shadow-2xl",
-      mobile: "mx-auto mt-3 h-44",
     },
     lines: ["DÉCOUVRE NOS", "MASCOTTES !"],
     cta: [
@@ -218,14 +318,16 @@ const heroSlides = [
   },
   {
     img: slideClubs,
+    onglet: "Clubs Santé",
+    fond: "from-night to-logo-blue",
+    accent: "bg-primary",
+    cadrage: "object-center",
     alt: "Jeunes des Clubs Santé en t-shirt blanc, affiches à la main, salués par un responsable",
     mascot: {
       src: mascottesLivres,
       alt: "Deux mascottes caméléons, l'une brune et l'autre bleue, entourées de livres",
       width: 1122,
       height: 1402,
-      place: "-bottom-24 left-0 w-80 drop-shadow-2xl",
-      mobile: "absolute inset-x-0 bottom-4 mx-auto h-24",
     },
     lines: ["CLUBS SANTÉ", "SOS DOCTEUR TV"],
     cta: [
@@ -237,14 +339,16 @@ const heroSlides = [
   },
   {
     img: slideGenie,
+    onglet: "Génie Imhotep",
+    fond: "from-grape to-night",
+    accent: "bg-tangerine",
+    cadrage: "object-center",
     alt: "Trois élèves du Collège St. Joseph en polo bleu au pupitre de Génie Imhotep",
     mascot: {
       src: mascottesVs,
       alt: "Deux mascottes caméléons, l'une bleue et l'autre violette, face à un grand VS doré",
       width: 2000,
       height: 2000,
-      place: "-bottom-24 left-0 w-80 drop-shadow-2xl lg:w-96",
-      mobile: "mx-auto mt-3 h-32",
     },
     lines: ["GÉNIE", "IMHOTEP"],
     cta: [
@@ -256,14 +360,16 @@ const heroSlides = [
   },
   {
     img: slideAxes,
+    onglet: "7 axes",
+    fond: "from-logo-blue to-night",
+    accent: "bg-sky",
+    cadrage: "object-center",
     alt: "Élèves qui applaudissent et agitent le drapeau togolais",
     mascot: {
       src: mascottesAxes,
       alt: "Quatre mascottes caméléons avec une caméra, un mégaphone et un arrosoir",
       width: 1122,
       height: 1402,
-      place: "-bottom-24 left-0 w-80 drop-shadow-2xl",
-      mobile: "absolute inset-x-0 bottom-4 mx-auto h-24",
     },
     lines: ["7 AXES", "STRATÉGIQUES"],
     cta: [
@@ -273,13 +379,6 @@ const heroSlides = [
     tagline: "Conçus pour permettre aux élèves de mener leurs activités de façon autonome.",
     sub: "Conçus pour permettre aux élèves de mener leurs activités de façon autonome : découvre les programmes d'action concrets de l'hygiène au secourisme, de la nutrition à la santé mentale dans chaque établissement.",
   },
-];
-
-const steps = [
-  { i: ClipboardCheck, n: "12", t: "Quiz Santé" },
-  { i: Award, n: "1", t: "Certificat officiel Génie Imhotep" },
-  { i: Medal, n: "5", t: "Badges thématiques" },
-  { i: Gift, n: "1 M", t: "Des lots jusqu'à 1 million FCFA" },
 ];
 
 // Ces pages n'existent pas encore : les liens sans `href` pointent vers « # ».
@@ -319,67 +418,419 @@ function DefiDuJour() {
       ? "border-border opacity-60"
       : "border-border hover:-translate-y-0.5 hover:border-logo-blue";
   };
+  const pastille = (i: number) =>
+    (valide && i === defi.bonne) || i === choix ? "bg-white/25" : "bg-mist text-logo-blue";
 
+  return (
+    <section
+      id="defi"
+      className="relative isolate scroll-mt-16 overflow-hidden bg-logo-blue text-primary-foreground"
+    >
+      <div className="absolute -left-16 -top-16 -z-10 h-72 w-72 rounded-full bg-sky/40 blur-3xl" />
+      <div className="absolute -bottom-24 right-0 -z-10 h-80 w-80 rounded-full bg-primary/25 blur-3xl" />
+      <div className="mx-auto grid max-w-7xl px-5 lg:grid-cols-[1fr_2fr]">
+        <img
+          src={mascotteBourses}
+          alt="Mascotte du Club Santé brandissant un trophée"
+          loading="lazy"
+          width={1414}
+          height={2000}
+          data-reveal="left"
+          className="order-last mx-auto h-auto w-full max-w-60 pb-8 drop-shadow-2xl lg:order-first lg:max-w-sm lg:self-center lg:py-10"
+        />
+        <div className="py-12 md:py-16 lg:pl-8">
+          <h2 data-reveal className="text-4xl md:text-5xl">
+            Le défi <span className="text-sun">du jour</span>
+          </h2>
+          <p data-reveal className="mt-3 max-w-2xl text-lg font-medium text-white/85">
+            Une nouvelle question santé chaque jour : teste tes connaissances et gagne des points !
+          </p>
+
+          <div
+            data-reveal="zoom"
+            className="mt-8 rounded-[2rem] bg-card p-6 text-foreground shadow-card md:p-8"
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-rose px-3 py-1 text-xs font-extrabold uppercase text-primary-foreground">
+                Santé & bien-être
+              </span>
+              <span className="rounded-full bg-sun px-3 py-1 text-xs font-extrabold uppercase text-ink">
+                Question du jour
+              </span>
+            </div>
+            <p className="mt-4 font-display text-2xl leading-tight text-logo-blue md:text-3xl">
+              Quelle est la meilleure façon de se protéger contre le paludisme ?
+            </p>
+
+            <div className="mt-6 grid gap-3 md:grid-cols-3">
+              {defi.options.map((o, i) => (
+                <button
+                  key={o}
+                  type="button"
+                  disabled={valide}
+                  aria-pressed={i === choix}
+                  onClick={() => setChoix(i)}
+                  className={`flex items-center gap-3 rounded-2xl border-2 p-3 text-left font-bold transition duration-200 active:scale-95 ${couleur(i)}`}
+                >
+                  <span
+                    className={`inline-flex size-9 shrink-0 items-center justify-center rounded-xl font-display text-lg ${pastille(i)}`}
+                  >
+                    {"ABC"[i]}
+                  </span>
+                  {o}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+              <p role="status" className="text-sm font-bold">
+                {valide &&
+                  (choix === defi.bonne
+                    ? "Bravo, c'est la bonne réponse !"
+                    : "Pas tout à fait : la bonne réponse est en vert.")}
+              </p>
+              {valide ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setValide(false);
+                    setChoix(null);
+                  }}
+                  className="btn-fx ml-auto rounded-full bg-primary px-8 py-3 font-bold text-primary-foreground"
+                >
+                  Rejouer
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled={choix === null}
+                  onClick={() => setValide(true)}
+                  className="btn-fx ml-auto rounded-full bg-primary px-8 py-3 font-bold text-primary-foreground disabled:opacity-50"
+                >
+                  Valider
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Carte d'un axe : la mascotte au recto, la description et le slogan au verso.
+// À la souris, le survol la retourne ; au toucher et au clavier, chaque appui la retourne et la laisse ainsi.
+function CarteAxe({ u, i }: { u: (typeof univers)[number]; i: number }) {
+  const [retournee, setRetournee] = useState(false);
+  const basculer = () => setRetournee((r) => !r);
+
+  return (
+    <div
+      data-reveal
+      style={retard(i)}
+      className="group perspective-[1400px] sm:col-span-2 sm:max-lg:last:col-start-2 lg:nth-5:col-start-2"
+    >
+      <div
+        role="button"
+        tabIndex={0}
+        aria-pressed={retournee}
+        onClick={() => {
+          // Un clic de souris suit déjà le survol : le compter retournerait la carte une seconde fois.
+          if (window.matchMedia("(hover: none)").matches) basculer();
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            basculer();
+          }
+        }}
+        className={`relative aspect-[4/5] w-full cursor-pointer rounded-3xl shadow-card transition-transform duration-700 transform-3d lg:aspect-[3/4] group-hover:rotate-y-180 ${retournee ? "rotate-y-180" : ""}`}
+      >
+        <div
+          className={`${u.c} absolute inset-0 overflow-hidden rounded-3xl bg-[radial-gradient(circle_at_50%_22%,oklch(1_0_0/0.25),transparent_65%)] text-center text-primary-foreground backface-hidden`}
+        >
+          <img
+            src={u.img}
+            alt=""
+            loading="lazy"
+            width={1414}
+            height={2000}
+            className="absolute inset-x-0 bottom-0 mx-auto h-[94%] w-auto object-contain object-bottom"
+          />
+          {/* Seul indice au recto, sans texte : la carte se retourne. */}
+          <span className="absolute bottom-3 right-3 rounded-full bg-white/25 p-2 backdrop-blur-sm">
+            <RotateCw className="h-5 w-5" />
+          </span>
+        </div>
+
+        <div className="absolute inset-0 flex rotate-y-180 flex-col overflow-hidden rounded-3xl bg-night p-6 text-white backface-hidden">
+          <div
+            aria-hidden
+            className={`${u.c} absolute -right-16 -top-16 size-48 rounded-full opacity-50 blur-3xl`}
+          />
+          <span
+            className={`${u.c} relative self-start rounded-full px-3 py-1 text-xs font-extrabold uppercase text-primary-foreground`}
+          >
+            Axe {i + 1}
+          </span>
+          <h3 className="relative mt-4 flex-1 font-sans text-lg font-extrabold leading-snug lg:text-base xl:text-lg">
+            {u.t}
+          </h3>
+          <p className="relative font-hand text-2xl leading-tight text-sun lg:text-xl xl:text-2xl">
+            « {u.s} »
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ObjectifProgramme() {
+  return (
+    <section id="objectif" className="mx-auto max-w-7xl scroll-mt-16 px-5 pt-20">
+      <div data-reveal>
+        <h2 className="text-4xl md:text-5xl">
+          <span className="text-logo-blue">Objectif</span>{" "}
+          <span className="text-primary">du programme</span>
+        </h2>
+        <p className="mt-3 max-w-4xl text-lg font-medium text-muted-foreground">
+          Mobiliser les apprenants autour de 5 entités clés à savoir : la redynamisation de la vie
+          scolaire ; la promotion de la santé dès le bas âge ; la culture de l’excellence et
+          l’émulation ; la responsabilité et la citoyenneté pour un épanouissement intégral des
+          élèves.
+        </p>
+      </div>
+
+      <h3
+        data-reveal
+        className="mt-12 flex items-center gap-3 font-sans text-sm font-extrabold uppercase tracking-widest text-logo-blue"
+      >
+        <span className="h-1 w-8 rounded-full bg-primary" />
+        Socle & valeurs du programme
+      </h3>
+      <div className="mt-6 grid gap-6 md:grid-cols-3">
+        {valeurs.map((v, i) => (
+          <article
+            key={v.mot}
+            data-reveal
+            style={retard(i)}
+            className="card-fx group relative overflow-hidden rounded-3xl bg-card p-7 pb-9 shadow-card"
+          >
+            <span
+              aria-hidden
+              className="absolute -right-2 -top-5 font-display text-[7rem] leading-none text-ink/5"
+            >
+              0{i + 1}
+            </span>
+            <span
+              className={`${v.c} inline-flex size-14 items-center justify-center rounded-2xl text-primary-foreground shadow-card transition duration-300 group-hover:-rotate-6 group-hover:scale-110`}
+            >
+              <v.i className="size-7" />
+            </span>
+            <h4 className={`mt-5 font-display text-3xl ${v.tc}`}>{v.mot}</h4>
+            <p className="mt-2 text-sm font-extrabold uppercase tracking-wide">{v.titre}</p>
+            <p className="mt-3 font-medium text-muted-foreground">{v.d}</p>
+            <span className={`${v.c} absolute inset-x-0 bottom-0 h-1.5`} />
+          </article>
+        ))}
+      </div>
+
+      <h3
+        data-reveal
+        className="mt-12 flex items-center gap-3 font-sans text-sm font-extrabold uppercase tracking-widest text-logo-blue"
+      >
+        <span className="h-1 w-8 rounded-full bg-primary" />
+        Chiffres clés du réseau national
+      </h3>
+      <ul className="mt-8 grid grid-cols-2 gap-4 md:gap-5 lg:auto-rows-[minmax(12.5rem,auto)] lg:grid-cols-4">
+        {chiffresCles.map((c, i) => (
+          <li
+            key={c.t}
+            data-reveal={i === 0 ? "zoom" : ""}
+            style={retard(i)}
+            className={`card-fx group relative isolate flex min-h-44 flex-col justify-between gap-6 overflow-hidden rounded-3xl p-5 md:p-7 ${c.place} ${c.fond}`}
+          >
+            <c.i
+              aria-hidden
+              className={`absolute -z-10 opacity-10 transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-110 ${i === 0 ? "-bottom-10 -right-10 size-72" : "-bottom-6 -right-6 size-32"}`}
+            />
+            {i === 0 && (
+              <span
+                aria-hidden
+                className="absolute -left-20 -top-20 -z-10 size-64 rounded-full border-[2rem] border-white/10"
+              />
+            )}
+            <span className="inline-flex size-11 items-center justify-center rounded-2xl bg-current/10">
+              <c.i className="size-5" />
+            </span>
+            <div>
+              <p className={`whitespace-nowrap font-display leading-none ${c.taille} ${c.chiffre}`}>
+                {c.plus && "+"}
+                <Compteur value={c.n} />
+              </p>
+              <p
+                className={`mt-2 font-bold leading-snug ${i === 0 ? "text-xl md:text-2xl" : "text-sm md:text-base"}`}
+              >
+                {c.t}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+// Actualités : « C'est toi la star ! » sur deux colonnes (un article à la une, puis trois en ligne), l'agenda en colonne de droite.
+function ActualitesSection() {
+  return (
+    <section id="actualites" className="mx-auto max-w-7xl scroll-mt-16 px-5 pb-12 pt-20">
+      <div data-reveal>
+        <h2 className="text-4xl md:text-5xl">
+          <span className="text-logo-blue">Actualités</span>{" "}
+          <span className="text-primary">des clubs</span>
+        </h2>
+        <p className="mt-3 max-w-2xl text-lg font-medium text-muted-foreground">
+          Les talents des jeunes, les temps forts et les prochains rendez-vous des Clubs Santé.
+        </p>
+      </div>
+
+      <div className="mt-10 grid gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <div data-reveal className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
+            <h3 className="text-3xl">
+              <span className="text-logo-blue">C'est toi</span>{" "}
+              <span className="text-primary">la star !</span>
+            </h3>
+            <a href="#" className="group flex items-center gap-1.5 font-bold text-logo-blue">
+              Toutes les actus
+              <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+          </div>
+
+          <article
+            data-reveal="zoom"
+            className="group relative isolate mt-5 flex min-h-[28rem] items-end overflow-hidden rounded-[2rem] shadow-card md:aspect-video md:min-h-0"
+          >
+            <img
+              src={aLaUne.img}
+              alt=""
+              loading="lazy"
+              width={2000}
+              height={963}
+              className="absolute inset-0 -z-20 size-full object-cover transition duration-1000 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 -z-10 bg-linear-to-t from-night from-15% via-night/50 to-transparent" />
+            <span className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-sun px-3 py-1.5 text-xs font-extrabold uppercase text-ink shadow-card">
+              <Sparkles className="size-3.5" /> À la une
+            </span>
+            <div className="p-6 text-white md:p-9">
+              <span className="rounded-full border border-white/40 bg-white/10 px-3 py-1 text-xs font-extrabold uppercase backdrop-blur">
+                {aLaUne.tag}
+              </span>
+              <h4 className="mt-4 max-w-xl font-display text-3xl leading-tight md:text-4xl">
+                {aLaUne.t}
+              </h4>
+              <p className="mt-2 max-w-lg font-medium text-white/80">{aLaUne.d}</p>
+              <a
+                href="#"
+                className="btn-fx mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-[15px] font-bold after:absolute after:inset-0"
+              >
+                Lire l'article <ArrowRight className="size-4" />
+              </a>
+            </div>
+          </article>
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-3 md:gap-5">
+            {stars.map((s, i) => (
+              <article
+                key={s.t}
+                data-reveal
+                style={retard(i)}
+                className="card-fx group relative flex gap-4 rounded-3xl bg-card p-2.5 shadow-card sm:flex-col sm:gap-0"
+              >
+                <div className="relative w-28 shrink-0 overflow-hidden rounded-2xl sm:w-auto">
+                  <img
+                    src={s.img}
+                    alt=""
+                    loading="lazy"
+                    className="aspect-square w-full object-cover object-right transition duration-500 group-hover:scale-110 sm:aspect-[4/3]"
+                  />
+                  <span className="absolute bottom-2 right-2 rounded-full bg-primary p-2 text-primary-foreground transition duration-300 group-hover:scale-110">
+                    <Play className="size-3.5 fill-current" />
+                  </span>
+                </div>
+                <div className="flex flex-1 flex-col py-1 pr-2 sm:p-3 sm:pt-4">
+                  <span
+                    className={`${s.tc} self-start rounded-full px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-primary-foreground`}
+                  >
+                    {s.tag}
+                  </span>
+                  <h4 className="mt-2 font-sans font-extrabold leading-snug">
+                    <a href="#" className="after:absolute after:inset-0">
+                      {s.t}
+                    </a>
+                  </h4>
+                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground max-sm:hidden">
+                    {s.d}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <AgendaSidebar />
+      </div>
+    </section>
+  );
+}
+
+// Carte du jeu concours, à cheval sur le bas du hero : le liseré blanc la détache du fond coloré.
+function JeuConcours() {
   return (
     <section className="mx-auto -mt-6 max-w-7xl px-5">
       <div
         data-reveal
-        className="relative grid items-center gap-6 rounded-3xl bg-sun p-6 shadow-card md:grid-cols-[1fr_2fr]"
+        className="relative isolate overflow-hidden rounded-3xl bg-linear-to-br from-logo-blue via-logo-blue to-night p-5 text-white sm:p-6 shadow-card ring-4 ring-white md:p-10"
       >
-        <div>
-          <h2 className="text-4xl">LE DÉFI DU JOUR</h2>
-          <p className="font-bold">Teste tes connaissances et gagne des points !</p>
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -right-24 -top-24 size-80 rounded-full bg-sun/25 blur-3xl" />
+          <div className="absolute -bottom-32 left-1/3 size-80 rounded-full bg-primary/25 blur-3xl" />
+          <div className="absolute inset-0 bg-[radial-gradient(oklch(1_0_0/0.1)_1.5px,transparent_1.5px)] bg-size-[22px_22px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+          <Trophy className="absolute -bottom-10 -right-6 size-72 -rotate-12 text-white/5 md:size-96" />
         </div>
-        <div className="rounded-2xl bg-card p-5">
-          <p className="text-xs font-extrabold uppercase text-rose">Santé & bien-être</p>
-          <p className="mt-1 font-extrabold">
-            Quelle est la meilleure façon de se protéger contre le paludisme ?
-          </p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            {defi.options.map((o, i) => (
-              <button
-                key={o}
-                type="button"
-                disabled={valide}
-                aria-pressed={i === choix}
-                onClick={() => setChoix(i)}
-                className={`rounded-xl border-2 px-4 py-2 text-sm font-bold transition duration-200 active:scale-95 ${couleur(i)}`}
-              >
-                {"ABC"[i]} · {o}
-              </button>
-            ))}
-            {valide ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setValide(false);
-                  setChoix(null);
-                }}
-                className="btn-fx ml-auto rounded-full bg-primary px-6 py-2 font-bold text-primary-foreground"
-              >
-                Rejouer
-              </button>
-            ) : (
-              <button
-                type="button"
-                disabled={choix === null}
-                onClick={() => setValide(true)}
-                className="btn-fx ml-auto rounded-full bg-primary px-6 py-2 font-bold text-primary-foreground disabled:opacity-50"
-              >
-                Valider
-              </button>
-            )}
-          </div>
-          {valide && (
-            <p
-              role="status"
-              className="mt-3 text-sm font-bold animate-in fade-in slide-in-from-top-1"
-            >
-              {choix === defi.bonne
-                ? "Bravo, c'est la bonne réponse !"
-                : "Pas tout à fait : la bonne réponse est en vert."}
+
+        <h2 className="text-[1.75rem] uppercase leading-[1.05] min-[400px]:text-4xl md:text-6xl">
+          Obtiens ta <span className="text-primary">certification</span> & gagne jusqu'à{" "}
+          <span className="mt-2 inline-block -rotate-2 whitespace-nowrap rounded-2xl bg-linear-to-r from-sun to-tangerine px-3 py-1 text-ink sm:px-4 shadow-[0_12px_30px_-8px] shadow-tangerine/70">
+            1 million FCFA !
+          </span>
+        </h2>
+
+        <div className="mt-8 grid items-center gap-6 lg:grid-cols-[1.3fr_1fr]">
+          <div>
+            <p className="text-lg font-bold md:text-xl">
+              Inscription 100 % gratuite, ouverte à tous les élèves des Clubs Santé ainsi qu'aux
+              visiteurs et particuliers du Togo.
             </p>
-          )}
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-end">
+            <a
+              href="#"
+              className="btn-fx group flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-primary px-4 text-sm font-bold text-primary-foreground shadow-card sm:px-6 sm:text-[15px] lg:w-88"
+            >
+              <Trophy className="hidden h-5 w-5 sm:block" />
+              Obtenir ma certification & jouer
+              <ArrowRight className="hidden h-4 w-4 transition-transform group-hover:translate-x-1 sm:block" />
+            </a>
+            <a
+              href="#"
+              className="btn-fx flex h-12 items-center justify-center rounded-full border-2 border-white/60 bg-white/10 px-6 lg:w-88 text-[15px] font-bold backdrop-blur-sm"
+            >
+              S'inscrire aux quiz
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -525,77 +976,91 @@ function Index() {
       <SiteMotion />
       <SiteHeader />
 
-      {/* Hero */}
-      <section className="relative flex min-h-[80vh] overflow-hidden bg-mist">
-        <div className="absolute inset-y-0 right-0 isolate h-full w-full md:w-3/4">
-          {/* La nouvelle photo arrive par-dessus l'ancienne, qui ne s'efface qu'ensuite : le fond ne transparaît pas entre les deux. Elle avance lentement pendant son affichage, et ne revient à sa taille qu'une fois invisible. */}
-          {heroSlides.map((s, i) => (
-            <img
-              key={i}
-              src={s.img}
-              alt={s.alt}
-              width={1600}
-              height={912}
-              aria-hidden={i !== active}
-              className={`absolute inset-0 h-full w-full object-cover ${s.pos ?? "object-right"} ${i === active ? "z-10 scale-105 opacity-100 [transition:opacity_700ms_ease-in-out,scale_7000ms_linear]" : "scale-100 opacity-0 [transition:opacity_500ms_ease-in-out_300ms,scale_0s_linear_800ms]"}`}
-            />
-          ))}
+      {/* Hero : un fond coloré propre à chaque slide, la photo dans un cadre arrondi et des flèches sur les bords. */}
+      <section className="relative isolate flex min-h-[80vh] flex-col justify-center overflow-hidden text-white">
+        {heroSlides.map((s, i) => (
+          <div
+            key={i}
+            aria-hidden
+            className={`absolute inset-0 -z-10 bg-linear-to-br ${s.fond} transition-opacity duration-700 ${i === active ? "opacity-100" : "opacity-0"}`}
+          />
+        ))}
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-[radial-gradient(oklch(1_0_0/0.14)_1.5px,transparent_1.5px)] bg-size-[22px_22px] [mask-image:linear-gradient(to_right,black,transparent_60%)]" />
+          <div className="absolute -right-48 -top-48 size-[44rem] rounded-full border-[3.5rem] border-white/5" />
+          <div className="absolute -right-12 -top-16 size-[26rem] rounded-full border-2 border-dashed border-white/15" />
+          <div className="absolute -bottom-32 -left-24 size-[22rem] rounded-full bg-white/5" />
         </div>
-        <div
-          className={`absolute inset-0 bg-hero transition-opacity duration-700 ${heroSlides[active]?.fullPhoto ? "lg:opacity-0" : ""}`}
-        />
-        <div className="absolute inset-0 bg-mist/80 md:hidden" />
-        <div className="relative mx-auto grid w-full max-w-7xl items-center px-5 pb-30 pt-8 md:grid-cols-2 md:pb-24 md:pt-14 xl:pl-16">
-          <div>
-            {/* Toutes les slides partagent la même cellule : la hauteur reste celle de la plus longue. */}
-            <div className="grid">
-              {heroSlides.map((s, i) => {
-                const Heading = i === 0 ? "h1" : "h2";
-                return (
-                  <div
-                    key={i}
-                    aria-hidden={i !== active}
-                    className={`col-start-1 row-start-1 ${heroFade(i === active)}`}
-                  >
-                    <Heading className="text-4xl leading-[0.95] min-[360px]:text-[2.625rem] sm:text-[3.25rem] md:text-5xl lg:text-[4rem]">
-                      {s.lines.map((l, j) => (
-                        <span key={l}>
-                          <span className={j === 0 ? "text-logo-blue" : "text-logo-red"}>{l}</span>
-                          <br />
-                        </span>
-                      ))}
-                    </Heading>
-                    {s.tagline && (
-                      <p className="mt-4 text-lg font-extrabold md:text-xl">{s.tagline}</p>
-                    )}
-                    <p className="mt-3 font-semibold md:text-lg">{s.sub}</p>
-                    <div className="mt-6 flex flex-wrap gap-3">
-                      {s.cta.map((c, j) => (
-                        <a
-                          key={c.t}
-                          href={c.href}
-                          className={`btn-fx group flex h-12 w-60 items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 text-[15px] font-bold shadow-card ${j === 0 ? "bg-primary text-primary-foreground" : "bg-card"}`}
-                        >
-                          {c.t}{" "}
-                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </a>
-                      ))}
-                    </div>
-                    {s.mascot.mobile && (
-                      <img
-                        src={s.mascot.src}
-                        alt={s.mascot.alt}
-                        width={s.mascot.width}
-                        height={s.mascot.height}
-                        className={`${s.mascot.mobile} w-auto md:hidden`}
-                      />
-                    )}
+
+        <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-5 pb-24 pt-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-16 xl:px-16 xl:pb-20">
+          {/* Toutes les slides partagent la même cellule : la hauteur reste celle de la plus longue. */}
+          <div className="grid">
+            {heroSlides.map((s, i) => {
+              const Heading = i === 0 ? "h1" : "h2";
+              return (
+                <div
+                  key={i}
+                  aria-hidden={i !== active}
+                  className={`col-start-1 row-start-1 ${heroFade(i === active)}`}
+                >
+                  <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-bold backdrop-blur-sm">
+                    <span className="size-2 rounded-full bg-sun" />
+                    {s.onglet}
+                  </p>
+                  <Heading className="text-4xl leading-[0.95] min-[360px]:text-[2.625rem] sm:text-[3.25rem] lg:text-[4rem]">
+                    {s.lines.map((l, j) => (
+                      <span key={l}>
+                        <span className={j === 0 ? "text-white" : "text-sun"}>{l}</span>
+                        <br />
+                      </span>
+                    ))}
+                  </Heading>
+                  {s.tagline && (
+                    <p className="mt-4 hidden text-lg font-extrabold sm:block md:text-xl">
+                      {s.tagline}
+                    </p>
+                  )}
+                  <p className="mt-3 font-semibold text-white/80 md:text-lg">{s.sub}</p>
+                  <div className="mt-7 flex flex-wrap gap-3">
+                    {s.cta.map((c, j) => (
+                      <a
+                        key={c.t}
+                        href={c.href}
+                        className={`btn-fx group flex h-12 w-60 items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 text-[15px] font-bold ${j === 0 ? "bg-primary text-primary-foreground shadow-card" : "border-2 border-white/60 bg-white/10 backdrop-blur-sm"}`}
+                      >
+                        {c.t}{" "}
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </a>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
-          <div className="relative hidden self-stretch md:block">
+
+          {/* Sur mobile la photo passe en premier : la hauteur réservée au texte le plus long se retrouve avant les flèches, pas entre le texte et la photo. */}
+          <div className="relative order-first mx-auto w-full max-w-md sm:max-w-lg lg:order-none lg:max-w-none">
+            {heroSlides.map((s, i) => (
+              <div
+                key={i}
+                aria-hidden
+                className={`absolute inset-0 translate-x-3 translate-y-3 rotate-2 rounded-[2.5rem] rounded-tl-[6rem] transition-opacity duration-700 sm:translate-x-5 sm:translate-y-5 ${s.accent} ${i === active ? "opacity-100" : "opacity-0"}`}
+              />
+            ))}
+            {/* La nouvelle photo arrive par-dessus l'ancienne, qui ne s'efface qu'ensuite. Elle avance lentement pendant son affichage, et ne revient à sa taille qu'une fois invisible. */}
+            <div className="relative isolate aspect-[16/11] overflow-hidden lg:aspect-[5/4] rounded-[2.5rem] rounded-tl-[6rem] shadow-2xl ring-4 ring-white/25">
+              {heroSlides.map((s, i) => (
+                <img
+                  key={i}
+                  src={s.img}
+                  alt={s.alt}
+                  width={1600}
+                  height={912}
+                  aria-hidden={i !== active}
+                  className={`absolute inset-0 h-full w-full object-cover ${s.cadrage} ${i === active ? "z-10 scale-105 opacity-100 [transition:opacity_700ms_ease-in-out,scale_7000ms_linear]" : "scale-100 opacity-0 [transition:opacity_500ms_ease-in-out_300ms,scale_0s_linear_800ms]"}`}
+                />
+              ))}
+            </div>
             {heroSlides.map((s, i) => (
               <img
                 key={i}
@@ -604,216 +1069,65 @@ function Index() {
                 width={s.mascot.width}
                 height={s.mascot.height}
                 aria-hidden={i !== active}
-                className={`absolute motion-safe:animate-float ${s.mascot.place} ${heroFade(i === active)}`}
+                className={`absolute bottom-0 left-1 w-24 drop-shadow-2xl motion-safe:animate-float sm:-left-4 sm:w-40 lg:-bottom-12 lg:-left-16 lg:w-56 ${heroFade(i === active)}`}
               />
             ))}
           </div>
         </div>
+
+        {/* Flèches centrées sur les bords à partir de 1280 px ; en dessous, la marge latérale est trop étroite et elles passent en bas. */}
         <button
           aria-label="Diapositive précédente"
           onClick={prev}
-          className="absolute bottom-12 left-5 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-card text-ink shadow-card transition hover:scale-110 hover:bg-primary hover:text-primary-foreground active:scale-95 md:bottom-14 xl:bottom-auto xl:left-4 xl:top-1/2 xl:-translate-y-1/2"
+          className="absolute bottom-10 left-5 z-10 flex size-10 items-center justify-center rounded-full border-2 border-white/40 bg-white/10 backdrop-blur-sm transition hover:scale-110 hover:bg-white hover:text-ink active:scale-95 xl:bottom-auto xl:left-4 xl:top-1/2 xl:-translate-y-1/2"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
         <button
           aria-label="Diapositive suivante"
           onClick={next}
-          className="absolute bottom-12 right-5 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-card text-ink shadow-card transition hover:scale-110 hover:bg-primary hover:text-primary-foreground active:scale-95 md:bottom-14 xl:bottom-auto xl:right-4 xl:top-1/2 xl:-translate-y-1/2"
+          className="absolute bottom-10 right-5 z-10 flex size-10 items-center justify-center rounded-full border-2 border-white/40 bg-white/10 backdrop-blur-sm transition hover:scale-110 hover:bg-white hover:text-ink active:scale-95 xl:bottom-auto xl:right-4 xl:top-1/2 xl:-translate-y-1/2"
         >
           <ChevronRight className="h-5 w-5" />
         </button>
       </section>
 
-      <DefiDuJour />
+      <JeuConcours />
+      <ObjectifProgramme />
 
       {/* Univers */}
       <section id="univers" className="mx-auto max-w-7xl px-5 py-20">
         <div data-reveal className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-4xl md:text-5xl">
-              <span className="text-logo-blue">Les 7 univers</span>{" "}
-              <span className="text-primary">du Club Santé</span>
+              <span className="text-logo-blue">Les 7 Axes</span>{" "}
+              <span className="text-primary">Stratégiques</span>
             </h2>
             <p className="mt-2 text-muted-foreground">
-              Explore les sept axes du Club Santé et trouve celui qui te fait vibrer !
+              Une approche holistique pour promouvoir la santé publique et l'excellence dans les
+              collèges et lycées du Togo.
             </p>
           </div>
           <a
             href="#"
             className="group font-bold text-primary underline transition hover:brightness-90"
           >
-            Découvrir les 7 univers{" "}
+            Découvrir les 7 axes{" "}
             <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
           </a>
         </div>
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
+        {/* 4 cartes puis 3 centrées : chaque carte couvre 2 colonnes sur 8, et la 5e commence à la 2e colonne. */}
+        <div className="mx-auto mt-8 grid max-w-sm gap-6 sm:max-w-none sm:grid-cols-4 lg:grid-cols-8">
           {univers.map((u, i) => (
-            <a
-              key={u.t}
-              href="#"
-              data-reveal
-              style={retard(i)}
-              className={`${u.c} card-fx group flex flex-col overflow-hidden rounded-3xl bg-[radial-gradient(circle_at_50%_22%,oklch(1_0_0/0.25),transparent_65%)] pt-2 text-center text-primary-foreground shadow-card`}
-            >
-              {/* Mascotte en buste : le bas de l'image passe sous le panneau, dont le flou donne l'effet de verre. La marge en % suit la largeur de la carte, donc celle de l'image. */}
-              <img
-                src={u.img}
-                alt=""
-                loading="lazy"
-                width={1414}
-                height={2000}
-                className="aspect-[1/0.83] w-[115%] max-w-none origin-top self-center object-cover object-top transition duration-300 group-hover:-rotate-2 group-hover:scale-110"
-              />
-              <div className="relative mx-1.5 mb-1.5 -mt-[17%] flex flex-1 flex-col items-center rounded-[1.25rem] border border-white/30 bg-black/10 px-2 py-3 backdrop-blur-md backdrop-saturate-150">
-                <h3 className="text-base leading-tight">{u.t}</h3>
-                <p className="mt-2 flex-1 text-xs font-semibold">{u.d}</p>
-                <span
-                  className={`mt-3 rounded-full bg-card p-2.5 transition duration-300 group-hover:scale-110 ${u.a}`}
-                >
-                  <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-0.5" />
-                </span>
-              </div>
-            </a>
+            <CarteAxe key={u.t} u={u} i={i} />
           ))}
-        </div>
-        <div className="mt-10 grid items-center gap-6 lg:grid-cols-[1fr_2.6fr]">
-          <div data-reveal="left">
-            <h3 className="text-3xl leading-tight md:text-4xl">
-              Les Clubs Santé
-              <br />
-              en chiffres
-            </h3>
-            <p className="mt-2 text-sm font-medium text-muted-foreground">
-              Une communauté qui grandit et qui agit pour une génération de jeunes en bonne santé.
-            </p>
-          </div>
-          {/* Comme sur les cards des univers : le panneau de verre est posé dans la card, et les formes floutées derrière lui donnent l'effet. */}
-          <div
-            data-reveal="right"
-            className="relative isolate overflow-hidden rounded-3xl bg-logo-blue bg-[radial-gradient(circle_at_50%_22%,oklch(1_0_0/0.25),transparent_65%)] p-1.5 text-primary-foreground shadow-card"
-          >
-            <div className="absolute -left-6 -top-6 -z-10 h-28 w-28 rounded-full bg-sky/70" />
-            <div className="absolute -bottom-8 left-1/2 -z-10 h-24 w-24 rounded-full bg-primary/60" />
-            <div className="absolute -right-6 top-1/4 -z-10 h-28 w-28 rounded-full bg-sky/50" />
-            <div className="grid grid-cols-2 gap-y-6 rounded-[1.25rem] border border-white/30 bg-white/10 px-1 py-6 text-center backdrop-blur-md backdrop-saturate-150 md:grid-cols-5">
-              {chiffres.map((c) => (
-                <div
-                  key={c.t}
-                  className="group flex flex-col items-center border-white/25 px-1 last:col-span-2 md:border-l md:first:border-l-0 md:last:col-span-1"
-                >
-                  <c.i className="h-8 w-8 text-sun transition duration-300 group-hover:-translate-y-1 group-hover:scale-110" />
-                  <p className="mt-2 whitespace-nowrap font-display text-[1.75rem] leading-none min-[360px]:text-3xl sm:text-4xl md:text-3xl lg:text-[1.75rem] xl:text-4xl">
-                    <span className="text-[0.7em]">+</span>
-                    <Compteur value={c.n} />
-                  </p>
-                  <p className="mt-2 text-xs font-bold">{c.t}</p>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
       <ClubsSection />
-      <AgendaSection />
+      <ActualitesSection />
 
-      {/* Stars */}
-      <section className="mx-auto max-w-7xl px-5 py-20">
-        <div data-reveal>
-          <h2 className="text-4xl md:text-5xl">
-            <span className="text-logo-blue">C'est toi</span>{" "}
-            <span className="text-primary">la star !</span>
-          </h2>
-          <p className="mt-2 text-muted-foreground">
-            Les réalisations et talents des jeunes des Clubs Santé.
-          </p>
-        </div>
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
-          {stars.map((s, i) => (
-            <article
-              key={s.t}
-              data-reveal
-              style={retard(i)}
-              className="card-fx group overflow-hidden rounded-3xl bg-card shadow-card"
-            >
-              <div className="relative">
-                <div className="overflow-hidden">
-                  <img
-                    src={s.img}
-                    alt={s.t}
-                    loading="lazy"
-                    className="aspect-[3/2] w-full object-cover object-right transition duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <span className="absolute -bottom-5 right-5 rounded-full bg-primary p-3 text-primary-foreground transition duration-300 group-hover:scale-110">
-                  <Play className="h-5 w-5 fill-current" />
-                </span>
-              </div>
-              <div className="p-5">
-                <span
-                  className={`${s.tc} rounded-full px-3 py-1 text-xs font-extrabold uppercase text-primary-foreground`}
-                >
-                  {s.tag}
-                </span>
-                <h3 className="mt-3 font-sans text-lg font-extrabold">{s.t}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{s.d}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* Parcours */}
-      <section className="relative isolate overflow-hidden bg-logo-blue text-primary-foreground">
-        <div className="absolute -left-16 -top-16 -z-10 h-72 w-72 rounded-full bg-sky/40 blur-3xl" />
-        <div className="mx-auto grid max-w-7xl px-5 lg:grid-cols-[1fr_2fr]">
-          {/* Mascotte coupée à la taille : elle sort du bas du panneau. */}
-          <img
-            src={mascotteBourses}
-            alt="Mascotte du Club Santé brandissant un trophée"
-            loading="lazy"
-            width={1414}
-            height={2000}
-            data-reveal="left"
-            className="order-last mx-auto aspect-[1414/1280] w-full max-w-xs self-end object-cover object-top drop-shadow-2xl lg:order-first lg:max-w-none"
-          />
-          <div className="py-12 md:py-16 lg:pl-8">
-            <h2 data-reveal className="text-4xl md:text-5xl">
-              PASSE AU NIVEAU SUPÉRIEUR{" "}
-              <span className="block text-sun">& GAGNE JUSQU'À 1 MILLION FCFA !</span>
-            </h2>
-            <p data-reveal className="mt-4 max-w-3xl font-medium">
-              Collégien, lycéen ou simple visiteur engagé : relève le défi des 12 Quiz Santé,
-              décroche ton Certificat officiel Génie Imhotep et tes 5 Badges, et tente de remporter
-              des lots exceptionnels !
-            </p>
-            <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
-              {steps.map((s, i) => (
-                <div
-                  key={s.t}
-                  data-reveal="zoom"
-                  style={retard(i)}
-                  className="card-fx group relative rounded-2xl border border-white/25 bg-white/10 p-4 backdrop-blur-md hover:bg-white/20"
-                >
-                  <s.i className="h-7 w-7 text-sun transition duration-300 group-hover:-rotate-6 group-hover:scale-110" />
-                  <p className="mt-2 font-display text-3xl leading-none">{s.n}</p>
-                  <p className="mt-2 text-xs font-bold">{s.t}</p>
-                  {i < steps.length - 1 && (
-                    <ChevronRight className="absolute -right-5 top-1/2 hidden h-4 w-4 -translate-y-1/2 text-sun md:block" />
-                  )}
-                </div>
-              ))}
-            </div>
-            <a
-              href="#"
-              className="btn-fx mt-8 inline-block rounded-full bg-primary px-8 py-3 text-center text-[15px] font-bold shadow-card"
-            >
-              Découvrir la certification
-            </a>
-          </div>
-        </div>
-      </section>
+      <DefiDuJour />
 
       <PartenairesSection />
       <GalerieSection />
