@@ -302,7 +302,7 @@ const heroSlides = [
     lines: ["DÉCOUVRE NOS", "MASCOTTES !"],
     cta: [
       { t: "Découvrir les mascottes", href: "#" },
-      { t: "Obtenir ma certification", href: "#" },
+      { t: "Obtenir ma certification", href: "/certification" },
     ],
     sub: "Découvre les mascottes qui accompagnent les jeunes à apprendre, créer, s’engager et révéler leurs talents.",
   },
@@ -321,8 +321,8 @@ const heroSlides = [
     },
     lines: ["CLUBS SANTÉ", "SOS DOCTEUR TV"],
     cta: [
-      { t: "Rejoindre un club", href: "#" },
-      { t: "Découvrir les clubs", href: "#" },
+      { t: "Rejoindre un club", href: "/club-sante#adhesion" },
+      { t: "Découvrir les clubs", href: "/carte-des-clubs" },
     ],
     tagline: "Ensemble pour une génération de jeunes en bonne santé, responsables et épanouie",
     sub: "Les Clubs Santé SOS DOCTEUR TV réunissent des milliers de jeunes engagés pour la santé, le leadership, l'excellence et la citoyenneté active au Togo.",
@@ -342,8 +342,8 @@ const heroSlides = [
     },
     lines: ["GÉNIE", "IMHOTEP"],
     cta: [
-      { t: "Lancer le quiz", href: "#" },
-      { t: "Voir la carte", href: "#clubs" },
+      { t: "Lancer le quiz", href: "/jeux" },
+      { t: "Voir la carte", href: "/carte-des-clubs" },
     ],
     tagline: "C’est ici et maintenant",
     sub: "La grande compétition de culture générale en santé publique dans les collèges et lycées du Togo et sur la chaîne SOS DOCTEUR TV !",
@@ -363,8 +363,8 @@ const heroSlides = [
     },
     lines: ["7 AXES", "STRATÉGIQUES"],
     cta: [
-      { t: "Découvrir les 7 axes", href: "#univers" },
-      { t: "Bibliothèque", href: "#" },
+      { t: "Découvrir les 7 axes", href: "/les-7-axes" },
+      { t: "Bibliothèque", href: "/bibliotheque" },
     ],
     tagline: "Conçus pour permettre aux élèves de mener leurs activités de façon autonome.",
     sub: "Conçus pour permettre aux élèves de mener leurs activités de façon autonome : découvre les programmes d'action concrets de l'hygiène au secourisme, de la nutrition à la santé mentale dans chaque établissement.",
@@ -676,7 +676,10 @@ function ActualitesSection() {
               <span className="text-logo-blue">C'est toi</span>{" "}
               <span className="text-primary">la star !</span>
             </h3>
-            <a href="#" className="group flex items-center gap-1.5 font-bold text-logo-blue">
+            <a
+              href="/magazine"
+              className="group flex items-center gap-1.5 font-bold text-logo-blue"
+            >
               Toutes les actus
               <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
@@ -707,7 +710,7 @@ function ActualitesSection() {
               </h4>
               <p className="mt-2 max-w-lg font-medium text-white/80">{aLaUne.d}</p>
               <a
-                href="#"
+                href="/magazine"
                 className="btn-fx mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-[15px] font-bold after:absolute after:inset-0"
               >
                 Lire l'article <ArrowRight className="size-4" />
@@ -741,7 +744,7 @@ function ActualitesSection() {
                     {s.tag}
                   </span>
                   <h4 className="mt-2 font-sans font-extrabold leading-snug">
-                    <a href="#" className="after:absolute after:inset-0">
+                    <a href="/magazine" className="after:absolute after:inset-0">
                       {s.t}
                     </a>
                   </h4>
@@ -791,7 +794,7 @@ function JeuConcours() {
           </div>
           <div className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-end">
             <a
-              href="#"
+              href="/certification"
               className="btn-fx group flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-primary px-4 text-sm font-bold text-primary-foreground shadow-card sm:px-6 sm:text-[15px] lg:w-88"
             >
               <Trophy className="hidden h-5 w-5 sm:block" />
@@ -799,7 +802,7 @@ function JeuConcours() {
               <ArrowRight className="hidden h-4 w-4 transition-transform group-hover:translate-x-1 sm:block" />
             </a>
             <a
-              href="#"
+              href="/jeux"
               className="btn-fx flex h-12 items-center justify-center rounded-full border-2 border-white/60 bg-white/10 px-6 lg:w-88 text-[15px] font-bold backdrop-blur-sm"
             >
               S'inscrire aux quiz
@@ -960,7 +963,7 @@ function Index() {
             </p>
           </div>
           <a
-            href="#"
+            href="/les-7-axes"
             className="group font-bold text-primary underline transition hover:brightness-90"
           >
             Découvrir les 7 axes{" "}

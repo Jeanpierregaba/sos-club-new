@@ -12,20 +12,38 @@ import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/com
 import { useMoi } from "@/hooks/use-moi";
 import logo from "@/assets/logo.webp";
 
-// Les pages pas encore construites n'ont pas de `href` : leur lien pointe vers « # ». Les ancres visent l'accueil, pour fonctionner depuis toutes les pages.
-const menu: { t: string; items: { t: string; href?: string }[] }[] = [
+// Une page par entrée de menu, rangées par rubrique.
+const menu: { t: string; items: { t: string; href: string }[] }[] = [
   {
     t: "Vie du club",
     items: [
       { t: "Club santé", href: "/club-sante" },
-      { t: "Les 7 axes", href: "/#univers" },
-      { t: "Cartes des clubs", href: "/#clubs" },
-      { t: "Bibliothèques" },
+      { t: "Les 7 axes", href: "/les-7-axes" },
+      { t: "Carte des clubs", href: "/carte-des-clubs" },
+      { t: "Bibliothèque", href: "/bibliotheque" },
     ],
   },
-  { t: "Génie Imhotep", items: [{ t: "Hall of Fame" }, { t: "Inscription" }] },
-  { t: "Gamification", items: [{ t: "Jeux" }, { t: "Certification" }] },
-  { t: "Actualités", items: [{ t: "Agenda", href: "/#agenda" }, { t: "Magazine" }] },
+  {
+    t: "Génie Imhotep",
+    items: [
+      { t: "Hall of Fame", href: "/genie-imhotep/hall-of-fame" },
+      { t: "Inscription", href: "/genie-imhotep/inscription" },
+    ],
+  },
+  {
+    t: "Gamification",
+    items: [
+      { t: "Jeux", href: "/jeux" },
+      { t: "Certification", href: "/certification" },
+    ],
+  },
+  {
+    t: "Actualités",
+    items: [
+      { t: "Agenda", href: "/agenda" },
+      { t: "Magazine", href: "/magazine" },
+    ],
+  },
 ];
 
 function Logo() {
@@ -90,7 +108,7 @@ export function SiteHeader() {
                     {m.items.map((i) => (
                       <li key={i.t}>
                         <NavigationMenuPrimitive.Link
-                          href={i.href ?? "#"}
+                          href={i.href}
                           className="block rounded-lg px-3 py-2 text-sm font-semibold transition hover:translate-x-1 hover:bg-mist hover:text-logo-blue"
                         >
                           {i.t}
@@ -125,7 +143,7 @@ export function SiteHeader() {
                           <li key={i.t}>
                             <SheetClose asChild>
                               <a
-                                href={i.href ?? "#"}
+                                href={i.href}
                                 className="block rounded-lg px-3 py-2 font-semibold hover:bg-mist hover:text-logo-blue"
                               >
                                 {i.t}

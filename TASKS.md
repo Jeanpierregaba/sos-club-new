@@ -33,7 +33,8 @@ Ordre : dépendances, puis valeur. Les questions Q renvoient à `docs/PRD.md`.
 ### Petites tâches
 
 - [ ] Mettre à jour les dépendances du site : 13 failles élevées signalées par `bun audit` (zod, vite, nanoid…), puis rendre cet audit bloquant dans la CI
-- [ ] Remplacer les liens vers des pages absentes et les contenus provisoires de l'accueil au fil des specs (dates d'Agenda, `/agenda`, `/etablissements`, chiffres des clubs)
+- [ ] Remplacer les liens vers des pages absentes et les contenus provisoires de l'accueil au fil des specs (dates d'Agenda, chiffres des clubs)
+- [ ] Pages du menu : brancher sur l'API les contenus repris du site de référence (agenda, magazine, bibliothèque, Hall of Fame, quiz), mettre en ligne les fichiers (plaquette, documentaire, documents de la bibliothèque, liens en `#`) et ouvrir les formulaires d'inscription Génie Imhotep ; vérifier 5 doublons probables de l'annuaire (IESG Aného et Dapaong)
 - [ ] Renommer le paquet `tanstack_start_ts`
 - [ ] Suspension d'un compte (avec son interface) : supprimer aussi les sessions, sinon une réactivation les rend de nouveau valides
 - [ ] Suite Playwright des parcours de connexion (garde, en-tête, retour arrière), vérifiés à la main pour l'instant, avant l'ouverture

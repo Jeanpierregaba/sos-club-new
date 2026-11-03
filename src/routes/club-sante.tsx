@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Accessibility,
@@ -24,6 +24,7 @@ import {
   Target,
   Trophy,
 } from "lucide-react";
+import { EnTete } from "@/components/EnTete";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion, retard } from "@/components/SiteMotion";
@@ -229,36 +230,6 @@ const faq: { theme: keyof typeof themes; q: string; r: string }[] = [
     r: "C’est la compétition nationale d’excellence scolaire retransmise sur SOS DOCTEUR TV, qui confronte les clubs santé sur la culture générale en santé, les gestes qui sauvent et les projets d’impact communautaire. Lancement officiel de la 1re édition : 02 avril 2026.",
   },
 ];
-
-// Surtitre en capitales, puis titre en deux couleurs.
-function EnTete({
-  sur,
-  bleu,
-  vert,
-  children,
-  centre = false,
-}: {
-  sur: string;
-  bleu: string;
-  vert: string;
-  children?: ReactNode;
-  centre?: boolean;
-}) {
-  return (
-    <div data-reveal className={centre ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
-      <p
-        className={`flex items-center gap-3 text-sm font-extrabold uppercase tracking-widest text-logo-red ${centre ? "justify-center" : ""}`}
-      >
-        <span className="h-1 w-8 rounded-full bg-primary" />
-        {sur}
-      </p>
-      <h2 className="mt-3 text-4xl md:text-5xl">
-        <span className="text-logo-blue">{bleu}</span> <span className="text-primary">{vert}</span>
-      </h2>
-      {children && <p className="mt-3 text-lg font-medium text-muted-foreground">{children}</p>}
-    </div>
-  );
-}
 
 // FAQ : les thèmes en filtre, les questions à gauche, la réponse dans une grande bulle à droite.
 // Sur mobile, la réponse s'ouvre sous la question choisie.
@@ -593,7 +564,7 @@ function ClubSante() {
             </ul>
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
               <a
-                href="#"
+                href="/certification"
                 className="btn-fx inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold shadow-card"
               >
                 Lancer ma certification <ArrowRight className="size-4" />

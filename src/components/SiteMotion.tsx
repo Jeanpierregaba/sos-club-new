@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
 // Décale l'apparition des éléments d'une même rangée.
 export const retard = (i: number) => ({ "--delay": `${i * 80}ms` }) as CSSProperties;
 
-// Apparitions au défilement, barre de progression et ombre du header. Les éléments ciblés doivent être présents dès le premier rendu.
+// Apparitions au défilement, barre de progression et ombre du header. Seuls les éléments présents au premier rendu sont animés.
 export function SiteMotion() {
   const barre = useRef<HTMLDivElement>(null);
 
@@ -29,8 +29,20 @@ export function SiteMotion() {
         el.setAttribute("data-visible", "instant");
       else observer.observe(el);
     });
+    // Les éléments montés plus tard (listes filtrées, contenu calculé au navigateur) s'affichent sans animation.
+    const ajouts = new MutationObserver((mutations) => {
+      for (const m of mutations)
+        m.addedNodes.forEach((n) => {
+          if (!(n instanceof Element)) return;
+          for (const el of [n, ...n.querySelectorAll("[data-reveal]")])
+            if (el.hasAttribute("data-reveal") && !el.hasAttribute("data-visible"))
+              el.setAttribute("data-visible", "instant");
+        });
+    });
+    ajouts.observe(document.body, { childList: true, subtree: true });
     document.documentElement.classList.add("reveal-ready");
     return () => {
+      ajouts.disconnect();
       observer.disconnect();
       document.documentElement.classList.remove("reveal-ready");
     };

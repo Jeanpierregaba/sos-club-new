@@ -184,7 +184,7 @@ export function ClubsSection() {
                   </p>
                 )}
                 <a
-                  href="/etablissements"
+                  href="/carte-des-clubs"
                   className="btn-fx mt-6 self-start rounded-full bg-primary px-6 py-3 text-center text-[15px] font-bold text-primary-foreground shadow-card"
                 >
                   Découvrir les établissements
