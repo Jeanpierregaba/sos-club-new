@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConnecteRouteImport } from './routes/_connecte'
+import { Route as ClubSanteRouteImport } from './routes/club-sante'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as ConnecteMonEspaceRouteImport } from './routes/_connecte/mon-espace'
 
@@ -21,6 +22,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const ConnecteRoute = ConnecteRouteImport.update({
   id: '/_connecte',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClubSanteRoute = ClubSanteRouteImport.update({
+  id: '/club-sante',
+  path: '/club-sante',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConnexionRoute = ConnexionRouteImport.update({
@@ -36,11 +42,13 @@ const ConnecteMonEspaceRoute = ConnecteMonEspaceRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/club-sante': typeof ClubSanteRoute
   '/connexion': typeof ConnexionRoute
   '/mon-espace': typeof ConnecteMonEspaceRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/club-sante': typeof ClubSanteRoute
   '/connexion': typeof ConnexionRoute
   '/mon-espace': typeof ConnecteMonEspaceRoute
 }
@@ -48,20 +56,28 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_connecte': typeof ConnecteRouteWithChildren
+  '/club-sante': typeof ClubSanteRoute
   '/connexion': typeof ConnexionRoute
   '/_connecte/mon-espace': typeof ConnecteMonEspaceRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/connexion' | '/mon-espace'
+  fullPaths: '/' | '/club-sante' | '/connexion' | '/mon-espace'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/connexion' | '/mon-espace'
-  id: '__root__' | '/' | '/_connecte' | '/connexion' | '/_connecte/mon-espace'
+  to: '/' | '/club-sante' | '/connexion' | '/mon-espace'
+  id:
+    | '__root__'
+    | '/'
+    | '/_connecte'
+    | '/club-sante'
+    | '/connexion'
+    | '/_connecte/mon-espace'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConnecteRoute: typeof ConnecteRouteWithChildren
+  ClubSanteRoute: typeof ClubSanteRoute
   ConnexionRoute: typeof ConnexionRoute
 }
 
@@ -79,6 +95,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof ConnecteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/club-sante': {
+      id: '/club-sante'
+      path: '/club-sante'
+      fullPath: '/club-sante'
+      preLoaderRoute: typeof ClubSanteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/connexion': {
@@ -113,6 +136,7 @@ const ConnecteRouteWithChildren = ConnecteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConnecteRoute: ConnecteRouteWithChildren,
+  ClubSanteRoute: ClubSanteRoute,
   ConnexionRoute: ConnexionRoute,
 }
 export const routeTree = rootRouteImport
