@@ -27,8 +27,8 @@ const menu: { t: string; items: { t: string; href: string }[] }[] = [
   {
     t: "Génie Imhotep",
     items: [
-      { t: "Hall of Fame", href: "/genie-imhotep/hall-of-fame" },
       { t: "Description", href: "/genie-imhotep/description" },
+      { t: "Hall of Fame", href: "/genie-imhotep/hall-of-fame" },
     ],
   },
   {

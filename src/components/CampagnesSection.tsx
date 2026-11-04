@@ -78,7 +78,7 @@ export function CampagnesSection() {
         data-reveal="zoom"
         aria-roledescription="carrousel"
         aria-label="Campagnes du Club Santé"
-        className="relative isolate mt-8 grid overflow-hidden rounded-[2rem] text-white shadow-card lg:min-h-[34rem] lg:grid-cols-[1.3fr_1fr]"
+        className="relative isolate mt-8 grid overflow-hidden rounded-3xl text-white shadow-card lg:min-h-[34rem] lg:grid-cols-[1.3fr_1fr]"
       >
         {campagnes.map((c, i) => (
           <div

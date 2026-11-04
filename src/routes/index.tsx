@@ -28,6 +28,7 @@ import { CampagnesSection } from "@/components/CampagnesSection";
 import { TemoignagesSection } from "@/components/TemoignagesSection";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { Compteur } from "@/components/Compteur";
 import { SiteMotion, retard } from "@/components/SiteMotion";
 import hero from "@/assets/hero.jpg";
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
@@ -217,40 +218,6 @@ const chiffresCles = [
   },
 ];
 
-// Le rendu serveur affiche le vrai chiffre (sans JavaScript, ou si l'utilisateur limite les animations) ; le compte part de 0 quand le chiffre devient visible.
-function Compteur({ value }: { value: number }) {
-  const [current, setCurrent] = useState(value);
-  const ref = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setCurrent(0);
-    let frame = 0;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        observer.disconnect();
-        const start = performance.now();
-        const tick = (now: number) => {
-          const p = Math.min(Math.max(now - start, 0) / 1800, 1);
-          setCurrent(Math.round(value * (1 - (1 - p) ** 3)));
-          if (p < 1) frame = requestAnimationFrame(tick);
-        };
-        frame = requestAnimationFrame(tick);
-      },
-      { threshold: 0.5 },
-    );
-    observer.observe(el);
-    return () => {
-      observer.disconnect();
-      cancelAnimationFrame(frame);
-    };
-  }, [value]);
-
-  return <span ref={ref}>{String(current).replace(/\B(?=(\d{3})+$)/g, " ")}</span>;
-}
-
 // Section Actualités : un article à la une, puis les autres en ligne.
 const aLaUne = {
   img: grandesFinales,
@@ -295,12 +262,6 @@ const heroSlides = [
     accent: "bg-sun",
     cadrage: "object-[50%_25%]",
     alt: "Remise du trophée de champion national Génie Imhotep 2026 à une élève en t-shirt orange",
-    mascot: {
-      src: mascottesAxes,
-      alt: "Quatre mascottes caméléons avec une caméra, un mégaphone et un arrosoir",
-      width: 1122,
-      height: 1402,
-    },
     lines: ["DÉCOUVRE NOS", "MASCOTTES !"],
     cta: [
       { t: "Découvrir les mascottes", href: "#" },
@@ -784,25 +745,45 @@ function JeuConcours() {
           className="pointer-events-none absolute -bottom-10 -right-6 -z-10 size-72 -rotate-12 text-white/10 md:size-96"
         />
 
-        <h2 className="text-[1.75rem] uppercase leading-[1.05] min-[400px]:text-4xl xl:text-5xl">
-          Obtiens ta <span className="text-sun">certification</span> & gagne jusqu'à{" "}
-          <span className="mt-2 inline-block -rotate-2 whitespace-nowrap rounded-2xl bg-sun px-3 py-1 text-ink shadow-[0_12px_30px_-8px] shadow-black/40 sm:px-4">
-            1 million FCFA !
+        {/* Deux lignes à partir de 640 px ; en dessous, le texte revient à la ligne selon la place. */}
+        <h2 className="text-[1.75rem] uppercase leading-[1.15] sm:text-3xl lg:text-[2rem] xl:text-[2.5rem]">
+          <span className="sm:block sm:whitespace-nowrap">
+            Obtiens ta <span className="text-sun">certification</span> &
+          </span>{" "}
+          <span className="sm:block sm:whitespace-nowrap">
+            gagne jusqu'à{" "}
+            <span className="inline-block -rotate-2 whitespace-nowrap rounded-2xl bg-sun px-3 py-0.5 text-ink shadow-[0_12px_30px_-8px] shadow-black/40">
+              1 million FCFA !
+            </span>
           </span>
         </h2>
 
         <a
           href="/certification"
-          className="btn-fx group flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground shadow-card sm:text-[15px] lg:h-14 lg:px-8"
+          className="btn-fx flex h-12 items-center justify-center whitespace-nowrap rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground shadow-card sm:text-[15px] lg:h-14 lg:px-8"
         >
-          <Trophy className="hidden h-5 w-5 sm:block" />
           Obtenir ma certification & jouer
-          <ArrowRight className="hidden h-4 w-4 transition-transform group-hover:translate-x-1 sm:block" />
         </a>
       </div>
     </section>
   );
 }
+
+// Le lecteur YouTube se pilote par messages (API IFrame).
+const commande = (lecteur: HTMLIFrameElement | null, func: string, args: unknown[] = []) =>
+  lecteur?.contentWindow?.postMessage(
+    JSON.stringify({ event: "command", func, args }),
+    "https://www.youtube-nocookie.com",
+  );
+
+// Les sous-titres automatiques se chargent avec la lecture, un peu après le lecteur : on les retire à plusieurs reprises au démarrage.
+const sansSousTitres = (lecteur: HTMLIFrameElement | null) =>
+  [500, 2000, 5000].forEach((t) =>
+    setTimeout(() => {
+      commande(lecteur, "unloadModule", ["captions"]);
+      commande(lecteur, "unloadModule", ["cc"]);
+    }, t),
+  );
 
 function Index() {
   const [active, setActive] = useState(0);
@@ -816,14 +797,13 @@ function Index() {
     return () => clearInterval(t);
   }, [active, count, son]);
 
-  // Le lecteur YouTube se pilote par messages (API IFrame) : la vidéo démarre muette, le bouton coupe ou rétablit le son.
+  // La vidéo démarre muette ; le bouton coupe ou rétablit le son.
   const basculerSon = () => {
-    lecteur.current?.contentWindow?.postMessage(
-      JSON.stringify({ event: "command", func: son ? "mute" : "unMute", args: [] }),
-      "https://www.youtube-nocookie.com",
-    );
+    commande(lecteur.current, son ? "mute" : "unMute");
     setSon(!son);
   };
+  // Le lecteur peut finir de charger avant l'hydratation : son onLoad serait alors perdu.
+  useEffect(() => sansSousTitres(lecteur.current), []);
   const changer = (i: number) => {
     if (son) basculerSon();
     setActive(i);
@@ -902,11 +882,11 @@ function Index() {
               <div
                 key={i}
                 aria-hidden
-                className={`absolute inset-0 translate-x-3 translate-y-3 rotate-2 rounded-[2.5rem] rounded-tl-[6rem] transition-opacity duration-700 sm:translate-x-5 sm:translate-y-5 ${s.accent} ${i === active ? "opacity-100" : "opacity-0"}`}
+                className={`absolute inset-0 translate-x-3 translate-y-3 rotate-2 rounded-3xl transition-opacity duration-700 sm:translate-x-5 sm:translate-y-5 ${s.accent} ${i === active ? "opacity-100" : "opacity-0"}`}
               />
             ))}
             {/* La nouvelle photo arrive par-dessus l'ancienne, qui ne s'efface qu'ensuite. Elle avance lentement pendant son affichage, et ne revient à sa taille qu'une fois invisible. */}
-            <div className="relative isolate aspect-[16/11] overflow-hidden lg:aspect-[5/4] rounded-[2.5rem] rounded-tl-[6rem] shadow-2xl ring-4 ring-white/25">
+            <div className="relative isolate aspect-video overflow-hidden rounded-3xl shadow-2xl ring-4 ring-white/25">
               {heroSlides.map((s, i) => (
                 <img
                   key={i}
@@ -918,19 +898,20 @@ function Index() {
                   className={`absolute inset-0 h-full w-full object-cover ${s.cadrage} ${i === active ? "z-10 scale-105 opacity-100 [transition:opacity_700ms_ease-in-out,scale_7000ms_linear]" : "scale-100 opacity-0 [transition:opacity_500ms_ease-in-out_300ms,scale_0s_linear_800ms]"}`}
                 />
               ))}
-              {/* La vidéo couvre le cadre comme une photo : en 16/9 sur toute la hauteur, ses côtés sont rognés, et le zoom masque le titre et les sous-titres de YouTube. */}
+              {/* Le cadre est en 16/9, comme la vidéo : elle s'affiche en entier, sans rognage. */}
               {heroSlides.map(
                 (s, i) =>
                   s.video && (
                     <iframe
                       key={s.video}
                       ref={lecteur}
+                      onLoad={(e) => sansSousTitres(e.currentTarget)}
                       src={`https://www.youtube-nocookie.com/embed/${s.video}?autoplay=1&mute=1&loop=1&playlist=${s.video}&controls=0&rel=0&playsinline=1&modestbranding=1&cc_load_policy=0&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1`}
                       title="Vidéo de présentation des Clubs Santé SOS Docteur TV"
                       allow="autoplay; encrypted-media; picture-in-picture"
                       tabIndex={-1}
                       aria-hidden={i !== active}
-                      className={`pointer-events-none absolute left-1/2 top-1/2 aspect-video h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.35] transition-opacity duration-700 ${i === active ? "z-20 opacity-100" : "opacity-0"}`}
+                      className={`pointer-events-none absolute inset-0 size-full transition-opacity duration-700 ${i === active ? "z-20 opacity-100" : "opacity-0"}`}
                     />
                   ),
               )}
@@ -946,17 +927,21 @@ function Index() {
                 </button>
               )}
             </div>
-            {heroSlides.map((s, i) => (
-              <img
-                key={i}
-                src={s.mascot.src}
-                alt={s.mascot.alt}
-                width={s.mascot.width}
-                height={s.mascot.height}
-                aria-hidden={i !== active}
-                className={`absolute bottom-0 left-1 w-24 drop-shadow-2xl motion-safe:animate-float sm:-left-4 sm:w-40 lg:-bottom-12 lg:-left-16 lg:w-56 ${heroFade(i === active)}`}
-              />
-            ))}
+            {/* La slide de la vidéo n'a pas de mascotte : rien ne vient la masquer. */}
+            {heroSlides.map(
+              (s, i) =>
+                s.mascot && (
+                  <img
+                    key={i}
+                    src={s.mascot.src}
+                    alt={s.mascot.alt}
+                    width={s.mascot.width}
+                    height={s.mascot.height}
+                    aria-hidden={i !== active}
+                    className={`absolute bottom-0 left-1 w-24 drop-shadow-2xl motion-safe:animate-float sm:-left-4 sm:w-40 lg:-bottom-12 lg:-left-16 lg:w-56 ${heroFade(i === active)}`}
+                  />
+                ),
+            )}
           </div>
         </div>
 
