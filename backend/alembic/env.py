@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 import app.admin.models
 import app.comptes.models
 import app.eleves.models
+import app.encadreurs.models
 import app.points.models
 import app.referentiel.models  # noqa: F401
 from alembic import context

@@ -14,6 +14,22 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-04 — Compte encadreur (spec 018, R3)
+
+- Fait : spec 018 livrée. Domaine `encadreurs` (inscription en attente, `verification.py` : file filtrable par DRE,
+  activation avec +100 de bienvenue en une transaction idempotente, refus motivé, renvoi de l'encadreur,
+  `encadreur_actif`) ; API et site (`/inscription?profil=encadreur`, espace encadreur, `/admin/encadreurs`
+  avec 2FA et compteur), OpenAPI et types régénérés. Relecture du sous-agent `reviewer` : 3 constats importants
+  corrigés (version envoyée par le site à l'activation **et** au refus, verrou `Utilisateur` à la décision,
+  plus aucun contenu d'e-mail dans les journaux), 4 mineurs traités. Vérifié en format téléphone : boucle
+  complet refusé → renvoi → en attente. Prérequis R4/R5.
+- Pièges rencontrés : le `fastapi dev` de l'utilisateur tourne sur le port 8001 (le site de 3000 proxifie vers
+  8000, qui sert une autre application) ; hors production, les e-mails ne sont plus journalisés : l'invitation
+  admin renvoie le lien par `lien_de_test`.
+- Décisions : sans objet (reprise). Note : `Row._tuple()` remplacé par `tuple()` (dépréciation SQLAlchemy 2.1).
+- Prochaine étape : `/spec` R4 — Clubs et présidence (questions de cadrage posées, dossier
+  `docs/specs/019-clubs-et-presidence/` ouvert, spec non encore écrite).
+
 ### 2026-11-04 — Compte élève et registre des points (spec 017, R2)
 
 - Fait : spec 017 livrée. Domaine `points` (registre `mouvement_points` idempotent, semestres sans

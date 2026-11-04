@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
@@ -66,3 +66,26 @@ class LigneBaremeModification(BaseModel):
     montant: Montant | None = None
     propose: bool | None = None
     actif: bool | None = None
+
+
+# Résumé des points d'un élève ou d'un encadreur, dans son espace ou sa fiche admin -------------------------------
+
+
+class SemestreResume(BaseModel):
+    libelle: str
+    debut: date
+    fin: date
+
+
+class LignePoints(BaseModel):
+    libelle: str
+    montant: int
+    cree_le: datetime
+    semestre: str | None
+
+
+class ResumePoints(BaseModel):
+    semestre: SemestreResume | None
+    points_semestre: int
+    total: int
+    lignes: list[LignePoints]

@@ -56,3 +56,12 @@ Jusqu'ici, un seul rôle `admin` donnait tous les droits (ADR-0003, spec 001).
   motifs saisis. Le texte des recherches d'export, lui, n'y est jamais écrit. Une durée de conservation est à
   fixer avec un juriste (question Q8 du PRD, § 16 du CDC admin) ; la purge passera alors par une migration
   tracée.
+
+## Note du 2026-11-04 : vérification des encadreurs par DRE (spec 018)
+
+Les données nominatives restent réservées au périmètre national, avec une exception limitée : le module
+`encadreurs` (`consulter`, `approuver`). Un collaborateur de DRE y voit le nom, l'e-mail et le téléphone des
+seuls encadreurs inscrits dans un établissement de sa DRE, pour vérifier leur inscription, comme la
+validation des affiliations par la DRE (Q18). Le périmètre se lit sur l'établissement actuel, sous verrou, au
+moment de la décision ; hors de sa DRE, la demande lui est introuvable (404). `approuver` est un droit
+sensible : il exige la double authentification. L'annuaire des inscrits reste national.

@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.comptes.dependances import utilisateur_courant
+from app.comptes.inscription import InscriptionsFermees, Refus, TropDInscriptions
 from app.comptes.models import Utilisateur
 from app.comptes.router import _poser_cookie
 from app.comptes.schemas import Moi
@@ -31,7 +32,7 @@ def _adresse(request: Request) -> str:
 def _traduire_refus() -> Iterator[None]:
     try:
         yield
-    except service.Refus as refus:
+    except Refus as refus:
         raise HTTPException(refus.statut, str(refus)) from None
     except service.PasUnEleve:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cet espace est réservé aux élèves.") from None
@@ -50,9 +51,9 @@ async def inscription(entree: InscriptionEntree, request: Request, response: Res
     try:
         with _traduire_refus():
             utilisateur = await service.inscrire(db, entree, _adresse(request))
-    except service.InscriptionsFermees:
+    except InscriptionsFermees:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Les inscriptions ne sont pas encore ouvertes.") from None
-    except service.TropDInscriptions:
+    except TropDInscriptions:
         raise HTTPException(
             status.HTTP_429_TOO_MANY_REQUESTS, "Trop d'inscriptions depuis ce réseau. Réessaie dans une heure."
         ) from None

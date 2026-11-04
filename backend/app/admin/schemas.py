@@ -8,7 +8,9 @@ from app.admin.catalogue import Action, RoleDepart
 from app.admin.models import FormatExport, StatutExport, TypeExport
 from app.comptes.models import Role, StatutCompte
 from app.eleves.models import Classe
-from app.eleves.schemas import EtablissementEleve, PointsEleve
+from app.encadreurs.models import EtatVerification, Fonction
+from app.points.schemas import ResumePoints
+from app.referentiel.schemas import EtablissementRattache
 
 Motif = Field(min_length=3, max_length=500)
 
@@ -29,6 +31,8 @@ class AdminMoi(BaseModel):
     droits: list[Droit]
     double_auth_active: bool
     double_auth_requise: bool
+    # Le compteur du menu : None sans le droit de consulter la file (spec 018).
+    encadreurs_a_verifier: int | None = None
 
 
 class ModuleCatalogue(BaseModel):
@@ -184,14 +188,30 @@ class ProfilEleveAdmin(BaseModel):
     pseudonyme: str
     classe: Classe
     charte_version: str
-    etablissement: EtablissementEleve
-    points: PointsEleve
+    etablissement: EtablissementRattache
+    points: ResumePoints
+
+
+class ProfilEncadreurAdmin(BaseModel):
+    fonction: Fonction
+    fonction_precision: str | None
+    charte_version: str
+    etablissement: EtablissementRattache
+    etat: EtatVerification
+    demande_le: datetime
+    decide_le: datetime | None
+    # Nom du collaborateur qui a décidé, s'il existe encore.
+    decide_par: str | None
+    motif_refus: str | None
+    points: ResumePoints
 
 
 class InscritDetail(Inscrit):
     historique: list[EvenementJournal]
     # Pour un élève qui a son profil (spec 017) ; les comptes créés avant n'en ont pas.
     eleve: ProfilEleveAdmin | None = None
+    # Pour un encadreur qui a son profil (spec 018).
+    encadreur: ProfilEncadreurAdmin | None = None
 
 
 class PseudonymeEntree(BaseModel):
@@ -280,4 +300,6 @@ class TableauDeBord(BaseModel):
     indicateurs: list[Indicateur]
     # Libellé du semestre en cours ; None signale qu'aucun semestre n'est configuré pour aujourd'hui (spec 017).
     semestre_en_cours: str | None
+    # Demandes d'encadreurs en attente dans le périmètre ; None sans le droit de les consulter (spec 018).
+    encadreurs_a_verifier: int | None = None
     derniers_evenements: list[EvenementJournal] | None

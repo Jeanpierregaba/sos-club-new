@@ -97,6 +97,20 @@ def test_un_super_admin_se_connecte_aussi_par_e_mail(client: TestClient, en_base
     assert reponse.json()["etape"] == "code"
 
 
+def test_les_encadreurs_ont_un_profil_et_le_premier_est_actif(client: TestClient, en_base: Callable[..., Any]) -> None:
+    en_base(semer)
+    encadreur = acces_de(en_base(semer), "dev.encadreur")
+    client.post(
+        "/api/comptes/connexion", json={"identifiant": "dev.encadreur", "mot_de_passe": encadreur["mot_de_passe"]}
+    )
+
+    espace = client.get("/api/encadreurs/moi").json()
+
+    assert (espace["etat"], espace["fonction"]) == ("actif", "enseignant")
+    assert espace["points"]["total"] == 100
+    assert acces_de(en_base(semer), "dev.encadreur.attente")["profil"] == "Encadreur (en attente)"
+
+
 def test_les_eleves_ont_un_profil_et_leur_bienvenue(client: TestClient, en_base: Callable[..., Any]) -> None:
     en_base(semer)
     # Relancé : ni second profil, ni seconde ligne de bienvenue, ni second semestre.

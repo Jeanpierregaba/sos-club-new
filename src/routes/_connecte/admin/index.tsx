@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, CalendarX, Clock, Download, UserPlus, Users } from "lucide-react";
+import { ArrowRight, CalendarX, Clock, Download, UserCheck, UserPlus, Users } from "lucide-react";
 
 import { EnTeteAdmin } from "@/components/admin/EnTeteAdmin";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
@@ -97,6 +97,23 @@ function TableauDeBordPage() {
                 </Link>
               )}
             </p>
+          )}
+          {Boolean(tableau.encadreurs_a_verifier) && (
+            <Link
+              to="/admin/encadreurs"
+              className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-ink shadow-sm ring-1 ring-border transition hover:ring-night/30"
+            >
+              <UserCheck aria-hidden className="size-5 shrink-0 text-logo-red" />
+              <span>
+                <strong className="text-logo-blue">{tableau.encadreurs_a_verifier}</strong>{" "}
+                {tableau.encadreurs_a_verifier === 1
+                  ? "encadreur attend sa vérification."
+                  : "encadreurs attendent leur vérification."}
+              </span>
+              <span className="ml-auto inline-flex items-center gap-1 font-bold text-logo-blue">
+                Vérifier <ArrowRight aria-hidden className="size-4" />
+              </span>
+            </Link>
           )}
           <section aria-labelledby="titre-comptes">
             <h2 id="titre-comptes" className="text-xl text-logo-blue">

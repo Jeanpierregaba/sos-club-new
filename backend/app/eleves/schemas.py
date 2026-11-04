@@ -1,4 +1,3 @@
-from datetime import date, datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
@@ -6,22 +5,13 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.comptes.service import LONGUEUR_MAX_MOT_DE_PASSE
 from app.eleves.models import Classe
-from app.referentiel.models import StatutEtablissement
-from app.referentiel.schemas import Nom
+from app.points.schemas import ResumePoints
+from app.referentiel.schemas import EtablissementRattache, Proposition
 
 
 class EtatInscription(BaseModel):
     ouvertes: bool
     version_charte: str
-
-
-class Proposition(BaseModel):
-    """Un établissement absent du référentiel : créé « proposé », invisible du public, validé par l'admin."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    iesg_id: UUID
-    nom: Nom
 
 
 class InscriptionEntree(BaseModel):
@@ -47,42 +37,13 @@ class InscriptionEntree(BaseModel):
         return self
 
 
-class EtablissementEleve(BaseModel):
-    id: UUID
-    nom: str
-    statut: StatutEtablissement
-    iesg: str
-    dre_code: str
-    dre: str
-
-
-class SemestreEleve(BaseModel):
-    libelle: str
-    debut: date
-    fin: date
-
-
-class LignePoints(BaseModel):
-    libelle: str
-    montant: int
-    cree_le: datetime
-    semestre: str | None
-
-
-class PointsEleve(BaseModel):
-    semestre: SemestreEleve | None
-    points_semestre: int
-    total: int
-    lignes: list[LignePoints]
-
-
 class EspaceEleve(BaseModel):
     pseudonyme: str
     classe: Classe
     email: str | None
-    etablissement: EtablissementEleve
+    etablissement: EtablissementRattache
     version: int
-    points: PointsEleve
+    points: ResumePoints
 
 
 class ProfilModification(BaseModel):

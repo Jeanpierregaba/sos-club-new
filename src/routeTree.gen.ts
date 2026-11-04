@@ -31,6 +31,7 @@ import { Route as GenieImhotepHallOfFameRouteImport } from './routes/genie-imhot
 import { Route as GenieImhotepInscriptionRouteImport } from './routes/genie-imhotep/inscription'
 import { Route as ConnecteAdminIndexRouteImport } from './routes/_connecte/admin/index'
 import { Route as ConnecteAdminDoubleAuthentificationRouteImport } from './routes/_connecte/admin/double-authentification'
+import { Route as ConnecteAdminEncadreursRouteImport } from './routes/_connecte/admin/encadreurs'
 import { Route as ConnecteAdminExportsRouteImport } from './routes/_connecte/admin/exports'
 import { Route as ConnecteAdminJournalRouteImport } from './routes/_connecte/admin/journal'
 import { Route as ConnecteAdminPointsRouteImport } from './routes/_connecte/admin/points'
@@ -155,6 +156,11 @@ const ConnecteAdminDoubleAuthentificationRoute =
     path: '/double-authentification',
     getParentRoute: () => ConnecteAdminRoute,
   } as any)
+const ConnecteAdminEncadreursRoute = ConnecteAdminEncadreursRouteImport.update({
+  id: '/encadreurs',
+  path: '/encadreurs',
+  getParentRoute: () => ConnecteAdminRoute,
+} as any)
 const ConnecteAdminExportsRoute = ConnecteAdminExportsRouteImport.update({
   id: '/exports',
   path: '/exports',
@@ -251,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
   '/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
+  '/admin/encadreurs': typeof ConnecteAdminEncadreursRoute
   '/admin/exports': typeof ConnecteAdminExportsRoute
   '/admin/journal': typeof ConnecteAdminJournalRoute
   '/admin/points': typeof ConnecteAdminPointsRouteWithChildren
@@ -286,6 +293,7 @@ export interface FileRoutesByTo {
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
   '/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
+  '/admin/encadreurs': typeof ConnecteAdminEncadreursRoute
   '/admin/exports': typeof ConnecteAdminExportsRoute
   '/admin/journal': typeof ConnecteAdminJournalRoute
   '/admin': typeof ConnecteAdminIndexRoute
@@ -322,6 +330,7 @@ export interface FileRoutesById {
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
   '/_connecte/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
+  '/_connecte/admin/encadreurs': typeof ConnecteAdminEncadreursRoute
   '/_connecte/admin/exports': typeof ConnecteAdminExportsRoute
   '/_connecte/admin/journal': typeof ConnecteAdminJournalRoute
   '/_connecte/admin/points': typeof ConnecteAdminPointsRouteWithChildren
@@ -360,6 +369,7 @@ export interface FileRouteTypes {
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/inscription'
     | '/admin/double-authentification'
+    | '/admin/encadreurs'
     | '/admin/exports'
     | '/admin/journal'
     | '/admin/points'
@@ -395,6 +405,7 @@ export interface FileRouteTypes {
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/inscription'
     | '/admin/double-authentification'
+    | '/admin/encadreurs'
     | '/admin/exports'
     | '/admin/journal'
     | '/admin'
@@ -430,6 +441,7 @@ export interface FileRouteTypes {
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/inscription'
     | '/_connecte/admin/double-authentification'
+    | '/_connecte/admin/encadreurs'
     | '/_connecte/admin/exports'
     | '/_connecte/admin/journal'
     | '/_connecte/admin/points'
@@ -623,6 +635,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteAdminDoubleAuthentificationRouteImport
       parentRoute: typeof ConnecteAdminRoute
     }
+    '/_connecte/admin/encadreurs': {
+      id: '/_connecte/admin/encadreurs'
+      path: '/encadreurs'
+      fullPath: '/admin/encadreurs'
+      preLoaderRoute: typeof ConnecteAdminEncadreursRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
     '/_connecte/admin/exports': {
       id: '/_connecte/admin/exports'
       path: '/exports'
@@ -751,6 +770,7 @@ const ConnecteAdminReferentielRouteWithChildren =
 
 interface ConnecteAdminRouteChildren {
   ConnecteAdminDoubleAuthentificationRoute: typeof ConnecteAdminDoubleAuthentificationRoute
+  ConnecteAdminEncadreursRoute: typeof ConnecteAdminEncadreursRoute
   ConnecteAdminExportsRoute: typeof ConnecteAdminExportsRoute
   ConnecteAdminJournalRoute: typeof ConnecteAdminJournalRoute
   ConnecteAdminPointsRoute: typeof ConnecteAdminPointsRouteWithChildren
@@ -765,6 +785,7 @@ interface ConnecteAdminRouteChildren {
 const ConnecteAdminRouteChildren: ConnecteAdminRouteChildren = {
   ConnecteAdminDoubleAuthentificationRoute:
     ConnecteAdminDoubleAuthentificationRoute,
+  ConnecteAdminEncadreursRoute: ConnecteAdminEncadreursRoute,
   ConnecteAdminExportsRoute: ConnecteAdminExportsRoute,
   ConnecteAdminJournalRoute: ConnecteAdminJournalRoute,
   ConnecteAdminPointsRoute: ConnecteAdminPointsRouteWithChildren,

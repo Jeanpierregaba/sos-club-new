@@ -50,6 +50,7 @@ from app.admin.schemas import (
     RoleCatalogue,
     TableauDeBord,
 )
+from app.comptes.inscription import Refus as RefusEleve
 from app.comptes.models import Role, StatutCompte
 from app.comptes.router import _poser_cookie
 from app.comptes.schemas import Moi
@@ -63,7 +64,7 @@ from app.comptes.service import (
 from app.config import settings
 from app.db import get_session
 from app.eleves import administration as administration_eleves
-from app.eleves.service import Refus as RefusEleve
+from app.encadreurs.verification import compter_en_attente
 from app.referentiel.models import Dre
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -90,7 +91,7 @@ Pret = Annotated[Acces, Depends(collaborateur_pret)]
 
 
 @router.get("/moi")
-async def moi(acces: Collaborateur_) -> AdminMoi:
+async def moi(acces: Collaborateur_, db: Base) -> AdminMoi:
     u, c = acces.utilisateur, acces.collaborateur
     return AdminMoi(
         id=u.id,
@@ -103,6 +104,10 @@ async def moi(acces: Collaborateur_) -> AdminMoi:
         droits=_droits(acces.droits),
         double_auth_active=acces.double_auth_active,
         double_auth_requise=acces.double_auth_requise,
+        # Le compteur du menu, une fois la double authentification faite : la file en dépend.
+        encadreurs_a_verifier=await compter_en_attente(db, acces)
+        if acces.a("encadreurs", Action.consulter) and not acces.double_auth_requise
+        else None,
     )
 
 

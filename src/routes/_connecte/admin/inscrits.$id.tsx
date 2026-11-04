@@ -23,8 +23,11 @@ import {
   reinitialiserMotDePasse,
   type InscritDetail,
   type ProfilEleveAdmin,
+  type ProfilEncadreurAdmin,
+  type ResumePoints,
 } from "@/lib/api/client";
 import { libelleClasse } from "@/lib/classes";
+import { LIBELLES_VERIFICATION, libelleFonction } from "@/lib/fonctions";
 
 export const Route = createFileRoute("/_connecte/admin/inscrits/$id")({
   loader: ({ params }) => chargerInscrit(params.id),
@@ -96,6 +99,7 @@ function FicheInscrit() {
       </section>
 
       {inscrit.eleve && <SectionEleve inscrit={inscrit} eleve={inscrit.eleve} gerable={gerable} />}
+      {inscrit.encadreur && <SectionEncadreur encadreur={inscrit.encadreur} />}
 
       <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-border">
         <h2 className="text-xl text-logo-blue">Historique du compte</h2>
@@ -207,28 +211,7 @@ function SectionEleve({
           </div>
         ))}
       </dl>
-      <h3 className="mt-8 text-sm font-extrabold uppercase tracking-wider text-muted-foreground">
-        Registre des points
-      </h3>
-      {points.lignes.length === 0 ? (
-        <p className="mt-2 text-sm font-medium text-muted-foreground">Aucune ligne.</p>
-      ) : (
-        <ol className="mt-2 divide-y text-sm">
-          {points.lignes.map((ligne, rang) => (
-            <li key={rang} className="flex items-center justify-between gap-4 py-2.5">
-              <span className="min-w-0">
-                <span className="font-bold">{ligne.libelle}</span>
-                <span className="block text-muted-foreground">
-                  {dateHeure(ligne.cree_le)} · {ligne.semestre ?? "hors semestre"}
-                </span>
-              </span>
-              <span className="shrink-0 font-extrabold tabular-nums text-primary">
-                {ligne.montant > 0 ? `+${ligne.montant}` : ligne.montant}
-              </span>
-            </li>
-          ))}
-        </ol>
-      )}
+      <RegistrePoints points={points} />
 
       {pseudonyme && (
         <DialoguePseudonyme
@@ -321,5 +304,99 @@ function DialoguePseudonyme({
         />
       </Champ>
     </DialogueFormulaire>
+  );
+}
+
+function RegistrePoints({ points }: { points: ResumePoints }) {
+  return (
+    <>
+      <h3 className="mt-8 text-sm font-extrabold uppercase tracking-wider text-muted-foreground">
+        Registre des points
+      </h3>
+      {points.lignes.length === 0 ? (
+        <p className="mt-2 text-sm font-medium text-muted-foreground">Aucune ligne.</p>
+      ) : (
+        <ol className="mt-2 divide-y text-sm">
+          {points.lignes.map((ligne, rang) => (
+            <li key={rang} className="flex items-center justify-between gap-4 py-2.5">
+              <span className="min-w-0">
+                <span className="font-bold">{ligne.libelle}</span>
+                <span className="block text-muted-foreground">
+                  {dateHeure(ligne.cree_le)} · {ligne.semestre ?? "hors semestre"}
+                </span>
+              </span>
+              <span className="shrink-0 font-extrabold tabular-nums text-primary">
+                {ligne.montant > 0 ? `+${ligne.montant}` : ligne.montant}
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </>
+  );
+}
+
+// Profil d'encadreur (spec 018) : fonction, établissement, vérification et registre des points.
+function SectionEncadreur({ encadreur }: { encadreur: ProfilEncadreurAdmin }) {
+  const { admin } = Route.useRouteContext();
+  const champs: [string, React.ReactNode][] = [
+    ["Vérification", LIBELLES_VERIFICATION[encadreur.etat]],
+    ["Fonction", libelleFonction(encadreur.fonction, encadreur.fonction_precision)],
+    [
+      "Établissement",
+      <>
+        {encadreur.etablissement.nom}
+        {encadreur.etablissement.statut !== "actif" && (
+          <span className="ml-2 rounded-full bg-sun/30 px-2 py-0.5 text-xs font-extrabold">
+            {encadreur.etablissement.statut === "propose" ? "Proposé" : "Désactivé"}
+          </span>
+        )}
+      </>,
+    ],
+    ["IESG et DRE", `${encadreur.etablissement.iesg} · ${encadreur.etablissement.dre}`],
+    ["Demande", dateHeure(encadreur.demande_le)],
+    [
+      "Décision",
+      encadreur.decide_le
+        ? `${dateHeure(encadreur.decide_le)}${encadreur.decide_par ? ` · ${encadreur.decide_par}` : ""}`
+        : "En attente",
+    ],
+    ["Charte acceptée", encadreur.charte_version],
+    [
+      "Points",
+      `${encadreur.points.points_semestre} ce semestre · ${encadreur.points.total} au total`,
+    ],
+  ];
+
+  return (
+    <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-border md:p-8">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <h2 className="text-xl text-logo-blue">Profil d'encadreur</h2>
+        {encadreur.etat === "en_attente" && peut(admin, "encadreurs", "consulter") && (
+          <Link
+            to="/admin/encadreurs"
+            className="rounded-full px-4 py-2 text-sm font-bold text-logo-blue ring-1 ring-border hover:ring-night/30"
+          >
+            Voir la file de vérification
+          </Link>
+        )}
+      </div>
+      {encadreur.motif_refus && (
+        <p className="mt-4 rounded-2xl bg-logo-red/10 px-4 py-3 text-sm font-semibold text-ink">
+          Motif du refus : {encadreur.motif_refus}
+        </p>
+      )}
+      <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {champs.map(([libelle, valeur]) => (
+          <div key={libelle} className="flex flex-col-reverse">
+            <dd className="mt-0.5 font-semibold">{valeur}</dd>
+            <dt className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">
+              {libelle}
+            </dt>
+          </div>
+        ))}
+      </dl>
+      <RegistrePoints points={encadreur.points} />
+    </section>
   );
 }

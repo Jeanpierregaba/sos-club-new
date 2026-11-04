@@ -28,10 +28,11 @@ from app.config import RACINE_PROJET, settings
 from app.db import SessionLocal, engine
 from app.eleves import pseudonyme
 from app.eleves.models import Classe, Eleve
+from app.encadreurs.models import Encadreur, EtatVerification, Fonction
 from app.points import service as points
-from app.points.bareme import BIENVENUE_ELEVE
+from app.points.bareme import BIENVENUE_ELEVE, BIENVENUE_ENCADREUR
 from app.points.models import Semestre
-from app.referentiel.models import Etablissement, StatutEtablissement
+from app.referentiel.models import Etablissement, Iesg, StatutEtablissement
 
 FICHIER_ACCES = RACINE_PROJET / ".comptes-dev.local"
 DOMAINE = "exemple.tg"
@@ -47,6 +48,7 @@ COMPTES: list[tuple[str, str, str, Role, RoleDepart | None | str, str | None]] =
     ("dev.agenda", "Ablavi", "Agenda", Role.admin, RoleDepart.gestionnaire_agenda, None),
     ("dev.analyste", "Mawuli", "Analyste", Role.admin, RoleDepart.analyste, None),
     ("dev.encadreur", "Kafui", "Encadreur", Role.encadreur, "", None),
+    ("dev.encadreur.attente", "Yao", "Attente", Role.encadreur, "", None),
     ("dev.eleve1", "Ama", "Eleve", Role.eleve, "", None),
     ("dev.eleve2", "Kofi", "Eleve", Role.eleve, "", None),
 ]
@@ -55,6 +57,12 @@ COMPTES: list[tuple[str, str, str, Role, RoleDepart | None | str, str | None]] =
 PROFILS_ELEVES = {
     "dev.eleve1": ("Ama du Golfe", Classe.seconde, "Lycée de Tokoin I"),
     "dev.eleve2": ("Kofi Curieux", Classe.troisieme, "Lycée Tokoin Est"),
+}
+# Profils des encadreurs (spec 018) : fonction, DRE de l'établissement, état. Celui en attente est dans la DRE de
+# dev.clubs.kara, pour montrer la file vue d'une DRE.
+PROFILS_ENCADREURS = {
+    "dev.encadreur": (Fonction.enseignant, "grand-lome", EtatVerification.actif),
+    "dev.encadreur.attente": (Fonction.sante, "kara", EtatVerification.en_attente),
 }
 DUREE_SEMESTRE = timedelta(days=180)
 
@@ -152,6 +160,32 @@ async def _preparer_eleve(db: AsyncSession, utilisateur: Utilisateur) -> None:
     await points.crediter(db, BIENVENUE_ELEVE, utilisateur.id, f"bienvenue:{utilisateur.id}")
 
 
+async def _preparer_encadreur(db: AsyncSession, utilisateur: Utilisateur) -> None:
+    fonction, dre, etat = PROFILS_ENCADREURS[utilisateur.identifiant]
+    etablissement_id = await db.scalar(
+        select(Etablissement.id)
+        .join(Iesg, Iesg.id == Etablissement.iesg_id)
+        .where(Etablissement.statut == StatutEtablissement.actif, Iesg.dre_code == dre)
+        .order_by(Etablissement.nom_normalise)
+        .limit(1)
+    )
+    if etablissement_id is None:
+        return
+    if await db.get(Encadreur, utilisateur.id) is None:
+        actif = etat is EtatVerification.actif
+        db.add(
+            Encadreur(
+                utilisateur_id=utilisateur.id, etablissement_id=etablissement_id, fonction=fonction, etat=etat,
+                demande_le=datetime.now(UTC), decide_le=datetime.now(UTC) if actif else None,
+                charte_version=settings.version_charte,
+            )
+        )  # fmt: skip
+        utilisateur.consentement_le = datetime.now(UTC)
+        await db.flush()
+    if etat is EtatVerification.actif:
+        await points.crediter(db, BIENVENUE_ENCADREUR, utilisateur.id, f"bienvenue:{utilisateur.id}")
+
+
 async def semer(db: AsyncSession) -> list[dict[str, str]]:
     """Prépare tous les comptes `dev.*` et renvoie leurs accès. Valide la transaction."""
     if settings.production:
@@ -179,6 +213,11 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
             ligne["profil"] = "Encadreur" if role is Role.encadreur else "Élève"
             if role is Role.eleve:
                 await _preparer_eleve(db, utilisateur)
+            else:
+                await _preparer_encadreur(db, utilisateur)
+                ligne["profil"] += (
+                    " (actif)" if PROFILS_ENCADREURS[identifiant][2] is EtatVerification.actif else " (en attente)"
+                )
         acces.append(ligne)
     journaliser(db, "comptes_de_developpement_prepares", details={"comptes": [c[0] for c in COMPTES]})
     await db.commit()

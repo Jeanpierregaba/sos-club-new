@@ -1646,7 +1646,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ActivationEntree"
+                "$ref": "#/components/schemas/app__admin__schemas__ActivationEntree"
               }
             }
           },
@@ -2765,6 +2765,288 @@
         }
       }
     },
+    "/api/encadreurs/inscription": {
+      "post": {
+        "tags": [
+          "encadreurs"
+        ],
+        "summary": "Inscription",
+        "operationId": "inscription_api_encadreurs_inscription_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InscriptionEncadreur"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Moi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/encadreurs/moi": {
+      "get": {
+        "tags": [
+          "encadreurs"
+        ],
+        "summary": "Mon Espace",
+        "operationId": "mon_espace_api_encadreurs_moi_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EspaceEncadreur"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "encadreurs"
+        ],
+        "summary": "Modifier Mon Profil",
+        "operationId": "modifier_mon_profil_api_encadreurs_moi_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfilEncadreurModification"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EspaceEncadreur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/encadreurs/moi/renvoyer": {
+      "post": {
+        "tags": [
+          "encadreurs"
+        ],
+        "summary": "Renvoyer Ma Demande",
+        "operationId": "renvoyer_ma_demande_api_encadreurs_moi_renvoyer_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EspaceEncadreur"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/encadreurs": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "File Attente",
+        "operationId": "file_attente_api_admin_encadreurs_get",
+        "parameters": [
+          {
+            "name": "etat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "en_attente",
+                "refuse"
+              ],
+              "type": "string",
+              "default": "en_attente",
+              "title": "Etat"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileEncadreurs"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/encadreurs/{utilisateur_id}/activer": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Activer",
+        "operationId": "activer_api_admin_encadreurs__utilisateur_id__activer_post",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/app__encadreurs__schemas__ActivationEntree"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Entree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemandeEncadreur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/encadreurs/{utilisateur_id}/refuser": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Refuser",
+        "operationId": "refuser_api_admin_encadreurs__utilisateur_id__refuser_post",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefusEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemandeEncadreur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -2802,35 +3084,6 @@
           "exporter"
         ],
         "title": "Action"
-      },
-      "ActivationEntree": {
-        "properties": {
-          "jeton": {
-            "type": "string",
-            "maxLength": 100,
-            "minLength": 1,
-            "title": "Jeton"
-          },
-          "identifiant": {
-            "type": "string",
-            "maxLength": 30,
-            "minLength": 3,
-            "title": "Identifiant"
-          },
-          "mot_de_passe": {
-            "type": "string",
-            "maxLength": 256,
-            "minLength": 8,
-            "title": "Mot De Passe"
-          }
-        },
-        "type": "object",
-        "required": [
-          "jeton",
-          "identifiant",
-          "mot_de_passe"
-        ],
-        "title": "ActivationEntree"
       },
       "ActivationInfo": {
         "properties": {
@@ -2914,6 +3167,17 @@
           "double_auth_requise": {
             "type": "boolean",
             "title": "Double Auth Requise"
+          },
+          "encadreurs_a_verifier": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Encadreurs A Verifier"
           }
         },
         "type": "object",
@@ -3550,6 +3814,120 @@
         ],
         "title": "ConnexionEntree"
       },
+      "DemandeEncadreur": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "identifiant": {
+            "type": "string",
+            "title": "Identifiant"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "telephone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telephone"
+          },
+          "fonction": {
+            "$ref": "#/components/schemas/Fonction"
+          },
+          "fonction_precision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fonction Precision"
+          },
+          "etablissement": {
+            "$ref": "#/components/schemas/EtablissementRattache"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatVerification"
+          },
+          "demande_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Demande Le"
+          },
+          "decide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Le"
+          },
+          "motif_refus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Refus"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "identifiant",
+          "prenom",
+          "nom",
+          "email",
+          "telephone",
+          "fonction",
+          "fonction_precision",
+          "etablissement",
+          "etat",
+          "demande_le",
+          "decide_le",
+          "motif_refus",
+          "version"
+        ],
+        "title": "DemandeEncadreur",
+        "description": "Une ligne de la file : tout ce qu'il faut pour vérifier la personne, sans ouvrir sa fiche."
+      },
       "DreAdmin": {
         "properties": {
           "code": {
@@ -3881,14 +4259,14 @@
             "title": "Email"
           },
           "etablissement": {
-            "$ref": "#/components/schemas/EtablissementEleve"
+            "$ref": "#/components/schemas/EtablissementRattache"
           },
           "version": {
             "type": "integer",
             "title": "Version"
           },
           "points": {
-            "$ref": "#/components/schemas/PointsEleve"
+            "$ref": "#/components/schemas/ResumePoints"
           }
         },
         "type": "object",
@@ -3901,6 +4279,109 @@
           "points"
         ],
         "title": "EspaceEleve"
+      },
+      "EspaceEncadreur": {
+        "properties": {
+          "etat": {
+            "$ref": "#/components/schemas/EtatVerification"
+          },
+          "demande_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Demande Le"
+          },
+          "decide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Le"
+          },
+          "motif_refus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Refus"
+          },
+          "fonction": {
+            "$ref": "#/components/schemas/Fonction"
+          },
+          "fonction_precision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fonction Precision"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "telephone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telephone"
+          },
+          "etablissement": {
+            "$ref": "#/components/schemas/EtablissementRattache"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "points": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResumePoints"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "etat",
+          "demande_le",
+          "decide_le",
+          "motif_refus",
+          "fonction",
+          "fonction_precision",
+          "email",
+          "telephone",
+          "etablissement",
+          "version",
+          "points"
+        ],
+        "title": "EspaceEncadreur"
       },
       "EtablissementAdmin": {
         "properties": {
@@ -3959,6 +4440,11 @@
           "nb_eleves": {
             "type": "integer",
             "title": "Nb Eleves"
+          },
+          "nb_encadreurs": {
+            "type": "integer",
+            "title": "Nb Encadreurs",
+            "default": 0
           }
         },
         "type": "object",
@@ -4014,44 +4500,6 @@
           "type"
         ],
         "title": "EtablissementCreation"
-      },
-      "EtablissementEleve": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "nom": {
-            "type": "string",
-            "title": "Nom"
-          },
-          "statut": {
-            "$ref": "#/components/schemas/StatutEtablissement"
-          },
-          "iesg": {
-            "type": "string",
-            "title": "Iesg"
-          },
-          "dre_code": {
-            "type": "string",
-            "title": "Dre Code"
-          },
-          "dre": {
-            "type": "string",
-            "title": "Dre"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "nom",
-          "statut",
-          "iesg",
-          "dre_code",
-          "dre"
-        ],
-        "title": "EtablissementEleve"
       },
       "EtablissementModification": {
         "properties": {
@@ -4152,6 +4600,45 @@
         ],
         "title": "EtablissementPublic"
       },
+      "EtablissementRattache": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "statut": {
+            "$ref": "#/components/schemas/StatutEtablissement"
+          },
+          "iesg": {
+            "type": "string",
+            "title": "Iesg"
+          },
+          "dre_code": {
+            "type": "string",
+            "title": "Dre Code"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "statut",
+          "iesg",
+          "dre_code",
+          "dre"
+        ],
+        "title": "EtablissementRattache",
+        "description": "L'établissement d'un élève ou d'un encadreur, vu par lui-même ou par l'admin : avec son statut."
+      },
       "EtablissementTrouve": {
         "properties": {
           "id": {
@@ -4234,6 +4721,15 @@
           "version_charte"
         ],
         "title": "EtatInscription"
+      },
+      "EtatVerification": {
+        "type": "string",
+        "enum": [
+          "en_attente",
+          "actif",
+          "refuse"
+        ],
+        "title": "EtatVerification"
       },
       "EvenementJournal": {
         "properties": {
@@ -4488,6 +4984,27 @@
         ],
         "title": "ExportResume"
       },
+      "FileEncadreurs": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "demandes": {
+            "items": {
+              "$ref": "#/components/schemas/DemandeEncadreur"
+            },
+            "type": "array",
+            "title": "Demandes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "demandes"
+        ],
+        "title": "FileEncadreurs"
+      },
       "FiltresInscrits": {
         "properties": {
           "recherche": {
@@ -4549,6 +5066,17 @@
         },
         "type": "object",
         "title": "FiltresInscrits"
+      },
+      "Fonction": {
+        "type": "string",
+        "enum": [
+          "enseignant",
+          "responsable",
+          "sante",
+          "accompagnateur",
+          "autre"
+        ],
+        "title": "Fonction"
       },
       "FormatExport": {
         "type": "string",
@@ -4838,6 +5366,107 @@
         ],
         "title": "Indicateur"
       },
+      "InscriptionEncadreur": {
+        "properties": {
+          "prenom": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Nom"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "title": "Email"
+          },
+          "telephone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telephone"
+          },
+          "identifiant": {
+            "type": "string",
+            "maxLength": 60,
+            "title": "Identifiant"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "maxLength": 256,
+            "title": "Mot De Passe"
+          },
+          "fonction": {
+            "$ref": "#/components/schemas/Fonction"
+          },
+          "fonction_precision": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fonction Precision"
+          },
+          "charte": {
+            "type": "boolean",
+            "const": true,
+            "title": "Charte"
+          },
+          "consentement": {
+            "type": "boolean",
+            "const": true,
+            "title": "Consentement"
+          },
+          "etablissement_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Etablissement Id"
+          },
+          "proposition": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Proposition"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "prenom",
+          "nom",
+          "email",
+          "identifiant",
+          "mot_de_passe",
+          "fonction",
+          "charte",
+          "consentement"
+        ],
+        "title": "InscriptionEncadreur"
+      },
       "InscriptionEntree": {
         "properties": {
           "prenom": {
@@ -5082,6 +5711,16 @@
             "anyOf": [
               {
                 "$ref": "#/components/schemas/ProfilEleveAdmin"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "encadreur": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProfilEncadreurAdmin"
               },
               {
                 "type": "null"
@@ -5552,43 +6191,6 @@
         ],
         "title": "PageJournal"
       },
-      "PointsEleve": {
-        "properties": {
-          "semestre": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/SemestreEleve"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "points_semestre": {
-            "type": "integer",
-            "title": "Points Semestre"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "lignes": {
-            "items": {
-              "$ref": "#/components/schemas/LignePoints"
-            },
-            "type": "array",
-            "title": "Lignes"
-          }
-        },
-        "type": "object",
-        "required": [
-          "semestre",
-          "points_semestre",
-          "total",
-          "lignes"
-        ],
-        "title": "PointsEleve"
-      },
       "ProfilEleveAdmin": {
         "properties": {
           "pseudonyme": {
@@ -5603,10 +6205,10 @@
             "title": "Charte Version"
           },
           "etablissement": {
-            "$ref": "#/components/schemas/EtablissementEleve"
+            "$ref": "#/components/schemas/EtablissementRattache"
           },
           "points": {
-            "$ref": "#/components/schemas/PointsEleve"
+            "$ref": "#/components/schemas/ResumePoints"
           }
         },
         "type": "object",
@@ -5618,6 +6220,151 @@
           "points"
         ],
         "title": "ProfilEleveAdmin"
+      },
+      "ProfilEncadreurAdmin": {
+        "properties": {
+          "fonction": {
+            "$ref": "#/components/schemas/Fonction"
+          },
+          "fonction_precision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fonction Precision"
+          },
+          "charte_version": {
+            "type": "string",
+            "title": "Charte Version"
+          },
+          "etablissement": {
+            "$ref": "#/components/schemas/EtablissementRattache"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatVerification"
+          },
+          "demande_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Demande Le"
+          },
+          "decide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Le"
+          },
+          "decide_par": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Par"
+          },
+          "motif_refus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Refus"
+          },
+          "points": {
+            "$ref": "#/components/schemas/ResumePoints"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fonction",
+          "fonction_precision",
+          "charte_version",
+          "etablissement",
+          "etat",
+          "demande_le",
+          "decide_le",
+          "decide_par",
+          "motif_refus",
+          "points"
+        ],
+        "title": "ProfilEncadreurAdmin"
+      },
+      "ProfilEncadreurModification": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "telephone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telephone"
+          },
+          "etablissement_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Etablissement Id"
+          },
+          "fonction": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Fonction"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fonction_precision": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fonction Precision"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "ProfilEncadreurModification"
       },
       "ProfilModification": {
         "properties": {
@@ -5688,7 +6435,7 @@
           "nom"
         ],
         "title": "Proposition",
-        "description": "Un établissement absent du référentiel : créé « proposé », invisible du public, validé par l'admin."
+        "description": "Un établissement absent du référentiel, proposé à l'inscription : créé « proposé », invisible du public, validé par l'admin."
       },
       "PseudonymeEntree": {
         "properties": {
@@ -5711,6 +6458,33 @@
         ],
         "title": "PseudonymeEntree"
       },
+      "RefusEntree": {
+        "properties": {
+          "motif": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Motif"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "motif"
+        ],
+        "title": "RefusEntree"
+      },
       "Remplacement": {
         "properties": {
           "version": {
@@ -5732,6 +6506,43 @@
         ],
         "title": "Remplacement",
         "description": "Remplace un établissement proposé par un établissement existant : ses élèves y sont rattachés (spec 017)."
+      },
+      "ResumePoints": {
+        "properties": {
+          "semestre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SemestreResume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "points_semestre": {
+            "type": "integer",
+            "title": "Points Semestre"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "lignes": {
+            "items": {
+              "$ref": "#/components/schemas/LignePoints"
+            },
+            "type": "array",
+            "title": "Lignes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "semestre",
+          "points_semestre",
+          "total",
+          "lignes"
+        ],
+        "title": "ResumePoints"
       },
       "Role": {
         "type": "string",
@@ -5852,31 +6663,6 @@
         ],
         "title": "SemestreCreation"
       },
-      "SemestreEleve": {
-        "properties": {
-          "libelle": {
-            "type": "string",
-            "title": "Libelle"
-          },
-          "debut": {
-            "type": "string",
-            "format": "date",
-            "title": "Debut"
-          },
-          "fin": {
-            "type": "string",
-            "format": "date",
-            "title": "Fin"
-          }
-        },
-        "type": "object",
-        "required": [
-          "libelle",
-          "debut",
-          "fin"
-        ],
-        "title": "SemestreEleve"
-      },
       "SemestreModification": {
         "properties": {
           "version": {
@@ -5926,6 +6712,31 @@
           "version"
         ],
         "title": "SemestreModification"
+      },
+      "SemestreResume": {
+        "properties": {
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date",
+            "title": "Fin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "libelle",
+          "debut",
+          "fin"
+        ],
+        "title": "SemestreResume"
       },
       "StatutCompte": {
         "type": "string",
@@ -6017,6 +6828,17 @@
             ],
             "title": "Semestre En Cours"
           },
+          "encadreurs_a_verifier": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Encadreurs A Verifier"
+          },
           "derniers_evenements": {
             "anyOf": [
               {
@@ -6101,6 +6923,54 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "app__admin__schemas__ActivationEntree": {
+        "properties": {
+          "jeton": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Jeton"
+          },
+          "identifiant": {
+            "type": "string",
+            "maxLength": 30,
+            "minLength": 3,
+            "title": "Identifiant"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 8,
+            "title": "Mot De Passe"
+          }
+        },
+        "type": "object",
+        "required": [
+          "jeton",
+          "identifiant",
+          "mot_de_passe"
+        ],
+        "title": "ActivationEntree"
+      },
+      "app__encadreurs__schemas__ActivationEntree": {
+        "properties": {
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ActivationEntree"
       }
     }
   }

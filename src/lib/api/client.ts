@@ -50,13 +50,21 @@ export type InscriptionEntree = Schemas["InscriptionEntree"];
 export type Classe = Schemas["Classe"];
 export type EspaceEleve = Schemas["EspaceEleve"];
 export type ProfilModification = Schemas["ProfilModification"];
-export type PointsEleve = Schemas["PointsEleve"];
+export type ResumePoints = Schemas["ResumePoints"];
 export type ProfilEleveAdmin = Schemas["ProfilEleveAdmin"];
 export type SemestreAdmin = Schemas["SemestreAdmin"];
 export type SemestreCreation = Schemas["SemestreCreation"];
 export type SemestreModification = Schemas["SemestreModification"];
 export type LigneBaremeAdmin = Schemas["LigneBaremeAdmin"];
 export type LigneBaremeModification = Schemas["LigneBaremeModification"];
+export type InscriptionEncadreur = Schemas["InscriptionEncadreur"];
+export type EspaceEncadreur = Schemas["EspaceEncadreur"];
+export type ProfilEncadreurModification = Schemas["ProfilEncadreurModification"];
+export type Fonction = Schemas["Fonction"];
+export type EtatVerification = Schemas["EtatVerification"];
+export type DemandeEncadreur = Schemas["DemandeEncadreur"];
+export type FileEncadreurs = Schemas["FileEncadreurs"];
+export type ProfilEncadreurAdmin = Schemas["ProfilEncadreurAdmin"];
 
 export const MESSAGE_SAISIE = "Vérifie le formulaire : un champ est vide, trop long ou mal rempli.";
 
@@ -283,3 +291,21 @@ export const adminModifierSemestre = (id: string, entree: SemestreModification) 
 export const adminListerBareme = () => requeteApi<LigneBaremeAdmin[]>(`${POINTS}/bareme`);
 export const adminModifierBareme = (code: string, entree: LigneBaremeModification) =>
   envoyerJson<LigneBaremeAdmin>(`${POINTS}/bareme/${code}`, entree, "PATCH");
+
+// Compte encadreur (spec 018) ----------------------------------------------------------------------------
+
+export const inscrireEncadreur = (entree: InscriptionEncadreur) =>
+  envoyerJson<Moi>("/api/encadreurs/inscription", entree);
+export const chargerEspaceEncadreur = () => requeteApi<EspaceEncadreur>("/api/encadreurs/moi");
+export const modifierProfilEncadreur = (entree: ProfilEncadreurModification) =>
+  envoyerJson<EspaceEncadreur>("/api/encadreurs/moi", entree, "PATCH");
+export const renvoyerDemandeEncadreur = () =>
+  envoyerJson<EspaceEncadreur>("/api/encadreurs/moi/renvoyer");
+
+const ENCADREURS = "/api/admin/encadreurs";
+export const adminFileEncadreurs = (etat: EtatVerification) =>
+  requeteApi<FileEncadreurs>(avecParametres(ENCADREURS, { etat }));
+export const adminActiverEncadreur = (id: string, version: number) =>
+  envoyerJson<DemandeEncadreur>(`${ENCADREURS}/${id}/activer`, { version });
+export const adminRefuserEncadreur = (id: string, version: number, motif: string) =>
+  envoyerJson<DemandeEncadreur>(`${ENCADREURS}/${id}/refuser`, { version, motif });

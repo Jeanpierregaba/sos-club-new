@@ -1,20 +1,27 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
-import { CalendarRange, KeyRound, LogOut, PartyPopper, Pencil, Star, Trophy } from "lucide-react";
+import { KeyRound, LogOut, PartyPopper, Pencil } from "lucide-react";
 import { useState } from "react";
 
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { ChoixEtablissement, type EtablissementChoisi } from "@/components/ChoixEtablissement";
+import {
+  CartesPoints,
+  DernieresLignes,
+  DialogueMotDePasse,
+  EnTeteEspace,
+  EtablissementAffiche,
+  Info,
+  MotDePasseChange,
+} from "@/components/espace/commun";
+import { EspaceEncadreur } from "@/components/espace/EspaceEncadreur";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { CLE_MOI } from "@/hooks/use-moi";
+import { useDeconnexion } from "@/hooks/use-deconnexion";
 import {
-  changerMotDePasse,
   chargerEspaceEleve,
-  deconnecter,
+  chargerEspaceEncadreur,
   ErreurApi,
-  MESSAGE_INDISPONIBLE,
   modifierProfilEleve,
   type Classe,
   type EspaceEleve,
@@ -33,14 +40,18 @@ export const Route = createFileRoute("/_connecte/mon-espace")({
     if (context.moi.role === "admin") throw redirect({ to: "/admin" });
   },
   loader: async ({ context }) => {
-    if (context.moi.role !== "eleve") return { espace: null };
     try {
-      return { espace: await chargerEspaceEleve() };
+      if (context.moi.role === "eleve")
+        return { eleve: await chargerEspaceEleve(), encadreur: null };
+      if (context.moi.role === "encadreur")
+        return { eleve: null, encadreur: await chargerEspaceEncadreur() };
     } catch (e) {
-      // Un compte élève créé avant la spec 017 n'a pas de profil : il garde l'espace simple.
-      if (e instanceof ErreurApi && e.statut === 403) return { espace: null };
+      // Un compte créé avant les specs 017 et 018 n'a pas de profil : il garde l'espace simple.
+      if (e instanceof ErreurApi && (e.statut === 403 || e.statut === 404))
+        return { eleve: null, encadreur: null, message: e.message };
       throw e;
     }
+    return { eleve: null, encadreur: null };
   },
   head: () => ({
     meta: [
@@ -53,32 +64,14 @@ export const Route = createFileRoute("/_connecte/mon-espace")({
 });
 
 function MonEspace() {
-  const { espace } = Route.useLoaderData();
-  return espace ? <EspaceDeLEleve espace={espace} /> : <EspaceSimple />;
+  const donnees = Route.useLoaderData();
+  const { moi } = Route.useRouteContext();
+  if (donnees.eleve) return <EspaceDeLEleve espace={donnees.eleve} />;
+  if (donnees.encadreur) return <EspaceEncadreur espace={donnees.encadreur} prenom={moi.prenom} />;
+  return <EspaceSimple message={"message" in donnees ? donnees.message : undefined} />;
 }
 
-function useDeconnexion() {
-  const queryClient = useQueryClient();
-  const router = useRouter();
-  const [erreur, setErreur] = useState<string | null>(null);
-  const [enCours, setEnCours] = useState(false);
-
-  const seDeconnecter = async () => {
-    setErreur(null);
-    setEnCours(true);
-    try {
-      await deconnecter();
-      queryClient.setQueryData(CLE_MOI, null);
-      await router.navigate({ to: "/", replace: true });
-    } catch (e) {
-      setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
-      setEnCours(false);
-    }
-  };
-  return { seDeconnecter, erreur, enCours };
-}
-
-function EspaceSimple() {
+function EspaceSimple({ message }: { message?: string | undefined }) {
   const { moi } = Route.useRouteContext();
   const { seDeconnecter, erreur, enCours } = useDeconnexion();
 
@@ -91,7 +84,9 @@ function EspaceSimple() {
         <p className="mt-2 text-muted-foreground">
           Rôle : <strong className="text-foreground">{LIBELLES_ROLE[moi.role]}</strong>
         </p>
-        <p className="mt-1 text-sm text-muted-foreground">Ton espace s'enrichira bientôt.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {message ?? "Ton espace s'enrichira bientôt."}
+        </p>
 
         {erreur && (
           <Alert variant="destructive" className="mt-6 text-left">
@@ -121,12 +116,8 @@ function EspaceSimple() {
   );
 }
 
-const dateCourte = (iso: string) =>
-  new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-
 function EspaceDeLEleve({ espace }: { espace: EspaceEleve }) {
   const { bienvenue } = Route.useSearch();
-  const { seDeconnecter, erreur, enCours } = useDeconnexion();
   const [profil, setProfil] = useState(false);
   const [motDePasse, setMotDePasse] = useState(false);
   const [motDePasseChange, setMotDePasseChange] = useState(false);
@@ -135,47 +126,9 @@ function EspaceDeLEleve({ espace }: { espace: EspaceEleve }) {
   return (
     <main className="min-h-screen bg-carnet px-4 py-10 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="flex items-center gap-3 text-sm font-extrabold uppercase tracking-widest text-logo-red">
-              <span className="h-1 w-8 rounded-full bg-primary" />
-              Mon espace
-            </p>
-            <h1 className="mt-3 text-4xl leading-tight md:text-5xl">
-              <span className="text-logo-blue">Salut</span>{" "}
-              <span className="text-primary">{espace.pseudonyme} !</span>
-            </h1>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link
-              to="/"
-              className="inline-flex h-11 items-center rounded-full px-4 text-sm font-bold text-logo-blue hover:bg-white"
-            >
-              Accueil
-            </Link>
-            <Button
-              variant="outline"
-              onClick={seDeconnecter}
-              disabled={enCours}
-              className="h-11 rounded-full px-5 font-bold"
-            >
-              <LogOut className="size-4" /> Me déconnecter
-            </Button>
-          </div>
-        </div>
-
-        {erreur && (
-          <Alert variant="destructive" className="mt-6">
-            <AlertDescription>{erreur}</AlertDescription>
-          </Alert>
-        )}
-        {motDePasseChange && (
-          <Alert role="status" className="mt-6">
-            <AlertDescription>
-              Ton mot de passe est changé. Tes autres appareils sont déconnectés.
-            </AlertDescription>
-          </Alert>
-        )}
+        <EnTeteEspace nom={espace.pseudonyme}>
+          {motDePasseChange && <MotDePasseChange />}
+        </EnTeteEspace>
         {bienvenue && (
           <div className="mt-6 flex items-start gap-3 rounded-3xl bg-primary/10 p-5 ring-1 ring-primary/30">
             <PartyPopper aria-hidden className="mt-0.5 size-6 shrink-0 text-primary" />
@@ -191,59 +144,10 @@ function EspaceDeLEleve({ espace }: { espace: EspaceEleve }) {
           </div>
         )}
 
-        <section aria-label="Mes points" className="mt-8 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-3xl bg-logo-blue p-6 text-white shadow-card">
-            <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/75">
-              <Star aria-hidden className="size-4 text-sun" /> Points du semestre
-            </p>
-            <p className="mt-2 font-display text-5xl">{points.points_semestre}</p>
-            <p className="mt-2 flex items-center gap-1.5 text-sm font-semibold text-white/80">
-              <CalendarRange aria-hidden className="size-4" />
-              {points.semestre
-                ? `${points.semestre.libelle}, jusqu'au ${dateCourte(points.semestre.fin)}`
-                : "Aucun semestre en cours"}
-            </p>
-          </div>
-          <div className="rounded-3xl bg-white p-6 shadow-card ring-1 ring-border">
-            <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">
-              <Trophy aria-hidden className="size-4 text-primary" /> Total depuis ton inscription
-            </p>
-            <p className="mt-2 font-display text-5xl text-logo-blue">{points.total}</p>
-            <p className="mt-2 text-sm font-semibold text-muted-foreground">
-              Les classements arrivent bientôt.
-            </p>
-          </div>
-        </section>
+        <CartesPoints points={points} />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-          <section className="rounded-3xl bg-white p-6 shadow-card ring-1 ring-border">
-            <h2 className="text-2xl">
-              <span className="text-logo-blue">Mes derniers</span>{" "}
-              <span className="text-primary">points</span>
-            </h2>
-            {points.lignes.length === 0 ? (
-              <p className="mt-3 font-medium text-muted-foreground">Aucun point pour l'instant.</p>
-            ) : (
-              <ol className="mt-4 divide-y">
-                {points.lignes.map((ligne, rang) => (
-                  <li key={rang} className="flex items-center justify-between gap-4 py-3">
-                    <div className="min-w-0">
-                      <p className="font-bold text-ink">{ligne.libelle}</p>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        {dateCourte(ligne.cree_le)}
-                        {ligne.semestre ? ` · ${ligne.semestre}` : " · hors semestre"}
-                      </p>
-                    </div>
-                    <span
-                      className={`shrink-0 rounded-full px-3 py-1 text-sm font-extrabold ${ligne.montant > 0 ? "bg-primary/10 text-primary" : "bg-logo-red/10 text-logo-red"}`}
-                    >
-                      {ligne.montant > 0 ? `+${ligne.montant}` : ligne.montant}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            )}
-          </section>
+          <DernieresLignes points={points} />
 
           <section className="rounded-3xl bg-white p-6 shadow-card ring-1 ring-border">
             <h2 className="text-2xl">
@@ -255,19 +159,7 @@ function EspaceDeLEleve({ espace }: { espace: EspaceEleve }) {
               <Info terme="Classe" valeur={libelleClasse(espace.classe)} />
               <Info
                 terme="Établissement"
-                valeur={
-                  <>
-                    {espace.etablissement.nom}
-                    <span className="block font-medium text-muted-foreground">
-                      {espace.etablissement.iesg} · {espace.etablissement.dre}
-                    </span>
-                    {espace.etablissement.statut === "propose" && (
-                      <span className="mt-1 inline-flex rounded-full bg-sun/30 px-2.5 py-0.5 text-xs font-extrabold text-ink">
-                        En cours de vérification
-                      </span>
-                    )}
-                  </>
-                }
+                valeur={<EtablissementAffiche etablissement={espace.etablissement} />}
               />
               <Info terme="Club" valeur="Sans club pour l'instant" />
               <Info terme="Email" valeur={espace.email ?? "Aucun"} />
@@ -298,15 +190,6 @@ function EspaceDeLEleve({ espace }: { espace: EspaceEleve }) {
         onFait={() => setMotDePasseChange(true)}
       />
     </main>
-  );
-}
-
-function Info({ terme, valeur }: { terme: string; valeur: React.ReactNode }) {
-  return (
-    <div className="grid grid-cols-[7rem_1fr] gap-3">
-      <dt className="font-bold text-muted-foreground">{terme}</dt>
-      <dd className="min-w-0 font-semibold text-ink">{valeur}</dd>
-    </div>
   );
 }
 
@@ -382,66 +265,5 @@ function DialogueProfil({
         />
       </Champ>
     </DialogueFormulaire>
-  );
-}
-
-function DialogueMotDePasse({
-  ouvert,
-  onOuvert,
-  onFait,
-}: {
-  ouvert: boolean;
-  onOuvert: (ouvert: boolean) => void;
-  onFait: () => void;
-}) {
-  const [actuel, setActuel] = useState("");
-  const [nouveau, setNouveau] = useState("");
-
-  return (
-    <>
-      <DialogueFormulaire
-        ouvert={ouvert}
-        onOuvert={(o) => {
-          setActuel("");
-          setNouveau("");
-          onOuvert(o);
-        }}
-        titre="Changer mon mot de passe"
-        description="Tes autres appareils seront déconnectés."
-        bouton="Changer"
-        onEnvoie={async () => {
-          if (nouveau.length < 8)
-            throw new ErreurApi(
-              422,
-              "Le nouveau mot de passe doit contenir au moins 8 caractères.",
-            );
-          await changerMotDePasse(actuel, nouveau);
-          onFait();
-        }}
-      >
-        <Champ libelle="Mot de passe actuel">
-          <input
-            type="password"
-            value={actuel}
-            onChange={(e) => setActuel(e.target.value)}
-            autoComplete="current-password"
-            required
-            className={CHAMP_ADMIN}
-          />
-        </Champ>
-        <Champ libelle="Nouveau mot de passe (8 caractères au moins)">
-          <input
-            type="password"
-            value={nouveau}
-            onChange={(e) => setNouveau(e.target.value)}
-            autoComplete="new-password"
-            minLength={8}
-            maxLength={256}
-            required
-            className={CHAMP_ADMIN}
-          />
-        </Champ>
-      </DialogueFormulaire>
-    </>
   );
 }

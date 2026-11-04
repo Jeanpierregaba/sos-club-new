@@ -17,6 +17,7 @@ import {
   ScrollText,
   ShieldCheck,
   Star,
+  UserCheck,
   UserCog,
   Users,
   type LucideIcon,
@@ -75,7 +76,7 @@ export const Route = createFileRoute("/_connecte/admin")({
   component: EspaceAdmin,
 });
 
-type Entree = { to: string; libelle: string; i: LucideIcon; visible: boolean };
+type Entree = { to: string; libelle: string; i: LucideIcon; visible: boolean; compteur?: number };
 
 function entrees(admin: AdminMoi): Entree[] {
   return [
@@ -86,6 +87,13 @@ function entrees(admin: AdminMoi): Entree[] {
       visible: peut(admin, "tableau_de_bord", "consulter"),
     },
     { to: "/admin/inscrits", libelle: "Inscrits", i: Users, visible: peutVoirInscrits(admin) },
+    {
+      to: "/admin/encadreurs",
+      libelle: "Encadreurs",
+      i: UserCheck,
+      visible: peut(admin, "encadreurs", "consulter"),
+      compteur: admin.encadreurs_a_verifier ?? 0,
+    },
     { to: "/admin/exports", libelle: "Exports", i: Download, visible: peutExporter(admin) },
     {
       to: "/admin/referentiel",
@@ -157,7 +165,7 @@ function Menu_({
         <ul className="space-y-1">
           {entrees(admin)
             .filter((e) => e.visible && !verrouille)
-            .map(({ to, libelle, i: Icone }) => {
+            .map(({ to, libelle, i: Icone, compteur }) => {
               const actif = to === "/admin" ? chemin === "/admin" : chemin.startsWith(to);
               return (
                 <li key={to}>
@@ -173,6 +181,14 @@ function Menu_({
                   >
                     <Icone className="size-[18px] shrink-0" />
                     {libelle}
+                    {Boolean(compteur) && (
+                      <span
+                        aria-label={`${compteur} à vérifier`}
+                        className="ml-auto rounded-full bg-logo-red px-2 py-0.5 text-xs font-extrabold text-white"
+                      >
+                        {compteur}
+                      </span>
+                    )}
                   </Link>
                 </li>
               );

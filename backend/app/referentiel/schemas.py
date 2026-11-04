@@ -69,6 +69,26 @@ class EtablissementTrouve(EtablissementPublic):
     dre: str
 
 
+class EtablissementRattache(BaseModel):
+    """L'établissement d'un élève ou d'un encadreur, vu par lui-même ou par l'admin : avec son statut."""
+
+    id: UUID
+    nom: str
+    statut: StatutEtablissement
+    iesg: str
+    dre_code: str
+    dre: str
+
+
+class Proposition(BaseModel):
+    """Un établissement absent du référentiel, proposé à l'inscription : créé « proposé », invisible du public, validé par l'admin."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    iesg_id: UUID
+    nom: Nom
+
+
 class AxePublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -115,6 +135,7 @@ class EtablissementAdmin(BaseModel):
     modifie_le: datetime
     # Élèves rattachés (spec 017) : utile pour décider du sort d'un établissement proposé.
     nb_eleves: int
+    nb_encadreurs: int = 0
 
 
 class PageEtablissements(BaseModel):

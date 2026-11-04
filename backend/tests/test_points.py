@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.comptes.models import Utilisateur
 from app.points import service
-from app.points.bareme import BIENVENUE_ELEVE
+from app.points.bareme import BIENVENUE_ELEVE, BIENVENUE_ENCADREUR
 from app.points.models import LigneBareme, MouvementPoints, Semestre
 from tests.conftest import moteur_test
 
@@ -202,7 +202,10 @@ def test_la_base_refuse_deux_semestres_qui_se_chevauchent(creer_semestre: Callab
 def test_le_bareme_initial_contient_toute_la_grille(en_base: Callable[..., Any]) -> None:
     async def lire(db: AsyncSession) -> tuple[int, list[str]]:
         nombre = await db.scalar(select(func.count()).select_from(LigneBareme))
-        en_service = list(await db.scalars(select(LigneBareme.code).where(LigneBareme.en_service)))
+        en_service = list(
+            await db.scalars(select(LigneBareme.code).where(LigneBareme.en_service).order_by(LigneBareme.code))
+        )
         return nombre, en_service
 
-    assert en_base(lire) == (29, [BIENVENUE_ELEVE])
+    # Les actions écrites par une spec livrée : la bienvenue élève (017), puis encadreur (018).
+    assert en_base(lire) == (29, [BIENVENUE_ELEVE, BIENVENUE_ENCADREUR])

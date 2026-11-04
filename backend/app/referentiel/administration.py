@@ -22,6 +22,7 @@ from app.admin.models import Collaborateur
 from app.comptes.models import StatutCompte, Utilisateur
 from app.comptes.service import VIOLATION_UNICITE
 from app.eleves.models import Eleve
+from app.encadreurs.models import Encadreur
 from app.referentiel.models import Axe, Dre, Etablissement, Iesg, StatutEtablissement, TypeEtablissement
 from app.referentiel.normalisation import normaliser
 from app.referentiel.schemas import (
@@ -335,16 +336,26 @@ async def modifier_iesg(db: AsyncSession, acces: Acces, iesg_id: UUID, entree: I
 # Établissements -------------------------------------------------------------------------------------------------
 
 
-async def _eleves_par_etablissement(db: AsyncSession, ids: Sequence[UUID]) -> dict[UUID, int]:
-    lignes = await db.execute(
-        select(Eleve.etablissement_id, func.count())
-        .where(Eleve.etablissement_id.in_(ids))
-        .group_by(Eleve.etablissement_id)
-    )
-    return dict(lignes.all())
+async def _inscrits_par_etablissement(db: AsyncSession, ids: Sequence[UUID]) -> dict[UUID, tuple[int, int]]:
+    """Nombre d'élèves et d'encadreurs rattachés à chaque établissement."""
+    eleves = dict(
+        (await db.execute(
+            select(Eleve.etablissement_id, func.count()).where(Eleve.etablissement_id.in_(ids))
+            .group_by(Eleve.etablissement_id)
+        )).all()
+    )  # fmt: skip
+    encadreurs = dict(
+        (await db.execute(
+            select(Encadreur.etablissement_id, func.count()).where(Encadreur.etablissement_id.in_(ids))
+            .group_by(Encadreur.etablissement_id)
+        )).all()
+    )  # fmt: skip
+    return {i: (eleves.get(i, 0), encadreurs.get(i, 0)) for i in ids}
 
 
-def _etablissement_admin(etablissement: Etablissement, iesg: Iesg, dre: Dre, nb_eleves: int = 0) -> EtablissementAdmin:
+def _etablissement_admin(
+    etablissement: Etablissement, iesg: Iesg, dre: Dre, inscrits: tuple[int, int] = (0, 0)
+) -> EtablissementAdmin:
     return EtablissementAdmin(
         id=etablissement.id,
         nom=etablissement.nom,
@@ -357,7 +368,8 @@ def _etablissement_admin(etablissement: Etablissement, iesg: Iesg, dre: Dre, nb_
         dre_code=dre.code,
         dre=dre.nom,
         modifie_le=etablissement.modifie_le,
-        nb_eleves=nb_eleves,
+        nb_eleves=inscrits[0],
+        nb_encadreurs=inscrits[1],
     )
 
 
@@ -398,12 +410,12 @@ async def lister_etablissements(
             .limit(par_page)
         )
     ).all()
-    eleves = await _eleves_par_etablissement(db, [ligne[0].id for ligne in lignes])
+    inscrits = await _inscrits_par_etablissement(db, [ligne[0].id for ligne in lignes])
     return PageEtablissements(
         total=total,
         page=page,
         par_page=par_page,
-        etablissements=[_etablissement_admin(*ligne, eleves.get(ligne[0].id, 0)) for ligne in lignes],
+        etablissements=[_etablissement_admin(*ligne, inscrits[ligne[0].id]) for ligne in lignes],
     )
 
 
@@ -427,8 +439,8 @@ async def _detail_etablissement(db: AsyncSession, etablissement_id: UUID) -> Eta
             .where(Etablissement.id == etablissement_id)
         )
     ).one()
-    eleves = await _eleves_par_etablissement(db, [etablissement_id])
-    return _etablissement_admin(*ligne, eleves.get(etablissement_id, 0))
+    inscrits = await _inscrits_par_etablissement(db, [etablissement_id])
+    return _etablissement_admin(*ligne, inscrits[etablissement_id])
 
 
 async def creer_etablissement(
@@ -477,8 +489,8 @@ async def modifier_etablissement(
 async def remplacer_proposition(
     db: AsyncSession, acces: Acces, etablissement_id: UUID, entree: Remplacement, ip: str
 ) -> EtablissementAdmin:
-    """Un établissement proposé par un élève existait déjà sous un autre nom : ses élèves rejoignent le bon, et la
-    proposition est désactivée. Le journal garde l'un et l'autre."""
+    """Un établissement proposé à l'inscription existait déjà sous un autre nom : ses élèves et ses encadreurs
+    rejoignent le bon, et la proposition est désactivée. Le journal garde l'un et l'autre."""
     proposition = await _obtenir(db, Etablissement, etablissement_id)
     iesg = await _obtenir(db, Iesg, proposition.iesg_id)
     _dans_perimetre(acces, iesg.dre_code)
@@ -491,7 +503,15 @@ async def remplacer_proposition(
     iesg_cible = await _obtenir(db, Iesg, cible.iesg_id)
     _dans_perimetre(acces, iesg_cible.dre_code)
     deplaces = await db.execute(
-        update(Eleve).where(Eleve.etablissement_id == proposition.id).values(etablissement_id=cible.id)
+        # La version monte : un profil ouvert avant le remplacement ne l'écrase pas ensuite.
+        update(Eleve)
+        .where(Eleve.etablissement_id == proposition.id)
+        .values(etablissement_id=cible.id, version=Eleve.version + 1)
+    )
+    encadreurs_deplaces = await db.execute(
+        update(Encadreur)
+        .where(Encadreur.etablissement_id == proposition.id)
+        .values(etablissement_id=cible.id, version=Encadreur.version + 1)
     )
     proposition.statut = StatutEtablissement.inactif
     await _ecrire(db)
@@ -499,7 +519,8 @@ async def remplacer_proposition(
         db, "etablissement_remplace", acces.utilisateur, cible_type="etablissement", cible_id=proposition.id,
         perimetre=iesg.dre_code,
         details={"avant": {"etablissement_id": str(proposition.id), "nom": proposition.nom},
-                 "apres": {"etablissement_id": str(cible.id), "nom": cible.nom}, "nb_eleves": deplaces.rowcount},
+                 "apres": {"etablissement_id": str(cible.id), "nom": cible.nom}, "nb_eleves": deplaces.rowcount,
+                 "nb_encadreurs": encadreurs_deplaces.rowcount},
         adresse_ip=ip,
     )  # fmt: skip
     await db.commit()

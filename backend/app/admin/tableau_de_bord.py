@@ -11,6 +11,7 @@ from app.admin.dependances import Acces
 from app.admin.models import Collaborateur, Export, Invitation, JournalAudit
 from app.admin.schemas import EvenementJournal, Indicateur, TableauDeBord
 from app.comptes.models import Role, StatutCompte, Utilisateur
+from app.encadreurs.verification import compter_en_attente
 from app.points.service import semestre_en_cours
 from app.referentiel.models import Dre, Etablissement, StatutEtablissement
 
@@ -94,5 +95,10 @@ async def calculer(db: AsyncSession, acces: Acces) -> TableauDeBord:
         inscriptions_30_jours=inscriptions,
         indicateurs=indicateurs,
         semestre_en_cours=semestre.libelle if semestre else None,
+        encadreurs_a_verifier=(
+            await compter_en_attente(db, acces)
+            if acces.a("encadreurs", Action.consulter) and not acces.double_auth_requise
+            else None
+        ),
         derniers_evenements=derniers,
     )

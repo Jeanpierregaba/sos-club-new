@@ -4,7 +4,7 @@ specs des clubs."""
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Select, func, or_, select
+from sqlalchemy import Select, false, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.dependances import Acces
@@ -17,11 +17,14 @@ from app.admin.schemas import (
     InscritDetail,
     PageInscrits,
     ProfilEleveAdmin,
+    ProfilEncadreurAdmin,
 )
+from app.comptes.inscription import etablissement_rattache
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.comptes.service import couper_sessions
 from app.eleves.models import Eleve
-from app.eleves.service import etablissement_eleve, points_eleve
+from app.encadreurs.models import Encadreur
+from app.points import service as points
 
 HISTORIQUE = [
     "inscrit_suspendu",
@@ -31,6 +34,11 @@ HISTORIQUE = [
     "pseudonyme_impose",
     "mot_de_passe_change",
     "mot_de_passe_reinitialise",
+    "inscription_encadreur",
+    "profil_encadreur_modifie",
+    "encadreur_active",
+    "encadreur_refuse",
+    "encadreur_redemande",
 ]
 
 
@@ -48,6 +56,7 @@ def requete_filtree(filtres: FiltresInscrits) -> Select[tuple[Utilisateur]]:
         # Les caractères spéciaux de LIKE sont échappés : « 100% » cherche bien « 100% ».
         texte = filtres.recherche.strip().lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
         motif = f"%{texte}%"
+        chiffres = "".join(c for c in texte if c.isdigit())
         requete = requete.where(
             or_(
                 func.lower(Utilisateur.nom).like(motif, escape="\\"),
@@ -55,6 +64,9 @@ def requete_filtree(filtres: FiltresInscrits) -> Select[tuple[Utilisateur]]:
                 func.lower(Utilisateur.identifiant).like(motif, escape="\\"),
                 func.lower(Utilisateur.email).like(motif, escape="\\"),
                 func.lower(Eleve.pseudonyme).like(motif, escape="\\"),
+                # Le téléphone se cherche sans ses séparateurs, comme il est enregistré pour un encadreur. À partir de
+                # 4 chiffres : « eleve1 » ne doit pas trouver tous les numéros qui contiennent un 1.
+                Utilisateur.telephone.like(f"%{chiffres}%") if len(chiffres) >= 4 else false(),
             )
         )
     if filtres.profil:
@@ -106,13 +118,37 @@ async def detail(db: AsyncSession, utilisateur_id: UUID) -> InscritDetail:
             pseudonyme=eleve.pseudonyme,
             classe=eleve.classe,
             charte_version=eleve.charte_version,
-            etablissement=await etablissement_eleve(db, eleve.etablissement_id),
-            points=await points_eleve(db, utilisateur.id, 50),
+            etablissement=await etablissement_rattache(db, eleve.etablissement_id),
+            points=await points.resume(db, utilisateur.id, 50),
         )
         if eleve
         else None
     )
-    return InscritDetail(**donnees, historique=await historique(db, utilisateur.id), eleve=profil)
+    return InscritDetail(
+        **donnees,
+        historique=await historique(db, utilisateur.id),
+        eleve=profil,
+        encadreur=await _profil_encadreur(db, utilisateur.id),
+    )
+
+
+async def _profil_encadreur(db: AsyncSession, utilisateur_id: UUID) -> ProfilEncadreurAdmin | None:
+    encadreur = await db.get(Encadreur, utilisateur_id)
+    if encadreur is None:
+        return None
+    decideur = await db.get(Utilisateur, encadreur.decide_par) if encadreur.decide_par else None
+    return ProfilEncadreurAdmin(
+        fonction=encadreur.fonction,
+        fonction_precision=encadreur.fonction_precision,
+        charte_version=encadreur.charte_version,
+        etablissement=await etablissement_rattache(db, encadreur.etablissement_id),
+        etat=encadreur.etat,
+        demande_le=encadreur.demande_le,
+        decide_le=encadreur.decide_le,
+        decide_par=f"{decideur.prenom} {decideur.nom}" if decideur else None,
+        motif_refus=encadreur.motif_refus,
+        points=await points.resume(db, utilisateur_id, 50),
+    )
 
 
 async def changer_statut(

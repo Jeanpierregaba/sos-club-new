@@ -63,7 +63,9 @@ async def _creer(arguments: argparse.Namespace, mot_de_passe: str) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Crée un compte sur la plateforme.")
-    parser.add_argument("--role", required=True, choices=[role.value for role in Role])
+    # Un encadreur passe toujours par l'inscription du site : il lui faut un établissement, une fonction et la
+    # vérification de l'équipe (spec 018).
+    parser.add_argument("--role", required=True, choices=[role.value for role in Role if role is not Role.encadreur])
     parser.add_argument("--identifiant", required=True)
     parser.add_argument("--prenom", required=True)
     parser.add_argument("--nom", required=True)

@@ -204,6 +204,9 @@ function Etablissements() {
               <th scope="col" className="px-4 py-3 text-right">
                 Élèves
               </th>
+              <th scope="col" className="px-4 py-3 text-right">
+                Encadreurs
+              </th>
               <th scope="col" className="px-4 py-3">
                 <span className="sr-only">Actions</span>
               </th>
@@ -227,6 +230,7 @@ function Etablissements() {
                 </td>
                 <td className="px-4 py-3 text-muted-foreground">{e.localite ?? "—"}</td>
                 <td className="px-4 py-3 text-right font-bold tabular-nums">{e.nb_eleves}</td>
+                <td className="px-4 py-3 text-right font-bold tabular-nums">{e.nb_encadreurs}</td>
                 <td className="px-4 py-3 text-right">
                   {peut(admin, "clubs", "modifier") && e.statut === "propose" && (
                     <span className="mb-1.5 inline-flex flex-wrap justify-end gap-1.5">
@@ -262,7 +266,7 @@ function Etablissements() {
             {page.etablissements.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="px-4 py-10 text-center font-semibold text-muted-foreground"
                 >
                   Aucun établissement ne correspond à ces filtres.
@@ -499,14 +503,14 @@ function RemplacerProposition({
 }) {
   const router = useRouter();
   const [cible, setCible] = useState<EtablissementChoisi | null>(null);
-  const eleves = etablissement.nb_eleves;
+  const inscrits = etablissement.nb_eleves + etablissement.nb_encadreurs;
 
   return (
     <DialogueFormulaire
       ouvert
       onOuvert={(o) => !o && fermer()}
       titre={`Remplacer « ${etablissement.nom} »`}
-      description={`Cet établissement existe déjà sous un autre nom ? Choisis-le : ${eleves} élève${eleves > 1 ? "s" : ""} y ser${eleves > 1 ? "ont" : "a"} rattaché${eleves > 1 ? "s" : ""}, et la proposition sera désactivée.`}
+      description={`Cet établissement existe déjà sous un autre nom ? Choisis-le : ${inscrits} inscrit${inscrits > 1 ? "s" : ""} (élèves et encadreurs) y ser${inscrits > 1 ? "ont" : "a"} rattaché${inscrits > 1 ? "s" : ""}, et la proposition sera désactivée.`}
       bouton="Remplacer"
       onEnvoie={async () => {
         if (!cible) throw new ErreurApi(422, "Choisis un établissement de la liste.");

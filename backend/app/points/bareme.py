@@ -24,6 +24,7 @@ class Action(NamedTuple):
 
 
 BIENVENUE_ELEVE = "eleve.bienvenue"
+BIENVENUE_ENCADREUR = "encadreur.bienvenue"
 
 GRILLE: tuple[Action, ...] = (
     Action(BIENVENUE_ELEVE, "eleve", "Compte créé", 100),
@@ -58,7 +59,7 @@ GRILLE: tuple[Action, ...] = (
 )
 
 # Actions déjà écrites par une spec livrée. Chaque nouvelle spec ajoute la sienne ici et dans sa migration.
-EN_SERVICE: frozenset[str] = frozenset({BIENVENUE_ELEVE})
+EN_SERVICE: frozenset[str] = frozenset({BIENVENUE_ELEVE, BIENVENUE_ENCADREUR})
 
 
 def lignes_initiales() -> list[dict[str, object]]:

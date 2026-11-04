@@ -12,12 +12,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
+from app.comptes.inscription import Refus, flush
 from app.comptes.models import Role, Utilisateur
 from app.comptes.motdepasse import hacher
 from app.comptes.service import couper_sessions
 from app.eleves import pseudonyme
 from app.eleves.models import Eleve
-from app.eleves.service import Refus, _flush
 
 # Sans caractères qui se confondent à l'écrit ou à l'oral : 0 et o, 1, l et i.
 ALPHABET_PROVISOIRE = "abcdefghjkmnpqrstuvwxyz23456789"
@@ -59,7 +59,7 @@ async def imposer_pseudonyme(
     avant = eleve.pseudonyme
     eleve.pseudonyme, eleve.pseudonyme_normalise = affiche, cle
     # Deux collaborateurs qui imposent le même pseudonyme au même instant : la base tranche.
-    await _flush(db)
+    await flush(db)
     journaliser(
         db, "pseudonyme_impose", acces.utilisateur, cible_type="utilisateur", cible_id=utilisateur.id,
         details={"avant": avant, "apres": affiche, "motif": motif}, adresse_ip=ip,

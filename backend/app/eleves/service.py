@@ -4,23 +4,27 @@ L'inscription est une seule transaction : compte, profil, établissement propos�
 Si une étape échoue, rien n'est écrit. Seule la limite par adresse est validée à part, avant tout le reste.
 """
 
-from datetime import UTC, datetime, timedelta
-from uuid import UUID, uuid7
+from datetime import UTC, datetime
 
-from sqlalchemy import delete, func, select
-from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import StaleDataError
 
 from app.admin.journal import journaliser
-from app.comptes.models import Role, TentativeConnexion, Utilisateur
+from app.comptes.inscription import (
+    InscriptionsFermees,
+    Refus,
+    etablissement_actif,
+    etablissement_rattache,
+    flush,
+    limiter,
+    proposer,
+)
+from app.comptes.models import Role, Utilisateur
 from app.comptes.service import (
-    VIOLATION_UNICITE,
     CompteInvalide,
     DejaPris,
     TropDEssais,
-    _purger_vieux_essais,
     _reserver_essai,
     _valider_email,
     empreinte,
@@ -30,140 +34,23 @@ from app.comptes.service import normaliser as normaliser_identifiant
 from app.config import settings
 from app.eleves import pseudonyme
 from app.eleves.models import Eleve
-from app.eleves.schemas import (
-    EspaceEleve,
-    EtablissementEleve,
-    InscriptionEntree,
-    LignePoints,
-    PointsEleve,
-    ProfilModification,
-    SemestreEleve,
-)
+from app.eleves.schemas import EspaceEleve, InscriptionEntree, ProfilModification
 from app.points import service as points
 from app.points.bareme import BIENVENUE_ELEVE
-from app.referentiel.models import Dre, Etablissement, Iesg, StatutEtablissement, TypeEtablissement
-from app.referentiel.normalisation import normaliser
+from app.referentiel.models import StatutEtablissement
 
-# Pas une empreinte SHA-256 (64 caractères hexadécimaux) : elle ne se confond avec la clé d'aucune connexion.
-CLE_LIMITE = "inscription"
-FENETRE_LIMITE = timedelta(hours=1)
 MESSAGE_VERSION = "Ton profil a été modifié entre-temps : recharge la page."
-DOUBLONS = {
-    "uq_utilisateur_identifiant": "Cet identifiant est déjà pris.",
-    "uq_utilisateur_email": "Cet email est déjà pris.",
-    "uq_eleve_pseudonyme_normalise": "Ce pseudonyme est déjà pris.",
-}
-
-
-class Refus(Exception):
-    def __init__(self, message: str, statut: int = 422) -> None:
-        super().__init__(message)
-        self.statut = statut
-
-
-class InscriptionsFermees(Exception):
-    pass
-
-
-class TropDInscriptions(Exception):
-    pass
 
 
 class PasUnEleve(Exception):
     pass
 
 
-async def _limiter(db: AsyncSession, adresse_ip: str) -> None:
-    """Compte l'inscription avant de la traiter, dans sa propre transaction : une rafale simultanée ne dépasse pas
-    le seuil. `en_cours` reste vrai : la limite des connexions ne compte que les échecs, pas ces lignes."""
-    await _purger_vieux_essais(db)
-    reservation = TentativeConnexion(cle_hash=CLE_LIMITE, adresse_ip=adresse_ip, en_cours=True)
-    db.add(reservation)
-    await db.commit()
-    nombre = await db.scalar(
-        select(func.count())
-        .select_from(TentativeConnexion)
-        .where(
-            TentativeConnexion.cle_hash == CLE_LIMITE,
-            TentativeConnexion.adresse_ip == adresse_ip,
-            TentativeConnexion.cree_le > datetime.now(UTC) - FENETRE_LIMITE,
-        )
-    )
-    if nombre > settings.inscriptions_max_adresse:
-        # Un essai refusé ne compte pas : réessayer pendant le blocage ne le prolonge pas.
-        await db.execute(delete(TentativeConnexion).where(TentativeConnexion.id == reservation.id))
-        await db.commit()
-        raise TropDInscriptions
-
-
-async def _etablissement_actif(db: AsyncSession, etablissement_id: UUID) -> Etablissement:
-    etablissement = await db.scalar(
-        select(Etablissement)
-        .join(Iesg, Iesg.id == Etablissement.iesg_id)
-        .join(Dre, Dre.code == Iesg.dre_code)
-        .where(
-            Etablissement.id == etablissement_id,
-            Etablissement.statut == StatutEtablissement.actif,
-            Iesg.actif,
-            Dre.actif,
-        )
-    )
-    if etablissement is None:
-        raise Refus("Cet établissement n'existe pas ou n'est plus actif : choisis-en un autre.")
-    return etablissement
-
-
-async def _proposer(db: AsyncSession, iesg_id: UUID, nom: str) -> Etablissement:
-    iesg = await db.scalar(
-        select(Iesg).join(Dre, Dre.code == Iesg.dre_code).where(Iesg.id == iesg_id, Iesg.actif, Dre.actif)
-    )
-    if iesg is None:
-        raise Refus("Cette inspection n'existe pas ou n'est plus active.")
-    # Deux élèves peuvent proposer le même établissement au même instant : la base tranche, et le second se
-    # rattache à la proposition du premier.
-    await db.execute(
-        insert(Etablissement)
-        .values(
-            id=uuid7(),
-            iesg_id=iesg_id,
-            nom=nom,
-            nom_normalise=normaliser(nom),
-            type=TypeEtablissement.autre,
-            statut=StatutEtablissement.propose,
-        )
-        .on_conflict_do_nothing(index_elements=["iesg_id", "nom_normalise"])
-    )
-    # Verrouillée : l'admin ne peut pas la remplacer pendant qu'un élève s'y rattache.
-    existant = await db.scalar(
-        select(Etablissement)
-        .where(Etablissement.iesg_id == iesg_id, Etablissement.nom_normalise == normaliser(nom))
-        .with_for_update()
-    )
-    assert existant is not None
-    if existant.statut == StatutEtablissement.actif:
-        raise Refus(f"« {existant.nom} » est déjà dans la liste : choisis-le dans la recherche.", 409)
-    if existant.statut == StatutEtablissement.inactif:
-        raise Refus(f"« {existant.nom} » n'est plus actif : choisis un autre établissement.", 409)
-    return existant
-
-
-async def _flush(db: AsyncSession) -> None:
-    """Un doublon apparu entre la vérification et l'écriture (deux inscriptions simultanées) devient un refus."""
-    try:
-        await db.flush()
-    except IntegrityError as erreur:
-        await db.rollback()
-        if getattr(erreur.orig, "sqlstate", None) != VIOLATION_UNICITE:
-            raise
-        contrainte = getattr(getattr(erreur.orig, "__cause__", None), "constraint_name", None) or ""
-        raise Refus(DOUBLONS.get(contrainte, "Un de ces éléments est déjà pris."), 409) from None
-
-
 async def inscrire(db: AsyncSession, entree: InscriptionEntree, adresse_ip: str) -> Utilisateur:
     """Prépare toute l'inscription sans la valider : la session ouverte ensuite valide le tout."""
     if not settings.inscriptions_actives:
         raise InscriptionsFermees
-    await _limiter(db, adresse_ip)
+    await limiter(db, adresse_ip)
 
     try:
         affiche = pseudonyme.valider(entree.pseudonyme)
@@ -178,10 +65,10 @@ async def inscrire(db: AsyncSession, entree: InscriptionEntree, adresse_ip: str)
         raise Refus("Ce pseudonyme est déjà pris.", 409)
 
     if entree.etablissement_id:
-        etablissement = await _etablissement_actif(db, entree.etablissement_id)
+        etablissement = await etablissement_actif(db, entree.etablissement_id)
     else:
         assert entree.proposition
-        etablissement = await _proposer(db, entree.proposition.iesg_id, entree.proposition.nom)
+        etablissement = await proposer(db, entree.proposition.iesg_id, entree.proposition.nom)
 
     try:
         utilisateur = await preparer_utilisateur(
@@ -192,7 +79,7 @@ async def inscrire(db: AsyncSession, entree: InscriptionEntree, adresse_ip: str)
     except CompteInvalide as erreur:
         raise Refus(str(erreur)) from None
     utilisateur.consentement_le = datetime.now(UTC)
-    await _flush(db)
+    await flush(db)
 
     db.add(
         Eleve(
@@ -204,7 +91,7 @@ async def inscrire(db: AsyncSession, entree: InscriptionEntree, adresse_ip: str)
             charte_version=settings.version_charte,
         )
     )
-    await _flush(db)
+    await flush(db)
     await points.crediter(db, BIENVENUE_ELEVE, utilisateur.id, f"bienvenue:{utilisateur.id}")
     journaliser(
         db, "inscription_eleve", utilisateur, cible_type="utilisateur", cible_id=utilisateur.id,
@@ -227,42 +114,15 @@ async def _profil(db: AsyncSession, utilisateur: Utilisateur, *, verrouiller: bo
     return eleve
 
 
-async def etablissement_eleve(db: AsyncSession, etablissement_id: UUID) -> EtablissementEleve:
-    etablissement, iesg, dre = (
-        await db.execute(
-            select(Etablissement, Iesg, Dre)
-            .join(Iesg, Iesg.id == Etablissement.iesg_id)
-            .join(Dre, Dre.code == Iesg.dre_code)
-            .where(Etablissement.id == etablissement_id)
-        )
-    ).one()
-    return EtablissementEleve(
-        id=etablissement.id, nom=etablissement.nom, statut=etablissement.statut, iesg=iesg.nom, dre_code=dre.code,
-        dre=dre.nom,
-    )  # fmt: skip
-
-
-async def points_eleve(db: AsyncSession, utilisateur_id: UUID, nombre: int) -> PointsEleve:
-    totaux = await points.totaux(db, utilisateur_id)
-    lignes = await points.dernieres_lignes(db, utilisateur_id, nombre)
-    semestre = totaux.semestre
-    return PointsEleve(
-        semestre=SemestreEleve(libelle=semestre.libelle, debut=semestre.debut, fin=semestre.fin) if semestre else None,
-        points_semestre=totaux.points_semestre,
-        total=totaux.total,
-        lignes=[LignePoints(**ligne.__dict__) for ligne in lignes],
-    )
-
-
 async def espace(db: AsyncSession, utilisateur: Utilisateur) -> EspaceEleve:
     eleve = await _profil(db, utilisateur)
     return EspaceEleve(
         pseudonyme=eleve.pseudonyme,
         classe=eleve.classe,
         email=utilisateur.email,
-        etablissement=await etablissement_eleve(db, eleve.etablissement_id),
+        etablissement=await etablissement_rattache(db, eleve.etablissement_id),
         version=eleve.version,
-        points=await points_eleve(db, utilisateur.id, 20),
+        points=await points.resume(db, utilisateur.id, 20),
     )
 
 
@@ -285,7 +145,7 @@ async def modifier_profil(
         avant["classe"], apres["classe"] = eleve.classe.value, entree.classe.value
         eleve.classe = entree.classe
     if entree.etablissement_id and entree.etablissement_id != eleve.etablissement_id:
-        await _etablissement_actif(db, entree.etablissement_id)
+        await etablissement_actif(db, entree.etablissement_id)
         avant["etablissement_id"], apres["etablissement_id"] = str(eleve.etablissement_id), str(entree.etablissement_id)
         eleve.etablissement_id = entree.etablissement_id
     if "email" in entree.model_fields_set:
@@ -303,7 +163,7 @@ async def modifier_profil(
         # Le verrou optimiste ne voit que les colonnes du profil : l'email seul doit aussi faire monter la version.
         eleve.modifie_le = datetime.now(UTC)
         try:
-            await _flush(db)
+            await flush(db)
         except StaleDataError:
             await db.rollback()
             raise Refus(MESSAGE_VERSION, 409) from None

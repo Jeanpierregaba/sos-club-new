@@ -373,8 +373,8 @@ def test_deux_inscriptions_simultanees_avec_le_meme_pseudonyme(en_base: Callable
 def test_un_refus_pour_trop_dinscriptions_ne_prolonge_pas_le_blocage(
     client: TestClient, en_base: Callable[..., Any], monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    from app.comptes.inscription import CLE_LIMITE
     from app.comptes.models import TentativeConnexion
-    from app.eleves.service import CLE_LIMITE
 
     monkeypatch.setattr(settings, "inscriptions_max_adresse", 1)
     client.post(INSCRIPTION, json=formulaire(en_base))

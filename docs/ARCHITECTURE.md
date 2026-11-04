@@ -86,6 +86,11 @@ Champs structurants :
   identité publique, Q20) et `pseudonyme_normalise` unique (sans accents, majuscules, espaces ni
   ponctuation), `classe`, `etablissement_id`, `charte_version`. Le prénom et le nom restent dans
   `utilisateur` et ne sortent pas de l'espace admin.
+- `encadreur` (spec 018) : le profil d'un compte encadreur, lié un à un à `utilisateur`. `etablissement_id`,
+  `fonction` (et `fonction_precision` pour « autre »), `etat` de la vérification (en_attente, actif, refuse),
+  `demande_le`, `decide_le`, `decide_par`, `motif_refus`, `charte_version`. L'état est distinct de
+  `utilisateur.statut` (la suspension, qui prime). Seul un encadreur actif passera la dépendance
+  `encadreur_actif`, que les clubs et les rattachements (R4, R5) utiliseront.
 - `mouvement_points` (spec 017, ADR-0004) : `utilisateur_id` (R4 ajoutera `club_id`), `action` (code du
   barème), `montant` copié du barème au moment du gain, `semestre_id` (nul hors semestre), `cle` unique
   d'idempotence, `valide_par`, `annule_id` (une annulation est une ligne négative), `cree_le`. Jamais
@@ -117,7 +122,7 @@ flowchart LR
 - **Site** : rendu serveur pour les pages publiques (référencement, affichage rapide sur réseau lent).
   Il n'a aucune logique métier et n'accède jamais à la base (ADR-0002).
 - **API** : seule détentrice des données et des règles. Chaque domaine vit dans son dossier sous
-  `backend/app/` (`comptes/`, `admin/`, `referentiel/`, `eleves/`, `points/`, `clubs/`, `articles/`, `agenda/`, `mediatheque/`, `quiz/`),
+  `backend/app/` (`comptes/`, `admin/`, `referentiel/`, `eleves/`, `encadreurs/`, `points/`, `clubs/`, `articles/`, `agenda/`, `mediatheque/`, `quiz/`),
   avec `router.py` (HTTP), `schemas.py` (Pydantic), `models.py` (SQLAlchemy) et `service.py` (règles).
 - **Types partagés** : `backend/openapi.json` est versionné, et `npm run api:types` en génère les types
   TypeScript avec `openapi-typescript`. La CI vérifie que les deux restent à jour.

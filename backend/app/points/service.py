@@ -13,6 +13,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.points.models import LigneBareme, MouvementPoints, Semestre
+from app.points.schemas import LignePoints, ResumePoints, SemestreResume
 
 
 class ActionInconnue(Exception):
@@ -96,3 +97,16 @@ async def dernieres_lignes(db: AsyncSession, utilisateur_id: UUID, nombre: int) 
         .limit(nombre)
     )
     return [Ligne(*rangee) for rangee in (await db.execute(requete)).all()]
+
+
+async def resume(db: AsyncSession, utilisateur_id: UUID, nombre: int) -> ResumePoints:
+    """Totaux et dernières lignes, pour l'espace d'un élève ou d'un encadreur et pour sa fiche admin."""
+    calcul = await totaux(db, utilisateur_id)
+    lignes = await dernieres_lignes(db, utilisateur_id, nombre)
+    semestre = calcul.semestre
+    return ResumePoints(
+        semestre=SemestreResume(libelle=semestre.libelle, debut=semestre.debut, fin=semestre.fin) if semestre else None,
+        points_semestre=calcul.points_semestre,
+        total=calcul.total,
+        lignes=[LignePoints(**ligne.__dict__) for ligne in lignes],
+    )

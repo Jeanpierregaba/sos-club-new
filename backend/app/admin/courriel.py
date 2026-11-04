@@ -1,5 +1,5 @@
-"""Envoi des e-mails par SMTP, avec la bibliothèque standard. Hors production et sans SMTP configuré, le lien est
-seulement écrit dans le terminal de l'API, pour pouvoir tester."""
+"""Envoi des e-mails par SMTP, avec la bibliothèque standard. Hors production et sans SMTP configuré, le lien
+d'invitation est renvoyé par l'API (lien_de_test) pour pouvoir tester : aucune adresse ni contenu n'est journalisé."""
 
 import asyncio
 import logging
@@ -41,7 +41,8 @@ async def envoyer(destinataire: str, sujet: str, texte: str) -> None:
     if not smtp_configure():
         if settings.production:
             raise EnvoiImpossible("SMTP non configuré")
-        logger.warning("SMTP non configuré : e-mail non envoyé à %s. Contenu :\n%s", destinataire, texte)
+        # Ni le destinataire ni le contenu ne partent dans les journaux : le lien part par la réponse de l'API (lien_de_test) en local.
+        logger.warning("SMTP non configuré : e-mail non envoyé.")
         return
     message = EmailMessage()
     message["From"] = settings.smtp_expediteur

@@ -19,6 +19,8 @@ from app.comptes.dependances import verifier_origine
 from app.comptes.router import router as router_comptes
 from app.db import engine, get_session
 from app.eleves.router import router as router_eleves
+from app.encadreurs.router import router as router_encadreurs
+from app.encadreurs.router import router_admin as router_encadreurs_admin
 from app.points.router import router_admin as router_points_admin
 from app.referentiel.router import router_admin as router_referentiel_admin
 from app.referentiel.router import router_public as router_referentiel
@@ -48,6 +50,8 @@ api.include_router(router_referentiel)
 api.include_router(router_referentiel_admin)
 api.include_router(router_points_admin)
 api.include_router(router_eleves)
+api.include_router(router_encadreurs)
+api.include_router(router_encadreurs_admin)
 app.include_router(api)
 
 

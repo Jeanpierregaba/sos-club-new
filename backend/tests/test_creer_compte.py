@@ -74,7 +74,6 @@ def test_la_commande_cree_un_eleve_sans_email(client: TestClient) -> None:
         ("court", ADMIN, "8 caractères"),
         ("x" * 257, ADMIN, "256 caractères"),
         (MOT_DE_PASSE, ("--role", "admin", "--identifiant", "chef", "--prenom", "A", "--nom", "B"), "email"),
-        (MOT_DE_PASSE, ("--role", "encadreur", "--identifiant", "prof", "--prenom", "A", "--nom", "B"), "email"),
         (MOT_DE_PASSE, ("--role", "eleve", "--identifiant", "a@b", "--prenom", "A", "--nom", "B"), "identifiant"),
         (MOT_DE_PASSE, ("--role", "eleve", "--identifiant", "ab", "--prenom", "A", "--nom", "B"), "identifiant"),
         (MOT_DE_PASSE, ("--role", "eleve", "--identifiant", "abc", "--prenom", " ", "--nom", "B"), "prénom"),
@@ -90,6 +89,16 @@ def test_la_commande_refuse_les_comptes_invalides(
     assert resultat.returncode == 1
     assert message in resultat.stderr
     assert mot_de_passe not in resultat.stdout + resultat.stderr
+    assert compter(en_base) == 0
+
+
+def test_la_commande_ne_cree_pas_dencadreur(en_base: Callable[..., Any]) -> None:
+    arguments = ("--role", "encadreur", "--identifiant", "prof", "--prenom", "A", "--nom", "B", "--email", "p@e.tg")
+
+    resultat = lancer(MOT_DE_PASSE, *arguments)
+
+    assert resultat.returncode == 2
+    assert "--role" in resultat.stderr
     assert compter(en_base) == 0
 
 
