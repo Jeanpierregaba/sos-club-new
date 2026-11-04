@@ -11,6 +11,7 @@ from app.admin.dependances import Acces
 from app.admin.models import Collaborateur, Export, Invitation, JournalAudit
 from app.admin.schemas import EvenementJournal, Indicateur, TableauDeBord
 from app.comptes.models import Role, StatutCompte, Utilisateur
+from app.referentiel.models import Dre, Etablissement, StatutEtablissement
 
 # Indicateurs du CDC qui dépendent de modules à venir : affichés sans valeur.
 A_VENIR = [
@@ -64,8 +65,15 @@ async def calculer(db: AsyncSession, acces: Acces) -> TableauDeBord:
         .where(Utilisateur.statut == StatutCompte.actif)
     )
 
+    dre_actives = await db.scalar(select(func.count()).select_from(Dre).where(Dre.actif))
+    etablissements_actifs = await db.scalar(
+        select(func.count()).select_from(Etablissement).where(Etablissement.statut == StatutEtablissement.actif)
+    )
+
     indicateurs = [
         Indicateur(id="collaborateurs_actifs", libelle="Collaborateurs actifs", valeur=collaborateurs_actifs or 0),
+        Indicateur(id="dre_actives", libelle="DRE actives", valeur=dre_actives or 0),
+        Indicateur(id="etablissements_actifs", libelle="Établissements actifs", valeur=etablissements_actifs or 0),
         Indicateur(id="invitations_en_attente", libelle="Invitations en attente", valeur=invitations_en_attente or 0),
         Indicateur(id="exports_du_mois", libelle="Exports ce mois-ci", valeur=exports_du_mois or 0),
     ] + [Indicateur(id=i, libelle=libelle, valeur=None, disponible_avec=module) for i, libelle, module in A_VENIR]

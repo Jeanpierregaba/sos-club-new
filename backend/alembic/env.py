@@ -6,7 +6,8 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 import app.admin.models
-import app.comptes.models  # noqa: F401
+import app.comptes.models
+import app.referentiel.models  # noqa: F401
 from alembic import context
 from app.config import settings
 from app.db import Base

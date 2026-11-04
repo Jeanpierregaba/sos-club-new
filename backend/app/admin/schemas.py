@@ -2,9 +2,9 @@ from datetime import datetime
 from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field
 
-from app.admin.catalogue import DRE, Action, RoleDepart
+from app.admin.catalogue import Action, RoleDepart
 from app.admin.models import FormatExport, StatutExport, TypeExport
 from app.comptes.models import Role, StatutCompte
 
@@ -47,7 +47,9 @@ class Catalogue(BaseModel):
     actions: dict[Action, str]
     sensibles: list[Droit]
     roles: list[RoleCatalogue]
+    # Toutes les DRE du référentiel pour afficher un périmètre ; les actives seules pour en choisir un (spec 016).
     dre: dict[str, str]
+    dre_actives: list[str]
 
 
 # Double authentification ------------------------------------------------------------------------------------
@@ -80,26 +82,12 @@ class InvitationEntree(BaseModel):
     fin_acces: datetime | None = None
     droits: list[Droit] = []
 
-    @field_validator("perimetre_dre")
-    @classmethod
-    def dre_connue(cls, valeur: str | None) -> str | None:
-        if valeur is not None and valeur not in DRE:
-            raise ValueError("DRE inconnue")
-        return valeur
-
 
 class DroitsEntree(BaseModel):
     droits: list[Droit]
     perimetre_dre: str | None = None
     fin_acces: datetime | None = None
     motif: str = Motif
-
-    @field_validator("perimetre_dre")
-    @classmethod
-    def dre_connue(cls, valeur: str | None) -> str | None:
-        if valeur is not None and valeur not in DRE:
-            raise ValueError("DRE inconnue")
-        return valeur
 
 
 class MotifEntree(BaseModel):

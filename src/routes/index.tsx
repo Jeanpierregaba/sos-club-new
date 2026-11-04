@@ -20,6 +20,7 @@ import {
   VolumeX,
 } from "lucide-react";
 import { ClubsSection } from "@/components/ClubsSection";
+import { chargerDre } from "@/lib/api/client";
 import { AgendaSidebar } from "@/components/AgendaSidebar";
 import { PartenairesSection } from "@/components/PartenairesSection";
 import { GalerieSection } from "@/components/GalerieSection";
@@ -66,6 +67,8 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  // Sans l'API, l'accueil s'affiche quand même : seule la section des clubs disparaît.
+  loader: () => chargerDre().catch(() => []),
   component: Index,
 });
 
@@ -786,6 +789,7 @@ const sansSousTitres = (lecteur: HTMLIFrameElement | null) =>
   );
 
 function Index() {
+  const dre = Route.useLoaderData();
   const [active, setActive] = useState(0);
   const [son, setSon] = useState(false);
   const lecteur = useRef<HTMLIFrameElement>(null);
@@ -994,7 +998,7 @@ function Index() {
         </div>
       </section>
 
-      <ClubsSection />
+      <ClubsSection liste={dre} />
       <ActualitesSection />
       <CampagnesSection />
       <DefiDuJour />

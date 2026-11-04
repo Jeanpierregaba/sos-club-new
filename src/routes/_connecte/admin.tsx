@@ -12,6 +12,7 @@ import {
   ExternalLink,
   LayoutDashboard,
   LogOut,
+  MapPinned,
   Menu,
   ScrollText,
   ShieldCheck,
@@ -85,6 +86,12 @@ function entrees(admin: AdminMoi): Entree[] {
     },
     { to: "/admin/inscrits", libelle: "Inscrits", i: Users, visible: peutVoirInscrits(admin) },
     { to: "/admin/exports", libelle: "Exports", i: Download, visible: peutExporter(admin) },
+    {
+      to: "/admin/referentiel",
+      libelle: "Référentiel",
+      i: MapPinned,
+      visible: peut(admin, "clubs", "consulter"),
+    },
     {
       to: "/admin/journal",
       libelle: "Journal d'audit",

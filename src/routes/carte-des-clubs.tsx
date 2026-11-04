@@ -5,8 +5,9 @@ import { FilAriane } from "@/components/FilAriane";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion } from "@/components/SiteMotion";
-import { dres, grandLome, type Dre } from "@/lib/togo-dre";
-import { etablissements, type TypeEtablissement } from "@/lib/etablissements";
+import { chargerAnnuaire, type TypeEtablissement } from "@/lib/api/client";
+import { chercher, compterParType, indexer } from "@/lib/carte-des-clubs";
+import { DRE_PAR_DEFAUT, dessins, regions } from "@/lib/togo-dre";
 import mascottesEquipe from "@/assets/mascottes-equipe.webp";
 
 export const Route = createFileRoute("/carte-des-clubs")({
@@ -16,11 +17,13 @@ export const Route = createFileRoute("/carte-des-clubs")({
       {
         name: "description",
         content:
-          "Carte des Clubs Santé SOS Docteur TV au Togo : les 7 Directions Régionales de l'Éducation, leurs 19 IESG et les 844 collèges et lycées du réseau.",
+          "Carte des Clubs Santé SOS Docteur TV au Togo : les Directions Régionales de l'Éducation, leurs IESG et les collèges et lycées du réseau.",
       },
       { property: "og:title", content: "La carte des Clubs Santé du Togo" },
     ],
   }),
+  // L'annuaire vient de l'API (spec 016). Sans elle, la carte garde ses contours et l'explique.
+  loader: () => chargerAnnuaire().catch(() => null),
   component: CarteDesClubs,
 });
 
@@ -30,45 +33,33 @@ const types: Record<TypeEtablissement, { t: string; c: string }> = {
   complexe: { t: "Complexe", c: "text-tangerine" },
   autre: { t: "Établissement", c: "text-muted-foreground" },
 };
-
-const totalClubs = dres.reduce((n, r) => n + r.clubs, 0);
-const totalIesg = dres.reduce((n, r) => n + r.iesg.length, 0);
-const chiffres = [
-  { n: dres.length, t: "Directions régionales" },
-  { n: totalIesg, t: "Inspections (IESG)" },
-  { n: totalClubs, t: "Collèges & lycées" },
-];
-
-// Comparaison sans accents ni majuscules, pour que « agoe » trouve « Agoè ».
-const normaliser = (s: string) =>
-  s
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLowerCase();
-
-const index = dres.flatMap((d) =>
-  d.iesg.flatMap((i) =>
-    (etablissements[i.nom] ?? []).map((e) => ({
-      ...e,
-      iesg: i.nom,
-      dre: d,
-      cle: normaliser(e.nom),
-    })),
-  ),
-);
+const ORDRE_TYPES = Object.keys(types) as TypeEtablissement[];
 
 const APERCU = 30;
 
 function CarteDesClubs() {
-  const [dre, setDre] = useState<Dre>(grandLome);
-  const [iesg, setIesg] = useState(grandLome.iesg[0]?.nom ?? "");
+  const annuaire = Route.useLoaderData();
+  const dres = useMemo(() => regions(annuaire ?? []), [annuaire]);
+  const index = useMemo(() => indexer(dres), [dres]);
+  const totalClubs = dres.reduce((n, r) => n + r.nb_etablissements, 0);
+  const chiffres = [
+    { n: dres.length, t: "Directions régionales" },
+    { n: dres.reduce((n, r) => n + r.iesg.length, 0), t: "Inspections (IESG)" },
+    { n: totalClubs, t: "Collèges & lycées" },
+  ];
+
+  const [code, setCode] = useState(DRE_PAR_DEFAUT);
+  const [iesgId, setIesgId] = useState<string | null>(null);
   const [type, setType] = useState<TypeEtablissement | null>(null);
   const [toutVoir, setToutVoir] = useState(false);
   const [recherche, setRecherche] = useState("");
 
-  const choisir = (d: Dre, i = d.iesg[0]?.nom ?? "") => {
-    setDre(d);
-    setIesg(i);
+  const dre = dres.find((r) => r.code === code) ?? dres[0];
+  const iesg = dre?.iesg.find((i) => i.id === iesgId) ?? dre?.iesg[0];
+
+  const choisir = (codeDre: string, idIesg: string | null = null) => {
+    setCode(codeDre);
+    setIesgId(idIesg);
     setType(null);
     setToutVoir(false);
     setRecherche("");
@@ -78,18 +69,14 @@ function CarteDesClubs() {
   const montrerExplorateur = () =>
     document.getElementById("explorateur")?.scrollIntoView({ behavior: "smooth" });
 
-  const liste = etablissements[iesg] ?? [];
-  const filtres = (Object.keys(types) as TypeEtablissement[])
-    .map((t) => ({ t, n: liste.filter((e) => e.type === t).length }))
-    .filter((f) => f.n > 0);
+  const liste = iesg?.etablissements ?? [];
+  const filtres = compterParType(liste, ORDRE_TYPES);
   const affiches = liste.filter((e) => !type || e.type === type);
   const visibles = toutVoir ? affiches : affiches.slice(0, APERCU);
 
-  const q = normaliser(recherche.trim());
-  const resultats = useMemo(
-    () => (q.length < 2 ? [] : index.filter((e) => e.cle.includes(q))),
-    [q],
-  );
+  const q = recherche.trim();
+  const resultats = useMemo(() => chercher(index, q), [index, q]);
+  const enRecherche = q.replace(/\s/g, "").length >= 2;
 
   return (
     <div className="min-h-screen overflow-x-clip bg-carnet text-ink">
@@ -155,21 +142,23 @@ function CarteDesClubs() {
                 )}
               </form>
 
-              <dl className="mt-8 grid max-w-xl grid-cols-3 gap-2 sm:gap-3">
-                {chiffres.map((c) => (
-                  <div
-                    key={c.t}
-                    className="flex flex-col-reverse rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur-sm sm:p-4"
-                  >
-                    <dt className="mt-1.5 text-xs font-bold leading-tight text-white/75 sm:text-sm">
-                      {c.t}
-                    </dt>
-                    <dd className="font-display text-3xl leading-none text-sun md:text-4xl">
-                      {c.n}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
+              {dre && (
+                <dl className="mt-8 grid max-w-xl grid-cols-3 gap-2 sm:gap-3">
+                  {chiffres.map((c) => (
+                    <div
+                      key={c.t}
+                      className="flex flex-col-reverse rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur-sm sm:p-4"
+                    >
+                      <dt className="mt-1.5 text-xs font-bold leading-tight text-white/75 sm:text-sm">
+                        {c.t}
+                      </dt>
+                      <dd className="font-display text-3xl leading-none text-sun md:text-4xl">
+                        {c.n}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
             </div>
           </div>
 
@@ -196,30 +185,40 @@ function CarteDesClubs() {
             aria-hidden
             className="mx-auto w-full overflow-visible lg:max-w-44"
           >
-            {[...dres.filter((r) => r.id !== dre.id), dre].map((r) => (
-              <path
-                key={r.id}
-                d={r.d}
-                fill={r.couleur}
-                onClick={() => choisir(r)}
-                strokeLinejoin="round"
-                className={`cursor-pointer transition-[opacity,stroke-width] duration-200 ${
-                  r.id === dre.id
-                    ? "stroke-ink stroke-[2.5]"
-                    : "stroke-white stroke-[1.5] opacity-35 hover:opacity-70"
-                }`}
-              />
-            ))}
+            {dre
+              ? [...dres.filter((r) => r.code !== dre.code), dre].map((r) => (
+                  <path
+                    key={r.code}
+                    d={r.d}
+                    fill={r.couleur}
+                    onClick={() => choisir(r.code)}
+                    strokeLinejoin="round"
+                    className={`cursor-pointer transition-[opacity,stroke-width] duration-200 ${
+                      r.code === dre.code
+                        ? "stroke-ink stroke-[2.5]"
+                        : "stroke-white stroke-[1.5] opacity-35 hover:opacity-70"
+                    }`}
+                  />
+                ))
+              : Object.entries(dessins).map(([id, r]) => (
+                  <path
+                    key={id}
+                    d={r.d}
+                    fill={r.couleur}
+                    strokeLinejoin="round"
+                    className="stroke-white stroke-[1.5] opacity-35"
+                  />
+                ))}
           </svg>
           <ul className="grid gap-0.5">
             {dres.map((r) => {
-              const on = r.id === dre.id;
+              const on = r.code === dre?.code;
               return (
-                <li key={r.id}>
+                <li key={r.code}>
                   <button
                     type="button"
                     aria-pressed={on}
-                    onClick={() => choisir(r)}
+                    onClick={() => choisir(r.code)}
                     className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm transition ${
                       on
                         ? "bg-mist font-extrabold text-logo-blue"
@@ -231,7 +230,9 @@ function CarteDesClubs() {
                       style={{ backgroundColor: r.couleur }}
                     />
                     <span className="flex-1">{r.nom}</span>
-                    <span className="tabular-nums text-muted-foreground">{r.clubs}</span>
+                    <span className="tabular-nums text-muted-foreground">
+                      {r.nb_etablissements}
+                    </span>
                   </button>
                 </li>
               );
@@ -240,20 +241,27 @@ function CarteDesClubs() {
         </aside>
 
         <div id="explorateur" data-reveal="right" className="min-w-0 scroll-mt-24">
-          {q.length >= 2 ? (
+          {!dre ? (
+            <div className="rounded-[2rem] border bg-white p-6 md:p-10">
+              <p role="status" className="font-bold">
+                La liste des établissements est momentanément indisponible. Réessaie dans quelques
+                instants.
+              </p>
+            </div>
+          ) : enRecherche ? (
             <div className="rounded-[2rem] border bg-white p-6 md:p-8">
               <p aria-live="polite" className="font-bold">
                 {resultats.length === 0
-                  ? `Aucun établissement ne correspond à « ${recherche.trim()} ».`
-                  : `${resultats.length} établissement${resultats.length > 1 ? "s" : ""} pour « ${recherche.trim()} »`}
+                  ? `Aucun établissement ne correspond à « ${q} ».`
+                  : `${resultats.length} établissement${resultats.length > 1 ? "s" : ""} pour « ${q} »`}
               </p>
               {resultats.length > 0 && (
                 <ul className="mt-5 divide-y border-y">
-                  {resultats.slice(0, 50).map((e, k) => (
-                    <li key={`${e.iesg}-${e.nom}-${k}`}>
+                  {resultats.slice(0, 50).map((e) => (
+                    <li key={e.id}>
                       <button
                         type="button"
-                        onClick={() => choisir(e.dre, e.iesg)}
+                        onClick={() => choisir(e.dre.code, e.iesg.id)}
                         className="group flex w-full items-center gap-4 py-3.5 text-left"
                       >
                         <MapPin
@@ -266,7 +274,7 @@ function CarteDesClubs() {
                             {e.nom}
                           </span>
                           <span className="block text-sm text-muted-foreground">
-                            {e.iesg} · DRE {e.dre.nom}
+                            {e.iesg.nom} · DRE {e.dre.nom}
                           </span>
                         </span>
                         <span className={`text-xs font-extrabold uppercase ${types[e.type].c}`}>
@@ -285,7 +293,7 @@ function CarteDesClubs() {
             </div>
           ) : (
             <div
-              key={dre.id}
+              key={dre.code}
               className="rounded-[2rem] border bg-white p-6 animate-in fade-in duration-300 md:p-10"
             >
               <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
@@ -303,10 +311,10 @@ function CarteDesClubs() {
                   </h2>
                 </div>
                 <p className="text-sm font-semibold text-muted-foreground">
-                  <strong className="text-ink">{dre.clubs}</strong> établissements ·{" "}
+                  <strong className="text-ink">{dre.nb_etablissements}</strong> établissements ·{" "}
                   <strong className="text-ink">{dre.iesg.length}</strong> IESG ·{" "}
                   <strong className="text-ink">
-                    {Math.round((dre.clubs / totalClubs) * 100)} %
+                    {Math.round((dre.nb_etablissements / (totalClubs || 1)) * 100)} %
                   </strong>{" "}
                   du réseau
                 </p>
@@ -318,13 +326,13 @@ function CarteDesClubs() {
                 className="mt-8 flex flex-wrap gap-2"
               >
                 {dre.iesg.map((i) => {
-                  const on = i.nom === iesg;
+                  const on = i.id === iesg?.id;
                   return (
                     <button
-                      key={i.nom}
+                      key={i.id}
                       type="button"
                       aria-pressed={on}
-                      onClick={() => choisir(dre, i.nom)}
+                      onClick={() => choisir(dre.code, i.id)}
                       className={`rounded-full px-4 py-2 text-sm font-bold transition ${
                         on
                           ? "bg-logo-blue text-white"
@@ -333,7 +341,7 @@ function CarteDesClubs() {
                     >
                       {i.nom}{" "}
                       <span className={on ? "text-white/70" : "text-muted-foreground"}>
-                        {i.clubs}
+                        {i.nb_etablissements}
                       </span>
                     </button>
                   );
@@ -368,7 +376,7 @@ function CarteDesClubs() {
               <ol className="mt-4 grid border-t sm:grid-cols-2 sm:gap-x-8 xl:grid-cols-3">
                 {visibles.map((e, k) => (
                   <li
-                    key={`${e.nom}-${k}`}
+                    key={e.id}
                     className="flex items-baseline gap-3 border-b border-border/60 py-3"
                   >
                     <span className="w-6 shrink-0 text-right text-xs font-bold tabular-nums text-muted-foreground">

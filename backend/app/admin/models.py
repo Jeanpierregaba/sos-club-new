@@ -19,8 +19,9 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.admin.catalogue import DRE, Action, RoleDepart
+from app.admin.catalogue import Action, RoleDepart
 from app.db import Base
+from app.referentiel.models import Dre
 
 
 def _enum_texte(enum: type[StrEnum], nom: str) -> Enum:
@@ -31,13 +32,7 @@ class Collaborateur(Base):
     """Profil de gestion d'un compte admin. `utilisateur_id` reste nul tant que l'invitation n'est pas acceptée."""
 
     __tablename__ = "collaborateur"
-    __table_args__ = (
-        CheckConstraint("email = lower(email)", name="email_minuscules"),
-        CheckConstraint(
-            "perimetre_dre IS NULL OR perimetre_dre IN (" + ", ".join(f"'{d}'" for d in DRE) + ")",
-            name="perimetre_dre_connue",
-        ),
-    )
+    __table_args__ = (CheckConstraint("email = lower(email)", name="email_minuscules"),)
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
     utilisateur_id: Mapped[UUID | None] = mapped_column(ForeignKey("utilisateur.id", ondelete="CASCADE"), unique=True)
@@ -45,8 +40,8 @@ class Collaborateur(Base):
     prenom: Mapped[str] = mapped_column(String(100))
     nom: Mapped[str] = mapped_column(String(100))
     role_depart: Mapped[RoleDepart | None] = mapped_column(_enum_texte(RoleDepart, "role_depart"))
-    # Nul : périmètre national.
-    perimetre_dre: Mapped[str | None] = mapped_column(String(30))
+    # Nul : périmètre national. Le code d'une DRE du référentiel (spec 016).
+    perimetre_dre: Mapped[str | None] = mapped_column(ForeignKey(Dre.code, ondelete="RESTRICT"), index=True)
     fin_acces: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     super_admin: Mapped[bool] = mapped_column(default=False)
     invite_par_id: Mapped[UUID | None] = mapped_column(ForeignKey("utilisateur.id", ondelete="SET NULL"))

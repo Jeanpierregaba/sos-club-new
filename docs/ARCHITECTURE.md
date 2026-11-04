@@ -26,7 +26,10 @@ erDiagram
   club ||--o{ adhesion : regroupe
   utilisateur ||--o{ encadrement : "encadreur"
   club ||--o{ encadrement : "3 à l'enregistrement"
-  region ||--o{ club : contient
+  dre ||--o{ iesg : regroupe
+  iesg ||--o{ etablissement : regroupe
+  etablissement ||--o{ club : accueille
+  dre ||--o{ collaborateur : "périmètre"
   axe ||--o{ article : classe
   axe ||--o{ video : classe
   axe ||--o{ quiz : classe
@@ -35,7 +38,7 @@ erDiagram
   article ||--o{ commentaire : recoit
   utilisateur ||--o{ commentaire : ecrit
   club ||--o{ evenement : organise
-  region ||--o{ evenement : accueille
+  dre ||--o{ evenement : accueille
   quiz ||--o{ question : contient
   question ||--o{ choix : propose
   quiz ||--o{ tentative : "passé via"
@@ -53,8 +56,15 @@ Champs structurants :
 - `utilisateur` : `role` (eleve, encadreur, admin), `identifiant` unique, `email` unique facultatif
   pour l'élève et obligatoire pour les autres, `telephone`, `prenom`, `nom`, `mot_de_passe_hash`,
   `statut`, `consentement_le`.
-- `club` : `nom`, `etablissement`, `region_id`, `ville`, `statut` (en_attente, actif, suspendu,
-  rejete). Un index unique sur l'établissement normalisé et la région évite les doublons simples.
+- `dre`, `iesg`, `etablissement` (spec 016) : le découpage scolaire. Une DRE a un `code` stable (clé
+  primaire, aussi utilisée par `collaborateur.perimetre_dre`) ; IESG et établissements ont un UUID.
+  La DRE d'un établissement se déduit de son IESG. Chaque table a un `nom_normalise` (sans accents ni
+  majuscules) qui porte l'unicité dans le parent, un statut actif ou inactif (`propose` en plus pour un
+  établissement) et une `version` pour le verrou optimiste. Rien ne se supprime.
+- `axe` (spec 016) : les 7 axes d'intervention (Q1), avec un `code` stable, un `libelle`, une
+  `description` courte et un `ordre`.
+- `club` : `nom`, `etablissement_id`, `ville`, `statut` (en_attente, actif, suspendu, rejete). Sa DRE
+  vient de son établissement (Q2).
 - `adhesion` : `eleve_id`, `club_id`, `depuis`, `jusqu_a`. Une seule adhésion active par élève
   (index unique partiel), l'historique reste conservé.
 - `encadrement` : `club_id`, `utilisateur_id`, `specialite`, `statut`. Un encadreur n'a qu'un
@@ -63,7 +73,7 @@ Champs structurants :
   `club_id` facultatif, `auteur_id`, `photo`, `statut` (brouillon, soumis, publie, rejete),
   `motif_rejet`, `modere_par`, `publie_le`.
 - `evenement` : `titre`, `type` (sensibilisation, nettoyage, depistage, defi), `debut`, `fin`, `lieu`,
-  `region_id`, `club_id` facultatif.
+  `dre_code`, `club_id` facultatif.
 - `video` : `titre`, `youtube_id`, `axe_id`. `document` : `titre`, `type` (magazine, guide, fiche),
   `fichier`, `couverture`, `publie_le`.
 - `tentative` : `quiz_id`, `eleve_id`, `commencee_le`, `terminee_le`, `score`, `reussie`.
@@ -72,8 +82,9 @@ Champs structurants :
   `motif`, `source_type`, `source_id`, `cle_idempotence` unique, `cree_le`. Jamais modifié ni supprimé
   (ADR-0004).
 
-`region` et `axe` sont des tables de référence, remplies par une migration : changer Q1 ou Q2 ne
-demandera pas de réécrire le code.
+Le référentiel (`dre`, `iesg`, `etablissement`, `axe`) est chargé par la migration `referentiel` depuis
+`backend/alembic/donnees/annuaire.json`, puis géré depuis `/admin/referentiel`. Le site lit ses listes
+dans l'API (`/api/referentiel/…`) ; `src/lib/togo-dre.ts` ne garde que le dessin de la carte.
 
 ## Architecture générale
 
@@ -91,7 +102,7 @@ flowchart LR
 - **Site** : rendu serveur pour les pages publiques (référencement, affichage rapide sur réseau lent).
   Il n'a aucune logique métier et n'accède jamais à la base (ADR-0002).
 - **API** : seule détentrice des données et des règles. Chaque domaine vit dans son dossier sous
-  `backend/app/` (`comptes/`, `clubs/`, `articles/`, `agenda/`, `mediatheque/`, `quiz/`, `points/`),
+  `backend/app/` (`comptes/`, `admin/`, `referentiel/`, `clubs/`, `articles/`, `agenda/`, `mediatheque/`, `quiz/`, `points/`),
   avec `router.py` (HTTP), `schemas.py` (Pydantic), `models.py` (SQLAlchemy) et `service.py` (règles).
 - **Types partagés** : `backend/openapi.json` est versionné, et `npm run api:types` en génère les types
   TypeScript avec `openapi-typescript`. La CI vérifie que les deux restent à jour.

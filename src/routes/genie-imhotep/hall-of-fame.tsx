@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Compteur } from "@/components/Compteur";
 import { SiteMotion, retard } from "@/components/SiteMotion";
-import { dres } from "@/lib/togo-dre";
+import { dessins } from "@/lib/togo-dre";
 import {
   CHAMPION,
   inspectorales,
@@ -17,6 +17,7 @@ import {
   regionales,
   type Equipe,
   type MatchNational,
+  nomsRegions,
   type RegionId,
 } from "@/lib/genie-imhotep-resultats";
 import mascottesVs from "@/assets/mascottes-vs.webp";
@@ -36,7 +37,7 @@ export const Route = createFileRoute("/genie-imhotep/hall-of-fame")({
   component: HallOfFame,
 });
 
-const region = (id: RegionId) => dres.find((r) => r.id === id)!;
+const region = (id: RegionId) => ({ nom: nomsRegions[id], couleur: dessins[id]!.couleur });
 
 const finale = nationale.find((m) => m.tour === "finale")!;
 const champion = finale.a.nom === CHAMPION ? finale.a : finale.b;

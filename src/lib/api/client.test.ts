@@ -6,6 +6,7 @@ import {
   deconnecter,
   ErreurApi,
   MESSAGE_INDISPONIBLE,
+  MESSAGE_SAISIE,
   type Moi,
 } from "./client";
 
@@ -91,7 +92,7 @@ describe("connecter", () => {
 
     await expect(connecter("jeank", "secret")).rejects.toMatchObject({
       statut: 422,
-      message: MESSAGE_INDISPONIBLE,
+      message: MESSAGE_SAISIE,
     });
   });
 });

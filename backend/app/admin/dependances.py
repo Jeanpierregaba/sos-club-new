@@ -84,7 +84,8 @@ async def collaborateur_courant(
 Collaborateur_ = Annotated[Acces, Depends(collaborateur_courant)]
 
 
-async def _refuser(db: AsyncSession, request: Request, acces: Acces, droit: str) -> None:
+async def refuser(db: AsyncSession, request: Request, acces: Acces, droit: str) -> None:
+    """Journalise le refus, puis répond 403."""
     journaliser(
         db,
         "acces_refuse",
@@ -107,18 +108,26 @@ def exiger_permission(module: str, action: Action, *, national: bool = False) ->
         if acces.double_auth_requise:
             raise HTTPException(status.HTTP_403_FORBIDDEN, MESSAGE_DOUBLE_AUTH)
         if not acces.a(module, action) or (national and not acces.national):
-            await _refuser(db, request, acces, f"{module}:{action.value}")
+            await refuser(db, request, acces, f"{module}:{action.value}")
         return acces
 
     return verifier
 
 
-async def exiger_super_admin(
-    request: Request, acces: Collaborateur_, db: Annotated[AsyncSession, Depends(get_session)]
-) -> Acces:
-    """La gestion des collaborateurs et des droits ne se délègue pas dans ce lot (stress-test du 2026-11-04)."""
-    if acces.double_auth_requise:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, MESSAGE_DOUBLE_AUTH)
-    if not acces.collaborateur.super_admin:
-        await _refuser(db, request, acces, "collaborateurs:gerer")
-    return acces
+def exiger_super_admin_pour(droit: str) -> Callable[..., Awaitable[Acces]]:
+    """Réservé au super-administrateur ; `droit` nomme l'opération dans le journal des refus."""
+
+    async def verifier(
+        request: Request, acces: Collaborateur_, db: Annotated[AsyncSession, Depends(get_session)]
+    ) -> Acces:
+        if acces.double_auth_requise:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, MESSAGE_DOUBLE_AUTH)
+        if not acces.collaborateur.super_admin:
+            await refuser(db, request, acces, droit)
+        return acces
+
+    return verifier
+
+
+# La gestion des collaborateurs et des droits ne se délègue pas dans ce lot (stress-test du 2026-11-04).
+exiger_super_admin = exiger_super_admin_pour("collaborateurs:gerer")

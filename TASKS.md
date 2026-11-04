@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- Aucune spec en cours : la prochaine est R1 (référentiel), voir la phase 1 ci-dessous.
+_Rien pour l'instant._
 
 ## À faire
 
@@ -22,7 +22,6 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 **Phase 1 — Comptes et clubs (P0, jalon A)**
 
-- [ ] R1 — Référentiel : DRE configurables, établissements, axes (Q1, Q2, Q28)
 - [ ] R2 — Compte élève et registre des points : inscription, pseudonyme, +100, semestres et barème réglables (Q4, Q8, Q17, Q20 à Q22)
 - [ ] R3 — Compte encadreur : inscription, vérification par l'admin, +100 (Q16, Q22)
 - [ ] R4 — Clubs et présidence : création par l'élève président, validation, passation, carte des clubs réelle ; amender l'ADR-0003 (Q5, Q6, Q16, Q19)
@@ -66,12 +65,13 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 - [ ] Mettre à jour les dépendances du site : 13 failles élevées signalées par `bun audit` (zod, vite, nanoid…), puis rendre cet audit bloquant dans la CI
 - [ ] Remplacer les liens vers des pages absentes et les contenus provisoires de l'accueil au fil des specs (dates d'Agenda, chiffres des clubs)
-- [ ] Pages du menu : brancher sur l'API les contenus repris du site de référence (agenda, magazine, bibliothèque, Hall of Fame, quiz), mettre en ligne les fichiers (plaquette, documentaire, documents de la bibliothèque, liens en `#`) et ouvrir les formulaires d'inscription Génie Imhotep ; vérifier 5 doublons probables de l'annuaire (IESG Aného et Dapaong)
+- [ ] Pages du menu : brancher sur l'API les contenus repris du site de référence (agenda, magazine, bibliothèque, Hall of Fame, quiz), mettre en ligne les fichiers (plaquette, documentaire, documents de la bibliothèque, liens en `#`) et ouvrir les formulaires d'inscription Génie Imhotep ; faire confirmer les 6 doublons de l'annuaire écartés au chargement du référentiel (5 dans l'IESG Aného, 1 dans celle de Dapaong)
 - [ ] Renommer le paquet `tanstack_start_ts`
 - [ ] Suite Playwright des parcours de connexion (garde, en-tête, retour arrière), vérifiés à la main pour l'instant, avant l'ouverture
 
 ## Terminé
 
+- [x] [016 — Référentiel : DRE, IESG, établissements et axes](docs/specs/016-referentiel/spec.md) (R1 : 7 DRE, 19 IESG, 838 établissements, 7 axes d'intervention, écrans admin, carte des clubs branchée sur l'API)
 - [x] [015 — Espace administrateur, lot 1 : les fondations](docs/specs/015-espace-admin/spec.md) (tableau de bord, collaborateurs et droits, double authentification, journal, annuaire, exports)
 - [x] [001 — Connexion et rôles](docs/specs/001-connexion-et-roles/spec.md)
 - [x] Installer le backend FastAPI et PostgreSQL (ADR-0001), sans schéma ni lien avec le site pour l'instant

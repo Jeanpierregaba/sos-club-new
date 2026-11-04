@@ -25,6 +25,27 @@ export type ExportEntree = Schemas["ExportEntree"];
 export type ExportResume = Schemas["ExportResume"];
 export type ExportCree = Schemas["ExportCree"];
 export type Apercu = Schemas["Apercu"];
+export type DrePublique = Schemas["DrePublique"];
+export type DreAnnuaire = Schemas["DreAnnuaire"];
+export type EtablissementTrouve = Schemas["EtablissementTrouve"];
+export type TypeEtablissement = Schemas["TypeEtablissement"];
+export type StatutEtablissement = Schemas["StatutEtablissement"];
+export type AxePublic = Schemas["AxePublic"];
+export type DreAdmin = Schemas["DreAdmin"];
+export type IesgAdmin = Schemas["IesgAdmin"];
+export type EtablissementAdmin = Schemas["EtablissementAdmin"];
+export type PageEtablissements = Schemas["PageEtablissements"];
+export type AxeAdmin = Schemas["AxeAdmin"];
+export type DreCreation = Schemas["DreCreation"];
+export type DreModification = Schemas["DreModification"];
+export type IesgCreation = Schemas["IesgCreation"];
+export type IesgModification = Schemas["IesgModification"];
+export type EtablissementCreation = Schemas["EtablissementCreation"];
+export type EtablissementModification = Schemas["EtablissementModification"];
+export type AxeCreation = Schemas["AxeCreation"];
+export type AxeModification = Schemas["AxeModification"];
+
+export const MESSAGE_SAISIE = "Vérifie le formulaire : un champ est vide, trop long ou mal rempli.";
 
 export const MESSAGE_INDISPONIBLE =
   "Connexion impossible pour le moment. Réessaie dans quelques instants.";
@@ -67,7 +88,14 @@ async function requeteApi<T>(chemin: string, init: RequestInit = {}): Promise<T>
   const corps: unknown = await reponse.json().catch(() => null);
   if (!reponse.ok) {
     const detail = (corps as { detail?: unknown } | null)?.detail;
-    throw new ErreurApi(reponse.status, typeof detail === "string" ? detail : MESSAGE_INDISPONIBLE);
+    // Un refus de validation (422) détaille les champs dans une liste, sans les valeurs saisies.
+    const message =
+      typeof detail === "string"
+        ? detail
+        : reponse.status === 422
+          ? MESSAGE_SAISIE
+          : MESSAGE_INDISPONIBLE;
+    throw new ErreurApi(reponse.status, message);
   }
   return corps as T;
 }
@@ -181,3 +209,36 @@ export const historiqueExports = () => requeteApi<ExportResume[]>("/api/admin/ex
 
 export const chargerJournal = (filtres: Record<string, string | number | undefined>) =>
   requeteApi<PageJournal>(avecParametres("/api/admin/journal", filtres));
+
+// Référentiel (spec 016) ----------------------------------------------------------------------------------
+
+export const chargerDre = () => requeteApi<DrePublique[]>("/api/referentiel/dre");
+export const chargerAnnuaire = () => requeteApi<DreAnnuaire[]>("/api/referentiel/annuaire");
+export const chercherEtablissements = (filtres: {
+  recherche?: string;
+  iesg?: string;
+  dre?: string;
+}) => requeteApi<EtablissementTrouve[]>(avecParametres("/api/referentiel/etablissements", filtres));
+export const chargerAxes = () => requeteApi<AxePublic[]>("/api/referentiel/axes");
+
+const REFERENTIEL = "/api/admin/referentiel";
+export const adminListerDre = () => requeteApi<DreAdmin[]>(`${REFERENTIEL}/dre`);
+export const adminCreerDre = (entree: DreCreation) =>
+  envoyerJson<DreAdmin>(`${REFERENTIEL}/dre`, entree);
+export const adminModifierDre = (code: string, entree: DreModification) =>
+  envoyerJson<DreAdmin>(`${REFERENTIEL}/dre/${code}`, entree, "PATCH");
+export const adminCreerIesg = (entree: IesgCreation) =>
+  envoyerJson<IesgAdmin>(`${REFERENTIEL}/iesg`, entree);
+export const adminModifierIesg = (id: string, entree: IesgModification) =>
+  envoyerJson<IesgAdmin>(`${REFERENTIEL}/iesg/${id}`, entree, "PATCH");
+export const adminListerEtablissements = (filtres: Record<string, string | number | undefined>) =>
+  requeteApi<PageEtablissements>(avecParametres(`${REFERENTIEL}/etablissements`, filtres));
+export const adminCreerEtablissement = (entree: EtablissementCreation) =>
+  envoyerJson<EtablissementAdmin>(`${REFERENTIEL}/etablissements`, entree);
+export const adminModifierEtablissement = (id: string, entree: EtablissementModification) =>
+  envoyerJson<EtablissementAdmin>(`${REFERENTIEL}/etablissements/${id}`, entree, "PATCH");
+export const adminListerAxes = () => requeteApi<AxeAdmin[]>(`${REFERENTIEL}/axes`);
+export const adminCreerAxe = (entree: AxeCreation) =>
+  envoyerJson<AxeAdmin>(`${REFERENTIEL}/axes`, entree);
+export const adminModifierAxe = (code: string, entree: AxeModification) =>
+  envoyerJson<AxeAdmin>(`${REFERENTIEL}/axes/${code}`, entree, "PATCH");

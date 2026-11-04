@@ -268,11 +268,14 @@ function FicheCollaborateur() {
                   className={CHAMP}
                 >
                   <option value="">National</option>
-                  {Object.entries(catalogue.dre).map(([id, libelle]) => (
-                    <option key={id} value={id}>
-                      DRE {libelle}
-                    </option>
-                  ))}
+                  {/* Les DRE actives, plus le périmètre actuel même s'il a été désactivé depuis. */}
+                  {Object.entries(catalogue.dre)
+                    .filter(([id]) => catalogue.dre_actives.includes(id) || id === perimetre)
+                    .map(([id, libelle]) => (
+                      <option key={id} value={id}>
+                        DRE {libelle}
+                      </option>
+                    ))}
                 </select>
               </label>
               <label className="grid gap-1 text-xs font-bold text-muted-foreground">

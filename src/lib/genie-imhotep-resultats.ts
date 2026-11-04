@@ -7,6 +7,18 @@
 export type RegionId =
   "grand-lome" | "maritime" | "plateaux-est" | "plateaux-ouest" | "centrale" | "kara" | "savanes";
 
+// Les régions telles qu'elles s'appelaient pendant le championnat : un palmarès ne se réécrit pas si une DRE est
+// renommée depuis l'espace admin (spec 016). Leur couleur vient du dessin de la carte (`togo-dre.ts`).
+export const nomsRegions: Record<RegionId, string> = {
+  "grand-lome": "Grand Lomé",
+  maritime: "Maritime",
+  "plateaux-est": "Plateaux Est",
+  "plateaux-ouest": "Plateaux Ouest",
+  centrale: "Centrale",
+  kara: "Kara",
+  savanes: "Savanes",
+};
+
 export const CHAMPION = "Lycée d’Adétikopé";
 
 // Ordre d'affichage des régions, du sud au nord, comme dans le document.

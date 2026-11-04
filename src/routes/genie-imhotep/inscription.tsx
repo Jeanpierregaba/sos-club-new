@@ -5,7 +5,7 @@ import { FilAriane } from "@/components/FilAriane";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion } from "@/components/SiteMotion";
-import { dres } from "@/lib/togo-dre";
+import { chargerDre } from "@/lib/api/client";
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
 import grandesFinales from "@/assets/agenda-grandes-finales.jpg";
 import slideClubs from "@/assets/slide-clubs.webp";
@@ -23,6 +23,8 @@ export const Route = createFileRoute("/genie-imhotep/inscription")({
       { property: "og:title", content: "Inscription au Génie Imhotep" },
     ],
   }),
+  // Sans l'API, le sélecteur de région reste vide : le formulaire n'est pas encore ouvert de toute façon.
+  loader: () => chargerDre().catch(() => []),
   component: Inscription,
 });
 
@@ -206,6 +208,7 @@ function Libelle({ l, children }: { l: string; children: ReactNode }) {
 }
 
 function Inscription() {
+  const dres = Route.useLoaderData();
   const [actif, setActif] = useState("championnat");
   const c = competitions.find((x) => x.id === actif) ?? competitions[0]!;
 
@@ -351,7 +354,9 @@ function Inscription() {
                       Choisis ta région
                     </option>
                     {dres.map((d) => (
-                      <option key={d.id}>{d.nom}</option>
+                      <option key={d.code} value={d.code}>
+                        {d.nom}
+                      </option>
                     ))}
                   </select>
                 ) : f.type === "texte" ? (

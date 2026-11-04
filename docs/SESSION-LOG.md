@@ -14,6 +14,23 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-04 — Référentiel (spec 016, R1)
+
+- Fait : spec 016 livrée. Tables `dre`, `iesg`, `etablissement` et `axe`, chargées par la migration
+  depuis `backend/alembic/donnees/annuaire.json` (7 DRE, 19 IESG, 838 établissements, 7 axes
+  d'intervention). Le périmètre des collaborateurs devient une clé étrangère vers `dre`. Routes
+  publiques `/api/referentiel/*` et admin `/api/admin/referentiel/*` (verrou de version, journal,
+  désactivation sans suppression). Écrans `/admin/referentiel` ; carte des clubs, accueil et formulaire
+  du Génie Imhotep lisent l'API ; `src/lib/etablissements.ts` supprimé. Relu par le sous-agent
+  `reviewer`, constats 1 à 10 corrigés.
+- Pièges rencontrés : deux `pytest` lancés en même temps se cassent mutuellement (la base de test est
+  recréée à chaque run). Les modèles admin doivent importer ceux du référentiel pour la clé étrangère.
+- Décisions : Q1 validée (les 7 axes d'intervention remplacent ceux de santé publique) ; 6 doublons
+  de l'annuaire écartés ; le Hall of Fame garde les noms historiques des régions. Non traité : la page
+  d'accueil peut attendre l'API jusqu'à 5 s si elle ne répond pas (constat 11, à surveiller).
+- Prochaine étape : préparer le VPS de préproduction, puis `/spec` pour R2 (compte élève et registre
+  des points).
+
 ### 2026-11-04 — Espace admin lot 1, comptes de démonstration et roadmap
 
 - Fait : spec 015 livrée (collaborateurs et droits, double authentification, journal d'audit, annuaire,

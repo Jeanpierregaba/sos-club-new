@@ -36,6 +36,7 @@ from app.comptes.service import (
     normaliser,
 )
 from app.config import settings
+from app.referentiel.models import Dre
 
 
 class Refus(Exception):
@@ -202,11 +203,19 @@ def lien_de_test(lien: str) -> str | None:
     return None if settings.production or courriel.smtp_configure() else lien
 
 
+async def _verifier_dre(db: AsyncSession, code: str | None) -> None:
+    """Un nouveau périmètre est une DRE active du référentiel (spec 016)."""
+    # Verrouillée : elle ne peut pas être désactivée pendant qu'on y limite un collaborateur.
+    if code is not None and not await db.scalar(select(Dre.actif).where(Dre.code == code).with_for_update()):
+        raise Refus("DRE inconnue ou désactivée.", 422)
+
+
 async def inviter(db: AsyncSession, auteur: Acces, entree: InvitationEntree, ip: str) -> tuple[Collaborateur, str]:
     email = _valider_email(entree.email)
     droits = _droits_valides(entree.droits)
     if entree.fin_acces and entree.fin_acces <= _maintenant():
         raise Refus("La date de fin d'accès doit être dans le futur.", 422)
+    await _verifier_dre(db, entree.perimetre_dre)
     if await db.scalar(select(Utilisateur.id).where(Utilisateur.email == email)) or await db.scalar(
         select(Collaborateur.id).where(Collaborateur.email == email)
     ):
@@ -409,6 +418,8 @@ async def modifier_droits(
     droits = _droits_valides(entree.droits)
     if entree.fin_acces and entree.fin_acces <= _maintenant():
         raise Refus("La date de fin d'accès doit être dans le futur.", 422)
+    if entree.perimetre_dre != collaborateur.perimetre_dre:
+        await _verifier_dre(db, entree.perimetre_dre)
     avant = await _droits_de(db, collaborateur.id)
     await _remplacer_droits(db, collaborateur.id, droits)
     details: dict[str, Any] = {

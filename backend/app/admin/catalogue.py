@@ -45,7 +45,7 @@ MODULES: dict[str, tuple[str, bool, tuple[Action, ...]]] = {
     "statistiques": ("Statistiques", True, (C, E)),
     "journal": ("Journal d'audit", True, (C,)),
     "moderation": ("Modération", False, (C, A, D)),
-    "clubs": ("Clubs et DRE", False, (C, CR, M, A)),
+    "clubs": ("Clubs et DRE", True, (C, CR, M, A)),
     "contenus": ("Contenus et rubriques", False, (C, CR, M, S, A, D)),
     "agenda": ("Agenda et campagnes", False, (C, CR, M, S, A, D)),
     "rapports": ("Rapports d'activités", False, (C, A)),
@@ -114,16 +114,4 @@ DROITS_DES_ROLES: dict[RoleDepart, set[tuple[str, Action]]] = {
     RoleDepart.gestionnaire_clubs: _TABLEAU | {("clubs", C), ("clubs", CR), ("clubs", M), ("statistiques", C)},
     RoleDepart.gestionnaire_agenda: _TABLEAU | {("agenda", C), ("agenda", CR), ("agenda", M), ("agenda", S)},
     RoleDepart.analyste: _TABLEAU | {("statistiques", C), ("statistiques", E)},
-}
-
-# Les 7 directions régionales de l'éducation (identifiants de src/lib/togo-dre.ts), en attendant le
-# référentiel en base de la spec 003.
-DRE: dict[str, str] = {
-    "grand-lome": "Grand Lomé",
-    "maritime": "Maritime",
-    "plateaux-est": "Plateaux Est",
-    "plateaux-ouest": "Plateaux Ouest",
-    "centrale": "Centrale",
-    "kara": "Kara",
-    "savanes": "Savanes",
 }

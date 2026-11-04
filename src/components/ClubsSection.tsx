@@ -1,21 +1,26 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { dres, grandLome } from "@/lib/togo-dre";
+import type { DrePublique } from "@/lib/api/client";
+import { DRE_PAR_DEFAUT, regions } from "@/lib/togo-dre";
 
-const totalClubs = dres.reduce((n, r) => n + r.clubs, 0);
 const teinte = (couleur: string) => `color-mix(in oklch, ${couleur} 12%, white)`;
 // Assombrie pour que le texte blanc reste lisible, y compris sur les régions orange.
 const fond = (couleur: string) =>
   `linear-gradient(135deg, color-mix(in oklch, ${couleur} 92%, black), color-mix(in oklch, ${couleur} 72%, black))`;
 
-export function ClubsSection() {
-  const [dre, setDre] = useState(grandLome);
+// Les DRE viennent de l'API (spec 016) ; sans elles, la section ne s'affiche pas.
+export function ClubsSection({ liste }: { liste: DrePublique[] }) {
+  const dres = regions(liste);
+  const totalClubs = dres.reduce((n, r) => n + r.nb_etablissements, 0);
+  const [code, setCode] = useState(DRE_PAR_DEFAUT);
+  const dre = dres.find((r) => r.code === code) ?? dres[0];
+  if (!dre) return null;
   const c = dre.couleur;
   const stats = [
-    { n: dre.clubs, t: "Total clubs" },
-    { n: dre.nbIesg, t: "IESG rattachées" },
+    { n: dre.nb_etablissements, t: "Total clubs" },
+    { n: dre.iesg.length, t: "IESG rattachées" },
     {
-      n: `${((dre.clubs / totalClubs) * 100).toFixed(1).replace(".", ",")} %`,
+      n: `${((dre.nb_etablissements / (totalClubs || 1)) * 100).toFixed(1).replace(".", ",")} %`,
       t: "des clubs du Togo",
     },
   ];
@@ -48,7 +53,7 @@ export function ClubsSection() {
                 className="whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold text-primary-foreground"
                 style={{ backgroundColor: c }}
               >
-                {dre.nbIesg} IESG
+                {dre.iesg.length} IESG
               </span>
             </div>
             <div className="mt-4 rounded-2xl border p-4">
@@ -60,25 +65,25 @@ export function ClubsSection() {
                   className="absolute inset-0 h-full w-full overflow-visible"
                 >
                   {/* La région sélectionnée passe en dernier pour que son contour ne soit pas recouvert par ses voisines. */}
-                  {[...dres.filter((r) => r.id !== dre.id), dre].map((r) => (
+                  {[...dres.filter((r) => r.code !== dre.code), dre].map((r) => (
                     <path
-                      key={r.id}
+                      key={r.code}
                       d={r.d}
                       fill={r.couleur}
-                      onClick={() => setDre(r)}
+                      onClick={() => setCode(r.code)}
                       strokeLinejoin="round"
-                      className={`cursor-pointer transition-[filter,stroke-width] duration-200 hover:brightness-110 ${r.id === dre.id ? "stroke-ink stroke-2" : "stroke-white stroke-[1.5]"}`}
+                      className={`cursor-pointer transition-[filter,stroke-width] duration-200 hover:brightness-110 ${r.code === dre.code ? "stroke-ink stroke-2" : "stroke-white stroke-[1.5]"}`}
                     />
                   ))}
                 </svg>
                 {dres.map((r) => {
-                  const on = r.id === dre.id;
+                  const on = r.code === dre.code;
                   return (
                     <button
-                      key={r.id}
+                      key={r.code}
                       type="button"
                       aria-pressed={on}
-                      onClick={() => setDre(r)}
+                      onClick={() => setCode(r.code)}
                       style={{
                         left: `${r.label.x}%`,
                         top: `${r.label.y}%`,
@@ -103,13 +108,13 @@ export function ClubsSection() {
             data-reveal="right"
             className="flex flex-col overflow-hidden rounded-3xl border bg-card shadow-card"
           >
-            <div key={dre.id} className="flex flex-1 flex-col animate-in fade-in duration-300">
+            <div key={dre.code} className="flex flex-1 flex-col animate-in fade-in duration-300">
               <div className="p-6 text-primary-foreground md:p-8" style={{ background: fond(c) }}>
                 <span className="rounded-full border border-white/40 bg-white/15 px-3 py-1 text-[11px] font-extrabold uppercase">
                   Zone scolaire officielle
                 </span>
                 <h3 className="mt-4 text-4xl uppercase md:text-5xl">DRE {dre.nom}</h3>
-                <p className="mt-1 font-medium">{dre.complet}</p>
+                <p className="mt-1 font-medium">{dre.nom_complet}</p>
                 <div className="mt-6 grid grid-cols-3 gap-2 md:gap-3">
                   {stats.map((s) => (
                     <div
@@ -139,10 +144,12 @@ export function ClubsSection() {
                 {dre.iesg.length > 0 ? (
                   <div className="mt-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(10rem,1fr))]">
                     {dre.iesg.map((i) => {
-                      const part = Math.round((i.clubs / dre.clubs) * 100);
+                      const part = Math.round(
+                        (i.nb_etablissements / (dre.nb_etablissements || 1)) * 100,
+                      );
                       return (
                         <a
-                          key={i.nom}
+                          key={i.id}
                           href="#"
                           className="card-fx group flex flex-col rounded-2xl p-5"
                           style={{ backgroundColor: teinte(c) }}
@@ -162,7 +169,9 @@ export function ClubsSection() {
                             </span>
                           </span>
                           <span className="mt-6 flex flex-wrap items-baseline gap-x-2">
-                            <span className="font-display text-5xl leading-none">{i.clubs}</span>
+                            <span className="font-display text-5xl leading-none">
+                              {i.nb_etablissements}
+                            </span>
                             <span className="text-sm font-bold">clubs actifs</span>
                           </span>
                           <span className="mt-4 block h-1.5 overflow-hidden rounded-full bg-card">
@@ -180,7 +189,7 @@ export function ClubsSection() {
                   </div>
                 ) : (
                   <p className="mt-4 flex flex-1 items-center justify-center rounded-2xl border border-dashed p-6 text-center text-sm font-semibold text-muted-foreground">
-                    Le détail des {dre.nbIesg} IESG de cette région sera bientôt disponible.
+                    Le détail des IESG de cette région sera bientôt disponible.
                   </p>
                 )}
                 <a

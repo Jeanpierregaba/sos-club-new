@@ -1536,6 +1536,728 @@
         }
       }
     },
+    "/api/referentiel/dre": {
+      "get": {
+        "tags": [
+          "referentiel"
+        ],
+        "summary": "Lister Dre",
+        "operationId": "lister_dre_api_referentiel_dre_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DrePublique"
+                  },
+                  "type": "array",
+                  "title": "Response Lister Dre Api Referentiel Dre Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/referentiel/annuaire": {
+      "get": {
+        "tags": [
+          "referentiel"
+        ],
+        "summary": "Annuaire",
+        "operationId": "annuaire_api_referentiel_annuaire_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DreAnnuaire"
+                  },
+                  "type": "array",
+                  "title": "Response Annuaire Api Referentiel Annuaire Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/referentiel/etablissements": {
+      "get": {
+        "tags": [
+          "referentiel"
+        ],
+        "summary": "Chercher Etablissements",
+        "description": "`iesg` : tous les établissements de l'inspection ; `recherche` : 20 résultats au plus. L'un des deux est requis.",
+        "operationId": "chercher_etablissements_api_referentiel_etablissements_get",
+        "parameters": [
+          {
+            "name": "iesg",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Iesg"
+            }
+          },
+          {
+            "name": "recherche",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Recherche"
+            }
+          },
+          {
+            "name": "dre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 30
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dre"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EtablissementTrouve"
+                  },
+                  "title": "Response Chercher Etablissements Api Referentiel Etablissements Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/referentiel/axes": {
+      "get": {
+        "tags": [
+          "referentiel"
+        ],
+        "summary": "Lister Axes",
+        "operationId": "lister_axes_api_referentiel_axes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AxePublic"
+                  },
+                  "type": "array",
+                  "title": "Response Lister Axes Api Referentiel Axes Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/referentiel/dre": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Lister Dre",
+        "operationId": "admin_lister_dre_api_admin_referentiel_dre_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DreAdmin"
+                  },
+                  "type": "array",
+                  "title": "Response Admin Lister Dre Api Admin Referentiel Dre Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Creer Dre",
+        "operationId": "admin_creer_dre_api_admin_referentiel_dre_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DreCreation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DreAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/referentiel/dre/{code}": {
+      "patch": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Modifier Dre",
+        "operationId": "admin_modifier_dre_api_admin_referentiel_dre__code__patch",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DreModification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DreAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/referentiel/iesg": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Creer Iesg",
+        "operationId": "admin_creer_iesg_api_admin_referentiel_iesg_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IesgCreation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IesgAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/referentiel/iesg/{iesg_id}": {
+      "patch": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Modifier Iesg",
+        "operationId": "admin_modifier_iesg_api_admin_referentiel_iesg__iesg_id__patch",
+        "parameters": [
+          {
+            "name": "iesg_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Iesg Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IesgModification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IesgAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/referentiel/etablissements": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Lister Etablissements",
+        "operationId": "admin_lister_etablissements_api_admin_referentiel_etablissements_get",
+        "parameters": [
+          {
+            "name": "recherche",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Recherche"
+            }
+          },
+          {
+            "name": "dre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 30
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dre"
+            }
+          },
+          {
+            "name": "iesg",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Iesg"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/TypeEtablissement"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type"
+            }
+          },
+          {
+            "name": "statut",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/StatutEtablissement"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Statut"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "par_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Par Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageEtablissements"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Creer Etablissement",
+        "operationId": "admin_creer_etablissement_api_admin_referentiel_etablissements_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EtablissementCreation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtablissementAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/referentiel/etablissements/{etablissement_id}": {
+      "patch": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Modifier Etablissement",
+        "operationId": "admin_modifier_etablissement_api_admin_referentiel_etablissements__etablissement_id__patch",
+        "parameters": [
+          {
+            "name": "etablissement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Etablissement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EtablissementModification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtablissementAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/referentiel/axes": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Lister Axes",
+        "operationId": "admin_lister_axes_api_admin_referentiel_axes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AxeAdmin"
+                  },
+                  "type": "array",
+                  "title": "Response Admin Lister Axes Api Admin Referentiel Axes Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Creer Axe",
+        "operationId": "admin_creer_axe_api_admin_referentiel_axes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AxeCreation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AxeAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/referentiel/axes/{code}": {
+      "patch": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Modifier Axe",
+        "operationId": "admin_modifier_axe_api_admin_referentiel_axes__code__patch",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AxeModification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AxeAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -1720,6 +2442,172 @@
         ],
         "title": "Apercu"
       },
+      "AxeAdmin": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "ordre": {
+            "type": "integer",
+            "title": "Ordre"
+          },
+          "actif": {
+            "type": "boolean",
+            "title": "Actif"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "libelle",
+          "description",
+          "ordre",
+          "actif",
+          "version"
+        ],
+        "title": "AxeAdmin"
+      },
+      "AxeCreation": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 2,
+            "pattern": "^[a-z0-9-]+$",
+            "title": "Code"
+          },
+          "libelle": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Libelle"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 600,
+            "title": "Description"
+          },
+          "ordre": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 99.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ordre"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "libelle",
+          "description"
+        ],
+        "title": "AxeCreation"
+      },
+      "AxeModification": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "libelle": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Libelle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 600
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "ordre": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 99.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ordre"
+          },
+          "actif": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actif"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "AxeModification"
+      },
+      "AxePublic": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "libelle",
+          "description"
+        ],
+        "title": "AxePublic"
+      },
       "Catalogue": {
         "properties": {
           "modules": {
@@ -1759,6 +2647,13 @@
             },
             "type": "object",
             "title": "Dre"
+          },
+          "dre_actives": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Dre Actives"
           }
         },
         "type": "object",
@@ -1767,7 +2662,8 @@
           "actions",
           "sensibles",
           "roles",
-          "dre"
+          "dre",
+          "dre_actives"
         ],
         "title": "Catalogue"
       },
@@ -2125,6 +3021,235 @@
         ],
         "title": "ConnexionEntree"
       },
+      "DreAdmin": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "nom_complet": {
+            "type": "string",
+            "title": "Nom Complet"
+          },
+          "ordre": {
+            "type": "integer",
+            "title": "Ordre"
+          },
+          "actif": {
+            "type": "boolean",
+            "title": "Actif"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "nb_etablissements": {
+            "type": "integer",
+            "title": "Nb Etablissements"
+          },
+          "iesg": {
+            "items": {
+              "$ref": "#/components/schemas/IesgAdmin"
+            },
+            "type": "array",
+            "title": "Iesg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "nom",
+          "nom_complet",
+          "ordre",
+          "actif",
+          "version",
+          "nb_etablissements",
+          "iesg"
+        ],
+        "title": "DreAdmin"
+      },
+      "DreAnnuaire": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "nom_complet": {
+            "type": "string",
+            "title": "Nom Complet"
+          },
+          "nb_etablissements": {
+            "type": "integer",
+            "title": "Nb Etablissements"
+          },
+          "iesg": {
+            "items": {
+              "$ref": "#/components/schemas/IesgAnnuaire"
+            },
+            "type": "array",
+            "title": "Iesg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "nom",
+          "nom_complet",
+          "nb_etablissements",
+          "iesg"
+        ],
+        "title": "DreAnnuaire"
+      },
+      "DreCreation": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 30,
+            "minLength": 2,
+            "pattern": "^[a-z0-9-]+$",
+            "title": "Code"
+          },
+          "nom": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Nom"
+          },
+          "nom_complet": {
+            "type": "string",
+            "maxLength": 400,
+            "title": "Nom Complet"
+          },
+          "ordre": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 99.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ordre"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "nom",
+          "nom_complet"
+        ],
+        "title": "DreCreation"
+      },
+      "DreModification": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "nom": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nom"
+          },
+          "nom_complet": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 400
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nom Complet"
+          },
+          "ordre": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 99.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ordre"
+          },
+          "actif": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actif"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "DreModification",
+        "description": "Seuls les champs envoyés changent. `version` est celle que le formulaire a lue."
+      },
+      "DrePublique": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "nom_complet": {
+            "type": "string",
+            "title": "Nom Complet"
+          },
+          "nb_etablissements": {
+            "type": "integer",
+            "title": "Nb Etablissements"
+          },
+          "iesg": {
+            "items": {
+              "$ref": "#/components/schemas/IesgPublique"
+            },
+            "type": "array",
+            "title": "Iesg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "nom",
+          "nom_complet",
+          "nb_etablissements",
+          "iesg"
+        ],
+        "title": "DrePublique"
+      },
       "Droit": {
         "properties": {
           "module": {
@@ -2205,6 +3330,258 @@
           "qr_svg"
         ],
         "title": "Enrolement"
+      },
+      "EtablissementAdmin": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeEtablissement"
+          },
+          "localite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Localite"
+          },
+          "statut": {
+            "$ref": "#/components/schemas/StatutEtablissement"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "iesg_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Iesg Id"
+          },
+          "iesg": {
+            "type": "string",
+            "title": "Iesg"
+          },
+          "dre_code": {
+            "type": "string",
+            "title": "Dre Code"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "modifie_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Modifie Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "type",
+          "localite",
+          "statut",
+          "version",
+          "iesg_id",
+          "iesg",
+          "dre_code",
+          "dre",
+          "modifie_le"
+        ],
+        "title": "EtablissementAdmin"
+      },
+      "EtablissementCreation": {
+        "properties": {
+          "iesg_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Iesg Id"
+          },
+          "nom": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Nom"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeEtablissement"
+          },
+          "localite": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 150
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Localite"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "iesg_id",
+          "nom",
+          "type"
+        ],
+        "title": "EtablissementCreation"
+      },
+      "EtablissementModification": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "nom": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nom"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TypeEtablissement"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "localite": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 150
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Localite"
+          },
+          "iesg_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iesg Id"
+          },
+          "statut": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "actif",
+                  "inactif"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statut"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "EtablissementModification"
+      },
+      "EtablissementPublic": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeEtablissement"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "type"
+        ],
+        "title": "EtablissementPublic"
+      },
+      "EtablissementTrouve": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeEtablissement"
+          },
+          "iesg_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Iesg Id"
+          },
+          "iesg": {
+            "type": "string",
+            "title": "Iesg"
+          },
+          "dre_code": {
+            "type": "string",
+            "title": "Dre Code"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "type",
+          "iesg_id",
+          "iesg",
+          "dre_code",
+          "dre"
+        ],
+        "title": "EtablissementTrouve",
+        "description": "Un établissement avec de quoi le situer dans un formulaire : son IESG et sa DRE."
       },
       "EtapeCode": {
         "properties": {
@@ -2561,6 +3938,232 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "IesgAdmin": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "dre_code": {
+            "type": "string",
+            "title": "Dre Code"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "zone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zone"
+          },
+          "actif": {
+            "type": "boolean",
+            "title": "Actif"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "nb_etablissements": {
+            "type": "integer",
+            "title": "Nb Etablissements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "dre_code",
+          "nom",
+          "zone",
+          "actif",
+          "version",
+          "nb_etablissements"
+        ],
+        "title": "IesgAdmin"
+      },
+      "IesgAnnuaire": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "zone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zone"
+          },
+          "nb_etablissements": {
+            "type": "integer",
+            "title": "Nb Etablissements"
+          },
+          "etablissements": {
+            "items": {
+              "$ref": "#/components/schemas/EtablissementPublic"
+            },
+            "type": "array",
+            "title": "Etablissements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "zone",
+          "nb_etablissements",
+          "etablissements"
+        ],
+        "title": "IesgAnnuaire"
+      },
+      "IesgCreation": {
+        "properties": {
+          "dre_code": {
+            "type": "string",
+            "maxLength": 30,
+            "title": "Dre Code"
+          },
+          "nom": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Nom"
+          },
+          "zone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 150
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zone"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "dre_code",
+          "nom"
+        ],
+        "title": "IesgCreation"
+      },
+      "IesgModification": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "nom": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nom"
+          },
+          "zone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 150
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zone"
+          },
+          "dre_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dre Code"
+          },
+          "actif": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actif"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "IesgModification"
+      },
+      "IesgPublique": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "zone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zone"
+          },
+          "nb_etablissements": {
+            "type": "integer",
+            "title": "Nb Etablissements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "zone",
+          "nb_etablissements"
+        ],
+        "title": "IesgPublique"
       },
       "Indicateur": {
         "properties": {
@@ -2958,6 +4561,37 @@
         ],
         "title": "MotifEntree"
       },
+      "PageEtablissements": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "etablissements": {
+            "items": {
+              "$ref": "#/components/schemas/EtablissementAdmin"
+            },
+            "type": "array",
+            "title": "Etablissements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "page",
+          "par_page",
+          "etablissements"
+        ],
+        "title": "PageEtablissements"
+      },
       "PageInscrits": {
         "properties": {
           "total": {
@@ -3076,6 +4710,15 @@
         ],
         "title": "StatutCompte"
       },
+      "StatutEtablissement": {
+        "type": "string",
+        "enum": [
+          "actif",
+          "inactif",
+          "propose"
+        ],
+        "title": "StatutEtablissement"
+      },
       "StatutExport": {
         "type": "string",
         "enum": [
@@ -3162,6 +4805,16 @@
           "derniers_evenements"
         ],
         "title": "TableauDeBord"
+      },
+      "TypeEtablissement": {
+        "type": "string",
+        "enum": [
+          "lycee",
+          "college",
+          "complexe",
+          "autre"
+        ],
+        "title": "TypeEtablissement"
       },
       "TypeExport": {
         "type": "string",

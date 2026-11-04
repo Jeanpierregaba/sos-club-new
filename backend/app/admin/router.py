@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin import collaborateurs, double_auth, exports, inscrits, tableau_de_bord
-from app.admin.catalogue import DRE, DROITS_DES_ROLES, LIBELLES_ACTIONS, LIBELLES_ROLES, MODULES, SENSIBLES, Action
+from app.admin.catalogue import DROITS_DES_ROLES, LIBELLES_ACTIONS, LIBELLES_ROLES, MODULES, SENSIBLES, Action
 from app.admin.dependances import (
     MESSAGE_DOUBLE_AUTH,
     Acces,
@@ -60,6 +60,7 @@ from app.comptes.service import (
 )
 from app.config import settings
 from app.db import get_session
+from app.referentiel.models import Dre
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 router_activation = APIRouter(prefix="/activation", tags=["admin"])
@@ -102,7 +103,8 @@ async def moi(acces: Collaborateur_) -> AdminMoi:
 
 
 @router.get("/catalogue")
-async def catalogue(_: Collaborateur_) -> Catalogue:
+async def catalogue(_: Collaborateur_, db: Base) -> Catalogue:
+    dre = (await db.execute(select(Dre.code, Dre.nom, Dre.actif).order_by(Dre.ordre))).all()
     return Catalogue(
         modules=[
             ModuleCatalogue(id=i, libelle=libelle, disponible=disponible, actions=list(actions))
@@ -111,7 +113,8 @@ async def catalogue(_: Collaborateur_) -> Catalogue:
         actions=LIBELLES_ACTIONS,
         sensibles=_droits(SENSIBLES),
         roles=[RoleCatalogue(id=r, libelle=LIBELLES_ROLES[r], droits=_droits(d)) for r, d in DROITS_DES_ROLES.items()],
-        dre=DRE,
+        dre={code: nom for code, nom, _ in dre},
+        dre_actives=[code for code, _, actif in dre if actif],
     )
 
 

@@ -21,6 +21,7 @@ from app.comptes.models import Role, Utilisateur
 from app.comptes.motdepasse import hacher
 from app.db import Base
 from app.main import app
+from app.referentiel.chargement import charger
 
 MOT_DE_PASSE = "mot-de-passe-de-test"
 # NullPool : chaque appel ouvre sa connexion, car asyncio.run crée une nouvelle boucle à chaque fois.
@@ -50,11 +51,24 @@ async def _vider_tables() -> None:
     tables = ", ".join(f'"{table.name}"' for table in Base.metadata.sorted_tables)
     async with moteur_test.begin() as connexion:
         await connexion.execute(text(f"TRUNCATE {tables} CASCADE"))
+        # Les DRE, IESG et axes de l'annuaire : les périmètres des collaborateurs en ont besoin (spec 016).
+        await connexion.run_sync(lambda c: charger(c, etablissements=False))
+
+
+async def _charger_annuaire() -> None:
+    async with moteur_test.begin() as connexion:
+        await connexion.run_sync(charger)
 
 
 @pytest.fixture(autouse=True)
 def tables_vides() -> None:
     asyncio.run(_vider_tables())
+
+
+@pytest.fixture
+def annuaire() -> None:
+    """Charge en plus les établissements de l'annuaire (838 lignes)."""
+    asyncio.run(_charger_annuaire())
 
 
 @pytest.fixture

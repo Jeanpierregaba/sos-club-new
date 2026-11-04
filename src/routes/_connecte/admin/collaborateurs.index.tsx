@@ -400,9 +400,9 @@ function DialogueInvitation({
                   className={CHAMP}
                 >
                   <option value="">National</option>
-                  {Object.entries(catalogue.dre).map(([id, libelle]) => (
+                  {catalogue.dre_actives.map((id) => (
                     <option key={id} value={id}>
-                      DRE {libelle}
+                      DRE {catalogue.dre[id]}
                     </option>
                   ))}
                 </select>

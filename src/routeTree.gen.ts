@@ -31,10 +31,14 @@ import { Route as ConnecteAdminIndexRouteImport } from './routes/_connecte/admin
 import { Route as ConnecteAdminDoubleAuthentificationRouteImport } from './routes/_connecte/admin/double-authentification'
 import { Route as ConnecteAdminExportsRouteImport } from './routes/_connecte/admin/exports'
 import { Route as ConnecteAdminJournalRouteImport } from './routes/_connecte/admin/journal'
+import { Route as ConnecteAdminReferentielRouteImport } from './routes/_connecte/admin/referentiel'
 import { Route as ConnecteAdminCollaborateursIndexRouteImport } from './routes/_connecte/admin/collaborateurs.index'
 import { Route as ConnecteAdminCollaborateursIdRouteImport } from './routes/_connecte/admin/collaborateurs.$id'
 import { Route as ConnecteAdminInscritsIndexRouteImport } from './routes/_connecte/admin/inscrits.index'
 import { Route as ConnecteAdminInscritsIdRouteImport } from './routes/_connecte/admin/inscrits.$id'
+import { Route as ConnecteAdminReferentielIndexRouteImport } from './routes/_connecte/admin/referentiel.index'
+import { Route as ConnecteAdminReferentielAxesRouteImport } from './routes/_connecte/admin/referentiel.axes'
+import { Route as ConnecteAdminReferentielEtablissementsRouteImport } from './routes/_connecte/admin/referentiel.etablissements'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -146,6 +150,12 @@ const ConnecteAdminJournalRoute = ConnecteAdminJournalRouteImport.update({
   path: '/journal',
   getParentRoute: () => ConnecteAdminRoute,
 } as any)
+const ConnecteAdminReferentielRoute =
+  ConnecteAdminReferentielRouteImport.update({
+    id: '/referentiel',
+    path: '/referentiel',
+    getParentRoute: () => ConnecteAdminRoute,
+  } as any)
 const ConnecteAdminCollaborateursIndexRoute =
   ConnecteAdminCollaborateursIndexRouteImport.update({
     id: '/collaborateurs/',
@@ -169,6 +179,24 @@ const ConnecteAdminInscritsIdRoute = ConnecteAdminInscritsIdRouteImport.update({
   path: '/inscrits/$id',
   getParentRoute: () => ConnecteAdminRoute,
 } as any)
+const ConnecteAdminReferentielIndexRoute =
+  ConnecteAdminReferentielIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ConnecteAdminReferentielRoute,
+  } as any)
+const ConnecteAdminReferentielAxesRoute =
+  ConnecteAdminReferentielAxesRouteImport.update({
+    id: '/axes',
+    path: '/axes',
+    getParentRoute: () => ConnecteAdminReferentielRoute,
+  } as any)
+const ConnecteAdminReferentielEtablissementsRoute =
+  ConnecteAdminReferentielEtablissementsRouteImport.update({
+    id: '/etablissements',
+    path: '/etablissements',
+    getParentRoute: () => ConnecteAdminReferentielRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -191,11 +219,15 @@ export interface FileRoutesByFullPath {
   '/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
   '/admin/exports': typeof ConnecteAdminExportsRoute
   '/admin/journal': typeof ConnecteAdminJournalRoute
+  '/admin/referentiel': typeof ConnecteAdminReferentielRouteWithChildren
   '/admin/': typeof ConnecteAdminIndexRoute
   '/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
+  '/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
+  '/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
   '/admin/collaborateurs/': typeof ConnecteAdminCollaborateursIndexRoute
   '/admin/inscrits/': typeof ConnecteAdminInscritsIndexRoute
+  '/admin/referentiel/': typeof ConnecteAdminReferentielIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -220,8 +252,11 @@ export interface FileRoutesByTo {
   '/admin': typeof ConnecteAdminIndexRoute
   '/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
+  '/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
+  '/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
   '/admin/collaborateurs': typeof ConnecteAdminCollaborateursIndexRoute
   '/admin/inscrits': typeof ConnecteAdminInscritsIndexRoute
+  '/admin/referentiel': typeof ConnecteAdminReferentielIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -246,11 +281,15 @@ export interface FileRoutesById {
   '/_connecte/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
   '/_connecte/admin/exports': typeof ConnecteAdminExportsRoute
   '/_connecte/admin/journal': typeof ConnecteAdminJournalRoute
+  '/_connecte/admin/referentiel': typeof ConnecteAdminReferentielRouteWithChildren
   '/_connecte/admin/': typeof ConnecteAdminIndexRoute
   '/_connecte/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/_connecte/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
+  '/_connecte/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
+  '/_connecte/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
   '/_connecte/admin/collaborateurs/': typeof ConnecteAdminCollaborateursIndexRoute
   '/_connecte/admin/inscrits/': typeof ConnecteAdminInscritsIndexRoute
+  '/_connecte/admin/referentiel/': typeof ConnecteAdminReferentielIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -275,11 +314,15 @@ export interface FileRouteTypes {
     | '/admin/double-authentification'
     | '/admin/exports'
     | '/admin/journal'
+    | '/admin/referentiel'
     | '/admin/'
     | '/admin/collaborateurs/$id'
     | '/admin/inscrits/$id'
+    | '/admin/referentiel/axes'
+    | '/admin/referentiel/etablissements'
     | '/admin/collaborateurs/'
     | '/admin/inscrits/'
+    | '/admin/referentiel/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -304,8 +347,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin/collaborateurs/$id'
     | '/admin/inscrits/$id'
+    | '/admin/referentiel/axes'
+    | '/admin/referentiel/etablissements'
     | '/admin/collaborateurs'
     | '/admin/inscrits'
+    | '/admin/referentiel'
   id:
     | '__root__'
     | '/'
@@ -329,11 +375,15 @@ export interface FileRouteTypes {
     | '/_connecte/admin/double-authentification'
     | '/_connecte/admin/exports'
     | '/_connecte/admin/journal'
+    | '/_connecte/admin/referentiel'
     | '/_connecte/admin/'
     | '/_connecte/admin/collaborateurs/$id'
     | '/_connecte/admin/inscrits/$id'
+    | '/_connecte/admin/referentiel/axes'
+    | '/_connecte/admin/referentiel/etablissements'
     | '/_connecte/admin/collaborateurs/'
     | '/_connecte/admin/inscrits/'
+    | '/_connecte/admin/referentiel/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -511,6 +561,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteAdminJournalRouteImport
       parentRoute: typeof ConnecteAdminRoute
     }
+    '/_connecte/admin/referentiel': {
+      id: '/_connecte/admin/referentiel'
+      path: '/referentiel'
+      fullPath: '/admin/referentiel'
+      preLoaderRoute: typeof ConnecteAdminReferentielRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
     '/_connecte/admin/collaborateurs/': {
       id: '/_connecte/admin/collaborateurs/'
       path: '/collaborateurs'
@@ -539,13 +596,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteAdminInscritsIdRouteImport
       parentRoute: typeof ConnecteAdminRoute
     }
+    '/_connecte/admin/referentiel/': {
+      id: '/_connecte/admin/referentiel/'
+      path: '/'
+      fullPath: '/admin/referentiel/'
+      preLoaderRoute: typeof ConnecteAdminReferentielIndexRouteImport
+      parentRoute: typeof ConnecteAdminReferentielRoute
+    }
+    '/_connecte/admin/referentiel/axes': {
+      id: '/_connecte/admin/referentiel/axes'
+      path: '/axes'
+      fullPath: '/admin/referentiel/axes'
+      preLoaderRoute: typeof ConnecteAdminReferentielAxesRouteImport
+      parentRoute: typeof ConnecteAdminReferentielRoute
+    }
+    '/_connecte/admin/referentiel/etablissements': {
+      id: '/_connecte/admin/referentiel/etablissements'
+      path: '/etablissements'
+      fullPath: '/admin/referentiel/etablissements'
+      preLoaderRoute: typeof ConnecteAdminReferentielEtablissementsRouteImport
+      parentRoute: typeof ConnecteAdminReferentielRoute
+    }
   }
 }
+
+interface ConnecteAdminReferentielRouteChildren {
+  ConnecteAdminReferentielAxesRoute: typeof ConnecteAdminReferentielAxesRoute
+  ConnecteAdminReferentielEtablissementsRoute: typeof ConnecteAdminReferentielEtablissementsRoute
+  ConnecteAdminReferentielIndexRoute: typeof ConnecteAdminReferentielIndexRoute
+}
+
+const ConnecteAdminReferentielRouteChildren: ConnecteAdminReferentielRouteChildren =
+  {
+    ConnecteAdminReferentielAxesRoute: ConnecteAdminReferentielAxesRoute,
+    ConnecteAdminReferentielEtablissementsRoute:
+      ConnecteAdminReferentielEtablissementsRoute,
+    ConnecteAdminReferentielIndexRoute: ConnecteAdminReferentielIndexRoute,
+  }
+
+const ConnecteAdminReferentielRouteWithChildren =
+  ConnecteAdminReferentielRoute._addFileChildren(
+    ConnecteAdminReferentielRouteChildren,
+  )
 
 interface ConnecteAdminRouteChildren {
   ConnecteAdminDoubleAuthentificationRoute: typeof ConnecteAdminDoubleAuthentificationRoute
   ConnecteAdminExportsRoute: typeof ConnecteAdminExportsRoute
   ConnecteAdminJournalRoute: typeof ConnecteAdminJournalRoute
+  ConnecteAdminReferentielRoute: typeof ConnecteAdminReferentielRouteWithChildren
   ConnecteAdminIndexRoute: typeof ConnecteAdminIndexRoute
   ConnecteAdminCollaborateursIdRoute: typeof ConnecteAdminCollaborateursIdRoute
   ConnecteAdminInscritsIdRoute: typeof ConnecteAdminInscritsIdRoute
@@ -558,6 +656,7 @@ const ConnecteAdminRouteChildren: ConnecteAdminRouteChildren = {
     ConnecteAdminDoubleAuthentificationRoute,
   ConnecteAdminExportsRoute: ConnecteAdminExportsRoute,
   ConnecteAdminJournalRoute: ConnecteAdminJournalRoute,
+  ConnecteAdminReferentielRoute: ConnecteAdminReferentielRouteWithChildren,
   ConnecteAdminIndexRoute: ConnecteAdminIndexRoute,
   ConnecteAdminCollaborateursIdRoute: ConnecteAdminCollaborateursIdRoute,
   ConnecteAdminInscritsIdRoute: ConnecteAdminInscritsIdRoute,

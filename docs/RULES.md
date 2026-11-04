@@ -44,3 +44,5 @@ ne doit JAMAIS enfreindre, quelle que soit la demande. Les règles déjà impos�
 - Ne jamais inventer un contenu médical présenté comme réel : quiz, article et fiche de test sont
   signalés comme tels, et rien n'est publié sans validation de l'équipe nationale.
 - Tous les textes du site tutoient, sans exception.
+- On ne supprime pas un élément du référentiel (DRE, IESG, établissement, axe) : on le désactive, pour
+  qu'il reste attaché à tout ce qui le référence (spec 016).

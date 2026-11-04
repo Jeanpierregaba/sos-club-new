@@ -8,3 +8,4 @@ bun.lock
 routeTree.gen.ts
 schema.gen.ts
 backend/openapi.json
+backend/alembic/donnees
