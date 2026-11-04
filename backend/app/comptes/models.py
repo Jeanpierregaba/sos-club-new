@@ -17,6 +17,8 @@ class Role(StrEnum):
 class StatutCompte(StrEnum):
     actif = "actif"
     suspendu = "suspendu"
+    # Collaborateur retiré définitivement (spec 015) : ne se réactive pas.
+    revoque = "revoque"
 
 
 def _enum_texte(enum: type[StrEnum], nom: str) -> Enum:

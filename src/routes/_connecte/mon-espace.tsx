@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
 import { useState } from "react";
 
@@ -7,19 +7,17 @@ import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { CLE_MOI } from "@/hooks/use-moi";
-import {
-  chargerChiffresAdmin,
-  deconnecter,
-  ErreurApi,
-  MESSAGE_INDISPONIBLE,
-} from "@/lib/api/client";
+import { deconnecter, ErreurApi, MESSAGE_INDISPONIBLE } from "@/lib/api/client";
 
 const LIBELLES_ROLE = { eleve: "Élève", encadreur: "Encadreur", admin: "Admin" } as const;
 
 export const Route = createFileRoute("/_connecte/mon-espace")({
   // Rien en cache : les données d'un compte ne doivent pas s'afficher, même un instant, au compte suivant.
   gcTime: 0,
-  loader: ({ context }) => (context.moi.role === "admin" ? chargerChiffresAdmin() : null),
+  // Un collaborateur a son propre espace (spec 015).
+  beforeLoad: ({ context }) => {
+    if (context.moi.role === "admin") throw redirect({ to: "/admin" });
+  },
   head: () => ({
     meta: [
       { title: "Mon espace — Club Santé SOS Docteur TV" },
@@ -32,7 +30,6 @@ export const Route = createFileRoute("/_connecte/mon-espace")({
 
 function MonEspace() {
   const { moi } = Route.useRouteContext();
-  const chiffres = Route.useLoaderData();
   const queryClient = useQueryClient();
   const router = useRouter();
   const [erreur, setErreur] = useState<string | null>(null);
@@ -61,19 +58,6 @@ function MonEspace() {
           Rôle : <strong className="text-foreground">{LIBELLES_ROLE[moi.role]}</strong>
         </p>
         <p className="mt-1 text-sm text-muted-foreground">Ton espace s'enrichira bientôt.</p>
-
-        {chiffres && (
-          <dl className="mt-6 grid grid-cols-3 gap-3">
-            {(["eleve", "encadreur", "admin"] as const).map((role) => (
-              <div key={role} className="flex flex-col-reverse rounded-2xl bg-mist p-3">
-                <dt className="text-xs font-semibold text-muted-foreground">
-                  {LIBELLES_ROLE[role]}
-                </dt>
-                <dd className="font-display text-2xl text-logo-blue">{chiffres.comptes[role]}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
 
         {erreur && (
           <Alert variant="destructive" className="mt-6 text-left">

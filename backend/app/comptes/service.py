@@ -1,17 +1,24 @@
 import hashlib
 import re
 import secrets
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from ipaddress import ip_address, ip_network
+from uuid import UUID
 
 from email_validator import EmailNotValidError, validate_email
 from sqlalchemy import ColumnElement, delete, func, or_, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.admin.journal import journaliser
+from app.admin.models import Collaborateur, DoubleAuth, EtapeDoubleAuth
 from app.comptes.models import Role, Session, StatutCompte, TentativeConnexion, Utilisateur
 from app.comptes.motdepasse import doit_rehacher, hacher, verifier, verifier_factice
 from app.config import settings
+
+type VerificateurCode = Callable[[AsyncSession, Utilisateur, str], Awaitable[bool]]
 
 FORMAT_IDENTIFIANT = re.compile(r"[a-z0-9._-]{3,30}")
 FORMAT_TELEPHONE = re.compile(r"\+?[0-9 ().-]{6,30}")
@@ -32,6 +39,27 @@ class CompteSuspendu(Exception):
 
 class TropDEssais(Exception):
     pass
+
+
+class AccesTermine(Exception):
+    """La date de fin d'accès d'un collaborateur est passée."""
+
+
+class EtapeInvalide(Exception):
+    """Jeton d'étape inconnu ou expiré : il faut reprendre la connexion depuis le mot de passe."""
+
+
+class CodeIncorrect(Exception):
+    pass
+
+
+@dataclass
+class Connexion:
+    """Issue d'une connexion : une session ouverte, ou une étape « code » à franchir (double authentification)."""
+
+    utilisateur: Utilisateur
+    jeton_session: str | None = None
+    jeton_etape: str | None = None
 
 
 class CompteInvalide(Exception):
@@ -102,8 +130,8 @@ async def _purger_vieux_essais(db: AsyncSession) -> None:
 
 async def connecter(
     db: AsyncSession, saisie: str, mot_de_passe: str, adresse_ip: str, jeton_precedent: str | None
-) -> tuple[Utilisateur, str]:
-    """Vérifie les identifiants et ouvre une session. Renvoie l'utilisateur et le jeton à placer dans le cookie."""
+) -> Connexion:
+    """Vérifie les identifiants. Ouvre une session, ou, si la double authentification est active, une étape « code »."""
     identifiant = normaliser(saisie)
     colonne = Utilisateur.email if "@" in identifiant else Utilisateur.identifiant
     utilisateur = await db.scalar(select(Utilisateur).where(colonne == identifiant))
@@ -120,19 +148,68 @@ async def connecter(
     if not correct:
         await db.execute(update(TentativeConnexion).where(TentativeConnexion.id == essai.id).values(en_cours=False))
         await _purger_vieux_essais(db)
+        if utilisateur and utilisateur.role is Role.admin:
+            journaliser(
+                db,
+                "echec_connexion",
+                utilisateur,
+                cible_type="utilisateur",
+                cible_id=utilisateur.id,
+                adresse_ip=adresse_ip,
+            )
         await db.commit()
         raise IdentifiantsIncorrects
     if utilisateur.statut is not StatutCompte.actif:
         await _supprimer_essai(db, essai)
         await db.commit()
         raise CompteSuspendu
+    if utilisateur.role is Role.admin and await acces_termine(db, utilisateur):
+        await _supprimer_essai(db, essai)
+        await db.commit()
+        raise AccesTermine
 
     if doit_rehacher(utilisateur.mot_de_passe_hash):
         utilisateur.mot_de_passe_hash = await hacher(mot_de_passe)
 
-    maintenant = datetime.now(UTC)
     await db.execute(delete(TentativeConnexion).where(TentativeConnexion.cle_hash == cle))
     await _purger_vieux_essais(db)
+
+    double_auth = await db.scalar(
+        select(DoubleAuth.utilisateur_id).where(
+            DoubleAuth.utilisateur_id == utilisateur.id, DoubleAuth.active_le.is_not(None)
+        )
+    )
+    if double_auth:
+        maintenant = datetime.now(UTC)
+        await db.execute(
+            delete(EtapeDoubleAuth).where(
+                or_(EtapeDoubleAuth.utilisateur_id == utilisateur.id, EtapeDoubleAuth.expire_le < maintenant)
+            )
+        )
+        jeton_etape = secrets.token_urlsafe(32)
+        db.add(
+            EtapeDoubleAuth(
+                jeton_hash=empreinte(jeton_etape),
+                utilisateur_id=utilisateur.id,
+                expire_le=maintenant + timedelta(minutes=settings.duree_etape_code_minutes),
+            )
+        )
+        await db.commit()
+        return Connexion(utilisateur, jeton_etape=jeton_etape)
+
+    return Connexion(utilisateur, jeton_session=await ouvrir_session(db, utilisateur, jeton_precedent, adresse_ip))
+
+
+async def acces_termine(db: AsyncSession, utilisateur: Utilisateur) -> bool:
+    fin = await db.scalar(select(Collaborateur.fin_acces).where(Collaborateur.utilisateur_id == utilisateur.id))
+    return fin is not None and fin <= datetime.now(UTC)
+
+
+async def ouvrir_session(
+    db: AsyncSession, utilisateur: Utilisateur, jeton_precedent: str | None = None, adresse_ip: str | None = None
+) -> str:
+    """Crée la session et renvoie le jeton à placer dans le cookie. Valide la transaction."""
+    maintenant = datetime.now(UTC)
     conditions = [Session.expire_le < maintenant]
     if jeton_precedent:
         conditions.append(Session.jeton_hash == empreinte(jeton_precedent))
@@ -146,8 +223,83 @@ async def connecter(
             expire_le=maintenant + duree_session(utilisateur.role),
         )
     )
+    if utilisateur.role is Role.admin:
+        journaliser(
+            db, "connexion", utilisateur, cible_type="utilisateur", cible_id=utilisateur.id, adresse_ip=adresse_ip
+        )
     await db.commit()
-    return utilisateur, jeton
+    return jeton
+
+
+async def connecter_avec_code(
+    db: AsyncSession,
+    jeton_etape: str,
+    code: str,
+    adresse_ip: str,
+    verifier_code: VerificateurCode,
+    jeton_precedent: str | None,
+) -> Connexion:
+    """Seconde étape : le code de l'application ou un code de secours. Les erreurs comptent comme à la connexion."""
+    etape = await db.scalar(
+        select(EtapeDoubleAuth).where(
+            EtapeDoubleAuth.jeton_hash == empreinte(jeton_etape), EtapeDoubleAuth.expire_le > datetime.now(UTC)
+        )
+    )
+    utilisateur = await db.get(Utilisateur, etape.utilisateur_id) if etape else None
+    if etape is None or utilisateur is None or utilisateur.statut is not StatutCompte.actif:
+        raise EtapeInvalide
+    # La fin d'accès a pu tomber entre le mot de passe et le code.
+    if await acces_termine(db, utilisateur):
+        await db.execute(delete(EtapeDoubleAuth).where(EtapeDoubleAuth.id == etape.id))
+        await db.commit()
+        raise AccesTermine
+
+    essai = await reserver_essai_code(db, utilisateur, adresse_ip)
+    if not await verifier_code(db, utilisateur, code):
+        await noter_echec_code(db, utilisateur, essai, adresse_ip)
+        await db.commit()
+        raise CodeIncorrect
+
+    await effacer_essais_code(db, utilisateur)
+    await db.execute(delete(EtapeDoubleAuth).where(EtapeDoubleAuth.id == etape.id))
+    return Connexion(utilisateur, jeton_session=await ouvrir_session(db, utilisateur, jeton_precedent, adresse_ip))
+
+
+# Les codes de double authentification ont leur propre limite : 5 erreurs par 15 minutes et par compte, à la
+# connexion comme sur les pages qui redemandent un code (activation, codes de secours).
+
+
+def _cle_code(utilisateur: Utilisateur) -> str:
+    return empreinte(f"code:{utilisateur.identifiant}")
+
+
+async def reserver_essai_code(db: AsyncSession, utilisateur: Utilisateur, adresse_ip: str) -> TentativeConnexion:
+    """Lève TropDEssais au-delà du seuil."""
+    return await _reserver_essai(db, _cle_code(utilisateur), adresse_ip)
+
+
+async def noter_echec_code(
+    db: AsyncSession, utilisateur: Utilisateur, essai: TentativeConnexion, adresse_ip: str
+) -> None:
+    """Ne valide pas la transaction."""
+    await db.execute(update(TentativeConnexion).where(TentativeConnexion.id == essai.id).values(en_cours=False))
+    journaliser(
+        db,
+        "echec_code_double_auth",
+        utilisateur,
+        cible_type="utilisateur",
+        cible_id=utilisateur.id,
+        adresse_ip=adresse_ip,
+    )
+
+
+async def effacer_essais_code(db: AsyncSession, utilisateur: Utilisateur) -> None:
+    await db.execute(delete(TentativeConnexion).where(TentativeConnexion.cle_hash == _cle_code(utilisateur)))
+
+
+async def couper_sessions(db: AsyncSession, utilisateur_id: UUID) -> None:
+    """Supprime toutes les sessions d'un compte : la requête suivante est refusée. Ne valide pas la transaction."""
+    await db.execute(delete(Session).where(Session.utilisateur_id == utilisateur_id))
 
 
 async def utilisateur_de_la_session(db: AsyncSession, jeton: str) -> Utilisateur | None:
@@ -165,11 +317,6 @@ async def utilisateur_de_la_session(db: AsyncSession, jeton: str) -> Utilisateur
 async def deconnecter(db: AsyncSession, jeton: str) -> None:
     await db.execute(delete(Session).where(Session.jeton_hash == empreinte(jeton)))
     await db.commit()
-
-
-async def compter_comptes_par_role(db: AsyncSession) -> dict[Role, int]:
-    lignes = await db.execute(select(Utilisateur.role, func.count()).group_by(Utilisateur.role))
-    return {role: 0 for role in Role} | {role: nombre for role, nombre in lignes}
 
 
 def _valider_nom(valeur: str, libelle: str) -> str:

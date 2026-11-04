@@ -1,11 +1,17 @@
+import logging
 from pathlib import Path
-from typing import Self
+from typing import Literal, Self
 
+from cryptography.fernet import Fernet
 from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 RACINE_PROJET = Path(__file__).resolve().parents[2]
 BASE_LOCALE = "postgresql+asyncpg://sosclub@127.0.0.1:5435/sosclub"
+# Hors production uniquement : une clé créée au premier lancement, ignorée par git (*.key).
+FICHIER_CLE_LOCALE = RACINE_PROJET / "backend" / ".cle-chiffrement-locale.key"
+
+logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):
@@ -28,6 +34,24 @@ class Settings(BaseSettings):
     # Une classe peut partager une même adresse réseau : ce seuil reste bien plus haut que par identifiant.
     essais_max_adresse: int = 50
 
+    # Espace administrateur (spec 015).
+    duree_invitation_heures: int = 72
+    duree_etape_code_minutes: int = 5
+    duree_lien_export_minutes: int = 15
+    duree_fichier_export_heures: int = 24
+    export_lignes_max: int = 50_000
+
+    # Clé Fernet qui chiffre les secrets de double authentification. Obligatoire en production.
+    cle_chiffrement: str | None = None
+
+    # Envoi des e-mails. Sans hôte, hors production, les liens sont seulement écrits dans le terminal.
+    smtp_hote: str | None = None
+    smtp_port: int = 587
+    smtp_securite: Literal["starttls", "ssl", "aucune"] = "starttls"
+    smtp_utilisateur: str | None = None
+    smtp_mot_de_passe: str | None = None
+    smtp_expediteur: str | None = None
+
     @field_validator("site_origine")
     @classmethod
     def origine_sans_barre_finale(cls, valeur: str) -> str:
@@ -37,11 +61,28 @@ class Settings(BaseSettings):
     def production_sans_base_locale(self) -> Self:
         if self.cookie_secure and self.database_url == BASE_LOCALE:
             raise ValueError("DATABASE_URL est obligatoire quand le site est en HTTPS.")
+        if self.cookie_secure and not self.cle_chiffrement:
+            raise ValueError("CLE_CHIFFREMENT est obligatoire quand le site est en HTTPS.")
+        if self.cle_chiffrement:
+            Fernet(self.cle_chiffrement)  # Une clé mal formée doit bloquer le démarrage, pas la première connexion.
         return self
 
     @property
     def cookie_secure(self) -> bool:
         return self.site_origine.startswith("https://")
+
+    @property
+    def production(self) -> bool:
+        return self.cookie_secure
+
+    def fernet(self) -> Fernet:
+        if self.cle_chiffrement:
+            return Fernet(self.cle_chiffrement)
+        if not FICHIER_CLE_LOCALE.exists():
+            FICHIER_CLE_LOCALE.write_bytes(Fernet.generate_key())
+            FICHIER_CLE_LOCALE.chmod(0o600)
+            logger.warning("Clé de chiffrement locale créée : %s", FICHIER_CLE_LOCALE.name)
+        return Fernet(FICHIER_CLE_LOCALE.read_bytes())
 
 
 settings = Settings()

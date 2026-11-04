@@ -1,3 +1,4 @@
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -21,6 +22,19 @@ class ConnexionEntree(BaseModel):
         return valeur
 
 
+class EtapeCode(BaseModel):
+    """Mot de passe juste, double authentification active : le code est demandé avant d'ouvrir la session."""
+
+    etape: Literal["code"] = "code"
+    jeton: str
+
+
+class CodeEntree(BaseModel):
+    jeton: str = Field(min_length=1, max_length=100)
+    # 6 chiffres, ou un code de secours de 16 caractères, avec ses tirets et espaces éventuels.
+    code: str = Field(min_length=1, max_length=40)
+
+
 class Moi(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -29,13 +43,3 @@ class Moi(BaseModel):
     prenom: str
     nom: str
     role: Role
-
-
-class ComptesParRole(BaseModel):
-    eleve: int
-    encadreur: int
-    admin: int
-
-
-class ChiffresAdmin(BaseModel):
-    comptes: ComptesParRole

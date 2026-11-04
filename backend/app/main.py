@@ -1,3 +1,5 @@
+import asyncio
+import contextlib
 import logging
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
@@ -10,9 +12,11 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.admin.exports import purger_regulierement
+from app.admin.router import router as router_admin
+from app.admin.router import router_activation
 from app.comptes.dependances import verifier_origine
 from app.comptes.router import router as router_comptes
-from app.comptes.router import router_admin
 from app.db import engine, get_session
 
 logger = logging.getLogger(__name__)
@@ -20,7 +24,12 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    # Efface les fichiers d'export expirés au démarrage, puis toutes les heures (spec 015).
+    purge = asyncio.create_task(purger_regulierement())
     yield
+    purge.cancel()
+    with contextlib.suppress(asyncio.CancelledError):
+        await purge
     await engine.dispose()
 
 
@@ -30,6 +39,7 @@ app = FastAPI(title="API Club Santé SOS Docteur TV", lifespan=lifespan)
 api = APIRouter(prefix="/api", dependencies=[Depends(verifier_origine)])
 api.include_router(router_comptes)
 api.include_router(router_admin)
+api.include_router(router_activation)
 app.include_router(api)
 
 

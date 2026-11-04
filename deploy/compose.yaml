@@ -65,6 +65,13 @@ services:
       # Le port n'est pas publié : seul le proxy peut joindre ce conteneur, et il écrase X-Forwarded-For.
       FORWARDED_ALLOW_IPS: "*"
       WEB_CONCURRENCY: ${API_PROCESSUS:-2}
+      CLE_CHIFFREMENT: ${CLE_CHIFFREMENT:?CLE_CHIFFREMENT est obligatoire, voir env.example}
+      SMTP_HOTE: ${SMTP_HOTE:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURITE: ${SMTP_SECURITE:-starttls}
+      SMTP_UTILISATEUR: ${SMTP_UTILISATEUR:-}
+      SMTP_MOT_DE_PASSE: ${SMTP_MOT_DE_PASSE:-}
+      SMTP_EXPEDITEUR: ${SMTP_EXPEDITEUR:-}
     depends_on:
       db:
         condition: service_healthy

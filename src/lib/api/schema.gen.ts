@@ -21,6 +21,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/comptes/connexion/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Connexion Code */
+        post: operations["connexion_code_api_comptes_connexion_code_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/comptes/deconnexion": {
         parameters: {
             query?: never;
@@ -55,17 +72,450 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/admin/chiffres": {
+    "/api/admin/moi": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Chiffres */
-        get: operations["chiffres_api_admin_chiffres_get"];
+        /** Moi */
+        get: operations["moi_api_admin_moi_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/catalogue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Catalogue */
+        get: operations["catalogue_api_admin_catalogue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/double-auth/enrolement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enrolement */
+        post: operations["enrolement_api_admin_double_auth_enrolement_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/double-auth/confirmer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirmer */
+        post: operations["confirmer_api_admin_double_auth_confirmer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/double-auth/codes-secours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Nouveaux Codes
+         * @description Remplace les codes de secours. Le code de l'application est exigé : une session volée ne suffit pas.
+         */
+        post: operations["nouveaux_codes_api_admin_double_auth_codes_secours_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/tableau-de-bord": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tableau */
+        get: operations["tableau_api_admin_tableau_de_bord_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/collaborateurs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister Collaborateurs */
+        get: operations["lister_collaborateurs_api_admin_collaborateurs_get"];
+        put?: never;
+        /** Inviter */
+        post: operations["inviter_api_admin_collaborateurs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/collaborateurs/{collaborateur_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Voir Collaborateur */
+        get: operations["voir_collaborateur_api_admin_collaborateurs__collaborateur_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/collaborateurs/{collaborateur_id}/invitation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Renvoyer */
+        post: operations["renvoyer_api_admin_collaborateurs__collaborateur_id__invitation_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/collaborateurs/{collaborateur_id}/invitation/annuler": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Annuler Invitation */
+        post: operations["annuler_invitation_api_admin_collaborateurs__collaborateur_id__invitation_annuler_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/collaborateurs/{collaborateur_id}/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Modifier Droits */
+        put: operations["modifier_droits_api_admin_collaborateurs__collaborateur_id__permissions_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/collaborateurs/{collaborateur_id}/suspendre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Suspendre */
+        post: operations["suspendre_api_admin_collaborateurs__collaborateur_id__suspendre_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/collaborateurs/{collaborateur_id}/reactiver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reactiver */
+        post: operations["reactiver_api_admin_collaborateurs__collaborateur_id__reactiver_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/collaborateurs/{collaborateur_id}/revoquer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoquer */
+        post: operations["revoquer_api_admin_collaborateurs__collaborateur_id__revoquer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/collaborateurs/{collaborateur_id}/double-auth/reinitialiser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reinitialiser Double Auth */
+        post: operations["reinitialiser_double_auth_api_admin_collaborateurs__collaborateur_id__double_auth_reinitialiser_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/collaborateurs/{collaborateur_id}/revue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Marquer Revu */
+        post: operations["marquer_revu_api_admin_collaborateurs__collaborateur_id__revue_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/inscrits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister Inscrits */
+        get: operations["lister_inscrits_api_admin_inscrits_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/inscrits/{utilisateur_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Voir Inscrit */
+        get: operations["voir_inscrit_api_admin_inscrits__utilisateur_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/inscrits/{utilisateur_id}/suspendre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Suspendre Inscrit */
+        post: operations["suspendre_inscrit_api_admin_inscrits__utilisateur_id__suspendre_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/inscrits/{utilisateur_id}/reactiver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reactiver Inscrit */
+        post: operations["reactiver_inscrit_api_admin_inscrits__utilisateur_id__reactiver_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/exports/apercu": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apercu Export */
+        post: operations["apercu_export_api_admin_exports_apercu_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historique Exports */
+        get: operations["historique_exports_api_admin_exports_get"];
+        put?: never;
+        /** Creer Export */
+        post: operations["creer_export_api_admin_exports_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/exports/{export_id}/fichier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Telecharger Export */
+        get: operations["telecharger_export_api_admin_exports__export_id__fichier_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/journal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Journal */
+        get: operations["journal_api_admin_journal_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/activation/info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Voir Invitation
+         * @description Le jeton passe dans le corps : dans l'adresse, il finirait dans les journaux d'accès du proxy.
+         */
+        post: operations["voir_invitation_api_activation_info_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/activation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activer */
+        post: operations["activer_api_activation_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -93,18 +543,179 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** ChiffresAdmin */
-        ChiffresAdmin: {
-            comptes: components["schemas"]["ComptesParRole"];
+        /**
+         * Action
+         * @enum {string}
+         */
+        Action: "consulter" | "creer" | "modifier" | "soumettre" | "approuver" | "depublier" | "exporter";
+        /** ActivationEntree */
+        ActivationEntree: {
+            /** Jeton */
+            jeton: string;
+            /** Identifiant */
+            identifiant: string;
+            /** Mot De Passe */
+            mot_de_passe: string;
         };
-        /** ComptesParRole */
-        ComptesParRole: {
-            /** Eleve */
-            eleve: number;
-            /** Encadreur */
-            encadreur: number;
-            /** Admin */
-            admin: number;
+        /** ActivationInfo */
+        ActivationInfo: {
+            /** Prenom */
+            prenom: string;
+            /** Email */
+            email: string;
+            /** Double Auth Requise */
+            double_auth_requise: boolean;
+        };
+        /** AdminMoi */
+        AdminMoi: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Identifiant */
+            identifiant: string;
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            /** Email */
+            email: string | null;
+            /** Super Admin */
+            super_admin: boolean;
+            /** Perimetre Dre */
+            perimetre_dre: string | null;
+            /** Droits */
+            droits: components["schemas"]["Droit"][];
+            /** Double Auth Active */
+            double_auth_active: boolean;
+            /** Double Auth Requise */
+            double_auth_requise: boolean;
+        };
+        /** Apercu */
+        Apercu: {
+            /** Nb Lignes */
+            nb_lignes: number;
+            /** Plafond */
+            plafond: number;
+        };
+        /** Catalogue */
+        Catalogue: {
+            /** Modules */
+            modules: components["schemas"]["ModuleCatalogue"][];
+            /** Actions */
+            actions: {
+                [key: string]: string;
+            };
+            /** Sensibles */
+            sensibles: components["schemas"]["Droit"][];
+            /** Roles */
+            roles: components["schemas"]["RoleCatalogue"][];
+            /** Dre */
+            dre: {
+                [key: string]: string;
+            };
+        };
+        /** CodeEntree */
+        CodeEntree: {
+            /** Jeton */
+            jeton: string;
+            /** Code */
+            code: string;
+        };
+        /** CodeSaisi */
+        CodeSaisi: {
+            /** Code */
+            code: string;
+        };
+        /** CodesSecours */
+        CodesSecours: {
+            /** Codes */
+            codes: string[];
+        };
+        /** CollaborateurDetail */
+        CollaborateurDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Email */
+            email: string;
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            /** Identifiant */
+            identifiant: string | null;
+            role_depart: components["schemas"]["RoleDepart"] | null;
+            /** Perimetre Dre */
+            perimetre_dre: string | null;
+            /** Super Admin */
+            super_admin: boolean;
+            /**
+             * Statut
+             * @enum {string}
+             */
+            statut: "invitation_envoyee" | "invitation_expiree" | "actif" | "suspendu" | "revoque";
+            /** Fin Acces */
+            fin_acces: string | null;
+            /** Double Auth Active */
+            double_auth_active: boolean;
+            /** Nb Droits Sensibles */
+            nb_droits_sensibles: number;
+            /** Revu Le */
+            revu_le: string | null;
+            /**
+             * Cree Le
+             * Format: date-time
+             */
+            cree_le: string;
+            /** Droits */
+            droits: components["schemas"]["Droit"][];
+            /** Invitation Expire Le */
+            invitation_expire_le: string | null;
+            /** Invitation Envoi */
+            invitation_envoi: string | null;
+        };
+        /** CollaborateurResume */
+        CollaborateurResume: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Email */
+            email: string;
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            /** Identifiant */
+            identifiant: string | null;
+            role_depart: components["schemas"]["RoleDepart"] | null;
+            /** Perimetre Dre */
+            perimetre_dre: string | null;
+            /** Super Admin */
+            super_admin: boolean;
+            /**
+             * Statut
+             * @enum {string}
+             */
+            statut: "invitation_envoyee" | "invitation_expiree" | "actif" | "suspendu" | "revoque";
+            /** Fin Acces */
+            fin_acces: string | null;
+            /** Double Auth Active */
+            double_auth_active: boolean;
+            /** Nb Droits Sensibles */
+            nb_droits_sensibles: number;
+            /** Revu Le */
+            revu_le: string | null;
+            /**
+             * Cree Le
+             * Format: date-time
+             */
+            cree_le: string;
         };
         /** ConnexionEntree */
         ConnexionEntree: {
@@ -113,10 +724,256 @@ export interface components {
             /** Mot De Passe */
             mot_de_passe: string;
         };
+        /** Droit */
+        Droit: {
+            /** Module */
+            module: string;
+            action: components["schemas"]["Action"];
+        };
+        /** DroitsEntree */
+        DroitsEntree: {
+            /** Droits */
+            droits: components["schemas"]["Droit"][];
+            /** Perimetre Dre */
+            perimetre_dre?: string | null;
+            /** Fin Acces */
+            fin_acces?: string | null;
+            /** Motif */
+            motif: string;
+        };
+        /** Enrolement */
+        Enrolement: {
+            /** Secret */
+            secret: string;
+            /** Qr Svg */
+            qr_svg: string;
+        };
+        /**
+         * EtapeCode
+         * @description Mot de passe juste, double authentification active : le code est demandé avant d'ouvrir la session.
+         */
+        EtapeCode: {
+            /**
+             * Etape
+             * @default code
+             * @constant
+             */
+            etape: "code";
+            /** Jeton */
+            jeton: string;
+        };
+        /** EvenementJournal */
+        EvenementJournal: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Quand
+             * Format: date-time
+             */
+            quand: string;
+            /** Auteur Id */
+            auteur_id: string | null;
+            /** Auteur Libelle */
+            auteur_libelle: string | null;
+            /** Action */
+            action: string;
+            /** Cible Type */
+            cible_type: string | null;
+            /** Cible Id */
+            cible_id: string | null;
+            /** Perimetre */
+            perimetre: string | null;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            };
+        };
+        /** ExportCree */
+        ExportCree: {
+            export: components["schemas"]["ExportResume"];
+            /** Lien */
+            lien: string;
+        };
+        /** ExportEntree */
+        ExportEntree: {
+            type: components["schemas"]["TypeExport"];
+            format: components["schemas"]["FormatExport"];
+            /** @default {} */
+            filtres: components["schemas"]["FiltresInscrits"];
+            /**
+             * Colonnes
+             * @default []
+             */
+            colonnes: ("identifiant" | "nom" | "prenom" | "email" | "telephone" | "profil" | "statut" | "date_inscription" | "consentement")[];
+            /** Finalite */
+            finalite?: string | null;
+        };
+        /** ExportResume */
+        ExportResume: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            type: components["schemas"]["TypeExport"];
+            format: components["schemas"]["FormatExport"];
+            /** Filtres */
+            filtres: {
+                [key: string]: unknown;
+            };
+            /** Colonnes */
+            colonnes: string[];
+            /** Finalite */
+            finalite: string | null;
+            /** Nb Lignes */
+            nb_lignes: number;
+            statut: components["schemas"]["StatutExport"];
+            /** Demandeur Libelle */
+            demandeur_libelle?: string | null;
+            /**
+             * Lien Expire Le
+             * Format: date-time
+             */
+            lien_expire_le: string;
+            /** Telecharge Le */
+            telecharge_le: string | null;
+            /**
+             * Cree Le
+             * Format: date-time
+             */
+            cree_le: string;
+        };
+        /** FiltresInscrits */
+        FiltresInscrits: {
+            /** Recherche */
+            recherche?: string | null;
+            profil?: components["schemas"]["Role"] | null;
+            statut?: components["schemas"]["StatutCompte"] | null;
+            /** Inscrit Depuis */
+            inscrit_depuis?: string | null;
+            /** Inscrit Avant */
+            inscrit_avant?: string | null;
+        };
+        /**
+         * FormatExport
+         * @enum {string}
+         */
+        FormatExport: "csv" | "xlsx";
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** Indicateur */
+        Indicateur: {
+            /** Id */
+            id: string;
+            /** Libelle */
+            libelle: string;
+            /** Valeur */
+            valeur: number | null;
+            /** Disponible Avec */
+            disponible_avec?: string | null;
+        };
+        /** Inscrit */
+        Inscrit: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Identifiant */
+            identifiant: string;
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            /** Email */
+            email: string | null;
+            /** Telephone */
+            telephone: string | null;
+            role: components["schemas"]["Role"];
+            statut: components["schemas"]["StatutCompte"];
+            /** Consentement Le */
+            consentement_le: string | null;
+            /**
+             * Cree Le
+             * Format: date-time
+             */
+            cree_le: string;
+        };
+        /** InscritDetail */
+        InscritDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Identifiant */
+            identifiant: string;
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            /** Email */
+            email: string | null;
+            /** Telephone */
+            telephone: string | null;
+            role: components["schemas"]["Role"];
+            statut: components["schemas"]["StatutCompte"];
+            /** Consentement Le */
+            consentement_le: string | null;
+            /**
+             * Cree Le
+             * Format: date-time
+             */
+            cree_le: string;
+            /** Historique */
+            historique: components["schemas"]["EvenementJournal"][];
+        };
+        /** InvitationCree */
+        InvitationCree: {
+            collaborateur: components["schemas"]["CollaborateurDetail"];
+            /** Lien De Test */
+            lien_de_test?: string | null;
+        };
+        /** InvitationEntree */
+        InvitationEntree: {
+            /** Email */
+            email: string;
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            role_depart?: components["schemas"]["RoleDepart"] | null;
+            /** Perimetre Dre */
+            perimetre_dre?: string | null;
+            /** Fin Acces */
+            fin_acces?: string | null;
+            /**
+             * Droits
+             * @default []
+             */
+            droits: components["schemas"]["Droit"][];
+        };
+        /** JetonEntree */
+        JetonEntree: {
+            /** Jeton */
+            jeton: string;
+        };
+        /** ModuleCatalogue */
+        ModuleCatalogue: {
+            /** Id */
+            id: string;
+            /** Libelle */
+            libelle: string;
+            /** Disponible */
+            disponible: boolean;
+            /** Actions */
+            actions: components["schemas"]["Action"][];
         };
         /** Moi */
         Moi: {
@@ -133,11 +990,91 @@ export interface components {
             nom: string;
             role: components["schemas"]["Role"];
         };
+        /** MotifEntree */
+        MotifEntree: {
+            /** Motif */
+            motif: string;
+        };
+        /** PageInscrits */
+        PageInscrits: {
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Par Page */
+            par_page: number;
+            /** Inscrits */
+            inscrits: components["schemas"]["Inscrit"][];
+        };
+        /** PageJournal */
+        PageJournal: {
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Par Page */
+            par_page: number;
+            /** Evenements */
+            evenements: components["schemas"]["EvenementJournal"][];
+        };
         /**
          * Role
          * @enum {string}
          */
         Role: "eleve" | "encadreur" | "admin";
+        /** RoleCatalogue */
+        RoleCatalogue: {
+            id: components["schemas"]["RoleDepart"];
+            /** Libelle */
+            libelle: string;
+            /** Droits */
+            droits: components["schemas"]["Droit"][];
+        };
+        /**
+         * RoleDepart
+         * @enum {string}
+         */
+        RoleDepart: "admin_national" | "moderateur" | "gestionnaire_contenus" | "gestionnaire_pedagogique" | "gestionnaire_clubs" | "gestionnaire_agenda" | "analyste";
+        /**
+         * StatutCompte
+         * @enum {string}
+         */
+        StatutCompte: "actif" | "suspendu" | "revoque";
+        /**
+         * StatutExport
+         * @enum {string}
+         */
+        StatutExport: "pret" | "telecharge" | "expire" | "echec";
+        /** TableauDeBord */
+        TableauDeBord: {
+            /**
+             * Calcule Le
+             * Format: date-time
+             */
+            calcule_le: string;
+            /** Comptes Par Profil */
+            comptes_par_profil: {
+                [key: string]: number;
+            };
+            /** Comptes Par Statut */
+            comptes_par_statut: {
+                [key: string]: number;
+            };
+            /** Inscriptions 30 Jours */
+            inscriptions_30_jours: [
+                string,
+                number
+            ][];
+            /** Indicateurs */
+            indicateurs: components["schemas"]["Indicateur"][];
+            /** Derniers Evenements */
+            derniers_evenements: components["schemas"]["EvenementJournal"][] | null;
+        };
+        /**
+         * TypeExport
+         * @enum {string}
+         */
+        TypeExport: "agrege" | "nominatif";
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -170,6 +1107,39 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ConnexionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Moi"] | components["schemas"]["EtapeCode"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connexion_code_api_comptes_connexion_code_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CodeEntree"];
             };
         };
         responses: {
@@ -231,7 +1201,7 @@ export interface operations {
             };
         };
     };
-    chiffres_api_admin_chiffres_get: {
+    moi_api_admin_moi_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -246,7 +1216,862 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ChiffresAdmin"];
+                    "application/json": components["schemas"]["AdminMoi"];
+                };
+            };
+        };
+    };
+    catalogue_api_admin_catalogue_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Catalogue"];
+                };
+            };
+        };
+    };
+    enrolement_api_admin_double_auth_enrolement_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Enrolement"];
+                };
+            };
+        };
+    };
+    confirmer_api_admin_double_auth_confirmer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CodeSaisi"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CodesSecours"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    nouveaux_codes_api_admin_double_auth_codes_secours_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CodeSaisi"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CodesSecours"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tableau_api_admin_tableau_de_bord_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TableauDeBord"];
+                };
+            };
+        };
+    };
+    lister_collaborateurs_api_admin_collaborateurs_get: {
+        parameters: {
+            query?: {
+                recherche?: string | null;
+                role?: string | null;
+                perimetre?: string | null;
+                statut?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollaborateurResume"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    inviter_api_admin_collaborateurs_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InvitationEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationCree"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    voir_collaborateur_api_admin_collaborateurs__collaborateur_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collaborateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollaborateurDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    renvoyer_api_admin_collaborateurs__collaborateur_id__invitation_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collaborateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationCree"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    annuler_invitation_api_admin_collaborateurs__collaborateur_id__invitation_annuler_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collaborateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollaborateurDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modifier_droits_api_admin_collaborateurs__collaborateur_id__permissions_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collaborateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DroitsEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollaborateurDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    suspendre_api_admin_collaborateurs__collaborateur_id__suspendre_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collaborateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollaborateurDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactiver_api_admin_collaborateurs__collaborateur_id__reactiver_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collaborateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollaborateurDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoquer_api_admin_collaborateurs__collaborateur_id__revoquer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collaborateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollaborateurDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reinitialiser_double_auth_api_admin_collaborateurs__collaborateur_id__double_auth_reinitialiser_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collaborateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollaborateurDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    marquer_revu_api_admin_collaborateurs__collaborateur_id__revue_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collaborateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CollaborateurDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lister_inscrits_api_admin_inscrits_get: {
+        parameters: {
+            query?: {
+                recherche?: string | null;
+                profil?: components["schemas"]["Role"] | null;
+                statut?: components["schemas"]["StatutCompte"] | null;
+                inscrit_depuis?: string | null;
+                inscrit_avant?: string | null;
+                page?: number;
+                par_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageInscrits"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    voir_inscrit_api_admin_inscrits__utilisateur_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InscritDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    suspendre_inscrit_api_admin_inscrits__utilisateur_id__suspendre_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InscritDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactiver_inscrit_api_admin_inscrits__utilisateur_id__reactiver_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InscritDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    apercu_export_api_admin_exports_apercu_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExportEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Apercu"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    historique_exports_api_admin_exports_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportResume"][];
+                };
+            };
+        };
+    };
+    creer_export_api_admin_exports_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExportEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportCree"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    telecharger_export_api_admin_exports__export_id__fichier_get: {
+        parameters: {
+            query: {
+                jeton: string;
+            };
+            header?: never;
+            path: {
+                export_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    journal_api_admin_journal_get: {
+        parameters: {
+            query?: {
+                auteur?: string | null;
+                action?: string | null;
+                depuis?: string | null;
+                avant?: string | null;
+                page?: number;
+                par_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageJournal"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    voir_invitation_api_activation_info_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JetonEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivationInfo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    activer_api_activation_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActivationEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Moi"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

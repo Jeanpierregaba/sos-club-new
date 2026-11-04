@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConnecteRouteImport } from './routes/_connecte'
+import { Route as ActivationRouteImport } from './routes/activation'
 import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as BibliothequeRouteImport } from './routes/bibliotheque'
 import { Route as CarteDesClubsRouteImport } from './routes/carte-des-clubs'
@@ -21,10 +22,19 @@ import { Route as GalerieRouteImport } from './routes/galerie'
 import { Route as JeuxRouteImport } from './routes/jeux'
 import { Route as Les7AxesRouteImport } from './routes/les-7-axes'
 import { Route as MagazineRouteImport } from './routes/magazine'
+import { Route as ConnecteAdminRouteImport } from './routes/_connecte/admin'
 import { Route as ConnecteMonEspaceRouteImport } from './routes/_connecte/mon-espace'
 import { Route as GenieImhotepDescriptionRouteImport } from './routes/genie-imhotep/description'
 import { Route as GenieImhotepHallOfFameRouteImport } from './routes/genie-imhotep/hall-of-fame'
 import { Route as GenieImhotepInscriptionRouteImport } from './routes/genie-imhotep/inscription'
+import { Route as ConnecteAdminIndexRouteImport } from './routes/_connecte/admin/index'
+import { Route as ConnecteAdminDoubleAuthentificationRouteImport } from './routes/_connecte/admin/double-authentification'
+import { Route as ConnecteAdminExportsRouteImport } from './routes/_connecte/admin/exports'
+import { Route as ConnecteAdminJournalRouteImport } from './routes/_connecte/admin/journal'
+import { Route as ConnecteAdminCollaborateursIndexRouteImport } from './routes/_connecte/admin/collaborateurs.index'
+import { Route as ConnecteAdminCollaborateursIdRouteImport } from './routes/_connecte/admin/collaborateurs.$id'
+import { Route as ConnecteAdminInscritsIndexRouteImport } from './routes/_connecte/admin/inscrits.index'
+import { Route as ConnecteAdminInscritsIdRouteImport } from './routes/_connecte/admin/inscrits.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -33,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const ConnecteRoute = ConnecteRouteImport.update({
   id: '/_connecte',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActivationRoute = ActivationRouteImport.update({
+  id: '/activation',
+  path: '/activation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AgendaRoute = AgendaRouteImport.update({
@@ -85,6 +100,11 @@ const MagazineRoute = MagazineRouteImport.update({
   path: '/magazine',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConnecteAdminRoute = ConnecteAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => ConnecteRoute,
+} as any)
 const ConnecteMonEspaceRoute = ConnecteMonEspaceRouteImport.update({
   id: '/mon-espace',
   path: '/mon-espace',
@@ -105,9 +125,54 @@ const GenieImhotepInscriptionRoute = GenieImhotepInscriptionRouteImport.update({
   path: '/genie-imhotep/inscription',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConnecteAdminIndexRoute = ConnecteAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ConnecteAdminRoute,
+} as any)
+const ConnecteAdminDoubleAuthentificationRoute =
+  ConnecteAdminDoubleAuthentificationRouteImport.update({
+    id: '/double-authentification',
+    path: '/double-authentification',
+    getParentRoute: () => ConnecteAdminRoute,
+  } as any)
+const ConnecteAdminExportsRoute = ConnecteAdminExportsRouteImport.update({
+  id: '/exports',
+  path: '/exports',
+  getParentRoute: () => ConnecteAdminRoute,
+} as any)
+const ConnecteAdminJournalRoute = ConnecteAdminJournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => ConnecteAdminRoute,
+} as any)
+const ConnecteAdminCollaborateursIndexRoute =
+  ConnecteAdminCollaborateursIndexRouteImport.update({
+    id: '/collaborateurs/',
+    path: '/collaborateurs/',
+    getParentRoute: () => ConnecteAdminRoute,
+  } as any)
+const ConnecteAdminCollaborateursIdRoute =
+  ConnecteAdminCollaborateursIdRouteImport.update({
+    id: '/collaborateurs/$id',
+    path: '/collaborateurs/$id',
+    getParentRoute: () => ConnecteAdminRoute,
+  } as any)
+const ConnecteAdminInscritsIndexRoute =
+  ConnecteAdminInscritsIndexRouteImport.update({
+    id: '/inscrits/',
+    path: '/inscrits/',
+    getParentRoute: () => ConnecteAdminRoute,
+  } as any)
+const ConnecteAdminInscritsIdRoute = ConnecteAdminInscritsIdRouteImport.update({
+  id: '/inscrits/$id',
+  path: '/inscrits/$id',
+  getParentRoute: () => ConnecteAdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/activation': typeof ActivationRoute
   '/agenda': typeof AgendaRoute
   '/bibliotheque': typeof BibliothequeRoute
   '/carte-des-clubs': typeof CarteDesClubsRoute
@@ -118,13 +183,23 @@ export interface FileRoutesByFullPath {
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
+  '/admin': typeof ConnecteAdminRouteWithChildren
   '/mon-espace': typeof ConnecteMonEspaceRoute
   '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
+  '/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
+  '/admin/exports': typeof ConnecteAdminExportsRoute
+  '/admin/journal': typeof ConnecteAdminJournalRoute
+  '/admin/': typeof ConnecteAdminIndexRoute
+  '/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
+  '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
+  '/admin/collaborateurs/': typeof ConnecteAdminCollaborateursIndexRoute
+  '/admin/inscrits/': typeof ConnecteAdminInscritsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/activation': typeof ActivationRoute
   '/agenda': typeof AgendaRoute
   '/bibliotheque': typeof BibliothequeRoute
   '/carte-des-clubs': typeof CarteDesClubsRoute
@@ -139,11 +214,20 @@ export interface FileRoutesByTo {
   '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
+  '/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
+  '/admin/exports': typeof ConnecteAdminExportsRoute
+  '/admin/journal': typeof ConnecteAdminJournalRoute
+  '/admin': typeof ConnecteAdminIndexRoute
+  '/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
+  '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
+  '/admin/collaborateurs': typeof ConnecteAdminCollaborateursIndexRoute
+  '/admin/inscrits': typeof ConnecteAdminInscritsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_connecte': typeof ConnecteRouteWithChildren
+  '/activation': typeof ActivationRoute
   '/agenda': typeof AgendaRoute
   '/bibliotheque': typeof BibliothequeRoute
   '/carte-des-clubs': typeof CarteDesClubsRoute
@@ -154,15 +238,25 @@ export interface FileRoutesById {
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
+  '/_connecte/admin': typeof ConnecteAdminRouteWithChildren
   '/_connecte/mon-espace': typeof ConnecteMonEspaceRoute
   '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
+  '/_connecte/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
+  '/_connecte/admin/exports': typeof ConnecteAdminExportsRoute
+  '/_connecte/admin/journal': typeof ConnecteAdminJournalRoute
+  '/_connecte/admin/': typeof ConnecteAdminIndexRoute
+  '/_connecte/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
+  '/_connecte/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
+  '/_connecte/admin/collaborateurs/': typeof ConnecteAdminCollaborateursIndexRoute
+  '/_connecte/admin/inscrits/': typeof ConnecteAdminInscritsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/activation'
     | '/agenda'
     | '/bibliotheque'
     | '/carte-des-clubs'
@@ -173,13 +267,23 @@ export interface FileRouteTypes {
     | '/jeux'
     | '/les-7-axes'
     | '/magazine'
+    | '/admin'
     | '/mon-espace'
     | '/genie-imhotep/description'
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/inscription'
+    | '/admin/double-authentification'
+    | '/admin/exports'
+    | '/admin/journal'
+    | '/admin/'
+    | '/admin/collaborateurs/$id'
+    | '/admin/inscrits/$id'
+    | '/admin/collaborateurs/'
+    | '/admin/inscrits/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/activation'
     | '/agenda'
     | '/bibliotheque'
     | '/carte-des-clubs'
@@ -194,10 +298,19 @@ export interface FileRouteTypes {
     | '/genie-imhotep/description'
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/inscription'
+    | '/admin/double-authentification'
+    | '/admin/exports'
+    | '/admin/journal'
+    | '/admin'
+    | '/admin/collaborateurs/$id'
+    | '/admin/inscrits/$id'
+    | '/admin/collaborateurs'
+    | '/admin/inscrits'
   id:
     | '__root__'
     | '/'
     | '/_connecte'
+    | '/activation'
     | '/agenda'
     | '/bibliotheque'
     | '/carte-des-clubs'
@@ -208,15 +321,25 @@ export interface FileRouteTypes {
     | '/jeux'
     | '/les-7-axes'
     | '/magazine'
+    | '/_connecte/admin'
     | '/_connecte/mon-espace'
     | '/genie-imhotep/description'
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/inscription'
+    | '/_connecte/admin/double-authentification'
+    | '/_connecte/admin/exports'
+    | '/_connecte/admin/journal'
+    | '/_connecte/admin/'
+    | '/_connecte/admin/collaborateurs/$id'
+    | '/_connecte/admin/inscrits/$id'
+    | '/_connecte/admin/collaborateurs/'
+    | '/_connecte/admin/inscrits/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConnecteRoute: typeof ConnecteRouteWithChildren
+  ActivationRoute: typeof ActivationRoute
   AgendaRoute: typeof AgendaRoute
   BibliothequeRoute: typeof BibliothequeRoute
   CarteDesClubsRoute: typeof CarteDesClubsRoute
@@ -246,6 +369,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof ConnecteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/activation': {
+      id: '/activation'
+      path: '/activation'
+      fullPath: '/activation'
+      preLoaderRoute: typeof ActivationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/agenda': {
@@ -318,6 +448,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MagazineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_connecte/admin': {
+      id: '/_connecte/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof ConnecteAdminRouteImport
+      parentRoute: typeof ConnecteRoute
+    }
     '/_connecte/mon-espace': {
       id: '/_connecte/mon-espace'
       path: '/mon-espace'
@@ -346,14 +483,99 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GenieImhotepInscriptionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_connecte/admin/': {
+      id: '/_connecte/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof ConnecteAdminIndexRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
+    '/_connecte/admin/double-authentification': {
+      id: '/_connecte/admin/double-authentification'
+      path: '/double-authentification'
+      fullPath: '/admin/double-authentification'
+      preLoaderRoute: typeof ConnecteAdminDoubleAuthentificationRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
+    '/_connecte/admin/exports': {
+      id: '/_connecte/admin/exports'
+      path: '/exports'
+      fullPath: '/admin/exports'
+      preLoaderRoute: typeof ConnecteAdminExportsRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
+    '/_connecte/admin/journal': {
+      id: '/_connecte/admin/journal'
+      path: '/journal'
+      fullPath: '/admin/journal'
+      preLoaderRoute: typeof ConnecteAdminJournalRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
+    '/_connecte/admin/collaborateurs/': {
+      id: '/_connecte/admin/collaborateurs/'
+      path: '/collaborateurs'
+      fullPath: '/admin/collaborateurs/'
+      preLoaderRoute: typeof ConnecteAdminCollaborateursIndexRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
+    '/_connecte/admin/collaborateurs/$id': {
+      id: '/_connecte/admin/collaborateurs/$id'
+      path: '/collaborateurs/$id'
+      fullPath: '/admin/collaborateurs/$id'
+      preLoaderRoute: typeof ConnecteAdminCollaborateursIdRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
+    '/_connecte/admin/inscrits/': {
+      id: '/_connecte/admin/inscrits/'
+      path: '/inscrits'
+      fullPath: '/admin/inscrits/'
+      preLoaderRoute: typeof ConnecteAdminInscritsIndexRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
+    '/_connecte/admin/inscrits/$id': {
+      id: '/_connecte/admin/inscrits/$id'
+      path: '/inscrits/$id'
+      fullPath: '/admin/inscrits/$id'
+      preLoaderRoute: typeof ConnecteAdminInscritsIdRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
   }
 }
 
+interface ConnecteAdminRouteChildren {
+  ConnecteAdminDoubleAuthentificationRoute: typeof ConnecteAdminDoubleAuthentificationRoute
+  ConnecteAdminExportsRoute: typeof ConnecteAdminExportsRoute
+  ConnecteAdminJournalRoute: typeof ConnecteAdminJournalRoute
+  ConnecteAdminIndexRoute: typeof ConnecteAdminIndexRoute
+  ConnecteAdminCollaborateursIdRoute: typeof ConnecteAdminCollaborateursIdRoute
+  ConnecteAdminInscritsIdRoute: typeof ConnecteAdminInscritsIdRoute
+  ConnecteAdminCollaborateursIndexRoute: typeof ConnecteAdminCollaborateursIndexRoute
+  ConnecteAdminInscritsIndexRoute: typeof ConnecteAdminInscritsIndexRoute
+}
+
+const ConnecteAdminRouteChildren: ConnecteAdminRouteChildren = {
+  ConnecteAdminDoubleAuthentificationRoute:
+    ConnecteAdminDoubleAuthentificationRoute,
+  ConnecteAdminExportsRoute: ConnecteAdminExportsRoute,
+  ConnecteAdminJournalRoute: ConnecteAdminJournalRoute,
+  ConnecteAdminIndexRoute: ConnecteAdminIndexRoute,
+  ConnecteAdminCollaborateursIdRoute: ConnecteAdminCollaborateursIdRoute,
+  ConnecteAdminInscritsIdRoute: ConnecteAdminInscritsIdRoute,
+  ConnecteAdminCollaborateursIndexRoute: ConnecteAdminCollaborateursIndexRoute,
+  ConnecteAdminInscritsIndexRoute: ConnecteAdminInscritsIndexRoute,
+}
+
+const ConnecteAdminRouteWithChildren = ConnecteAdminRoute._addFileChildren(
+  ConnecteAdminRouteChildren,
+)
+
 interface ConnecteRouteChildren {
+  ConnecteAdminRoute: typeof ConnecteAdminRouteWithChildren
   ConnecteMonEspaceRoute: typeof ConnecteMonEspaceRoute
 }
 
 const ConnecteRouteChildren: ConnecteRouteChildren = {
+  ConnecteAdminRoute: ConnecteAdminRouteWithChildren,
   ConnecteMonEspaceRoute: ConnecteMonEspaceRoute,
 }
 
@@ -364,6 +586,7 @@ const ConnecteRouteWithChildren = ConnecteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConnecteRoute: ConnecteRouteWithChildren,
+  ActivationRoute: ActivationRoute,
   AgendaRoute: AgendaRoute,
   BibliothequeRoute: BibliothequeRoute,
   CarteDesClubsRoute: CarteDesClubsRoute,

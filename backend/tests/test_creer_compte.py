@@ -47,6 +47,20 @@ def test_la_commande_cree_un_admin_qui_peut_se_connecter(client: TestClient) -> 
     assert se_connecter(client, "ama@exemple.tg", MOT_DE_PASSE).status_code == 200
 
 
+def test_un_admin_cree_en_ligne_de_commande_est_super_administrateur(
+    client: TestClient, en_base: Callable[..., Any]
+) -> None:
+    from app.admin.models import Collaborateur
+
+    assert lancer(MOT_DE_PASSE, *ADMIN).returncode == 0
+
+    collaborateur = en_base(lambda db: db.scalar(select(Collaborateur)))
+    assert collaborateur.super_admin and collaborateur.perimetre_dre is None
+    se_connecter(client, "chef", MOT_DE_PASSE)
+    # Super-administrateur : la double authentification est à activer avant toute autre page.
+    assert client.get("/api/admin/moi").json()["double_auth_requise"] is True
+
+
 def test_la_commande_cree_un_eleve_sans_email(client: TestClient) -> None:
     resultat = lancer(MOT_DE_PASSE, "--role", "eleve", "--identifiant", "Jean.K", "--prenom", "Jean", "--nom", "K")
 

@@ -1,6 +1,8 @@
 """Crée un compte en ligne de commande, en attendant les inscriptions depuis le site (specs 003 et 004).
 
 Le mot de passe n'est jamais passé en argument : il finirait dans l'historique du terminal.
+Un compte admin créé ici est super-administrateur : c'est l'amorce de l'espace admin (spec 015). Les autres
+collaborateurs sont ensuite invités depuis le site.
 """
 
 import argparse
@@ -8,6 +10,8 @@ import asyncio
 import getpass
 import sys
 
+from app.admin.journal import journaliser
+from app.admin.models import Collaborateur
 from app.comptes.models import Role
 from app.comptes.service import CompteInvalide, creer_compte
 from app.db import SessionLocal, engine
@@ -25,7 +29,7 @@ def _lire_mot_de_passe() -> str:
 async def _creer(arguments: argparse.Namespace, mot_de_passe: str) -> None:
     try:
         async with SessionLocal() as db:
-            await creer_compte(
+            utilisateur = await creer_compte(
                 db,
                 role=Role(arguments.role),
                 identifiant=arguments.identifiant,
@@ -35,6 +39,24 @@ async def _creer(arguments: argparse.Namespace, mot_de_passe: str) -> None:
                 email=arguments.email,
                 telephone=arguments.telephone,
             )
+            if utilisateur.role is Role.admin and utilisateur.email:
+                collaborateur = Collaborateur(
+                    utilisateur_id=utilisateur.id,
+                    email=utilisateur.email,
+                    prenom=utilisateur.prenom,
+                    nom=utilisateur.nom,
+                    super_admin=True,
+                )
+                db.add(collaborateur)
+                await db.flush()
+                journaliser(
+                    db,
+                    "super_admin_cree_en_ligne_de_commande",
+                    cible_type="collaborateur",
+                    cible_id=collaborateur.id,
+                    perimetre="national",
+                )
+                await db.commit()
     finally:
         await engine.dispose()
 

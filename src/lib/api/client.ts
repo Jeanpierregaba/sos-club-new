@@ -3,8 +3,28 @@ import { getRequestHeader } from "@tanstack/react-start/server";
 
 import type { components } from "./schema.gen";
 
-export type Moi = components["schemas"]["Moi"];
-export type ChiffresAdmin = components["schemas"]["ChiffresAdmin"];
+type Schemas = components["schemas"];
+export type Moi = Schemas["Moi"];
+export type EtapeCode = Schemas["EtapeCode"];
+export type AdminMoi = Schemas["AdminMoi"];
+export type Catalogue = Schemas["Catalogue"];
+export type Droit = Schemas["Droit"];
+export type TableauDeBord = Schemas["TableauDeBord"];
+export type CollaborateurResume = Schemas["CollaborateurResume"];
+export type CollaborateurDetail = Schemas["CollaborateurDetail"];
+export type InvitationEntree = Schemas["InvitationEntree"];
+export type InvitationCree = Schemas["InvitationCree"];
+export type DroitsEntree = Schemas["DroitsEntree"];
+export type ActivationInfo = Schemas["ActivationInfo"];
+export type Enrolement = Schemas["Enrolement"];
+export type PageInscrits = Schemas["PageInscrits"];
+export type InscritDetail = Schemas["InscritDetail"];
+export type EvenementJournal = Schemas["EvenementJournal"];
+export type PageJournal = Schemas["PageJournal"];
+export type ExportEntree = Schemas["ExportEntree"];
+export type ExportResume = Schemas["ExportResume"];
+export type ExportCree = Schemas["ExportCree"];
+export type Apercu = Schemas["Apercu"];
 
 export const MESSAGE_INDISPONIBLE =
   "Connexion impossible pour le moment. Réessaie dans quelques instants.";
@@ -62,18 +82,102 @@ export async function chargerMoi(): Promise<Moi | null> {
   }
 }
 
-export function connecter(identifiant: string, motDePasse: string): Promise<Moi> {
-  return requeteApi<Moi>("/api/comptes/connexion", {
-    method: "POST",
+function envoyerJson<T>(chemin: string, corps?: unknown, method = "POST"): Promise<T> {
+  return requeteApi<T>(chemin, {
+    method,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ identifiant, mot_de_passe: motDePasse }),
+    body: corps === undefined ? null : JSON.stringify(corps),
   });
+}
+
+// Les paramètres vides sont omis : l'API garde alors sa valeur par défaut.
+function avecParametres(
+  chemin: string,
+  parametres: Record<string, string | number | null | undefined>,
+) {
+  const recherche = new URLSearchParams();
+  for (const [cle, valeur] of Object.entries(parametres)) {
+    if (valeur !== undefined && valeur !== null && valeur !== "")
+      recherche.set(cle, String(valeur));
+  }
+  const texte = recherche.toString();
+  return texte ? `${chemin}?${texte}` : chemin;
+}
+
+// Si la double authentification est active, la réponse est une étape « code » et aucune session n'est ouverte.
+export function connecter(identifiant: string, motDePasse: string): Promise<Moi | EtapeCode> {
+  return envoyerJson<Moi | EtapeCode>("/api/comptes/connexion", {
+    identifiant,
+    mot_de_passe: motDePasse,
+  });
+}
+
+export function connecterAvecCode(jeton: string, code: string): Promise<Moi> {
+  return envoyerJson<Moi>("/api/comptes/connexion/code", { jeton, code });
 }
 
 export function deconnecter(): Promise<void> {
   return requeteApi<void>("/api/comptes/deconnexion", { method: "POST" });
 }
 
-export function chargerChiffresAdmin(): Promise<ChiffresAdmin> {
-  return requeteApi<ChiffresAdmin>("/api/admin/chiffres");
-}
+// Espace administrateur (spec 015) -----------------------------------------------------------------------
+
+export const chargerAdminMoi = () => requeteApi<AdminMoi>("/api/admin/moi");
+export const chargerCatalogue = () => requeteApi<Catalogue>("/api/admin/catalogue");
+export const chargerTableauDeBord = () => requeteApi<TableauDeBord>("/api/admin/tableau-de-bord");
+
+export const commencerEnrolement = () =>
+  envoyerJson<Enrolement>("/api/admin/double-auth/enrolement");
+export const confirmerEnrolement = (code: string) =>
+  envoyerJson<{ codes: string[] }>("/api/admin/double-auth/confirmer", { code });
+export const regenererCodesSecours = (code: string) =>
+  envoyerJson<{ codes: string[] }>("/api/admin/double-auth/codes-secours", { code });
+
+export const listerCollaborateurs = (filtres: Record<string, string | undefined> = {}) =>
+  requeteApi<CollaborateurResume[]>(avecParametres("/api/admin/collaborateurs", filtres));
+export const chargerCollaborateur = (id: string) =>
+  requeteApi<CollaborateurDetail>(`/api/admin/collaborateurs/${id}`);
+export const inviterCollaborateur = (entree: InvitationEntree) =>
+  envoyerJson<InvitationCree>("/api/admin/collaborateurs", entree);
+export const renvoyerInvitation = (id: string) =>
+  envoyerJson<InvitationCree>(`/api/admin/collaborateurs/${id}/invitation`);
+export const modifierDroits = (id: string, entree: DroitsEntree) =>
+  envoyerJson<CollaborateurDetail>(`/api/admin/collaborateurs/${id}/permissions`, entree, "PUT");
+export const changerStatutCollaborateur = (
+  id: string,
+  action: "suspendre" | "reactiver" | "revoquer",
+  motif: string,
+) => envoyerJson<CollaborateurDetail>(`/api/admin/collaborateurs/${id}/${action}`, { motif });
+export const reinitialiserDoubleAuth = (id: string, motif: string) =>
+  envoyerJson<CollaborateurDetail>(`/api/admin/collaborateurs/${id}/double-auth/reinitialiser`, {
+    motif,
+  });
+export const annulerInvitation = (id: string, motif: string) =>
+  envoyerJson<CollaborateurDetail>(`/api/admin/collaborateurs/${id}/invitation/annuler`, { motif });
+export const marquerRevu = (id: string) =>
+  envoyerJson<CollaborateurDetail>(`/api/admin/collaborateurs/${id}/revue`);
+
+// Le jeton voyage dans le corps de la requête : dans l'adresse, il finirait dans les journaux d'accès.
+export const voirInvitation = (jeton: string) =>
+  envoyerJson<ActivationInfo>("/api/activation/info", { jeton });
+export const activerInvitation = (jeton: string, identifiant: string, motDePasse: string) =>
+  envoyerJson<Moi>("/api/activation", { jeton, identifiant, mot_de_passe: motDePasse });
+
+export const listerInscrits = (filtres: Record<string, string | number | undefined>) =>
+  requeteApi<PageInscrits>(avecParametres("/api/admin/inscrits", filtres));
+export const chargerInscrit = (id: string) =>
+  requeteApi<InscritDetail>(`/api/admin/inscrits/${id}`);
+export const changerStatutInscrit = (
+  id: string,
+  action: "suspendre" | "reactiver",
+  motif: string,
+) => envoyerJson<InscritDetail>(`/api/admin/inscrits/${id}/${action}`, { motif });
+
+export const apercuExport = (entree: ExportEntree) =>
+  envoyerJson<Apercu>("/api/admin/exports/apercu", entree);
+export const creerExport = (entree: ExportEntree) =>
+  envoyerJson<ExportCree>("/api/admin/exports", entree);
+export const historiqueExports = () => requeteApi<ExportResume[]>("/api/admin/exports");
+
+export const chargerJournal = (filtres: Record<string, string | number | undefined>) =>
+  requeteApi<PageJournal>(avecParametres("/api/admin/journal", filtres));

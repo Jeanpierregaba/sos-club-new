@@ -1,0 +1,86 @@
+"""Tableau de bord national (CDC admin, 3). Chaque chiffre est calculé ici, au moment de la demande : aucun n'est
+saisi ni codé en dur (CDC admin, 11)."""
+
+from datetime import UTC, date, datetime, timedelta
+
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.admin.catalogue import Action
+from app.admin.dependances import Acces
+from app.admin.models import Collaborateur, Export, Invitation, JournalAudit
+from app.admin.schemas import EvenementJournal, Indicateur, TableauDeBord
+from app.comptes.models import Role, StatutCompte, Utilisateur
+
+# Indicateurs du CDC qui dépendent de modules à venir : affichés sans valeur.
+A_VENIR = [
+    ("clubs_actifs", "Clubs actifs", "Clubs et DRE"),
+    ("contenus_en_attente", "Contenus en attente de validation", "Modération"),
+    ("quiz_joues", "Quiz joués", "Quiz et certification"),
+    ("certifications", "Certifications obtenues", "Quiz et certification"),
+    ("badges", "Badges délivrés", "Points et classements"),
+]
+
+
+async def calculer(db: AsyncSession, acces: Acces) -> TableauDeBord:
+    maintenant = datetime.now(UTC)
+
+    par_profil = {role: 0 for role in Role} | dict(
+        (await db.execute(select(Utilisateur.role, func.count()).group_by(Utilisateur.role))).all()
+    )
+    par_statut = {statut: 0 for statut in StatutCompte} | dict(
+        (await db.execute(select(Utilisateur.statut, func.count()).group_by(Utilisateur.statut))).all()
+    )
+
+    debut = (maintenant - timedelta(days=29)).date()
+    jour = func.date(func.timezone("UTC", Utilisateur.cree_le))
+    lignes = await db.execute(
+        select(jour, func.count())
+        .where(Utilisateur.cree_le >= datetime.combine(debut, datetime.min.time(), UTC))
+        .group_by(jour)
+    )
+    par_jour: dict[date, int] = dict(lignes.all())
+    inscriptions = [
+        ((debut + timedelta(days=i)).isoformat(), par_jour.get(debut + timedelta(days=i), 0)) for i in range(30)
+    ]
+
+    invitations_en_attente = await db.scalar(
+        select(func.count())
+        .select_from(Invitation)
+        .join(Collaborateur, Collaborateur.id == Invitation.collaborateur_id)
+        .where(
+            Collaborateur.utilisateur_id.is_(None),
+            Invitation.utilisee_le.is_(None),
+            Invitation.annulee_le.is_(None),
+            Invitation.expire_le > maintenant,
+        )
+    )
+    debut_mois = maintenant.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    exports_du_mois = await db.scalar(select(func.count()).select_from(Export).where(Export.cree_le >= debut_mois))
+    collaborateurs_actifs = await db.scalar(
+        select(func.count())
+        .select_from(Collaborateur)
+        .join(Utilisateur, Utilisateur.id == Collaborateur.utilisateur_id)
+        .where(Utilisateur.statut == StatutCompte.actif)
+    )
+
+    indicateurs = [
+        Indicateur(id="collaborateurs_actifs", libelle="Collaborateurs actifs", valeur=collaborateurs_actifs or 0),
+        Indicateur(id="invitations_en_attente", libelle="Invitations en attente", valeur=invitations_en_attente or 0),
+        Indicateur(id="exports_du_mois", libelle="Exports ce mois-ci", valeur=exports_du_mois or 0),
+    ] + [Indicateur(id=i, libelle=libelle, valeur=None, disponible_avec=module) for i, libelle, module in A_VENIR]
+
+    derniers = None
+    # Le journal contient des données nominatives : réservé au périmètre national, comme sa page.
+    if acces.a("journal", Action.consulter) and acces.national:
+        evenements = await db.scalars(select(JournalAudit).order_by(JournalAudit.quand.desc()).limit(8))
+        derniers = [EvenementJournal.model_validate(e) for e in evenements.all()]
+
+    return TableauDeBord(
+        calcule_le=maintenant,
+        comptes_par_profil=par_profil,
+        comptes_par_statut=par_statut,
+        inscriptions_30_jours=inscriptions,
+        indicateurs=indicateurs,
+        derniers_evenements=derniers,
+    )

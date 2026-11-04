@@ -28,6 +28,55 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Moi"
+                    },
+                    {
+                      "$ref": "#/components/schemas/EtapeCode"
+                    }
+                  ],
+                  "title": "Response Connexion Api Comptes Connexion Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/comptes/connexion/code": {
+      "post": {
+        "tags": [
+          "comptes"
+        ],
+        "summary": "Connexion Code",
+        "operationId": "connexion_code_api_comptes_connexion_code_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
                   "$ref": "#/components/schemas/Moi"
                 }
               }
@@ -81,20 +130,1405 @@
         }
       }
     },
-    "/api/admin/chiffres": {
+    "/api/admin/moi": {
       "get": {
         "tags": [
           "admin"
         ],
-        "summary": "Chiffres",
-        "operationId": "chiffres_api_admin_chiffres_get",
+        "summary": "Moi",
+        "operationId": "moi_api_admin_moi_get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChiffresAdmin"
+                  "$ref": "#/components/schemas/AdminMoi"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/catalogue": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Catalogue",
+        "operationId": "catalogue_api_admin_catalogue_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Catalogue"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/double-auth/enrolement": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Enrolement",
+        "operationId": "enrolement_api_admin_double_auth_enrolement_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Enrolement"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/double-auth/confirmer": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Confirmer",
+        "operationId": "confirmer_api_admin_double_auth_confirmer_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeSaisi"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodesSecours"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/double-auth/codes-secours": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Nouveaux Codes",
+        "description": "Remplace les codes de secours. Le code de l'application est exigé : une session volée ne suffit pas.",
+        "operationId": "nouveaux_codes_api_admin_double_auth_codes_secours_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CodeSaisi"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodesSecours"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/tableau-de-bord": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Tableau",
+        "operationId": "tableau_api_admin_tableau_de_bord_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableauDeBord"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/collaborateurs": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister Collaborateurs",
+        "operationId": "lister_collaborateurs_api_admin_collaborateurs_get",
+        "parameters": [
+          {
+            "name": "recherche",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Recherche"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Role"
+            }
+          },
+          {
+            "name": "perimetre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Perimetre"
+            }
+          },
+          {
+            "name": "statut",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Statut"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CollaborateurResume"
+                  },
+                  "title": "Response Lister Collaborateurs Api Admin Collaborateurs Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Inviter",
+        "operationId": "inviter_api_admin_collaborateurs_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationCree"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/collaborateurs/{collaborateur_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Voir Collaborateur",
+        "operationId": "voir_collaborateur_api_admin_collaborateurs__collaborateur_id__get",
+        "parameters": [
+          {
+            "name": "collaborateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Collaborateur Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollaborateurDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/collaborateurs/{collaborateur_id}/invitation": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Renvoyer",
+        "operationId": "renvoyer_api_admin_collaborateurs__collaborateur_id__invitation_post",
+        "parameters": [
+          {
+            "name": "collaborateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Collaborateur Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationCree"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/collaborateurs/{collaborateur_id}/invitation/annuler": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Annuler Invitation",
+        "operationId": "annuler_invitation_api_admin_collaborateurs__collaborateur_id__invitation_annuler_post",
+        "parameters": [
+          {
+            "name": "collaborateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Collaborateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotifEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollaborateurDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/collaborateurs/{collaborateur_id}/permissions": {
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Modifier Droits",
+        "operationId": "modifier_droits_api_admin_collaborateurs__collaborateur_id__permissions_put",
+        "parameters": [
+          {
+            "name": "collaborateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Collaborateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DroitsEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollaborateurDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/collaborateurs/{collaborateur_id}/suspendre": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Suspendre",
+        "operationId": "suspendre_api_admin_collaborateurs__collaborateur_id__suspendre_post",
+        "parameters": [
+          {
+            "name": "collaborateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Collaborateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotifEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollaborateurDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/collaborateurs/{collaborateur_id}/reactiver": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Reactiver",
+        "operationId": "reactiver_api_admin_collaborateurs__collaborateur_id__reactiver_post",
+        "parameters": [
+          {
+            "name": "collaborateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Collaborateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotifEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollaborateurDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/collaborateurs/{collaborateur_id}/revoquer": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Revoquer",
+        "operationId": "revoquer_api_admin_collaborateurs__collaborateur_id__revoquer_post",
+        "parameters": [
+          {
+            "name": "collaborateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Collaborateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotifEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollaborateurDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/collaborateurs/{collaborateur_id}/double-auth/reinitialiser": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Reinitialiser Double Auth",
+        "operationId": "reinitialiser_double_auth_api_admin_collaborateurs__collaborateur_id__double_auth_reinitialiser_post",
+        "parameters": [
+          {
+            "name": "collaborateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Collaborateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotifEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollaborateurDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/collaborateurs/{collaborateur_id}/revue": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Marquer Revu",
+        "operationId": "marquer_revu_api_admin_collaborateurs__collaborateur_id__revue_post",
+        "parameters": [
+          {
+            "name": "collaborateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Collaborateur Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollaborateurDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/inscrits": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister Inscrits",
+        "operationId": "lister_inscrits_api_admin_inscrits_get",
+        "parameters": [
+          {
+            "name": "recherche",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Recherche"
+            }
+          },
+          {
+            "name": "profil",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Role"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Profil"
+            }
+          },
+          {
+            "name": "statut",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/StatutCompte"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Statut"
+            }
+          },
+          {
+            "name": "inscrit_depuis",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Inscrit Depuis"
+            }
+          },
+          {
+            "name": "inscrit_avant",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Inscrit Avant"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "par_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 25,
+              "title": "Par Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageInscrits"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/inscrits/{utilisateur_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Voir Inscrit",
+        "operationId": "voir_inscrit_api_admin_inscrits__utilisateur_id__get",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscritDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/inscrits/{utilisateur_id}/suspendre": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Suspendre Inscrit",
+        "operationId": "suspendre_inscrit_api_admin_inscrits__utilisateur_id__suspendre_post",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotifEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscritDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/inscrits/{utilisateur_id}/reactiver": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Reactiver Inscrit",
+        "operationId": "reactiver_inscrit_api_admin_inscrits__utilisateur_id__reactiver_post",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotifEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscritDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/exports/apercu": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Apercu Export",
+        "operationId": "apercu_export_api_admin_exports_apercu_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Apercu"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/exports": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Historique Exports",
+        "operationId": "historique_exports_api_admin_exports_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExportResume"
+                  },
+                  "type": "array",
+                  "title": "Response Historique Exports Api Admin Exports Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Creer Export",
+        "operationId": "creer_export_api_admin_exports_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportCree"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/exports/{export_id}/fichier": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Telecharger Export",
+        "operationId": "telecharger_export_api_admin_exports__export_id__fichier_get",
+        "parameters": [
+          {
+            "name": "export_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Export Id"
+            }
+          },
+          {
+            "name": "jeton",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "title": "Jeton"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/journal": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Journal",
+        "operationId": "journal_api_admin_journal_get",
+        "parameters": [
+          {
+            "name": "auteur",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Auteur"
+            }
+          },
+          {
+            "name": "action",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 50
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Action"
+            }
+          },
+          {
+            "name": "depuis",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Depuis"
+            }
+          },
+          {
+            "name": "avant",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Avant"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "par_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Par Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageJournal"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/activation/info": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Voir Invitation",
+        "description": "Le jeton passe dans le corps : dans l'adresse, il finirait dans les journaux d'accès du proxy.",
+        "operationId": "voir_invitation_api_activation_info_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JetonEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivationInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/activation": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Activer",
+        "operationId": "activer_api_activation_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivationEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Moi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -127,40 +1561,547 @@
   },
   "components": {
     "schemas": {
-      "ChiffresAdmin": {
-        "properties": {
-          "comptes": {
-            "$ref": "#/components/schemas/ComptesParRole"
-          }
-        },
-        "type": "object",
-        "required": [
-          "comptes"
+      "Action": {
+        "type": "string",
+        "enum": [
+          "consulter",
+          "creer",
+          "modifier",
+          "soumettre",
+          "approuver",
+          "depublier",
+          "exporter"
         ],
-        "title": "ChiffresAdmin"
+        "title": "Action"
       },
-      "ComptesParRole": {
+      "ActivationEntree": {
         "properties": {
-          "eleve": {
-            "type": "integer",
-            "title": "Eleve"
+          "jeton": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Jeton"
           },
-          "encadreur": {
-            "type": "integer",
-            "title": "Encadreur"
+          "identifiant": {
+            "type": "string",
+            "maxLength": 30,
+            "minLength": 3,
+            "title": "Identifiant"
           },
-          "admin": {
-            "type": "integer",
-            "title": "Admin"
+          "mot_de_passe": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 8,
+            "title": "Mot De Passe"
           }
         },
         "type": "object",
         "required": [
-          "eleve",
-          "encadreur",
-          "admin"
+          "jeton",
+          "identifiant",
+          "mot_de_passe"
         ],
-        "title": "ComptesParRole"
+        "title": "ActivationEntree"
+      },
+      "ActivationInfo": {
+        "properties": {
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "double_auth_requise": {
+            "type": "boolean",
+            "title": "Double Auth Requise"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prenom",
+          "email",
+          "double_auth_requise"
+        ],
+        "title": "ActivationInfo"
+      },
+      "AdminMoi": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "identifiant": {
+            "type": "string",
+            "title": "Identifiant"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "super_admin": {
+            "type": "boolean",
+            "title": "Super Admin"
+          },
+          "perimetre_dre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Perimetre Dre"
+          },
+          "droits": {
+            "items": {
+              "$ref": "#/components/schemas/Droit"
+            },
+            "type": "array",
+            "title": "Droits"
+          },
+          "double_auth_active": {
+            "type": "boolean",
+            "title": "Double Auth Active"
+          },
+          "double_auth_requise": {
+            "type": "boolean",
+            "title": "Double Auth Requise"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "identifiant",
+          "prenom",
+          "nom",
+          "email",
+          "super_admin",
+          "perimetre_dre",
+          "droits",
+          "double_auth_active",
+          "double_auth_requise"
+        ],
+        "title": "AdminMoi"
+      },
+      "Apercu": {
+        "properties": {
+          "nb_lignes": {
+            "type": "integer",
+            "title": "Nb Lignes"
+          },
+          "plafond": {
+            "type": "integer",
+            "title": "Plafond"
+          }
+        },
+        "type": "object",
+        "required": [
+          "nb_lignes",
+          "plafond"
+        ],
+        "title": "Apercu"
+      },
+      "Catalogue": {
+        "properties": {
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/ModuleCatalogue"
+            },
+            "type": "array",
+            "title": "Modules"
+          },
+          "actions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/Action"
+            },
+            "type": "object",
+            "title": "Actions"
+          },
+          "sensibles": {
+            "items": {
+              "$ref": "#/components/schemas/Droit"
+            },
+            "type": "array",
+            "title": "Sensibles"
+          },
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/RoleCatalogue"
+            },
+            "type": "array",
+            "title": "Roles"
+          },
+          "dre": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Dre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "modules",
+          "actions",
+          "sensibles",
+          "roles",
+          "dre"
+        ],
+        "title": "Catalogue"
+      },
+      "CodeEntree": {
+        "properties": {
+          "jeton": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Jeton"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "jeton",
+          "code"
+        ],
+        "title": "CodeEntree"
+      },
+      "CodeSaisi": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 6,
+            "title": "Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "title": "CodeSaisi"
+      },
+      "CodesSecours": {
+        "properties": {
+          "codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Codes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "codes"
+        ],
+        "title": "CodesSecours"
+      },
+      "CollaborateurDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "identifiant": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Identifiant"
+          },
+          "role_depart": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RoleDepart"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "perimetre_dre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Perimetre Dre"
+          },
+          "super_admin": {
+            "type": "boolean",
+            "title": "Super Admin"
+          },
+          "statut": {
+            "type": "string",
+            "enum": [
+              "invitation_envoyee",
+              "invitation_expiree",
+              "actif",
+              "suspendu",
+              "revoque"
+            ],
+            "title": "Statut"
+          },
+          "fin_acces": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fin Acces"
+          },
+          "double_auth_active": {
+            "type": "boolean",
+            "title": "Double Auth Active"
+          },
+          "nb_droits_sensibles": {
+            "type": "integer",
+            "title": "Nb Droits Sensibles"
+          },
+          "revu_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revu Le"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          },
+          "droits": {
+            "items": {
+              "$ref": "#/components/schemas/Droit"
+            },
+            "type": "array",
+            "title": "Droits"
+          },
+          "invitation_expire_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invitation Expire Le"
+          },
+          "invitation_envoi": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invitation Envoi"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "prenom",
+          "nom",
+          "identifiant",
+          "role_depart",
+          "perimetre_dre",
+          "super_admin",
+          "statut",
+          "fin_acces",
+          "double_auth_active",
+          "nb_droits_sensibles",
+          "revu_le",
+          "cree_le",
+          "droits",
+          "invitation_expire_le",
+          "invitation_envoi"
+        ],
+        "title": "CollaborateurDetail"
+      },
+      "CollaborateurResume": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "identifiant": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Identifiant"
+          },
+          "role_depart": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RoleDepart"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "perimetre_dre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Perimetre Dre"
+          },
+          "super_admin": {
+            "type": "boolean",
+            "title": "Super Admin"
+          },
+          "statut": {
+            "type": "string",
+            "enum": [
+              "invitation_envoyee",
+              "invitation_expiree",
+              "actif",
+              "suspendu",
+              "revoque"
+            ],
+            "title": "Statut"
+          },
+          "fin_acces": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fin Acces"
+          },
+          "double_auth_active": {
+            "type": "boolean",
+            "title": "Double Auth Active"
+          },
+          "nb_droits_sensibles": {
+            "type": "integer",
+            "title": "Nb Droits Sensibles"
+          },
+          "revu_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revu Le"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "prenom",
+          "nom",
+          "identifiant",
+          "role_depart",
+          "perimetre_dre",
+          "super_admin",
+          "statut",
+          "fin_acces",
+          "double_auth_active",
+          "nb_droits_sensibles",
+          "revu_le",
+          "cree_le"
+        ],
+        "title": "CollaborateurResume"
       },
       "ConnexionEntree": {
         "properties": {
@@ -184,6 +2125,430 @@
         ],
         "title": "ConnexionEntree"
       },
+      "Droit": {
+        "properties": {
+          "module": {
+            "type": "string",
+            "title": "Module"
+          },
+          "action": {
+            "$ref": "#/components/schemas/Action"
+          }
+        },
+        "type": "object",
+        "required": [
+          "module",
+          "action"
+        ],
+        "title": "Droit"
+      },
+      "DroitsEntree": {
+        "properties": {
+          "droits": {
+            "items": {
+              "$ref": "#/components/schemas/Droit"
+            },
+            "type": "array",
+            "title": "Droits"
+          },
+          "perimetre_dre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Perimetre Dre"
+          },
+          "fin_acces": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fin Acces"
+          },
+          "motif": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Motif"
+          }
+        },
+        "type": "object",
+        "required": [
+          "droits",
+          "motif"
+        ],
+        "title": "DroitsEntree"
+      },
+      "Enrolement": {
+        "properties": {
+          "secret": {
+            "type": "string",
+            "title": "Secret"
+          },
+          "qr_svg": {
+            "type": "string",
+            "title": "Qr Svg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "secret",
+          "qr_svg"
+        ],
+        "title": "Enrolement"
+      },
+      "EtapeCode": {
+        "properties": {
+          "etape": {
+            "type": "string",
+            "const": "code",
+            "title": "Etape",
+            "default": "code"
+          },
+          "jeton": {
+            "type": "string",
+            "title": "Jeton"
+          }
+        },
+        "type": "object",
+        "required": [
+          "jeton"
+        ],
+        "title": "EtapeCode",
+        "description": "Mot de passe juste, double authentification active : le code est demandé avant d'ouvrir la session."
+      },
+      "EvenementJournal": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "quand": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Quand"
+          },
+          "auteur_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auteur Id"
+          },
+          "auteur_libelle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auteur Libelle"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "cible_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cible Type"
+          },
+          "cible_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cible Id"
+          },
+          "perimetre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Perimetre"
+          },
+          "details": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Details"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "quand",
+          "auteur_id",
+          "auteur_libelle",
+          "action",
+          "cible_type",
+          "cible_id",
+          "perimetre",
+          "details"
+        ],
+        "title": "EvenementJournal"
+      },
+      "ExportCree": {
+        "properties": {
+          "export": {
+            "$ref": "#/components/schemas/ExportResume"
+          },
+          "lien": {
+            "type": "string",
+            "title": "Lien"
+          }
+        },
+        "type": "object",
+        "required": [
+          "export",
+          "lien"
+        ],
+        "title": "ExportCree"
+      },
+      "ExportEntree": {
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/TypeExport"
+          },
+          "format": {
+            "$ref": "#/components/schemas/FormatExport"
+          },
+          "filtres": {
+            "$ref": "#/components/schemas/FiltresInscrits",
+            "default": {}
+          },
+          "colonnes": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "identifiant",
+                "nom",
+                "prenom",
+                "email",
+                "telephone",
+                "profil",
+                "statut",
+                "date_inscription",
+                "consentement"
+              ]
+            },
+            "type": "array",
+            "title": "Colonnes",
+            "default": []
+          },
+          "finalite": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finalite"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "format"
+        ],
+        "title": "ExportEntree"
+      },
+      "ExportResume": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeExport"
+          },
+          "format": {
+            "$ref": "#/components/schemas/FormatExport"
+          },
+          "filtres": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Filtres"
+          },
+          "colonnes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Colonnes"
+          },
+          "finalite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finalite"
+          },
+          "nb_lignes": {
+            "type": "integer",
+            "title": "Nb Lignes"
+          },
+          "statut": {
+            "$ref": "#/components/schemas/StatutExport"
+          },
+          "demandeur_libelle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Demandeur Libelle"
+          },
+          "lien_expire_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Lien Expire Le"
+          },
+          "telecharge_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telecharge Le"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "format",
+          "filtres",
+          "colonnes",
+          "finalite",
+          "nb_lignes",
+          "statut",
+          "lien_expire_le",
+          "telecharge_le",
+          "cree_le"
+        ],
+        "title": "ExportResume"
+      },
+      "FiltresInscrits": {
+        "properties": {
+          "recherche": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recherche"
+          },
+          "profil": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Role"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "statut": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StatutCompte"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "inscrit_depuis": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inscrit Depuis"
+          },
+          "inscrit_avant": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inscrit Avant"
+          }
+        },
+        "type": "object",
+        "title": "FiltresInscrits"
+      },
+      "FormatExport": {
+        "type": "string",
+        "enum": [
+          "csv",
+          "xlsx"
+        ],
+        "title": "FormatExport"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -196,6 +2561,354 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "Indicateur": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "valeur": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valeur"
+          },
+          "disponible_avec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Disponible Avec"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "libelle",
+          "valeur"
+        ],
+        "title": "Indicateur"
+      },
+      "Inscrit": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "identifiant": {
+            "type": "string",
+            "title": "Identifiant"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "telephone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telephone"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "statut": {
+            "$ref": "#/components/schemas/StatutCompte"
+          },
+          "consentement_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consentement Le"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "identifiant",
+          "prenom",
+          "nom",
+          "email",
+          "telephone",
+          "role",
+          "statut",
+          "consentement_le",
+          "cree_le"
+        ],
+        "title": "Inscrit"
+      },
+      "InscritDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "identifiant": {
+            "type": "string",
+            "title": "Identifiant"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "telephone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telephone"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "statut": {
+            "$ref": "#/components/schemas/StatutCompte"
+          },
+          "consentement_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consentement Le"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          },
+          "historique": {
+            "items": {
+              "$ref": "#/components/schemas/EvenementJournal"
+            },
+            "type": "array",
+            "title": "Historique"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "identifiant",
+          "prenom",
+          "nom",
+          "email",
+          "telephone",
+          "role",
+          "statut",
+          "consentement_le",
+          "cree_le",
+          "historique"
+        ],
+        "title": "InscritDetail"
+      },
+      "InvitationCree": {
+        "properties": {
+          "collaborateur": {
+            "$ref": "#/components/schemas/CollaborateurDetail"
+          },
+          "lien_de_test": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lien De Test"
+          }
+        },
+        "type": "object",
+        "required": [
+          "collaborateur"
+        ],
+        "title": "InvitationCree"
+      },
+      "InvitationEntree": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "minLength": 3,
+            "title": "Email"
+          },
+          "prenom": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Nom"
+          },
+          "role_depart": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RoleDepart"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "perimetre_dre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Perimetre Dre"
+          },
+          "fin_acces": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fin Acces"
+          },
+          "droits": {
+            "items": {
+              "$ref": "#/components/schemas/Droit"
+            },
+            "type": "array",
+            "title": "Droits",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "prenom",
+          "nom"
+        ],
+        "title": "InvitationEntree"
+      },
+      "JetonEntree": {
+        "properties": {
+          "jeton": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Jeton"
+          }
+        },
+        "type": "object",
+        "required": [
+          "jeton"
+        ],
+        "title": "JetonEntree"
+      },
+      "ModuleCatalogue": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "disponible": {
+            "type": "boolean",
+            "title": "Disponible"
+          },
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/Action"
+            },
+            "type": "array",
+            "title": "Actions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "libelle",
+          "disponible",
+          "actions"
+        ],
+        "title": "ModuleCatalogue"
       },
       "Moi": {
         "properties": {
@@ -230,6 +2943,83 @@
         ],
         "title": "Moi"
       },
+      "MotifEntree": {
+        "properties": {
+          "motif": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Motif"
+          }
+        },
+        "type": "object",
+        "required": [
+          "motif"
+        ],
+        "title": "MotifEntree"
+      },
+      "PageInscrits": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "inscrits": {
+            "items": {
+              "$ref": "#/components/schemas/Inscrit"
+            },
+            "type": "array",
+            "title": "Inscrits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "page",
+          "par_page",
+          "inscrits"
+        ],
+        "title": "PageInscrits"
+      },
+      "PageJournal": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "evenements": {
+            "items": {
+              "$ref": "#/components/schemas/EvenementJournal"
+            },
+            "type": "array",
+            "title": "Evenements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "page",
+          "par_page",
+          "evenements"
+        ],
+        "title": "PageJournal"
+      },
       "Role": {
         "type": "string",
         "enum": [
@@ -238,6 +3028,148 @@
           "admin"
         ],
         "title": "Role"
+      },
+      "RoleCatalogue": {
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/RoleDepart"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "droits": {
+            "items": {
+              "$ref": "#/components/schemas/Droit"
+            },
+            "type": "array",
+            "title": "Droits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "libelle",
+          "droits"
+        ],
+        "title": "RoleCatalogue"
+      },
+      "RoleDepart": {
+        "type": "string",
+        "enum": [
+          "admin_national",
+          "moderateur",
+          "gestionnaire_contenus",
+          "gestionnaire_pedagogique",
+          "gestionnaire_clubs",
+          "gestionnaire_agenda",
+          "analyste"
+        ],
+        "title": "RoleDepart"
+      },
+      "StatutCompte": {
+        "type": "string",
+        "enum": [
+          "actif",
+          "suspendu",
+          "revoque"
+        ],
+        "title": "StatutCompte"
+      },
+      "StatutExport": {
+        "type": "string",
+        "enum": [
+          "pret",
+          "telecharge",
+          "expire",
+          "echec"
+        ],
+        "title": "StatutExport"
+      },
+      "TableauDeBord": {
+        "properties": {
+          "calcule_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Calcule Le"
+          },
+          "comptes_par_profil": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/Role"
+            },
+            "type": "object",
+            "title": "Comptes Par Profil"
+          },
+          "comptes_par_statut": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/StatutCompte"
+            },
+            "type": "object",
+            "title": "Comptes Par Statut"
+          },
+          "inscriptions_30_jours": {
+            "items": {
+              "prefixItems": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array",
+              "maxItems": 2,
+              "minItems": 2
+            },
+            "type": "array",
+            "title": "Inscriptions 30 Jours"
+          },
+          "indicateurs": {
+            "items": {
+              "$ref": "#/components/schemas/Indicateur"
+            },
+            "type": "array",
+            "title": "Indicateurs"
+          },
+          "derniers_evenements": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/EvenementJournal"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Derniers Evenements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "calcule_le",
+          "comptes_par_profil",
+          "comptes_par_statut",
+          "inscriptions_30_jours",
+          "indicateurs",
+          "derniers_evenements"
+        ],
+        "title": "TableauDeBord"
+      },
+      "TypeExport": {
+        "type": "string",
+        "enum": [
+          "agrege",
+          "nominatif"
+        ],
+        "title": "TypeExport"
       },
       "ValidationError": {
         "properties": {

@@ -47,6 +47,9 @@ export default defineConfig(({ command }) => ({
     host: "::",
     port: 3000,
     // Le navigateur voit l'API sur le domaine du site, comme en production (ADR-0006).
-    proxy: { "/api": { target: "http://127.0.0.1:8000", xfwd: true } },
+    // Même adresse que le rendu serveur (API_URL_INTERNE), pour qu'un autre port local reste cohérent.
+    proxy: {
+      "/api": { target: process.env["API_URL_INTERNE"] || "http://127.0.0.1:8000", xfwd: true },
+    },
   },
 }));

@@ -105,3 +105,109 @@ def creer_utilisateur(en_base: Callable[..., Any]) -> Callable[..., Utilisateur]
         return en_base(inserer)
 
     return creer
+
+
+# Espace administrateur (spec 015) ----------------------------------------------------------------------------
+
+SECRET_TOTP = "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP"
+
+
+@pytest.fixture
+def creer_collaborateur(
+    en_base: Callable[..., Any], creer_utilisateur: Callable[..., Utilisateur]
+) -> Callable[..., Any]:
+    """Un compte admin et son profil de collaborateur. `double_auth=True` active une double authentification
+    dont le secret est SECRET_TOTP."""
+    from app.admin.models import Collaborateur, DoubleAuth, Permission
+    from app.config import settings
+
+    def creer(
+        identifiant: str = "chef",
+        email: str | None = None,
+        *,
+        super_admin: bool = False,
+        droits: set[tuple[str, str]] | None = None,
+        perimetre_dre: str | None = None,
+        fin_acces: Any = None,
+        double_auth: bool = False,
+    ) -> Utilisateur:
+        utilisateur = creer_utilisateur(identifiant, Role.admin, email=email or f"{identifiant}@aimes.tg")
+
+        async def inserer(db: AsyncSession) -> None:
+            collaborateur = Collaborateur(
+                utilisateur_id=utilisateur.id,
+                email=utilisateur.email,
+                prenom=utilisateur.prenom,
+                nom=utilisateur.nom,
+                super_admin=super_admin,
+                perimetre_dre=perimetre_dre,
+                fin_acces=fin_acces,
+            )
+            db.add(collaborateur)
+            await db.flush()
+            for module, action in droits or set():
+                db.add(Permission(collaborateur_id=collaborateur.id, module=module, action=action))
+            if double_auth:
+                from datetime import UTC, datetime
+
+                db.add(
+                    DoubleAuth(
+                        utilisateur_id=utilisateur.id,
+                        secret_chiffre=settings.fernet().encrypt(SECRET_TOTP.encode()).decode(),
+                        active_le=datetime.now(UTC),
+                    )
+                )
+
+        en_base(inserer)
+        return utilisateur
+
+    return creer
+
+
+def code_totp(decalage: int = 0) -> str:
+    import time
+
+    import pyotp
+
+    return pyotp.TOTP(SECRET_TOTP).at(time.time() + decalage * 30)
+
+
+def connecter_admin(client: TestClient, identifiant: str = "chef") -> Any:
+    """Connexion complète : mot de passe, puis code si la double authentification est active."""
+    reponse = client.post("/api/comptes/connexion", json={"identifiant": identifiant, "mot_de_passe": MOT_DE_PASSE})
+    corps = reponse.json()
+    if reponse.status_code == 200 and corps.get("etape") == "code":
+        reponse = client.post("/api/comptes/connexion/code", json={"jeton": corps["jeton"], "code": code_totp()})
+    return reponse
+
+
+class Navigateur:
+    """Un second navigateur : le même client de test (la même boucle d'événements que la base), avec ses propres
+    cookies. Deux TestClient distincts se partageraient mal les connexions de l'API."""
+
+    def __init__(self, client: TestClient) -> None:
+        self.client = client
+        self.cookies: list[Any] = []
+
+    def request(self, methode: str, url: str, **options: Any) -> Any:
+        pot = self.client.cookies.jar
+        ceux_du_client = list(pot)
+        pot.clear()
+        for cookie in self.cookies:
+            pot.set_cookie(cookie)
+        try:
+            return self.client.request(methode, url, **options)
+        finally:
+            self.cookies = list(pot)
+            pot.clear()
+            for cookie in ceux_du_client:
+                pot.set_cookie(cookie)
+
+    def get(self, url: str, **options: Any) -> Any:
+        return self.request("GET", url, **options)
+
+    def post(self, url: str, **options: Any) -> Any:
+        return self.request("POST", url, **options)
+
+    def put(self, url: str, **options: Any) -> Any:
+        return self.request("PUT", url, **options)
