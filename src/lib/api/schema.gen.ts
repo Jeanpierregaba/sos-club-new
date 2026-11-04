@@ -72,6 +72,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/comptes/mot-de-passe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Changer Mon Mot De Passe */
+        post: operations["changer_mon_mot_de_passe_api_comptes_mot_de_passe_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/moi": {
         parameters: {
             query?: never;
@@ -416,6 +433,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/inscrits/{utilisateur_id}/pseudonyme": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Imposer Pseudonyme */
+        post: operations["imposer_pseudonyme_api_admin_inscrits__utilisateur_id__pseudonyme_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/inscrits/{utilisateur_id}/mot-de-passe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reinitialiser Mot De Passe */
+        post: operations["reinitialiser_mot_de_passe_api_admin_inscrits__utilisateur_id__mot_de_passe_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/exports/apercu": {
         parameters: {
             query?: never;
@@ -697,6 +748,23 @@ export interface paths {
         patch: operations["admin_modifier_etablissement_api_admin_referentiel_etablissements__etablissement_id__patch"];
         trace?: never;
     };
+    "/api/admin/referentiel/etablissements/{etablissement_id}/remplacer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admin Remplacer Proposition */
+        post: operations["admin_remplacer_proposition_api_admin_referentiel_etablissements__etablissement_id__remplacer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/referentiel/axes": {
         parameters: {
             query?: never;
@@ -730,6 +798,111 @@ export interface paths {
         head?: never;
         /** Admin Modifier Axe */
         patch: operations["admin_modifier_axe_api_admin_referentiel_axes__code__patch"];
+        trace?: never;
+    };
+    "/api/admin/points/semestres": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister Semestres */
+        get: operations["lister_semestres_api_admin_points_semestres_get"];
+        put?: never;
+        /** Creer Semestre */
+        post: operations["creer_semestre_api_admin_points_semestres_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/points/semestres/{semestre_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Modifier Semestre */
+        patch: operations["modifier_semestre_api_admin_points_semestres__semestre_id__patch"];
+        trace?: never;
+    };
+    "/api/admin/points/bareme": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister Bareme */
+        get: operations["lister_bareme_api_admin_points_bareme_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/points/bareme/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Modifier Bareme */
+        patch: operations["modifier_bareme_api_admin_points_bareme__code__patch"];
+        trace?: never;
+    };
+    "/api/eleves/inscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Etat Inscription */
+        get: operations["etat_inscription_api_eleves_inscription_get"];
+        put?: never;
+        /** Inscription */
+        post: operations["inscription_api_eleves_inscription_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/eleves/moi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mon Espace */
+        get: operations["mon_espace_api_eleves_moi_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Modifier Mon Profil */
+        patch: operations["modifier_mon_profil_api_eleves_moi_patch"];
         trace?: never;
     };
     "/health": {
@@ -857,6 +1030,11 @@ export interface components {
             /** Description */
             description: string;
         };
+        /**
+         * Beneficiaire
+         * @enum {string}
+         */
+        Beneficiaire: "eleve" | "encadreur" | "club";
         /** Catalogue */
         Catalogue: {
             /** Modules */
@@ -876,6 +1054,11 @@ export interface components {
             /** Dre Actives */
             dre_actives: string[];
         };
+        /**
+         * Classe
+         * @enum {string}
+         */
+        Classe: "6e" | "5e" | "4e" | "3e" | "2nde" | "1re" | "tle";
         /** CodeEntree */
         CodeEntree: {
             /** Jeton */
@@ -1080,6 +1263,18 @@ export interface components {
             /** Qr Svg */
             qr_svg: string;
         };
+        /** EspaceEleve */
+        EspaceEleve: {
+            /** Pseudonyme */
+            pseudonyme: string;
+            classe: components["schemas"]["Classe"];
+            /** Email */
+            email: string | null;
+            etablissement: components["schemas"]["EtablissementEleve"];
+            /** Version */
+            version: number;
+            points: components["schemas"]["PointsEleve"];
+        };
         /** EtablissementAdmin */
         EtablissementAdmin: {
             /**
@@ -1111,6 +1306,8 @@ export interface components {
              * Format: date-time
              */
             modifie_le: string;
+            /** Nb Eleves */
+            nb_eleves: number;
         };
         /** EtablissementCreation */
         EtablissementCreation: {
@@ -1124,6 +1321,23 @@ export interface components {
             type: components["schemas"]["TypeEtablissement"];
             /** Localite */
             localite?: string | null;
+        };
+        /** EtablissementEleve */
+        EtablissementEleve: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            statut: components["schemas"]["StatutEtablissement"];
+            /** Iesg */
+            iesg: string;
+            /** Dre Code */
+            dre_code: string;
+            /** Dre */
+            dre: string;
         };
         /** EtablissementModification */
         EtablissementModification: {
@@ -1188,6 +1402,13 @@ export interface components {
             etape: "code";
             /** Jeton */
             jeton: string;
+        };
+        /** EtatInscription */
+        EtatInscription: {
+            /** Ouvertes */
+            ouvertes: boolean;
+            /** Version Charte */
+            version_charte: string;
         };
         /** EvenementJournal */
         EvenementJournal: {
@@ -1377,6 +1598,35 @@ export interface components {
             /** Disponible Avec */
             disponible_avec?: string | null;
         };
+        /** InscriptionEntree */
+        InscriptionEntree: {
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            /** Pseudonyme */
+            pseudonyme: string;
+            /** Identifiant */
+            identifiant: string;
+            /** Mot De Passe */
+            mot_de_passe: string;
+            /** Email */
+            email?: string | null;
+            classe: components["schemas"]["Classe"];
+            /**
+             * Charte
+             * @constant
+             */
+            charte: true;
+            /**
+             * Consentement Parent
+             * @constant
+             */
+            consentement_parent: true;
+            /** Etablissement Id */
+            etablissement_id?: string | null;
+            proposition?: components["schemas"]["Proposition"] | null;
+        };
         /** Inscrit */
         Inscrit: {
             /**
@@ -1432,6 +1682,7 @@ export interface components {
             cree_le: string;
             /** Historique */
             historique: components["schemas"]["EvenementJournal"][];
+            eleve?: components["schemas"]["ProfilEleveAdmin"] | null;
         };
         /** InvitationCree */
         InvitationCree: {
@@ -1463,6 +1714,49 @@ export interface components {
             /** Jeton */
             jeton: string;
         };
+        /** LigneBaremeAdmin */
+        LigneBaremeAdmin: {
+            /** Code */
+            code: string;
+            beneficiaire: components["schemas"]["Beneficiaire"];
+            /** Libelle */
+            libelle: string;
+            /** Montant */
+            montant: number;
+            /** Propose */
+            propose: boolean;
+            /** En Service */
+            en_service: boolean;
+            /** Actif */
+            actif: boolean;
+            /** Version */
+            version: number;
+        };
+        /** LigneBaremeModification */
+        LigneBaremeModification: {
+            /** Version */
+            version: number;
+            /** Montant */
+            montant?: number | null;
+            /** Propose */
+            propose?: boolean | null;
+            /** Actif */
+            actif?: boolean | null;
+        };
+        /** LignePoints */
+        LignePoints: {
+            /** Libelle */
+            libelle: string;
+            /** Montant */
+            montant: number;
+            /**
+             * Cree Le
+             * Format: date-time
+             */
+            cree_le: string;
+            /** Semestre */
+            semestre: string | null;
+        };
         /** ModuleCatalogue */
         ModuleCatalogue: {
             /** Id */
@@ -1488,6 +1782,18 @@ export interface components {
             /** Nom */
             nom: string;
             role: components["schemas"]["Role"];
+        };
+        /** MotDePasseEntree */
+        MotDePasseEntree: {
+            /** Actuel */
+            actuel: string;
+            /** Nouveau */
+            nouveau: string;
+        };
+        /** MotDePasseProvisoire */
+        MotDePasseProvisoire: {
+            /** Mot De Passe */
+            mot_de_passe: string;
         };
         /** MotifEntree */
         MotifEntree: {
@@ -1527,6 +1833,69 @@ export interface components {
             /** Evenements */
             evenements: components["schemas"]["EvenementJournal"][];
         };
+        /** PointsEleve */
+        PointsEleve: {
+            semestre: components["schemas"]["SemestreEleve"] | null;
+            /** Points Semestre */
+            points_semestre: number;
+            /** Total */
+            total: number;
+            /** Lignes */
+            lignes: components["schemas"]["LignePoints"][];
+        };
+        /** ProfilEleveAdmin */
+        ProfilEleveAdmin: {
+            /** Pseudonyme */
+            pseudonyme: string;
+            classe: components["schemas"]["Classe"];
+            /** Charte Version */
+            charte_version: string;
+            etablissement: components["schemas"]["EtablissementEleve"];
+            points: components["schemas"]["PointsEleve"];
+        };
+        /** ProfilModification */
+        ProfilModification: {
+            /** Version */
+            version: number;
+            classe?: components["schemas"]["Classe"] | null;
+            /** Etablissement Id */
+            etablissement_id?: string | null;
+            /** Email */
+            email?: string | null;
+        };
+        /**
+         * Proposition
+         * @description Un établissement absent du référentiel : créé « proposé », invisible du public, validé par l'admin.
+         */
+        Proposition: {
+            /**
+             * Iesg Id
+             * Format: uuid
+             */
+            iesg_id: string;
+            /** Nom */
+            nom: string;
+        };
+        /** PseudonymeEntree */
+        PseudonymeEntree: {
+            /** Pseudonyme */
+            pseudonyme: string;
+            /** Motif */
+            motif: string;
+        };
+        /**
+         * Remplacement
+         * @description Remplace un établissement proposé par un établissement existant : ses élèves y sont rattachés (spec 017).
+         */
+        Remplacement: {
+            /** Version */
+            version: number;
+            /**
+             * Cible Id
+             * Format: uuid
+             */
+            cible_id: string;
+        };
         /**
          * Role
          * @enum {string}
@@ -1545,6 +1914,74 @@ export interface components {
          * @enum {string}
          */
         RoleDepart: "admin_national" | "moderateur" | "gestionnaire_contenus" | "gestionnaire_pedagogique" | "gestionnaire_clubs" | "gestionnaire_agenda" | "analyste";
+        /** SemestreAdmin */
+        SemestreAdmin: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Libelle */
+            libelle: string;
+            /**
+             * Debut
+             * Format: date
+             */
+            debut: string;
+            /**
+             * Fin
+             * Format: date
+             */
+            fin: string;
+            /**
+             * Etat
+             * @enum {string}
+             */
+            etat: "a_venir" | "en_cours" | "termine";
+            /** Version */
+            version: number;
+        };
+        /** SemestreCreation */
+        SemestreCreation: {
+            /** Libelle */
+            libelle: string;
+            /**
+             * Debut
+             * Format: date
+             */
+            debut: string;
+            /**
+             * Fin
+             * Format: date
+             */
+            fin: string;
+        };
+        /** SemestreEleve */
+        SemestreEleve: {
+            /** Libelle */
+            libelle: string;
+            /**
+             * Debut
+             * Format: date
+             */
+            debut: string;
+            /**
+             * Fin
+             * Format: date
+             */
+            fin: string;
+        };
+        /** SemestreModification */
+        SemestreModification: {
+            /** Version */
+            version: number;
+            /** Libelle */
+            libelle?: string | null;
+            /** Debut */
+            debut?: string | null;
+            /** Fin */
+            fin?: string | null;
+        };
         /**
          * StatutCompte
          * @enum {string}
@@ -1582,6 +2019,8 @@ export interface components {
             ][];
             /** Indicateurs */
             indicateurs: components["schemas"]["Indicateur"][];
+            /** Semestre En Cours */
+            semestre_en_cours: string | null;
             /** Derniers Evenements */
             derniers_evenements: components["schemas"]["EvenementJournal"][] | null;
         };
@@ -1717,6 +2156,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Moi"];
+                };
+            };
+        };
+    };
+    changer_mon_mot_de_passe_api_comptes_mot_de_passe_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotDePasseEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -2375,6 +2845,76 @@ export interface operations {
             };
         };
     };
+    imposer_pseudonyme_api_admin_inscrits__utilisateur_id__pseudonyme_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PseudonymeEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InscritDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reinitialiser_mot_de_passe_api_admin_inscrits__utilisateur_id__mot_de_passe_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MotDePasseProvisoire"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     apercu_export_api_admin_exports_apercu_post: {
         parameters: {
             query?: never;
@@ -2950,6 +3490,41 @@ export interface operations {
             };
         };
     };
+    admin_remplacer_proposition_api_admin_referentiel_etablissements__etablissement_id__remplacer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                etablissement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Remplacement"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtablissementAdmin"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     admin_lister_axes_api_admin_referentiel_axes_get: {
         parameters: {
             query?: never;
@@ -3025,6 +3600,255 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AxeAdmin"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lister_semestres_api_admin_points_semestres_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SemestreAdmin"][];
+                };
+            };
+        };
+    };
+    creer_semestre_api_admin_points_semestres_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SemestreCreation"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SemestreAdmin"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modifier_semestre_api_admin_points_semestres__semestre_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                semestre_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SemestreModification"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SemestreAdmin"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lister_bareme_api_admin_points_bareme_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LigneBaremeAdmin"][];
+                };
+            };
+        };
+    };
+    modifier_bareme_api_admin_points_bareme__code__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LigneBaremeModification"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LigneBaremeAdmin"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    etat_inscription_api_eleves_inscription_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatInscription"];
+                };
+            };
+        };
+    };
+    inscription_api_eleves_inscription_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InscriptionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Moi"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mon_espace_api_eleves_moi_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EspaceEleve"];
+                };
+            };
+        };
+    };
+    modifier_mon_profil_api_eleves_moi_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfilModification"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EspaceEleve"];
                 };
             };
             /** @description Validation Error */

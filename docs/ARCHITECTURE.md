@@ -22,6 +22,8 @@ Noms métier en français, sans accent (voir AGENTS.md). Identifiants en UUID, d
 ```mermaid
 erDiagram
   utilisateur ||--o{ session : ouvre
+  utilisateur ||--o| eleve : "profil (spec 017)"
+  etablissement ||--o{ eleve : scolarise
   utilisateur ||--o| adhesion : "élève, adhésion active"
   club ||--o{ adhesion : regroupe
   utilisateur ||--o{ encadrement : "encadreur"
@@ -46,6 +48,8 @@ erDiagram
   tentative ||--o{ reponse : contient
   utilisateur ||--o{ mouvement_points : "gagne (élève, encadreur)"
   club ||--o{ mouvement_points : gagne
+  bareme ||--o{ mouvement_points : "fixe le montant"
+  semestre ||--o{ mouvement_points : "classe"
   badge ||--o{ badge_attribue : "attribué via"
   utilisateur ||--o{ badge_attribue : recoit
   utilisateur ||--o{ notification : recoit
@@ -78,9 +82,20 @@ Champs structurants :
   `fichier`, `couverture`, `publie_le`.
 - `tentative` : `quiz_id`, `eleve_id`, `commencee_le`, `terminee_le`, `score`, `reussie`.
   `reponse` : `question_id`, `choix_id`, `envoyee_le`, `repondue_le`.
-- `mouvement_points` : `utilisateur_id` ou `club_id` (exactement un), `points` (positif ou négatif),
-  `motif`, `source_type`, `source_id`, `cle_idempotence` unique, `cree_le`. Jamais modifié ni supprimé
-  (ADR-0004).
+- `eleve` (spec 017) : le profil d'un compte élève, lié un à un à `utilisateur`. `pseudonyme` (seule
+  identité publique, Q20) et `pseudonyme_normalise` unique (sans accents, majuscules, espaces ni
+  ponctuation), `classe`, `etablissement_id`, `charte_version`. Le prénom et le nom restent dans
+  `utilisateur` et ne sortent pas de l'espace admin.
+- `mouvement_points` (spec 017, ADR-0004) : `utilisateur_id` (R4 ajoutera `club_id`), `action` (code du
+  barème), `montant` copié du barème au moment du gain, `semestre_id` (nul hors semestre), `cle` unique
+  d'idempotence, `valide_par`, `annule_id` (une annulation est une ligne négative), `cree_le`. Jamais
+  modifié ni supprimé. Seule la fonction `points.service.crediter` y écrit.
+- `bareme` (spec 017) : une ligne par action et par bénéficiaire (`eleve.bienvenue`, `club.quiz_eleve`…),
+  `montant` réglable, `propose` (montant à valider, Q22), `en_service` (une spec livrée l'écrit déjà),
+  `actif`. Préremplie avec la grille du PRD.
+- `semestre` (spec 017) : `libelle`, `debut`, `fin` (dates de Lomé, UTC+0). Une contrainte d'exclusion
+  interdit deux semestres qui se chevauchent ; un semestre commencé ne se modifie plus, sauf pour
+  prolonger un semestre en cours.
 
 Le référentiel (`dre`, `iesg`, `etablissement`, `axe`) est chargé par la migration `referentiel` depuis
 `backend/alembic/donnees/annuaire.json`, puis géré depuis `/admin/referentiel`. Le site lit ses listes
@@ -102,7 +117,7 @@ flowchart LR
 - **Site** : rendu serveur pour les pages publiques (référencement, affichage rapide sur réseau lent).
   Il n'a aucune logique métier et n'accède jamais à la base (ADR-0002).
 - **API** : seule détentrice des données et des règles. Chaque domaine vit dans son dossier sous
-  `backend/app/` (`comptes/`, `admin/`, `referentiel/`, `clubs/`, `articles/`, `agenda/`, `mediatheque/`, `quiz/`, `points/`),
+  `backend/app/` (`comptes/`, `admin/`, `referentiel/`, `eleves/`, `points/`, `clubs/`, `articles/`, `agenda/`, `mediatheque/`, `quiz/`),
   avec `router.py` (HTTP), `schemas.py` (Pydantic), `models.py` (SQLAlchemy) et `service.py` (règles).
 - **Types partagés** : `backend/openapi.json` est versionné, et `npm run api:types` en génère les types
   TypeScript avec `openapi-typescript`. La CI vérifie que les deux restent à jour.

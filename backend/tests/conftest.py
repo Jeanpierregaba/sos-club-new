@@ -21,6 +21,7 @@ from app.comptes.models import Role, Utilisateur
 from app.comptes.motdepasse import hacher
 from app.db import Base
 from app.main import app
+from app.points import bareme
 from app.referentiel.chargement import charger
 
 MOT_DE_PASSE = "mot-de-passe-de-test"
@@ -53,6 +54,8 @@ async def _vider_tables() -> None:
         await connexion.execute(text(f"TRUNCATE {tables} CASCADE"))
         # Les DRE, IESG et axes de l'annuaire : les périmètres des collaborateurs en ont besoin (spec 016).
         await connexion.run_sync(lambda c: charger(c, etablissements=False))
+        # Le barème initial (spec 017) : chaque gain de points y lit son montant.
+        await connexion.run_sync(bareme.charger)
 
 
 async def _charger_annuaire() -> None:

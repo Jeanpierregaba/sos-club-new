@@ -32,6 +32,7 @@ from app.referentiel.schemas import (
     IesgCreation,
     IesgModification,
     PageEtablissements,
+    Remplacement,
 )
 
 Base = Annotated[AsyncSession, Depends(get_session)]
@@ -164,6 +165,14 @@ async def admin_modifier_etablissement(
 ) -> EtablissementAdmin:
     async with _traduire_refus(db, request, acces, "clubs:modifier"):
         return await administration.modifier_etablissement(db, acces, etablissement_id, entree, adresse_ip(request))
+
+
+@router_admin.post("/etablissements/{etablissement_id}/remplacer")
+async def admin_remplacer_proposition(
+    etablissement_id: UUID, entree: Remplacement, request: Request, acces: Modificateur, db: Base
+) -> EtablissementAdmin:
+    async with _traduire_refus(db, request, acces, "clubs:modifier"):
+        return await administration.remplacer_proposition(db, acces, etablissement_id, entree, adresse_ip(request))
 
 
 @router_admin.get("/axes")

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, Pencil, Plus, Search } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Pencil, Plus, Replace, Search } from "lucide-react";
 import { useState } from "react";
 
 import {
@@ -8,6 +8,7 @@ import {
   Champ,
   DialogueFormulaire,
 } from "@/components/admin/DialogueFormulaire";
+import { ChoixEtablissement, type EtablissementChoisi } from "@/components/ChoixEtablissement";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Button } from "@/components/ui/button";
 import { peut } from "@/lib/admin";
@@ -16,6 +17,8 @@ import {
   adminListerDre,
   adminListerEtablissements,
   adminModifierEtablissement,
+  adminRemplacerEtablissement,
+  ErreurApi,
   type DreAdmin,
   type EtablissementAdmin,
   type StatutEtablissement,
@@ -78,6 +81,10 @@ function Etablissements() {
     naviguer({ search: (avant) => ({ ...avant, ...changement, page: undefined }) });
   const pages = Math.max(1, Math.ceil(page.total / page.par_page));
   const [edition, setEdition] = useState<EtablissementAdmin | "nouveau" | null>(null);
+  const [proposition, setProposition] = useState<{
+    action: "accepter" | "remplacer";
+    etablissement: EtablissementAdmin;
+  } | null>(null);
   const iesgDeLaDre = dres.find((d) => d.code === filtres.dre)?.iesg ?? dres.flatMap((d) => d.iesg);
 
   return (
@@ -194,6 +201,9 @@ function Etablissements() {
               <th scope="col" className="px-4 py-3">
                 Localité
               </th>
+              <th scope="col" className="px-4 py-3 text-right">
+                Élèves
+              </th>
               <th scope="col" className="px-4 py-3">
                 <span className="sr-only">Actions</span>
               </th>
@@ -203,7 +213,7 @@ function Etablissements() {
             {page.etablissements.map((e) => (
               <tr key={e.id} className="border-t hover:bg-mist-soft/60">
                 <td className="px-4 py-3 font-bold">
-                  {e.nom} <BadgeActif actif={e.statut === "actif"} />
+                  {e.nom} <BadgeActif actif={e.statut !== "inactif"} />
                   {e.statut === "propose" && (
                     <span className="ml-1 rounded-full bg-sky/15 px-2.5 py-0.5 text-xs font-extrabold text-sky">
                       Proposé
@@ -216,7 +226,26 @@ function Etablissements() {
                   <span className="block text-xs text-muted-foreground">DRE {e.dre}</span>
                 </td>
                 <td className="px-4 py-3 text-muted-foreground">{e.localite ?? "—"}</td>
+                <td className="px-4 py-3 text-right font-bold tabular-nums">{e.nb_eleves}</td>
                 <td className="px-4 py-3 text-right">
+                  {peut(admin, "clubs", "modifier") && e.statut === "propose" && (
+                    <span className="mb-1.5 inline-flex flex-wrap justify-end gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setProposition({ action: "accepter", etablissement: e })}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground transition hover:bg-primary/90"
+                      >
+                        <Check className="size-3.5" /> Accepter
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setProposition({ action: "remplacer", etablissement: e })}
+                        className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ring-1 ring-border transition hover:bg-mist-soft"
+                      >
+                        <Replace className="size-3.5" /> Remplacer par…
+                      </button>
+                    </span>
+                  )}
                   {peut(admin, "clubs", "modifier") && (
                     <button
                       type="button"
@@ -233,7 +262,7 @@ function Etablissements() {
             {page.etablissements.length === 0 && (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   className="px-4 py-10 text-center font-semibold text-muted-foreground"
                 >
                   Aucun établissement ne correspond à ces filtres.
@@ -271,6 +300,18 @@ function Etablissements() {
         </nav>
       )}
 
+      {proposition?.action === "accepter" && (
+        <AccepterProposition
+          etablissement={proposition.etablissement}
+          fermer={() => setProposition(null)}
+        />
+      )}
+      {proposition?.action === "remplacer" && (
+        <RemplacerProposition
+          etablissement={proposition.etablissement}
+          fermer={() => setProposition(null)}
+        />
+      )}
       {edition && (
         <FormulaireEtablissement
           key={edition === "nouveau" ? "nouveau" : edition.id}
@@ -390,6 +431,93 @@ function FormulaireEtablissement({
           </select>
         </Champ>
       )}
+    </DialogueFormulaire>
+  );
+}
+
+// Établissements proposés par des élèves à leur inscription (spec 017).
+function AccepterProposition({
+  etablissement,
+  fermer,
+}: {
+  etablissement: EtablissementAdmin;
+  fermer: () => void;
+}) {
+  const router = useRouter();
+  const [nom, setNom] = useState(etablissement.nom);
+  const [type, setType] = useState<TypeEtablissement>(etablissement.type);
+
+  return (
+    <DialogueFormulaire
+      ouvert
+      onOuvert={(o) => !o && fermer()}
+      titre="Accepter cet établissement"
+      description={`Il rejoint la liste publique de l'${etablissement.iesg}. Vérifie son nom et son type avant.`}
+      bouton="Accepter"
+      onEnvoie={async () => {
+        await adminModifierEtablissement(etablissement.id, {
+          version: etablissement.version,
+          nom,
+          type,
+          statut: "actif",
+        });
+        await router.invalidate();
+      }}
+    >
+      <Champ libelle="Nom">
+        <input
+          required
+          value={nom}
+          onChange={(e) => setNom(e.target.value)}
+          maxLength={150}
+          className={CHAMP_ADMIN}
+        />
+      </Champ>
+      <Champ libelle="Type">
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value as TypeEtablissement)}
+          className={CHAMP_ADMIN}
+        >
+          {Object.entries(TYPES).map(([valeur, libelle]) => (
+            <option key={valeur} value={valeur}>
+              {libelle}
+            </option>
+          ))}
+        </select>
+      </Champ>
+    </DialogueFormulaire>
+  );
+}
+
+function RemplacerProposition({
+  etablissement,
+  fermer,
+}: {
+  etablissement: EtablissementAdmin;
+  fermer: () => void;
+}) {
+  const router = useRouter();
+  const [cible, setCible] = useState<EtablissementChoisi | null>(null);
+  const eleves = etablissement.nb_eleves;
+
+  return (
+    <DialogueFormulaire
+      ouvert
+      onOuvert={(o) => !o && fermer()}
+      titre={`Remplacer « ${etablissement.nom} »`}
+      description={`Cet établissement existe déjà sous un autre nom ? Choisis-le : ${eleves} élève${eleves > 1 ? "s" : ""} y ser${eleves > 1 ? "ont" : "a"} rattaché${eleves > 1 ? "s" : ""}, et la proposition sera désactivée.`}
+      bouton="Remplacer"
+      onEnvoie={async () => {
+        if (!cible) throw new ErreurApi(422, "Choisis un établissement de la liste.");
+        await adminRemplacerEtablissement(etablissement.id, {
+          version: etablissement.version,
+          cible_id: cible.id,
+        });
+        await router.invalidate();
+      }}
+    >
+      <ChoixEtablissement valeur={cible} onChoix={setCible} exclure={etablissement.id} />
     </DialogueFormulaire>
   );
 }

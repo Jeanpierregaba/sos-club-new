@@ -16,9 +16,11 @@ import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as BibliothequeRouteImport } from './routes/bibliotheque'
 import { Route as CarteDesClubsRouteImport } from './routes/carte-des-clubs'
 import { Route as CertificationRouteImport } from './routes/certification'
+import { Route as CharteRouteImport } from './routes/charte'
 import { Route as ClubSanteRouteImport } from './routes/club-sante'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as GalerieRouteImport } from './routes/galerie'
+import { Route as InscriptionRouteImport } from './routes/inscription'
 import { Route as JeuxRouteImport } from './routes/jeux'
 import { Route as Les7AxesRouteImport } from './routes/les-7-axes'
 import { Route as MagazineRouteImport } from './routes/magazine'
@@ -31,11 +33,14 @@ import { Route as ConnecteAdminIndexRouteImport } from './routes/_connecte/admin
 import { Route as ConnecteAdminDoubleAuthentificationRouteImport } from './routes/_connecte/admin/double-authentification'
 import { Route as ConnecteAdminExportsRouteImport } from './routes/_connecte/admin/exports'
 import { Route as ConnecteAdminJournalRouteImport } from './routes/_connecte/admin/journal'
+import { Route as ConnecteAdminPointsRouteImport } from './routes/_connecte/admin/points'
 import { Route as ConnecteAdminReferentielRouteImport } from './routes/_connecte/admin/referentiel'
 import { Route as ConnecteAdminCollaborateursIndexRouteImport } from './routes/_connecte/admin/collaborateurs.index'
 import { Route as ConnecteAdminCollaborateursIdRouteImport } from './routes/_connecte/admin/collaborateurs.$id'
 import { Route as ConnecteAdminInscritsIndexRouteImport } from './routes/_connecte/admin/inscrits.index'
 import { Route as ConnecteAdminInscritsIdRouteImport } from './routes/_connecte/admin/inscrits.$id'
+import { Route as ConnecteAdminPointsIndexRouteImport } from './routes/_connecte/admin/points.index'
+import { Route as ConnecteAdminPointsBaremeRouteImport } from './routes/_connecte/admin/points.bareme'
 import { Route as ConnecteAdminReferentielIndexRouteImport } from './routes/_connecte/admin/referentiel.index'
 import { Route as ConnecteAdminReferentielAxesRouteImport } from './routes/_connecte/admin/referentiel.axes'
 import { Route as ConnecteAdminReferentielEtablissementsRouteImport } from './routes/_connecte/admin/referentiel.etablissements'
@@ -74,6 +79,11 @@ const CertificationRoute = CertificationRouteImport.update({
   path: '/certification',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CharteRoute = CharteRouteImport.update({
+  id: '/charte',
+  path: '/charte',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClubSanteRoute = ClubSanteRouteImport.update({
   id: '/club-sante',
   path: '/club-sante',
@@ -87,6 +97,11 @@ const ConnexionRoute = ConnexionRouteImport.update({
 const GalerieRoute = GalerieRouteImport.update({
   id: '/galerie',
   path: '/galerie',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InscriptionRoute = InscriptionRouteImport.update({
+  id: '/inscription',
+  path: '/inscription',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JeuxRoute = JeuxRouteImport.update({
@@ -150,6 +165,11 @@ const ConnecteAdminJournalRoute = ConnecteAdminJournalRouteImport.update({
   path: '/journal',
   getParentRoute: () => ConnecteAdminRoute,
 } as any)
+const ConnecteAdminPointsRoute = ConnecteAdminPointsRouteImport.update({
+  id: '/points',
+  path: '/points',
+  getParentRoute: () => ConnecteAdminRoute,
+} as any)
 const ConnecteAdminReferentielRoute =
   ConnecteAdminReferentielRouteImport.update({
     id: '/referentiel',
@@ -179,6 +199,18 @@ const ConnecteAdminInscritsIdRoute = ConnecteAdminInscritsIdRouteImport.update({
   path: '/inscrits/$id',
   getParentRoute: () => ConnecteAdminRoute,
 } as any)
+const ConnecteAdminPointsIndexRoute =
+  ConnecteAdminPointsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ConnecteAdminPointsRoute,
+  } as any)
+const ConnecteAdminPointsBaremeRoute =
+  ConnecteAdminPointsBaremeRouteImport.update({
+    id: '/bareme',
+    path: '/bareme',
+    getParentRoute: () => ConnecteAdminPointsRoute,
+  } as any)
 const ConnecteAdminReferentielIndexRoute =
   ConnecteAdminReferentielIndexRouteImport.update({
     id: '/',
@@ -205,9 +237,11 @@ export interface FileRoutesByFullPath {
   '/bibliotheque': typeof BibliothequeRoute
   '/carte-des-clubs': typeof CarteDesClubsRoute
   '/certification': typeof CertificationRoute
+  '/charte': typeof CharteRoute
   '/club-sante': typeof ClubSanteRoute
   '/connexion': typeof ConnexionRoute
   '/galerie': typeof GalerieRoute
+  '/inscription': typeof InscriptionRoute
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
@@ -219,14 +253,17 @@ export interface FileRoutesByFullPath {
   '/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
   '/admin/exports': typeof ConnecteAdminExportsRoute
   '/admin/journal': typeof ConnecteAdminJournalRoute
+  '/admin/points': typeof ConnecteAdminPointsRouteWithChildren
   '/admin/referentiel': typeof ConnecteAdminReferentielRouteWithChildren
   '/admin/': typeof ConnecteAdminIndexRoute
   '/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
+  '/admin/points/bareme': typeof ConnecteAdminPointsBaremeRoute
   '/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
   '/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
   '/admin/collaborateurs/': typeof ConnecteAdminCollaborateursIndexRoute
   '/admin/inscrits/': typeof ConnecteAdminInscritsIndexRoute
+  '/admin/points/': typeof ConnecteAdminPointsIndexRoute
   '/admin/referentiel/': typeof ConnecteAdminReferentielIndexRoute
 }
 export interface FileRoutesByTo {
@@ -236,9 +273,11 @@ export interface FileRoutesByTo {
   '/bibliotheque': typeof BibliothequeRoute
   '/carte-des-clubs': typeof CarteDesClubsRoute
   '/certification': typeof CertificationRoute
+  '/charte': typeof CharteRoute
   '/club-sante': typeof ClubSanteRoute
   '/connexion': typeof ConnexionRoute
   '/galerie': typeof GalerieRoute
+  '/inscription': typeof InscriptionRoute
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
@@ -252,10 +291,12 @@ export interface FileRoutesByTo {
   '/admin': typeof ConnecteAdminIndexRoute
   '/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
+  '/admin/points/bareme': typeof ConnecteAdminPointsBaremeRoute
   '/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
   '/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
   '/admin/collaborateurs': typeof ConnecteAdminCollaborateursIndexRoute
   '/admin/inscrits': typeof ConnecteAdminInscritsIndexRoute
+  '/admin/points': typeof ConnecteAdminPointsIndexRoute
   '/admin/referentiel': typeof ConnecteAdminReferentielIndexRoute
 }
 export interface FileRoutesById {
@@ -267,9 +308,11 @@ export interface FileRoutesById {
   '/bibliotheque': typeof BibliothequeRoute
   '/carte-des-clubs': typeof CarteDesClubsRoute
   '/certification': typeof CertificationRoute
+  '/charte': typeof CharteRoute
   '/club-sante': typeof ClubSanteRoute
   '/connexion': typeof ConnexionRoute
   '/galerie': typeof GalerieRoute
+  '/inscription': typeof InscriptionRoute
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
@@ -281,14 +324,17 @@ export interface FileRoutesById {
   '/_connecte/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
   '/_connecte/admin/exports': typeof ConnecteAdminExportsRoute
   '/_connecte/admin/journal': typeof ConnecteAdminJournalRoute
+  '/_connecte/admin/points': typeof ConnecteAdminPointsRouteWithChildren
   '/_connecte/admin/referentiel': typeof ConnecteAdminReferentielRouteWithChildren
   '/_connecte/admin/': typeof ConnecteAdminIndexRoute
   '/_connecte/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/_connecte/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
+  '/_connecte/admin/points/bareme': typeof ConnecteAdminPointsBaremeRoute
   '/_connecte/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
   '/_connecte/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
   '/_connecte/admin/collaborateurs/': typeof ConnecteAdminCollaborateursIndexRoute
   '/_connecte/admin/inscrits/': typeof ConnecteAdminInscritsIndexRoute
+  '/_connecte/admin/points/': typeof ConnecteAdminPointsIndexRoute
   '/_connecte/admin/referentiel/': typeof ConnecteAdminReferentielIndexRoute
 }
 export interface FileRouteTypes {
@@ -300,9 +346,11 @@ export interface FileRouteTypes {
     | '/bibliotheque'
     | '/carte-des-clubs'
     | '/certification'
+    | '/charte'
     | '/club-sante'
     | '/connexion'
     | '/galerie'
+    | '/inscription'
     | '/jeux'
     | '/les-7-axes'
     | '/magazine'
@@ -314,14 +362,17 @@ export interface FileRouteTypes {
     | '/admin/double-authentification'
     | '/admin/exports'
     | '/admin/journal'
+    | '/admin/points'
     | '/admin/referentiel'
     | '/admin/'
     | '/admin/collaborateurs/$id'
     | '/admin/inscrits/$id'
+    | '/admin/points/bareme'
     | '/admin/referentiel/axes'
     | '/admin/referentiel/etablissements'
     | '/admin/collaborateurs/'
     | '/admin/inscrits/'
+    | '/admin/points/'
     | '/admin/referentiel/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -331,9 +382,11 @@ export interface FileRouteTypes {
     | '/bibliotheque'
     | '/carte-des-clubs'
     | '/certification'
+    | '/charte'
     | '/club-sante'
     | '/connexion'
     | '/galerie'
+    | '/inscription'
     | '/jeux'
     | '/les-7-axes'
     | '/magazine'
@@ -347,10 +400,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin/collaborateurs/$id'
     | '/admin/inscrits/$id'
+    | '/admin/points/bareme'
     | '/admin/referentiel/axes'
     | '/admin/referentiel/etablissements'
     | '/admin/collaborateurs'
     | '/admin/inscrits'
+    | '/admin/points'
     | '/admin/referentiel'
   id:
     | '__root__'
@@ -361,9 +416,11 @@ export interface FileRouteTypes {
     | '/bibliotheque'
     | '/carte-des-clubs'
     | '/certification'
+    | '/charte'
     | '/club-sante'
     | '/connexion'
     | '/galerie'
+    | '/inscription'
     | '/jeux'
     | '/les-7-axes'
     | '/magazine'
@@ -375,14 +432,17 @@ export interface FileRouteTypes {
     | '/_connecte/admin/double-authentification'
     | '/_connecte/admin/exports'
     | '/_connecte/admin/journal'
+    | '/_connecte/admin/points'
     | '/_connecte/admin/referentiel'
     | '/_connecte/admin/'
     | '/_connecte/admin/collaborateurs/$id'
     | '/_connecte/admin/inscrits/$id'
+    | '/_connecte/admin/points/bareme'
     | '/_connecte/admin/referentiel/axes'
     | '/_connecte/admin/referentiel/etablissements'
     | '/_connecte/admin/collaborateurs/'
     | '/_connecte/admin/inscrits/'
+    | '/_connecte/admin/points/'
     | '/_connecte/admin/referentiel/'
   fileRoutesById: FileRoutesById
 }
@@ -394,9 +454,11 @@ export interface RootRouteChildren {
   BibliothequeRoute: typeof BibliothequeRoute
   CarteDesClubsRoute: typeof CarteDesClubsRoute
   CertificationRoute: typeof CertificationRoute
+  CharteRoute: typeof CharteRoute
   ClubSanteRoute: typeof ClubSanteRoute
   ConnexionRoute: typeof ConnexionRoute
   GalerieRoute: typeof GalerieRoute
+  InscriptionRoute: typeof InscriptionRoute
   JeuxRoute: typeof JeuxRoute
   Les7AxesRoute: typeof Les7AxesRoute
   MagazineRoute: typeof MagazineRoute
@@ -456,6 +518,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CertificationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/charte': {
+      id: '/charte'
+      path: '/charte'
+      fullPath: '/charte'
+      preLoaderRoute: typeof CharteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/club-sante': {
       id: '/club-sante'
       path: '/club-sante'
@@ -475,6 +544,13 @@ declare module '@tanstack/react-router' {
       path: '/galerie'
       fullPath: '/galerie'
       preLoaderRoute: typeof GalerieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inscription': {
+      id: '/inscription'
+      path: '/inscription'
+      fullPath: '/inscription'
+      preLoaderRoute: typeof InscriptionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jeux': {
@@ -561,6 +637,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteAdminJournalRouteImport
       parentRoute: typeof ConnecteAdminRoute
     }
+    '/_connecte/admin/points': {
+      id: '/_connecte/admin/points'
+      path: '/points'
+      fullPath: '/admin/points'
+      preLoaderRoute: typeof ConnecteAdminPointsRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
     '/_connecte/admin/referentiel': {
       id: '/_connecte/admin/referentiel'
       path: '/referentiel'
@@ -596,6 +679,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteAdminInscritsIdRouteImport
       parentRoute: typeof ConnecteAdminRoute
     }
+    '/_connecte/admin/points/': {
+      id: '/_connecte/admin/points/'
+      path: '/'
+      fullPath: '/admin/points/'
+      preLoaderRoute: typeof ConnecteAdminPointsIndexRouteImport
+      parentRoute: typeof ConnecteAdminPointsRoute
+    }
+    '/_connecte/admin/points/bareme': {
+      id: '/_connecte/admin/points/bareme'
+      path: '/bareme'
+      fullPath: '/admin/points/bareme'
+      preLoaderRoute: typeof ConnecteAdminPointsBaremeRouteImport
+      parentRoute: typeof ConnecteAdminPointsRoute
+    }
     '/_connecte/admin/referentiel/': {
       id: '/_connecte/admin/referentiel/'
       path: '/'
@@ -620,6 +717,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ConnecteAdminPointsRouteChildren {
+  ConnecteAdminPointsBaremeRoute: typeof ConnecteAdminPointsBaremeRoute
+  ConnecteAdminPointsIndexRoute: typeof ConnecteAdminPointsIndexRoute
+}
+
+const ConnecteAdminPointsRouteChildren: ConnecteAdminPointsRouteChildren = {
+  ConnecteAdminPointsBaremeRoute: ConnecteAdminPointsBaremeRoute,
+  ConnecteAdminPointsIndexRoute: ConnecteAdminPointsIndexRoute,
+}
+
+const ConnecteAdminPointsRouteWithChildren =
+  ConnecteAdminPointsRoute._addFileChildren(ConnecteAdminPointsRouteChildren)
+
 interface ConnecteAdminReferentielRouteChildren {
   ConnecteAdminReferentielAxesRoute: typeof ConnecteAdminReferentielAxesRoute
   ConnecteAdminReferentielEtablissementsRoute: typeof ConnecteAdminReferentielEtablissementsRoute
@@ -643,6 +753,7 @@ interface ConnecteAdminRouteChildren {
   ConnecteAdminDoubleAuthentificationRoute: typeof ConnecteAdminDoubleAuthentificationRoute
   ConnecteAdminExportsRoute: typeof ConnecteAdminExportsRoute
   ConnecteAdminJournalRoute: typeof ConnecteAdminJournalRoute
+  ConnecteAdminPointsRoute: typeof ConnecteAdminPointsRouteWithChildren
   ConnecteAdminReferentielRoute: typeof ConnecteAdminReferentielRouteWithChildren
   ConnecteAdminIndexRoute: typeof ConnecteAdminIndexRoute
   ConnecteAdminCollaborateursIdRoute: typeof ConnecteAdminCollaborateursIdRoute
@@ -656,6 +767,7 @@ const ConnecteAdminRouteChildren: ConnecteAdminRouteChildren = {
     ConnecteAdminDoubleAuthentificationRoute,
   ConnecteAdminExportsRoute: ConnecteAdminExportsRoute,
   ConnecteAdminJournalRoute: ConnecteAdminJournalRoute,
+  ConnecteAdminPointsRoute: ConnecteAdminPointsRouteWithChildren,
   ConnecteAdminReferentielRoute: ConnecteAdminReferentielRouteWithChildren,
   ConnecteAdminIndexRoute: ConnecteAdminIndexRoute,
   ConnecteAdminCollaborateursIdRoute: ConnecteAdminCollaborateursIdRoute,
@@ -690,9 +802,11 @@ const rootRouteChildren: RootRouteChildren = {
   BibliothequeRoute: BibliothequeRoute,
   CarteDesClubsRoute: CarteDesClubsRoute,
   CertificationRoute: CertificationRoute,
+  CharteRoute: CharteRoute,
   ClubSanteRoute: ClubSanteRoute,
   ConnexionRoute: ConnexionRoute,
   GalerieRoute: GalerieRoute,
+  InscriptionRoute: InscriptionRoute,
   JeuxRoute: JeuxRoute,
   Les7AxesRoute: Les7AxesRoute,
   MagazineRoute: MagazineRoute,

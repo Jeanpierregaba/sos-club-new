@@ -113,6 +113,8 @@ class EtablissementAdmin(BaseModel):
     dre_code: str
     dre: str
     modifie_le: datetime
+    # Élèves rattachés (spec 017) : utile pour décider du sort d'un établissement proposé.
+    nb_eleves: int
 
 
 class PageEtablissements(BaseModel):
@@ -198,3 +200,12 @@ class AxeModification(_Entree):
     description: Description | None = None
     ordre: int | None = Field(default=None, ge=1, le=99)
     actif: bool | None = None
+
+
+class Remplacement(BaseModel):
+    """Remplace un établissement proposé par un établissement existant : ses élèves y sont rattachés (spec 017)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    version: Version
+    cible_id: UUID

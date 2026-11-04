@@ -120,10 +120,10 @@ function Connexion() {
           <p className="mt-6 text-center text-sm font-semibold text-muted-foreground">
             Pas encore de compte ?{" "}
             <Link
-              to="/carte-des-clubs"
+              to="/inscription"
               className="font-bold text-logo-blue underline-offset-4 hover:underline"
             >
-              Trouve ton club sur la carte
+              Crée ton compte
             </Link>
           </p>
           <Link

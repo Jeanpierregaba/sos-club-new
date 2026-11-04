@@ -1,5 +1,5 @@
-"""Annuaire des inscrits (CDC admin, 4.1 et 12B.1). Les filtres par club, DRE et établissement arrivent avec la
-spec 003."""
+"""Annuaire des inscrits (CDC admin, 4.1 et 12B.1). Les filtres par club, DRE et établissement arrivent avec les
+specs des clubs."""
 
 from typing import Any
 from uuid import UUID
@@ -10,9 +10,28 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
 from app.admin.models import JournalAudit
-from app.admin.schemas import EvenementJournal, FiltresInscrits, Inscrit, InscritDetail, PageInscrits
+from app.admin.schemas import (
+    EvenementJournal,
+    FiltresInscrits,
+    Inscrit,
+    InscritDetail,
+    PageInscrits,
+    ProfilEleveAdmin,
+)
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.comptes.service import couper_sessions
+from app.eleves.models import Eleve
+from app.eleves.service import etablissement_eleve, points_eleve
+
+HISTORIQUE = [
+    "inscrit_suspendu",
+    "inscrit_reactive",
+    "inscription_eleve",
+    "profil_eleve_modifie",
+    "pseudonyme_impose",
+    "mot_de_passe_change",
+    "mot_de_passe_reinitialise",
+]
 
 
 class Introuvable(Exception):
@@ -24,7 +43,7 @@ class Refus(Exception):
 
 
 def requete_filtree(filtres: FiltresInscrits) -> Select[tuple[Utilisateur]]:
-    requete = select(Utilisateur)
+    requete = select(Utilisateur).outerjoin(Eleve, Eleve.utilisateur_id == Utilisateur.id)
     if filtres.recherche and filtres.recherche.strip():
         # Les caractères spéciaux de LIKE sont échappés : « 100% » cherche bien « 100% ».
         texte = filtres.recherche.strip().lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
@@ -35,6 +54,7 @@ def requete_filtree(filtres: FiltresInscrits) -> Select[tuple[Utilisateur]]:
                 func.lower(Utilisateur.prenom).like(motif, escape="\\"),
                 func.lower(Utilisateur.identifiant).like(motif, escape="\\"),
                 func.lower(Utilisateur.email).like(motif, escape="\\"),
+                func.lower(Eleve.pseudonyme).like(motif, escape="\\"),
             )
         )
     if filtres.profil:
@@ -65,11 +85,11 @@ async def lister(db: AsyncSession, filtres: FiltresInscrits, page: int, par_page
 
 
 async def historique(db: AsyncSession, utilisateur_id: UUID) -> list[EvenementJournal]:
-    """Changements de statut d'un compte, lus dans le journal : il fait foi."""
+    """Événements d'un compte, lus dans le journal : il fait foi."""
     requete = (
         select(JournalAudit)
         .where(JournalAudit.cible_type == "utilisateur", JournalAudit.cible_id == str(utilisateur_id))
-        .where(JournalAudit.action.in_(["inscrit_suspendu", "inscrit_reactive"]))
+        .where(JournalAudit.action.in_(HISTORIQUE))
         .order_by(JournalAudit.quand.desc())
     )
     return [EvenementJournal.model_validate(e) for e in (await db.scalars(requete)).all()]
@@ -80,7 +100,19 @@ async def detail(db: AsyncSession, utilisateur_id: UUID) -> InscritDetail:
     if utilisateur is None:
         raise Introuvable
     donnees: dict[str, Any] = Inscrit.model_validate(utilisateur).model_dump()
-    return InscritDetail(**donnees, historique=await historique(db, utilisateur.id))
+    eleve = await db.get(Eleve, utilisateur.id)
+    profil = (
+        ProfilEleveAdmin(
+            pseudonyme=eleve.pseudonyme,
+            classe=eleve.classe,
+            charte_version=eleve.charte_version,
+            etablissement=await etablissement_eleve(db, eleve.etablissement_id),
+            points=await points_eleve(db, utilisateur.id, 50),
+        )
+        if eleve
+        else None
+    )
+    return InscritDetail(**donnees, historique=await historique(db, utilisateur.id), eleve=profil)
 
 
 async def changer_statut(

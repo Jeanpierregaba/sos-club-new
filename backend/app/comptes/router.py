@@ -6,14 +6,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.double_auth import verifier_code
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.models import Utilisateur
-from app.comptes.schemas import CodeEntree, ConnexionEntree, EtapeCode, Moi
+from app.comptes.schemas import CodeEntree, ConnexionEntree, EtapeCode, Moi, MotDePasseEntree
 from app.comptes.service import (
     AccesTermine,
     CodeIncorrect,
+    CompteInvalide,
     CompteSuspendu,
     EtapeInvalide,
     IdentifiantsIncorrects,
+    MotDePasseIncorrect,
     TropDEssais,
+    changer_mot_de_passe,
     cle_adresse,
     connecter,
     connecter_avec_code,
@@ -99,3 +102,22 @@ async def deconnexion(request: Request, response: Response, db: Base) -> None:
 @router.get("/moi")
 async def moi(utilisateur: Annotated[Utilisateur, Depends(utilisateur_courant)]) -> Moi:
     return Moi.model_validate(utilisateur)
+
+
+@router.post("/mot-de-passe", status_code=status.HTTP_204_NO_CONTENT)
+async def changer_mon_mot_de_passe(
+    entree: MotDePasseEntree,
+    request: Request,
+    utilisateur: Annotated[Utilisateur, Depends(utilisateur_courant)],
+    db: Base,
+) -> None:
+    jeton = request.cookies.get(settings.cookie_session, "")
+    adresse_ip = cle_adresse(request.client.host if request.client else None)
+    try:
+        await changer_mot_de_passe(db, utilisateur, entree.actuel, entree.nouveau, jeton, adresse_ip)
+    except MotDePasseIncorrect:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Ton mot de passe actuel est incorrect.") from None
+    except TropDEssais:
+        raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, TROP_D_ESSAIS) from None
+    except CompteInvalide as erreur:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(erreur)) from None

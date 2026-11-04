@@ -66,6 +66,10 @@ class CompteInvalide(Exception):
     """Le message est destiné à la personne qui crée le compte."""
 
 
+class DejaPris(CompteInvalide):
+    """L'identifiant ou l'email appartient déjà à un autre compte."""
+
+
 def normaliser(saisie: str) -> str:
     return saisie.strip().lower()
 
@@ -337,7 +341,7 @@ def _valider_email(email: str | None, role: Role) -> str | None:
         raise CompteInvalide("Cet email n'est pas valide.") from None
 
 
-async def creer_compte(
+async def preparer_utilisateur(
     db: AsyncSession,
     role: Role,
     identifiant: str,
@@ -347,6 +351,8 @@ async def creer_compte(
     email: str | None = None,
     telephone: str | None = None,
 ) -> Utilisateur:
+    """Valide les champs et ajoute le compte à la transaction, sans la valider : l'inscription d'un élève y ajoute
+    son profil et ses points de bienvenue (spec 017)."""
     identifiant = normaliser(identifiant)
     if not FORMAT_IDENTIFIANT.fullmatch(identifiant):
         raise CompteInvalide("L'identifiant doit contenir de 3 à 30 lettres, chiffres, points, tirets ou « _ ».")
@@ -362,9 +368,9 @@ async def creer_compte(
         )
 
     if await db.scalar(select(Utilisateur.id).where(Utilisateur.identifiant == identifiant)):
-        raise CompteInvalide("Cet identifiant est déjà pris.")
+        raise DejaPris("Cet identifiant est déjà pris.")
     if email and await db.scalar(select(Utilisateur.id).where(Utilisateur.email == email)):
-        raise CompteInvalide("Cet email est déjà pris.")
+        raise DejaPris("Cet email est déjà pris.")
 
     utilisateur = Utilisateur(
         role=role,
@@ -376,6 +382,20 @@ async def creer_compte(
         mot_de_passe_hash=await hacher(mot_de_passe),
     )
     db.add(utilisateur)
+    return utilisateur
+
+
+async def creer_compte(
+    db: AsyncSession,
+    role: Role,
+    identifiant: str,
+    prenom: str,
+    nom: str,
+    mot_de_passe: str,
+    email: str | None = None,
+    telephone: str | None = None,
+) -> Utilisateur:
+    utilisateur = await preparer_utilisateur(db, role, identifiant, prenom, nom, mot_de_passe, email, telephone)
     try:
         await db.commit()
     except IntegrityError as erreur:
@@ -383,5 +403,35 @@ async def creer_compte(
         # Deux créations simultanées : la contrainte unique de la base tranche.
         if getattr(erreur.orig, "sqlstate", None) != VIOLATION_UNICITE:
             raise
-        raise CompteInvalide("Cet identifiant ou cet email est déjà pris.") from None
+        raise DejaPris("Cet identifiant ou cet email est déjà pris.") from None
     return utilisateur
+
+
+class MotDePasseIncorrect(Exception):
+    pass
+
+
+async def changer_mot_de_passe(
+    db: AsyncSession, utilisateur: Utilisateur, actuel: str, nouveau: str, jeton: str, adresse_ip: str
+) -> None:
+    """Coupe toutes les autres sessions du compte : un appareil oublié ou volé perd l'accès (spec 017).
+
+    Les essais partagent la limite de la connexion : une session restée ouverte ne permet pas de deviner le mot de
+    passe actuel, ni d'occuper le serveur avec des hachages."""
+    if not LONGUEUR_MIN_MOT_DE_PASSE <= len(nouveau) <= LONGUEUR_MAX_MOT_DE_PASSE:
+        raise CompteInvalide(f"Le nouveau mot de passe doit contenir au moins {LONGUEUR_MIN_MOT_DE_PASSE} caractères.")
+    essai = await _reserver_essai(db, empreinte(utilisateur.identifiant), adresse_ip)
+    if not await verifier(utilisateur.mot_de_passe_hash, actuel):
+        await db.execute(update(TentativeConnexion).where(TentativeConnexion.id == essai.id).values(en_cours=False))
+        await db.commit()
+        raise MotDePasseIncorrect
+    await _supprimer_essai(db, essai)
+    utilisateur.mot_de_passe_hash = await hacher(nouveau)
+    await db.execute(
+        delete(Session).where(Session.utilisateur_id == utilisateur.id, Session.jeton_hash != empreinte(jeton))
+    )
+    journaliser(
+        db, "mot_de_passe_change", utilisateur, cible_type="utilisateur", cible_id=utilisateur.id,
+        adresse_ip=adresse_ip,
+    )  # fmt: skip
+    await db.commit()

@@ -41,6 +41,14 @@ class Settings(BaseSettings):
     duree_fichier_export_heures: int = 24
     export_lignes_max: int = 50_000
 
+    # Inscription des élèves (spec 017). None : ouvertes en local, fermées dès que le site est en HTTPS, car aucune
+    # vraie donnée d'élève ne doit entrer avant le récépissé de l'IPDCP (docs/RULES.md). La préproduction les ouvre.
+    inscriptions_ouvertes: bool | None = None
+    # Une salle informatique partage souvent une seule adresse réseau.
+    inscriptions_max_adresse: int = 20
+    # Version de la charte acceptée à l'inscription : à changer avec le texte de la page /charte.
+    version_charte: str = "2026-11-provisoire"
+
     # Clé Fernet qui chiffre les secrets de double authentification. Obligatoire en production.
     cle_chiffrement: str | None = None
 
@@ -66,6 +74,10 @@ class Settings(BaseSettings):
         if self.cle_chiffrement:
             Fernet(self.cle_chiffrement)  # Une clé mal formée doit bloquer le démarrage, pas la première connexion.
         return self
+
+    @property
+    def inscriptions_actives(self) -> bool:
+        return self.inscriptions_ouvertes if self.inscriptions_ouvertes is not None else not self.cookie_secure
 
     @property
     def cookie_secure(self) -> bool:

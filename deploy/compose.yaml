@@ -67,6 +67,9 @@ services:
       # Le port n'est pas publié : seul le proxy peut joindre ce conteneur, et il écrase X-Forwarded-For.
       FORWARDED_ALLOW_IPS: "*"
       WEB_CONCURRENCY: ${API_PROCESSUS:-2}
+      # Fermées par défaut : aucune vraie donnée d'élève avant le récépissé de l'IPDCP (docs/RULES.md).
+      INSCRIPTIONS_OUVERTES: ${INSCRIPTIONS_OUVERTES:-false}
+      INSCRIPTIONS_MAX_ADRESSE: ${INSCRIPTIONS_MAX_ADRESSE:-20}
       SMTP_HOTE: ${SMTP_HOTE:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_SECURITE: ${SMTP_SECURITE:-starttls}

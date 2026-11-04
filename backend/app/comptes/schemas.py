@@ -43,3 +43,8 @@ class Moi(BaseModel):
     prenom: str
     nom: str
     role: Role
+
+
+class MotDePasseEntree(BaseModel):
+    actuel: str = Field(min_length=1, max_length=LONGUEUR_MAX_MOT_DE_PASSE)
+    nouveau: str = Field(max_length=LONGUEUR_MAX_MOT_DE_PASSE)

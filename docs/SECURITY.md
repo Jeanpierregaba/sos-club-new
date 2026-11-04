@@ -31,7 +31,7 @@ par la spec indiquée.
 
 ## Abus
 
-- [ ] Limite de débit sur l'inscription et l'envoi d'articles, en tenant compte des classes qui partagent une adresse réseau (connexion : en place, spec 001).
+- [ ] Limite de débit sur l'inscription et l'envoi d'articles, en tenant compte des classes qui partagent une adresse réseau (connexion : en place, spec 001 ; inscription, changement de mot de passe et d'email : en place, spec 017 ; articles : à faire).
 - [x] CSRF : `SameSite=Lax` et contrôle de l'en-tête `Origin` sur les actions modifiantes.
 - Sans objet : CORS. Le site et l'API sont sur la même origine (ADR-0006).
 - [x] Les messages d'erreur ne révèlent pas d'information interne ni l'existence d'un compte.
@@ -58,7 +58,7 @@ juridique.
 - [ ] Consentement du représentant légal des élèves mineurs recueilli selon l'avis juridique (Q8), sa date enregistrée.
 - [ ] Photos d'élèves publiées seulement avec l'attestation de l'encadreur ; retrait possible sur demande.
 - [ ] Données limitées au nécessaire : ni date de naissance exacte, ni adresse, ni photo de profil, ni téléphone d'élève.
-- [ ] Élèves affichés par leur pseudonyme et leur club ; liste des membres réservée au club.
+- [ ] Élèves affichés par leur pseudonyme et leur club ; liste des membres réservée au club (pseudonyme unique, alphabet latin, sans le nom complet : en place, spec 017 ; club et liste des membres : R4, R5).
 - [ ] Pas de messagerie privée, pas de commentaire d'élève ; un témoignage est toujours modéré avant publication.
 - [ ] Modérateurs alertés sur les témoignages révélant une situation de danger : procédure à définir avec AIMES-AFRIQUE.
 - [ ] Aucune donnée de santé individuelle dans le MVP (art. 21 et 24).

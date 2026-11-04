@@ -72,12 +72,16 @@ export function SiteHeader() {
       <span className={lang === "EN" ? "text-logo-blue" : "text-muted-foreground"}>EN</span>
     </button>
   );
-  const join = (
-    <button className="btn-fx whitespace-nowrap rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground">
-      Rejoindre le club
-    </button>
-  );
   const { data: moi } = useMoi();
+  // Un élève déjà inscrit n'a plus besoin de ce bouton : il retrouve son espace avec « Mon espace ».
+  const join = moi ? null : (
+    <Link
+      to="/inscription"
+      className="btn-fx whitespace-nowrap rounded-full bg-primary px-5 py-2.5 text-center text-sm font-bold text-primary-foreground"
+    >
+      Rejoindre le club
+    </Link>
+  );
   const login = (
     <Link
       to={moi ? "/mon-espace" : "/connexion"}

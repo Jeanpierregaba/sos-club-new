@@ -11,6 +11,7 @@ from app.admin.dependances import Acces
 from app.admin.models import Collaborateur, Export, Invitation, JournalAudit
 from app.admin.schemas import EvenementJournal, Indicateur, TableauDeBord
 from app.comptes.models import Role, StatutCompte, Utilisateur
+from app.points.service import semestre_en_cours
 from app.referentiel.models import Dre, Etablissement, StatutEtablissement
 
 # Indicateurs du CDC qui dépendent de modules à venir : affichés sans valeur.
@@ -78,6 +79,8 @@ async def calculer(db: AsyncSession, acces: Acces) -> TableauDeBord:
         Indicateur(id="exports_du_mois", libelle="Exports ce mois-ci", valeur=exports_du_mois or 0),
     ] + [Indicateur(id=i, libelle=libelle, valeur=None, disponible_avec=module) for i, libelle, module in A_VENIR]
 
+    semestre = await semestre_en_cours(db)
+
     derniers = None
     # Le journal contient des données nominatives : réservé au périmètre national, comme sa page.
     if acces.a("journal", Action.consulter) and acces.national:
@@ -90,5 +93,6 @@ async def calculer(db: AsyncSession, acces: Acces) -> TableauDeBord:
         comptes_par_statut=par_statut,
         inscriptions_30_jours=inscriptions,
         indicateurs=indicateurs,
+        semestre_en_cours=semestre.libelle if semestre else None,
         derniers_evenements=derniers,
     )

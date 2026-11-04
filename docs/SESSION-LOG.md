@@ -14,6 +14,23 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-04 — Compte élève et registre des points (spec 017, R2)
+
+- Fait : spec 017 livrée. Domaine `points` (registre `mouvement_points` idempotent, semestres sans
+  chevauchement garanti par la base, barème complet du PRD réglable) et domaine `eleves` (inscription en une
+  transaction avec +100, pseudonyme unique en alphabet latin, établissement proposé, espace élève, mot de
+  passe). Admin : onglets Points, fiche d'un élève (pseudonyme imposé, mot de passe provisoire),
+  propositions d'établissement acceptées ou remplacées. Relu par le sous-agent `reviewer` : 6 constats
+  importants corrigés (deux erreurs 500, limites d'essais, alerte de semestre). Correctif du déploiement :
+  `CLE_CHIFFREMENT` passée au conteneur des migrations.
+- Pièges rencontrés : `compose.yaml` est pris dans la version déployée, pas dans `main` ; relancer un run en
+  échec ne profite donc pas d'un correctif du compose. La table `tentative_connexion` sert aussi aux limites
+  d'inscription et de changement d'email : seules les lignes `en_cours = false` comptent pour la connexion.
+- Décisions : inscriptions fermées par défaut en HTTPS (`INSCRIPTIONS_OUVERTES`), ADR-0004 accepté.
+  Charte provisoire à faire valider (porteur du projet et juriste, avec le consentement Q8).
+- Prochaine étape : ouvrir les inscriptions en préproduction (`INSCRIPTIONS_OUVERTES=true` dans son `.env`),
+  créer le premier semestre depuis l'admin, puis `/spec` pour R3 (compte encadreur).
+
 ### 2026-11-04 — Référentiel (spec 016, R1)
 
 - Fait : spec 016 livrée. Tables `dre`, `iesg`, `etablissement` et `axe`, chargées par la migration

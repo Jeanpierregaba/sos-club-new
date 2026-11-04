@@ -11,7 +11,7 @@ Refusé en production : aucune base réelle ne doit recevoir ces comptes (docs/R
 import asyncio
 import secrets
 import sys
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pyotp
@@ -26,6 +26,12 @@ from app.comptes.models import Role, Session, StatutCompte, Utilisateur
 from app.comptes.motdepasse import hacher
 from app.config import RACINE_PROJET, settings
 from app.db import SessionLocal, engine
+from app.eleves import pseudonyme
+from app.eleves.models import Classe, Eleve
+from app.points import service as points
+from app.points.bareme import BIENVENUE_ELEVE
+from app.points.models import Semestre
+from app.referentiel.models import Etablissement, StatutEtablissement
 
 FICHIER_ACCES = RACINE_PROJET / ".comptes-dev.local"
 DOMAINE = "exemple.tg"
@@ -44,6 +50,13 @@ COMPTES: list[tuple[str, str, str, Role, RoleDepart | None | str, str | None]] =
     ("dev.eleve1", "Ama", "Eleve", Role.eleve, "", None),
     ("dev.eleve2", "Kofi", "Eleve", Role.eleve, "", None),
 ]
+
+# Profils des élèves (spec 017) : pseudonyme, classe, établissement.
+PROFILS_ELEVES = {
+    "dev.eleve1": ("Ama du Golfe", Classe.seconde, "Lycée de Tokoin I"),
+    "dev.eleve2": ("Kofi Curieux", Classe.troisieme, "Lycée Tokoin Est"),
+}
+DUREE_SEMESTRE = timedelta(days=180)
 
 
 class ProductionRefusee(Exception):
@@ -108,11 +121,43 @@ async def _activer_double_auth(db: AsyncSession, utilisateur: Utilisateur) -> tu
     return secret, await regenerer_codes_secours(db, utilisateur)
 
 
+async def _preparer_semestre(db: AsyncSession) -> None:
+    """Un semestre en cours, pour que les points de démonstration comptent au semestre. Rien si un semestre
+    occupe déjà la période."""
+    debut = points.aujourd_hui()
+    fin = debut + DUREE_SEMESTRE
+    if await db.scalar(select(Semestre.id).where(Semestre.debut <= fin, Semestre.fin >= debut)):
+        return
+    db.add(Semestre(libelle=f"Semestre de démonstration {debut.year}", debut=debut, fin=fin))
+    await db.flush()
+
+
+async def _preparer_eleve(db: AsyncSession, utilisateur: Utilisateur) -> None:
+    affiche, classe, nom_etablissement = PROFILS_ELEVES[utilisateur.identifiant]
+    actifs = select(Etablissement.id).where(Etablissement.statut == StatutEtablissement.actif)
+    etablissement_id = await db.scalar(actifs.where(Etablissement.nom == nom_etablissement)) or await db.scalar(
+        actifs.order_by(Etablissement.nom_normalise).limit(1)
+    )
+    if etablissement_id is None:
+        return
+    if await db.get(Eleve, utilisateur.id) is None:
+        db.add(
+            Eleve(
+                utilisateur_id=utilisateur.id, pseudonyme=affiche, pseudonyme_normalise=pseudonyme.cle(affiche),
+                classe=classe, etablissement_id=etablissement_id, charte_version=settings.version_charte,
+            )
+        )  # fmt: skip
+        utilisateur.consentement_le = datetime.now(UTC)
+        await db.flush()
+    await points.crediter(db, BIENVENUE_ELEVE, utilisateur.id, f"bienvenue:{utilisateur.id}")
+
+
 async def semer(db: AsyncSession) -> list[dict[str, str]]:
     """Prépare tous les comptes `dev.*` et renvoie leurs accès. Valide la transaction."""
     if settings.production:
         raise ProductionRefusee
     acces: list[dict[str, str]] = []
+    await _preparer_semestre(db)
     for identifiant, prenom, nom, role, role_depart, dre in COMPTES:
         mot_de_passe = _mot_de_passe()
         utilisateur = await _preparer_compte(db, identifiant, prenom, nom, role, mot_de_passe)
@@ -132,6 +177,8 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
                 await db.execute(delete(DoubleAuth).where(DoubleAuth.utilisateur_id == utilisateur.id))
         else:
             ligne["profil"] = "Encadreur" if role is Role.encadreur else "Élève"
+            if role is Role.eleve:
+                await _preparer_eleve(db, utilisateur)
         acces.append(ligne)
     journaliser(db, "comptes_de_developpement_prepares", details={"comptes": [c[0] for c in COMPTES]})
     await db.commit()

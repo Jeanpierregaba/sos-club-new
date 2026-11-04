@@ -1,13 +1,30 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { ArrowLeft, Pause, Play } from "lucide-react";
+import { ArrowLeft, Copy, KeyRound, Pause, Play, UserPen } from "lucide-react";
 import { useState } from "react";
 
 import { BadgeStatut } from "@/components/admin/BadgeStatut";
+import { CHAMP_ADMIN, Champ, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { DialogueMotif } from "@/components/admin/DialogueMotif";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { ACTIONS_JOURNAL, PROFILS, dateCourte, dateHeure, peut } from "@/lib/admin";
-import { chargerInscrit, changerStatutInscrit } from "@/lib/api/client";
+import {
+  chargerInscrit,
+  changerStatutInscrit,
+  imposerPseudonyme,
+  reinitialiserMotDePasse,
+  type InscritDetail,
+  type ProfilEleveAdmin,
+} from "@/lib/api/client";
+import { libelleClasse } from "@/lib/classes";
 
 export const Route = createFileRoute("/_connecte/admin/inscrits/$id")({
   loader: ({ params }) => chargerInscrit(params.id),
@@ -78,12 +95,12 @@ function FicheInscrit() {
         </dl>
       </section>
 
+      {inscrit.eleve && <SectionEleve inscrit={inscrit} eleve={inscrit.eleve} gerable={gerable} />}
+
       <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-border">
-        <h2 className="text-xl text-logo-blue">Historique du statut</h2>
+        <h2 className="text-xl text-logo-blue">Historique du compte</h2>
         {inscrit.historique.length === 0 ? (
-          <p className="mt-2 text-sm font-medium text-muted-foreground">
-            Aucun changement de statut.
-          </p>
+          <p className="mt-2 text-sm font-medium text-muted-foreground">Aucun événement.</p>
         ) : (
           <ol className="mt-3 divide-y">
             {inscrit.historique.map((e) => (
@@ -93,7 +110,8 @@ function FicheInscrit() {
                   <span className="font-medium text-muted-foreground"> · {dateHeure(e.quand)}</span>
                 </p>
                 <p className="text-muted-foreground">
-                  Par {e.auteur_libelle ?? "—"} · Motif : {String(e.details["motif"] ?? "—")}
+                  Par {e.auteur_libelle ?? "—"}
+                  {e.details["motif"] ? ` · Motif : ${String(e.details["motif"])}` : ""}
                 </p>
               </li>
             ))}
@@ -118,5 +136,190 @@ function FicheInscrit() {
         }}
       />
     </div>
+  );
+}
+
+// Profil d'élève (spec 017) : pseudonyme, établissement et registre des points.
+function SectionEleve({
+  inscrit,
+  eleve,
+  gerable,
+}: {
+  inscrit: InscritDetail;
+  eleve: ProfilEleveAdmin;
+  gerable: boolean;
+}) {
+  const router = useRouter();
+  const [pseudonyme, setPseudonyme] = useState(false);
+  const [reinitialiser, setReinitialiser] = useState(false);
+  const [provisoire, setProvisoire] = useState<string | null>(null);
+  const { points } = eleve;
+
+  const champs: [string, React.ReactNode][] = [
+    ["Pseudonyme", eleve.pseudonyme],
+    ["Classe", libelleClasse(eleve.classe)],
+    [
+      "Établissement",
+      <>
+        {eleve.etablissement.nom}
+        {eleve.etablissement.statut !== "actif" && (
+          <span className="ml-2 rounded-full bg-sun/30 px-2 py-0.5 text-xs font-extrabold">
+            {eleve.etablissement.statut === "propose" ? "Proposé" : "Désactivé"}
+          </span>
+        )}
+      </>,
+    ],
+    ["IESG et DRE", `${eleve.etablissement.iesg} · ${eleve.etablissement.dre}`],
+    ["Charte acceptée", eleve.charte_version],
+    ["Points", `${points.points_semestre} ce semestre · ${points.total} au total`],
+  ];
+
+  return (
+    <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-border md:p-8">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <h2 className="text-xl text-logo-blue">Profil d'élève</h2>
+        {gerable && (
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setPseudonyme(true)}
+              className="rounded-full font-bold"
+            >
+              <UserPen className="size-4" /> Imposer un pseudonyme
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setReinitialiser(true)}
+              className="rounded-full font-bold"
+            >
+              <KeyRound className="size-4" /> Réinitialiser le mot de passe
+            </Button>
+          </div>
+        )}
+      </div>
+      <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {champs.map(([libelle, valeur]) => (
+          <div key={libelle} className="flex flex-col-reverse">
+            <dd className="mt-0.5 font-semibold">{valeur}</dd>
+            <dt className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">
+              {libelle}
+            </dt>
+          </div>
+        ))}
+      </dl>
+      <h3 className="mt-8 text-sm font-extrabold uppercase tracking-wider text-muted-foreground">
+        Registre des points
+      </h3>
+      {points.lignes.length === 0 ? (
+        <p className="mt-2 text-sm font-medium text-muted-foreground">Aucune ligne.</p>
+      ) : (
+        <ol className="mt-2 divide-y text-sm">
+          {points.lignes.map((ligne, rang) => (
+            <li key={rang} className="flex items-center justify-between gap-4 py-2.5">
+              <span className="min-w-0">
+                <span className="font-bold">{ligne.libelle}</span>
+                <span className="block text-muted-foreground">
+                  {dateHeure(ligne.cree_le)} · {ligne.semestre ?? "hors semestre"}
+                </span>
+              </span>
+              <span className="shrink-0 font-extrabold tabular-nums text-primary">
+                {ligne.montant > 0 ? `+${ligne.montant}` : ligne.montant}
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      {pseudonyme && (
+        <DialoguePseudonyme
+          inscrit={inscrit}
+          actuel={eleve.pseudonyme}
+          fermer={() => setPseudonyme(false)}
+        />
+      )}
+      <DialogueMotif
+        ouvert={reinitialiser}
+        onOuvert={setReinitialiser}
+        titre="Réinitialiser le mot de passe"
+        description="Un mot de passe provisoire est créé et l'élève est déconnecté partout. Transmets-le lui en personne ou par son encadreur, et invite-le à le changer."
+        bouton="Réinitialiser"
+        danger
+        onConfirme={async (motif) => {
+          const { mot_de_passe } = await reinitialiserMotDePasse(inscrit.id, motif);
+          setProvisoire(mot_de_passe);
+          await router.invalidate();
+        }}
+      />
+      <Dialog open={provisoire !== null} onOpenChange={(o) => !o && setProvisoire(null)}>
+        <DialogContent className="rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl text-logo-blue">Mot de passe provisoire</DialogTitle>
+            <DialogDescription>
+              Il ne s'affichera plus : note-le maintenant. Identifiant : {inscrit.identifiant}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center gap-3 rounded-2xl bg-mist-soft p-4">
+            <code className="flex-1 font-mono text-xl font-bold tracking-wider">{provisoire}</code>
+            <Button
+              variant="outline"
+              className="rounded-full font-bold"
+              onClick={() => provisoire && void navigator.clipboard?.writeText(provisoire)}
+            >
+              <Copy className="size-4" /> Copier
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </section>
+  );
+}
+
+function DialoguePseudonyme({
+  inscrit,
+  actuel,
+  fermer,
+}: {
+  inscrit: InscritDetail;
+  actuel: string;
+  fermer: () => void;
+}) {
+  const router = useRouter();
+  const [pseudonyme, setPseudonyme] = useState("");
+  const [motif, setMotif] = useState("");
+
+  return (
+    <DialogueFormulaire
+      ouvert
+      onOuvert={(o) => !o && fermer()}
+      titre="Imposer un pseudonyme"
+      description={`Pseudonyme actuel : ${actuel}. Le nouveau suit les mêmes règles qu'à l'inscription.`}
+      bouton="Imposer"
+      onEnvoie={async () => {
+        await imposerPseudonyme(inscrit.id, pseudonyme, motif);
+        await router.invalidate();
+      }}
+    >
+      <Champ libelle="Nouveau pseudonyme">
+        <input
+          required
+          value={pseudonyme}
+          onChange={(e) => setPseudonyme(e.target.value)}
+          minLength={3}
+          maxLength={30}
+          className={CHAMP_ADMIN}
+        />
+      </Champ>
+      <Champ libelle="Motif (inscrit au journal)">
+        <Textarea
+          required
+          value={motif}
+          onChange={(e) => setMotif(e.target.value)}
+          minLength={3}
+          maxLength={500}
+          rows={3}
+          className="font-medium"
+        />
+      </Champ>
+    </DialogueFormulaire>
   );
 }

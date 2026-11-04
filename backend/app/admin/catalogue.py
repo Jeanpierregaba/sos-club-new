@@ -50,7 +50,7 @@ MODULES: dict[str, tuple[str, bool, tuple[Action, ...]]] = {
     "agenda": ("Agenda et campagnes", False, (C, CR, M, S, A, D)),
     "rapports": ("Rapports d'activités", False, (C, A)),
     "quiz": ("Quiz et certification", False, (C, CR, M, S, A, D)),
-    "points": ("Points et classements", False, (C, M)),
+    "points": ("Points et classements", True, (C, M)),
     "recompenses": ("Récompenses", False, (C, A)),
     "cartes": ("Cartes et QR codes", False, (C, M)),
     "notifications": ("Notifications et assistance", False, (C, M)),

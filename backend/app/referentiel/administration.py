@@ -11,7 +11,7 @@ from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import StaleDataError
@@ -21,6 +21,7 @@ from app.admin.journal import journaliser
 from app.admin.models import Collaborateur
 from app.comptes.models import StatutCompte, Utilisateur
 from app.comptes.service import VIOLATION_UNICITE
+from app.eleves.models import Eleve
 from app.referentiel.models import Axe, Dre, Etablissement, Iesg, StatutEtablissement, TypeEtablissement
 from app.referentiel.normalisation import normaliser
 from app.referentiel.schemas import (
@@ -37,6 +38,7 @@ from app.referentiel.schemas import (
     IesgCreation,
     IesgModification,
     PageEtablissements,
+    Remplacement,
 )
 from app.referentiel.service import filtrer_par_mots
 
@@ -333,7 +335,16 @@ async def modifier_iesg(db: AsyncSession, acces: Acces, iesg_id: UUID, entree: I
 # Établissements -------------------------------------------------------------------------------------------------
 
 
-def _etablissement_admin(etablissement: Etablissement, iesg: Iesg, dre: Dre) -> EtablissementAdmin:
+async def _eleves_par_etablissement(db: AsyncSession, ids: Sequence[UUID]) -> dict[UUID, int]:
+    lignes = await db.execute(
+        select(Eleve.etablissement_id, func.count())
+        .where(Eleve.etablissement_id.in_(ids))
+        .group_by(Eleve.etablissement_id)
+    )
+    return dict(lignes.all())
+
+
+def _etablissement_admin(etablissement: Etablissement, iesg: Iesg, dre: Dre, nb_eleves: int = 0) -> EtablissementAdmin:
     return EtablissementAdmin(
         id=etablissement.id,
         nom=etablissement.nom,
@@ -346,6 +357,7 @@ def _etablissement_admin(etablissement: Etablissement, iesg: Iesg, dre: Dre) -> 
         dre_code=dre.code,
         dre=dre.nom,
         modifie_le=etablissement.modifie_le,
+        nb_eleves=nb_eleves,
     )
 
 
@@ -379,13 +391,19 @@ async def lister_etablissements(
     if statut:
         requete = requete.where(Etablissement.statut == statut)
     total = await db.scalar(select(func.count()).select_from(requete.subquery())) or 0
-    lignes = await db.execute(
-        requete.order_by(Dre.ordre, Iesg.nom_normalise, Etablissement.nom_normalise, Etablissement.id)
-        .offset((page - 1) * par_page)
-        .limit(par_page)
-    )
+    lignes = (
+        await db.execute(
+            requete.order_by(Dre.ordre, Iesg.nom_normalise, Etablissement.nom_normalise, Etablissement.id)
+            .offset((page - 1) * par_page)
+            .limit(par_page)
+        )
+    ).all()
+    eleves = await _eleves_par_etablissement(db, [ligne[0].id for ligne in lignes])
     return PageEtablissements(
-        total=total, page=page, par_page=par_page, etablissements=[_etablissement_admin(*ligne) for ligne in lignes]
+        total=total,
+        page=page,
+        par_page=par_page,
+        etablissements=[_etablissement_admin(*ligne, eleves.get(ligne[0].id, 0)) for ligne in lignes],
     )
 
 
@@ -409,7 +427,8 @@ async def _detail_etablissement(db: AsyncSession, etablissement_id: UUID) -> Eta
             .where(Etablissement.id == etablissement_id)
         )
     ).one()
-    return _etablissement_admin(*ligne)
+    eleves = await _eleves_par_etablissement(db, [etablissement_id])
+    return _etablissement_admin(*ligne, eleves.get(etablissement_id, 0))
 
 
 async def creer_etablissement(
@@ -453,6 +472,38 @@ async def modifier_etablissement(
         _journaliser(db, acces, "etablissement", etablissement.id, iesg.dre_code, avant, apres, ip=ip)
     await db.commit()
     return await _detail_etablissement(db, etablissement.id)
+
+
+async def remplacer_proposition(
+    db: AsyncSession, acces: Acces, etablissement_id: UUID, entree: Remplacement, ip: str
+) -> EtablissementAdmin:
+    """Un établissement proposé par un élève existait déjà sous un autre nom : ses élèves rejoignent le bon, et la
+    proposition est désactivée. Le journal garde l'un et l'autre."""
+    proposition = await _obtenir(db, Etablissement, etablissement_id)
+    iesg = await _obtenir(db, Iesg, proposition.iesg_id)
+    _dans_perimetre(acces, iesg.dre_code)
+    _verifier_version(proposition, entree.version)
+    if proposition.statut != StatutEtablissement.propose:
+        raise Refus("Seul un établissement proposé peut être remplacé.", 409)
+    cible = await db.get(Etablissement, entree.cible_id, with_for_update=True)
+    if cible is None or cible.id == proposition.id or cible.statut != StatutEtablissement.actif:
+        raise Refus("Choisis un établissement actif de la liste.")
+    iesg_cible = await _obtenir(db, Iesg, cible.iesg_id)
+    _dans_perimetre(acces, iesg_cible.dre_code)
+    deplaces = await db.execute(
+        update(Eleve).where(Eleve.etablissement_id == proposition.id).values(etablissement_id=cible.id)
+    )
+    proposition.statut = StatutEtablissement.inactif
+    await _ecrire(db)
+    journaliser(
+        db, "etablissement_remplace", acces.utilisateur, cible_type="etablissement", cible_id=proposition.id,
+        perimetre=iesg.dre_code,
+        details={"avant": {"etablissement_id": str(proposition.id), "nom": proposition.nom},
+                 "apres": {"etablissement_id": str(cible.id), "nom": cible.nom}, "nb_eleves": deplaces.rowcount},
+        adresse_ip=ip,
+    )  # fmt: skip
+    await db.commit()
+    return await _detail_etablissement(db, cible.id)
 
 
 # Axes -----------------------------------------------------------------------------------------------------------

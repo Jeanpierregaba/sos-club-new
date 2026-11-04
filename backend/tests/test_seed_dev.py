@@ -13,6 +13,8 @@ from app.comptes.models import Utilisateur
 from app.config import settings
 from app.seed_dev import COMPTES, ProductionRefusee, ecrire_fichier, semer
 
+pytestmark = pytest.mark.usefixtures("annuaire")
+
 
 def acces_de(acces: list[dict[str, str]], identifiant: str) -> dict[str, str]:
     return next(a for a in acces if a["identifiant"] == identifiant)
@@ -93,3 +95,17 @@ def test_un_super_admin_se_connecte_aussi_par_e_mail(client: TestClient, en_base
     )
 
     assert reponse.json()["etape"] == "code"
+
+
+def test_les_eleves_ont_un_profil_et_leur_bienvenue(client: TestClient, en_base: Callable[..., Any]) -> None:
+    en_base(semer)
+    # Relancé : ni second profil, ni seconde ligne de bienvenue, ni second semestre.
+    eleve = acces_de(en_base(semer), "dev.eleve1")
+    client.post("/api/comptes/connexion", json={"identifiant": "dev.eleve1", "mot_de_passe": eleve["mot_de_passe"]})
+
+    espace = client.get("/api/eleves/moi").json()
+
+    assert espace["pseudonyme"] == "Ama du Golfe"
+    assert espace["etablissement"]["nom"] == "Lycée de Tokoin I"
+    assert espace["points"]["semestre"] is not None
+    assert (espace["points"]["points_semestre"], espace["points"]["total"]) == (100, 100)

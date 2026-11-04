@@ -130,6 +130,40 @@
         }
       }
     },
+    "/api/comptes/mot-de-passe": {
+      "post": {
+        "tags": [
+          "comptes"
+        ],
+        "summary": "Changer Mon Mot De Passe",
+        "operationId": "changer_mon_mot_de_passe_api_comptes_mot_de_passe_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotDePasseEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/moi": {
       "get": {
         "tags": [
@@ -1173,6 +1207,112 @@
         }
       }
     },
+    "/api/admin/inscrits/{utilisateur_id}/pseudonyme": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Imposer Pseudonyme",
+        "operationId": "imposer_pseudonyme_api_admin_inscrits__utilisateur_id__pseudonyme_post",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PseudonymeEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscritDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/inscrits/{utilisateur_id}/mot-de-passe": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Reinitialiser Mot De Passe",
+        "operationId": "reinitialiser_mot_de_passe_api_admin_inscrits__utilisateur_id__mot_de_passe_post",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotifEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MotDePasseProvisoire"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/exports/apercu": {
       "post": {
         "tags": [
@@ -2142,6 +2282,59 @@
         }
       }
     },
+    "/api/admin/referentiel/etablissements/{etablissement_id}/remplacer": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Remplacer Proposition",
+        "operationId": "admin_remplacer_proposition_api_admin_referentiel_etablissements__etablissement_id__remplacer_post",
+        "parameters": [
+          {
+            "name": "etablissement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Etablissement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Remplacement"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtablissementAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/referentiel/axes": {
       "get": {
         "tags": [
@@ -2241,6 +2434,320 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AxeAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/semestres": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister Semestres",
+        "operationId": "lister_semestres_api_admin_points_semestres_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SemestreAdmin"
+                  },
+                  "type": "array",
+                  "title": "Response Lister Semestres Api Admin Points Semestres Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Creer Semestre",
+        "operationId": "creer_semestre_api_admin_points_semestres_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SemestreCreation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemestreAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/semestres/{semestre_id}": {
+      "patch": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Modifier Semestre",
+        "operationId": "modifier_semestre_api_admin_points_semestres__semestre_id__patch",
+        "parameters": [
+          {
+            "name": "semestre_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Semestre Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SemestreModification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemestreAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/bareme": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister Bareme",
+        "operationId": "lister_bareme_api_admin_points_bareme_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LigneBaremeAdmin"
+                  },
+                  "type": "array",
+                  "title": "Response Lister Bareme Api Admin Points Bareme Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/bareme/{code}": {
+      "patch": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Modifier Bareme",
+        "operationId": "modifier_bareme_api_admin_points_bareme__code__patch",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LigneBaremeModification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LigneBaremeAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/eleves/inscription": {
+      "get": {
+        "tags": [
+          "eleves"
+        ],
+        "summary": "Etat Inscription",
+        "operationId": "etat_inscription_api_eleves_inscription_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatInscription"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "eleves"
+        ],
+        "summary": "Inscription",
+        "operationId": "inscription_api_eleves_inscription_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InscriptionEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Moi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/eleves/moi": {
+      "get": {
+        "tags": [
+          "eleves"
+        ],
+        "summary": "Mon Espace",
+        "operationId": "mon_espace_api_eleves_moi_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EspaceEleve"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "eleves"
+        ],
+        "summary": "Modifier Mon Profil",
+        "operationId": "modifier_mon_profil_api_eleves_moi_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfilModification"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EspaceEleve"
                 }
               }
             }
@@ -2608,6 +3115,15 @@
         ],
         "title": "AxePublic"
       },
+      "Beneficiaire": {
+        "type": "string",
+        "enum": [
+          "eleve",
+          "encadreur",
+          "club"
+        ],
+        "title": "Beneficiaire"
+      },
       "Catalogue": {
         "properties": {
           "modules": {
@@ -2666,6 +3182,19 @@
           "dre_actives"
         ],
         "title": "Catalogue"
+      },
+      "Classe": {
+        "type": "string",
+        "enum": [
+          "6e",
+          "5e",
+          "4e",
+          "3e",
+          "2nde",
+          "1re",
+          "tle"
+        ],
+        "title": "Classe"
       },
       "CodeEntree": {
         "properties": {
@@ -3331,6 +3860,48 @@
         ],
         "title": "Enrolement"
       },
+      "EspaceEleve": {
+        "properties": {
+          "pseudonyme": {
+            "type": "string",
+            "title": "Pseudonyme"
+          },
+          "classe": {
+            "$ref": "#/components/schemas/Classe"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "etablissement": {
+            "$ref": "#/components/schemas/EtablissementEleve"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "points": {
+            "$ref": "#/components/schemas/PointsEleve"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pseudonyme",
+          "classe",
+          "email",
+          "etablissement",
+          "version",
+          "points"
+        ],
+        "title": "EspaceEleve"
+      },
       "EtablissementAdmin": {
         "properties": {
           "id": {
@@ -3384,6 +3955,10 @@
             "type": "string",
             "format": "date-time",
             "title": "Modifie Le"
+          },
+          "nb_eleves": {
+            "type": "integer",
+            "title": "Nb Eleves"
           }
         },
         "type": "object",
@@ -3398,7 +3973,8 @@
           "iesg",
           "dre_code",
           "dre",
-          "modifie_le"
+          "modifie_le",
+          "nb_eleves"
         ],
         "title": "EtablissementAdmin"
       },
@@ -3438,6 +4014,44 @@
           "type"
         ],
         "title": "EtablissementCreation"
+      },
+      "EtablissementEleve": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "statut": {
+            "$ref": "#/components/schemas/StatutEtablissement"
+          },
+          "iesg": {
+            "type": "string",
+            "title": "Iesg"
+          },
+          "dre_code": {
+            "type": "string",
+            "title": "Dre Code"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "statut",
+          "iesg",
+          "dre_code",
+          "dre"
+        ],
+        "title": "EtablissementEleve"
       },
       "EtablissementModification": {
         "properties": {
@@ -3602,6 +4216,24 @@
         ],
         "title": "EtapeCode",
         "description": "Mot de passe juste, double authentification active : le code est demandé avant d'ouvrir la session."
+      },
+      "EtatInscription": {
+        "properties": {
+          "ouvertes": {
+            "type": "boolean",
+            "title": "Ouvertes"
+          },
+          "version_charte": {
+            "type": "string",
+            "title": "Version Charte"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ouvertes",
+          "version_charte"
+        ],
+        "title": "EtatInscription"
       },
       "EvenementJournal": {
         "properties": {
@@ -4206,6 +4838,95 @@
         ],
         "title": "Indicateur"
       },
+      "InscriptionEntree": {
+        "properties": {
+          "prenom": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Nom"
+          },
+          "pseudonyme": {
+            "type": "string",
+            "maxLength": 60,
+            "title": "Pseudonyme"
+          },
+          "identifiant": {
+            "type": "string",
+            "maxLength": 60,
+            "title": "Identifiant"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "maxLength": 256,
+            "title": "Mot De Passe"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 254
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "classe": {
+            "$ref": "#/components/schemas/Classe"
+          },
+          "charte": {
+            "type": "boolean",
+            "const": true,
+            "title": "Charte"
+          },
+          "consentement_parent": {
+            "type": "boolean",
+            "const": true,
+            "title": "Consentement Parent"
+          },
+          "etablissement_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Etablissement Id"
+          },
+          "proposition": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Proposition"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "prenom",
+          "nom",
+          "pseudonyme",
+          "identifiant",
+          "mot_de_passe",
+          "classe",
+          "charte",
+          "consentement_parent"
+        ],
+        "title": "InscriptionEntree"
+      },
       "Inscrit": {
         "properties": {
           "id": {
@@ -4356,6 +5077,16 @@
             },
             "type": "array",
             "title": "Historique"
+          },
+          "eleve": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProfilEleveAdmin"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -4482,6 +5213,139 @@
         ],
         "title": "JetonEntree"
       },
+      "LigneBaremeAdmin": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "beneficiaire": {
+            "$ref": "#/components/schemas/Beneficiaire"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "montant": {
+            "type": "integer",
+            "title": "Montant"
+          },
+          "propose": {
+            "type": "boolean",
+            "title": "Propose"
+          },
+          "en_service": {
+            "type": "boolean",
+            "title": "En Service"
+          },
+          "actif": {
+            "type": "boolean",
+            "title": "Actif"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "beneficiaire",
+          "libelle",
+          "montant",
+          "propose",
+          "en_service",
+          "actif",
+          "version"
+        ],
+        "title": "LigneBaremeAdmin"
+      },
+      "LigneBaremeModification": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "montant": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Montant"
+          },
+          "propose": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Propose"
+          },
+          "actif": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actif"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "LigneBaremeModification"
+      },
+      "LignePoints": {
+        "properties": {
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "montant": {
+            "type": "integer",
+            "title": "Montant"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          },
+          "semestre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Semestre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "libelle",
+          "montant",
+          "cree_le",
+          "semestre"
+        ],
+        "title": "LignePoints"
+      },
       "ModuleCatalogue": {
         "properties": {
           "id": {
@@ -4545,6 +5409,40 @@
           "role"
         ],
         "title": "Moi"
+      },
+      "MotDePasseEntree": {
+        "properties": {
+          "actuel": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Actuel"
+          },
+          "nouveau": {
+            "type": "string",
+            "maxLength": 256,
+            "title": "Nouveau"
+          }
+        },
+        "type": "object",
+        "required": [
+          "actuel",
+          "nouveau"
+        ],
+        "title": "MotDePasseEntree"
+      },
+      "MotDePasseProvisoire": {
+        "properties": {
+          "mot_de_passe": {
+            "type": "string",
+            "title": "Mot De Passe"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mot_de_passe"
+        ],
+        "title": "MotDePasseProvisoire"
       },
       "MotifEntree": {
         "properties": {
@@ -4654,6 +5552,187 @@
         ],
         "title": "PageJournal"
       },
+      "PointsEleve": {
+        "properties": {
+          "semestre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SemestreEleve"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "points_semestre": {
+            "type": "integer",
+            "title": "Points Semestre"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "lignes": {
+            "items": {
+              "$ref": "#/components/schemas/LignePoints"
+            },
+            "type": "array",
+            "title": "Lignes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "semestre",
+          "points_semestre",
+          "total",
+          "lignes"
+        ],
+        "title": "PointsEleve"
+      },
+      "ProfilEleveAdmin": {
+        "properties": {
+          "pseudonyme": {
+            "type": "string",
+            "title": "Pseudonyme"
+          },
+          "classe": {
+            "$ref": "#/components/schemas/Classe"
+          },
+          "charte_version": {
+            "type": "string",
+            "title": "Charte Version"
+          },
+          "etablissement": {
+            "$ref": "#/components/schemas/EtablissementEleve"
+          },
+          "points": {
+            "$ref": "#/components/schemas/PointsEleve"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pseudonyme",
+          "classe",
+          "charte_version",
+          "etablissement",
+          "points"
+        ],
+        "title": "ProfilEleveAdmin"
+      },
+      "ProfilModification": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "classe": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Classe"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "etablissement_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Etablissement Id"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 254
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "ProfilModification"
+      },
+      "Proposition": {
+        "properties": {
+          "iesg_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Iesg Id"
+          },
+          "nom": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Nom"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "iesg_id",
+          "nom"
+        ],
+        "title": "Proposition",
+        "description": "Un établissement absent du référentiel : créé « proposé », invisible du public, validé par l'admin."
+      },
+      "PseudonymeEntree": {
+        "properties": {
+          "pseudonyme": {
+            "type": "string",
+            "maxLength": 60,
+            "title": "Pseudonyme"
+          },
+          "motif": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Motif"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pseudonyme",
+          "motif"
+        ],
+        "title": "PseudonymeEntree"
+      },
+      "Remplacement": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "cible_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Cible Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version",
+          "cible_id"
+        ],
+        "title": "Remplacement",
+        "description": "Remplace un établissement proposé par un établissement existant : ses élèves y sont rattachés (spec 017)."
+      },
       "Role": {
         "type": "string",
         "enum": [
@@ -4700,6 +5779,153 @@
           "analyste"
         ],
         "title": "RoleDepart"
+      },
+      "SemestreAdmin": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date",
+            "title": "Fin"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "a_venir",
+              "en_cours",
+              "termine"
+            ],
+            "title": "Etat"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "libelle",
+          "debut",
+          "fin",
+          "etat",
+          "version"
+        ],
+        "title": "SemestreAdmin"
+      },
+      "SemestreCreation": {
+        "properties": {
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date",
+            "title": "Fin"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "libelle",
+          "debut",
+          "fin"
+        ],
+        "title": "SemestreCreation"
+      },
+      "SemestreEleve": {
+        "properties": {
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date",
+            "title": "Fin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "libelle",
+          "debut",
+          "fin"
+        ],
+        "title": "SemestreEleve"
+      },
+      "SemestreModification": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "libelle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Libelle"
+          },
+          "debut": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Debut"
+          },
+          "fin": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fin"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "SemestreModification"
       },
       "StatutCompte": {
         "type": "string",
@@ -4780,6 +6006,17 @@
             "type": "array",
             "title": "Indicateurs"
           },
+          "semestre_en_cours": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Semestre En Cours"
+          },
           "derniers_evenements": {
             "anyOf": [
               {
@@ -4802,6 +6039,7 @@
           "comptes_par_statut",
           "inscriptions_30_jours",
           "indicateurs",
+          "semestre_en_cours",
           "derniers_evenements"
         ],
         "title": "TableauDeBord"

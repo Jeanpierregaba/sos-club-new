@@ -22,7 +22,6 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 **Phase 1 — Comptes et clubs (P0, jalon A)**
 
-- [ ] R2 — Compte élève et registre des points : inscription, pseudonyme, +100, semestres et barème réglables (Q4, Q8, Q17, Q20 à Q22)
 - [ ] R3 — Compte encadreur : inscription, vérification par l'admin, +100 (Q16, Q22)
 - [ ] R4 — Clubs et présidence : création par l'élève président, validation, passation, carte des clubs réelle ; amender l'ADR-0003 (Q5, Q6, Q16, Q19)
 - [ ] R5 — Affiliations des élèves et rattachements des encadreurs (Q16, Q18)
@@ -71,6 +70,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] [017 — Compte élève et registre des points](docs/specs/017-compte-eleve/spec.md) (R2 : inscription avec pseudonyme et établissement proposé, +100 de bienvenue, espace élève, registre `mouvement_points`, semestres et barème réglables dans l'admin)
 - [x] [016 — Référentiel : DRE, IESG, établissements et axes](docs/specs/016-referentiel/spec.md) (R1 : 7 DRE, 19 IESG, 838 établissements, 7 axes d'intervention, écrans admin, carte des clubs branchée sur l'API)
 - [x] [015 — Espace administrateur, lot 1 : les fondations](docs/specs/015-espace-admin/spec.md) (tableau de bord, collaborateurs et droits, double authentification, journal, annuaire, exports)
 - [x] [001 — Connexion et rôles](docs/specs/001-connexion-et-roles/spec.md)

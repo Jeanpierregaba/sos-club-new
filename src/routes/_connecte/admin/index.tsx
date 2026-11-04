@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Clock, Download, UserPlus, Users } from "lucide-react";
+import { ArrowRight, CalendarX, Clock, Download, UserPlus, Users } from "lucide-react";
 
 import { EnTeteAdmin } from "@/components/admin/EnTeteAdmin";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
@@ -83,6 +83,21 @@ function TableauDeBordPage() {
 
       {tableau && (
         <>
+          {tableau.semestre_en_cours === null && (
+            <p
+              role="status"
+              className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl bg-sun/25 px-4 py-3 text-sm font-semibold text-ink"
+            >
+              <CalendarX aria-hidden className="size-4 shrink-0" />
+              Aucun semestre en cours : les points gagnés aujourd'hui ne comptent dans aucun
+              classement de semestre.
+              {peut(admin, "points", "consulter") && (
+                <Link to="/admin/points" className="font-bold text-logo-blue underline">
+                  Gérer les semestres
+                </Link>
+              )}
+            </p>
+          )}
           <section aria-labelledby="titre-comptes">
             <h2 id="titre-comptes" className="text-xl text-logo-blue">
               Comptes

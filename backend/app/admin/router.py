@@ -42,9 +42,11 @@ from app.admin.schemas import (
     InvitationEntree,
     JetonEntree,
     ModuleCatalogue,
+    MotDePasseProvisoire,
     MotifEntree,
     PageInscrits,
     PageJournal,
+    PseudonymeEntree,
     RoleCatalogue,
     TableauDeBord,
 )
@@ -60,6 +62,8 @@ from app.comptes.service import (
 )
 from app.config import settings
 from app.db import get_session
+from app.eleves import administration as administration_eleves
+from app.eleves.service import Refus as RefusEleve
 from app.referentiel.models import Dre
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -424,6 +428,34 @@ async def reactiver_inscrit(
     utilisateur_id: UUID, entree: MotifEntree, acces: GestionnaireInscrits, db: Base, request: Request
 ) -> InscritDetail:
     return await _statut_inscrit(utilisateur_id, StatutCompte.actif, entree, acces, db, request)
+
+
+@router.post("/inscrits/{utilisateur_id}/pseudonyme")
+async def imposer_pseudonyme(
+    utilisateur_id: UUID, entree: PseudonymeEntree, acces: GestionnaireInscrits, db: Base, request: Request
+) -> InscritDetail:
+    try:
+        await administration_eleves.imposer_pseudonyme(
+            db, acces, utilisateur_id, entree.pseudonyme, entree.motif, adresse_ip(request)
+        )
+    except administration_eleves.Introuvable:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Élève introuvable.") from None
+    except RefusEleve as refus:
+        raise HTTPException(refus.statut, str(refus)) from None
+    return await inscrits.detail(db, utilisateur_id)
+
+
+@router.post("/inscrits/{utilisateur_id}/mot-de-passe")
+async def reinitialiser_mot_de_passe(
+    utilisateur_id: UUID, entree: MotifEntree, acces: GestionnaireInscrits, db: Base, request: Request
+) -> MotDePasseProvisoire:
+    try:
+        provisoire = await administration_eleves.reinitialiser_mot_de_passe(
+            db, acces, utilisateur_id, entree.motif, adresse_ip(request)
+        )
+    except administration_eleves.Introuvable:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Élève introuvable.") from None
+    return MotDePasseProvisoire(mot_de_passe=provisoire)
 
 
 # Exports ----------------------------------------------------------------------------------------------------

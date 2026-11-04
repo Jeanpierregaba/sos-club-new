@@ -1,8 +1,9 @@
 from collections.abc import AsyncIterator
+from datetime import datetime
 
-from sqlalchemy import MetaData
+from sqlalchemy import DateTime, Integer, MetaData, func, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from app.config import settings
 
@@ -26,6 +27,17 @@ class Base(DeclarativeBase):
             "fk": "fk_%(table_name)s_%(column_0_N_name)s_%(referred_table_name)s",
             "pk": "pk_%(table_name)s",
         }
+    )
+
+
+class Suivi:
+    """Colonnes communes : verrou optimiste et dates. Chaque modèle déclare aussi
+    `__mapper_args__ = {"version_id_col": Suivi.version}` : deux collaborateurs ne s'écrasent pas."""
+
+    version: Mapped[int] = mapped_column(Integer, server_default=text("1"))
+    cree_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    modifie_le: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
 

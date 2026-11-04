@@ -1,6 +1,6 @@
 # 0004 — Journal de points et quiz arbitré par le serveur
 
-- **Statut** : Proposé
+- **Statut** : Accepté (registre mis en place par la spec 017 ; la partie quiz reste à livrer avec R9)
 - **Date** : 2026-11-02
 
 ## Contexte

@@ -7,6 +7,8 @@ from pydantic import BaseModel, ConfigDict, Field
 from app.admin.catalogue import Action, RoleDepart
 from app.admin.models import FormatExport, StatutExport, TypeExport
 from app.comptes.models import Role, StatutCompte
+from app.eleves.models import Classe
+from app.eleves.schemas import EtablissementEleve, PointsEleve
 
 Motif = Field(min_length=3, max_length=500)
 
@@ -178,8 +180,27 @@ class EvenementJournal(BaseModel):
     details: dict[str, Any]
 
 
+class ProfilEleveAdmin(BaseModel):
+    pseudonyme: str
+    classe: Classe
+    charte_version: str
+    etablissement: EtablissementEleve
+    points: PointsEleve
+
+
 class InscritDetail(Inscrit):
     historique: list[EvenementJournal]
+    # Pour un élève qui a son profil (spec 017) ; les comptes créés avant n'en ont pas.
+    eleve: ProfilEleveAdmin | None = None
+
+
+class PseudonymeEntree(BaseModel):
+    pseudonyme: str = Field(max_length=60)
+    motif: str = Motif
+
+
+class MotDePasseProvisoire(BaseModel):
+    mot_de_passe: str
 
 
 class PageJournal(BaseModel):
@@ -257,4 +278,6 @@ class TableauDeBord(BaseModel):
     comptes_par_statut: dict[StatutCompte, int]
     inscriptions_30_jours: list[tuple[str, int]]
     indicateurs: list[Indicateur]
+    # Libellé du semestre en cours ; None signale qu'aucun semestre n'est configuré pour aujourd'hui (spec 017).
+    semestre_en_cours: str | None
     derniers_evenements: list[EvenementJournal] | None

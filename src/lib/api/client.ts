@@ -44,6 +44,19 @@ export type EtablissementCreation = Schemas["EtablissementCreation"];
 export type EtablissementModification = Schemas["EtablissementModification"];
 export type AxeCreation = Schemas["AxeCreation"];
 export type AxeModification = Schemas["AxeModification"];
+export type Remplacement = Schemas["Remplacement"];
+export type EtatInscription = Schemas["EtatInscription"];
+export type InscriptionEntree = Schemas["InscriptionEntree"];
+export type Classe = Schemas["Classe"];
+export type EspaceEleve = Schemas["EspaceEleve"];
+export type ProfilModification = Schemas["ProfilModification"];
+export type PointsEleve = Schemas["PointsEleve"];
+export type ProfilEleveAdmin = Schemas["ProfilEleveAdmin"];
+export type SemestreAdmin = Schemas["SemestreAdmin"];
+export type SemestreCreation = Schemas["SemestreCreation"];
+export type SemestreModification = Schemas["SemestreModification"];
+export type LigneBaremeAdmin = Schemas["LigneBaremeAdmin"];
+export type LigneBaremeModification = Schemas["LigneBaremeModification"];
 
 export const MESSAGE_SAISIE = "Vérifie le formulaire : un champ est vide, trop long ou mal rempli.";
 
@@ -207,6 +220,11 @@ export const creerExport = (entree: ExportEntree) =>
   envoyerJson<ExportCree>("/api/admin/exports", entree);
 export const historiqueExports = () => requeteApi<ExportResume[]>("/api/admin/exports");
 
+export const imposerPseudonyme = (id: string, pseudonyme: string, motif: string) =>
+  envoyerJson<InscritDetail>(`/api/admin/inscrits/${id}/pseudonyme`, { pseudonyme, motif });
+export const reinitialiserMotDePasse = (id: string, motif: string) =>
+  envoyerJson<{ mot_de_passe: string }>(`/api/admin/inscrits/${id}/mot-de-passe`, { motif });
+
 export const chargerJournal = (filtres: Record<string, string | number | undefined>) =>
   requeteApi<PageJournal>(avecParametres("/api/admin/journal", filtres));
 
@@ -237,8 +255,31 @@ export const adminCreerEtablissement = (entree: EtablissementCreation) =>
   envoyerJson<EtablissementAdmin>(`${REFERENTIEL}/etablissements`, entree);
 export const adminModifierEtablissement = (id: string, entree: EtablissementModification) =>
   envoyerJson<EtablissementAdmin>(`${REFERENTIEL}/etablissements/${id}`, entree, "PATCH");
+export const adminRemplacerEtablissement = (id: string, entree: Remplacement) =>
+  envoyerJson<EtablissementAdmin>(`${REFERENTIEL}/etablissements/${id}/remplacer`, entree);
 export const adminListerAxes = () => requeteApi<AxeAdmin[]>(`${REFERENTIEL}/axes`);
 export const adminCreerAxe = (entree: AxeCreation) =>
   envoyerJson<AxeAdmin>(`${REFERENTIEL}/axes`, entree);
 export const adminModifierAxe = (code: string, entree: AxeModification) =>
   envoyerJson<AxeAdmin>(`${REFERENTIEL}/axes/${code}`, entree, "PATCH");
+
+// Compte élève et points (spec 017) ----------------------------------------------------------------------
+
+export const chargerEtatInscription = () => requeteApi<EtatInscription>("/api/eleves/inscription");
+export const inscrireEleve = (entree: InscriptionEntree) =>
+  envoyerJson<Moi>("/api/eleves/inscription", entree);
+export const chargerEspaceEleve = () => requeteApi<EspaceEleve>("/api/eleves/moi");
+export const modifierProfilEleve = (entree: ProfilModification) =>
+  envoyerJson<EspaceEleve>("/api/eleves/moi", entree, "PATCH");
+export const changerMotDePasse = (actuel: string, nouveau: string) =>
+  envoyerJson<void>("/api/comptes/mot-de-passe", { actuel, nouveau });
+
+const POINTS = "/api/admin/points";
+export const adminListerSemestres = () => requeteApi<SemestreAdmin[]>(`${POINTS}/semestres`);
+export const adminCreerSemestre = (entree: SemestreCreation) =>
+  envoyerJson<SemestreAdmin>(`${POINTS}/semestres`, entree);
+export const adminModifierSemestre = (id: string, entree: SemestreModification) =>
+  envoyerJson<SemestreAdmin>(`${POINTS}/semestres/${id}`, entree, "PATCH");
+export const adminListerBareme = () => requeteApi<LigneBaremeAdmin[]>(`${POINTS}/bareme`);
+export const adminModifierBareme = (code: string, entree: LigneBaremeModification) =>
+  envoyerJson<LigneBaremeAdmin>(`${POINTS}/bareme/${code}`, entree, "PATCH");

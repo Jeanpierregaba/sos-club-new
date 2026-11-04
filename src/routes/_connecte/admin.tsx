@@ -16,6 +16,7 @@ import {
   Menu,
   ScrollText,
   ShieldCheck,
+  Star,
   UserCog,
   Users,
   type LucideIcon,
@@ -91,6 +92,12 @@ function entrees(admin: AdminMoi): Entree[] {
       libelle: "Référentiel",
       i: MapPinned,
       visible: peut(admin, "clubs", "consulter"),
+    },
+    {
+      to: "/admin/points",
+      libelle: "Points",
+      i: Star,
+      visible: peut(admin, "points", "consulter"),
     },
     {
       to: "/admin/journal",
