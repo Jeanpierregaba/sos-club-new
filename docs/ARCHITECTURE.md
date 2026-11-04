@@ -114,7 +114,7 @@ pour la ressource demandée.
 | Modérer, publier vidéos et documents, valider un club, attribuer un badge | Non      | Non     | Non                | Oui   |
 
 Un élève ne peut ni voir les coordonnées d'un autre utilisateur, ni être contacté par un autre
-utilisateur. Sur les pages publiques, un élève apparaît en prénom, initiale du nom et nom du club.
+utilisateur. Sur les pages publiques, un élève apparaît par son pseudonyme et le nom de son club.
 
 ## Intégrations externes
 

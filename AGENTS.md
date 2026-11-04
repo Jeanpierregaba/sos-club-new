@@ -35,7 +35,7 @@ des points et des classements. Détail : `docs/PRD.md`.
 - `backend/alembic/` : les migrations ; `backend/tests/` : les tests de l'API
 - `docker-compose.yml` : la base PostgreSQL de développement
 - `deploy/` : le déploiement sur le VPS (voir `deploy/README.md`), `Dockerfile` et `backend/Dockerfile` : les images
-- `docs/cahier-des-charges.md` : le document source ; `docs/PRD.md` fait foi en cas d'écart
+- `docs/cahier-des-charges.md` et `docs/cdc/` : les cahiers des charges sources ; `docs/PRD.md` fait foi en cas d'écart
 
 ## Commandes
 
@@ -48,6 +48,7 @@ des points et des classements. Détail : `docs/PRD.md`.
 - Build : site `npm run build`
 - Types de l'API : `cd backend && uv run python -m app.export_openapi`, puis `npm run api:types`
 - Créer un compte : `cd backend && uv run python -m app.comptes.creer_compte --help`
+- Comptes de démonstration, base locale seulement : `cd backend && uv run python -m app.seed_dev` (accès dans `.comptes-dev.local`)
 
 ## Règles d'architecture non négociables
 
@@ -55,7 +56,7 @@ des points et des classements. Détail : `docs/PRD.md`.
 - Les droits se vérifient dans l'API, sur chaque route, pour la ressource demandée (ADR-0003).
 - Tout point passe par le journal `mouvement_points` et le domaine `points` ; un score est une somme (ADR-0004).
 - Le serveur seul arbitre les quiz : temps, résultat, et réponses jamais envoyées d'avance (ADR-0004).
-- Un élève n'apparaît publiquement qu'en prénom, initiale et club ; rien de public sans modération (`docs/RULES.md`).
+- Un élève n'apparaît publiquement que par son pseudonyme et son club ; rien de public sans modération (`docs/RULES.md`).
 
 ## Conventions de code
 
@@ -99,6 +100,7 @@ On travaille sur `develop`, qui déploie la preprod. `main` déploie la prod à 
 | Information                                | Emplacement                          |
 | ------------------------------------------ | ------------------------------------ |
 | Ce qu'on construit et pourquoi             | `docs/PRD.md`                        |
+| Dans quel ordre on le construit            | `docs/ROADMAP.md`                    |
 | Comment c'est construit                    | `docs/ARCHITECTURE.md`               |
 | Charte visuelle, composants, parcours      | `docs/DESIGN.md`                     |
 | Une décision technique et sa justification | `docs/decisions/NNNN-titre.md` (ADR) |

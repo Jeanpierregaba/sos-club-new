@@ -32,8 +32,10 @@ ne doit JAMAIS enfreindre, quelle que soit la demande. Les règles déjà impos�
 
 ## Spécifiques au projet
 
-- Ne jamais exposer publiquement les coordonnées d'un élève, ni plus que son prénom, l'initiale de son
-  nom et son club. Jamais de liste publique des membres d'un club.
+- Ne jamais exposer publiquement le nom complet ni les coordonnées d'un élève : hors de l'espace admin,
+  un élève n'apparaît que par son pseudonyme et, s'il le souhaite, son club (`docs/PRD.md`, Q20).
+- Jamais de liste publique des membres d'un club : elle n'est visible que de ses membres affiliés, de ses
+  encadreurs rattachés et des collaborateurs habilités.
 - Ne jamais ajouter de messagerie privée ni de moyen de contacter un élève sans décision écrite dans un ADR.
 - Ne jamais collecter de donnée de santé individuelle (dépistage inclus) sans spec et validation juridique.
 - Ne jamais charger de vraies données d'élèves avant le récépissé de l'IPDCP (voir `docs/PRD.md`, Q9).

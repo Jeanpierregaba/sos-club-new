@@ -58,7 +58,7 @@ juridique.
 - [ ] Consentement du représentant légal des élèves mineurs recueilli selon l'avis juridique (Q8), sa date enregistrée.
 - [ ] Photos d'élèves publiées seulement avec l'attestation de l'encadreur ; retrait possible sur demande.
 - [ ] Données limitées au nécessaire : ni date de naissance exacte, ni adresse, ni photo de profil, ni téléphone d'élève.
-- [ ] Élèves affichés en prénom, initiale et club ; pas de liste publique de membres.
+- [ ] Élèves affichés par leur pseudonyme et leur club ; liste des membres réservée au club.
 - [ ] Pas de messagerie privée, pas de commentaire d'élève ; un témoignage est toujours modéré avant publication.
 - [ ] Modérateurs alertés sur les témoignages révélant une situation de danger : procédure à définir avec AIMES-AFRIQUE.
 - [ ] Aucune donnée de santé individuelle dans le MVP (art. 21 et 24).

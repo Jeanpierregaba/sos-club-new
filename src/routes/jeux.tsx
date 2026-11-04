@@ -324,8 +324,9 @@ function Jeux() {
       <section className="bg-mist-soft py-20">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 lg:grid-cols-[1fr_1.1fr]">
           <EnTete sur="Émulation & classement" bleu="Le classement" vert="national">
-            Les élèves sentinelles et les établissements les plus engagés y apparaîtront, en prénom,
-            initiale et club, dès l’ouverture des quiz. Connecte-toi pour y inscrire ton nom !
+            Les élèves sentinelles et les établissements les plus engagés y apparaîtront, avec leur
+            pseudonyme et leur club, dès l’ouverture des quiz. Connecte-toi pour y inscrire ton nom
+            !
           </EnTete>
           <div data-reveal="zoom" className="flex items-end justify-center gap-3 sm:gap-5">
             {[

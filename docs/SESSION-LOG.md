@@ -14,6 +14,19 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-04 — Espace admin lot 1, comptes de démonstration et roadmap
+
+- Fait : spec 015 livrée (collaborateurs et droits, double authentification, journal d'audit, annuaire,
+  exports), relue par le sous-agent `reviewer` et corrigée. Seed `python -m app.seed_dev` (11 comptes
+  `dev.*`, accès dans `.comptes-dev.local`). Refonte des pages Hall of Fame et Connexion. Quatre CDC
+  reçus (admin, élève, club et président, encadreur), transcrits dans `docs/cdc/` ; PRD réécrit,
+  [roadmap](ROADMAP.md) en 8 phases ; Q17 à Q20 et Q28 validées, règle du pseudonyme dans `RULES.md`.
+- Pièges rencontrés : le port 8000 est pris par un autre projet, l'API locale tourne sur 8001
+  (`API_URL_INTERNE`). `uv` est dans `~/.local/bin`, absent du PATH du terminal de l'utilisateur.
+- Décisions : [ADR-0008](decisions/0008-droits-des-collaborateurs-et-double-authentification.md).
+- Prochaine étape : préparer le VPS de préproduction, puis `/spec` pour R1 (référentiel DRE,
+  établissements, axes).
+
 ### 2026-11-02 — Préparation du déploiement sur VPS
 
 - Fait : branche `develop` créée, tout poussé sur `develop` et `main` (`f07a23e`), première CI au vert. Images Docker, pile `deploy/`, workflow `deployer.yml`.
