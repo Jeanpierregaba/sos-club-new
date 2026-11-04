@@ -21,6 +21,8 @@ x-durci: &durci
 x-base: &base
   DATABASE_URL: postgresql+asyncpg://sosclub:${POSTGRES_PASSWORD:?}@db:5432/sosclub
   SITE_ORIGINE: ${SITE_ORIGINE:?}
+  # La configuration de l'API l'exige en HTTPS, y compris pour lancer les migrations.
+  CLE_CHIFFREMENT: ${CLE_CHIFFREMENT:?CLE_CHIFFREMENT est obligatoire, voir env.example}
 
 services:
   db:
@@ -65,7 +67,6 @@ services:
       # Le port n'est pas publié : seul le proxy peut joindre ce conteneur, et il écrase X-Forwarded-For.
       FORWARDED_ALLOW_IPS: "*"
       WEB_CONCURRENCY: ${API_PROCESSUS:-2}
-      CLE_CHIFFREMENT: ${CLE_CHIFFREMENT:?CLE_CHIFFREMENT est obligatoire, voir env.example}
       SMTP_HOTE: ${SMTP_HOTE:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_SECURITE: ${SMTP_SECURITE:-starttls}
