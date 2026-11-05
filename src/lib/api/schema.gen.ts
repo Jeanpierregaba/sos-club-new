@@ -1093,6 +1093,111 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/clubs/{club_id}/adhesions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Demander Adhesion */
+        post: operations["demander_adhesion_api_clubs__club_id__adhesions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}/adhesions/moi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Quitter Le Club
+         * @description Annule la demande en cours, ou quitte le club.
+         */
+        delete: operations["quitter_le_club_api_clubs__club_id__adhesions_moi_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}/adhesions/demandes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Demandes Adhesion */
+        get: operations["demandes_adhesion_api_clubs__club_id__adhesions_demandes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}/adhesions/{adhesion_id}/confirmer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirmer Adhesion */
+        post: operations["confirmer_adhesion_api_clubs__club_id__adhesions__adhesion_id__confirmer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}/adhesions/{adhesion_id}/refuser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refuser Adhesion */
+        post: operations["refuser_adhesion_api_clubs__club_id__adhesions__adhesion_id__refuser_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}/adhesions/{adhesion_id}/retirer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retirer Membre */
+        post: operations["retirer_membre_api_clubs__club_id__adhesions__adhesion_id__retirer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/clubs": {
         parameters: {
             query?: never;
@@ -1280,6 +1385,40 @@ export interface components {
             email: string;
             /** Double Auth Requise */
             double_auth_requise: boolean;
+        };
+        /**
+         * AdhesionResume
+         * @description Une adhésion, vue par l'élève concerné : son état et, s'il y en a, les motifs de refus ou de retrait.
+         */
+        AdhesionResume: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Club Id
+             * Format: uuid
+             */
+            club_id: string;
+            /** Club Nom */
+            club_nom: string;
+            /**
+             * Etat
+             * @enum {string}
+             */
+            etat: "en_attente_president" | "en_attente_validation" | "active" | "refusee" | "retiree";
+            /**
+             * Demande Le
+             * Format: date-time
+             */
+            demande_le: string;
+            /** Motif Refus */
+            motif_refus?: string | null;
+            /** Motif Retrait */
+            motif_retrait?: string | null;
+            /** Version */
+            version: number;
         };
         /** AdminMoi */
         AdminMoi: {
@@ -1576,6 +1715,33 @@ export interface components {
             /** Mot De Passe */
             mot_de_passe: string;
         };
+        /** DecisionEntree */
+        DecisionEntree: {
+            /** Version */
+            version: number;
+        };
+        /**
+         * DemandeAdhesion
+         * @description Une demande d'affiliation, vue par le président : le pseudonyme du demandeur, jamais son nom.
+         */
+        DemandeAdhesion: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Pseudonyme */
+            pseudonyme: string;
+            /** Classe */
+            classe: string;
+            /**
+             * Demande Le
+             * Format: date-time
+             */
+            demande_le: string;
+            /** Version */
+            version: number;
+        };
         /**
          * DemandeClub
          * @description Copie d'une demande dans la file d'un collaborateur.
@@ -1780,6 +1946,7 @@ export interface components {
             version: number;
             points: components["schemas"]["ResumePoints"];
             club?: components["schemas"]["ClubResume"] | null;
+            adhesion?: components["schemas"]["AdhesionResume"] | null;
         };
         /** EspaceEncadreur */
         EspaceEncadreur: {
@@ -2582,6 +2749,13 @@ export interface components {
             /** Motif */
             motif: string;
         };
+        /** RefusDemandeEntree */
+        RefusDemandeEntree: {
+            /** Motif */
+            motif: string;
+            /** Version */
+            version: number;
+        };
         /** RefusEntree */
         RefusEntree: {
             /** Motif */
@@ -2611,6 +2785,16 @@ export interface components {
             total: number;
             /** Lignes */
             lignes: components["schemas"]["LignePoints"][];
+        };
+        /**
+         * RetraitEntree
+         * @description Le retrait d'un membre par le président : le motif est facultatif.
+         */
+        RetraitEntree: {
+            /** Motif */
+            motif?: string | null;
+            /** Version */
+            version: number;
         };
         /**
          * Role
@@ -4930,6 +5114,207 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PassationApercu"];
+                };
+            };
+        };
+    };
+    demander_adhesion_api_clubs__club_id__adhesions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdhesionResume"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quitter_le_club_api_clubs__club_id__adhesions_moi_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdhesionResume"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    demandes_adhesion_api_clubs__club_id__adhesions_demandes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemandeAdhesion"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirmer_adhesion_api_clubs__club_id__adhesions__adhesion_id__confirmer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+                adhesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdhesionResume"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refuser_adhesion_api_clubs__club_id__adhesions__adhesion_id__refuser_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+                adhesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefusDemandeEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdhesionResume"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retirer_membre_api_clubs__club_id__adhesions__adhesion_id__retirer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+                adhesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RetraitEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdhesionResume"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

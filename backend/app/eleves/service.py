@@ -116,6 +116,7 @@ async def _profil(db: AsyncSession, utilisateur: Utilisateur, *, verrouiller: bo
 
 async def espace(db: AsyncSession, utilisateur: Utilisateur) -> EspaceEleve:
     eleve = await _profil(db, utilisateur)
+    from app.clubs.adhesions import mon_adhesion
     from app.clubs.service import club_lie
 
     return EspaceEleve(
@@ -126,6 +127,7 @@ async def espace(db: AsyncSession, utilisateur: Utilisateur) -> EspaceEleve:
         version=eleve.version,
         points=await points.resume(db, utilisateur.id, 20),
         club=await club_lie(db, utilisateur),
+        adhesion=await mon_adhesion(db, utilisateur),
     )
 
 

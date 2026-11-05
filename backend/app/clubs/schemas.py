@@ -154,3 +154,51 @@ class Passation(BaseModel):
 class FilePassations(BaseModel):
     total: int
     passations: list[Passation]
+
+
+# Affiliations et rattachements (spec 020) --------------------------------------------------------------------
+
+
+class AdhesionResume(BaseModel):
+    """Une adhésion, vue par l'élève concerné : son état et, s'il y en a, les motifs de refus ou de retrait."""
+
+    id: UUID
+    club_id: UUID
+    club_nom: str
+    etat: Literal["en_attente_president", "en_attente_validation", "active", "refusee", "retiree"]
+    demande_le: datetime
+    motif_refus: str | None = None
+    motif_retrait: str | None = None
+    version: int
+
+
+class DemandeAdhesion(BaseModel):
+    """Une demande d'affiliation, vue par le président : le pseudonyme du demandeur, jamais son nom."""
+
+    id: UUID
+    pseudonyme: str
+    classe: str
+    demande_le: datetime
+    version: int
+
+
+class DecisionEntree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    version: int = Field(ge=1)
+
+
+class RefusDemandeEntree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    motif: Motif
+    version: int = Field(ge=1)
+
+
+class RetraitEntree(BaseModel):
+    """Le retrait d'un membre par le président : le motif est facultatif."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    motif: Annotated[str, Field(max_length=500)] | None = None
+    version: int = Field(ge=1)

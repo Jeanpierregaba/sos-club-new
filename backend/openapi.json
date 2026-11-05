@@ -3192,6 +3192,329 @@
         }
       }
     },
+    "/api/clubs/{club_id}/adhesions": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Demander Adhesion",
+        "operationId": "demander_adhesion_api_clubs__club_id__adhesions_post",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdhesionResume"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}/adhesions/moi": {
+      "delete": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Quitter Le Club",
+        "description": "Annule la demande en cours, ou quitte le club.",
+        "operationId": "quitter_le_club_api_clubs__club_id__adhesions_moi_delete",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdhesionResume"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}/adhesions/demandes": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Demandes Adhesion",
+        "operationId": "demandes_adhesion_api_clubs__club_id__adhesions_demandes_get",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DemandeAdhesion"
+                  },
+                  "title": "Response Demandes Adhesion Api Clubs  Club Id  Adhesions Demandes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}/adhesions/{adhesion_id}/confirmer": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Confirmer Adhesion",
+        "operationId": "confirmer_adhesion_api_clubs__club_id__adhesions__adhesion_id__confirmer_post",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          },
+          {
+            "name": "adhesion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Adhesion Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdhesionResume"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}/adhesions/{adhesion_id}/refuser": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Refuser Adhesion",
+        "operationId": "refuser_adhesion_api_clubs__club_id__adhesions__adhesion_id__refuser_post",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          },
+          {
+            "name": "adhesion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Adhesion Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefusDemandeEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdhesionResume"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}/adhesions/{adhesion_id}/retirer": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Retirer Membre",
+        "operationId": "retirer_membre_api_clubs__club_id__adhesions__adhesion_id__retirer_post",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          },
+          {
+            "name": "adhesion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Adhesion Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetraitEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdhesionResume"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clubs": {
       "get": {
         "tags": [
@@ -3678,6 +4001,77 @@
           "double_auth_requise"
         ],
         "title": "ActivationInfo"
+      },
+      "AdhesionResume": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "club_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Club Id"
+          },
+          "club_nom": {
+            "type": "string",
+            "title": "Club Nom"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "en_attente_president",
+              "en_attente_validation",
+              "active",
+              "refusee",
+              "retiree"
+            ],
+            "title": "Etat"
+          },
+          "demande_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Demande Le"
+          },
+          "motif_refus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Refus"
+          },
+          "motif_retrait": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Retrait"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "club_id",
+          "club_nom",
+          "etat",
+          "demande_le",
+          "version"
+        ],
+        "title": "AdhesionResume",
+        "description": "Une adhésion, vue par l'élève concerné : son état et, s'il y en a, les motifs de refus ou de retrait."
       },
       "AdminMoi": {
         "properties": {
@@ -4605,6 +4999,57 @@
         ],
         "title": "ConnexionEntree"
       },
+      "DecisionEntree": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "DecisionEntree"
+      },
+      "DemandeAdhesion": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "pseudonyme": {
+            "type": "string",
+            "title": "Pseudonyme"
+          },
+          "classe": {
+            "type": "string",
+            "title": "Classe"
+          },
+          "demande_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Demande Le"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "pseudonyme",
+          "classe",
+          "demande_le",
+          "version"
+        ],
+        "title": "DemandeAdhesion",
+        "description": "Une demande d'affiliation, vue par le président : le pseudonyme du demandeur, jamais son nom."
+      },
       "DemandeClub": {
         "properties": {
           "id": {
@@ -5250,6 +5695,16 @@
             "anyOf": [
               {
                 "$ref": "#/components/schemas/ClubResume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "adhesion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdhesionResume"
               },
               {
                 "type": "null"
@@ -7698,6 +8153,27 @@
         ],
         "title": "PseudonymeEntree"
       },
+      "RefusDemandeEntree": {
+        "properties": {
+          "motif": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Motif"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "motif",
+          "version"
+        ],
+        "title": "RefusDemandeEntree"
+      },
       "RefusEntree": {
         "properties": {
           "motif": {
@@ -7783,6 +8259,34 @@
           "lignes"
         ],
         "title": "ResumePoints"
+      },
+      "RetraitEntree": {
+        "properties": {
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "RetraitEntree",
+        "description": "Le retrait d'un membre par le président : le motif est facultatif."
       },
       "Role": {
         "type": "string",

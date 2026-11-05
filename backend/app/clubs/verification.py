@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
+from app.clubs.adhesions import adhesion_president
 from app.clubs.models import Club, ClubAxe, ClubPassation, EtatClub, EtatPassation
 from app.clubs.schemas import DemandeClub, EncadreurAssocie, FileClubs, FilePassations, Passation
 from app.comptes.inscription import Refus
@@ -128,6 +129,27 @@ async def compter_en_attente(db: AsyncSession, acces: Acces) -> int:
 Ligne = tuple[Club, Utilisateur, Eleve, Etablissement, Iesg, Dre]
 
 
+async def club_du_perimetre(db: AsyncSession, acces: Acces, club_id: UUID) -> Club:
+    """Le club demandé, s'il est dans le périmètre du collaborateur ; pour les autres, rien (404).
+
+    Même garde que pour les demandes (spec 019) : un collaborateur de DRE ne voit et ne décide que les clubs
+    de son périmètre ; le périmètre se lit sur l'établissement actuel, sous verrou, au moment de la décision.
+    """
+    requete = (
+        select(Club)
+        .join(Etablissement, Etablissement.id == Club.etablissement_id)
+        .join(Iesg, Iesg.id == Etablissement.iesg_id)
+        .join(Dre, Dre.code == Iesg.dre_code)
+        .where(Club.id == club_id)
+    )
+    if not acces.national:
+        requete = requete.where(Iesg.dre_code == acces.collaborateur.perimetre_dre)
+    club = (await db.execute(requete)).scalar_one_or_none()
+    if club is None:
+        raise Introuvable
+    return club
+
+
 async def _a_decider(db: AsyncSession, acces: Acces, club_id: UUID, version: int | None = None) -> Ligne:
     """La demande, verrouillée : deux décisions simultanées passent l'une après l'autre. Le périmètre se lit
     sur l'établissement actuel : un changement d'établissement concurrent fait sortir la demande du périmètre."""
@@ -162,6 +184,8 @@ async def activer(db: AsyncSession, acces: Acces, club_id: UUID, ip: str, versio
     club.decide_le = datetime.now(UTC)
     club.decide_par = acces.utilisateur.id
     club.actif_le = datetime.now(UTC)
+    # Le président est membre de droit de son club (spec 020).
+    await adhesion_president(db, club)
     # Une doublure en attente du même établissement est refusée automatiquement, dans la même transaction.
     doublures = (
         await db.scalars(

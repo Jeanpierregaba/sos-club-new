@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from app.clubs.schemas import ClubResume
+from app.clubs.schemas import AdhesionResume, ClubResume
 from app.comptes.service import LONGUEUR_MAX_MOT_DE_PASSE
 from app.eleves.models import Classe
 from app.points.schemas import ResumePoints
@@ -47,6 +47,8 @@ class EspaceEleve(BaseModel):
     points: ResumePoints
     # Le club de cet Élève, ou sa demande en cours (spec 019) ; None sans demande.
     club: ClubResume | None = None
+    # Son affiliation à un club (spec 020) : en cours, sinon la dernière, pour lire un motif de refus.
+    adhesion: AdhesionResume | None = None
 
 
 class ProfilModification(BaseModel):

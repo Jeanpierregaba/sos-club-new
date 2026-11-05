@@ -1,4 +1,5 @@
-"""Clubs (spec 019) : demande et espace de l'élève sous /clubs, lecture publique, vérification sous /admin/clubs."""
+"""Clubs (spec 019) : demande et espace de l'élève sous /clubs, lecture publique, vérification sous /admin/clubs.
+Affiliations et rattachements (spec 020) : demandes, décisions du président, files des collaborateurs."""
 
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -10,13 +11,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.catalogue import Action
 from app.admin.dependances import Acces, adresse_ip, exiger_permission
-from app.clubs import service, verification
+from app.clubs import adhesions, service, verification
 from app.clubs.models import EtatClub
 from app.clubs.schemas import (
     ActivationEntree,
+    AdhesionResume,
     ClubFiche,
     ClubPublic,
     ClubResume,
+    DecisionEntree,
+    DemandeAdhesion,
     DemandeClub,
     DemandeClubEntree,
     FileClubs,
@@ -25,7 +29,9 @@ from app.clubs.schemas import (
     Passation,
     PassationApercu,
     PassationEntree,
+    RefusDemandeEntree,
     RefusEntree,
+    RetraitEntree,
 )
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.inscription import Refus
@@ -92,6 +98,56 @@ async def proposer_passation(
 async def annuler_passation(request: Request, utilisateur: Connecte, db: Base) -> PassationApercu:
     with _traduire_refus():
         return await service.annuler_passation(db, utilisateur, _adresse(request))
+
+
+# Affiliations (spec 020) : l'élève demande ou se retire, le président confirme, refuse ou retire ---------------
+
+
+@router.post("/{club_id}/adhesions", status_code=status.HTTP_201_CREATED)
+async def demander_adhesion(club_id: UUID, request: Request, utilisateur: Connecte, db: Base) -> AdhesionResume:
+    with _traduire_refus():
+        return await adhesions.demander(db, utilisateur, club_id, _adresse(request))
+
+
+@router.delete("/{club_id}/adhesions/moi")
+async def quitter_le_club(club_id: UUID, request: Request, utilisateur: Connecte, db: Base) -> AdhesionResume:
+    """Annule la demande en cours, ou quitte le club."""
+    with _traduire_refus():
+        return await adhesions.se_retirer(db, utilisateur, club_id, _adresse(request))
+
+
+@router.get("/{club_id}/adhesions/demandes")
+async def demandes_adhesion(club_id: UUID, utilisateur: Connecte, db: Base) -> list[DemandeAdhesion]:
+    with _traduire_refus():
+        return await adhesions.demandes_a_confirmer(db, utilisateur, club_id)
+
+
+@router.post("/{club_id}/adhesions/{adhesion_id}/confirmer")
+async def confirmer_adhesion(
+    club_id: UUID, adhesion_id: UUID, entree: DecisionEntree, request: Request, utilisateur: Connecte, db: Base
+) -> AdhesionResume:
+    with _traduire_refus():
+        return await adhesions.confirmer(db, utilisateur, club_id, adhesion_id, entree.version, _adresse(request))
+
+
+@router.post("/{club_id}/adhesions/{adhesion_id}/refuser")
+async def refuser_adhesion(
+    club_id: UUID, adhesion_id: UUID, entree: RefusDemandeEntree, request: Request, utilisateur: Connecte, db: Base
+) -> AdhesionResume:
+    with _traduire_refus():
+        return await adhesions.refuser(
+            db, utilisateur, club_id, adhesion_id, entree.motif, entree.version, _adresse(request)
+        )
+
+
+@router.post("/{club_id}/adhesions/{adhesion_id}/retirer")
+async def retirer_membre(
+    club_id: UUID, adhesion_id: UUID, entree: RetraitEntree, request: Request, utilisateur: Connecte, db: Base
+) -> AdhesionResume:
+    with _traduire_refus():
+        return await adhesions.retirer(
+            db, utilisateur, club_id, adhesion_id, entree.motif, entree.version, _adresse(request)
+        )
 
 
 # Public -----------------------------------------------------------------------------------------------------

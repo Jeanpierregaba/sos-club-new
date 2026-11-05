@@ -15,11 +15,11 @@ Chaque tâche est autonome et committable ; lint, typecheck et tests passent ava
 
 ## Tâche 2 — API affiliations : élève et président
 
-- [ ] Tests d'abord pour la confirmation par le président (TDD)
-- [ ] `adhesions.py` : demander, annuler ou se retirer, confirmer, refuser, retirer
-- [ ] Président membre de droit : adhésion créée à l'activation du club (spec 019)
-- [ ] État de l'adhésion dans l'espace élève (`GET /api/eleves/moi`)
-- [ ] `tests/test_clubs_adhesions.py` (parcours, doublons, droits, retraits)
+- [x] Tests d'abord pour la confirmation par le président (TDD)
+- [x] `adhesions.py` : demander, annuler ou se retirer, confirmer, refuser, retirer
+- [x] Président membre de droit : adhésion créée à l'activation du club (spec 019)
+- [x] État de l'adhésion dans l'espace élève (`GET /api/eleves/moi`)
+- [x] `tests/test_clubs_adhesions.py` (parcours, doublons, droits, retraits)
 
 **Commit :** `feat(clubs): affiliations, demande et confirmation par le président`
 
