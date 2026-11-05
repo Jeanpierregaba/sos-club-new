@@ -202,3 +202,36 @@ class RetraitEntree(BaseModel):
 
     motif: Annotated[str, Field(max_length=500)] | None = None
     version: int = Field(ge=1)
+
+
+class RattachementResume(BaseModel):
+    """Un rattachement, vu par l'encadreur concerné."""
+
+    id: UUID
+    club_id: UUID
+    club_nom: str
+    etat: Literal["en_attente_president", "en_attente_validation", "actif", "refuse", "retire"]
+    # Au-delà du premier club, seule l'équipe nationale peut valider (Q16).
+    supplementaire: bool
+    demande_le: datetime
+    motif_refus: str | None = None
+    motif_retrait: str | None = None
+    version: int
+
+
+class DemandeRattachement(BaseModel):
+    """Une demande de rattachement, vue par le président : un encadreur est un adulte identifié par son nom."""
+
+    id: UUID
+    prenom: str
+    nom: str
+    fonction: str
+    etablissement: str
+    demande_le: datetime
+    version: int
+
+
+class MesClubs(BaseModel):
+    """L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés."""
+
+    rattachements: list[RattachementResume]

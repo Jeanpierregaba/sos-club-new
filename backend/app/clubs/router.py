@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.catalogue import Action
 from app.admin.dependances import Acces, adresse_ip, exiger_permission
-from app.clubs import adhesions, service, verification
+from app.clubs import adhesions, rattachements, service, verification
 from app.clubs.models import EtatClub
 from app.clubs.schemas import (
     ActivationEntree,
@@ -23,12 +23,14 @@ from app.clubs.schemas import (
     DemandeAdhesion,
     DemandeClub,
     DemandeClubEntree,
+    DemandeRattachement,
     FileClubs,
     FilePassations,
     MonClub,
     Passation,
     PassationApercu,
     PassationEntree,
+    RattachementResume,
     RefusDemandeEntree,
     RefusEntree,
     RetraitEntree,
@@ -147,6 +149,65 @@ async def retirer_membre(
     with _traduire_refus():
         return await adhesions.retirer(
             db, utilisateur, club_id, adhesion_id, entree.motif, entree.version, _adresse(request)
+        )
+
+
+# Rattachements (spec 020) : l'encadreur demande ou se retire, le président confirme, refuse ou retire -------
+
+
+@router.post("/{club_id}/rattachements", status_code=status.HTTP_201_CREATED)
+async def demander_rattachement(club_id: UUID, request: Request, utilisateur: Connecte, db: Base) -> RattachementResume:
+    with _traduire_refus():
+        return await rattachements.demander(db, utilisateur, club_id, _adresse(request))
+
+
+@router.delete("/{club_id}/rattachements/moi")
+async def quitter_le_club_encadre(
+    club_id: UUID, request: Request, utilisateur: Connecte, db: Base
+) -> RattachementResume:
+    """Annule la demande en cours, ou met fin au rattachement."""
+    with _traduire_refus():
+        return await rattachements.se_retirer(db, utilisateur, club_id, _adresse(request))
+
+
+@router.get("/{club_id}/rattachements/demandes")
+async def demandes_rattachement(club_id: UUID, utilisateur: Connecte, db: Base) -> list[DemandeRattachement]:
+    with _traduire_refus():
+        return await rattachements.demandes_a_confirmer(db, utilisateur, club_id)
+
+
+@router.post("/{club_id}/rattachements/{rattachement_id}/confirmer")
+async def confirmer_rattachement(
+    club_id: UUID, rattachement_id: UUID, entree: DecisionEntree, request: Request, utilisateur: Connecte, db: Base
+) -> RattachementResume:
+    with _traduire_refus():
+        return await rattachements.confirmer(
+            db, utilisateur, club_id, rattachement_id, entree.version, _adresse(request)
+        )
+
+
+@router.post("/{club_id}/rattachements/{rattachement_id}/refuser")
+async def refuser_rattachement(
+    club_id: UUID,
+    rattachement_id: UUID,
+    entree: RefusDemandeEntree,
+    request: Request,
+    utilisateur: Connecte,
+    db: Base,
+) -> RattachementResume:
+    with _traduire_refus():
+        return await rattachements.refuser(
+            db, utilisateur, club_id, rattachement_id, entree.motif, entree.version, _adresse(request)
+        )
+
+
+@router.post("/{club_id}/rattachements/{rattachement_id}/retirer")
+async def retirer_encadreur(
+    club_id: UUID, rattachement_id: UUID, entree: RetraitEntree, request: Request, utilisateur: Connecte, db: Base
+) -> RattachementResume:
+    with _traduire_refus():
+        return await rattachements.retirer(
+            db, utilisateur, club_id, rattachement_id, entree.motif, entree.version, _adresse(request)
         )
 
 

@@ -940,6 +940,26 @@ export interface paths {
         patch: operations["modifier_mon_profil_api_encadreurs_moi_patch"];
         trace?: never;
     };
+    "/api/encadreurs/moi/clubs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Mes Clubs
+         * @description Les rattachements de l'encadreur (spec 020) : en cours, puis les derniers terminés.
+         */
+        get: operations["mes_clubs_api_encadreurs_moi_clubs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/encadreurs/moi/renvoyer": {
         parameters: {
             query?: never;
@@ -1192,6 +1212,111 @@ export interface paths {
         put?: never;
         /** Retirer Membre */
         post: operations["retirer_membre_api_clubs__club_id__adhesions__adhesion_id__retirer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}/rattachements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Demander Rattachement */
+        post: operations["demander_rattachement_api_clubs__club_id__rattachements_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}/rattachements/moi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Quitter Le Club Encadre
+         * @description Annule la demande en cours, ou met fin au rattachement.
+         */
+        delete: operations["quitter_le_club_encadre_api_clubs__club_id__rattachements_moi_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}/rattachements/demandes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Demandes Rattachement */
+        get: operations["demandes_rattachement_api_clubs__club_id__rattachements_demandes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}/rattachements/{rattachement_id}/confirmer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirmer Rattachement */
+        post: operations["confirmer_rattachement_api_clubs__club_id__rattachements__rattachement_id__confirmer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}/rattachements/{rattachement_id}/refuser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refuser Rattachement */
+        post: operations["refuser_rattachement_api_clubs__club_id__rattachements__rattachement_id__refuser_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}/rattachements/{rattachement_id}/retirer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retirer Encadreur */
+        post: operations["retirer_encadreur_api_clubs__club_id__rattachements__rattachement_id__retirer_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1826,6 +1951,32 @@ export interface components {
             decide_le: string | null;
             /** Motif Refus */
             motif_refus: string | null;
+            /** Version */
+            version: number;
+        };
+        /**
+         * DemandeRattachement
+         * @description Une demande de rattachement, vue par le président : un encadreur est un adulte identifié par son nom.
+         */
+        DemandeRattachement: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            /** Fonction */
+            fonction: string;
+            /** Etablissement */
+            etablissement: string;
+            /**
+             * Demande Le
+             * Format: date-time
+             */
+            demande_le: string;
             /** Version */
             version: number;
         };
@@ -2530,6 +2681,14 @@ export interface components {
             /** Semestre */
             semestre: string | null;
         };
+        /**
+         * MesClubs
+         * @description L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés.
+         */
+        MesClubs: {
+            /** Rattachements */
+            rattachements: components["schemas"]["RattachementResume"][];
+        };
         /** ModuleCatalogue */
         ModuleCatalogue: {
             /** Id */
@@ -2748,6 +2907,42 @@ export interface components {
             pseudonyme: string;
             /** Motif */
             motif: string;
+        };
+        /**
+         * RattachementResume
+         * @description Un rattachement, vu par l'encadreur concerné.
+         */
+        RattachementResume: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Club Id
+             * Format: uuid
+             */
+            club_id: string;
+            /** Club Nom */
+            club_nom: string;
+            /**
+             * Etat
+             * @enum {string}
+             */
+            etat: "en_attente_president" | "en_attente_validation" | "actif" | "refuse" | "retire";
+            /** Supplementaire */
+            supplementaire: boolean;
+            /**
+             * Demande Le
+             * Format: date-time
+             */
+            demande_le: string;
+            /** Motif Refus */
+            motif_refus?: string | null;
+            /** Motif Retrait */
+            motif_retrait?: string | null;
+            /** Version */
+            version: number;
         };
         /** RefusDemandeEntree */
         RefusDemandeEntree: {
@@ -4871,6 +5066,26 @@ export interface operations {
             };
         };
     };
+    mes_clubs_api_encadreurs_moi_clubs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MesClubs"];
+                };
+            };
+        };
+    };
     renvoyer_ma_demande_api_encadreurs_moi_renvoyer_post: {
         parameters: {
             query?: never;
@@ -5306,6 +5521,207 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdhesionResume"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    demander_rattachement_api_clubs__club_id__rattachements_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RattachementResume"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quitter_le_club_encadre_api_clubs__club_id__rattachements_moi_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RattachementResume"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    demandes_rattachement_api_clubs__club_id__rattachements_demandes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemandeRattachement"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirmer_rattachement_api_clubs__club_id__rattachements__rattachement_id__confirmer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+                rattachement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RattachementResume"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refuser_rattachement_api_clubs__club_id__rattachements__rattachement_id__refuser_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+                rattachement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefusDemandeEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RattachementResume"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retirer_encadreur_api_clubs__club_id__rattachements__rattachement_id__retirer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+                rattachement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RetraitEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RattachementResume"];
                 };
             };
             /** @description Validation Error */

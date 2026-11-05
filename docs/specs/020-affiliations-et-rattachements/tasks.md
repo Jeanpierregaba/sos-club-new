@@ -25,17 +25,17 @@ Chaque tâche est autonome et committable ; lint, typecheck et tests passent ava
 
 ## Tâche 3 — API rattachements : encadreur et président
 
-- [ ] `rattachements.py` : demander, annuler ou se retirer, confirmer, refuser, retirer
-- [ ] `supplementaire` calculé à la demande, recalculé sous verrou à la validation
-- [ ] `GET /api/encadreurs/moi/clubs`
-- [ ] `tests/test_clubs_rattachements.py`
+- [x] `rattachements.py` : demander, annuler ou se retirer, confirmer, refuser, retirer
+- [x] `supplementaire` calculé à la demande (le recalcul sous verrou à la validation est fait en tâche 4)
+- [x] `GET /api/encadreurs/moi/clubs`
+- [x] `tests/test_clubs_rattachements.py`
 
 **Commit :** `feat(clubs): rattachements des encadreurs`
 
 ## Tâche 4 — API admin : files et décisions en lot
 
 - [ ] `membres_admin.py` : files filtrées par DRE, validation et refus en lot avec résultat par élément
-- [ ] Club supplémentaire : 403 pour un collaborateur de DRE
+- [ ] Club supplémentaire : 403 pour un collaborateur de DRE ; `supplementaire` recalculé sous verrou à la validation
 - [ ] Compteurs du tableau de bord admin
 - [ ] `tests/test_clubs_lots.py`
 

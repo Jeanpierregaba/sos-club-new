@@ -2866,6 +2866,28 @@
         }
       }
     },
+    "/api/encadreurs/moi/clubs": {
+      "get": {
+        "tags": [
+          "encadreurs"
+        ],
+        "summary": "Mes Clubs",
+        "description": "Les rattachements de l'encadreur (spec 020) : en cours, puis les derniers terminés.",
+        "operationId": "mes_clubs_api_encadreurs_moi_clubs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MesClubs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/encadreurs/moi/renvoyer": {
       "post": {
         "tags": [
@@ -3498,6 +3520,329 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AdhesionResume"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}/rattachements": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Demander Rattachement",
+        "operationId": "demander_rattachement_api_clubs__club_id__rattachements_post",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RattachementResume"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}/rattachements/moi": {
+      "delete": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Quitter Le Club Encadre",
+        "description": "Annule la demande en cours, ou met fin au rattachement.",
+        "operationId": "quitter_le_club_encadre_api_clubs__club_id__rattachements_moi_delete",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RattachementResume"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}/rattachements/demandes": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Demandes Rattachement",
+        "operationId": "demandes_rattachement_api_clubs__club_id__rattachements_demandes_get",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DemandeRattachement"
+                  },
+                  "title": "Response Demandes Rattachement Api Clubs  Club Id  Rattachements Demandes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}/rattachements/{rattachement_id}/confirmer": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Confirmer Rattachement",
+        "operationId": "confirmer_rattachement_api_clubs__club_id__rattachements__rattachement_id__confirmer_post",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          },
+          {
+            "name": "rattachement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Rattachement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RattachementResume"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}/rattachements/{rattachement_id}/refuser": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Refuser Rattachement",
+        "operationId": "refuser_rattachement_api_clubs__club_id__rattachements__rattachement_id__refuser_post",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          },
+          {
+            "name": "rattachement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Rattachement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefusDemandeEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RattachementResume"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}/rattachements/{rattachement_id}/retirer": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Retirer Encadreur",
+        "operationId": "retirer_encadreur_api_clubs__club_id__rattachements__rattachement_id__retirer_post",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          },
+          {
+            "name": "rattachement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Rattachement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetraitEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RattachementResume"
                 }
               }
             }
@@ -5310,6 +5655,52 @@
         ],
         "title": "DemandeEncadreur",
         "description": "Une ligne de la file : tout ce qu'il faut pour vérifier la personne, sans ouvrir sa fiche."
+      },
+      "DemandeRattachement": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "fonction": {
+            "type": "string",
+            "title": "Fonction"
+          },
+          "etablissement": {
+            "type": "string",
+            "title": "Etablissement"
+          },
+          "demande_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Demande Le"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "prenom",
+          "nom",
+          "fonction",
+          "etablissement",
+          "demande_le",
+          "version"
+        ],
+        "title": "DemandeRattachement",
+        "description": "Une demande de rattachement, vue par le président : un encadreur est un adulte identifié par son nom."
       },
       "DreAdmin": {
         "properties": {
@@ -7479,6 +7870,23 @@
         ],
         "title": "LignePoints"
       },
+      "MesClubs": {
+        "properties": {
+          "rattachements": {
+            "items": {
+              "$ref": "#/components/schemas/RattachementResume"
+            },
+            "type": "array",
+            "title": "Rattachements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rattachements"
+        ],
+        "title": "MesClubs",
+        "description": "L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés."
+      },
       "ModuleCatalogue": {
         "properties": {
           "id": {
@@ -8152,6 +8560,82 @@
           "motif"
         ],
         "title": "PseudonymeEntree"
+      },
+      "RattachementResume": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "club_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Club Id"
+          },
+          "club_nom": {
+            "type": "string",
+            "title": "Club Nom"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "en_attente_president",
+              "en_attente_validation",
+              "actif",
+              "refuse",
+              "retire"
+            ],
+            "title": "Etat"
+          },
+          "supplementaire": {
+            "type": "boolean",
+            "title": "Supplementaire"
+          },
+          "demande_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Demande Le"
+          },
+          "motif_refus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Refus"
+          },
+          "motif_retrait": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Retrait"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "club_id",
+          "club_nom",
+          "etat",
+          "supplementaire",
+          "demande_le",
+          "version"
+        ],
+        "title": "RattachementResume",
+        "description": "Un rattachement, vu par l'encadreur concerné."
       },
       "RefusDemandeEntree": {
         "properties": {
