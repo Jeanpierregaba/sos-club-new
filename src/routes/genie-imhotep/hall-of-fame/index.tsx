@@ -42,29 +42,29 @@ function HallOfFame() {
       <SiteHeader />
 
       {/* Bannière claire : le titre à gauche, les mascottes en duel sur des rayons dorés à droite. */}
-      <section className="relative isolate overflow-hidden bg-linear-to-br from-mist via-white to-[color-mix(in_oklch,var(--sun)_28%,white)]">
+      <section className="relative isolate overflow-hidden bg-linear-to-br from-sky via-[oklch(0.52_0.17_252)] to-logo-blue text-white">
         <div
           aria-hidden
-          className="absolute left-1/2 top-[88%] -z-10 size-[56rem] -translate-x-1/2 -translate-y-1/2 bg-[repeating-conic-gradient(rgb(245_160_20/0.14)_0deg_6deg,transparent_6deg_18deg)] [mask-image:radial-gradient(circle,black_20%,transparent_65%)] motion-safe:animate-[spin_120s_linear_infinite] lg:left-[74%] lg:top-[60%] lg:size-[68rem]"
+          className="absolute left-1/2 top-[88%] -z-10 size-[56rem] -translate-x-1/2 -translate-y-1/2 bg-[repeating-conic-gradient(rgb(255_220_100/0.16)_0deg_6deg,transparent_6deg_18deg)] [mask-image:radial-gradient(circle,black_20%,transparent_65%)] motion-safe:animate-[spin_120s_linear_infinite] lg:left-[74%] lg:top-[60%] lg:size-[68rem]"
         />
         <div
           aria-hidden
           className="absolute left-1/2 top-[90%] -z-10 size-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sun/40 blur-3xl lg:left-[74%] lg:top-[64%]"
         />
-        <DecorAnime ton="clair" />
+        <DecorAnime />
 
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 pt-8 md:pt-12 lg:grid-cols-[1.15fr_1fr]">
           <div className="pb-14 lg:pb-24">
-            <FilAriane rubrique="Génie Imhotep" page="Hall of Fame" />
+            <FilAriane rubrique="Génie Imhotep" page="Hall of Fame" clair />
             <div data-reveal="left" className="pt-10 lg:pt-16">
               <p className="inline-flex items-center gap-2 rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-ink">
                 <Trophy className="size-4" /> Génie Imhotep · Hall of Fame
               </p>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block text-logo-blue">Le temple</span>
-                <span className="block text-primary">des champions</span>
+                <span className="block">Le temple</span>
+                <span className="block text-sun">des champions</span>
               </h1>
-              <p className="mt-6 max-w-xl text-lg font-medium text-muted-foreground">
+              <p className="mt-6 max-w-xl text-lg font-medium text-white/85">
                 Ici entrent les collèges et lycées qui ont marqué le Championnat national Génie
                 Imhotep. Saison après saison, revis leurs parcours, leurs finales et leurs exploits,
                 de la préfecture jusqu’à la grande finale.
@@ -72,10 +72,10 @@ function HallOfFame() {
               <ul className="mt-8 flex flex-wrap gap-x-8 gap-y-4">
                 {reperes.map((r) => (
                   <li key={r.t} className="flex items-center gap-3">
-                    <span className="font-display text-4xl leading-none tabular-nums text-tangerine">
+                    <span className="font-display text-4xl leading-none tabular-nums text-sun">
                       {r.n}
                     </span>
-                    <span className="max-w-[7rem] text-sm font-bold leading-tight text-ink/70">
+                    <span className="max-w-[7rem] text-sm font-bold leading-tight text-white/80">
                       {r.t}
                     </span>
                   </li>
@@ -90,7 +90,7 @@ function HallOfFame() {
                 </a>
                 <a
                   href="/genie-imhotep/palmares"
-                  className="btn-fx inline-flex items-center gap-2 rounded-full border-2 border-logo-blue px-7 py-3 text-[15px] font-bold text-logo-blue hover:bg-logo-blue hover:text-white"
+                  className="btn-fx inline-flex items-center gap-2 rounded-full border-2 border-white px-7 py-3 text-[15px] font-bold text-white hover:bg-white hover:text-ink"
                 >
                   <Medal className="size-4" /> Le palmarès
                 </a>

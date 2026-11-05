@@ -209,32 +209,41 @@ function JoueursPrimes({ joueurs }: { joueurs: JoueurPrime[] }) {
 
 function PalmaresAVenir({ edition }: { edition: Edition }) {
   return (
-    <div className="mx-auto max-w-7xl px-5 pb-16 pt-10 lg:pb-24">
-      <p className="inline-flex items-center gap-2 rounded-full bg-logo-red px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-white">
-        <Hourglass className="size-4 text-sun" /> {ordinal(edition.numero)} édition ·{" "}
-        {libelleSaison(edition.id)}
-      </p>
-      <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-        <span className="block text-logo-blue">Un palmarès</span>
-        <span className="block text-primary">encore à écrire</span>
-      </h1>
-      <p className="mt-5 max-w-xl text-lg font-medium text-muted-foreground">
-        Les lauréats de la saison {edition.id} seront inscrits ici à la fin du championnat. Le coup
-        d’envoi approche :
-      </p>
-      <div className="mt-6">
-        {edition.debut ? (
-          <CompteARebours cible={edition.debut} clair />
-        ) : (
-          <p className="font-display text-3xl text-logo-blue">Date bientôt annoncée</p>
-        )}
+    <div className="mx-auto grid max-w-7xl items-end gap-8 px-5 pt-10 lg:grid-cols-[1.2fr_1fr]">
+      <div className="pb-16 lg:pb-24">
+        <p className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-logo-red">
+          <Hourglass className="size-4" /> {ordinal(edition.numero)} édition ·{" "}
+          {libelleSaison(edition.id)}
+        </p>
+        <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
+          <span className="block">Un palmarès</span>
+          <span className="block text-sun">encore à écrire</span>
+        </h1>
+        <p className="mt-5 max-w-xl text-lg font-medium text-white/85">
+          Les lauréats de la saison {edition.id} seront inscrits ici à la fin du championnat. Le
+          coup d’envoi approche :
+        </p>
+        <div className="mt-6">
+          {edition.debut ? (
+            <CompteARebours cible={edition.debut} clair />
+          ) : (
+            <p className="font-display text-3xl text-sun">Date bientôt annoncée</p>
+          )}
+        </div>
+        <a
+          href="/genie-imhotep/inscription"
+          className="btn-fx mt-9 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
+        >
+          Inscrire mon établissement <ArrowRight className="size-4" />
+        </a>
       </div>
-      <a
-        href="/genie-imhotep/inscription"
-        className="btn-fx mt-9 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
-      >
-        Inscrire mon établissement <ArrowRight className="size-4" />
-      </a>
+      <img
+        src={mascottesTrophees}
+        alt="Des mascottes des Clubs Santé attendent les trophées de la prochaine édition"
+        width={1122}
+        height={1402}
+        className="mx-auto w-56 drop-shadow-2xl sm:w-72 lg:w-[24rem]"
+      />
     </div>
   );
 }
@@ -249,21 +258,22 @@ function PalmaresEdition() {
       <SiteHeader />
 
       {/* Bannière claire : des rayons dorés derrière les mascottes aux trophées, le titre de la saison. */}
-      <section className="relative isolate overflow-hidden bg-linear-to-br from-[color-mix(in_oklch,var(--sun)_26%,white)] via-white to-lilac">
+      <section className="relative isolate overflow-hidden bg-linear-to-br from-[oklch(0.66_0.21_30)] via-logo-red to-[oklch(0.47_0.19_25)] text-white">
         <div
           aria-hidden
-          className="absolute left-1/2 top-full -z-10 size-[60rem] -translate-x-1/2 -translate-y-1/2 bg-[repeating-conic-gradient(rgb(245_160_20/0.13)_0deg_6deg,transparent_6deg_18deg)] [mask-image:radial-gradient(circle,black_20%,transparent_65%)] motion-safe:animate-[spin_120s_linear_infinite] lg:left-[75%] lg:top-[70%]"
+          className="absolute left-1/2 top-full -z-10 size-[60rem] -translate-x-1/2 -translate-y-1/2 bg-[repeating-conic-gradient(rgb(255_220_100/0.16)_0deg_6deg,transparent_6deg_18deg)] [mask-image:radial-gradient(circle,black_20%,transparent_65%)] motion-safe:animate-[spin_120s_linear_infinite] lg:left-[75%] lg:top-[70%]"
         />
-        <DecorAnime ton="clair" />
+        <DecorAnime />
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 pt-8 md:pt-12">
           <FilAriane
+            clair
             rubrique="Génie Imhotep"
             parent={{ t: "Palmarès", href: "/genie-imhotep/palmares" }}
             page={`Édition ${libelleSaison(edition.id)}`}
           />
           <a
             href="/genie-imhotep/palmares#editions"
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-logo-blue hover:underline"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-white hover:underline"
           >
             <ArrowLeft className="size-4" /> Toutes les éditions
           </a>
@@ -275,10 +285,10 @@ function PalmaresEdition() {
                 <Sparkles className="size-4" /> Palmarès · {ordinal(edition.numero)} édition
               </p>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block text-logo-blue">Les lauréats</span>
-                <span className="block text-primary">{libelleSaison(edition.id)}</span>
+                <span className="block">Les lauréats</span>
+                <span className="block text-sun">{libelleSaison(edition.id)}</span>
               </h1>
-              <p className="mt-5 max-w-2xl text-lg font-medium text-muted-foreground">
+              <p className="mt-5 max-w-2xl text-lg font-medium text-white/85">
                 Ils ont buzzé plus vite, répondu plus juste et porté haut les couleurs de leur
                 établissement : honneur aux lauréats du Championnat national Génie Imhotep.
               </p>
@@ -371,28 +381,30 @@ function PalmaresEdition() {
         </>
       )}
 
-      <section className="mx-auto max-w-7xl px-5 pb-20">
-        <div
-          data-reveal="zoom"
-          className="flex flex-col items-start justify-between gap-6 rounded-3xl bg-sun p-8 md:flex-row md:items-center md:p-12"
-        >
-          <div>
-            <h2 className="text-3xl text-ink md:text-4xl">
-              Tous les matchs, <span className="text-logo-blue">phase par phase</span>
-            </h2>
-            <p className="mt-2 max-w-2xl font-semibold text-ink/75">
-              Le parcours du champion, le tableau final et les résultats de chaque région sont dans
-              le Hall of Fame.
-            </p>
-          </div>
-          <a
-            href={`/genie-imhotep/hall-of-fame/${edition.id}`}
-            className="btn-fx inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
+      {terminee && (
+        <section className="mx-auto max-w-7xl px-5 pb-20">
+          <div
+            data-reveal="zoom"
+            className="flex flex-col items-start justify-between gap-6 rounded-3xl bg-sun p-8 md:flex-row md:items-center md:p-12"
           >
-            Voir le Hall of Fame <ArrowRight className="size-4" />
-          </a>
-        </div>
-      </section>
+            <div>
+              <h2 className="text-3xl text-ink md:text-4xl">
+                Tous les matchs, <span className="text-logo-blue">phase par phase</span>
+              </h2>
+              <p className="mt-2 max-w-2xl font-semibold text-ink/75">
+                Le parcours du champion, le tableau final et les résultats de chaque région sont
+                dans le Hall of Fame.
+              </p>
+            </div>
+            <a
+              href={`/genie-imhotep/hall-of-fame/${edition.id}`}
+              className="btn-fx inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
+            >
+              Voir le Hall of Fame <ArrowRight className="size-4" />
+            </a>
+          </div>
+        </section>
+      )}
 
       <SiteFooter />
     </div>

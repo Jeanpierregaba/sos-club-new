@@ -235,21 +235,21 @@ function EditionAVenir({ edition }: { edition: Edition }) {
           {libelleSaison(edition.id)}
         </p>
         <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-          <span className="block text-logo-blue">Le prochain champion,</span>
-          <span className="block text-primary">c’est peut-être toi</span>
+          <span className="block">Le prochain champion,</span>
+          <span className="block text-sun">c’est peut-être toi</span>
         </h1>
-        <p className="mt-5 max-w-xl text-lg font-medium text-muted-foreground">
+        <p className="mt-5 max-w-xl text-lg font-medium text-white/85">
           La saison {edition.id} du Championnat national Génie Imhotep se prépare. Rassemble ton
           équipe, révise avec les quiz et sois prêt pour le coup d’envoi !
         </p>
-        <p className="mt-8 text-xs font-extrabold uppercase tracking-widest text-logo-red">
+        <p className="mt-8 text-xs font-extrabold uppercase tracking-widest text-sun">
           Coup d’envoi dans
         </p>
         <div className="mt-3">
           {edition.debut ? (
             <CompteARebours cible={edition.debut} clair />
           ) : (
-            <p className="font-display text-3xl text-logo-blue">Date bientôt annoncée</p>
+            <p className="font-display text-3xl text-sun">Date bientôt annoncée</p>
           )}
         </div>
         <div className="mt-9 flex flex-wrap gap-3">
@@ -261,7 +261,7 @@ function EditionAVenir({ edition }: { edition: Edition }) {
           </a>
           <a
             href="/jeux"
-            className="btn-fx inline-flex items-center gap-2 rounded-full border-2 border-logo-blue px-7 py-3 text-[15px] font-bold text-logo-blue hover:bg-logo-blue hover:text-white"
+            className="btn-fx inline-flex items-center gap-2 rounded-full border-2 border-white px-7 py-3 text-[15px] font-bold text-white hover:bg-white hover:text-ink"
           >
             <Gamepad2 className="size-4" /> M’entraîner avec les quiz
           </a>
@@ -295,25 +295,26 @@ function HallOfFameEdition() {
       <SiteHeader />
 
       {/* Bannière claire et dorée : des rayons qui tournent derrière les mascottes, le score de la finale. */}
-      <section className="relative isolate overflow-hidden bg-linear-to-b from-[color-mix(in_oklch,var(--sun)_24%,white)] to-white">
+      <section className="relative isolate overflow-hidden bg-linear-to-br from-sky via-[oklch(0.52_0.17_252)] to-logo-blue text-white">
         <div
           aria-hidden
-          className="absolute left-1/2 top-[85%] -z-10 size-[60rem] -translate-x-1/2 -translate-y-1/2 bg-[repeating-conic-gradient(rgb(245_160_20/0.13)_0deg_6deg,transparent_6deg_18deg)] [mask-image:radial-gradient(circle,black_20%,transparent_65%)] motion-safe:animate-[spin_120s_linear_infinite] lg:left-[72%] lg:top-[62%] lg:size-[70rem]"
+          className="absolute left-1/2 top-[85%] -z-10 size-[60rem] -translate-x-1/2 -translate-y-1/2 bg-[repeating-conic-gradient(rgb(255_220_100/0.16)_0deg_6deg,transparent_6deg_18deg)] [mask-image:radial-gradient(circle,black_20%,transparent_65%)] motion-safe:animate-[spin_120s_linear_infinite] lg:left-[72%] lg:top-[62%] lg:size-[70rem]"
         />
         <div
           aria-hidden
           className="absolute left-1/2 top-[88%] -z-10 size-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sun/40 blur-3xl lg:left-[72%] lg:top-[66%]"
         />
-        <DecorAnime ton="clair" />
+        <DecorAnime />
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 pt-8 md:pt-12">
           <FilAriane
+            clair
             rubrique="Génie Imhotep"
             parent={{ t: "Hall of Fame", href: "/genie-imhotep/hall-of-fame" }}
             page={`Édition ${libelleSaison(edition.id)}`}
           />
           <a
             href="/genie-imhotep/hall-of-fame#editions"
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-logo-blue hover:underline"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-white hover:underline"
           >
             <ArrowLeft className="size-4" /> Toutes les éditions
           </a>
@@ -329,10 +330,10 @@ function HallOfFameEdition() {
                     <Trophy className="size-4" /> Hall of Fame · {ordinal(edition.numero)} édition
                   </p>
                   <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                    <span className="block text-logo-blue">Édition</span>
-                    <span className="block text-primary">{libelleSaison(edition.id)}</span>
+                    <span className="block">Édition</span>
+                    <span className="block text-sun">{libelleSaison(edition.id)}</span>
                   </h1>
-                  <p className="mt-5 max-w-xl text-lg font-medium text-muted-foreground">
+                  <p className="mt-5 max-w-xl text-lg font-medium text-white/85">
                     De la préfecture à la grande finale de Lomé : tous les résultats du 1er
                     Championnat national, et le parcours de son champion.
                   </p>
@@ -376,7 +377,7 @@ function HallOfFameEdition() {
                 className="mx-auto w-72 self-end drop-shadow-2xl sm:w-96 lg:w-[30rem]"
               />
             </div>
-            <div className="relative border-y border-border bg-white/80 backdrop-blur">
+            <div className="relative border-y border-border bg-white">
               <dl className="mx-auto grid max-w-7xl grid-cols-2 divide-border px-5 md:grid-cols-4 md:divide-x">
                 {chiffres.map((c) => (
                   <div key={c.t} className="flex flex-col-reverse py-6 text-center md:py-8">
