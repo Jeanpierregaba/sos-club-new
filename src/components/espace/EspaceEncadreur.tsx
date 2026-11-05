@@ -1,9 +1,10 @@
 import { useRouter } from "@tanstack/react-router";
-import { CircleAlert, Hourglass, KeyRound, Loader2, Pencil, Send, Users } from "lucide-react";
+import { CircleAlert, Hourglass, KeyRound, Loader2, Pencil, Send } from "lucide-react";
 import { useState } from "react";
 
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { ChoixEtablissement, type EtablissementChoisi } from "@/components/ChoixEtablissement";
+import { MesClubsEncadreur } from "@/components/clubs/MesClubsEncadreur";
 import {
   CartesPoints,
   DernieresLignes,
@@ -20,15 +21,31 @@ import {
   MESSAGE_INDISPONIBLE,
   modifierProfilEncadreur,
   renvoyerDemandeEncadreur,
+  type ClubPublic,
   type EspaceEncadreur as Espace,
   type Fonction,
+  type MembresDuClub,
+  type MesClubs,
 } from "@/lib/api/client";
 import { dateCourte } from "@/lib/dates";
 import { FONCTIONS, LIBELLES_VERIFICATION, libelleFonction } from "@/lib/fonctions";
 import { normaliserTelephone, telephoneValide } from "@/lib/telephone";
 
-// L'espace d'un encadreur (spec 018) : en attente, refusé ou actif.
-export function EspaceEncadreur({ espace, prenom }: { espace: Espace; prenom: string }) {
+// L'espace d'un encadreur (spec 018) : en attente, refusé ou actif ; ses clubs une fois actif (spec 020).
+export function EspaceEncadreur({
+  espace,
+  prenom,
+  mesClubs = null,
+  clubEtablissement = null,
+  membres = {},
+}: {
+  espace: Espace;
+  prenom: string;
+  mesClubs?: MesClubs | null;
+  clubEtablissement?: ClubPublic | null;
+  membres?: Record<string, MembresDuClub>;
+}) {
+  const router = useRouter();
   const [profil, setProfil] = useState(false);
   const [motDePasse, setMotDePasse] = useState(false);
   const [motDePasseChange, setMotDePasseChange] = useState(false);
@@ -48,19 +65,18 @@ export function EspaceEncadreur({ espace, prenom }: { espace: Espace; prenom: st
           {espace.etat === "actif" && espace.points ? (
             <div className="space-y-6">
               <DernieresLignes points={espace.points} />
-              <section className="flex items-start gap-4 rounded-3xl bg-mist-soft p-6">
-                <Users aria-hidden className="mt-1 size-6 shrink-0 text-logo-blue" />
-                <div>
-                  <h2 className="text-xl">
-                    <span className="text-logo-blue">Tes clubs</span>{" "}
-                    <span className="text-primary">arrivent bientôt</span>
-                  </h2>
-                  <p className="mt-1 font-medium text-ink/80">
-                    Tu pourras bientôt demander ton rattachement au Club Santé de ton établissement,
-                    puis suivre ses élèves et ses activités.
-                  </p>
-                </div>
-              </section>
+              {mesClubs ? (
+                <MesClubsEncadreur
+                  mesClubs={mesClubs}
+                  clubEtablissement={clubEtablissement}
+                  membres={membres}
+                  onRafraichir={() => router.invalidate()}
+                />
+              ) : (
+                <p className="rounded-3xl bg-mist-soft p-6 font-medium text-muted-foreground">
+                  Tes clubs n'ont pas pu être chargés : recharge la page.
+                </p>
+              )}
             </div>
           ) : (
             <section className="rounded-3xl bg-white p-6 shadow-card ring-1 ring-border">

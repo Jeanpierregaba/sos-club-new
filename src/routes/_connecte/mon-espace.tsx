@@ -25,6 +25,7 @@ import {
   chargerDemandesAdhesion,
   chargerDemandesRattachement,
   chargerMembres,
+  chargerMesClubs,
   chargerEspaceEleve,
   chargerEspaceEncadreur,
   chargerMonClub,
@@ -88,14 +89,35 @@ export const Route = createFileRoute("/_connecte/mon-espace")({
           encadreur: null,
         };
       }
-      if (context.moi.role === "encadreur")
+      if (context.moi.role === "encadreur") {
+        const encadreur = await chargerEspaceEncadreur();
+        // Spec 020 : ses clubs, le club de son établissement et les membres de ses clubs actifs.
+        const actif = encadreur.etat === "actif";
+        const [mesClubs, clubEtablissement] = await Promise.all([
+          actif ? chargerMesClubs().catch(() => null) : Promise.resolve(null),
+          actif
+            ? chargerClubParEtablissement(encadreur.etablissement.id).catch(() => undefined)
+            : Promise.resolve(undefined),
+        ]);
+        const actifs = (mesClubs?.rattachements ?? []).filter((r) => r.etat === "actif");
+        const listes = await Promise.all(
+          actifs.map((r) => chargerMembres(r.club_id).catch(() => null)),
+        );
+        const membresEncadres: Record<string, MembresDuClub> = {};
+        actifs.forEach((r, i) => {
+          const liste = listes[i];
+          if (liste) membresEncadres[r.club_id] = liste;
+        });
         return {
           eleve: null,
           club: null,
           axes: [],
-          clubEtablissement: null,
-          encadreur: await chargerEspaceEncadreur(),
+          clubEtablissement: clubEtablissement ?? null,
+          encadreur,
+          mesClubs,
+          membresEncadres,
         };
+      }
     } catch (e) {
       // Un compte créé avant les specs 017 et 018 n'a pas de profil : il garde l'espace simple.
       if (e instanceof ErreurApi && (e.statut === 403 || e.statut === 404))
@@ -136,7 +158,16 @@ function MonEspace() {
         demandesRattachement={"demandesRattachement" in donnees ? donnees.demandesRattachement : []}
       />
     );
-  if (donnees.encadreur) return <EspaceEncadreur espace={donnees.encadreur} prenom={moi.prenom} />;
+  if (donnees.encadreur)
+    return (
+      <EspaceEncadreur
+        espace={donnees.encadreur}
+        prenom={moi.prenom}
+        mesClubs={"mesClubs" in donnees ? donnees.mesClubs : null}
+        clubEtablissement={donnees.clubEtablissement ?? null}
+        membres={"membresEncadres" in donnees ? donnees.membresEncadres : {}}
+      />
+    );
   return <EspaceSimple message={"message" in donnees ? donnees.message : undefined} />;
 }
 

@@ -68,9 +68,9 @@ Chaque tâche est autonome et committable ; lint, typecheck et tests passent ava
 
 ## Tâche 8 — Site : encadreur
 
-- [ ] `EspaceEncadreur` : mes clubs, demandes, passations à confirmer
-- [ ] Bouton « Demander mon rattachement » sur `/clubs/$id`
-- [ ] Tests des composants
+- [x] `EspaceEncadreur` : mes clubs, demandes, passations à confirmer
+- [x] Bouton « Demander mon rattachement » sur `/clubs/$id`
+- [x] Tests des composants
 
 **Commit :** `feat(site): rattachements dans l'espace encadreur`
 

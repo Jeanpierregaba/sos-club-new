@@ -1,22 +1,45 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, CalendarDays, MapPin, Sparkles } from "lucide-react";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  CalendarDays,
+  Hourglass,
+  MapPin,
+  Send,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
+import { useState } from "react";
+
+import { DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
+import { Button } from "@/components/ui/button";
 
 import { FilAriane } from "@/components/FilAriane";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteMotion } from "@/components/SiteMotion";
-import { chargerAxes, chargerFicheClub, ErreurApi } from "@/lib/api/client";
+import {
+  chargerAxes,
+  chargerFicheClub,
+  chargerMesClubs,
+  chargerMoi,
+  demanderRattachement,
+  ErreurApi,
+  type MesClubs,
+} from "@/lib/api/client";
 import { libelleAxes, libellesDesAxes } from "@/lib/clubs";
 import { dateCourte } from "@/lib/dates";
 
 export const Route = createFileRoute("/clubs/$id")({
   loader: async ({ params }) => {
-    const [club, axes] = await Promise.all([
+    const [club, axes, moi] = await Promise.all([
       chargerFicheClub(params.id),
       chargerAxes().catch(() => []),
+      chargerMoi().catch(() => null),
     ]);
-    return { club, axes };
+    // Un encadreur actif peut demander son rattachement depuis la fiche (spec 020) ; sinon, null.
+    const mesClubs = moi?.role === "encadreur" ? await chargerMesClubs().catch(() => null) : null;
+    return { club, axes, mesClubs };
   },
   head: () => ({
     meta: [
@@ -60,7 +83,7 @@ function ClubIntrouvable() {
 }
 
 function FicheClubPage() {
-  const { club, axes } = Route.useLoaderData();
+  const { club, axes, mesClubs } = Route.useLoaderData();
   const libelles = libellesDesAxes(axes);
 
   return (
@@ -125,9 +148,11 @@ function FicheClubPage() {
             </ul>
           )}
 
+          {mesClubs && <RattachementFiche clubId={club.id} mesClubs={mesClubs} />}
+
           <div className="mt-8 rounded-2xl bg-mist-soft p-4 text-sm font-medium text-muted-foreground">
-            Seuls le nom du club, son établissement et ses axes sont publics. Les membres et les
-            activités du club arriveront avec les prochaines étapes.
+            Seuls le nom du club, son établissement et ses axes sont publics. La liste des membres
+            n'est visible que de ses membres, de ses encadreurs et de l'équipe des Clubs Santé.
           </div>
 
           <Link
@@ -140,6 +165,55 @@ function FicheClubPage() {
       </main>
 
       <SiteFooter />
+    </div>
+  );
+}
+
+// Pour un encadreur actif (spec 020) : l'état de son rattachement à ce club, ou le bouton pour le demander.
+function RattachementFiche({ clubId, mesClubs }: { clubId: string; mesClubs: MesClubs }) {
+  const router = useRouter();
+  const [ouvert, setOuvert] = useState(false);
+  const enCours = mesClubs.rattachements.find(
+    (r) =>
+      r.club_id === clubId &&
+      ["en_attente_president", "en_attente_validation", "actif"].includes(r.etat),
+  );
+  const dejaRattache = mesClubs.rattachements.some((r) => r.etat === "actif");
+
+  if (enCours?.etat === "actif")
+    return (
+      <p className="mt-8 flex items-center gap-2 rounded-2xl bg-primary/10 p-4 font-semibold text-ink">
+        <ShieldCheck aria-hidden className="size-5 text-primary" /> Tu es rattaché à ce club.
+      </p>
+    );
+  if (enCours)
+    return (
+      <p className="mt-8 flex items-center gap-2 rounded-2xl bg-sun/20 p-4 font-semibold text-ink">
+        <Hourglass aria-hidden className="size-5" /> Ta demande de rattachement est en cours :
+        suis-la dans ton espace.
+      </p>
+    );
+  return (
+    <div className="mt-8 rounded-2xl border p-4">
+      <p className="font-medium text-ink/80">
+        Tu es encadreur : demande ton rattachement pour suivre ce club.
+        {dejaRattache &&
+          " Tu encadres déjà un club : l'équipe nationale devra autoriser ce club supplémentaire."}
+      </p>
+      <Button onClick={() => setOuvert(true)} className="mt-3 rounded-full font-bold">
+        <Send className="size-4" /> Demander mon rattachement
+      </Button>
+      <DialogueFormulaire
+        ouvert={ouvert}
+        onOuvert={setOuvert}
+        titre="Demander ton rattachement ?"
+        description="Le président du club confirmera ta demande, puis l'équipe la validera."
+        bouton="Envoyer ma demande"
+        onEnvoie={async () => {
+          await demanderRattachement(clubId);
+          await router.invalidate();
+        }}
+      />
     </div>
   );
 }
