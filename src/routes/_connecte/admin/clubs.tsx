@@ -5,13 +5,16 @@ import { useState } from "react";
 import { DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { DialogueMotif } from "@/components/admin/DialogueMotif";
 import { EnTeteAdmin } from "@/components/admin/EnTeteAdmin";
+import { FileMembres } from "@/components/admin/FileMembres";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Button } from "@/components/ui/button";
 import { peut } from "@/lib/admin";
 import {
   adminActiverClub,
+  adminFileAffiliations,
   adminFileClubs,
   adminFilePassations,
+  adminFileRattachements,
   adminRefuserClub,
   adminRefuserPassation,
   adminValiderPassation,
@@ -22,15 +25,12 @@ import {
 import { dateCourte } from "@/lib/dates";
 import { libelleAxes, libellesDesAxes } from "@/lib/clubs";
 
-type Onglet = "en_attente" | "refuse" | "passations";
+type Onglet = "en_attente" | "refuse" | "passations" | "affiliations" | "rattachements";
+const AUTRES_ONGLETS: Onglet[] = ["refuse", "passations", "affiliations", "rattachements"];
 
 export const Route = createFileRoute("/_connecte/admin/clubs")({
   validateSearch: (search: Record<string, unknown>): { etat?: Onglet } =>
-    search["etat"] === "refuse"
-      ? { etat: "refuse" }
-      : search["etat"] === "passations"
-        ? { etat: "passations" }
-        : {},
+    AUTRES_ONGLETS.includes(search["etat"] as Onglet) ? { etat: search["etat"] as Onglet } : {},
   beforeLoad: ({ context }) => {
     if (!peut(context.admin, "clubs", "consulter")) throw redirect({ to: "/admin" });
   },
@@ -40,6 +40,10 @@ export const Route = createFileRoute("/_connecte/admin/clubs")({
     if (deps.etat === "passations") {
       return { axes, passations: await adminFilePassations() };
     }
+    // Spec 020 : les affiliations et rattachements confirmés par un président.
+    if (deps.etat === "affiliations") return { axes, affiliations: await adminFileAffiliations() };
+    if (deps.etat === "rattachements")
+      return { axes, rattachements: await adminFileRattachements() };
     return { axes, file: await adminFileClubs(deps.etat) };
   },
   gcTime: 0,
@@ -51,6 +55,8 @@ const ONGLETS: { etat: Onglet; libelle: string }[] = [
   { etat: "en_attente", libelle: "À vérifier" },
   { etat: "refuse", libelle: "Refusés" },
   { etat: "passations", libelle: "Passations" },
+  { etat: "affiliations", libelle: "Affiliations" },
+  { etat: "rattachements", libelle: "Rattachements" },
 ];
 
 function Clubs() {
@@ -66,13 +72,21 @@ function Clubs() {
   const [refusPassation, setRefusPassation] = useState<Passation | null>(null);
   const router = useRouter();
 
-  const total = "passations" in donnees ? donnees.passations.total : donnees.file.total;
+  const total =
+    "passations" in donnees
+      ? donnees.passations.total
+      : "affiliations" in donnees
+        ? donnees.affiliations.total
+        : "rattachements" in donnees
+          ? donnees.rattachements.total
+          : donnees.file.total;
 
   return (
     <div className="space-y-6">
       <EnTeteAdmin sur="Clubs Santé" bleu="Clubs" vert="à valider">
         Vérifie le nom du club, son établissement et le demandeur avant d'activer. Une passation
-        change le président du club, jamais le compte des élèves.
+        change le président du club, jamais le compte des élèves. Les affiliations et les
+        rattachements arrivent ici une fois confirmés par le président du club.
         {admin.perimetre_dre &&
           ` Tu vois les demandes de la DRE ${catalogue.dre[admin.perimetre_dre]}.`}
       </EnTeteAdmin>
@@ -95,7 +109,21 @@ function Clubs() {
         ))}
       </nav>
 
-      {etat === "passations" && "passations" in donnees ? (
+      {"affiliations" in donnees ? (
+        <FileMembres
+          type="affiliations"
+          demandes={donnees.affiliations.demandes}
+          decideur={decideur}
+          onRafraichir={() => router.invalidate()}
+        />
+      ) : "rattachements" in donnees ? (
+        <FileMembres
+          type="rattachements"
+          demandes={donnees.rattachements.demandes}
+          decideur={decideur}
+          onRafraichir={() => router.invalidate()}
+        />
+      ) : etat === "passations" && "passations" in donnees ? (
         <Passations
           passations={donnees.passations}
           decideur={decideur}

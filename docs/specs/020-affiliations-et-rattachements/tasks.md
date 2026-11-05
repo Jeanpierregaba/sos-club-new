@@ -76,9 +76,9 @@ Chaque tâche est autonome et committable ; lint, typecheck et tests passent ava
 
 ## Tâche 9 — Site : admin
 
-- [ ] `/admin/clubs` : onglets Affiliations et Rattachements, sélection, décisions en lot, résultat par ligne
-- [ ] Mention « Autorisation nationale requise » pour un collaborateur de DRE
-- [ ] Tests
+- [x] `/admin/clubs` : onglets Affiliations et Rattachements, sélection, décisions en lot, résultat par ligne
+- [x] Mention « Autorisation nationale requise » pour un collaborateur de DRE
+- [x] Tests
 
 **Commit :** `feat(site): files admin des affiliations et rattachements`
 
