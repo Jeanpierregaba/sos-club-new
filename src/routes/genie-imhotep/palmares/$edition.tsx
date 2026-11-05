@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import {
+  ArrowLeft,
   ArrowRight,
   Award,
   Crown,
@@ -13,40 +14,42 @@ import { CompteARebours } from "@/components/CompteARebours";
 import { DecorAnime } from "@/components/DecorAnime";
 import { EnTete } from "@/components/EnTete";
 import { FilAriane } from "@/components/FilAriane";
-import { FriseEditions } from "@/components/FriseEditions";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteMotion, retard } from "@/components/SiteMotion";
-import { editionDe, ordinal, type Edition } from "@/lib/genie-imhotep-editions";
+import { libelleSaison, ordinal, trouverEdition, type Edition } from "@/lib/genie-imhotep-editions";
 import {
   CHAMPION,
-  joueursPrimes,
   nationale,
   nomsRegions,
   ordreRegions,
   regionales,
   type EquipeNationale,
+  type JoueurPrime,
   type RegionId,
 } from "@/lib/genie-imhotep-resultats";
 import { dessins } from "@/lib/togo-dre";
 import mascottesTrophees from "@/assets/mascottes-trophees.webp";
 
-export const Route = createFileRoute("/genie-imhotep/palmares")({
-  head: () => ({
+// Le palmarès d'une édition : podium, joueurs primés et champions régionaux d'une saison jouée, ou le
+// compte à rebours d'une saison à venir. Une édition inconnue donne la page 404.
+export const Route = createFileRoute("/genie-imhotep/palmares/$edition")({
+  loader: ({ params }) => {
+    const edition = trouverEdition(params.edition);
+    if (!edition) throw notFound();
+    return edition;
+  },
+  head: ({ loaderData }) => ({
     meta: [
-      { title: "Palmarès — Génie Imhotep" },
+      { title: `Palmarès ${loaderData?.id ?? ""} — Génie Imhotep` },
       {
         name: "description",
-        content:
-          "Le palmarès du Championnat national Génie Imhotep, saison par saison : le podium national, les champions régionaux et les joueurs primés.",
+        content: `Le palmarès de l’édition ${loaderData?.id ?? ""} du Championnat national Génie Imhotep : le podium national, les joueurs primés et les champions régionaux.`,
       },
-      { property: "og:title", content: "Le palmarès du Génie Imhotep" },
+      { property: "og:title", content: `Palmarès Génie Imhotep ${loaderData?.id ?? ""}` },
     ],
   }),
-  // ?edition=2026-2027 : la saison affichée ; sans paramètre, la dernière édition terminée.
-  validateSearch: (search: Record<string, unknown>): { edition?: string } =>
-    typeof search["edition"] === "string" ? { edition: search["edition"] } : {},
-  component: Palmares,
+  component: PalmaresEdition,
 });
 
 const couleur = (id: RegionId) => dessins[id]!.couleur;
@@ -152,11 +155,11 @@ function Podium() {
 
 // Les joueurs primés : leur pseudonyme et leur établissement, jamais leur nom (docs/RULES.md). Tant que la
 // liste n'est pas transmise, des cartes « bientôt dévoilé » gardent leur place.
-function JoueursPrimes() {
-  if (joueursPrimes.length > 0)
+function JoueursPrimes({ joueurs }: { joueurs: JoueurPrime[] }) {
+  if (joueurs.length > 0)
     return (
       <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {joueursPrimes.map((j, i) => (
+        {joueurs.map((j, i) => (
           <li
             key={`${j.pseudonyme}-${j.distinction}`}
             data-reveal
@@ -182,20 +185,20 @@ function JoueursPrimes() {
           key={i}
           data-reveal
           style={retard(i)}
-          className="relative overflow-hidden rounded-3xl bg-night p-6 text-center text-white shadow-card"
+          className="relative overflow-hidden rounded-3xl bg-white p-6 text-center shadow-card ring-1 ring-border"
         >
           <span
             aria-hidden
-            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgb(255_210_80/0.25),transparent_60%)]"
+            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_25%,color-mix(in_oklch,var(--sun)_30%,transparent),transparent_60%)]"
           />
-          <span className="relative mx-auto flex size-20 items-center justify-center rounded-full bg-white/10 ring-2 ring-dashed ring-sun/60">
-            <UserRound aria-hidden className="size-10 text-white/40" />
-            <span className="absolute -right-1 -top-1 inline-flex size-8 items-center justify-center rounded-full bg-sun font-display text-lg text-ink">
+          <span className="relative mx-auto flex size-20 items-center justify-center rounded-full border-2 border-dashed border-tangerine/60 bg-mist-soft">
+            <UserRound aria-hidden className="size-10 text-logo-blue/30" />
+            <span className="absolute -right-1 -top-1 inline-flex size-8 items-center justify-center rounded-full bg-sun font-display text-lg text-ink shadow-card">
               ?
             </span>
           </span>
-          <p className="relative mt-4 font-display text-2xl text-sun">Bientôt dévoilé</p>
-          <p className="relative mt-1 text-sm font-semibold text-white/70">
+          <p className="relative mt-4 font-display text-2xl text-logo-blue">Bientôt dévoilé</p>
+          <p className="relative mt-1 text-sm font-semibold text-muted-foreground">
             Pseudonyme et établissement du joueur primé
           </p>
         </li>
@@ -206,23 +209,24 @@ function JoueursPrimes() {
 
 function PalmaresAVenir({ edition }: { edition: Edition }) {
   return (
-    <div className="mx-auto max-w-7xl px-5 pb-16 pt-8 lg:pb-24">
-      <p className="inline-flex items-center gap-2 rounded-full bg-logo-red px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide">
-        <Hourglass className="size-4 text-sun" /> {ordinal(edition.numero)} édition · {edition.id}
+    <div className="mx-auto max-w-7xl px-5 pb-16 pt-10 lg:pb-24">
+      <p className="inline-flex items-center gap-2 rounded-full bg-logo-red px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-white">
+        <Hourglass className="size-4 text-sun" /> {ordinal(edition.numero)} édition ·{" "}
+        {libelleSaison(edition.id)}
       </p>
       <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-        <span className="block">Un palmarès</span>
-        <span className="block text-sun">encore à écrire</span>
+        <span className="block text-logo-blue">Un palmarès</span>
+        <span className="block text-primary">encore à écrire</span>
       </h1>
-      <p className="mt-5 max-w-xl text-lg font-medium text-white/80">
+      <p className="mt-5 max-w-xl text-lg font-medium text-muted-foreground">
         Les lauréats de la saison {edition.id} seront inscrits ici à la fin du championnat. Le coup
         d’envoi approche :
       </p>
       <div className="mt-6">
         {edition.debut ? (
-          <CompteARebours cible={edition.debut} />
+          <CompteARebours cible={edition.debut} clair />
         ) : (
-          <p className="font-display text-3xl text-sun">Date bientôt annoncée</p>
+          <p className="font-display text-3xl text-logo-blue">Date bientôt annoncée</p>
         )}
       </div>
       <a
@@ -235,9 +239,8 @@ function PalmaresAVenir({ edition }: { edition: Edition }) {
   );
 }
 
-function Palmares() {
-  const { edition: id } = Route.useSearch();
-  const edition = editionDe(id);
+function PalmaresEdition() {
+  const edition = Route.useLoaderData();
   const terminee = edition.statut === "terminee";
 
   return (
@@ -245,40 +248,47 @@ function Palmares() {
       <SiteMotion />
       <SiteHeader />
 
-      {/* Bannière : un ciel de nuit doré, la frise des saisons, puis le titre de la saison choisie. */}
-      <section className="relative isolate overflow-hidden bg-linear-to-br from-logo-blue via-ink to-night text-white">
+      {/* Bannière claire : des rayons dorés derrière les mascottes aux trophées, le titre de la saison. */}
+      <section className="relative isolate overflow-hidden bg-linear-to-br from-[color-mix(in_oklch,var(--sun)_26%,white)] via-white to-lilac">
         <div
           aria-hidden
-          className="absolute left-1/2 top-full -z-10 size-[60rem] lg:left-[75%] lg:top-[70%] -translate-x-1/2 -translate-y-1/2 bg-[repeating-conic-gradient(rgb(255_210_80/0.10)_0deg_6deg,transparent_6deg_18deg)] [mask-image:radial-gradient(circle,black_20%,transparent_65%)] motion-safe:animate-[spin_120s_linear_infinite]"
+          className="absolute left-1/2 top-full -z-10 size-[60rem] -translate-x-1/2 -translate-y-1/2 bg-[repeating-conic-gradient(rgb(245_160_20/0.13)_0deg_6deg,transparent_6deg_18deg)] [mask-image:radial-gradient(circle,black_20%,transparent_65%)] motion-safe:animate-[spin_120s_linear_infinite] lg:left-[75%] lg:top-[70%]"
         />
-        <DecorAnime />
-        <div className="mx-auto max-w-7xl px-5 pt-8 md:pt-12">
-          <FilAriane rubrique="Génie Imhotep" page="Palmarès" clair />
-          <div className="mt-8">
-            <FriseEditions actuelle={edition} vers="/genie-imhotep/palmares" />
-          </div>
+        <DecorAnime ton="clair" />
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 pt-8 md:pt-12">
+          <FilAriane
+            rubrique="Génie Imhotep"
+            parent={{ t: "Palmarès", href: "/genie-imhotep/palmares" }}
+            page={`Édition ${libelleSaison(edition.id)}`}
+          />
+          <a
+            href="/genie-imhotep/palmares#editions"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-logo-blue hover:underline"
+          >
+            <ArrowLeft className="size-4" /> Toutes les éditions
+          </a>
         </div>
         {terminee ? (
           <div className="mx-auto grid max-w-7xl items-end gap-8 px-5 pt-6 lg:grid-cols-[1.2fr_1fr]">
             <div data-reveal="left" className="pb-16 lg:pb-20">
               <p className="inline-flex items-center gap-2 rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-ink">
-                <Sparkles className="size-4" /> {ordinal(edition.numero)} édition · {edition.id}
+                <Sparkles className="size-4" /> Palmarès · {ordinal(edition.numero)} édition
               </p>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block">Le palmarès</span>
-                <span className="block text-sun">des lauréats</span>
+                <span className="block text-logo-blue">Les lauréats</span>
+                <span className="block text-primary">{libelleSaison(edition.id)}</span>
               </h1>
-              <p className="mt-5 max-w-2xl text-lg font-medium text-white/80">
+              <p className="mt-5 max-w-2xl text-lg font-medium text-muted-foreground">
                 Ils ont buzzé plus vite, répondu plus juste et porté haut les couleurs de leur
                 établissement : honneur aux lauréats du Championnat national Génie Imhotep.
               </p>
-              <p className="mt-8 inline-flex items-center gap-3 rounded-2xl bg-white/10 px-5 py-3 ring-1 ring-white/15 backdrop-blur-sm">
-                <Crown aria-hidden className="size-6 text-sun" />
+              <p className="mt-8 inline-flex items-center gap-3 rounded-2xl bg-white px-5 py-3 shadow-card ring-1 ring-border">
+                <Crown aria-hidden className="size-6 text-tangerine" />
                 <span>
-                  <span className="block text-xs font-extrabold uppercase tracking-widest text-white/60">
+                  <span className="block text-xs font-extrabold uppercase tracking-widest text-muted-foreground">
                     Champion national
                   </span>
-                  <span className="font-display text-2xl">{CHAMPION}</span>
+                  <span className="font-display text-2xl text-logo-blue">{edition.champion}</span>
                 </span>
               </p>
             </div>
@@ -314,7 +324,7 @@ function Palmares() {
                 établissement.
               </EnTete>
               <div className="mt-10">
-                <JoueursPrimes />
+                <JoueursPrimes joueurs={edition.joueursPrimes ?? []} />
               </div>
             </div>
           </section>
@@ -376,7 +386,7 @@ function Palmares() {
             </p>
           </div>
           <a
-            href={`/genie-imhotep/hall-of-fame?edition=${edition.id}`}
+            href={`/genie-imhotep/hall-of-fame/${edition.id}`}
             className="btn-fx inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
           >
             Voir le Hall of Fame <ArrowRight className="size-4" />

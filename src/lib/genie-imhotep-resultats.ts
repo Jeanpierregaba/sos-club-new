@@ -680,9 +680,8 @@ export const nationale: MatchNational[] = [
   },
 ];
 
-// Joueurs primés de l'édition (page Palmarès). Vide tant qu'AIMES-AFRIQUE n'a pas transmis la liste.
-// Un élève n'apparaît publiquement que par son pseudonyme et son établissement, jamais par son nom
-// complet (docs/RULES.md) : ne rien ajouter ici sans l'accord de l'élève et de son établissement.
+// Un joueur primé d'une édition (page Palmarès ; la liste est rangée par édition dans
+// genie-imhotep-editions.ts). Un élève n'apparaît publiquement que par son pseudonyme et son
+// établissement, jamais par son nom complet (docs/RULES.md) : rien sans l'accord de l'élève et de son
+// établissement.
 export type JoueurPrime = { pseudonyme: string; etablissement: string; distinction: string };
-
-export const joueursPrimes: JoueurPrime[] = [];

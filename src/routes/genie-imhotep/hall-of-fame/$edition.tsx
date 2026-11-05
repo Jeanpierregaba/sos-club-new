@@ -1,6 +1,7 @@
 import { useState, type CSSProperties } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import {
+  ArrowLeft,
   ArrowRight,
   Check,
   Crown,
@@ -16,7 +17,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Compteur } from "@/components/Compteur";
 import { CompteARebours } from "@/components/CompteARebours";
-import { FriseEditions } from "@/components/FriseEditions";
+import { DecorAnime } from "@/components/DecorAnime";
 import { SiteMotion, retard } from "@/components/SiteMotion";
 import { dessins } from "@/lib/togo-dre";
 import {
@@ -31,25 +32,31 @@ import {
   nomsRegions,
   type RegionId,
 } from "@/lib/genie-imhotep-resultats";
-import { editionDe, ordinal, type Edition } from "@/lib/genie-imhotep-editions";
+import { libelleSaison, ordinal, trouverEdition, type Edition } from "@/lib/genie-imhotep-editions";
 import mascottesVs from "@/assets/mascottes-vs.webp";
 
-export const Route = createFileRoute("/genie-imhotep/hall-of-fame")({
-  head: () => ({
+// La page d'une édition du Hall of Fame : les résultats complets d'une saison jouée, ou le compte à
+// rebours d'une saison à venir. Une édition inconnue donne la page 404.
+export const Route = createFileRoute("/genie-imhotep/hall-of-fame/$edition")({
+  loader: ({ params }) => {
+    const edition = trouverEdition(params.edition);
+    if (!edition) throw notFound();
+    return edition;
+  },
+  head: ({ loaderData }) => ({
     meta: [
-      { title: "Hall of Fame — Génie Imhotep" },
+      { title: `Hall of Fame ${loaderData?.id ?? ""} — Génie Imhotep` },
       {
         name: "description",
         content:
-          "Toutes les éditions du Championnat national Génie Imhotep : le parcours du champion, le tableau final, les classements régionaux, les phases locales, et le compte à rebours de la prochaine saison.",
+          loaderData?.statut === "a-venir"
+            ? `L’édition ${loaderData.id} du Championnat national Génie Imhotep : le compte à rebours jusqu’au coup d’envoi.`
+            : `L’édition ${loaderData?.id ?? ""} du Championnat national Génie Imhotep : le parcours du champion, le tableau final, les classements régionaux et les phases locales.`,
       },
-      { property: "og:title", content: "Hall of Fame du Génie Imhotep" },
+      { property: "og:title", content: `Hall of Fame Génie Imhotep ${loaderData?.id ?? ""}` },
     ],
   }),
-  // ?edition=2026-2027 : la saison affichée ; sans paramètre, la dernière édition terminée.
-  validateSearch: (search: Record<string, unknown>): { edition?: string } =>
-    typeof search["edition"] === "string" ? { edition: search["edition"] } : {},
-  component: HallOfFame,
+  component: HallOfFameEdition,
 });
 
 const region = (id: RegionId) => ({ nom: nomsRegions[id], couleur: dessins[id]!.couleur });
@@ -223,25 +230,26 @@ function EditionAVenir({ edition }: { edition: Edition }) {
   return (
     <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 lg:grid-cols-[1.2fr_1fr]">
       <div className="min-w-0 pb-16 pt-8 lg:pb-24 lg:pt-10">
-        <p className="inline-flex items-center gap-2 rounded-full bg-logo-red px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide">
-          <Hourglass className="size-4 text-sun" /> {ordinal(edition.numero)} édition · {edition.id}
+        <p className="inline-flex items-center gap-2 rounded-full bg-logo-red px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-white">
+          <Hourglass className="size-4 text-sun" /> {ordinal(edition.numero)} édition ·{" "}
+          {libelleSaison(edition.id)}
         </p>
         <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-          <span className="block">Le prochain champion,</span>
-          <span className="block text-sun">c’est peut-être toi</span>
+          <span className="block text-logo-blue">Le prochain champion,</span>
+          <span className="block text-primary">c’est peut-être toi</span>
         </h1>
-        <p className="mt-5 max-w-xl text-lg font-medium text-white/80">
+        <p className="mt-5 max-w-xl text-lg font-medium text-muted-foreground">
           La saison {edition.id} du Championnat national Génie Imhotep se prépare. Rassemble ton
           équipe, révise avec les quiz et sois prêt pour le coup d’envoi !
         </p>
-        <p className="mt-8 text-xs font-extrabold uppercase tracking-widest text-white/60">
+        <p className="mt-8 text-xs font-extrabold uppercase tracking-widest text-logo-red">
           Coup d’envoi dans
         </p>
         <div className="mt-3">
           {edition.debut ? (
-            <CompteARebours cible={edition.debut} />
+            <CompteARebours cible={edition.debut} clair />
           ) : (
-            <p className="font-display text-3xl text-sun">Date bientôt annoncée</p>
+            <p className="font-display text-3xl text-logo-blue">Date bientôt annoncée</p>
           )}
         </div>
         <div className="mt-9 flex flex-wrap gap-3">
@@ -253,7 +261,7 @@ function EditionAVenir({ edition }: { edition: Edition }) {
           </a>
           <a
             href="/jeux"
-            className="btn-fx inline-flex items-center gap-2 rounded-full border-2 border-white px-7 py-3 text-[15px] font-bold hover:bg-white hover:text-ink"
+            className="btn-fx inline-flex items-center gap-2 rounded-full border-2 border-logo-blue px-7 py-3 text-[15px] font-bold text-logo-blue hover:bg-logo-blue hover:text-white"
           >
             <Gamepad2 className="size-4" /> M’entraîner avec les quiz
           </a>
@@ -275,9 +283,8 @@ function EditionAVenir({ edition }: { edition: Edition }) {
   );
 }
 
-function HallOfFame() {
-  const { edition: id } = Route.useSearch();
-  const edition = editionDe(id);
+function HallOfFameEdition() {
+  const edition = Route.useLoaderData();
   const [choix, setChoix] = useState<RegionId>("grand-lome");
   const insp = inspectorales.filter((i) => i.region === choix);
   const pref = prefectorales.filter((p) => p.region === choix);
@@ -287,21 +294,29 @@ function HallOfFame() {
       <SiteMotion />
       <SiteHeader />
 
-      {/* Bannière : la nuit et ses rayons dorés, le champion et le score de la finale. */}
-      <section className="relative isolate overflow-hidden bg-night text-white">
+      {/* Bannière claire et dorée : des rayons qui tournent derrière les mascottes, le score de la finale. */}
+      <section className="relative isolate overflow-hidden bg-linear-to-b from-[color-mix(in_oklch,var(--sun)_24%,white)] to-white">
         <div
           aria-hidden
-          className="absolute left-[70%] top-[60%] -z-10 size-[70rem] -translate-x-1/2 -translate-y-1/2 bg-[repeating-conic-gradient(rgb(255_210_80/0.10)_0deg_6deg,transparent_6deg_18deg)] [mask-image:radial-gradient(circle,black_20%,transparent_65%)] motion-safe:animate-[spin_120s_linear_infinite]"
+          className="absolute left-1/2 top-[85%] -z-10 size-[60rem] -translate-x-1/2 -translate-y-1/2 bg-[repeating-conic-gradient(rgb(245_160_20/0.13)_0deg_6deg,transparent_6deg_18deg)] [mask-image:radial-gradient(circle,black_20%,transparent_65%)] motion-safe:animate-[spin_120s_linear_infinite] lg:left-[72%] lg:top-[62%] lg:size-[70rem]"
         />
         <div
           aria-hidden
-          className="absolute left-[70%] top-[65%] -z-10 size-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sun/30 blur-3xl"
+          className="absolute left-1/2 top-[88%] -z-10 size-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sun/40 blur-3xl lg:left-[72%] lg:top-[66%]"
         />
-        <div className="mx-auto max-w-7xl px-5 pt-8 md:pt-12">
-          <FilAriane rubrique="Génie Imhotep" page="Hall of Fame" clair />
-          <div className="mt-8">
-            <FriseEditions actuelle={edition} vers="/genie-imhotep/hall-of-fame" />
-          </div>
+        <DecorAnime ton="clair" />
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 pt-8 md:pt-12">
+          <FilAriane
+            rubrique="Génie Imhotep"
+            parent={{ t: "Hall of Fame", href: "/genie-imhotep/hall-of-fame" }}
+            page={`Édition ${libelleSaison(edition.id)}`}
+          />
+          <a
+            href="/genie-imhotep/hall-of-fame#editions"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-logo-blue hover:underline"
+          >
+            <ArrowLeft className="size-4" /> Toutes les éditions
+          </a>
         </div>
         {edition.statut === "a-venir" ? (
           <EditionAVenir edition={edition} />
@@ -311,40 +326,40 @@ function HallOfFame() {
               <div className="min-w-0 pb-12 lg:pb-20">
                 <div data-reveal="left" className="pt-8 lg:pt-10">
                   <p className="inline-flex items-center gap-2 rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-ink">
-                    <Trophy className="size-4" /> Hall of Fame · 1re édition
+                    <Trophy className="size-4" /> Hall of Fame · {ordinal(edition.numero)} édition
                   </p>
                   <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                    <span className="block">Le palmarès</span>
-                    <span className="block text-sun">Génie Imhotep</span>
+                    <span className="block text-logo-blue">Édition</span>
+                    <span className="block text-primary">{libelleSaison(edition.id)}</span>
                   </h1>
-                  <p className="mt-5 max-w-xl text-lg font-medium text-white/80">
+                  <p className="mt-5 max-w-xl text-lg font-medium text-muted-foreground">
                     De la préfecture à la grande finale de Lomé : tous les résultats du 1er
                     Championnat national, et le parcours de son champion.
                   </p>
 
                   {/* Le tableau d'affichage de la finale. */}
-                  <div className="mt-8 max-w-xl overflow-hidden rounded-3xl bg-white/10 ring-1 ring-white/15 backdrop-blur-sm">
-                    <p className="flex items-center gap-2 bg-logo-red px-5 py-2 text-xs font-extrabold uppercase tracking-widest">
+                  <div className="mt-8 max-w-xl overflow-hidden rounded-3xl bg-white shadow-card ring-1 ring-border">
+                    <p className="flex items-center gap-2 bg-logo-red px-5 py-2 text-xs font-extrabold uppercase tracking-widest text-white">
                       <Crown className="size-4 text-sun" /> Grande finale · Jeu {finale.jeu}
                     </p>
                     {/* Sur mobile, les deux équipes s'empilent de part et d'autre du score. */}
                     <div className="grid items-center gap-3 p-5 text-center sm:grid-cols-[1fr_auto_1fr] sm:text-left">
                       <div>
-                        <p className="font-display text-xl leading-tight text-sun md:text-2xl">
+                        <p className="font-display text-xl leading-tight text-primary md:text-2xl">
                           {CHAMPION}
                         </p>
-                        <p className="mt-1 text-xs font-bold text-white/70">
+                        <p className="mt-1 text-xs font-bold text-muted-foreground">
                           DRE {region(champion.region).nom} · Champion
                         </p>
                       </div>
-                      <p className="whitespace-nowrap font-display text-3xl tabular-nums sm:text-4xl md:text-5xl">
-                        {champion.pts} <span className="text-white/40">–</span> {finaliste.pts}
+                      <p className="whitespace-nowrap font-display text-3xl tabular-nums text-ink sm:text-4xl md:text-5xl">
+                        {champion.pts} <span className="text-ink/30">–</span> {finaliste.pts}
                       </p>
                       <div className="sm:text-right">
-                        <p className="font-display text-xl leading-tight md:text-2xl">
+                        <p className="font-display text-xl leading-tight text-logo-blue md:text-2xl">
                           {finaliste.nom}
                         </p>
-                        <p className="mt-1 text-xs font-bold text-white/70">
+                        <p className="mt-1 text-xs font-bold text-muted-foreground">
                           DRE {region(finaliste.region).nom} · Finaliste
                         </p>
                       </div>
@@ -361,11 +376,11 @@ function HallOfFame() {
                 className="mx-auto w-72 self-end drop-shadow-2xl sm:w-96 lg:w-[30rem]"
               />
             </div>
-            <div className="relative border-t border-white/10 bg-white/5 backdrop-blur">
-              <dl className="mx-auto grid max-w-7xl grid-cols-2 divide-white/10 px-5 md:grid-cols-4 md:divide-x">
+            <div className="relative border-y border-border bg-white/80 backdrop-blur">
+              <dl className="mx-auto grid max-w-7xl grid-cols-2 divide-border px-5 md:grid-cols-4 md:divide-x">
                 {chiffres.map((c) => (
                   <div key={c.t} className="flex flex-col-reverse py-6 text-center md:py-8">
-                    <dt className="mt-2 text-sm font-bold text-white/70">{c.t}</dt>
+                    <dt className="mt-2 text-sm font-bold text-muted-foreground">{c.t}</dt>
                     <dd className="font-display text-4xl leading-none text-primary md:text-5xl">
                       <Compteur value={c.n} />
                     </dd>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 // Compte à rebours jusqu'à `cible` (date ISO) : jours, heures, minutes, secondes.
+// `clair` : version pour un fond clair (cartes blanches, chiffres bleus).
 // Rendu serveur : des tirets, pour que le HTML ne dépende pas de l'heure du serveur ; le navigateur prend le relais.
 const UNITES = [
   { t: "Jours", ms: 86_400_000 },
@@ -16,7 +17,7 @@ function decouper(reste: number) {
   });
 }
 
-export function CompteARebours({ cible }: { cible: string }) {
+export function CompteARebours({ cible, clair = false }: { cible: string; clair?: boolean }) {
   const fin = new Date(cible).getTime();
   const [maintenant, setMaintenant] = useState<number | null>(null);
 
@@ -28,7 +29,11 @@ export function CompteARebours({ cible }: { cible: string }) {
 
   const reste = maintenant === null ? null : Math.max(0, fin - maintenant);
   if (reste === 0)
-    return <p className="font-display text-4xl text-sun md:text-5xl">C’est parti !</p>;
+    return (
+      <p className={`font-display text-4xl md:text-5xl ${clair ? "text-primary" : "text-sun"}`}>
+        C’est parti !
+      </p>
+    );
   const valeurs = reste === null ? null : decouper(reste);
 
   return (
@@ -37,14 +42,21 @@ export function CompteARebours({ cible }: { cible: string }) {
         {UNITES.map((u, i) => (
           <li
             key={u.t}
-            className="relative overflow-hidden rounded-2xl bg-white/10 px-1 pb-3 pt-4 text-center ring-1 ring-white/15 backdrop-blur-sm"
+            className={`relative overflow-hidden rounded-2xl px-1 pb-3 pt-4 text-center ring-1 ${clair ? "bg-white shadow-card ring-border" : "bg-white/10 ring-white/15 backdrop-blur-sm"}`}
           >
             {/* Le pli du milieu, comme un afficheur à palettes. */}
-            <span aria-hidden className="absolute inset-x-0 top-1/2 h-px bg-night/40" />
-            <span className="block font-display text-4xl leading-none tabular-nums text-sun sm:text-5xl md:text-6xl">
+            <span
+              aria-hidden
+              className={`absolute inset-x-0 top-1/2 h-px ${clair ? "bg-border" : "bg-night/40"}`}
+            />
+            <span
+              className={`block font-display text-4xl leading-none tabular-nums sm:text-5xl md:text-6xl ${clair ? "text-logo-blue" : "text-sun"}`}
+            >
               {valeurs === null ? "--" : String(valeurs[i]).padStart(2, "0")}
             </span>
-            <span className="mt-2 block text-[11px] font-extrabold uppercase tracking-widest text-white/70 sm:text-xs">
+            <span
+              className={`mt-2 block text-[11px] font-extrabold uppercase tracking-widest sm:text-xs ${clair ? "text-muted-foreground" : "text-white/70"}`}
+            >
               {u.t}
             </span>
           </li>
