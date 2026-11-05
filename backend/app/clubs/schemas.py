@@ -71,9 +71,12 @@ class FileClubs(BaseModel):
 
 class PassationApercu(BaseModel):
     id: UUID
+    # en_attente_encadreur (Q19, spec 020), en_attente (l'admin), validee, refusee.
     etat: str
     successeur_pseudonyme: str
     propose_le: datetime
+    # La confirmation par un encadreur rattaché, s'il y en a un.
+    confirmee_le: datetime | None = None
     decide_le: datetime | None
     motif_refus: str | None
     version: int
@@ -231,10 +234,24 @@ class DemandeRattachement(BaseModel):
     version: int
 
 
+class PassationAConfirmer(BaseModel):
+    """Une passation qu'un encadreur rattaché au club doit confirmer (Q19)."""
+
+    id: UUID
+    club_id: UUID
+    club_nom: str
+    successeur_pseudonyme: str
+    president_sortant_pseudonyme: str
+    propose_le: datetime
+    version: int
+
+
 class MesClubs(BaseModel):
-    """L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés."""
+    """L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés, et les
+    passations de ses clubs qu'il doit confirmer (Q19)."""
 
     rattachements: list[RattachementResume]
+    passations: list[PassationAConfirmer] = []
 
 
 class AffiliationAValider(BaseModel):

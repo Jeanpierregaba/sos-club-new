@@ -3908,6 +3908,112 @@
         }
       }
     },
+    "/api/clubs/{club_id}/passation/confirmer": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Confirmer Passation",
+        "operationId": "confirmer_passation_api_clubs__club_id__passation_confirmer_post",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassationAConfirmer"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}/passation/refuser": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Refuser Passation Encadreur",
+        "operationId": "refuser_passation_encadreur_api_clubs__club_id__passation_refuser_post",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefusDemandeEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassationAConfirmer"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clubs": {
       "get": {
         "tags": [
@@ -8400,6 +8506,14 @@
             },
             "type": "array",
             "title": "Rattachements"
+          },
+          "passations": {
+            "items": {
+              "$ref": "#/components/schemas/PassationAConfirmer"
+            },
+            "type": "array",
+            "title": "Passations",
+            "default": []
           }
         },
         "type": "object",
@@ -8407,7 +8521,7 @@
           "rattachements"
         ],
         "title": "MesClubs",
-        "description": "L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés."
+        "description": "L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés, et les\npassations de ses clubs qu'il doit confirmer (Q19)."
       },
       "ModuleCatalogue": {
         "properties": {
@@ -8724,6 +8838,53 @@
         ],
         "title": "Passation"
       },
+      "PassationAConfirmer": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "club_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Club Id"
+          },
+          "club_nom": {
+            "type": "string",
+            "title": "Club Nom"
+          },
+          "successeur_pseudonyme": {
+            "type": "string",
+            "title": "Successeur Pseudonyme"
+          },
+          "president_sortant_pseudonyme": {
+            "type": "string",
+            "title": "President Sortant Pseudonyme"
+          },
+          "propose_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Propose Le"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "club_id",
+          "club_nom",
+          "successeur_pseudonyme",
+          "president_sortant_pseudonyme",
+          "propose_le",
+          "version"
+        ],
+        "title": "PassationAConfirmer",
+        "description": "Une passation qu'un encadreur rattaché au club doit confirmer (Q19)."
+      },
       "PassationApercu": {
         "properties": {
           "id": {
@@ -8743,6 +8904,18 @@
             "type": "string",
             "format": "date-time",
             "title": "Propose Le"
+          },
+          "confirmee_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmee Le"
           },
           "decide_le": {
             "anyOf": [

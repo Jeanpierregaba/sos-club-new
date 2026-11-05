@@ -1343,6 +1343,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/clubs/{club_id}/passation/confirmer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirmer Passation */
+        post: operations["confirmer_passation_api_clubs__club_id__passation_confirmer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}/passation/refuser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refuser Passation Encadreur */
+        post: operations["refuser_passation_encadreur_api_clubs__club_id__passation_refuser_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/clubs": {
         parameters: {
             query?: never;
@@ -2918,11 +2952,17 @@ export interface components {
         };
         /**
          * MesClubs
-         * @description L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés.
+         * @description L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés, et les
+         *     passations de ses clubs qu'il doit confirmer (Q19).
          */
         MesClubs: {
             /** Rattachements */
             rattachements: components["schemas"]["RattachementResume"][];
+            /**
+             * Passations
+             * @default []
+             */
+            passations: components["schemas"]["PassationAConfirmer"][];
         };
         /** ModuleCatalogue */
         ModuleCatalogue: {
@@ -3038,6 +3078,35 @@ export interface components {
             /** Version */
             version: number;
         };
+        /**
+         * PassationAConfirmer
+         * @description Une passation qu'un encadreur rattaché au club doit confirmer (Q19).
+         */
+        PassationAConfirmer: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Club Id
+             * Format: uuid
+             */
+            club_id: string;
+            /** Club Nom */
+            club_nom: string;
+            /** Successeur Pseudonyme */
+            successeur_pseudonyme: string;
+            /** President Sortant Pseudonyme */
+            president_sortant_pseudonyme: string;
+            /**
+             * Propose Le
+             * Format: date-time
+             */
+            propose_le: string;
+            /** Version */
+            version: number;
+        };
         /** PassationApercu */
         PassationApercu: {
             /**
@@ -3054,6 +3123,8 @@ export interface components {
              * Format: date-time
              */
             propose_le: string;
+            /** Confirmee Le */
+            confirmee_le?: string | null;
             /** Decide Le */
             decide_le: string | null;
             /** Motif Refus */
@@ -6041,6 +6112,76 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RattachementResume"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirmer_passation_api_clubs__club_id__passation_confirmer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassationAConfirmer"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refuser_passation_encadreur_api_clubs__club_id__passation_refuser_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefusDemandeEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassationAConfirmer"];
                 };
             };
             /** @description Validation Error */

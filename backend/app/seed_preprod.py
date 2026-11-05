@@ -21,7 +21,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.journal import journaliser
-from app.clubs.models import Club, ClubAxe, ClubPassation, EtatClub, EtatPassation
+from app.clubs.adhesions import adhesion_president
+from app.clubs.models import PASSATION_EN_ATTENTE, Club, ClubAxe, ClubPassation, EtatClub
 from app.clubs.service import normaliser_nom
 from app.comptes.models import Role, Utilisateur
 from app.config import settings
@@ -119,7 +120,7 @@ async def _preparer_club(db: AsyncSession, president: Utilisateur, etablissement
         )
         db.add(club)
     elif await db.scalar(
-        select(ClubPassation.id).where(ClubPassation.club_id == club.id, ClubPassation.etat == EtatPassation.en_attente)
+        select(ClubPassation.id).where(ClubPassation.club_id == club.id, ClubPassation.etat.in_(PASSATION_EN_ATTENTE))
     ):
         raise PreparationImpossible("Une passation du club de test est en attente : décide-la d'abord.")
     maintenant = datetime.now(UTC)
@@ -130,6 +131,8 @@ async def _preparer_club(db: AsyncSession, president: Utilisateur, etablissement
     club.motif_refus = None
     club.president_id = president.id
     await db.flush()
+    # Le président est membre de droit de son club (spec 020), même s'il l'avait quitté pendant les tests.
+    await adhesion_president(db, club)
     if await db.scalar(select(ClubAxe.axe_code).where(ClubAxe.club_id == club.id)) is None:
         axes = list((await db.scalars(select(Axe.code).order_by(Axe.code).limit(2))).all())
         if not axes:

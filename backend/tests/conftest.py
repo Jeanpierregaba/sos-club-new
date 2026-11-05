@@ -282,6 +282,9 @@ class Navigateur:
     def put(self, url: str, **options: Any) -> Any:
         return self.request("PUT", url, **options)
 
+    def delete(self, url: str, **options: Any) -> Any:
+        return self.request("DELETE", url, **options)
+
 
 VERIFICATION_CLUBS = {
     ("tableau_de_bord", "consulter"),

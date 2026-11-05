@@ -33,6 +33,7 @@ from app.clubs.schemas import (
     MembreClub,
     MonClub,
     Passation,
+    PassationAConfirmer,
     PassationApercu,
     PassationEntree,
     RattachementResume,
@@ -221,6 +222,27 @@ async def retirer_encadreur(
     with _traduire_refus():
         return await rattachements.retirer(
             db, utilisateur, club_id, rattachement_id, entree.motif, entree.version, _adresse(request)
+        )
+
+
+# Passation confirmée par un encadreur rattaché (Q19, spec 020) ------------------------------------------------
+
+
+@router.post("/{club_id}/passation/confirmer")
+async def confirmer_passation(
+    club_id: UUID, entree: DecisionEntree, request: Request, utilisateur: Connecte, db: Base
+) -> PassationAConfirmer:
+    with _traduire_refus():
+        return await rattachements.confirmer_passation(db, utilisateur, club_id, entree.version, _adresse(request))
+
+
+@router.post("/{club_id}/passation/refuser")
+async def refuser_passation_encadreur(
+    club_id: UUID, entree: RefusDemandeEntree, request: Request, utilisateur: Connecte, db: Base
+) -> PassationAConfirmer:
+    with _traduire_refus():
+        return await rattachements.refuser_passation(
+            db, utilisateur, club_id, entree.motif, entree.version, _adresse(request)
         )
 
 

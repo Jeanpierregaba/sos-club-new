@@ -20,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.catalogue import LIBELLES_ROLES, RoleDepart
 from app.admin.journal import journaliser
 from app.admin.models import DoubleAuth
+from app.clubs.adhesions import adhesion_president
 from app.clubs.models import Club, ClubAxe, EtatClub
 from app.comptes.models import Role, Utilisateur
 from app.config import RACINE_PROJET, settings
@@ -137,6 +138,8 @@ async def _preparer_clubs(db: AsyncSession) -> None:
     )
     db.add_all([actif, attente])
     await db.flush()
+    # Le président est membre de droit de son club (spec 020).
+    await adhesion_president(db, actif)
     db.add_all(
         [
             ClubAxe(club_id=actif.id, axe_code="sante-environnement"),

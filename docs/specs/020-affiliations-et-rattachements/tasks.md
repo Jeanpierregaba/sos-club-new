@@ -51,9 +51,9 @@ Chaque tâche est autonome et committable ; lint, typecheck et tests passent ava
 
 ## Tâche 6 — API : confirmation du président par un encadreur (Q19)
 
-- [ ] Passation : `en_attente_encadreur` si le club a un encadreur rattaché ; successeur membre obligatoire
-- [ ] Routes confirmer / refuser pour l'encadreur rattaché
-- [ ] Adapter les tests de passation de la spec 019 ; `tests/test_clubs_passation_q19.py`
+- [x] Passation : `en_attente_encadreur` si le club a un encadreur rattaché ; successeur membre obligatoire
+- [x] Routes confirmer / refuser pour l'encadreur rattaché
+- [x] Adapter les tests de passation de la spec 019 ; `tests/test_clubs_passation_q19.py`
 
 **Commit :** `feat(clubs): confirmation de la passation par un encadreur (Q19)`
 

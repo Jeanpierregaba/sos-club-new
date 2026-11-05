@@ -17,7 +17,7 @@ from app.admin.dependances import Acces
 from app.admin.journal import journaliser
 from app.clubs.adhesions import adhesion_president
 from app.clubs.membres_admin import compter_a_valider
-from app.clubs.models import Club, ClubAxe, ClubPassation, EtatClub, EtatPassation
+from app.clubs.models import Adhesion, Club, ClubAxe, ClubPassation, EtatAdhesion, EtatClub, EtatPassation
 from app.clubs.schemas import DemandeClub, EncadreurAssocie, FileClubs, FilePassations, Passation
 from app.comptes.inscription import Refus
 from app.comptes.models import StatutCompte, Utilisateur
@@ -320,6 +320,14 @@ async def valider_passation(
     avant = club.president_id
     if avant == passation.successeur_id:
         raise Refus("Ce successeur est déjà président du club.", 409)
+    if not await db.scalar(
+        select(Adhesion.id).where(
+            Adhesion.club_id == club.id,
+            Adhesion.eleve_id == passation.successeur_id,
+            Adhesion.etat == EtatAdhesion.active,
+        )
+    ):
+        raise Refus("Le successeur n'est plus membre du club : la passation ne peut pas être validée.", 409)
     club.president_id = passation.successeur_id
     passation.etat = EtatPassation.validee
     passation.decide_le = datetime.now(UTC)

@@ -13,7 +13,18 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.journal import journaliser
-from app.clubs.models import Club, ClubAxe, ClubPassation, EtatClub, EtatPassation
+from app.clubs.models import (
+    PASSATION_EN_ATTENTE,
+    Adhesion,
+    Club,
+    ClubAxe,
+    ClubPassation,
+    EtatAdhesion,
+    EtatClub,
+    EtatPassation,
+    EtatRattachement,
+    Rattachement,
+)
 from app.clubs.schemas import (
     ClubFiche,
     ClubPublic,
@@ -100,7 +111,7 @@ async def _derniere_passation(db: AsyncSession, club_id: UUID) -> PassationAperc
         select(ClubPassation)
         .where(ClubPassation.club_id == club_id)
         .order_by(
-            case((ClubPassation.etat == EtatPassation.en_attente, 0), else_=1),
+            case((ClubPassation.etat.in_(PASSATION_EN_ATTENTE), 0), else_=1),
             ClubPassation.propose_le.desc(),
         )
         .limit(1)
@@ -267,7 +278,8 @@ async def club_preside(db: AsyncSession, utilisateur: Utilisateur) -> Club | Non
 async def proposer_passation(
     db: AsyncSession, utilisateur: Utilisateur, entree: PassationEntree, adresse_ip: str
 ) -> PassationApercu:
-    """Le président sortant désigne un successeur du même établissement ; l'admin valide ou refuse."""
+    """Le président sortant désigne un successeur parmi les membres du club (spec 020). Si le club a un encadreur
+    rattaché, celui-ci confirme d'abord le successeur (Q19) ; l'admin valide ou refuse ensuite."""
     club = await club_preside(db, utilisateur)
     if club is None:
         raise Refus("Tu n'es pas président d'un club actif.", 403)
@@ -284,11 +296,28 @@ async def proposer_passation(
     successeur = await db.get(Utilisateur, eleve_succ.utilisateur_id)
     if successeur.statut is not StatutCompte.actif:
         raise Refus("Cet élève n'est pas actif. Choisis un élève dont le compte est actif.", 409)
+    membre = await db.scalar(
+        select(Adhesion.id).where(
+            Adhesion.club_id == club.id,
+            Adhesion.eleve_id == eleve_succ.utilisateur_id,
+            Adhesion.etat == EtatAdhesion.active,
+        )
+    )
+    if membre is None:
+        raise Refus("Cet élève n'est pas membre de ton club : il doit d'abord le rejoindre.")
     if await db.scalar(
-        select(ClubPassation).where(ClubPassation.club_id == club.id, ClubPassation.etat == EtatPassation.en_attente)
+        select(ClubPassation).where(ClubPassation.club_id == club.id, ClubPassation.etat.in_(PASSATION_EN_ATTENTE))
     ):
         raise Refus("Une passation est déjà en attente pour ce club.", 409)
-    passation = ClubPassation(club_id=club.id, successeur_id=eleve_succ.utilisateur_id, propose_par=utilisateur.id)
+    encadre = await db.scalar(
+        select(Rattachement.id).where(Rattachement.club_id == club.id, Rattachement.etat == EtatRattachement.actif)
+    )
+    passation = ClubPassation(
+        club_id=club.id,
+        successeur_id=eleve_succ.utilisateur_id,
+        propose_par=utilisateur.id,
+        etat=EtatPassation.en_attente_encadreur if encadre else EtatPassation.en_attente,
+    )
     db.add(passation)
     try:
         await db.flush()
@@ -320,7 +349,7 @@ async def annuler_passation(db: AsyncSession, utilisateur: Utilisateur, adresse_
         .where(
             ClubPassation.club_id == club.id,
             ClubPassation.propose_par == utilisateur.id,
-            ClubPassation.etat == EtatPassation.en_attente,
+            ClubPassation.etat.in_(PASSATION_EN_ATTENTE),
         )
         .with_for_update()
     )
@@ -350,6 +379,7 @@ async def _appercu_passation(db: AsyncSession, passation: ClubPassation) -> Pass
         etat=passation.etat.value,
         successeur_pseudonyme=successeur or "",
         propose_le=passation.propose_le,
+        confirmee_le=passation.confirmee_le,
         decide_le=passation.decide_le,
         motif_refus=passation.motif_refus,
         version=passation.version,

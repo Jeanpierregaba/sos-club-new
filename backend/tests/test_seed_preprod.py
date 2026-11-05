@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.clubs.models import Club, ClubPassation, EtatClub
+from app.clubs.models import Adhesion, Club, ClubPassation, EtatAdhesion, EtatClub
 from app.comptes.models import Utilisateur
 from app.config import settings
 from app.eleves.models import Eleve
@@ -154,12 +154,22 @@ def test_relancer_remet_le_club_en_etat_sans_doublon(en_preprod: None, en_base: 
     async def etat(db: AsyncSession) -> dict[str, Any]:
         clubs = list((await db.scalars(select(Club))).all())
         president = await db.get(Utilisateur, clubs[0].president_id)
+        adhesions_president = list(
+            (
+                await db.scalars(
+                    select(Adhesion.etat).where(
+                        Adhesion.eleve_id == clubs[0].president_id, Adhesion.etat != EtatAdhesion.retiree
+                    )
+                )
+            ).all()
+        )
         bienvenues = list(
             (await db.scalars(select(MouvementPoints.cle).where(MouvementPoints.cle.like("bienvenue:%")))).all()
         )
         return {
             "clubs": clubs,
             "president": president.identifiant,
+            "adhesions_president": [e.value for e in adhesions_president],
             "bienvenues": bienvenues,
             "eleves": len((await db.scalars(select(Eleve))).all()),
             "encadreurs": len((await db.scalars(select(Encadreur))).all()),
@@ -171,6 +181,8 @@ def test_relancer_remet_le_club_en_etat_sans_doublon(en_preprod: None, en_base: 
     assert club.etat == EtatClub.actif
     assert club.motif_refus is None
     assert resultat["president"] == "preprod.president"
+    # Le président est membre de droit de son club (spec 020), une seule fois.
+    assert resultat["adhesions_president"] == ["active"]
     # Élève, président et encadreur : un seul crédit de bienvenue chacun, même après deux lancements.
     assert len(resultat["bienvenues"]) == len(set(resultat["bienvenues"])) == 3
     assert resultat["eleves"] == 2

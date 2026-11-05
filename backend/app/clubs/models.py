@@ -46,6 +46,10 @@ class EtatPassation(StrEnum):
     refusee = "refusee"
 
 
+# Une passation en attente : de la confirmation de l'encadreur rattaché (Q19), puis de la décision de l'admin.
+PASSATION_EN_ATTENTE = (EtatPassation.en_attente_encadreur, EtatPassation.en_attente)
+
+
 class Club(Suivi, Base):
     __tablename__ = "club"
     __table_args__ = (

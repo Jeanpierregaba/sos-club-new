@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.models import JournalAudit
 from app.clubs import service
-from app.clubs.models import Club, ClubPassation, EtatClub, EtatPassation
+from app.clubs.models import Adhesion, Club, ClubPassation, EtatAdhesion, EtatClub, EtatPassation
 from app.comptes.models import StatutCompte, Utilisateur
 from app.eleves.models import Eleve
 from tests.conftest import (
@@ -39,6 +39,8 @@ def connecter(navigateur: Navigateur, identifiant: str) -> None:
 
 
 def club_actif(en_base: Callable[..., Any], president: Utilisateur, *, dre: str = "grand-lome") -> Club:
+    """Un club actif. Depuis la spec 020, un successeur doit être membre : les élèves déjà inscrits dans
+    l'établissement (président compris) sont rendus membres du club."""
     lieu = etablissement_de(en_base, dre)
 
     async def inserer(db: AsyncSession) -> Club:
@@ -53,6 +55,8 @@ def club_actif(en_base: Callable[..., Any], president: Utilisateur, *, dre: str 
         )
         db.add(club)
         await db.flush()
+        for eleve_id in (await db.scalars(select(Eleve.utilisateur_id).where(Eleve.etablissement_id == lieu))).all():
+            db.add(Adhesion(eleve_id=eleve_id, club_id=club.id, etat=EtatAdhesion.active))
         return club
 
     return en_base(inserer)

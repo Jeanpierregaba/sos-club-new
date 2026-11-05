@@ -14,10 +14,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.journal import journaliser
 from app.clubs.adhesions import DEJA_TRAITEE, VIOLATION_UNICITE, club_actif, club_preside
-from app.clubs.models import RATTACHEMENT_EN_COURS, Club, EtatRattachement, Rattachement
-from app.clubs.schemas import DemandeRattachement, MesClubs, RattachementResume
+from app.clubs.models import (
+    RATTACHEMENT_EN_COURS,
+    Club,
+    ClubPassation,
+    EtatPassation,
+    EtatRattachement,
+    Rattachement,
+)
+from app.clubs.schemas import DemandeRattachement, MesClubs, PassationAConfirmer, RattachementResume
 from app.comptes.inscription import Refus
 from app.comptes.models import Role, Utilisateur
+from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur, EtatVerification
 from app.referentiel.models import Etablissement
 
@@ -75,7 +83,10 @@ async def mes_clubs(db: AsyncSession, utilisateur: Utilisateur) -> MesClubs:
             .limit(TERMINES_AFFICHES)
         )
     ).all()
-    return MesClubs(rattachements=[await resume(db, r) for r in [*en_cours, *termines]])
+    return MesClubs(
+        rattachements=[await resume(db, r) for r in [*en_cours, *termines]],
+        passations=await passations_a_confirmer(db, utilisateur),
+    )
 
 
 async def demander(db: AsyncSession, utilisateur: Utilisateur, club_id: UUID, adresse_ip: str) -> RattachementResume:
@@ -147,6 +158,7 @@ async def se_retirer(db: AsyncSession, utilisateur: Utilisateur, club_id: UUID, 
         details={"club_id": str(club_id), "par": "encadreur", "etat_precedent": etat_precedent.value},
         adresse_ip=adresse_ip,
     )
+    await liberer_passation(db, club_id)
     await db.commit()
     return await resume(db, rattachement)
 
@@ -267,6 +279,7 @@ async def retirer(
         details={"club_id": str(club.id), "par": "president", "motif": motif},
         adresse_ip=adresse_ip,
     )
+    await liberer_passation(db, club.id)
     await db.commit()
     return await resume(db, rattachement)
 
@@ -302,3 +315,143 @@ async def quitter_au_changement_detablissement(
             details={"club_id": str(rattachement.club_id), "par": "changement_etablissement"},
             adresse_ip=adresse_ip,
         )
+        await liberer_passation(db, rattachement.club_id)
+
+
+# Confirmation du président par un encadreur rattaché (Q19) ----------------------------------------------------
+
+
+async def passations_a_confirmer(db: AsyncSession, utilisateur: Utilisateur) -> list[PassationAConfirmer]:
+    lignes = await db.execute(
+        select(ClubPassation, Club)
+        .join(Club, Club.id == ClubPassation.club_id)
+        .join(Rattachement, Rattachement.club_id == Club.id)
+        .where(
+            Rattachement.encadreur_id == utilisateur.id,
+            Rattachement.etat == EtatRattachement.actif,
+            ClubPassation.etat == EtatPassation.en_attente_encadreur,
+        )
+        .order_by(ClubPassation.propose_le)
+    )
+    resultat = []
+    for passation, club in lignes.all():
+        successeur = await db.scalar(select(Eleve.pseudonyme).where(Eleve.utilisateur_id == passation.successeur_id))
+        sortant = await db.scalar(select(Eleve.pseudonyme).where(Eleve.utilisateur_id == club.president_id))
+        resultat.append(
+            PassationAConfirmer(
+                id=passation.id,
+                club_id=club.id,
+                club_nom=club.nom,
+                successeur_pseudonyme=successeur or "",
+                president_sortant_pseudonyme=sortant or "",
+                propose_le=passation.propose_le,
+                version=passation.version,
+            )
+        )
+    return resultat
+
+
+async def _passation_a_confirmer(
+    db: AsyncSession, utilisateur: Utilisateur, club_id: UUID, version: int
+) -> ClubPassation:
+    """La passation du club, verrouillée, si l'utilisateur est un encadreur actif rattaché à ce club."""
+    await encadreur_actif(db, utilisateur)
+    rattache = await db.scalar(
+        select(Rattachement.id).where(
+            Rattachement.encadreur_id == utilisateur.id,
+            Rattachement.club_id == club_id,
+            Rattachement.etat == EtatRattachement.actif,
+        )
+    )
+    if rattache is None:
+        raise Refus("Seul un encadreur rattaché à ce club peut confirmer son président.", 403)
+    passation = await db.scalar(
+        select(ClubPassation)
+        .where(ClubPassation.club_id == club_id, ClubPassation.etat == EtatPassation.en_attente_encadreur)
+        .with_for_update()
+    )
+    if passation is None:
+        raise Refus("Aucune passation n'attend ta confirmation dans ce club.", 404)
+    if passation.version != version:
+        raise Refus("Cette passation a changé depuis que tu l'as ouverte : recharge la page.", 409)
+    return passation
+
+
+async def confirmer_passation(
+    db: AsyncSession, utilisateur: Utilisateur, club_id: UUID, version: int, adresse_ip: str
+) -> PassationAConfirmer:
+    passation = await _passation_a_confirmer(db, utilisateur, club_id, version)
+    passation.etat = EtatPassation.en_attente
+    passation.confirmee_le = datetime.now(UTC)
+    passation.confirmee_par = utilisateur.id
+    journaliser(
+        db,
+        "club_passation_confirmee",
+        utilisateur,
+        cible_type="club",
+        cible_id=club_id,
+        details={"passation_id": str(passation.id)},
+        adresse_ip=adresse_ip,
+    )
+    await db.commit()
+    return await _apercu_a_confirmer(db, passation)
+
+
+async def refuser_passation(
+    db: AsyncSession, utilisateur: Utilisateur, club_id: UUID, motif: str, version: int, adresse_ip: str
+) -> PassationAConfirmer:
+    passation = await _passation_a_confirmer(db, utilisateur, club_id, version)
+    passation.etat = EtatPassation.refusee
+    passation.motif_refus = motif
+    passation.decide_le = datetime.now(UTC)
+    passation.decide_par = utilisateur.id
+    journaliser(
+        db,
+        "club_passation_refusee",
+        utilisateur,
+        cible_type="club",
+        cible_id=club_id,
+        details={"passation_id": str(passation.id), "par": "encadreur", "motif": motif},
+        adresse_ip=adresse_ip,
+    )
+    await db.commit()
+    return await _apercu_a_confirmer(db, passation)
+
+
+async def _apercu_a_confirmer(db: AsyncSession, passation: ClubPassation) -> PassationAConfirmer:
+    club = await db.get(Club, passation.club_id)
+    successeur = await db.scalar(select(Eleve.pseudonyme).where(Eleve.utilisateur_id == passation.successeur_id))
+    sortant = await db.scalar(select(Eleve.pseudonyme).where(Eleve.utilisateur_id == club.president_id))
+    return PassationAConfirmer(
+        id=passation.id,
+        club_id=club.id,
+        club_nom=club.nom,
+        successeur_pseudonyme=successeur or "",
+        president_sortant_pseudonyme=sortant or "",
+        propose_le=passation.propose_le,
+        version=passation.version,
+    )
+
+
+async def liberer_passation(db: AsyncSession, club_id: UUID) -> None:
+    """Quand le club n'a plus d'encadreur rattaché, une passation qui l'attendait passe directement à l'admin."""
+    await db.flush()
+    if await db.scalar(
+        select(Rattachement.id).where(Rattachement.club_id == club_id, Rattachement.etat == EtatRattachement.actif)
+    ):
+        return
+    passation = await db.scalar(
+        select(ClubPassation)
+        .where(ClubPassation.club_id == club_id, ClubPassation.etat == EtatPassation.en_attente_encadreur)
+        .with_for_update()
+    )
+    if passation is None:
+        return
+    passation.etat = EtatPassation.en_attente
+    journaliser(
+        db,
+        "club_passation_sans_encadreur",
+        cible_type="club",
+        cible_id=club_id,
+        details={"passation_id": str(passation.id)},
+    )
