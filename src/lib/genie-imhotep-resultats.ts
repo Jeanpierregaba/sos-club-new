@@ -679,3 +679,10 @@ export const nationale: MatchNational[] = [
     gagnant: CHAMPION,
   },
 ];
+
+// Joueurs primés de l'édition (page Palmarès). Vide tant qu'AIMES-AFRIQUE n'a pas transmis la liste.
+// Un élève n'apparaît publiquement que par son pseudonyme et son établissement, jamais par son nom
+// complet (docs/RULES.md) : ne rien ajouter ici sans l'accord de l'élève et de son établissement.
+export type JoueurPrime = { pseudonyme: string; etablissement: string; distinction: string };
+
+export const joueursPrimes: JoueurPrime[] = [];

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
 
 // Bouton « Retour en haut », sur tout le site : il apparaît une fois qu'on a descendu d'un écran.
+// --retour-bas : posé par une bulle flottante (BulleDefi) pour que le bouton passe au-dessus d'elle.
 export function RetourEnHaut() {
   const [visible, setVisible] = useState(false);
 
@@ -25,7 +26,7 @@ export function RetourEnHaut() {
       title="Retour en haut"
       tabIndex={visible ? 0 : -1}
       aria-hidden={!visible}
-      className={`btn-fx fixed bottom-5 right-5 z-40 inline-flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-card ring-2 ring-white transition-[opacity,translate] duration-300 print:hidden md:bottom-8 md:right-8 ${
+      className={`btn-fx fixed bottom-[var(--retour-bas,1.25rem)] right-6 z-40 inline-flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-card ring-2 ring-white transition-[opacity,translate] duration-300 print:hidden md:bottom-[var(--retour-bas-md,2rem)] md:right-10 ${
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
       }`}
     >

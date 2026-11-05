@@ -222,6 +222,13 @@
       stroke-dashoffset: -120;
     }
   }
+  /* La mascotte change de couleur mais reste la même (page des 7 axes). */
+  --animate-cameleon: cameleon 14s linear infinite;
+  @keyframes cameleon {
+    to {
+      filter: hue-rotate(360deg);
+    }
+  }
 }
 :root {
   --sun: oklch(0.86 0.17 88);

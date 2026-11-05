@@ -32,6 +32,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Compteur } from "@/components/Compteur";
 import { SiteMotion, retard } from "@/components/SiteMotion";
 import { DecorAnime } from "@/components/DecorAnime";
+import { BulleDefi } from "@/components/BulleDefi";
+import { QuelAxe } from "@/components/QuelAxe";
 import hero from "@/assets/hero.jpg";
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
 import mascotteValeurs from "@/assets/mascotte-valeurs.webp";
@@ -341,123 +343,6 @@ const heroSlides = [
 // Le contenu sortant s'efface vite, puis le suivant apparaît : les deux ne se superposent jamais.
 const heroFade = (on: boolean) =>
   `transition-[opacity,visibility,translate] ease-out ${on ? "translate-y-0 opacity-100 duration-500 delay-200" : "invisible translate-y-3 opacity-0 duration-200"}`;
-
-const defi = {
-  options: ["Dormir sous une moustiquaire", "Boire beaucoup d'eau", "Éviter les fruits la nuit"],
-  bonne: 0,
-};
-
-function DefiDuJour() {
-  const [choix, setChoix] = useState<number | null>(null);
-  const [valide, setValide] = useState(false);
-  const couleur = (i: number) => {
-    if (valide && i === defi.bonne) return "border-leaf bg-leaf text-primary-foreground";
-    if (valide && i === choix)
-      return "animate-shake border-logo-red bg-logo-red text-primary-foreground";
-    if (i === choix) return "border-logo-blue bg-logo-blue text-primary-foreground";
-    return valide
-      ? "border-border opacity-60"
-      : "border-border hover:-translate-y-0.5 hover:border-logo-blue";
-  };
-  const pastille = (i: number) =>
-    (valide && i === defi.bonne) || i === choix ? "bg-white/25" : "bg-mist text-logo-blue";
-
-  return (
-    <section
-      id="defi"
-      className="relative isolate scroll-mt-16 overflow-hidden bg-logo-blue text-primary-foreground"
-    >
-      <div className="absolute -left-16 -top-16 -z-10 h-72 w-72 rounded-full bg-sky/40 blur-3xl" />
-      <div className="absolute -bottom-24 right-0 -z-10 h-80 w-80 rounded-full bg-primary/25 blur-3xl" />
-      <div className="mx-auto grid max-w-7xl px-5 lg:grid-cols-[1fr_2fr]">
-        <img
-          src={mascotteBourses}
-          alt="Mascotte du Club Santé brandissant un trophée"
-          loading="lazy"
-          width={1414}
-          height={2000}
-          data-reveal="left"
-          className="order-last mx-auto h-auto w-full max-w-60 pb-8 drop-shadow-2xl lg:order-first lg:max-w-sm lg:self-center lg:py-10"
-        />
-        <div className="py-12 md:py-16 lg:pl-8">
-          <h2 data-reveal className="text-4xl md:text-5xl">
-            Le défi <span className="text-sun">du jour</span>
-          </h2>
-          <p data-reveal className="mt-3 max-w-2xl text-lg font-medium text-white/85">
-            Une nouvelle question santé chaque jour : teste tes connaissances et gagne des points !
-          </p>
-
-          <div
-            data-reveal="zoom"
-            className="mt-8 rounded-[2rem] bg-card p-6 text-foreground shadow-card md:p-8"
-          >
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-rose px-3 py-1 text-xs font-extrabold uppercase text-primary-foreground">
-                Santé & bien-être
-              </span>
-              <span className="rounded-full bg-sun px-3 py-1 text-xs font-extrabold uppercase text-ink">
-                Question du jour
-              </span>
-            </div>
-            <p className="mt-4 font-display text-2xl leading-tight text-logo-blue md:text-3xl">
-              Quelle est la meilleure façon de se protéger contre le paludisme ?
-            </p>
-
-            <div className="mt-6 grid gap-3 md:grid-cols-3">
-              {defi.options.map((o, i) => (
-                <button
-                  key={o}
-                  type="button"
-                  disabled={valide}
-                  aria-pressed={i === choix}
-                  onClick={() => setChoix(i)}
-                  className={`flex items-center gap-3 rounded-2xl border-2 p-3 text-left font-bold transition duration-200 active:scale-95 ${couleur(i)}`}
-                >
-                  <span
-                    className={`inline-flex size-9 shrink-0 items-center justify-center rounded-xl font-display text-lg ${pastille(i)}`}
-                  >
-                    {"ABC"[i]}
-                  </span>
-                  {o}
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-              <p role="status" className="text-sm font-bold">
-                {valide &&
-                  (choix === defi.bonne
-                    ? "Bravo, c'est la bonne réponse !"
-                    : "Pas tout à fait : la bonne réponse est en vert.")}
-              </p>
-              {valide ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setValide(false);
-                    setChoix(null);
-                  }}
-                  className="btn-fx ml-auto rounded-full bg-primary px-8 py-3 font-bold text-primary-foreground"
-                >
-                  Rejouer
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  disabled={choix === null}
-                  onClick={() => setValide(true)}
-                  className="btn-fx ml-auto rounded-full bg-primary px-8 py-3 font-bold text-primary-foreground disabled:opacity-50"
-                >
-                  Valider
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // Carte d'un axe : la mascotte au recto, la description et le slogan au verso.
 // À la souris, le survol la retourne ; au toucher et au clavier, chaque appui la retourne et la laisse ainsi.
@@ -1000,16 +885,17 @@ function Index() {
         </div>
       </section>
 
+      <QuelAxe />
       <ClubsSection liste={dre} />
       <ActualitesSection />
       <CampagnesSection />
-      <DefiDuJour />
       <GalerieSection />
       <PartenairesSection />
       <TemoignagesSection />
       <InitiateurSection />
 
       <SiteFooter />
+      <BulleDefi />
     </div>
   );
 }

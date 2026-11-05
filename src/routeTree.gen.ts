@@ -30,6 +30,7 @@ import { Route as ClubsIdRouteImport } from './routes/clubs.$id'
 import { Route as GenieImhotepDescriptionRouteImport } from './routes/genie-imhotep/description'
 import { Route as GenieImhotepHallOfFameRouteImport } from './routes/genie-imhotep/hall-of-fame'
 import { Route as GenieImhotepInscriptionRouteImport } from './routes/genie-imhotep/inscription'
+import { Route as GenieImhotepPalmaresRouteImport } from './routes/genie-imhotep/palmares'
 import { Route as ConnecteAdminIndexRouteImport } from './routes/_connecte/admin/index'
 import { Route as ConnecteAdminClubsRouteImport } from './routes/_connecte/admin/clubs'
 import { Route as ConnecteAdminDoubleAuthentificationRouteImport } from './routes/_connecte/admin/double-authentification'
@@ -152,6 +153,11 @@ const GenieImhotepInscriptionRoute = GenieImhotepInscriptionRouteImport.update({
   path: '/genie-imhotep/inscription',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GenieImhotepPalmaresRoute = GenieImhotepPalmaresRouteImport.update({
+  id: '/genie-imhotep/palmares',
+  path: '/genie-imhotep/palmares',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConnecteAdminIndexRoute = ConnecteAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -269,6 +275,7 @@ export interface FileRoutesByFullPath {
   '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
+  '/genie-imhotep/palmares': typeof GenieImhotepPalmaresRoute
   '/admin/clubs': typeof ConnecteAdminClubsRoute
   '/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
   '/admin/encadreurs': typeof ConnecteAdminEncadreursRoute
@@ -307,6 +314,7 @@ export interface FileRoutesByTo {
   '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
+  '/genie-imhotep/palmares': typeof GenieImhotepPalmaresRoute
   '/admin/clubs': typeof ConnecteAdminClubsRoute
   '/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
   '/admin/encadreurs': typeof ConnecteAdminEncadreursRoute
@@ -346,6 +354,7 @@ export interface FileRoutesById {
   '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
+  '/genie-imhotep/palmares': typeof GenieImhotepPalmaresRoute
   '/_connecte/admin/clubs': typeof ConnecteAdminClubsRoute
   '/_connecte/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
   '/_connecte/admin/encadreurs': typeof ConnecteAdminEncadreursRoute
@@ -387,6 +396,7 @@ export interface FileRouteTypes {
     | '/genie-imhotep/description'
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/inscription'
+    | '/genie-imhotep/palmares'
     | '/admin/clubs'
     | '/admin/double-authentification'
     | '/admin/encadreurs'
@@ -425,6 +435,7 @@ export interface FileRouteTypes {
     | '/genie-imhotep/description'
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/inscription'
+    | '/genie-imhotep/palmares'
     | '/admin/clubs'
     | '/admin/double-authentification'
     | '/admin/encadreurs'
@@ -463,6 +474,7 @@ export interface FileRouteTypes {
     | '/genie-imhotep/description'
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/inscription'
+    | '/genie-imhotep/palmares'
     | '/_connecte/admin/clubs'
     | '/_connecte/admin/double-authentification'
     | '/_connecte/admin/encadreurs'
@@ -502,6 +514,7 @@ export interface RootRouteChildren {
   GenieImhotepDescriptionRoute: typeof GenieImhotepDescriptionRoute
   GenieImhotepHallOfFameRoute: typeof GenieImhotepHallOfFameRoute
   GenieImhotepInscriptionRoute: typeof GenieImhotepInscriptionRoute
+  GenieImhotepPalmaresRoute: typeof GenieImhotepPalmaresRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -651,6 +664,13 @@ declare module '@tanstack/react-router' {
       path: '/genie-imhotep/inscription'
       fullPath: '/genie-imhotep/inscription'
       preLoaderRoute: typeof GenieImhotepInscriptionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/genie-imhotep/palmares': {
+      id: '/genie-imhotep/palmares'
+      path: '/genie-imhotep/palmares'
+      fullPath: '/genie-imhotep/palmares'
+      preLoaderRoute: typeof GenieImhotepPalmaresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_connecte/admin/': {
@@ -876,6 +896,7 @@ const rootRouteChildren: RootRouteChildren = {
   GenieImhotepDescriptionRoute: GenieImhotepDescriptionRoute,
   GenieImhotepHallOfFameRoute: GenieImhotepHallOfFameRoute,
   GenieImhotepInscriptionRoute: GenieImhotepInscriptionRoute,
+  GenieImhotepPalmaresRoute: GenieImhotepPalmaresRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

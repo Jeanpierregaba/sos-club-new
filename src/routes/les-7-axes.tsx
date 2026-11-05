@@ -320,6 +320,68 @@ function LesSeptAxes() {
         </div>
       </section>
 
+      {/* Pourquoi un caméléon : la mascotte change de couleur sous les yeux du lecteur, mais reste la même. */}
+      <section className="relative isolate overflow-hidden bg-white py-20 md:py-28">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+          <div data-reveal="left" className="relative mx-auto w-full max-w-sm">
+            {/* Les 7 couleurs des axes, en anneau autour de la mascotte. */}
+            <div
+              aria-hidden
+              className="absolute inset-x-0 top-1/2 -z-10 aspect-square -translate-y-1/2 rounded-full p-3 motion-safe:animate-[spin_30s_linear_infinite]"
+              style={{
+                background: `conic-gradient(${axes.map((a) => a.couleur).join(", ")}, ${axes[0]!.couleur})`,
+              }}
+            >
+              <div className="size-full rounded-full bg-white" />
+            </div>
+            <div className="drop-shadow-2xl">
+              <img
+                src={mascotteImhotep}
+                alt="La mascotte caméléon des Clubs Santé, dont la couleur change sans cesse"
+                loading="lazy"
+                width={1414}
+                height={2000}
+                className="relative mx-auto h-96 w-auto motion-safe:animate-cameleon md:h-[28rem]"
+              />
+            </div>
+          </div>
+
+          <div data-reveal>
+            <p className="text-sm font-extrabold uppercase tracking-widest text-logo-red">
+              Notre mascotte
+            </p>
+            <h2 className="mt-3 text-4xl md:text-5xl">
+              <span className="text-logo-blue">Pourquoi</span>{" "}
+              <span className="text-primary">un caméléon ?</span>
+            </h2>
+            <p className="mt-6 text-xl font-semibold leading-relaxed">
+              Le caméléon change de couleur, mais reste toujours le même.
+            </p>
+            <p className="mt-4 text-lg font-medium leading-relaxed text-muted-foreground">
+              Comme lui, chaque jeune peut apprendre, évoluer, développer de nouvelles compétences
+              et s’adapter aux situations, tout en restant fidèle à ses valeurs.
+            </p>
+            <div className="mt-8 rounded-3xl bg-mist-soft p-6 ring-1 ring-border md:p-8">
+              <ul aria-hidden className="flex gap-1.5">
+                {axes.map((a) => (
+                  <li
+                    key={a.bleu}
+                    className="h-2 flex-1 rounded-full"
+                    style={{ background: a.couleur }}
+                  />
+                ))}
+              </ul>
+              <p className="mt-5 font-display text-2xl leading-snug text-logo-blue md:text-3xl">
+                Plusieurs couleurs, plusieurs talents…
+              </p>
+              <p className="mt-2 text-lg font-bold">
+                Une même génération de jeunes en bonne santé, responsables et épanouis.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {axes.map((a, i) => (
         <Axe key={a.bleu} a={a} n={i + 1} />
       ))}

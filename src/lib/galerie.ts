@@ -9,22 +9,13 @@ import banniere from "@/assets/club-sante-banniere.jpg";
 import campagneHygiene from "@/assets/campagne-hygiene.jpg";
 import campagneEcologie from "@/assets/campagne-ecologie.jpg";
 import campagneSecourisme from "@/assets/campagne-secourisme.jpg";
+import { axes, type NumeroAxe } from "@/lib/axes";
+
+export { axes, type NumeroAxe };
 
 // Photos de la galerie. L'accueil montre les 6 premières, la page /galerie les montre toutes.
 // `axe` : le numéro de l'axe d'intervention (page /les-7-axes) auquel la photo se rattache ; c'est le filtre de la galerie.
 // `pos` : la partie de la photo gardée quand elle est rognée dans une vignette.
-export const axes = [
-  { n: 1, nom: "Génie Imhotep" },
-  { n: 2, nom: "Santé sexuelle & EVSS" },
-  { n: 3, nom: "Production TV & médias" },
-  { n: 4, nom: "Sport & secourisme" },
-  { n: 5, nom: "Bourses & excellence" },
-  { n: 6, nom: "Leadership & mentorat" },
-  { n: 7, nom: "Santé & environnement" },
-] as const;
-
-export type NumeroAxe = (typeof axes)[number]["n"];
-
 export type Photo = {
   axe: NumeroAxe;
   img: string;
