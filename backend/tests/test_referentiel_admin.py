@@ -36,14 +36,14 @@ def super_admin(client: TestClient, creer_collaborateur: Callable[..., Any]) -> 
 
 @pytest.fixture
 def gestionnaire_kara(client: TestClient, creer_collaborateur: Callable[..., Any]) -> TestClient:
-    creer_collaborateur("gestion", droits=CLUBS, perimetre_dre="kara")
+    creer_collaborateur("gestion", droits=CLUBS, perimetre_dre="kara", double_auth=True)
     connecter_admin(client, "gestion")
     return client
 
 
 @pytest.fixture
 def gestionnaire_national(client: TestClient, creer_collaborateur: Callable[..., Any]) -> TestClient:
-    creer_collaborateur("gestion", droits=CLUBS)
+    creer_collaborateur("gestion", droits=CLUBS, double_auth=True)
     connecter_admin(client, "gestion")
     return client
 

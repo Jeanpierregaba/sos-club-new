@@ -10,14 +10,15 @@ from app.admin.catalogue import Action
 from app.admin.dependances import Acces
 from app.admin.models import Collaborateur, Export, Invitation, JournalAudit
 from app.admin.schemas import EvenementJournal, Indicateur, TableauDeBord
+from app.clubs.models import Club, EtatClub
+from app.clubs.verification import compter_en_attente as compter_clubs_en_attente
 from app.comptes.models import Role, StatutCompte, Utilisateur
-from app.encadreurs.verification import compter_en_attente
+from app.encadreurs.verification import compter_en_attente as compter_encadreurs_en_attente
 from app.points.service import semestre_en_cours
 from app.referentiel.models import Dre, Etablissement, StatutEtablissement
 
 # Indicateurs du CDC qui dépendent de modules à venir : affichés sans valeur.
 A_VENIR = [
-    ("clubs_actifs", "Clubs actifs", "Clubs et DRE"),
     ("contenus_en_attente", "Contenus en attente de validation", "Modération"),
     ("quiz_joues", "Quiz joués", "Quiz et certification"),
     ("certifications", "Certifications obtenues", "Quiz et certification"),
@@ -71,11 +72,13 @@ async def calculer(db: AsyncSession, acces: Acces) -> TableauDeBord:
     etablissements_actifs = await db.scalar(
         select(func.count()).select_from(Etablissement).where(Etablissement.statut == StatutEtablissement.actif)
     )
+    clubs_actifs = await db.scalar(select(func.count()).select_from(Club).where(Club.etat == EtatClub.actif))
 
     indicateurs = [
         Indicateur(id="collaborateurs_actifs", libelle="Collaborateurs actifs", valeur=collaborateurs_actifs or 0),
         Indicateur(id="dre_actives", libelle="DRE actives", valeur=dre_actives or 0),
         Indicateur(id="etablissements_actifs", libelle="Établissements actifs", valeur=etablissements_actifs or 0),
+        Indicateur(id="clubs_actifs", libelle="Clubs actifs", valeur=clubs_actifs or 0),
         Indicateur(id="invitations_en_attente", libelle="Invitations en attente", valeur=invitations_en_attente or 0),
         Indicateur(id="exports_du_mois", libelle="Exports ce mois-ci", valeur=exports_du_mois or 0),
     ] + [Indicateur(id=i, libelle=libelle, valeur=None, disponible_avec=module) for i, libelle, module in A_VENIR]
@@ -96,8 +99,13 @@ async def calculer(db: AsyncSession, acces: Acces) -> TableauDeBord:
         indicateurs=indicateurs,
         semestre_en_cours=semestre.libelle if semestre else None,
         encadreurs_a_verifier=(
-            await compter_en_attente(db, acces)
+            await compter_encadreurs_en_attente(db, acces)
             if acces.a("encadreurs", Action.consulter) and not acces.double_auth_requise
+            else None
+        ),
+        clubs_a_valider=(
+            await compter_clubs_en_attente(db, acces)
+            if acces.a("clubs", Action.consulter) and not acces.double_auth_requise
             else None
         ),
         derniers_evenements=derniers,

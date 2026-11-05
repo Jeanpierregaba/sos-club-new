@@ -22,6 +22,7 @@ from app.admin.catalogue import DROITS_DES_ROLES, LIBELLES_ROLES, SENSIBLES, Rol
 from app.admin.double_auth import regenerer_codes_secours
 from app.admin.journal import journaliser
 from app.admin.models import Collaborateur, DoubleAuth, Permission
+from app.clubs.models import Club, ClubAxe, EtatClub
 from app.comptes.models import Role, Session, StatutCompte, Utilisateur
 from app.comptes.motdepasse import hacher
 from app.config import RACINE_PROJET, settings
@@ -186,6 +187,49 @@ async def _preparer_encadreur(db: AsyncSession, utilisateur: Utilisateur) -> Non
         await points.crediter(db, BIENVENUE_ENCADREUR, utilisateur.id, f"bienvenue:{utilisateur.id}")
 
 
+async def _preparer_clubs(db: AsyncSession) -> None:
+    """Un club actif pour l'élève 1 et une demande en attente pour l'élève 2 (spec 019), une seule fois."""
+    if await db.scalar(select(Club.id)):
+        return
+    eleve1 = await db.get(
+        Eleve, (await db.scalar(select(Utilisateur.id).where(Utilisateur.identifiant == "dev.eleve1")))
+    )
+    eleve2 = await db.get(
+        Eleve, (await db.scalar(select(Utilisateur.id).where(Utilisateur.identifiant == "dev.eleve2")))
+    )
+    if eleve1 is None or eleve2 is None:
+        return
+    actif = Club(
+        etablissement_id=eleve1.etablissement_id,
+        nom="Club Santé Tokoin",
+        nom_normalise="club sante tokoin",
+        description="Le club de démonstration, animé par les élèves du lycée.",
+        demandeur_id=eleve1.utilisateur_id,
+        president_id=eleve1.utilisateur_id,
+        etat=EtatClub.actif,
+        decide_le=datetime.now(UTC),
+        actif_le=datetime.now(UTC),
+        encadreurs_associes=[{"nom": "M. Kodjo", "email": "kodjo@exemple.tg"}],
+    )
+    attente = Club(
+        etablissement_id=eleve2.etablissement_id,
+        nom="Club Santé Tokoin Est",
+        nom_normalise="club sante tokoin est",
+        demandeur_id=eleve2.utilisateur_id,
+        etat=EtatClub.en_attente,
+        encadreurs_associes=[{"nom": "Mme Afi"}],
+    )
+    db.add_all([actif, attente])
+    await db.flush()
+    db.add_all(
+        [
+            ClubAxe(club_id=actif.id, axe_code="sante-environnement"),
+            ClubAxe(club_id=actif.id, axe_code="sport-secourisme"),
+            ClubAxe(club_id=attente.id, axe_code="sante-sexuelle-evss"),
+        ]
+    )
+
+
 async def semer(db: AsyncSession) -> list[dict[str, str]]:
     """Prépare tous les comptes `dev.*` et renvoie leurs accès. Valide la transaction."""
     if settings.production:
@@ -219,6 +263,7 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
                     " (actif)" if PROFILS_ENCADREURS[identifiant][2] is EtatVerification.actif else " (en attente)"
                 )
         acces.append(ligne)
+    await _preparer_clubs(db)
     journaliser(db, "comptes_de_developpement_prepares", details={"comptes": [c[0] for c in COMPTES]})
     await db.commit()
     return acces

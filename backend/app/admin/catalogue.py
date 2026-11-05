@@ -45,6 +45,7 @@ MODULES: dict[str, tuple[str, bool, tuple[Action, ...]]] = {
     "statistiques": ("Statistiques", True, (C, E)),
     "journal": ("Journal d'audit", True, (C,)),
     "moderation": ("Modération", False, (C, A, D)),
+    # La file des clubs et des passations arrive avec la spec 019 ; le droit `clubs` existait déjà.
     "clubs": ("Clubs et DRE", True, (C, CR, M, A)),
     "contenus": ("Contenus et rubriques", False, (C, CR, M, S, A, D)),
     "agenda": ("Agenda et campagnes", False, (C, CR, M, S, A, D)),
@@ -75,6 +76,9 @@ SENSIBLES: frozenset[tuple[str, Action]] = frozenset(
         # La file montre l'e-mail et le téléphone ; un encadreur actif accédera aux données de ses élèves.
         ("encadreurs", C),
         ("encadreurs", A),
+        # La file des clubs montre des données personnelles (nom, établissement, enquêtes de requête).
+        ("clubs", C),
+        ("clubs", A),
         ("recompenses", A),
     }
 )
@@ -117,7 +121,15 @@ DROITS_DES_ROLES: dict[RoleDepart, set[tuple[str, Action]]] = {
     RoleDepart.gestionnaire_contenus: _TABLEAU | {("contenus", C), ("contenus", CR), ("contenus", M), ("contenus", S)},
     RoleDepart.gestionnaire_pedagogique: _TABLEAU | {("quiz", C), ("quiz", CR), ("quiz", M), ("quiz", S)},
     RoleDepart.gestionnaire_clubs: _TABLEAU
-    | {("clubs", C), ("clubs", CR), ("clubs", M), ("statistiques", C), ("encadreurs", C), ("encadreurs", A)},
+    | {
+        ("clubs", C),
+        ("clubs", CR),
+        ("clubs", M),
+        ("clubs", A),
+        ("statistiques", C),
+        ("encadreurs", C),
+        ("encadreurs", A),
+    },
     RoleDepart.gestionnaire_agenda: _TABLEAU | {("agenda", C), ("agenda", CR), ("agenda", M), ("agenda", S)},
     RoleDepart.analyste: _TABLEAU | {("statistiques", C), ("statistiques", E)},
 }

@@ -4,47 +4,47 @@
 
 **API, socle**
 
-- [ ] 1. Modèle `club`, `club_axe`, `club_passation` et migration `clubs` (index partiels uniques, CHECK refus↔motif).
+- [x] 1. Modèle `club`, `club_axe`, `club_passation` et migration `clubs` (index partiels uniques, CHECK refus↔motif).
       `tiers.associes` en JSON. Export OpenAPI + `npm run api:types` quand le routeur existera.
 
-- [ ] 2. Module `clubs` dans le catalogue : `clubs:consulter` et `clubs:approuver` en sensibles ; `gestionnaire_clubs`
+- [x] 2. Module `clubs` dans le catalogue : `clubs:consulter` et `clubs:approuver` en sensibles ; `gestionnaire_clubs`
       gagne `("clubs", A)` (Tâche 1, étape 2). Tests `test_catalogue` à jour.
 
 **API, demande et consultation**
 
-- [ ] 3. Tests puis code de la demande : `DemandeClubEntree`, `POST /api/clubs/demande` et `GET /api/clubs/moi`
+- [x] 3. Tests puis code de la demande : `DemandeClubEntree`, `POST /api/clubs/demande` et `GET /api/clubs/moi`
       (`test_clubs_demande.py`) : établissement lu sur le compte, nom normalisé unique par établissement,
       ≤ 3 axes valides, encadreurs déclaratifs bornés, confirmation obligatoire, une seule demande en attente,
       refus du doublon au même établissement (409), club actif au même établissement → 409.
 
-- [ ] 4. Tests puis code du renvoi : `POST /api/clubs/demande/renvoyer` (`test_clubs_renvoi.py`) : seule une demande
+- [x] 4. Tests puis code du renvoi : `POST /api/clubs/demande/renvoyer` (`test_clubs_renvoi.py`) : seule une demande
       refusée est relançable ; elle repasse en attente ; le motif précédent reste au journal.
 
-- [ ] 5. Lecture publique : `GET /api/clubs`, `GET /api/clubs/{id}`, `GET /api/clubs/par-etablissement`
+- [x] 5. Lecture publique : `GET /api/clubs`, `GET /api/clubs/{id}`, `GET /api/clubs/par-etablissement`
       (`test_clubs_public.py`) : seuls les clubs actifs ; fiche minimale (nom, établissement IESG/DRE, axes) ;
       en attente → 404 ; rien de nominatif.
 
 **API, admin et passation**
 
-- [ ] 6. **Tests d'abord** de la vérification (`test_clubs_verification.py`) : file et périmètre DRE/national,
+- [x] 6. **Tests d'abord** de la vérification (`test_clubs_verification.py`) : file et périmètre DRE/national,
       double auth exigée, activation atomique, doublure refusée, version périmée → 409, refus sans motif → 422,
       suspension du demandeur → 409, établissement désactivé → 409 (doivent échouer — échec attendu avant implémentation).
 
-- [ ] 7. `verification.py` clubs (`/admin/clubs` : file, activer, refuser, renvoi) + compteurs `/admin/moi` et
+- [x] 7. `verification.py` clubs (`/admin/clubs` : file, activer, refuser, renvoi) + compteurs `/admin/moi` et
       tableau de bord (`clubs_a_valider`, `clubs_actifs`). La tâche 6 passe.
 
-- [ ] 8. **Tests d'abord** de la passation (`test_clubs_passation.py`) : proposition (pseudonyme inexistant,
+- [x] 8. **Tests d'abord** de la passation (`test_clubs_passation.py`) : proposition (pseudonyme inexistant,
       hors établissement, soi-même, élève suspendu → 422/409), valider (l'ancien président perd la gestion, le nouveau
       la reçoit — vérification des droits), refuser (reste président), annuler, double validation impossible,
       journalisation avant/après.
 
-- [ ] 9. Passation côté `clubs` : `POST /api/clubs/moi/passation`, `POST /api/clubs/moi/passation/annuler`,
+- [x] 9. Passation côté `clubs` : `POST /api/clubs/moi/passation`, `POST /api/clubs/moi/passation/annuler`,
       `/api/admin/clubs/passations/*`. La tâche 8 passe.
 
-- [ ] 10. Admin existant : file des inscrits (section Club : club de l'élève, état, président), fiche d'un inscrit
+- [x] 10. Admin existant : file des inscrits (section Club : club de l'élève, état, président), fiche d'un inscrit
         club, compteur du tableau de bord (`test_clubs_admin.py`).
 
-- [ ] 11. Seed de démonstration (un club actif, une demande en attente), `test_seed_dev.py`, OpenAPI + `npm run api:types`.
+- [x] 11. Seed de démonstration (un club actif, une demande en attente), `test_seed_dev.py`, OpenAPI + `npm run api:types`.
 
 **Site**
 

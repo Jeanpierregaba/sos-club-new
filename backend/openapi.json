@@ -3047,6 +3047,577 @@
         }
       }
     },
+    "/api/clubs/demande": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Demander",
+        "operationId": "demander_api_clubs_demande_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemandeClubEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClubResume"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/demande/renvoyer": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Renvoyer Ma Demande",
+        "operationId": "renvoyer_ma_demande_api_clubs_demande_renvoyer_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClubResume"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Mon Club",
+        "operationId": "mon_club_api_clubs_moi_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonClub"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/passation": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Proposer Passation",
+        "operationId": "proposer_passation_api_clubs_moi_passation_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PassationEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassationApercu"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/passation/annuler": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Annuler Passation",
+        "operationId": "annuler_passation_api_clubs_moi_passation_annuler_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassationApercu"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Lister Clubs",
+        "operationId": "lister_clubs_api_clubs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ClubPublic"
+                  },
+                  "type": "array",
+                  "title": "Response Lister Clubs Api Clubs Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/par-etablissement": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Club De Letablissement",
+        "operationId": "club_de_letablissement_api_clubs_par_etablissement_get",
+        "parameters": [
+          {
+            "name": "etablissement_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Etablissement Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Fiche Club",
+        "operationId": "fiche_club_api_clubs__club_id__get",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClubFiche"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "File Attente",
+        "operationId": "file_attente_api_admin_clubs_get",
+        "parameters": [
+          {
+            "name": "etat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "en_attente",
+                "refuse"
+              ],
+              "type": "string",
+              "default": "en_attente",
+              "title": "Etat"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "par_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Par Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileClubs"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/passations": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "File Passations",
+        "operationId": "file_passations_api_admin_clubs_passations_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilePassations"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/passations/{passation_id}/valider": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Valider Passation",
+        "operationId": "valider_passation_api_admin_clubs_passations__passation_id__valider_post",
+        "parameters": [
+          {
+            "name": "passation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Passation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/app__clubs__schemas__ActivationEntree"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Entree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Passation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/passations/{passation_id}/refuser": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Refuser Passation",
+        "operationId": "refuser_passation_api_admin_clubs_passations__passation_id__refuser_post",
+        "parameters": [
+          {
+            "name": "passation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Passation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefusEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Passation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/{club_id}/activer": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Activer",
+        "operationId": "activer_api_admin_clubs__club_id__activer_post",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/app__clubs__schemas__ActivationEntree"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Entree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemandeClub"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/{club_id}/refuser": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Refuser",
+        "operationId": "refuser_api_admin_clubs__club_id__refuser_post",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefusEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemandeClub"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -3178,6 +3749,17 @@
               }
             ],
             "title": "Encadreurs A Verifier"
+          },
+          "clubs_a_valider": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clubs A Valider"
           }
         },
         "type": "object",
@@ -3459,6 +4041,215 @@
           "tle"
         ],
         "title": "Classe"
+      },
+      "ClubFiche": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "etablissement": {
+            "$ref": "#/components/schemas/EtablissementRattache"
+          },
+          "axes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Axes"
+          },
+          "actif_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actif Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "description",
+          "etablissement",
+          "axes",
+          "actif_le"
+        ],
+        "title": "ClubFiche"
+      },
+      "ClubInscrit": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatClub"
+          },
+          "president": {
+            "type": "boolean",
+            "title": "President"
+          },
+          "motif_refus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Refus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "etat",
+          "president"
+        ],
+        "title": "ClubInscrit",
+        "description": "Le club d'un élève, vu dans sa fiche admin (spec 019). Aucune donnée nominative de plus."
+      },
+      "ClubPublic": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "etablissement": {
+            "$ref": "#/components/schemas/EtablissementRattache"
+          },
+          "axes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Axes"
+          },
+          "actif_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actif Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "etablissement",
+          "axes",
+          "actif_le"
+        ],
+        "title": "ClubPublic"
+      },
+      "ClubResume": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "etablissement": {
+            "$ref": "#/components/schemas/EtablissementRattache"
+          },
+          "axes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Axes"
+          },
+          "etat": {
+            "type": "string",
+            "title": "Etat"
+          },
+          "president": {
+            "type": "boolean",
+            "title": "President"
+          },
+          "motif_refus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Refus"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "description",
+          "etablissement",
+          "axes",
+          "etat",
+          "president",
+          "version"
+        ],
+        "title": "ClubResume"
       },
       "CodeEntree": {
         "properties": {
@@ -3813,6 +4604,153 @@
           "mot_de_passe"
         ],
         "title": "ConnexionEntree"
+      },
+      "DemandeClub": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "axes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Axes"
+          },
+          "demandeur_pseudonyme": {
+            "type": "string",
+            "title": "Demandeur Pseudonyme"
+          },
+          "etablissement": {
+            "$ref": "#/components/schemas/EtablissementRattache"
+          },
+          "encadreurs_associes": {
+            "items": {
+              "$ref": "#/components/schemas/EncadreurAssocie"
+            },
+            "type": "array",
+            "title": "Encadreurs Associes"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatClub"
+          },
+          "demande_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Demande Le"
+          },
+          "decide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Le"
+          },
+          "motif_refus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Refus"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "description",
+          "axes",
+          "demandeur_pseudonyme",
+          "etablissement",
+          "encadreurs_associes",
+          "etat",
+          "demande_le",
+          "decide_le",
+          "motif_refus",
+          "version"
+        ],
+        "title": "DemandeClub",
+        "description": "Copie d'une demande dans la file d'un collaborateur."
+      },
+      "DemandeClubEntree": {
+        "properties": {
+          "nom": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 3,
+            "title": "Nom"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "axes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "title": "Axes"
+          },
+          "encadreurs_associes": {
+            "items": {
+              "$ref": "#/components/schemas/EncadreurAssocie"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Encadreurs Associes"
+          },
+          "confirmation": {
+            "type": "boolean",
+            "const": true,
+            "title": "Confirmation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nom",
+          "confirmation"
+        ],
+        "title": "DemandeClubEntree"
       },
       "DemandeEncadreur": {
         "properties": {
@@ -4220,6 +5158,46 @@
         ],
         "title": "DroitsEntree"
       },
+      "EncadreurAssocie": {
+        "properties": {
+          "nom": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Nom"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 254
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "telephone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telephone"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nom"
+        ],
+        "title": "EncadreurAssocie"
+      },
       "Enrolement": {
         "properties": {
           "secret": {
@@ -4267,6 +5245,16 @@
           },
           "points": {
             "$ref": "#/components/schemas/ResumePoints"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubResume"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -4704,6 +5692,15 @@
         "title": "EtapeCode",
         "description": "Mot de passe juste, double authentification active : le code est demandé avant d'ouvrir la session."
       },
+      "EtatClub": {
+        "type": "string",
+        "enum": [
+          "en_attente",
+          "actif",
+          "refuse"
+        ],
+        "title": "EtatClub"
+      },
       "EtatInscription": {
         "properties": {
           "ouvertes": {
@@ -4984,6 +5981,27 @@
         ],
         "title": "ExportResume"
       },
+      "FileClubs": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "demandes": {
+            "items": {
+              "$ref": "#/components/schemas/DemandeClub"
+            },
+            "type": "array",
+            "title": "Demandes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "demandes"
+        ],
+        "title": "FileClubs"
+      },
       "FileEncadreurs": {
         "properties": {
           "total": {
@@ -5004,6 +6022,27 @@
           "demandes"
         ],
         "title": "FileEncadreurs"
+      },
+      "FilePassations": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "passations": {
+            "items": {
+              "$ref": "#/components/schemas/Passation"
+            },
+            "type": "array",
+            "title": "Passations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "passations"
+        ],
+        "title": "FilePassations"
       },
       "FiltresInscrits": {
         "properties": {
@@ -6049,6 +7088,35 @@
         ],
         "title": "Moi"
       },
+      "MonClub": {
+        "properties": {
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubResume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "passation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PassationApercu"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "club"
+        ],
+        "title": "MonClub"
+      },
       "MotDePasseEntree": {
         "properties": {
           "actuel": {
@@ -6191,6 +7259,168 @@
         ],
         "title": "PageJournal"
       },
+      "Passation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "club_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Club Id"
+          },
+          "club_nom": {
+            "type": "string",
+            "title": "Club Nom"
+          },
+          "etablissement": {
+            "$ref": "#/components/schemas/EtablissementRattache"
+          },
+          "successeur_pseudonyme": {
+            "type": "string",
+            "title": "Successeur Pseudonyme"
+          },
+          "president_sortant_pseudonyme": {
+            "type": "string",
+            "title": "President Sortant Pseudonyme"
+          },
+          "etat": {
+            "type": "string",
+            "title": "Etat"
+          },
+          "propose_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Propose Le"
+          },
+          "decide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Le"
+          },
+          "motif_refus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Refus"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "club_id",
+          "club_nom",
+          "etablissement",
+          "successeur_pseudonyme",
+          "president_sortant_pseudonyme",
+          "etat",
+          "propose_le",
+          "decide_le",
+          "motif_refus",
+          "version"
+        ],
+        "title": "Passation"
+      },
+      "PassationApercu": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "etat": {
+            "type": "string",
+            "title": "Etat"
+          },
+          "successeur_pseudonyme": {
+            "type": "string",
+            "title": "Successeur Pseudonyme"
+          },
+          "propose_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Propose Le"
+          },
+          "decide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Le"
+          },
+          "motif_refus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Refus"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "etat",
+          "successeur_pseudonyme",
+          "propose_le",
+          "decide_le",
+          "motif_refus",
+          "version"
+        ],
+        "title": "PassationApercu"
+      },
+      "PassationEntree": {
+        "properties": {
+          "pseudonyme": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Pseudonyme"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "pseudonyme",
+          "version"
+        ],
+        "title": "PassationEntree"
+      },
       "ProfilEleveAdmin": {
         "properties": {
           "pseudonyme": {
@@ -6209,6 +7439,16 @@
           },
           "points": {
             "$ref": "#/components/schemas/ResumePoints"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubInscrit"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -6839,6 +8079,17 @@
             ],
             "title": "Encadreurs A Verifier"
           },
+          "clubs_a_valider": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clubs A Valider"
+          },
           "derniers_evenements": {
             "anyOf": [
               {
@@ -6951,6 +8202,25 @@
           "identifiant",
           "mot_de_passe"
         ],
+        "title": "ActivationEntree"
+      },
+      "app__clubs__schemas__ActivationEntree": {
+        "properties": {
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
         "title": "ActivationEntree"
       },
       "app__encadreurs__schemas__ActivationEntree": {

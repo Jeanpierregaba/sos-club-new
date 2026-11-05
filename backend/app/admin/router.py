@@ -50,6 +50,7 @@ from app.admin.schemas import (
     RoleCatalogue,
     TableauDeBord,
 )
+from app.clubs.verification import compter_en_attente as compter_clubs_en_attente
 from app.comptes.inscription import Refus as RefusEleve
 from app.comptes.models import Role, StatutCompte
 from app.comptes.router import _poser_cookie
@@ -64,7 +65,7 @@ from app.comptes.service import (
 from app.config import settings
 from app.db import get_session
 from app.eleves import administration as administration_eleves
-from app.encadreurs.verification import compter_en_attente
+from app.encadreurs.verification import compter_en_attente as compter_encadreurs_en_attente
 from app.referentiel.models import Dre
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -104,9 +105,12 @@ async def moi(acces: Collaborateur_, db: Base) -> AdminMoi:
         droits=_droits(acces.droits),
         double_auth_active=acces.double_auth_active,
         double_auth_requise=acces.double_auth_requise,
-        # Le compteur du menu, une fois la double authentification faite : la file en dépend.
-        encadreurs_a_verifier=await compter_en_attente(db, acces)
+        # Les compteurs du menu, une fois la double authentification faite : les files en dépendent.
+        encadreurs_a_verifier=await compter_encadreurs_en_attente(db, acces)
         if acces.a("encadreurs", Action.consulter) and not acces.double_auth_requise
+        else None,
+        clubs_a_valider=await compter_clubs_en_attente(db, acces)
+        if acces.a("clubs", Action.consulter) and not acces.double_auth_requise
         else None,
     )
 

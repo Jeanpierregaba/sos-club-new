@@ -4,13 +4,14 @@ specs des clubs."""
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Select, false, func, or_, select
+from sqlalchemy import Select, case, false, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
 from app.admin.models import JournalAudit
 from app.admin.schemas import (
+    ClubInscrit,
     EvenementJournal,
     FiltresInscrits,
     Inscrit,
@@ -19,6 +20,7 @@ from app.admin.schemas import (
     ProfilEleveAdmin,
     ProfilEncadreurAdmin,
 )
+from app.clubs.models import Club, EtatClub
 from app.comptes.inscription import etablissement_rattache
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.comptes.service import couper_sessions
@@ -39,6 +41,14 @@ HISTORIQUE = [
     "encadreur_active",
     "encadreur_refuse",
     "encadreur_redemande",
+    "demande_club",
+    "club_active",
+    "club_refuse",
+    "club_redemande",
+    "club_passation_proposee",
+    "club_passation",
+    "club_passation_refusee",
+    "club_passation_annulee",
 ]
 
 
@@ -120,6 +130,7 @@ async def detail(db: AsyncSession, utilisateur_id: UUID) -> InscritDetail:
             charte_version=eleve.charte_version,
             etablissement=await etablissement_rattache(db, eleve.etablissement_id),
             points=await points.resume(db, utilisateur.id, 50),
+            club=await _club_de(db, utilisateur.id),
         )
         if eleve
         else None
@@ -129,6 +140,28 @@ async def detail(db: AsyncSession, utilisateur_id: UUID) -> InscritDetail:
         historique=await historique(db, utilisateur.id),
         eleve=profil,
         encadreur=await _profil_encadreur(db, utilisateur.id),
+    )
+
+
+async def _club_de(db: AsyncSession, utilisateur_id: UUID) -> ClubInscrit | None:
+    """Le club dont cet élève est demandeur ou président, actif ou en attente d'abord (spec 019)."""
+    club = await db.scalar(
+        select(Club)
+        .where(or_(Club.demandeur_id == utilisateur_id, Club.president_id == utilisateur_id))
+        .order_by(
+            case((Club.etat == EtatClub.actif, 0), (Club.etat == EtatClub.en_attente, 1), else_=2),
+            Club.demande_le.desc(),
+        )
+        .limit(1)
+    )
+    if club is None:
+        return None
+    return ClubInscrit(
+        id=club.id,
+        nom=club.nom,
+        etat=club.etat,
+        president=club.president_id == utilisateur_id and club.etat is EtatClub.actif,
+        motif_refus=club.motif_refus,
     )
 
 

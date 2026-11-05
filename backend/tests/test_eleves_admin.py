@@ -164,7 +164,7 @@ def test_on_ne_reinitialise_que_le_mot_de_passe_dun_eleve(
 
 @pytest.fixture
 def gestionnaire_clubs(client: TestClient, creer_collaborateur: Callable[..., Any]) -> TestClient:
-    creer_collaborateur("clubs", droits=CLUBS)
+    creer_collaborateur("clubs", droits=CLUBS, double_auth=True)
     connecter_admin(client, "clubs")
     return client
 
@@ -251,7 +251,7 @@ def test_remplacer_hors_de_son_perimetre_est_refuse(
     client: TestClient, creer_collaborateur: Callable[..., Any], en_base: Callable[..., Any]
 ) -> None:
     proposer(client, en_base, 1, "CEG des Étoiles")
-    creer_collaborateur("kara", droits=CLUBS, perimetre_dre="kara")
+    creer_collaborateur("kara", droits=CLUBS, perimetre_dre="kara", double_auth=True)
     connecter_admin(client, "kara")
     proposition_id = id_de(en_base, Etablissement, "CEG des Étoiles")
 

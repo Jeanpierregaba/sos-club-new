@@ -1008,6 +1008,244 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/clubs/demande": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Demander */
+        post: operations["demander_api_clubs_demande_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/demande/renvoyer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Renvoyer Ma Demande */
+        post: operations["renvoyer_ma_demande_api_clubs_demande_renvoyer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mon Club */
+        get: operations["mon_club_api_clubs_moi_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/passation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Proposer Passation */
+        post: operations["proposer_passation_api_clubs_moi_passation_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/passation/annuler": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Annuler Passation */
+        post: operations["annuler_passation_api_clubs_moi_passation_annuler_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister Clubs */
+        get: operations["lister_clubs_api_clubs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/par-etablissement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Club De Letablissement */
+        get: operations["club_de_letablissement_api_clubs_par_etablissement_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fiche Club */
+        get: operations["fiche_club_api_clubs__club_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/clubs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** File Attente */
+        get: operations["file_attente_api_admin_clubs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/clubs/passations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** File Passations */
+        get: operations["file_passations_api_admin_clubs_passations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/clubs/passations/{passation_id}/valider": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Valider Passation */
+        post: operations["valider_passation_api_admin_clubs_passations__passation_id__valider_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/clubs/passations/{passation_id}/refuser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refuser Passation */
+        post: operations["refuser_passation_api_admin_clubs_passations__passation_id__refuser_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/clubs/{club_id}/activer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activer */
+        post: operations["activer_api_admin_clubs__club_id__activer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/clubs/{club_id}/refuser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refuser */
+        post: operations["refuser_api_admin_clubs__club_id__refuser_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -1070,6 +1308,8 @@ export interface components {
             double_auth_requise: boolean;
             /** Encadreurs A Verifier */
             encadreurs_a_verifier?: number | null;
+            /** Clubs A Valider */
+            clubs_a_valider?: number | null;
         };
         /** Apercu */
         Apercu: {
@@ -1155,6 +1395,79 @@ export interface components {
          * @enum {string}
          */
         Classe: "6e" | "5e" | "4e" | "3e" | "2nde" | "1re" | "tle";
+        /** ClubFiche */
+        ClubFiche: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            /** Description */
+            description: string | null;
+            etablissement: components["schemas"]["EtablissementRattache"];
+            /** Axes */
+            axes: string[];
+            /** Actif Le */
+            actif_le: string | null;
+        };
+        /**
+         * ClubInscrit
+         * @description Le club d'un élève, vu dans sa fiche admin (spec 019). Aucune donnée nominative de plus.
+         */
+        ClubInscrit: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            etat: components["schemas"]["EtatClub"];
+            /** President */
+            president: boolean;
+            /** Motif Refus */
+            motif_refus?: string | null;
+        };
+        /** ClubPublic */
+        ClubPublic: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            etablissement: components["schemas"]["EtablissementRattache"];
+            /** Axes */
+            axes: string[];
+            /** Actif Le */
+            actif_le: string | null;
+        };
+        /** ClubResume */
+        ClubResume: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            /** Description */
+            description: string | null;
+            etablissement: components["schemas"]["EtablissementRattache"];
+            /** Axes */
+            axes: string[];
+            /** Etat */
+            etat: string;
+            /** President */
+            president: boolean;
+            /** Motif Refus */
+            motif_refus?: string | null;
+            /** Version */
+            version: number;
+        };
         /** CodeEntree */
         CodeEntree: {
             /** Jeton */
@@ -1262,6 +1575,56 @@ export interface components {
             identifiant: string;
             /** Mot De Passe */
             mot_de_passe: string;
+        };
+        /**
+         * DemandeClub
+         * @description Copie d'une demande dans la file d'un collaborateur.
+         */
+        DemandeClub: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            /** Description */
+            description: string | null;
+            /** Axes */
+            axes: string[];
+            /** Demandeur Pseudonyme */
+            demandeur_pseudonyme: string;
+            etablissement: components["schemas"]["EtablissementRattache"];
+            /** Encadreurs Associes */
+            encadreurs_associes: components["schemas"]["EncadreurAssocie"][];
+            etat: components["schemas"]["EtatClub"];
+            /**
+             * Demande Le
+             * Format: date-time
+             */
+            demande_le: string;
+            /** Decide Le */
+            decide_le: string | null;
+            /** Motif Refus */
+            motif_refus: string | null;
+            /** Version */
+            version: number;
+        };
+        /** DemandeClubEntree */
+        DemandeClubEntree: {
+            /** Nom */
+            nom: string;
+            /** Description */
+            description?: string | null;
+            /** Axes */
+            axes?: string[];
+            /** Encadreurs Associes */
+            encadreurs_associes?: components["schemas"]["EncadreurAssocie"][];
+            /**
+             * Confirmation
+             * @constant
+             */
+            confirmation: true;
         };
         /**
          * DemandeEncadreur
@@ -1389,6 +1752,15 @@ export interface components {
             /** Motif */
             motif: string;
         };
+        /** EncadreurAssocie */
+        EncadreurAssocie: {
+            /** Nom */
+            nom: string;
+            /** Email */
+            email?: string | null;
+            /** Telephone */
+            telephone?: string | null;
+        };
         /** Enrolement */
         Enrolement: {
             /** Secret */
@@ -1407,6 +1779,7 @@ export interface components {
             /** Version */
             version: number;
             points: components["schemas"]["ResumePoints"];
+            club?: components["schemas"]["ClubResume"] | null;
         };
         /** EspaceEncadreur */
         EspaceEncadreur: {
@@ -1568,6 +1941,11 @@ export interface components {
             /** Jeton */
             jeton: string;
         };
+        /**
+         * EtatClub
+         * @enum {string}
+         */
+        EtatClub: "en_attente" | "actif" | "refuse";
         /** EtatInscription */
         EtatInscription: {
             /** Ouvertes */
@@ -1664,12 +2042,26 @@ export interface components {
              */
             cree_le: string;
         };
+        /** FileClubs */
+        FileClubs: {
+            /** Total */
+            total: number;
+            /** Demandes */
+            demandes: components["schemas"]["DemandeClub"][];
+        };
         /** FileEncadreurs */
         FileEncadreurs: {
             /** Total */
             total: number;
             /** Demandes */
             demandes: components["schemas"]["DemandeEncadreur"][];
+        };
+        /** FilePassations */
+        FilePassations: {
+            /** Total */
+            total: number;
+            /** Passations */
+            passations: components["schemas"]["Passation"][];
         };
         /** FiltresInscrits */
         FiltresInscrits: {
@@ -1997,6 +2389,11 @@ export interface components {
             nom: string;
             role: components["schemas"]["Role"];
         };
+        /** MonClub */
+        MonClub: {
+            club: components["schemas"]["ClubResume"] | null;
+            passation?: components["schemas"]["PassationApercu"] | null;
+        };
         /** MotDePasseEntree */
         MotDePasseEntree: {
             /** Actuel */
@@ -2047,6 +2444,69 @@ export interface components {
             /** Evenements */
             evenements: components["schemas"]["EvenementJournal"][];
         };
+        /** Passation */
+        Passation: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Club Id
+             * Format: uuid
+             */
+            club_id: string;
+            /** Club Nom */
+            club_nom: string;
+            etablissement: components["schemas"]["EtablissementRattache"];
+            /** Successeur Pseudonyme */
+            successeur_pseudonyme: string;
+            /** President Sortant Pseudonyme */
+            president_sortant_pseudonyme: string;
+            /** Etat */
+            etat: string;
+            /**
+             * Propose Le
+             * Format: date-time
+             */
+            propose_le: string;
+            /** Decide Le */
+            decide_le: string | null;
+            /** Motif Refus */
+            motif_refus: string | null;
+            /** Version */
+            version: number;
+        };
+        /** PassationApercu */
+        PassationApercu: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Etat */
+            etat: string;
+            /** Successeur Pseudonyme */
+            successeur_pseudonyme: string;
+            /**
+             * Propose Le
+             * Format: date-time
+             */
+            propose_le: string;
+            /** Decide Le */
+            decide_le: string | null;
+            /** Motif Refus */
+            motif_refus: string | null;
+            /** Version */
+            version: number;
+        };
+        /** PassationEntree */
+        PassationEntree: {
+            /** Pseudonyme */
+            pseudonyme: string;
+            /** Version */
+            version: number;
+        };
         /** ProfilEleveAdmin */
         ProfilEleveAdmin: {
             /** Pseudonyme */
@@ -2056,6 +2516,7 @@ export interface components {
             charte_version: string;
             etablissement: components["schemas"]["EtablissementRattache"];
             points: components["schemas"]["ResumePoints"];
+            club?: components["schemas"]["ClubInscrit"] | null;
         };
         /** ProfilEncadreurAdmin */
         ProfilEncadreurAdmin: {
@@ -2278,6 +2739,8 @@ export interface components {
             semestre_en_cours: string | null;
             /** Encadreurs A Verifier */
             encadreurs_a_verifier?: number | null;
+            /** Clubs A Valider */
+            clubs_a_valider?: number | null;
             /** Derniers Evenements */
             derniers_evenements: components["schemas"]["EvenementJournal"][] | null;
         };
@@ -2312,6 +2775,11 @@ export interface components {
             identifiant: string;
             /** Mot De Passe */
             mot_de_passe: string;
+        };
+        /** ActivationEntree */
+        app__clubs__schemas__ActivationEntree: {
+            /** Version */
+            version?: number | null;
         };
         /** ActivationEntree */
         app__encadreurs__schemas__ActivationEntree: {
@@ -4327,6 +4795,407 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DemandeEncadreur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    demander_api_clubs_demande_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DemandeClubEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClubResume"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    renvoyer_ma_demande_api_clubs_demande_renvoyer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClubResume"];
+                };
+            };
+        };
+    };
+    mon_club_api_clubs_moi_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MonClub"];
+                };
+            };
+        };
+    };
+    proposer_passation_api_clubs_moi_passation_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PassationEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassationApercu"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    annuler_passation_api_clubs_moi_passation_annuler_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassationApercu"];
+                };
+            };
+        };
+    };
+    lister_clubs_api_clubs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClubPublic"][];
+                };
+            };
+        };
+    };
+    club_de_letablissement_api_clubs_par_etablissement_get: {
+        parameters: {
+            query: {
+                etablissement_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    fiche_club_api_clubs__club_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClubFiche"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    file_attente_api_admin_clubs_get: {
+        parameters: {
+            query?: {
+                etat?: "en_attente" | "refuse";
+                page?: number;
+                par_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileClubs"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    file_passations_api_admin_clubs_passations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FilePassations"];
+                };
+            };
+        };
+    };
+    valider_passation_api_admin_clubs_passations__passation_id__valider_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                passation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["app__clubs__schemas__ActivationEntree"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Passation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refuser_passation_api_admin_clubs_passations__passation_id__refuser_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                passation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefusEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Passation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    activer_api_admin_clubs__club_id__activer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["app__clubs__schemas__ActivationEntree"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemandeClub"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refuser_api_admin_clubs__club_id__refuser_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefusEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemandeClub"];
                 };
             };
             /** @description Validation Error */

@@ -1,0 +1,156 @@
+"""Schémas de l'API des clubs (spec 019)."""
+
+from datetime import datetime
+from typing import Annotated, Literal
+from uuid import UUID
+
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field, field_validator
+
+from app.clubs.models import EtatClub
+from app.referentiel.schemas import EtablissementRattache
+
+
+def _motif(valeur: str) -> str:
+    propre = " ".join(valeur.split())
+    if len(propre) < 3:
+        raise ValueError("Indique un motif d'au moins 3 caractères")
+    return propre
+
+
+Motif = Annotated[str, Field(max_length=500), AfterValidator(_motif)]
+
+
+class EncadreurAssocie(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    nom: str = Field(min_length=1, max_length=100)
+    email: str | None = Field(default=None, max_length=254)
+    telephone: str | None = Field(default=None, max_length=30)
+
+
+class DemandeClubEntree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    nom: str = Field(min_length=3, max_length=150)
+    description: str | None = Field(default=None, max_length=300)
+    axes: list[str] = Field(default_factory=list, max_length=3)
+    encadreurs_associes: list[EncadreurAssocie] = Field(default_factory=list, max_length=10)
+    # La case « je suis désigné président », vérifiée ici, pas seulement par le site.
+    confirmation: Literal[True]
+
+    @field_validator("nom")
+    @classmethod
+    def nom_non_vide(cls, valeur: str) -> str:
+        return " ".join(valeur.split())
+
+
+class DemandeClub(BaseModel):
+    """Copie d'une demande dans la file d'un collaborateur."""
+
+    id: UUID
+    nom: str
+    description: str | None
+    axes: list[str]
+    demandeur_pseudonyme: str
+    etablissement: EtablissementRattache
+    encadreurs_associes: list[EncadreurAssocie]
+    etat: EtatClub
+    demande_le: datetime
+    decide_le: datetime | None
+    motif_refus: str | None
+    version: int
+
+
+class FileClubs(BaseModel):
+    total: int
+    demandes: list[DemandeClub]
+
+
+# Vues côté élève -------------------------------------------------------------------------------------------
+
+
+class PassationApercu(BaseModel):
+    id: UUID
+    etat: str
+    successeur_pseudonyme: str
+    propose_le: datetime
+    decide_le: datetime | None
+    motif_refus: str | None
+    version: int
+
+
+class ClubResume(BaseModel):
+    id: UUID
+    nom: str
+    description: str | None
+    etablissement: EtablissementRattache
+    axes: list[str]
+    etat: str
+    president: bool
+    motif_refus: str | None = None
+    version: int
+
+
+class ClubPublic(BaseModel):
+    id: UUID
+    nom: str
+    etablissement: EtablissementRattache
+    axes: list[str]
+    actif_le: datetime | None
+
+
+class ClubFiche(BaseModel):
+    id: UUID
+    nom: str
+    description: str | None
+    etablissement: EtablissementRattache
+    axes: list[str]
+    actif_le: datetime | None
+
+
+# Passation --------------------------------------------------------------------------------------------------
+
+
+class PassationEntree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    pseudonyme: str = Field(min_length=1, max_length=60)
+    version: int = Field(ge=1)
+
+
+class MonClub(BaseModel):
+    club: ClubResume | None
+    # La proposition de passation en attente, visible par le président sortant.
+    passation: PassationApercu | None = None
+
+
+class ActivationEntree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    version: int | None = Field(default=None, ge=1)
+
+
+class RefusEntree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    motif: Motif
+    version: int | None = Field(default=None, ge=1)
+
+
+class Passation(BaseModel):
+    id: UUID
+    club_id: UUID
+    club_nom: str
+    etablissement: EtablissementRattache
+    successeur_pseudonyme: str
+    president_sortant_pseudonyme: str
+    etat: str
+    propose_le: datetime
+    decide_le: datetime | None
+    motif_refus: str | None
+    version: int
+
+
+class FilePassations(BaseModel):
+    total: int
+    passations: list[Passation]

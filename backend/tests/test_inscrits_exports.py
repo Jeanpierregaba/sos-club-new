@@ -229,6 +229,6 @@ def test_tableau_de_bord_sur_les_vraies_donnees(
     assert sum(n for _, n in corps["inscriptions_30_jours"]) == 4
     indicateurs = {i["id"]: i for i in corps["indicateurs"]}
     assert indicateurs["collaborateurs_actifs"]["valeur"] == 1
-    assert indicateurs["clubs_actifs"]["valeur"] is None
-    assert indicateurs["clubs_actifs"]["disponible_avec"] == "Clubs et DRE"
+    assert indicateurs["clubs_actifs"]["valeur"] == 0
+    assert indicateurs["clubs_actifs"]["disponible_avec"] is None
     assert datetime.fromisoformat(corps["calcule_le"]) <= datetime.now(UTC)

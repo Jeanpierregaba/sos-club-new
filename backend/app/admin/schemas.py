@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.admin.catalogue import Action, RoleDepart
 from app.admin.models import FormatExport, StatutExport, TypeExport
+from app.clubs.models import EtatClub
 from app.comptes.models import Role, StatutCompte
 from app.eleves.models import Classe
 from app.encadreurs.models import EtatVerification, Fonction
@@ -31,8 +32,9 @@ class AdminMoi(BaseModel):
     droits: list[Droit]
     double_auth_active: bool
     double_auth_requise: bool
-    # Le compteur du menu : None sans le droit de consulter la file (spec 018).
+    # Les compteurs du menu : None sans le droit de consulter la file (specs 018 et 019).
     encadreurs_a_verifier: int | None = None
+    clubs_a_valider: int | None = None
 
 
 class ModuleCatalogue(BaseModel):
@@ -184,12 +186,24 @@ class EvenementJournal(BaseModel):
     details: dict[str, Any]
 
 
+class ClubInscrit(BaseModel):
+    """Le club d'un élève, vu dans sa fiche admin (spec 019). Aucune donnée nominative de plus."""
+
+    id: UUID
+    nom: str
+    etat: EtatClub
+    president: bool
+    motif_refus: str | None = None
+
+
 class ProfilEleveAdmin(BaseModel):
     pseudonyme: str
     classe: Classe
     charte_version: str
     etablissement: EtablissementRattache
     points: ResumePoints
+    # Sa demande ou son club (spec 019), priorité à l'actif puis à l'attente.
+    club: ClubInscrit | None = None
 
 
 class ProfilEncadreurAdmin(BaseModel):
@@ -300,6 +314,7 @@ class TableauDeBord(BaseModel):
     indicateurs: list[Indicateur]
     # Libellé du semestre en cours ; None signale qu'aucun semestre n'est configuré pour aujourd'hui (spec 017).
     semestre_en_cours: str | None
-    # Demandes d'encadreurs en attente dans le périmètre ; None sans le droit de les consulter (spec 018).
+    # Demandes d'encadreurs et de clubs en attente dans le périmètre ; None sans le droit de les consulter.
     encadreurs_a_verifier: int | None = None
+    clubs_a_valider: int | None = None
     derniers_evenements: list[EvenementJournal] | None

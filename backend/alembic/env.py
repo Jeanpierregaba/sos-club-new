@@ -6,6 +6,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 import app.admin.models
+import app.clubs.models
 import app.comptes.models
 import app.eleves.models
 import app.encadreurs.models

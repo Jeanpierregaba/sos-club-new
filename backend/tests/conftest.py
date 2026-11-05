@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from sqlalchemy import make_url, text
+from sqlalchemy import make_url, select, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import NullPool
 
@@ -20,9 +20,12 @@ from alembic import command
 from app.comptes.models import Role, Utilisateur
 from app.comptes.motdepasse import hacher
 from app.db import Base
+from app.eleves import pseudonyme
+from app.eleves.models import Classe, Eleve
 from app.main import app
 from app.points import bareme
 from app.referentiel.chargement import charger
+from app.referentiel.models import Dre, Etablissement, Iesg
 
 MOT_DE_PASSE = "mot-de-passe-de-test"
 # NullPool : chaque appel ouvre sa connexion, car asyncio.run crée une nouvelle boucle à chaque fois.
@@ -120,6 +123,56 @@ def creer_utilisateur(en_base: Callable[..., Any]) -> Callable[..., Utilisateur]
             return utilisateur
 
         return en_base(inserer)
+
+    return creer
+
+
+def etablissement_de(en_base: Callable[..., Any], dre: str) -> Any:
+    """Un établissement de la DRE demandée, pris dans l'annuaire chargé."""
+    return en_base(
+        lambda db: db.scalar(
+            select(Etablissement.id)
+            .join(Iesg, Iesg.id == Etablissement.iesg_id)
+            .join(Dre, Dre.code == Iesg.dre_code)
+            .where(Dre.code == dre)
+            .order_by(Etablissement.nom)
+            .limit(1)
+        )
+    )
+
+
+@pytest.fixture
+def creer_eleve(
+    annuaire: None,
+    en_base: Callable[..., Any],
+    creer_utilisateur: Callable[..., Utilisateur],
+) -> Callable[..., Utilisateur]:
+    """Un élève avec son profil (spec 017) dans un établissement de la DRE demandée."""
+
+    def creer(
+        identifiant: str = "eleve1",
+        affiche: str = "Ama du Golfe",
+        dre: str = "grand-lome",
+        classe: Classe = Classe.seconde,
+        etablissement_id: Any = None,
+    ) -> Utilisateur:
+        utilisateur = creer_utilisateur(identifiant, Role.eleve)
+        lieu = etablissement_id or etablissement_de(en_base, dre)
+
+        async def inserer(db: AsyncSession) -> None:
+            db.add(
+                Eleve(
+                    utilisateur_id=utilisateur.id,
+                    pseudonyme=affiche,
+                    pseudonyme_normalise=pseudonyme.cle(affiche),
+                    classe=classe,
+                    etablissement_id=lieu,
+                    charte_version="test",
+                )
+            )
+
+        en_base(inserer)
+        return utilisateur
 
     return creer
 
@@ -228,3 +281,18 @@ class Navigateur:
 
     def put(self, url: str, **options: Any) -> Any:
         return self.request("PUT", url, **options)
+
+
+VERIFICATION_CLUBS = {
+    ("tableau_de_bord", "consulter"),
+    ("clubs", "consulter"),
+    ("clubs", "approuver"),
+}
+
+
+@pytest.fixture
+def verificateur_clubs(client: TestClient, creer_collaborateur: Callable[..., Any]) -> TestClient:
+    """Un collaborateur national qui peut lire et décider les clubs, double authentification faite."""
+    creer_collaborateur("verif.clubs", droits=VERIFICATION_CLUBS, double_auth=True)
+    connecter_admin(client, "verif.clubs")
+    return client

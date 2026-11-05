@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-_Rien pour l'instant._
+- [ ] 019 — Clubs et présidence (R4) : API et site de la demande, de la vérification, de la carte et de la passation. Spec : [`docs/specs/019-clubs-et-presidence/`](docs/specs/019-clubs-et-presidence/)
 
 ## À faire
 
