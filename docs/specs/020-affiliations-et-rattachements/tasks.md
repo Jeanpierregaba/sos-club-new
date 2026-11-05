@@ -1,0 +1,92 @@
+# 020 — Tâches
+
+<!-- Spec et plan corrigés et validés le 2026-11-05 par le porteur du projet.
+Chaque tâche est autonome et committable ; lint, typecheck et tests passent avant chaque commit. -->
+
+## Tâche 1 — Données : modèles, migration, reprise
+
+- [ ] Modèles `Adhesion`, `Rattachement` dans `clubs/models.py` (états, contraintes, index du plan)
+- [ ] `club_passation` : état `en_attente_encadreur`, `confirmee_par`, `confirmee_le`
+- [ ] Migration réécrite, avec la reprise : adhésion active du président de chaque club actif
+- [ ] Tests des contraintes : une adhésion en cours par élève, motif obligatoire au refus
+- [ ] Supprimer `adhesion_models.py` ; retirer les routes non testées de `router.py` jusqu'aux tâches 2-4
+
+**Commit :** `feat(clubs): tables adhesion et rattachement (spec 020)`
+
+## Tâche 2 — API affiliations : élève et président
+
+- [ ] Tests d'abord pour la confirmation par le président (TDD)
+- [ ] `adhesions.py` : demander, annuler ou se retirer, confirmer, refuser, retirer
+- [ ] Président membre de droit : adhésion créée à l'activation du club (spec 019)
+- [ ] État de l'adhésion dans l'espace élève (`GET /api/eleves/moi`)
+- [ ] `tests/test_clubs_adhesions.py` (parcours, doublons, droits, retraits)
+
+**Commit :** `feat(clubs): affiliations, demande et confirmation par le président`
+
+## Tâche 3 — API rattachements : encadreur et président
+
+- [ ] `rattachements.py` : demander, annuler ou se retirer, confirmer, refuser, retirer
+- [ ] `supplementaire` calculé à la demande, recalculé sous verrou à la validation
+- [ ] `GET /api/encadreurs/moi/clubs`
+- [ ] `tests/test_clubs_rattachements.py`
+
+**Commit :** `feat(clubs): rattachements des encadreurs`
+
+## Tâche 4 — API admin : files et décisions en lot
+
+- [ ] `membres_admin.py` : files filtrées par DRE, validation et refus en lot avec résultat par élément
+- [ ] Club supplémentaire : 403 pour un collaborateur de DRE
+- [ ] Compteurs du tableau de bord admin
+- [ ] `tests/test_clubs_lots.py`
+
+**Commit :** `feat(admin): validation des affiliations et rattachements`
+
+## Tâche 5 — API : membres et changements d'établissement
+
+- [ ] `GET /api/clubs/{id}/membres` (pseudonymes, 404 pour les autres)
+- [ ] Fin d'adhésion ou de rattachement au changement d'établissement ; refus pour un président
+- [ ] Tests par profil (membre, président, encadreur, DRE, autre DRE, visiteur)
+
+**Commit :** `feat(clubs): liste des membres et changement d'établissement`
+
+## Tâche 6 — API : confirmation du président par un encadreur (Q19)
+
+- [ ] Passation : `en_attente_encadreur` si le club a un encadreur rattaché ; successeur membre obligatoire
+- [ ] Routes confirmer / refuser pour l'encadreur rattaché
+- [ ] Adapter les tests de passation de la spec 019 ; `tests/test_clubs_passation_q19.py`
+
+**Commit :** `feat(clubs): confirmation de la passation par un encadreur (Q19)`
+
+## Tâche 7 — Site : élève et président dans /mon-espace
+
+- [ ] Régénérer le schéma OpenAPI et les types du site
+- [ ] `BlocClub` élève : rejoindre, état, motif, se retirer, membres
+- [ ] `BlocClub` président : onglets Demandes et Membres, état de la passation
+- [ ] Tests des composants
+
+**Commit :** `feat(site): affiliation et gestion des membres dans mon-espace`
+
+## Tâche 8 — Site : encadreur
+
+- [ ] `EspaceEncadreur` : mes clubs, demandes, passations à confirmer
+- [ ] Bouton « Demander mon rattachement » sur `/clubs/$id`
+- [ ] Tests des composants
+
+**Commit :** `feat(site): rattachements dans l'espace encadreur`
+
+## Tâche 9 — Site : admin
+
+- [ ] `/admin/clubs` : onglets Affiliations et Rattachements, sélection, décisions en lot, résultat par ligne
+- [ ] Mention « Autorisation nationale requise » pour un collaborateur de DRE
+- [ ] Tests
+
+**Commit :** `feat(site): files admin des affiliations et rattachements`
+
+## Tâche 10 — Clôture
+
+- [ ] Vérification sur téléphone (viewport mobile) des trois espaces
+- [ ] Relecture par le sous-agent `reviewer`, constats corrigés
+- [ ] `ARCHITECTURE.md` (tables, routes), `SECURITY.md` (droits par ressource), note sur Q4 restant à faire
+- [ ] `TASKS.md`, `docs/SESSION-LOG.md`
+
+**Commit :** `docs: clôture de la spec 020`

@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-_Rien pour l'instant._
+- [ ] R5 — [020 Affiliations et rattachements](docs/specs/020-affiliations-et-rattachements/) : spec et plan validés le 2026-11-05 ; en cours : tâche 1
 
 ## À faire
 
