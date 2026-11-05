@@ -5,11 +5,11 @@ Chaque tâche est autonome et committable ; lint, typecheck et tests passent ava
 
 ## Tâche 1 — Données : modèles, migration, reprise
 
-- [ ] Modèles `Adhesion`, `Rattachement` dans `clubs/models.py` (états, contraintes, index du plan)
-- [ ] `club_passation` : état `en_attente_encadreur`, `confirmee_par`, `confirmee_le`
-- [ ] Migration réécrite, avec la reprise : adhésion active du président de chaque club actif
-- [ ] Tests des contraintes : une adhésion en cours par élève, motif obligatoire au refus
-- [ ] Supprimer `adhesion_models.py` ; retirer les routes non testées de `router.py` jusqu'aux tâches 2-4
+- [x] Modèles `Adhesion`, `Rattachement` dans `clubs/models.py` (états, contraintes, index du plan)
+- [x] `club_passation` : état `en_attente_encadreur`, `confirmee_par`, `confirmee_le`
+- [x] Migration réécrite, avec la reprise : adhésion active du président de chaque club actif
+- [x] Tests des contraintes : une adhésion en cours par élève, motif obligatoire au refus
+- [x] Supprimer `adhesion_models.py` ; retirer les routes non testées de `router.py` jusqu'aux tâches 2-4
 
 **Commit :** `feat(clubs): tables adhesion et rattachement (spec 020)`
 

@@ -30,7 +30,7 @@ règles s'appuient sur celles des clubs (périmètre DRE, verrous, journal). Deu
 
 - Index unique `uq_adhesion_en_cours_par_eleve` sur `eleve_id` où `etat IN (en_attente_president,
 en_attente_validation, active)` : un élève n'a qu'une adhésion en cours, tous clubs confondus.
-- Contrainte : `etat = 'refusee'` ⇒ `motif` non nul.
+- Contrainte : `motif_refus` non nul si et seulement si `etat = 'refusee'`.
 - Index partiel `(club_id, etat)` sur les états en attente, pour les files.
 
 ### `rattachement` (encadreur → club)

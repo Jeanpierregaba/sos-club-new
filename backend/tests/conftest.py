@@ -296,3 +296,74 @@ def verificateur_clubs(client: TestClient, creer_collaborateur: Callable[..., An
     creer_collaborateur("verif.clubs", droits=VERIFICATION_CLUBS, double_auth=True)
     connecter_admin(client, "verif.clubs")
     return client
+
+
+# Clubs, affiliations et rattachements (spec 020) --------------------------------------------------------------
+
+
+@pytest.fixture
+def creer_club(en_base: Callable[..., Any]) -> Callable[..., Any]:
+    """Un club actif présidé par `president`, dans l'établissement de ce dernier, avec l'adhésion active du
+    président (membre de droit, spec 020). `etat` permet un club en attente ou refusé, sans adhésion."""
+    from datetime import UTC, datetime
+
+    from app.clubs.models import Adhesion, Club, EtatAdhesion, EtatClub
+
+    def creer(president: Utilisateur, nom: str = "Club Santé Test", etat: EtatClub = EtatClub.actif) -> Club:
+        async def inserer(db: AsyncSession) -> Club:
+            eleve = await db.get(Eleve, president.id)
+            assert eleve is not None, "le président doit être un élève"
+            actif = etat is EtatClub.actif
+            club = Club(
+                etablissement_id=eleve.etablissement_id,
+                nom=nom,
+                nom_normalise=nom.lower(),
+                demandeur_id=president.id,
+                president_id=president.id if actif else None,
+                etat=etat,
+                motif_refus="Refus de test." if etat is EtatClub.refuse else None,
+                actif_le=datetime.now(UTC) if actif else None,
+                encadreurs_associes=[],
+            )
+            db.add(club)
+            await db.flush()
+            if actif:
+                db.add(Adhesion(eleve_id=president.id, club_id=club.id, etat=EtatAdhesion.active))
+            return club
+
+        return en_base(inserer)
+
+    return creer
+
+
+@pytest.fixture
+def creer_encadreur(
+    annuaire: None, en_base: Callable[..., Any], creer_utilisateur: Callable[..., Utilisateur]
+) -> Callable[..., Utilisateur]:
+    """Un encadreur (spec 018), actif par défaut, dans un établissement de la DRE demandée."""
+    from app.encadreurs.models import Encadreur, EtatVerification, Fonction
+
+    def creer(
+        identifiant: str = "encadreur1",
+        dre: str = "grand-lome",
+        etablissement_id: Any = None,
+        etat: EtatVerification = EtatVerification.actif,
+    ) -> Utilisateur:
+        utilisateur = creer_utilisateur(identifiant, Role.encadreur, email=f"{identifiant}@ecole.tg")
+        lieu = etablissement_id or etablissement_de(en_base, dre)
+
+        async def inserer(db: AsyncSession) -> None:
+            db.add(
+                Encadreur(
+                    utilisateur_id=utilisateur.id,
+                    etablissement_id=lieu,
+                    fonction=Fonction.enseignant,
+                    etat=etat,
+                    charte_version="test",
+                )
+            )
+
+        en_base(inserer)
+        return utilisateur
+
+    return creer
