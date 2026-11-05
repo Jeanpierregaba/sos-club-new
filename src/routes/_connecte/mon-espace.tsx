@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { ChoixEtablissement, type EtablissementChoisi } from "@/components/ChoixEtablissement";
+import { BlocClub } from "@/components/clubs/BlocClub";
 import {
   CartesPoints,
   DernieresLignes,
@@ -19,12 +20,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useDeconnexion } from "@/hooks/use-deconnexion";
 import {
+  chargerAxes,
+  chargerClubParEtablissement,
   chargerEspaceEleve,
   chargerEspaceEncadreur,
+  chargerMonClub,
   ErreurApi,
   modifierProfilEleve,
+  type AxePublic,
   type Classe,
+  type ClubPublic,
   type EspaceEleve,
+  type MonClub,
 } from "@/lib/api/client";
 import { CLASSES, libelleClasse } from "@/lib/classes";
 
@@ -41,17 +48,42 @@ export const Route = createFileRoute("/_connecte/mon-espace")({
   },
   loader: async ({ context }) => {
     try {
-      if (context.moi.role === "eleve")
-        return { eleve: await chargerEspaceEleve(), encadreur: null };
+      if (context.moi.role === "eleve") {
+        const [espace, club, axes] = await Promise.all([
+          chargerEspaceEleve(),
+          chargerMonClub(),
+          chargerAxes().catch(() => []),
+        ]);
+        // Quand l'élève n'a pas lui-même de demande, l'établissement peut déjà avoir un club actif :
+        // le formulaire ne doit pas être proposé (§1 de la spec).
+        const clubEtablissement =
+          club.club === null
+            ? await chargerClubParEtablissement(espace.etablissement.id).catch(() => undefined)
+            : null;
+        return { eleve: espace, club, axes, clubEtablissement, encadreur: null };
+      }
       if (context.moi.role === "encadreur")
-        return { eleve: null, encadreur: await chargerEspaceEncadreur() };
+        return {
+          eleve: null,
+          club: null,
+          axes: [],
+          clubEtablissement: null,
+          encadreur: await chargerEspaceEncadreur(),
+        };
     } catch (e) {
       // Un compte créé avant les specs 017 et 018 n'a pas de profil : il garde l'espace simple.
       if (e instanceof ErreurApi && (e.statut === 403 || e.statut === 404))
-        return { eleve: null, encadreur: null, message: e.message };
+        return {
+          eleve: null,
+          club: null,
+          axes: [],
+          clubEtablissement: null,
+          encadreur: null,
+          message: e.message,
+        };
       throw e;
     }
-    return { eleve: null, encadreur: null };
+    return { eleve: null, club: null, axes: [], clubEtablissement: null, encadreur: null };
   },
   head: () => ({
     meta: [
@@ -66,7 +98,15 @@ export const Route = createFileRoute("/_connecte/mon-espace")({
 function MonEspace() {
   const donnees = Route.useLoaderData();
   const { moi } = Route.useRouteContext();
-  if (donnees.eleve) return <EspaceDeLEleve espace={donnees.eleve} />;
+  if (donnees.eleve)
+    return (
+      <EspaceDeLEleve
+        espace={donnees.eleve}
+        club={donnees.club}
+        axes={donnees.axes}
+        clubEtablissement={donnees.clubEtablissement ?? null}
+      />
+    );
   if (donnees.encadreur) return <EspaceEncadreur espace={donnees.encadreur} prenom={moi.prenom} />;
   return <EspaceSimple message={"message" in donnees ? donnees.message : undefined} />;
 }
@@ -116,8 +156,19 @@ function EspaceSimple({ message }: { message?: string | undefined }) {
   );
 }
 
-function EspaceDeLEleve({ espace }: { espace: EspaceEleve }) {
+function EspaceDeLEleve({
+  espace,
+  club,
+  axes,
+  clubEtablissement,
+}: {
+  espace: EspaceEleve;
+  club: MonClub;
+  axes: AxePublic[];
+  clubEtablissement: ClubPublic | null;
+}) {
   const { bienvenue } = Route.useSearch();
+  const router = useRouter();
   const [profil, setProfil] = useState(false);
   const [motDePasse, setMotDePasse] = useState(false);
   const [motDePasseChange, setMotDePasseChange] = useState(false);
@@ -146,6 +197,17 @@ function EspaceDeLEleve({ espace }: { espace: EspaceEleve }) {
 
         <CartesPoints points={points} />
 
+        <BlocClub
+          club={club.club}
+          passation={club.passation ?? null}
+          etablissement={espace.etablissement}
+          axes={axes}
+          clubEtablissement={clubEtablissement}
+          onRafraichir={async () => {
+            await router.invalidate();
+          }}
+        />
+
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
           <DernieresLignes points={points} />
 
@@ -161,7 +223,7 @@ function EspaceDeLEleve({ espace }: { espace: EspaceEleve }) {
                 terme="Établissement"
                 valeur={<EtablissementAffiche etablissement={espace.etablissement} />}
               />
-              <Info terme="Club" valeur="Sans club pour l'instant" />
+              <Info terme="Club" valeur={club.club ? club.club.nom : "Aucun pour l'instant"} />
               <Info terme="Email" valeur={espace.email ?? "Aucun"} />
             </dl>
             <div className="mt-6 flex flex-wrap gap-2">

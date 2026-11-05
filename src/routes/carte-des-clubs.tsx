@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, MapPin, Search, X } from "lucide-react";
 import { FilAriane } from "@/components/FilAriane";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion } from "@/components/SiteMotion";
-import { chargerAnnuaire, type TypeEtablissement } from "@/lib/api/client";
+import { chargerAnnuaire, chargerClubsPublics, type TypeEtablissement } from "@/lib/api/client";
 import { chercher, compterParType, indexer } from "@/lib/carte-des-clubs";
+import { clubsParEtablissement, LIBELLE_SANS_CLUB } from "@/lib/clubs";
 import { DRE_PAR_DEFAUT, dessins, regions } from "@/lib/togo-dre";
 import mascottesEquipe from "@/assets/mascottes-equipe.webp";
 
@@ -22,8 +23,16 @@ export const Route = createFileRoute("/carte-des-clubs")({
       { property: "og:title", content: "La carte des Clubs Santé du Togo" },
     ],
   }),
-  // L'annuaire vient de l'API (spec 016). Sans elle, la carte garde ses contours et l'explique.
-  loader: () => chargerAnnuaire().catch(() => null),
+  // L'annuaire et les clubs actifs viennent de l'API (specs 016 et 019). Sans elle, la carte garde ses
+  // contours et l'explique ; l'échec des clubs (null) ne doit ni casser l'annuaire ni afficher, à tort,
+  // « aucun club » partout.
+  loader: async () => {
+    const [annuaire, clubs] = await Promise.all([
+      chargerAnnuaire().catch(() => null),
+      chargerClubsPublics().catch(() => null),
+    ]);
+    return { annuaire, clubs };
+  },
   component: CarteDesClubs,
 });
 
@@ -38,14 +47,20 @@ const ORDRE_TYPES = Object.keys(types) as TypeEtablissement[];
 const APERCU = 30;
 
 function CarteDesClubs() {
-  const annuaire = Route.useLoaderData();
+  const { annuaire, clubs } = Route.useLoaderData();
   const dres = useMemo(() => regions(annuaire ?? []), [annuaire]);
   const index = useMemo(() => indexer(dres), [dres]);
+  const clubParEtablissement = useMemo(
+    () => (clubs ? clubsParEtablissement(clubs) : new Map()),
+    [clubs],
+  );
+  const listeClubs = clubs ?? [];
   const totalClubs = dres.reduce((n, r) => n + r.nb_etablissements, 0);
   const chiffres = [
     { n: dres.length, t: "Directions régionales" },
     { n: dres.reduce((n, r) => n + r.iesg.length, 0), t: "Inspections (IESG)" },
     { n: totalClubs, t: "Collèges & lycées" },
+    { n: listeClubs.length, t: "Clubs actifs" },
   ];
 
   const [code, setCode] = useState(DRE_PAR_DEFAUT);
@@ -56,6 +71,9 @@ function CarteDesClubs() {
 
   const dre = dres.find((r) => r.code === code) ?? dres[0];
   const iesg = dre?.iesg.find((i) => i.id === iesgId) ?? dre?.iesg[0];
+  const clubsDeLaDre = dre
+    ? listeClubs.filter((club) => club.etablissement.dre_code === dre.code).length
+    : 0;
 
   const choisir = (codeDre: string, idIesg: string | null = null) => {
     setCode(codeDre);
@@ -104,8 +122,9 @@ function CarteDesClubs() {
                 <span className="block text-sun">des clubs santé</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg font-medium text-white/80">
-                Les clubs santé de chaque Direction Régionale de l’Éducation et de chaque Inspection
-                (IESG). Choisis ta région sur la carte, ou cherche directement ton établissement.
+                Les Clubs Santé actifs de chaque Direction Régionale de l’Éducation et de chaque
+                Inspection (IESG). Choisis ta région sur la carte, ou cherche directement ton
+                établissement.
               </p>
 
               {/* Entrée amène les résultats, affichés dans l'explorateur, sous les yeux. */}
@@ -143,7 +162,7 @@ function CarteDesClubs() {
               </form>
 
               {dre && (
-                <dl className="mt-8 grid max-w-xl grid-cols-3 gap-2 sm:gap-3">
+                <dl className="mt-8 grid max-w-xl grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
                   {chiffres.map((c) => (
                     <div
                       key={c.t}
@@ -257,32 +276,51 @@ function CarteDesClubs() {
               </p>
               {resultats.length > 0 && (
                 <ul className="mt-5 divide-y border-y">
-                  {resultats.slice(0, 50).map((e) => (
-                    <li key={e.id}>
-                      <button
-                        type="button"
-                        onClick={() => choisir(e.dre.code, e.iesg.id)}
-                        className="group flex w-full items-center gap-4 py-3.5 text-left"
-                      >
+                  {resultats.slice(0, 50).map((e) => {
+                    const club = clubParEtablissement.get(e.id);
+                    return (
+                      <li key={e.id} className="flex items-center gap-3 py-3.5">
                         <MapPin
                           aria-hidden
                           className="size-4 shrink-0"
                           style={{ color: e.dre.couleur }}
                         />
-                        <span className="min-w-0 flex-1">
+                        <button
+                          type="button"
+                          onClick={() => choisir(e.dre.code, e.iesg.id)}
+                          className="group min-w-0 flex-1 text-left"
+                        >
                           <span className="block font-bold group-hover:text-logo-blue">
                             {e.nom}
                           </span>
                           <span className="block text-sm text-muted-foreground">
                             {e.iesg.nom} · DRE {e.dre.nom}
                           </span>
+                          {club ? (
+                            <span className="block text-xs font-bold text-primary">{club.nom}</span>
+                          ) : clubs ? (
+                            <span className="block text-xs font-medium text-muted-foreground">
+                              {LIBELLE_SANS_CLUB}
+                            </span>
+                          ) : null}
+                        </button>
+                        <span className="flex shrink-0 flex-col items-end gap-1.5">
+                          <span className={`text-xs font-extrabold uppercase ${types[e.type].c}`}>
+                            {types[e.type].t}
+                          </span>
+                          {club && (
+                            <Link
+                              to="/clubs/$id"
+                              params={{ id: club.id }}
+                              className="inline-flex items-center gap-1 text-xs font-bold text-logo-blue hover:underline"
+                            >
+                              Fiche <ArrowRight aria-hidden className="size-3.5" />
+                            </Link>
+                          )}
                         </span>
-                        <span className={`text-xs font-extrabold uppercase ${types[e.type].c}`}>
-                          {types[e.type].t}
-                        </span>
-                      </button>
-                    </li>
-                  ))}
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
               {resultats.length > 50 && (
@@ -313,6 +351,8 @@ function CarteDesClubs() {
                 <p className="text-sm font-semibold text-muted-foreground">
                   <strong className="text-ink">{dre.nb_etablissements}</strong> établissements ·{" "}
                   <strong className="text-ink">{dre.iesg.length}</strong> IESG ·{" "}
+                  <strong className="text-ink">{clubsDeLaDre}</strong>{" "}
+                  {clubsDeLaDre === 1 ? "club actif" : "clubs actifs"} ·{" "}
                   <strong className="text-ink">
                     {Math.round((dre.nb_etablissements / (totalClubs || 1)) * 100)} %
                   </strong>{" "}
@@ -374,20 +414,42 @@ function CarteDesClubs() {
               </div>
 
               <ol className="mt-4 grid border-t sm:grid-cols-2 sm:gap-x-8 xl:grid-cols-3">
-                {visibles.map((e, k) => (
-                  <li
-                    key={e.id}
-                    className="flex items-baseline gap-3 border-b border-border/60 py-3"
-                  >
-                    <span className="w-6 shrink-0 text-right text-xs font-bold tabular-nums text-muted-foreground">
-                      {k + 1}
-                    </span>
-                    <span className="min-w-0 flex-1 font-semibold leading-snug">{e.nom}</span>
-                    <span className={`text-[11px] font-extrabold uppercase ${types[e.type].c}`}>
-                      {types[e.type].t}
-                    </span>
-                  </li>
-                ))}
+                {visibles.map((e, k) => {
+                  const club = clubParEtablissement.get(e.id);
+                  return (
+                    <li
+                      key={e.id}
+                      className="flex items-start gap-3 border-b border-border/60 py-3"
+                    >
+                      <span className="w-6 shrink-0 pt-0.5 text-right text-xs font-bold tabular-nums text-muted-foreground">
+                        {k + 1}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-baseline justify-between gap-2">
+                          <span className="font-semibold leading-snug">{e.nom}</span>
+                          <span
+                            className={`shrink-0 text-[11px] font-extrabold uppercase ${types[e.type].c}`}
+                          >
+                            {types[e.type].t}
+                          </span>
+                        </span>
+                        {club ? (
+                          <Link
+                            to="/clubs/$id"
+                            params={{ id: club.id }}
+                            className="mt-0.5 inline-flex items-center gap-1 text-xs font-bold text-logo-blue hover:underline"
+                          >
+                            {club.nom} <ArrowRight aria-hidden className="size-3" />
+                          </Link>
+                        ) : clubs ? (
+                          <span className="mt-0.5 block text-xs font-medium text-muted-foreground">
+                            {LIBELLE_SANS_CLUB}
+                          </span>
+                        ) : null}
+                      </span>
+                    </li>
+                  );
+                })}
               </ol>
               {affiches.length > APERCU && (
                 <button

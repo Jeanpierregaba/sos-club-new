@@ -65,3 +65,14 @@ seuls encadreurs inscrits dans un établissement de sa DRE, pour vérifier leur 
 validation des affiliations par la DRE (Q18). Le périmètre se lit sur l'établissement actuel, sous verrou, au
 moment de la décision ; hors de sa DRE, la demande lui est introuvable (404). `approuver` est un droit
 sensible : il exige la double authentification. L'annuaire des inscrits reste national.
+
+## Note du 2026-11-05 : file des clubs et passations (spec 019)
+
+Le module `clubs` (`consulter`, `approuver`) reprend exactement le même mécanisme que `encadreurs`
+(spec 018) : `consulter` et `approuver` y sont des droits sensibles, qui exigent la double
+authentification. La file `/admin/clubs` est filtrée par la DRE de l'établissement du club (sous
+verrou, au moment de la décision) ; hors de sa DRE, la demande est introuvable (404) et une action
+sans double authentification répond 403. Les consultations de la file ne sont pas journalisées ;
+seules les décisions le sont (`club_active`, `club_refuse`, `club_passation`, dont la validation ou
+le refus d'une passation, avec avant/après). Le gestionnaire des clubs et DRE reçoit
+(`clubs`, approuver) en plus de (`clubs`, consulter), comme pour les encadreurs.

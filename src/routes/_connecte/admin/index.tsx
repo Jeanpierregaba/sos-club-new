@@ -1,5 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, CalendarX, Clock, Download, UserCheck, UserPlus, Users } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarX,
+  Clock,
+  Download,
+  Flag,
+  UserCheck,
+  UserPlus,
+  Users,
+} from "lucide-react";
 
 import { EnTeteAdmin } from "@/components/admin/EnTeteAdmin";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
@@ -109,6 +118,23 @@ function TableauDeBordPage() {
                 {tableau.encadreurs_a_verifier === 1
                   ? "encadreur attend sa vérification."
                   : "encadreurs attendent leur vérification."}
+              </span>
+              <span className="ml-auto inline-flex items-center gap-1 font-bold text-logo-blue">
+                Vérifier <ArrowRight aria-hidden className="size-4" />
+              </span>
+            </Link>
+          )}
+          {Boolean(tableau.clubs_a_valider) && (
+            <Link
+              to="/admin/clubs"
+              className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-ink shadow-sm ring-1 ring-border transition hover:ring-night/30"
+            >
+              <Flag aria-hidden className="size-5 shrink-0 text-logo-red" />
+              <span>
+                <strong className="text-logo-blue">{tableau.clubs_a_valider}</strong>{" "}
+                {tableau.clubs_a_valider === 1
+                  ? "demande de club ou passation attend une décision."
+                  : "demandes de club ou passations attendent une décision."}
               </span>
               <span className="ml-auto inline-flex items-center gap-1 font-bold text-logo-blue">
                 Vérifier <ArrowRight aria-hidden className="size-4" />

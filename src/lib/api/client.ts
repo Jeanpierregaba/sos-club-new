@@ -65,6 +65,21 @@ export type EtatVerification = Schemas["EtatVerification"];
 export type DemandeEncadreur = Schemas["DemandeEncadreur"];
 export type FileEncadreurs = Schemas["FileEncadreurs"];
 export type ProfilEncadreurAdmin = Schemas["ProfilEncadreurAdmin"];
+export type ClubPublic = Schemas["ClubPublic"];
+export type ClubFiche = Schemas["ClubFiche"];
+export type ClubResume = Schemas["ClubResume"];
+export type MonClub = Schemas["MonClub"];
+export type DemandeClub = Schemas["DemandeClub"];
+export type DemandeClubEntree = Schemas["DemandeClubEntree"];
+export type EncadreurAssocie = Schemas["EncadreurAssocie"];
+export type FileClubs = Schemas["FileClubs"];
+export type FilePassations = Schemas["FilePassations"];
+export type Passation = Schemas["Passation"];
+export type PassationApercu = Schemas["PassationApercu"];
+export type PassationEntree = Schemas["PassationEntree"];
+export type EtatClub = Schemas["EtatClub"];
+export type ClubInscrit = Schemas["ClubInscrit"];
+export type EtablissementRattache = Schemas["EtablissementRattache"];
 
 export const MESSAGE_SAISIE = "Vérifie le formulaire : un champ est vide, trop long ou mal rempli.";
 
@@ -309,3 +324,34 @@ export const adminActiverEncadreur = (id: string, version: number) =>
   envoyerJson<DemandeEncadreur>(`${ENCADREURS}/${id}/activer`, { version });
 export const adminRefuserEncadreur = (id: string, version: number, motif: string) =>
   envoyerJson<DemandeEncadreur>(`${ENCADREURS}/${id}/refuser`, { version, motif });
+
+// Clubs et présidence (spec 019) --------------------------------------------------------------------------
+
+export const demanderClub = (entree: DemandeClubEntree) =>
+  envoyerJson<ClubResume>("/api/clubs/demande", entree);
+export const renvoyerDemandeClub = () => envoyerJson<ClubResume>("/api/clubs/demande/renvoyer");
+export const chargerMonClub = () => requeteApi<MonClub>("/api/clubs/moi");
+export const proposerPassation = (pseudonyme: string, version: number) =>
+  envoyerJson<PassationApercu>("/api/clubs/moi/passation", { pseudonyme, version });
+export const annulerPassation = () =>
+  envoyerJson<PassationApercu>("/api/clubs/moi/passation/annuler");
+
+export const chargerClubsPublics = () => requeteApi<ClubPublic[]>("/api/clubs");
+export const chargerFicheClub = (id: string) => requeteApi<ClubFiche>(`/api/clubs/${id}`);
+export const chargerClubParEtablissement = (etablissementId: string) =>
+  requeteApi<ClubPublic | undefined>(
+    avecParametres("/api/clubs/par-etablissement", { etablissement_id: etablissementId }),
+  );
+
+const CLUBS_ADMIN = "/api/admin/clubs";
+export const adminFileClubs = (etat: "en_attente" | "refuse") =>
+  requeteApi<FileClubs>(avecParametres(CLUBS_ADMIN, { etat }));
+export const adminActiverClub = (id: string, version: number) =>
+  envoyerJson<DemandeClub>(`${CLUBS_ADMIN}/${id}/activer`, { version });
+export const adminRefuserClub = (id: string, version: number, motif: string) =>
+  envoyerJson<DemandeClub>(`${CLUBS_ADMIN}/${id}/refuser`, { version, motif });
+export const adminFilePassations = () => requeteApi<FilePassations>(`${CLUBS_ADMIN}/passations`);
+export const adminValiderPassation = (id: string, version: number) =>
+  envoyerJson<Passation>(`${CLUBS_ADMIN}/passations/${id}/valider`, { version });
+export const adminRefuserPassation = (id: string, version: number, motif: string) =>
+  envoyerJson<Passation>(`${CLUBS_ADMIN}/passations/${id}/refuser`, { version, motif });

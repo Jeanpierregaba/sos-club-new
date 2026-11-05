@@ -48,19 +48,19 @@
 
 **Site**
 
-- [ ] 12. Page `/clubs/$id` (fiche publique minimale) + branchement de la carte des clubs sur `GET /api/clubs`
+- [x] 12. Page `/clubs/$id` (fiche publique minimale) + branchement de la carte des clubs sur `GET /api/clubs`
         (clubs actifs réels ; libellé « Aucun club enregistré pour cet établissement »). Test Vitest du branchement.
 
-- [ ] 13. `/mon-espace` : bloc « Club » (demander la création — formulaire `DemandeClub` dans `#etat-vide` ; carte d'état
+- [x] 13. `/mon-espace` : bloc « Club » (demander la création — formulaire `DemandeClub` dans `#etat-vide` ; carte d'état
         si demande ou club actif ; proposer une passation — `CartePassation`). Tests Vitest du formulaire.
 
-- [ ] 14. Admin : page `/admin/clubs` (file des clubs, ongleta Refusés, ongleta Passations), entrée au menu avec
+- [x] 14. Admin : page `/admin/clubs` (file des clubs, ongleta Refusés, ongleta Passations), entrée au menu avec
         compteur, carte du tableau de bord. Vérification des critères d'acceptation.
 
 **Clôture**
 
-- [ ] 15. Documentation : `ARCHITECTURE.md`, note de l'ADR-0003 amendé (le club n'a pas de compte), note ADR-0008
+- [x] 15. Documentation : `ARCHITECTURE.md`, note de l'ADR-0003 amendé (le club n'a pas de compte), note ADR-0008
         (passations), `SECURITY.md` (club dans les données limitées).
-- [ ] 16. Vérifier tous les critères d'acceptation, en local et dans le navigateur sur téléphone.
-- [ ] 17. Relecture par le sous-agent `reviewer`, corrections.
-- [ ] 18. `TASKS.md` et `docs/SESSION-LOG.md` mis à jour.
+- [x] 16. Vérifier tous les critères d'acceptation, en local et dans le navigateur sur téléphone.
+- [x] 17. Relecture par le sous-agent `reviewer`, corrections.
+- [x] 18. `TASKS.md` et `docs/SESSION-LOG.md` mis à jour.

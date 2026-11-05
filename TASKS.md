@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] 019 — Clubs et présidence (R4) : API et site de la demande, de la vérification, de la carte et de la passation. Spec : [`docs/specs/019-clubs-et-presidence/`](docs/specs/019-clubs-et-presidence/)
+_Rien pour l'instant._
 
 ## À faire
 
@@ -69,6 +69,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] [019 — Clubs et présidence](docs/specs/019-clubs-et-presidence/spec.md) (R4 : demande de création par l'élève président, vérification par DRE, carte et fiches publiques, passations de présidence)
 - [x] [018 — Compte encadreur](docs/specs/018-compte-encadreur/spec.md) (R3 : inscription en attente d'activation, +100 de bienvenue après vérification, file admin filtrable par DRE, refus motivé et renvoi de demande)
 - [x] [017 — Compte élève et registre des points](docs/specs/017-compte-eleve/spec.md) (R2 : inscription avec pseudonyme et établissement proposé, +100 de bienvenue, espace élève, registre `mouvement_points`, semestres et barème réglables dans l'admin)
 - [x] [016 — Référentiel : DRE, IESG, établissements et axes](docs/specs/016-referentiel/spec.md) (R1 : 7 DRE, 19 IESG, 838 établissements, 7 axes d'intervention, écrans admin, carte des clubs branchée sur l'API)

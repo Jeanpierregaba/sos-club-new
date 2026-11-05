@@ -79,36 +79,36 @@ affiliation, ni publication, ni points de club.
 
 ## Critères d'acceptation
 
-- [ ] Étant donné un élève connecté dont l'établissement n'a pas de club, quand il envoie une demande valide,
+- [x] Étant donné un élève connecté dont l'établissement n'a pas de club, quand il envoie une demande valide,
       alors un club « en attente » est créé avec lui comme demandeur, rien n'est publié, et aucun point n'est
       crédité.
-- [ ] Étant donné un établissement qui a déjà un club actif, quand un élève demande la création d'un club, alors
+- [x] Étant donné un établissement qui a déjà un club actif, quand un élève demande la création d'un club, alors
       l'API répond 409 avec un message indiquant que l'établissement a déjà un club ; rien n'est créé.
-- [ ] Étant donné deux demandes en attente pour le même établissement, quand l'admin en active une, alors l'autre
+- [x] Étant donné deux demandes en attente pour le même établissement, quand l'admin en active une, alors l'autre
       est refusée (409 ou état « refusée ») et le refus se voit dans la file des refusés avec la date et le motif.
-- [ ] Étant donné une demande valide, quand un collaborateur national ou de la DRE de l'établissement l'active,
+- [x] Étant donné une demande valide, quand un collaborateur national ou de la DRE de l'établissement l'active,
       alors le club devient actif, le demandeur devient président, un journal `club_active` est inscrit avec
       l'auteur, et le club apparaît sur la carte avec sa fiche publique minimale.
-- [ ] Étant donné un étranger à la DRE ou sans le droit `clubs : approuver`, quand il lit la file ou décide,
+- [x] Étant donné un étranger à la DRE ou sans le droit `clubs : approuver`, quand il lit la file ou décide,
       alors l'API répond 403 (ou lui cache la demande, 404), comme pour les encadreurs.
-- [ ] Étant donné un collaborateur avec le droit `clubs : approuver` mais sans double authentification active,
+- [x] Étant donné un collaborateur avec le droit `clubs : approuver` mais sans double authentification active,
       quand il tente une action, alors l'API répond 403.
-- [ ] Étant donné deux activations simultanées d'un même club, alors une seule réussit ; un seul président existe.
-- [ ] Étant donné un refus sans motif, alors l'API répond 422.
-- [ ] Étant donné un club refusé, quand le demandeur corrige et renvoie sa demande, alors elle repasse en
+- [x] Étant donné deux activations simultanées d'un même club, alors une seule réussit ; un seul président existe.
+- [x] Étant donné un refus sans motif, alors l'API répond 422.
+- [x] Étant donné un club refusé, quand le demandeur corrige et renvoie sa demande, alors elle repasse en
       attente, le motif précédent reste au journal (`club_redemande`).
-- [ ] Étant donné un club actif et un élève successeur du même établissement, quand le président propose la
+- [x] Étant donné un club actif et un élève successeur du même établissement, quand le président propose la
       passation et que l'admin la valide, alors l'ancien président n'a plus accès à la gestion du club, le
       nouveau oui, et le journal `club_passation` enregistre l'avant et l'après ; les données du club
       (y compris futures) restent au club.
-- [ ] Étant donné une passation vers un élève d'un autre établissement, ou vers soi-même, alors l'API répond
+- [x] Étant donné une passation vers un élève d'un autre établissement, ou vers soi-même, alors l'API répond
       422 ; la version conservée côté client évite les passations sur un profil modifié entre-temps (comme 018).
-- [ ] Étant donné une passation refusée par l'admin avec motif, alors le président sortant voit le motif dans
+- [x] Étant donné une passation refusée par l'admin avec motif, alors le président sortant voit le motif dans
       son espace et reste président.
-- [ ] Étant donné un visiteur sans compte, quand il ouvre la fiche publique minimale d'un club actif, alors il
+- [x] Étant donné un visiteur sans compte, quand il ouvre la fiche publique minimale d'un club actif, alors il
       voit nom, établissement (IESG, DRE) et axes ; aucun téléphone, e-mail ou nom complet d'élève n'apparaît ;
       un club en attente est introuvable dans le public.
-- [ ] Le site affiche le formulaire de demande, l'état de la demande dans l'espace du demandeur (en attente /
+- [x] Le site affiche le formulaire de demande, l'état de la demande dans l'espace du demandeur (en attente /
       refusée avec motif / actif), la file de validation admin, la carte et les passations — lisibles sur
       téléphone.
 

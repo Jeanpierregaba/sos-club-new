@@ -10,6 +10,7 @@ import {
 import {
   Download,
   ExternalLink,
+  Flag,
   LayoutDashboard,
   LogOut,
   MapPinned,
@@ -93,6 +94,13 @@ function entrees(admin: AdminMoi): Entree[] {
       i: UserCheck,
       visible: peut(admin, "encadreurs", "consulter"),
       compteur: admin.encadreurs_a_verifier ?? 0,
+    },
+    {
+      to: "/admin/clubs",
+      libelle: "Clubs",
+      i: Flag,
+      visible: peut(admin, "clubs", "consulter"),
+      compteur: admin.clubs_a_valider ?? 0,
     },
     { to: "/admin/exports", libelle: "Exports", i: Download, visible: peutExporter(admin) },
     {

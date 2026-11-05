@@ -31,6 +31,9 @@ erDiagram
   dre ||--o{ iesg : regroupe
   iesg ||--o{ etablissement : regroupe
   etablissement ||--o{ club : accueille
+  club ||--o{ club_axe : classe
+  axe ||--o{ club_axe : classe
+  club ||--o{ club_passation : "transmet la présidence"
   dre ||--o{ collaborateur : "périmètre"
   axe ||--o{ article : classe
   axe ||--o{ video : classe
@@ -67,8 +70,19 @@ Champs structurants :
   établissement) et une `version` pour le verrou optimiste. Rien ne se supprime.
 - `axe` (spec 016) : les 7 axes d'intervention (Q1), avec un `code` stable, un `libelle`, une
   `description` courte et un `ordre`.
-- `club` : `nom`, `etablissement_id`, `ville`, `statut` (en_attente, actif, suspendu, rejete). Sa DRE
-  vient de son établissement (Q2).
+- `club` (spec 019) : demande de création puis club officiel d'un établissement. `etablissement_id`,
+  `nom` (officiel, unique après normalisation dans l'établissement), `nom_normalise`, `description`
+  courte (facultative, bornée), `demandeur_id`, `president_id` (le gestionnaire courant, nul tant que
+  la demande est en attente), `encadreurs_associes` (JSON borné, à titre déclaratif pour la vérification,
+  aucun compte ni rattachement), `etat` (en_attente, actif, refuse), `motif_refus` (obligatoire en
+  cas de refus, CHECK), `demande_le`, `decide_le`, `decide_par`, `actif_le`, `version` (verrou
+  optimiste). Un seul club actif par établissement (index partiel unique). Voir aussi `club_axe`.
+- `club_axe` (spec 019) : jusqu'à 3 axes privilégiés par club, jointure `club_id` + code de l'axe.
+- `club_passation` (spec 019) : proposition de transmission de la présidence par le président
+  sortant vers un élève du même établissement (`successeur_id`, `propose_par`, `propose_le`,
+  `etat` en_attente / validee / refusee, `motif_refus`, `decide_le`, `decide_par`, `version`).
+  Une seule passation en attente par club (index partiel unique). La décision change le
+  gestionnaire du club, jamais le rôle des comptes.
 - `adhesion` : `eleve_id`, `club_id`, `depuis`, `jusqu_a`. Une seule adhésion active par élève
   (index unique partiel), l'historique reste conservé.
 - `encadrement` : `club_id`, `utilisateur_id`, `specialite`, `statut`. Un encadreur n'a qu'un

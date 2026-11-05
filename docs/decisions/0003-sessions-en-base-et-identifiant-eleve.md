@@ -34,3 +34,13 @@ console de leur club avec leur compte personnel : il n'existe pas de compte club
 - Connexion et inscription ont une limite de débit par adresse réseau et par identifiant, en tenant
   compte qu'une classe peut partager une même adresse.
 - Le site et l'API partagent la même origine (ADR-0006), plutôt qu'un domaine parent comme prévu au départ.
+
+## Note du 2026-11-05 : le club n'a pas de compte, le président gère avec le sien (spec 019, R4)
+
+La spec 019 confirme ce que l'ADR-0003 posait déjà : un club n'a jamais de compte propre. Un élève
+désigné président par son établissement demande la création de l'espace de son club (`/mon-espace`),
+et le gère ensuite avec son compte élève personnel, après validation de la création par l'admin (ou
+la DRE). La présidence est une donnée du club (`club.president_id`), pas un rôle de compte : elle
+se transmet par une passation proposée par le président sortant et validée ou refusée (avec motif)
+par l'admin, journalisée comme `club_passation`. Les rattachements d'élèves et d'encadreurs au club
+(Membres, R5) suivront ; les encadreurs associés cités dans une demande restent déclaratifs.

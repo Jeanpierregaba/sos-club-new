@@ -14,6 +14,24 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-05 — Clubs et présidence (spec 019, R4)
+
+- Fait : spec 019 livrée (tâches 1–18). API : tables `club`, `club_axe`, `club_passation`, demande et renvoi de
+  l'élève, file admin filtrée par DRE (droits `clubs` sensibles, 2FA), activation atomique avec refus des
+  doublures, passations proposées/annulées/décidées, compteurs admin, 546 tests verts. Site : bloc « Mon club »
+  dans `/mon-espace` (formulaire `DemandeClub`, états en attente/refusée/actif, pas de CTA si l'établissement
+  a déjà un club actif), `/admin/clubs` (À vérifier / Refusés / Passations), `/clubs/$id` (fiche publique
+  minimale), carte des clubs sur `GET /api/clubs` (compteur réel, libellé « Aucun club enregistré »).
+  Vérifié sur téléphone (viewport mobile) : carte, fiche, 404, espace président. Relecture `reviewer` :
+  0 bloquant, 4 constats « à corriger » corrigés (CTA conservateur, échec clubs neutre, texte de passation,
+  description non inventée) + `libelleAxes` employé et tests `BlocClub`.
+- Pièges rencontrés : l'API tournait sans `SITE_ORIGINE` cohérent (port 8002, site 3002) ; la seed ne créait
+  pas les clubs si elle avait déjà tourné sans eux — relancer `python -m app.seed_dev`. `RouterProvider` ne
+  rend rien en test sans `router.load()` dans `act`.
+- Décisions : notes ADR-0003 (le club n'a pas de compte) et ADR-0008 (file clubs, mêmes règles 2FA que les
+  encadreurs) ; `SECURITY.md` et `ARCHITECTURE.md` à jour.
+- Prochaine étape : `/spec` R5 — Affiliations des élèves et rattachements des encadreurs.
+
 ### 2026-11-04 — Compte encadreur (spec 018, R3)
 
 - Fait : spec 018 livrée. Domaine `encadreurs` (inscription en attente, `verification.py` : file filtrable par DRE,
