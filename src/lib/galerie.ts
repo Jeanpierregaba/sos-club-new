@@ -11,17 +11,22 @@ import campagneEcologie from "@/assets/campagne-ecologie.jpg";
 import campagneSecourisme from "@/assets/campagne-secourisme.jpg";
 
 // Photos de la galerie. L'accueil montre les 6 premières, la page /galerie les montre toutes.
+// `axe` : le numéro de l'axe d'intervention (page /les-7-axes) auquel la photo se rattache ; c'est le filtre de la galerie.
 // `pos` : la partie de la photo gardée quand elle est rognée dans une vignette.
-export const themes = [
-  "Génie Imhotep",
-  "Vie des clubs",
-  "Sports & Secourisme",
-  "TV & Médias",
-  "Campagnes",
+export const axes = [
+  { n: 1, nom: "Génie Imhotep" },
+  { n: 2, nom: "Santé sexuelle & EVSS" },
+  { n: 3, nom: "Production TV & médias" },
+  { n: 4, nom: "Sport & secourisme" },
+  { n: 5, nom: "Bourses & excellence" },
+  { n: 6, nom: "Leadership & mentorat" },
+  { n: 7, nom: "Santé & environnement" },
 ] as const;
 
+export type NumeroAxe = (typeof axes)[number]["n"];
+
 export type Photo = {
-  theme: (typeof themes)[number];
+  axe: NumeroAxe;
   img: string;
   w: number;
   h: number;
@@ -31,7 +36,7 @@ export type Photo = {
 
 export const photos: Photo[] = [
   {
-    theme: "Vie des clubs",
+    axe: 2,
     img: slideClubs,
     w: 1493,
     h: 1053,
@@ -39,7 +44,7 @@ export const photos: Photo[] = [
     alt: "Des élèves en t-shirt Club Santé, affiches en main, saluent un officiel",
   },
   {
-    theme: "Génie Imhotep",
+    axe: 1,
     img: slideGenie,
     w: 2000,
     h: 1600,
@@ -47,7 +52,7 @@ export const photos: Photo[] = [
     alt: "Trois élèves en polo bleu au pupitre de la compétition Génie Imhotep",
   },
   {
-    theme: "Sports & Secourisme",
+    axe: 4,
     img: story1,
     w: 992,
     h: 672,
@@ -55,7 +60,7 @@ export const photos: Photo[] = [
     alt: "Une élève s'entraîne au massage cardiaque sur un mannequin",
   },
   {
-    theme: "Vie des clubs",
+    axe: 6,
     img: slideAxes,
     w: 2000,
     h: 1228,
@@ -63,7 +68,7 @@ export const photos: Photo[] = [
     alt: "Une salle d'élèves en t-shirt vert applaudit debout, sous le drapeau du Togo",
   },
   {
-    theme: "TV & Médias",
+    axe: 3,
     img: story2,
     w: 992,
     h: 672,
@@ -71,7 +76,7 @@ export const photos: Photo[] = [
     alt: "Une élève en interviewe une autre devant une caméra",
   },
   {
-    theme: "Génie Imhotep",
+    axe: 1,
     img: slideMascottes,
     w: 1514,
     h: 1600,
@@ -79,7 +84,7 @@ export const photos: Photo[] = [
     alt: "Remise du trophée de champion national Génie Imhotep à une élève en t-shirt orange",
   },
   {
-    theme: "Génie Imhotep",
+    axe: 1,
     img: grandesFinales,
     w: 2000,
     h: 963,
@@ -87,7 +92,7 @@ export const photos: Photo[] = [
     alt: "Les finalistes du Championnat national Génie Imhotep sur scène, chèques géants en main",
   },
   {
-    theme: "Vie des clubs",
+    axe: 6,
     img: banniere,
     w: 2000,
     h: 1160,
@@ -95,7 +100,7 @@ export const photos: Photo[] = [
     alt: "Élèves des Clubs Santé en t-shirts colorés, drapeaux du Togo en main",
   },
   {
-    theme: "Campagnes",
+    axe: 7,
     img: campagneHygiene,
     w: 544,
     h: 908,
@@ -103,7 +108,7 @@ export const photos: Photo[] = [
     alt: "Affiche de campagne : la mascotte rouge se lave les mains avec une élève",
   },
   {
-    theme: "Campagnes",
+    axe: 7,
     img: campagneEcologie,
     w: 544,
     h: 908,
@@ -111,7 +116,7 @@ export const photos: Photo[] = [
     alt: "Affiche de campagne : la mascotte verte plante un arbre avec un élève",
   },
   {
-    theme: "Campagnes",
+    axe: 4,
     img: campagneSecourisme,
     w: 546,
     h: 908,

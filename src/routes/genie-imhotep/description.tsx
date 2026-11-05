@@ -26,6 +26,7 @@ import { FilAriane } from "@/components/FilAriane";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion, retard } from "@/components/SiteMotion";
+import { DecorAnime } from "@/components/DecorAnime";
 import mascottesVs from "@/assets/mascottes-vs.webp";
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
 import mascottesLivres from "@/assets/mascottes-livres.webp";
@@ -302,12 +303,13 @@ function Description() {
       <SiteHeader />
 
       {/* Bannière : le nom du jeu et sa devise, les mascottes en duel à droite. */}
-      <section className="relative isolate overflow-hidden bg-linear-to-br from-logo-blue via-[oklch(0.36_0.16_275)] to-grape text-white">
+      <section className="relative isolate overflow-hidden bg-linear-to-br from-[oklch(0.58_0.22_300)] via-grape to-[oklch(0.5_0.25_285)] text-white">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-[radial-gradient(oklch(1_0_0/0.14)_1.5px,transparent_1.5px)] bg-size-[22px_22px] [mask-image:linear-gradient(to_right,black,transparent_55%)]" />
-          <div className="absolute -right-40 -top-40 size-[44rem] rounded-full border-[3.5rem] border-white/5" />
-          <div className="absolute -bottom-32 right-1/4 size-96 rounded-full bg-sun/20 blur-3xl" />
+          <div className="absolute inset-0 bg-[radial-gradient(oklch(1_0_0/0.14)_1.5px,transparent_1.5px)] bg-size-[22px_22px] [mask-image:linear-gradient(to_right,black,transparent_55%)] motion-safe:animate-defile-motif" />
+          <div className="absolute -right-40 -top-40 size-[44rem] rounded-full border-[3.5rem] border-white/5 motion-safe:animate-respire" />
+          <div className="absolute -bottom-32 right-1/4 size-96 rounded-full bg-sun/20 blur-3xl motion-safe:animate-derive" />
         </div>
+        <DecorAnime />
 
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 pt-8 md:pt-12 lg:grid-cols-[1.15fr_1fr]">
           <div className="pb-10 lg:pb-20">

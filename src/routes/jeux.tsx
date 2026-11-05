@@ -6,6 +6,7 @@ import { FilAriane } from "@/components/FilAriane";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion, retard } from "@/components/SiteMotion";
+import { DecorAnime } from "@/components/DecorAnime";
 import { niveauDe, poles, type Niveau } from "@/lib/quiz";
 import mascottesVs from "@/assets/mascottes-vs.webp";
 import mascottesTrophees from "@/assets/mascottes-trophees.webp";
@@ -90,16 +91,17 @@ function Jeux() {
       <section className="relative isolate overflow-hidden bg-linear-to-br from-grape via-ink to-night text-white">
         <div
           aria-hidden
-          className="absolute inset-0 -z-10 bg-[linear-gradient(oklch(1_0_0/0.07)_1px,transparent_1px),linear-gradient(90deg,oklch(1_0_0/0.07)_1px,transparent_1px)] bg-size-[40px_40px] [mask-image:radial-gradient(ellipse_at_70%_60%,black_10%,transparent_70%)]"
+          className="absolute inset-0 -z-10 bg-[linear-gradient(oklch(1_0_0/0.07)_1px,transparent_1px),linear-gradient(90deg,oklch(1_0_0/0.07)_1px,transparent_1px)] bg-size-[40px_40px] [mask-image:radial-gradient(ellipse_at_70%_60%,black_10%,transparent_70%)] motion-safe:animate-defile-motif"
         />
         <div
           aria-hidden
-          className="absolute right-[15%] top-1/3 -z-10 size-96 rounded-full bg-rose/30 blur-3xl"
+          className="absolute right-[15%] top-1/3 -z-10 size-96 rounded-full bg-rose/30 blur-3xl motion-safe:animate-derive"
         />
         <div
           aria-hidden
-          className="absolute bottom-0 left-1/4 -z-10 size-72 rounded-full bg-sky/25 blur-3xl"
+          className="absolute bottom-0 left-1/4 -z-10 size-72 rounded-full bg-sky/25 blur-3xl motion-safe:animate-derive [animation-delay:-9s]"
         />
+        <DecorAnime />
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 pb-16 pt-8 md:pt-12 lg:grid-cols-[1.2fr_1fr]">
           <div>
             <FilAriane rubrique="Gamification" page="Jeux" clair />

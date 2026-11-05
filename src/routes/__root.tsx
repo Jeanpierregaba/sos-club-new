@@ -11,6 +11,7 @@ import {
 import type { ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { RetourEnHaut } from "@/components/RetourEnHaut";
 
 function NotFoundComponent() {
   return (
@@ -122,6 +123,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <RetourEnHaut />
     </QueryClientProvider>
   );
 }

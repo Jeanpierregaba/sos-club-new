@@ -5,6 +5,7 @@ import { FilAriane } from "@/components/FilAriane";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion } from "@/components/SiteMotion";
+import { DecorAnime } from "@/components/DecorAnime";
 import { chargerAnnuaire, chargerClubsPublics, type TypeEtablissement } from "@/lib/api/client";
 import { chercher, compterParType, indexer } from "@/lib/carte-des-clubs";
 import { clubsParEtablissement, LIBELLE_SANS_CLUB } from "@/lib/clubs";
@@ -104,11 +105,12 @@ function CarteDesClubs() {
       {/* Bannière : titre, recherche et chiffres à gauche ; les mascottes à droite. */}
       <section className="relative isolate overflow-hidden bg-linear-to-br from-logo-blue to-night text-white">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-[radial-gradient(oklch(1_0_0/0.14)_1.5px,transparent_1.5px)] bg-size-[22px_22px] [mask-image:linear-gradient(to_right,black,transparent_55%)]" />
-          <div className="absolute -right-40 top-1/2 size-[46rem] -translate-y-1/2 rounded-full border-[3rem] border-white/5" />
-          <div className="absolute -right-8 top-1/2 size-[30rem] -translate-y-1/2 rounded-full border-2 border-dashed border-white/15" />
-          <div className="absolute -bottom-24 left-1/4 size-80 rounded-full bg-primary/25 blur-3xl" />
+          <div className="absolute inset-0 bg-[radial-gradient(oklch(1_0_0/0.14)_1.5px,transparent_1.5px)] bg-size-[22px_22px] [mask-image:linear-gradient(to_right,black,transparent_55%)] motion-safe:animate-defile-motif" />
+          <div className="absolute -right-40 top-1/2 size-[46rem] -translate-y-1/2 rounded-full border-[3rem] border-white/5 motion-safe:animate-respire" />
+          <div className="absolute -right-8 top-1/2 size-[30rem] -translate-y-1/2 rounded-full border-2 border-dashed border-white/15 motion-safe:animate-[spin_60s_linear_infinite]" />
+          <div className="absolute -bottom-24 left-1/4 size-80 rounded-full bg-primary/25 blur-3xl motion-safe:animate-derive" />
         </div>
+        <DecorAnime />
 
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 pb-16 pt-8 md:pt-12 lg:grid-cols-[1.2fr_1fr] lg:pb-20">
           <div>

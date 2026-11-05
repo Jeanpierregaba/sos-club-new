@@ -5,7 +5,8 @@ import { FilAriane } from "@/components/FilAriane";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion } from "@/components/SiteMotion";
-import { photos, themes, type Photo } from "@/lib/galerie";
+import { DecorAnime } from "@/components/DecorAnime";
+import { axes, photos, type NumeroAxe } from "@/lib/galerie";
 
 export const Route = createFileRoute("/galerie")({
   head: () => ({
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/galerie")({
       {
         name: "description",
         content:
-          "Les Clubs Santé en images : compétitions Génie Imhotep, vie des clubs, secourisme, médias et campagnes de sensibilisation.",
+          "Les Clubs Santé en images, classées par axe d’intervention : Génie Imhotep, secourisme, médias, environnement et sensibilisation.",
       },
       { property: "og:title", content: "La galerie des Clubs Santé" },
     ],
@@ -30,9 +31,9 @@ const collage = [
 ];
 
 function Galerie() {
-  const [theme, setTheme] = useState<Photo["theme"] | null>(null);
+  const [axe, setAxe] = useState<NumeroAxe | null>(null);
   const [ouverte, setOuverte] = useState<number | null>(null);
-  const liste = photos.filter((p) => !theme || p.theme === theme);
+  const liste = photos.filter((p) => !axe || p.axe === axe);
   const photo = ouverte === null ? undefined : liste[ouverte];
   const aller = (pas: number) =>
     setOuverte((i) => (i === null ? i : (i + pas + liste.length) % liste.length));
@@ -58,18 +59,19 @@ function Galerie() {
       <section className="relative isolate overflow-hidden bg-ink text-white">
         <div
           aria-hidden
-          className="absolute -left-24 bottom-0 -z-10 size-96 rounded-full bg-grape/40 blur-3xl"
+          className="absolute -left-24 bottom-0 -z-10 size-96 rounded-full bg-grape/40 blur-3xl motion-safe:animate-derive"
         />
         <div
           aria-hidden
-          className="absolute right-0 top-0 -z-10 size-96 rounded-full bg-tangerine/25 blur-3xl"
+          className="absolute right-0 top-0 -z-10 size-96 rounded-full bg-tangerine/25 blur-3xl motion-safe:animate-derive [animation-delay:-9s]"
         />
+        <DecorAnime />
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-8 md:pt-12 lg:grid-cols-[1fr_1.1fr]">
           <div>
             <FilAriane rubrique="Vie du club" page="Galerie" clair />
             <div data-reveal="left" className="pt-12">
               <span className="inline-flex rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-ink">
-                {photos.length} photos · {themes.length} thèmes
+                {photos.length} photos · {axes.length} axes
               </span>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
                 <span className="block">Les Clubs Santé</span>
@@ -101,28 +103,40 @@ function Galerie() {
         </div>
       </section>
 
-      {/* Mur de photos en colonnes, filtrable par thème ; un clic ouvre la visionneuse. */}
+      {/* Mur de photos en colonnes, filtrable par axe d'intervention ; un clic ouvre la visionneuse. */}
       <section className="mx-auto max-w-7xl px-5 py-16">
         <div data-reveal className="flex flex-wrap gap-2">
-          {[null, ...themes].map((t) => {
-            const n = t ? photos.filter((p) => p.theme === t).length : photos.length;
+          {[null, ...axes].map((a) => {
+            const n = a?.n ?? null;
             return (
               <button
-                key={t ?? "tous"}
+                key={n ?? "tous"}
                 type="button"
-                aria-pressed={theme === t}
-                onClick={() => setTheme(t)}
+                aria-pressed={axe === n}
+                aria-label={a ? `Axe ${a.n} : ${a.nom}` : undefined}
+                title={a?.nom}
+                onClick={() => setAxe(n)}
                 className={`rounded-full px-4 py-2 text-sm font-bold transition active:scale-95 ${
-                  theme === t
+                  axe === n
                     ? "bg-logo-blue text-white shadow-card"
                     : "bg-white ring-1 ring-border hover:ring-logo-blue/40"
                 }`}
               >
-                {t ?? "Toutes"} <span className="opacity-60">{n}</span>
+                {a ? `Axe ${a.n}` : "Toutes"}
               </button>
             );
           })}
         </div>
+        {axe !== null && (
+          <p className="mt-4 text-sm font-bold text-muted-foreground">
+            Axe {axe} : {axes[axe - 1]?.nom}
+          </p>
+        )}
+        {liste.length === 0 && (
+          <p className="mt-8 rounded-2xl bg-white p-6 text-center font-semibold text-muted-foreground ring-1 ring-border">
+            Pas encore de photo pour cet axe : reviens bientôt !
+          </p>
+        )}
 
         <ul className="mt-8 columns-1 gap-4 sm:columns-2 lg:columns-3">
           {liste.map((p, i) => (
@@ -169,7 +183,7 @@ function Galerie() {
             <figcaption className="mt-4 flex items-center justify-between gap-4 text-white">
               <span className="font-semibold">
                 <span className="mr-2 rounded-full bg-sun px-2.5 py-0.5 text-xs font-extrabold uppercase text-ink">
-                  {photo.theme}
+                  Axe {photo.axe}
                 </span>
                 {photo.alt}
               </span>

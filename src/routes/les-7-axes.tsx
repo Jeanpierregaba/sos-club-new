@@ -18,6 +18,7 @@ import { FilAriane } from "@/components/FilAriane";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion, retard } from "@/components/SiteMotion";
+import { DecorAnime } from "@/components/DecorAnime";
 import mascottesAxes from "@/assets/mascottes-axes.webp";
 import slideAxes from "@/assets/slide-axes.jpg";
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
@@ -251,12 +252,22 @@ function LesSeptAxes() {
       <section className="relative isolate overflow-hidden bg-linear-to-br from-logo-blue via-logo-blue to-night text-white">
         <div
           aria-hidden
-          className="absolute inset-0 -z-10 bg-[radial-gradient(oklch(1_0_0/0.14)_1.5px,transparent_1.5px)] bg-size-[22px_22px] [mask-image:linear-gradient(to_right,black,transparent_70%)]"
+          className="absolute inset-0 -z-10 bg-[radial-gradient(oklch(1_0_0/0.14)_1.5px,transparent_1.5px)] bg-size-[22px_22px] [mask-image:linear-gradient(to_right,black,transparent_70%)] motion-safe:animate-defile-motif"
         />
         <div
           aria-hidden
-          className="absolute -right-40 top-10 -z-10 size-[40rem] rounded-full border-[3rem] border-white/5"
+          className="absolute -right-40 top-10 -z-10 size-[40rem] rounded-full border-[3rem] border-white/5 motion-safe:animate-respire"
         />
+        {/* Rayons dorés qui tournent et halo derrière les mascottes, comme sur le Hall of Fame. */}
+        <div
+          aria-hidden
+          className="absolute left-1/2 top-[78%] -z-10 size-[50rem] -translate-x-1/2 -translate-y-1/2 bg-[repeating-conic-gradient(rgb(255_210_80/0.12)_0deg_6deg,transparent_6deg_18deg)] [mask-image:radial-gradient(circle,black_20%,transparent_65%)] motion-safe:animate-[spin_120s_linear_infinite] lg:left-[76%] lg:top-[62%] lg:size-[70rem]"
+        />
+        <div
+          aria-hidden
+          className="absolute left-1/2 top-[80%] -z-10 size-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sun/30 blur-3xl lg:left-[76%] lg:top-[66%] lg:size-96"
+        />
+        <DecorAnime />
         <div className="mx-auto grid max-w-7xl gap-6 px-5 pt-8 md:pt-12 lg:grid-cols-[1.1fr_1fr] lg:gap-10">
           <div className="pb-4 lg:pb-20">
             <FilAriane rubrique="Vie du club" page="Les 7 axes" clair />

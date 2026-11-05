@@ -31,6 +31,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Compteur } from "@/components/Compteur";
 import { SiteMotion, retard } from "@/components/SiteMotion";
+import { DecorAnime } from "@/components/DecorAnime";
 import hero from "@/assets/hero.jpg";
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
 import mascotteValeurs from "@/assets/mascotte-valeurs.webp";
@@ -828,11 +829,12 @@ function Index() {
           />
         ))}
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-[radial-gradient(oklch(1_0_0/0.14)_1.5px,transparent_1.5px)] bg-size-[22px_22px] [mask-image:linear-gradient(to_right,black,transparent_60%)]" />
-          <div className="absolute -right-48 -top-48 size-[44rem] rounded-full border-[3.5rem] border-white/5" />
-          <div className="absolute -right-12 -top-16 size-[26rem] rounded-full border-2 border-dashed border-white/15" />
-          <div className="absolute -bottom-32 -left-24 size-[22rem] rounded-full bg-white/5" />
+          <div className="absolute inset-0 bg-[radial-gradient(oklch(1_0_0/0.14)_1.5px,transparent_1.5px)] bg-size-[22px_22px] [mask-image:linear-gradient(to_right,black,transparent_60%)] motion-safe:animate-defile-motif" />
+          <div className="absolute -right-48 -top-48 size-[44rem] rounded-full border-[3.5rem] border-white/5 motion-safe:animate-respire" />
+          <div className="absolute -right-12 -top-16 size-[26rem] rounded-full border-2 border-dashed border-white/15 motion-safe:animate-[spin_60s_linear_infinite]" />
+          <div className="absolute -bottom-32 -left-24 size-[22rem] rounded-full bg-white/5 motion-safe:animate-derive" />
         </div>
+        <DecorAnime />
 
         <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-5 pb-52 pt-8 sm:pb-48 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-16 xl:px-16 xl:pb-36">
           {/* Toutes les slides partagent la même cellule : la hauteur reste celle de la plus longue. */}

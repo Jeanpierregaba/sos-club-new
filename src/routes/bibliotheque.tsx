@@ -14,6 +14,7 @@ import { FilAriane } from "@/components/FilAriane";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion, retard } from "@/components/SiteMotion";
+import { DecorAnime } from "@/components/DecorAnime";
 import mascottesLivres from "@/assets/mascottes-livres.webp";
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
 
@@ -91,12 +92,13 @@ function Bibliotheque() {
       <section className="relative isolate overflow-hidden bg-[color-mix(in_oklch,var(--sun)_24%,white)]">
         <div
           aria-hidden
-          className="absolute -right-24 top-1/2 -z-10 size-[34rem] -translate-y-1/2 rounded-full bg-sun/40"
+          className="absolute -right-24 top-1/2 -z-10 size-[34rem] -translate-y-1/2 rounded-full bg-sun/40 motion-safe:animate-respire"
         />
         <div
           aria-hidden
-          className="absolute -right-10 top-1/2 -z-10 size-[44rem] -translate-y-1/2 rounded-full border-2 border-dashed border-tangerine/30"
+          className="absolute -right-10 top-1/2 -z-10 size-[44rem] -translate-y-1/2 rounded-full border-2 border-dashed border-tangerine/30 motion-safe:animate-[spin_70s_linear_infinite]"
         />
+        <DecorAnime ton="clair" />
         <div className="mx-auto grid max-w-7xl items-end gap-8 px-5 pt-8 md:pt-12 lg:grid-cols-[1.2fr_1fr]">
           <div className="pb-14 lg:pb-24">
             <FilAriane rubrique="Vie du club" page="Bibliothèque" />
