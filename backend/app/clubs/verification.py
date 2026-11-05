@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
 from app.clubs.adhesions import adhesion_president
+from app.clubs.membres_admin import compter_a_valider
 from app.clubs.models import Club, ClubAxe, ClubPassation, EtatClub, EtatPassation
 from app.clubs.schemas import DemandeClub, EncadreurAssocie, FileClubs, FilePassations, Passation
 from app.comptes.inscription import Refus
@@ -103,11 +104,12 @@ async def file_attente(db: AsyncSession, acces: Acces, etat: EtatClub, page: int
 
 
 async def compter_en_attente(db: AsyncSession, acces: Acces) -> int:
-    """Demandes en attente + passations en attente, dans le périmètre du collaborateur."""
+    """Demandes de clubs, passations, affiliations et rattachements à décider, dans le périmètre du collaborateur."""
+    membres = await compter_a_valider(db, acces)
     if acces.national:
         demandes = await db.scalar(select(func.count()).where(Club.etat == EtatClub.en_attente))
         passations = await db.scalar(select(func.count()).where(ClubPassation.etat == EtatPassation.en_attente))
-        return (demandes or 0) + (passations or 0)
+        return (demandes or 0) + (passations or 0) + membres
     demandes = await db.scalar(
         select(func.count())
         .select_from(Club)
@@ -123,31 +125,10 @@ async def compter_en_attente(db: AsyncSession, acces: Acces) -> int:
         .join(Iesg, Iesg.id == Etablissement.iesg_id)
         .where(ClubPassation.etat == EtatPassation.en_attente, Iesg.dre_code == acces.collaborateur.perimetre_dre)
     )
-    return (demandes or 0) + (passations or 0)
+    return (demandes or 0) + (passations or 0) + membres
 
 
 Ligne = tuple[Club, Utilisateur, Eleve, Etablissement, Iesg, Dre]
-
-
-async def club_du_perimetre(db: AsyncSession, acces: Acces, club_id: UUID) -> Club:
-    """Le club demandé, s'il est dans le périmètre du collaborateur ; pour les autres, rien (404).
-
-    Même garde que pour les demandes (spec 019) : un collaborateur de DRE ne voit et ne décide que les clubs
-    de son périmètre ; le périmètre se lit sur l'établissement actuel, sous verrou, au moment de la décision.
-    """
-    requete = (
-        select(Club)
-        .join(Etablissement, Etablissement.id == Club.etablissement_id)
-        .join(Iesg, Iesg.id == Etablissement.iesg_id)
-        .join(Dre, Dre.code == Iesg.dre_code)
-        .where(Club.id == club_id)
-    )
-    if not acces.national:
-        requete = requete.where(Iesg.dre_code == acces.collaborateur.perimetre_dre)
-    club = (await db.execute(requete)).scalar_one_or_none()
-    if club is None:
-        raise Introuvable
-    return club
 
 
 async def _a_decider(db: AsyncSession, acces: Acces, club_id: UUID, version: int | None = None) -> Ligne:

@@ -34,10 +34,10 @@ Chaque tâche est autonome et committable ; lint, typecheck et tests passent ava
 
 ## Tâche 4 — API admin : files et décisions en lot
 
-- [ ] `membres_admin.py` : files filtrées par DRE, validation et refus en lot avec résultat par élément
-- [ ] Club supplémentaire : 403 pour un collaborateur de DRE ; `supplementaire` recalculé sous verrou à la validation
-- [ ] Compteurs du tableau de bord admin
-- [ ] `tests/test_clubs_lots.py`
+- [x] `membres_admin.py` : files filtrées par DRE, validation et refus en lot avec résultat par élément
+- [x] Club supplémentaire : 403 pour un collaborateur de DRE ; `supplementaire` recalculé sous verrou à la validation
+- [x] Compteurs du tableau de bord admin
+- [x] `tests/test_clubs_lots.py`
 
 **Commit :** `feat(admin): validation des affiliations et rattachements`
 

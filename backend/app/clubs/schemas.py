@@ -235,3 +235,80 @@ class MesClubs(BaseModel):
     """L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés."""
 
     rattachements: list[RattachementResume]
+
+
+class AffiliationAValider(BaseModel):
+    """Une affiliation confirmée par le président, dans la file d'un collaborateur."""
+
+    id: UUID
+    pseudonyme: str
+    classe: str
+    club_id: UUID
+    club_nom: str
+    etablissement: str
+    dre: str
+    demande_le: datetime
+    confirme_le: datetime | None
+    version: int
+
+
+class RattachementAValider(BaseModel):
+    """Un rattachement confirmé par le président, dans la file d'un collaborateur."""
+
+    id: UUID
+    prenom: str
+    nom: str
+    fonction: str
+    etablissement_encadreur: str
+    club_id: UUID
+    club_nom: str
+    club_etablissement: str
+    dre: str
+    supplementaire: bool
+    # Faux pour un collaborateur de DRE devant un club supplémentaire : seule l'équipe nationale décide (Q16).
+    decidable: bool
+    demande_le: datetime
+    confirme_le: datetime | None
+    version: int
+
+
+class FileAffiliations(BaseModel):
+    total: int
+    demandes: list[AffiliationAValider]
+
+
+class FileRattachements(BaseModel):
+    total: int
+    demandes: list[RattachementAValider]
+
+
+class ElementLot(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: UUID
+    version: int = Field(ge=1)
+
+
+class LotEntree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    elements: list[ElementLot] = Field(min_length=1, max_length=100)
+
+
+class LotRefusEntree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    elements: list[ElementLot] = Field(min_length=1, max_length=100)
+    motif: Motif
+
+
+class EchecLot(BaseModel):
+    id: UUID
+    message: str
+
+
+class ResultatLot(BaseModel):
+    """Chaque demande d'un lot est traitée à part : celles qui échouent n'empêchent pas les autres."""
+
+    reussies: list[UUID]
+    echecs: list[EchecLot]

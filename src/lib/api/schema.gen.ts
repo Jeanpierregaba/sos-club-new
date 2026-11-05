@@ -1408,6 +1408,108 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/clubs/affiliations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** File Affiliations */
+        get: operations["file_affiliations_api_admin_clubs_affiliations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/clubs/affiliations/valider": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Valider Affiliations */
+        post: operations["valider_affiliations_api_admin_clubs_affiliations_valider_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/clubs/affiliations/refuser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refuser Affiliations */
+        post: operations["refuser_affiliations_api_admin_clubs_affiliations_refuser_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/clubs/rattachements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** File Rattachements */
+        get: operations["file_rattachements_api_admin_clubs_rattachements_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/clubs/rattachements/valider": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Valider Rattachements */
+        post: operations["valider_rattachements_api_admin_clubs_rattachements_valider_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/clubs/rattachements/refuser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refuser Rattachements */
+        post: operations["refuser_rattachements_api_admin_clubs_rattachements_refuser_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/clubs/passations/{passation_id}/valider": {
         parameters: {
             query?: never;
@@ -1574,6 +1676,41 @@ export interface components {
             encadreurs_a_verifier?: number | null;
             /** Clubs A Valider */
             clubs_a_valider?: number | null;
+        };
+        /**
+         * AffiliationAValider
+         * @description Une affiliation confirmée par le président, dans la file d'un collaborateur.
+         */
+        AffiliationAValider: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Pseudonyme */
+            pseudonyme: string;
+            /** Classe */
+            classe: string;
+            /**
+             * Club Id
+             * Format: uuid
+             */
+            club_id: string;
+            /** Club Nom */
+            club_nom: string;
+            /** Etablissement */
+            etablissement: string;
+            /** Dre */
+            dre: string;
+            /**
+             * Demande Le
+             * Format: date-time
+             */
+            demande_le: string;
+            /** Confirme Le */
+            confirme_le: string | null;
+            /** Version */
+            version: number;
         };
         /** Apercu */
         Apercu: {
@@ -2069,6 +2206,26 @@ export interface components {
             /** Motif */
             motif: string;
         };
+        /** EchecLot */
+        EchecLot: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Message */
+            message: string;
+        };
+        /** ElementLot */
+        ElementLot: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Version */
+            version: number;
+        };
         /** EncadreurAssocie */
         EncadreurAssocie: {
             /** Nom */
@@ -2360,6 +2517,13 @@ export interface components {
              */
             cree_le: string;
         };
+        /** FileAffiliations */
+        FileAffiliations: {
+            /** Total */
+            total: number;
+            /** Demandes */
+            demandes: components["schemas"]["AffiliationAValider"][];
+        };
         /** FileClubs */
         FileClubs: {
             /** Total */
@@ -2380,6 +2544,13 @@ export interface components {
             total: number;
             /** Passations */
             passations: components["schemas"]["Passation"][];
+        };
+        /** FileRattachements */
+        FileRattachements: {
+            /** Total */
+            total: number;
+            /** Demandes */
+            demandes: components["schemas"]["RattachementAValider"][];
         };
         /** FiltresInscrits */
         FiltresInscrits: {
@@ -2681,6 +2852,18 @@ export interface components {
             /** Semestre */
             semestre: string | null;
         };
+        /** LotEntree */
+        LotEntree: {
+            /** Elements */
+            elements: components["schemas"]["ElementLot"][];
+        };
+        /** LotRefusEntree */
+        LotRefusEntree: {
+            /** Elements */
+            elements: components["schemas"]["ElementLot"][];
+            /** Motif */
+            motif: string;
+        };
         /**
          * MesClubs
          * @description L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés.
@@ -2909,6 +3092,49 @@ export interface components {
             motif: string;
         };
         /**
+         * RattachementAValider
+         * @description Un rattachement confirmé par le président, dans la file d'un collaborateur.
+         */
+        RattachementAValider: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            /** Fonction */
+            fonction: string;
+            /** Etablissement Encadreur */
+            etablissement_encadreur: string;
+            /**
+             * Club Id
+             * Format: uuid
+             */
+            club_id: string;
+            /** Club Nom */
+            club_nom: string;
+            /** Club Etablissement */
+            club_etablissement: string;
+            /** Dre */
+            dre: string;
+            /** Supplementaire */
+            supplementaire: boolean;
+            /** Decidable */
+            decidable: boolean;
+            /**
+             * Demande Le
+             * Format: date-time
+             */
+            demande_le: string;
+            /** Confirme Le */
+            confirme_le: string | null;
+            /** Version */
+            version: number;
+        };
+        /**
          * RattachementResume
          * @description Un rattachement, vu par l'encadreur concerné.
          */
@@ -2970,6 +3196,16 @@ export interface components {
              * Format: uuid
              */
             cible_id: string;
+        };
+        /**
+         * ResultatLot
+         * @description Chaque demande d'un lot est traitée à part : celles qui échouent n'empêchent pas les autres.
+         */
+        ResultatLot: {
+            /** Reussies */
+            reussies: string[];
+            /** Echecs */
+            echecs: components["schemas"]["EchecLot"][];
         };
         /** ResumePoints */
         ResumePoints: {
@@ -5866,6 +6102,178 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FilePassations"];
+                };
+            };
+        };
+    };
+    file_affiliations_api_admin_clubs_affiliations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileAffiliations"];
+                };
+            };
+        };
+    };
+    valider_affiliations_api_admin_clubs_affiliations_valider_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LotEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResultatLot"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refuser_affiliations_api_admin_clubs_affiliations_refuser_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LotRefusEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResultatLot"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    file_rattachements_api_admin_clubs_rattachements_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileRattachements"];
+                };
+            };
+        };
+    };
+    valider_rattachements_api_admin_clubs_rattachements_valider_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LotEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResultatLot"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refuser_rattachements_api_admin_clubs_rattachements_refuser_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LotRefusEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResultatLot"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

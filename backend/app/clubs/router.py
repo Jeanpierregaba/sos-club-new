@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.catalogue import Action
 from app.admin.dependances import Acces, adresse_ip, exiger_permission
-from app.clubs import adhesions, rattachements, service, verification
+from app.clubs import adhesions, membres_admin, rattachements, service, verification
 from app.clubs.models import EtatClub
 from app.clubs.schemas import (
     ActivationEntree,
@@ -24,8 +24,12 @@ from app.clubs.schemas import (
     DemandeClub,
     DemandeClubEntree,
     DemandeRattachement,
+    FileAffiliations,
     FileClubs,
     FilePassations,
+    FileRattachements,
+    LotEntree,
+    LotRefusEntree,
     MonClub,
     Passation,
     PassationApercu,
@@ -33,6 +37,7 @@ from app.clubs.schemas import (
     RattachementResume,
     RefusDemandeEntree,
     RefusEntree,
+    ResultatLot,
     RetraitEntree,
 )
 from app.comptes.dependances import utilisateur_courant
@@ -252,6 +257,39 @@ async def file_attente(
 @router_admin.get("/passations")
 async def file_passations(acces: Lecteur, db: Base) -> FilePassations:
     return await verification.file_passations(db, acces)
+
+
+# Affiliations et rattachements à valider (spec 020) : déclarées avant les routes /{club_id}/… -----------
+
+
+@router_admin.get("/affiliations")
+async def file_affiliations(acces: Lecteur, db: Base) -> FileAffiliations:
+    return await membres_admin.file_affiliations(db, acces)
+
+
+@router_admin.post("/affiliations/valider")
+async def valider_affiliations(entree: LotEntree, request: Request, acces: Decideur, db: Base) -> ResultatLot:
+    return await membres_admin.valider_affiliations(db, acces, entree.elements, adresse_ip(request))
+
+
+@router_admin.post("/affiliations/refuser")
+async def refuser_affiliations(entree: LotRefusEntree, request: Request, acces: Decideur, db: Base) -> ResultatLot:
+    return await membres_admin.refuser_affiliations(db, acces, entree.elements, entree.motif, adresse_ip(request))
+
+
+@router_admin.get("/rattachements")
+async def file_rattachements(acces: Lecteur, db: Base) -> FileRattachements:
+    return await membres_admin.file_rattachements(db, acces)
+
+
+@router_admin.post("/rattachements/valider")
+async def valider_rattachements(entree: LotEntree, request: Request, acces: Decideur, db: Base) -> ResultatLot:
+    return await membres_admin.valider_rattachements(db, acces, entree.elements, adresse_ip(request))
+
+
+@router_admin.post("/rattachements/refuser")
+async def refuser_rattachements(entree: LotRefusEntree, request: Request, acces: Decideur, db: Base) -> ResultatLot:
+    return await membres_admin.refuser_rattachements(db, acces, entree.elements, entree.motif, adresse_ip(request))
 
 
 @router_admin.post("/passations/{passation_id}/valider")

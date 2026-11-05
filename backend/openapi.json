@@ -4060,6 +4060,212 @@
         }
       }
     },
+    "/api/admin/clubs/affiliations": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "File Affiliations",
+        "operationId": "file_affiliations_api_admin_clubs_affiliations_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileAffiliations"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/affiliations/valider": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Valider Affiliations",
+        "operationId": "valider_affiliations_api_admin_clubs_affiliations_valider_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultatLot"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/affiliations/refuser": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Refuser Affiliations",
+        "operationId": "refuser_affiliations_api_admin_clubs_affiliations_refuser_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotRefusEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultatLot"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/rattachements": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "File Rattachements",
+        "operationId": "file_rattachements_api_admin_clubs_rattachements_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileRattachements"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/rattachements/valider": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Valider Rattachements",
+        "operationId": "valider_rattachements_api_admin_clubs_rattachements_valider_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultatLot"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/rattachements/refuser": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Refuser Rattachements",
+        "operationId": "refuser_rattachements_api_admin_clubs_rattachements_refuser_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotRefusEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultatLot"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/clubs/passations/{passation_id}/valider": {
       "post": {
         "tags": [
@@ -4515,6 +4721,76 @@
           "double_auth_requise"
         ],
         "title": "AdminMoi"
+      },
+      "AffiliationAValider": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "pseudonyme": {
+            "type": "string",
+            "title": "Pseudonyme"
+          },
+          "classe": {
+            "type": "string",
+            "title": "Classe"
+          },
+          "club_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Club Id"
+          },
+          "club_nom": {
+            "type": "string",
+            "title": "Club Nom"
+          },
+          "etablissement": {
+            "type": "string",
+            "title": "Etablissement"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "demande_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Demande Le"
+          },
+          "confirme_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirme Le"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "pseudonyme",
+          "classe",
+          "club_id",
+          "club_nom",
+          "etablissement",
+          "dre",
+          "demande_le",
+          "confirme_le",
+          "version"
+        ],
+        "title": "AffiliationAValider",
+        "description": "Une affiliation confirmée par le président, dans la file d'un collaborateur."
       },
       "Apercu": {
         "properties": {
@@ -5994,6 +6270,46 @@
         ],
         "title": "DroitsEntree"
       },
+      "EchecLot": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "message"
+        ],
+        "title": "EchecLot"
+      },
+      "ElementLot": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "version"
+        ],
+        "title": "ElementLot"
+      },
       "EncadreurAssocie": {
         "properties": {
           "nom": {
@@ -6827,6 +7143,27 @@
         ],
         "title": "ExportResume"
       },
+      "FileAffiliations": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "demandes": {
+            "items": {
+              "$ref": "#/components/schemas/AffiliationAValider"
+            },
+            "type": "array",
+            "title": "Demandes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "demandes"
+        ],
+        "title": "FileAffiliations"
+      },
       "FileClubs": {
         "properties": {
           "total": {
@@ -6889,6 +7226,27 @@
           "passations"
         ],
         "title": "FilePassations"
+      },
+      "FileRattachements": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "demandes": {
+            "items": {
+              "$ref": "#/components/schemas/RattachementAValider"
+            },
+            "type": "array",
+            "title": "Demandes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "demandes"
+        ],
+        "title": "FileRattachements"
       },
       "FiltresInscrits": {
         "properties": {
@@ -7870,6 +8228,50 @@
         ],
         "title": "LignePoints"
       },
+      "LotEntree": {
+        "properties": {
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/ElementLot"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Elements"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "elements"
+        ],
+        "title": "LotEntree"
+      },
+      "LotRefusEntree": {
+        "properties": {
+          "elements": {
+            "items": {
+              "$ref": "#/components/schemas/ElementLot"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Elements"
+          },
+          "motif": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Motif"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "elements",
+          "motif"
+        ],
+        "title": "LotRefusEntree"
+      },
       "MesClubs": {
         "properties": {
           "rattachements": {
@@ -8561,6 +8963,96 @@
         ],
         "title": "PseudonymeEntree"
       },
+      "RattachementAValider": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "fonction": {
+            "type": "string",
+            "title": "Fonction"
+          },
+          "etablissement_encadreur": {
+            "type": "string",
+            "title": "Etablissement Encadreur"
+          },
+          "club_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Club Id"
+          },
+          "club_nom": {
+            "type": "string",
+            "title": "Club Nom"
+          },
+          "club_etablissement": {
+            "type": "string",
+            "title": "Club Etablissement"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "supplementaire": {
+            "type": "boolean",
+            "title": "Supplementaire"
+          },
+          "decidable": {
+            "type": "boolean",
+            "title": "Decidable"
+          },
+          "demande_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Demande Le"
+          },
+          "confirme_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirme Le"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "prenom",
+          "nom",
+          "fonction",
+          "etablissement_encadreur",
+          "club_id",
+          "club_nom",
+          "club_etablissement",
+          "dre",
+          "supplementaire",
+          "decidable",
+          "demande_le",
+          "confirme_le",
+          "version"
+        ],
+        "title": "RattachementAValider",
+        "description": "Un rattachement confirmé par le président, dans la file d'un collaborateur."
+      },
       "RattachementResume": {
         "properties": {
           "id": {
@@ -8706,6 +9198,32 @@
         ],
         "title": "Remplacement",
         "description": "Remplace un établissement proposé par un établissement existant : ses élèves y sont rattachés (spec 017)."
+      },
+      "ResultatLot": {
+        "properties": {
+          "reussies": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Reussies"
+          },
+          "echecs": {
+            "items": {
+              "$ref": "#/components/schemas/EchecLot"
+            },
+            "type": "array",
+            "title": "Echecs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reussies",
+          "echecs"
+        ],
+        "title": "ResultatLot",
+        "description": "Chaque demande d'un lot est traitée à part : celles qui échouent n'empêchent pas les autres."
       },
       "ResumePoints": {
         "properties": {
