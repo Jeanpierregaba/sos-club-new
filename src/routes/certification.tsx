@@ -14,8 +14,10 @@ import {
   Save,
   Smartphone,
   Sparkles,
+  Trophy,
   type LucideIcon,
 } from "lucide-react";
+import { DecorAnime } from "@/components/DecorAnime";
 import { EnTete } from "@/components/EnTete";
 import { FilAriane } from "@/components/FilAriane";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -254,6 +256,98 @@ const parcours: { g: Groupe; sur: string; t: string; themes: string; pts: number
   },
 ];
 
+// L'anneau des 12 quiz : un segment par quiz, qui s'allume à tour de rôle ; au centre, le certificat.
+// Chaque badge de palier est posé à l'endroit où il se débloque : après le 3e, le 6e, le 9e et le 12e quiz.
+const RAYON = 130;
+const TOUR = 2 * Math.PI * RAYON;
+const SEGMENT = TOUR / 12;
+const placesPaliers = [
+  "right-0 top-1/2 translate-x-1/3 -translate-y-1/2",
+  "bottom-0 left-1/2 -translate-x-1/2 translate-y-1/3",
+  "left-0 top-1/2 -translate-x-1/3 -translate-y-1/2",
+  "left-1/2 top-0 -translate-x-1/2 -translate-y-1/3",
+];
+
+function AnneauCertification() {
+  return (
+    <div
+      data-reveal="zoom"
+      role="img"
+      aria-label="Les 12 quiz forment un anneau autour du certificat officiel ; 4 badges se débloquent en chemin."
+      className="relative mx-auto size-[19rem] sm:size-[24rem] lg:size-[27rem]"
+    >
+      <svg viewBox="0 0 300 300" className="absolute inset-0 size-full -rotate-90">
+        <circle
+          cx="150"
+          cy="150"
+          r={RAYON}
+          fill="none"
+          stroke="rgb(255 255 255 / 0.08)"
+          strokeWidth="16"
+        />
+        {Array.from({ length: 12 }, (_, i) => (
+          <circle
+            key={i}
+            cx="150"
+            cy="150"
+            r={RAYON}
+            fill="none"
+            stroke="var(--sun)"
+            strokeWidth="16"
+            strokeLinecap="round"
+            strokeDasharray={`${SEGMENT - 9} ${TOUR - SEGMENT + 9}`}
+            strokeDashoffset={-i * SEGMENT - 4.5}
+            className="motion-safe:animate-allume"
+            style={{ animationDelay: `${i * 0.35}s` }}
+          />
+        ))}
+      </svg>
+
+      {/* Le certificat, au centre de l'anneau. */}
+      <div className="absolute inset-[18%] flex flex-col items-center justify-center rounded-full bg-linear-to-br from-white to-mist text-center text-ink shadow-[0_0_60px_-10px_rgb(255_210_80/0.6)] ring-8 ring-white/10">
+        <span className="inline-flex size-16 items-center justify-center rounded-full bg-linear-to-br from-sun to-tangerine text-white shadow-card ring-4 ring-sun/30 motion-safe:animate-float sm:size-20">
+          <Award className="size-8 sm:size-10" />
+        </span>
+        <p className="mt-3 text-[10px] font-extrabold uppercase tracking-[0.2em] text-logo-red sm:text-xs">
+          Certificat officiel
+        </p>
+        <p className="font-display text-xl leading-tight text-logo-blue sm:text-2xl">
+          Génie Imhotep
+        </p>
+        <p className="mt-1 font-display text-3xl tabular-nums text-primary sm:text-4xl">12 / 12</p>
+        <p className="text-[11px] font-bold text-muted-foreground">quiz validés à 100 %</p>
+      </div>
+
+      {/* Les 4 badges de paliers, posés sur l'anneau. */}
+      {paliers.map((p, i) => (
+        <span
+          key={p.n}
+          title={`Palier ${p.n} · ${p.metal}`}
+          className={`absolute ${placesPaliers[i]}`}
+        >
+          <span
+            style={{ animationDelay: `${-i * 1.2}s` }}
+            className={`flex size-14 items-center justify-center rounded-full bg-linear-to-br text-white shadow-card ring-4 ring-night motion-safe:animate-float sm:size-16 ${p.fond}`}
+          >
+            <p.i className="size-6 sm:size-7" />
+          </span>
+          <span className="absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded-full bg-night px-2 py-0.5 ring-1 ring-white/20 text-[10px] font-extrabold uppercase tracking-wide text-white/80">
+            {p.seuil.split(" ")[0]} quiz
+          </span>
+        </span>
+      ))}
+
+      <img
+        src={mascotteImhotep}
+        alt=""
+        width={1414}
+        height={2000}
+        className="absolute -bottom-6 -left-4 w-20 -rotate-6 drop-shadow-xl sm:-left-10 sm:w-28"
+      />
+    </div>
+  );
+}
+
 function Certification() {
   const [etape, setEtape] = useState(0);
   const [groupe, setGroupe] = useState<Groupe | null>(null);
@@ -264,42 +358,65 @@ function Certification() {
       <SiteMotion />
       <SiteHeader />
 
-      {/* Bannière : le titre à gauche, le certificat officiel en vedette à droite. */}
-      <section className="relative isolate overflow-hidden bg-linear-to-b from-mist to-mist-soft">
+      {/* Bannière « cérémonie » : nuit et or. À droite, l'anneau des 12 quiz s'allume segment après segment
+          autour du certificat, et les 4 badges de paliers sont posés là où ils se débloquent (3, 6, 9, 12). */}
+      <section className="relative isolate overflow-hidden bg-night text-white">
         <div
           aria-hidden
-          className="absolute right-[8%] top-1/2 -z-10 size-[32rem] -translate-y-1/2 rounded-full bg-sun/30 blur-3xl"
+          className="absolute left-1/2 top-[85%] -z-10 size-[56rem] -translate-x-1/2 -translate-y-1/2 bg-[repeating-conic-gradient(rgb(255_210_80/0.08)_0deg_5deg,transparent_5deg_15deg)] [mask-image:radial-gradient(circle,black_15%,transparent_65%)] motion-safe:animate-[spin_140s_linear_infinite] lg:left-[74%] lg:top-1/2"
         />
+        <div
+          aria-hidden
+          className="absolute -left-32 top-1/3 -z-10 size-96 rounded-full bg-grape/40 blur-3xl motion-safe:animate-derive"
+        />
+        <div
+          aria-hidden
+          className="absolute left-1/2 top-[85%] -z-10 size-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sun/25 blur-3xl lg:left-[74%] lg:top-1/2"
+        />
+        <DecorAnime />
+
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-8 md:pt-12 lg:grid-cols-[1.1fr_1fr]">
           <div>
-            <FilAriane rubrique="Gamification" page="Certification" />
-            <div data-reveal="left" className="pt-12">
-              <p className="flex items-center gap-3 text-sm font-extrabold uppercase tracking-widest text-logo-red">
-                <Sparkles className="size-4" /> Certification & récompenses
+            <FilAriane rubrique="Gamification" page="Certification" clair />
+            <div data-reveal="left" className="pt-10 lg:pt-14">
+              <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-extrabold uppercase tracking-widest text-sun ring-1 ring-white/15">
+                <Sparkles className="size-4" /> Certification Académie Génie Imhotep
               </p>
-              <h1 className="mt-4 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block text-logo-blue">Obtiens ta certification</span>
-                <span className="mt-2 block text-3xl text-primary md:text-5xl">
-                  & gagne jusqu’à 1 million FCFA !
-                </span>
+              <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
+                <span className="block">Obtiens ta</span>
+                <span className="block text-sun">certification</span>
               </h1>
-              <p className="mt-6 max-w-xl text-lg font-medium text-muted-foreground">
+              {/* Le ticket de la cagnotte, avec sa perforation. */}
+              <p className="relative mt-6 inline-flex -rotate-2 items-center gap-3 rounded-2xl bg-logo-red py-3 pl-4 pr-6 shadow-card">
+                <span
+                  aria-hidden
+                  className="absolute -left-2 top-1/2 size-4 -translate-y-1/2 rounded-full bg-night"
+                />
+                <span
+                  aria-hidden
+                  className="absolute -right-2 top-1/2 size-4 -translate-y-1/2 rounded-full bg-night"
+                />
+                <Trophy aria-hidden className="size-7 shrink-0 text-sun" />
+                <span className="border-l-2 border-dashed border-white/40 pl-3 font-display text-xl leading-tight md:text-2xl">
+                  & gagne jusqu’à <span className="text-sun">1 million FCFA</span> !
+                </span>
+              </p>
+              <p className="mt-6 max-w-xl text-lg font-medium text-white/80">
                 Élèves, collégiens, lycéens et visiteurs engagés : relève le défi des 12 quiz santé,
                 décroche ton certificat officiel Génie Imhotep et tes badges, et tente de remporter
                 des lots exceptionnels !
               </p>
-              <dl className="mt-8 grid max-w-xl grid-cols-3 divide-x rounded-2xl bg-white shadow-sm ring-1 ring-border">
+              <ul className="mt-6 flex flex-wrap gap-2">
                 {atouts.map((a) => (
-                  <div key={a.sur} className="p-4">
-                    <dt className="text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
-                      {a.sur}
-                    </dt>
-                    <dd className="mt-1 font-display text-lg leading-tight text-logo-blue md:text-xl">
-                      {a.t}
-                    </dd>
-                  </div>
+                  <li
+                    key={a.sur}
+                    className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold ring-1 ring-white/15 backdrop-blur-sm"
+                  >
+                    <span className="text-white/60">{a.sur} · </span>
+                    {a.t}
+                  </li>
                 ))}
-              </dl>
+              </ul>
               <div className="mt-8 flex flex-wrap gap-3">
                 <a
                   href="#parcours"
@@ -309,7 +426,7 @@ function Certification() {
                 </a>
                 <a
                   href="/connexion"
-                  className="btn-fx rounded-full border-2 border-logo-blue px-7 py-3 text-[15px] font-bold text-logo-blue hover:bg-logo-blue hover:text-white"
+                  className="btn-fx rounded-full border-2 border-white px-7 py-3 text-[15px] font-bold hover:bg-white hover:text-ink"
                 >
                   Se connecter
                 </a>
@@ -317,44 +434,7 @@ function Certification() {
             </div>
           </div>
 
-          <div data-reveal="right" className="relative mx-auto w-full max-w-md">
-            <div className="relative -rotate-3 rounded-[1.75rem] bg-white p-3 shadow-card">
-              <div className="relative overflow-hidden rounded-[1.25rem] border-4 border-double border-sun p-8 text-center">
-                <div
-                  aria-hidden
-                  className="absolute inset-0 -z-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklch,var(--sun)_18%,transparent),transparent_60%)]"
-                />
-                <p className="relative text-xs font-extrabold uppercase tracking-[0.25em] text-logo-red">
-                  Distinction officielle
-                </p>
-                <p className="relative mt-3 font-display text-3xl leading-tight text-logo-blue">
-                  Académie Génie Imhotep
-                </p>
-                <p className="relative mt-1 text-sm font-bold text-muted-foreground">
-                  Clubs Santé SOS Docteur TV
-                </p>
-                <p className="relative mt-8 font-hand text-2xl text-ink/70">Décerné à</p>
-                <p className="relative mx-auto mt-1 h-8 w-3/4 border-b-2 border-dotted border-ink/30" />
-                <div className="relative mt-8 flex items-end justify-between">
-                  <span className="text-left text-[11px] font-bold leading-tight text-muted-foreground">
-                    12 / 12 quiz
-                    <br />
-                    validés à 100 %
-                  </span>
-                  <span className="inline-flex size-20 items-center justify-center rounded-full bg-linear-to-br from-sun to-tangerine text-white shadow-card ring-4 ring-sun/30">
-                    <Award className="size-10" />
-                  </span>
-                </div>
-              </div>
-            </div>
-            <img
-              src={mascotteImhotep}
-              alt=""
-              width={1414}
-              height={2000}
-              className="absolute -right-6 -top-16 w-24 rotate-6 drop-shadow-xl md:-right-10 md:w-32"
-            />
-          </div>
+          <AnneauCertification />
         </div>
       </section>
 
@@ -381,6 +461,7 @@ function Certification() {
           sur="Guide officiel du parcours"
           bleu="Comment fonctionne"
           vert="la certification ?"
+          large
         >
           Un parcours progressif pour renforcer tes connaissances en santé, prévention, valeurs et
           citoyenneté, puis les valider à travers une série de quiz.

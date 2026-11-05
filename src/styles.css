@@ -222,6 +222,18 @@
       stroke-dashoffset: -120;
     }
   }
+  /* Les 12 segments de l'anneau de la certification s'allument l'un après l'autre. */
+  --animate-allume: allume 6s ease-in-out infinite;
+  @keyframes allume {
+    0%,
+    100% {
+      opacity: 0.15;
+    }
+    10%,
+    70% {
+      opacity: 1;
+    }
+  }
   /* La mascotte change de couleur mais reste la même (page des 7 axes). */
   --animate-cameleon: cameleon 14s linear infinite;
   @keyframes cameleon {

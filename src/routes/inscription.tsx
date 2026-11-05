@@ -1,5 +1,18 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { ArrowLeft, ChevronRight, GraduationCap, Lock, Presentation, Sparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Award,
+  ChevronRight,
+  GraduationCap,
+  Hourglass,
+  ListChecks,
+  Lock,
+  Presentation,
+  Share2,
+  Sparkles,
+  UserRound,
+} from "lucide-react";
 
 import logo from "@/assets/logo.webp";
 import mascottesEquipe from "@/assets/mascottes-equipe.webp";
@@ -13,13 +26,16 @@ import {
   MESSAGE_INDISPONIBLE,
 } from "@/lib/api/client";
 
-type Profil = "eleve" | "encadreur";
+// « visiteur » : particulier ou visiteur qui veut suivre les quiz et la certification. Sa fiche
+// d'inscription reste à construire (R19, Q27) : le profil est présenté, sans formulaire, en attendant.
+type Profil = "eleve" | "encadreur" | "visiteur";
+const PROFILS_VALIDES: Profil[] = ["eleve", "encadreur", "visiteur"];
 
 export const Route = createFileRoute("/inscription")({
-  // Sans profil, la page propose de choisir : élève ou encadreur (spec 018).
+  // Sans profil, la page propose de choisir : élève, encadreur (spec 018) ou particulier / visiteur.
   validateSearch: (search: Record<string, unknown>): { profil?: Profil } =>
-    search["profil"] === "eleve" || search["profil"] === "encadreur"
-      ? { profil: search["profil"] }
+    PROFILS_VALIDES.includes(search["profil"] as Profil)
+      ? { profil: search["profil"] as Profil }
       : {},
   beforeLoad: async () => {
     const moi = await chargerMoi().catch(() => null);
@@ -39,7 +55,7 @@ export const Route = createFileRoute("/inscription")({
       {
         name: "description",
         content:
-          "Crée ton compte élève ou encadreur des Clubs Santé : quiz, points, classements et certification.",
+          "Crée ton compte élève, encadreur ou visiteur des Clubs Santé : quiz, points, classements et certification.",
       },
     ],
   }),
@@ -57,6 +73,11 @@ const ATOUTS: Record<Profil, string[]> = {
     "Forme-toi avec les quiz et la certification Génie Imhotep",
     "Valorise les actions de tes élèves",
   ],
+  visiteur: [
+    "Les 12 quiz de santé publique, à ton rythme",
+    "Des badges à partager sur tes réseaux",
+    "Ta certification Génie Imhotep",
+  ],
 };
 
 const TEXTES: Record<Profil, { eyebrow: string; intro: string }> = {
@@ -69,6 +90,11 @@ const TEXTES: Record<Profil, { eyebrow: string; intro: string }> = {
     eyebrow: "Compte encadreur",
     intro:
       "Enseignant, responsable ou accompagnateur : crée ton compte. L'équipe nationale vérifie ton inscription avant de l'activer.",
+  },
+  visiteur: {
+    eyebrow: "Particulier / visiteur",
+    intro:
+      "Tu n'es ni élève ni encadreur, mais la santé publique t'intéresse ? Ce compte arrive bientôt.",
   },
 };
 
@@ -158,6 +184,8 @@ function Inscription() {
               <InscriptionEncadreur dre={dre} />
             ) : profil === "eleve" ? (
               <InscriptionEleve dre={dre} />
+            ) : profil === "visiteur" ? (
+              <InscriptionVisiteur />
             ) : (
               <ChoixProfil />
             )}
@@ -192,7 +220,13 @@ function Inscription() {
   );
 }
 
-const PROFILS: { profil: Profil; titre: string; texte: string; icone: typeof GraduationCap }[] = [
+const PROFILS: {
+  profil: Profil;
+  titre: string;
+  texte: string;
+  icone: typeof GraduationCap;
+  bientot?: boolean;
+}[] = [
   {
     profil: "eleve",
     titre: "Je suis élève",
@@ -205,12 +239,19 @@ const PROFILS: { profil: Profil; titre: string; texte: string; icone: typeof Gra
     texte: "Enseignant, responsable ou accompagnateur. L'équipe vérifie ton inscription.",
     icone: Presentation,
   },
+  {
+    profil: "visiteur",
+    titre: "Je suis un particulier ou un visiteur",
+    texte: "Participe aux 12 quiz de santé publique, gagne des badges et obtiens ta certification.",
+    icone: UserRound,
+    bientot: true,
+  },
 ];
 
 function ChoixProfil() {
   return (
     <ul className="grid gap-4">
-      {PROFILS.map(({ profil, titre, texte, icone: Icone }) => (
+      {PROFILS.map(({ profil, titre, texte, icone: Icone, bientot }) => (
         <li key={profil}>
           <Link
             to="/inscription"
@@ -221,7 +262,14 @@ function ChoixProfil() {
               <Icone aria-hidden className="size-7" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-lg font-bold text-ink">{titre}</span>
+              <span className="flex flex-wrap items-center gap-2 text-lg font-bold text-ink">
+                {titre}
+                {bientot && (
+                  <span className="rounded-full bg-sun px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-ink">
+                    Bientôt
+                  </span>
+                )}
+              </span>
               <span className="block text-sm font-medium text-muted-foreground">{texte}</span>
             </span>
             <ChevronRight
@@ -232,5 +280,52 @@ function ChoixProfil() {
         </li>
       ))}
     </ul>
+  );
+}
+
+// Le profil particulier / visiteur, en attendant sa fiche d'inscription : ce qu'il offrira, et de quoi
+// découvrir le parcours dès maintenant. Aucune donnée n'est demandée.
+const PROMESSES_VISITEUR = [
+  {
+    i: ListChecks,
+    t: "12 quiz de santé publique",
+    d: "Les mêmes quiz que les élèves, à ton rythme.",
+  },
+  {
+    i: Share2,
+    t: "Des badges partageables",
+    d: "Un badge à chaque palier, à montrer sur tes réseaux.",
+  },
+  { i: Award, t: "Ta certification", d: "Le certificat Génie Imhotep, après les 12 quiz réussis." },
+];
+
+function InscriptionVisiteur() {
+  return (
+    <div>
+      <p className="flex items-start gap-3 rounded-2xl bg-sun/25 p-4 font-semibold text-ink">
+        <Hourglass aria-hidden className="mt-0.5 size-5 shrink-0 text-tangerine" />
+        Le compte particulier / visiteur est en préparation. Il ouvrira très bientôt : reviens vite
+        !
+      </p>
+      <ul className="mt-6 grid gap-4">
+        {PROMESSES_VISITEUR.map((p) => (
+          <li key={p.t} className="flex items-start gap-4">
+            <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-mist-soft text-logo-blue">
+              <p.i aria-hidden className="size-5" />
+            </span>
+            <span>
+              <span className="block font-bold text-ink">{p.t}</span>
+              <span className="block text-sm font-medium text-muted-foreground">{p.d}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+      <a
+        href="/certification"
+        className="btn-fx mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
+      >
+        Découvrir la certification <ArrowRight className="size-4" />
+      </a>
+    </div>
   );
 }

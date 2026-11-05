@@ -1,6 +1,11 @@
 import type { ReactNode } from "react";
 
+// Typographie française : « ? », « ! », « : » et « ; » restent collés au mot précédent (espace fine insécable),
+// pour ne jamais partir seuls à la ligne.
+const insecable = (texte: string) => texte.replace(/ ([?!:;])/g, "\u202f$1");
+
 // Surtitre rouge en capitales, puis titre en deux couleurs. `sombre` : sur un fond foncé, le titre passe en blanc et jaune.
+// `large` : le bloc prend toute la largeur, pour un titre long qui doit tenir sur une ligne.
 export function EnTete({
   sur,
   bleu,
@@ -8,6 +13,7 @@ export function EnTete({
   children,
   centre = false,
   sombre = false,
+  large = false,
 }: {
   sur: string;
   bleu: string;
@@ -15,9 +21,13 @@ export function EnTete({
   children?: ReactNode;
   centre?: boolean;
   sombre?: boolean;
+  large?: boolean;
 }) {
   return (
-    <div data-reveal className={centre ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
+    <div
+      data-reveal
+      className={`${large ? "max-w-5xl" : "max-w-3xl"} ${centre ? "mx-auto text-center" : ""}`}
+    >
       <p
         className={`flex items-center gap-3 text-sm font-extrabold uppercase tracking-widest ${sombre ? "text-sun" : "text-logo-red"} ${centre ? "justify-center" : ""}`}
       >
@@ -25,8 +35,8 @@ export function EnTete({
         {sur}
       </p>
       <h2 className="mt-3 text-4xl md:text-5xl">
-        <span className={sombre ? "text-white" : "text-logo-blue"}>{bleu}</span>{" "}
-        <span className={sombre ? "text-sun" : "text-primary"}>{vert}</span>
+        <span className={sombre ? "text-white" : "text-logo-blue"}>{insecable(bleu)}</span>{" "}
+        <span className={sombre ? "text-sun" : "text-primary"}>{insecable(vert)}</span>
       </h2>
       {children && (
         <p
