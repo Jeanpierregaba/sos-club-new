@@ -80,6 +80,21 @@ export type PassationEntree = Schemas["PassationEntree"];
 export type EtatClub = Schemas["EtatClub"];
 export type ClubInscrit = Schemas["ClubInscrit"];
 export type EtablissementRattache = Schemas["EtablissementRattache"];
+export type AdhesionResume = Schemas["AdhesionResume"];
+export type DemandeAdhesion = Schemas["DemandeAdhesion"];
+export type MembreClub = Schemas["MembreClub"];
+export type EncadreurDuClub = Schemas["EncadreurDuClub"];
+export type MembresDuClub = Schemas["MembresDuClub"];
+export type RattachementResume = Schemas["RattachementResume"];
+export type DemandeRattachement = Schemas["DemandeRattachement"];
+export type MesClubs = Schemas["MesClubs"];
+export type PassationAConfirmer = Schemas["PassationAConfirmer"];
+export type AffiliationAValider = Schemas["AffiliationAValider"];
+export type RattachementAValider = Schemas["RattachementAValider"];
+export type FileAffiliations = Schemas["FileAffiliations"];
+export type FileRattachements = Schemas["FileRattachements"];
+export type ResultatLot = Schemas["ResultatLot"];
+export type ElementLot = Schemas["ElementLot"];
 
 export const MESSAGE_SAISIE = "Vérifie le formulaire : un champ est vide, trop long ou mal rempli.";
 
@@ -355,3 +370,72 @@ export const adminValiderPassation = (id: string, version: number) =>
   envoyerJson<Passation>(`${CLUBS_ADMIN}/passations/${id}/valider`, { version });
 export const adminRefuserPassation = (id: string, version: number, motif: string) =>
   envoyerJson<Passation>(`${CLUBS_ADMIN}/passations/${id}/refuser`, { version, motif });
+
+// Affiliations et rattachements (spec 020) ------------------------------------------------------------------
+
+const club = (id: string) => `/api/clubs/${id}`;
+
+export const demanderAdhesion = (clubId: string) =>
+  envoyerJson<AdhesionResume>(`${club(clubId)}/adhesions`);
+export const quitterClub = (clubId: string) =>
+  envoyerJson<AdhesionResume>(`${club(clubId)}/adhesions/moi`, undefined, "DELETE");
+export const chargerDemandesAdhesion = (clubId: string) =>
+  requeteApi<DemandeAdhesion[]>(`${club(clubId)}/adhesions/demandes`);
+export const confirmerAdhesion = (clubId: string, id: string, version: number) =>
+  envoyerJson<AdhesionResume>(`${club(clubId)}/adhesions/${id}/confirmer`, { version });
+export const refuserAdhesion = (clubId: string, id: string, version: number, motif: string) =>
+  envoyerJson<AdhesionResume>(`${club(clubId)}/adhesions/${id}/refuser`, { version, motif });
+export const retirerMembre = (clubId: string, id: string, version: number, motif?: string) =>
+  envoyerJson<AdhesionResume>(`${club(clubId)}/adhesions/${id}/retirer`, {
+    version,
+    motif: motif || null,
+  });
+export const chargerMembres = (clubId: string) =>
+  requeteApi<MembresDuClub>(`${club(clubId)}/membres`);
+
+export const demanderRattachement = (clubId: string) =>
+  envoyerJson<RattachementResume>(`${club(clubId)}/rattachements`);
+export const quitterClubEncadre = (clubId: string) =>
+  envoyerJson<RattachementResume>(`${club(clubId)}/rattachements/moi`, undefined, "DELETE");
+export const chargerDemandesRattachement = (clubId: string) =>
+  requeteApi<DemandeRattachement[]>(`${club(clubId)}/rattachements/demandes`);
+export const confirmerRattachement = (clubId: string, id: string, version: number) =>
+  envoyerJson<RattachementResume>(`${club(clubId)}/rattachements/${id}/confirmer`, { version });
+export const refuserRattachement = (clubId: string, id: string, version: number, motif: string) =>
+  envoyerJson<RattachementResume>(`${club(clubId)}/rattachements/${id}/refuser`, {
+    version,
+    motif,
+  });
+export const retirerEncadreur = (clubId: string, id: string, version: number, motif?: string) =>
+  envoyerJson<RattachementResume>(`${club(clubId)}/rattachements/${id}/retirer`, {
+    version,
+    motif: motif || null,
+  });
+export const chargerMesClubs = () => requeteApi<MesClubs>("/api/encadreurs/moi/clubs");
+export const confirmerPassationEncadreur = (clubId: string, version: number) =>
+  envoyerJson<PassationAConfirmer>(`${club(clubId)}/passation/confirmer`, { version });
+export const refuserPassationEncadreur = (clubId: string, version: number, motif: string) =>
+  envoyerJson<PassationAConfirmer>(`${club(clubId)}/passation/refuser`, { version, motif });
+
+export const adminFileAffiliations = () =>
+  requeteApi<FileAffiliations>(`${CLUBS_ADMIN}/affiliations`);
+export const adminDeciderAffiliations = (
+  decision: "valider" | "refuser",
+  elements: ElementLot[],
+  motif?: string,
+) =>
+  envoyerJson<ResultatLot>(
+    `${CLUBS_ADMIN}/affiliations/${decision}`,
+    decision === "refuser" ? { elements, motif } : { elements },
+  );
+export const adminFileRattachements = () =>
+  requeteApi<FileRattachements>(`${CLUBS_ADMIN}/rattachements`);
+export const adminDeciderRattachements = (
+  decision: "valider" | "refuser",
+  elements: ElementLot[],
+  motif?: string,
+) =>
+  envoyerJson<ResultatLot>(
+    `${CLUBS_ADMIN}/rattachements/${decision}`,
+    decision === "refuser" ? { elements, motif } : { elements },
+  );

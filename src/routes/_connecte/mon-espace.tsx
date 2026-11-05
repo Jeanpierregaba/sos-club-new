@@ -22,6 +22,9 @@ import { useDeconnexion } from "@/hooks/use-deconnexion";
 import {
   chargerAxes,
   chargerClubParEtablissement,
+  chargerDemandesAdhesion,
+  chargerDemandesRattachement,
+  chargerMembres,
   chargerEspaceEleve,
   chargerEspaceEncadreur,
   chargerMonClub,
@@ -30,7 +33,10 @@ import {
   type AxePublic,
   type Classe,
   type ClubPublic,
+  type DemandeAdhesion,
+  type DemandeRattachement,
   type EspaceEleve,
+  type MembresDuClub,
   type MonClub,
 } from "@/lib/api/client";
 import { CLASSES, libelleClasse } from "@/lib/classes";
@@ -60,7 +66,27 @@ export const Route = createFileRoute("/_connecte/mon-espace")({
           club.club === null
             ? await chargerClubParEtablissement(espace.etablissement.id).catch(() => undefined)
             : null;
-        return { eleve: espace, club, axes, clubEtablissement, encadreur: null };
+        // Spec 020 : le président reçoit ses demandes et la liste ; un membre, la liste seulement.
+        const preside = club.club?.president && club.club.etat === "actif" ? club.club.id : null;
+        const membreDe = espace.adhesion?.etat === "active" ? espace.adhesion.club_id : null;
+        const sansErreur = <T,>(promesse: Promise<T>, defaut: T) => promesse.catch(() => defaut);
+        const [membres, demandesAdhesion, demandesRattachement] = await Promise.all([
+          preside || membreDe
+            ? sansErreur(chargerMembres((preside ?? membreDe)!), null)
+            : Promise.resolve(null),
+          preside ? sansErreur(chargerDemandesAdhesion(preside), []) : Promise.resolve([]),
+          preside ? sansErreur(chargerDemandesRattachement(preside), []) : Promise.resolve([]),
+        ]);
+        return {
+          eleve: espace,
+          club,
+          axes,
+          clubEtablissement,
+          membres,
+          demandesAdhesion,
+          demandesRattachement,
+          encadreur: null,
+        };
       }
       if (context.moi.role === "encadreur")
         return {
@@ -105,6 +131,9 @@ function MonEspace() {
         club={donnees.club}
         axes={donnees.axes}
         clubEtablissement={donnees.clubEtablissement ?? null}
+        membres={"membres" in donnees ? donnees.membres : null}
+        demandesAdhesion={"demandesAdhesion" in donnees ? donnees.demandesAdhesion : []}
+        demandesRattachement={"demandesRattachement" in donnees ? donnees.demandesRattachement : []}
       />
     );
   if (donnees.encadreur) return <EspaceEncadreur espace={donnees.encadreur} prenom={moi.prenom} />;
@@ -161,11 +190,17 @@ function EspaceDeLEleve({
   club,
   axes,
   clubEtablissement,
+  membres,
+  demandesAdhesion,
+  demandesRattachement,
 }: {
   espace: EspaceEleve;
   club: MonClub;
   axes: AxePublic[];
   clubEtablissement: ClubPublic | null;
+  membres: MembresDuClub | null;
+  demandesAdhesion: DemandeAdhesion[];
+  demandesRattachement: DemandeRattachement[];
 }) {
   const { bienvenue } = Route.useSearch();
   const router = useRouter();
@@ -203,6 +238,10 @@ function EspaceDeLEleve({
           etablissement={espace.etablissement}
           axes={axes}
           clubEtablissement={clubEtablissement}
+          adhesion={espace.adhesion ?? null}
+          membres={membres}
+          demandesAdhesion={demandesAdhesion}
+          demandesRattachement={demandesRattachement}
           onRafraichir={async () => {
             await router.invalidate();
           }}
@@ -223,7 +262,15 @@ function EspaceDeLEleve({
                 terme="Établissement"
                 valeur={<EtablissementAffiche etablissement={espace.etablissement} />}
               />
-              <Info terme="Club" valeur={club.club ? club.club.nom : "Aucun pour l'instant"} />
+              {/* Le club dont l'élève est membre (spec 020), président compris : membre de droit. */}
+              <Info
+                terme="Club"
+                valeur={
+                  espace.adhesion?.etat === "active"
+                    ? espace.adhesion.club_nom
+                    : "Aucun pour l'instant"
+                }
+              />
               <Info terme="Email" valeur={espace.email ?? "Aucun"} />
             </dl>
             <div className="mt-6 flex flex-wrap gap-2">

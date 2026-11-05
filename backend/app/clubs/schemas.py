@@ -332,8 +332,26 @@ class ResultatLot(BaseModel):
 
 
 class MembreClub(BaseModel):
-    """Un membre, dans la liste du club : son pseudonyme seulement, jamais son nom ni sa classe (docs/RULES.md)."""
+    """Un membre, dans la liste du club : son pseudonyme seulement, jamais son nom ni sa classe (docs/RULES.md).
+    `id` et `version` sont ceux de l'adhésion : le président s'en sert pour retirer un membre."""
 
+    id: UUID
     pseudonyme: str
     depuis: datetime
     president: bool
+    version: int
+
+
+class EncadreurDuClub(BaseModel):
+    """Un encadreur rattaché au club : un adulte, identifié par son nom et sa fonction."""
+
+    id: UUID
+    prenom: str
+    nom: str
+    fonction: str
+    version: int
+
+
+class MembresDuClub(BaseModel):
+    membres: list[MembreClub]
+    encadreurs: list[EncadreurDuClub]

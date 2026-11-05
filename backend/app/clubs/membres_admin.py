@@ -27,7 +27,7 @@ from app.clubs.schemas import (
     ElementLot,
     FileAffiliations,
     FileRattachements,
-    MembreClub,
+    MembresDuClub,
     RattachementAValider,
     ResultatLot,
 )
@@ -307,7 +307,7 @@ async def refuser_rattachements(
     return await _en_lot(db, elements, refuser)
 
 
-async def membres_du_club(db: AsyncSession, acces: Acces, club_id: UUID) -> list[MembreClub]:
+async def membres_du_club(db: AsyncSession, acces: Acces, club_id: UUID) -> MembresDuClub:
     """La liste des membres pour un collaborateur habilité, dans son périmètre ; hors périmètre, 404."""
     club = await db.scalar(
         _dans_le_perimetre(select(Club).where(Club.id == club_id, Club.etat == EtatClub.actif), acces)

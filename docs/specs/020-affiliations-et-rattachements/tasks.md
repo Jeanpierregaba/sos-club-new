@@ -59,10 +59,10 @@ Chaque tâche est autonome et committable ; lint, typecheck et tests passent ava
 
 ## Tâche 7 — Site : élève et président dans /mon-espace
 
-- [ ] Régénérer le schéma OpenAPI et les types du site
-- [ ] `BlocClub` élève : rejoindre, état, motif, se retirer, membres
-- [ ] `BlocClub` président : onglets Demandes et Membres, état de la passation
-- [ ] Tests des composants
+- [x] Régénérer le schéma OpenAPI et les types du site
+- [x] `BlocClub` élève : rejoindre, état, motif, se retirer, membres
+- [x] `BlocClub` président : onglets Demandes et Membres, état de la passation
+- [x] Tests des composants
 
 **Commit :** `feat(site): affiliation et gestion des membres dans mon-espace`
 

@@ -22,11 +22,12 @@ from app.clubs.models import (
     EtatRattachement,
     Rattachement,
 )
-from app.clubs.schemas import AdhesionResume, DemandeAdhesion, MembreClub
+from app.clubs.schemas import AdhesionResume, DemandeAdhesion, EncadreurDuClub, MembreClub, MembresDuClub
 from app.clubs.service import eleve_de
 from app.comptes.inscription import Refus
 from app.comptes.models import Utilisateur
 from app.eleves.models import Eleve
+from app.encadreurs.models import Encadreur
 
 VIOLATION_UNICITE = "23505"
 DEJA_TRAITEE = "Cette demande a déjà été traitée : recharge la page."
@@ -285,8 +286,8 @@ async def retirer(
 # Liste des membres et changement d'établissement -------------------------------------------------------------
 
 
-async def liste_membres(db: AsyncSession, club: Club) -> list[MembreClub]:
-    """Les membres actifs du club, le président en tête, puis par pseudonyme."""
+async def liste_membres(db: AsyncSession, club: Club) -> MembresDuClub:
+    """Les membres actifs du club, le président en tête, puis par pseudonyme ; et ses encadreurs rattachés."""
     lignes = await db.execute(
         select(Adhesion, Eleve.pseudonyme)
         .join(Eleve, Eleve.utilisateur_id == Adhesion.eleve_id)
@@ -294,16 +295,37 @@ async def liste_membres(db: AsyncSession, club: Club) -> list[MembreClub]:
     )
     membres = [
         MembreClub(
+            id=adhesion.id,
             pseudonyme=pseudo,
             depuis=adhesion.decide_le or adhesion.demande_le,
             president=adhesion.eleve_id == club.president_id,
+            version=adhesion.version,
         )
         for adhesion, pseudo in lignes.all()
     ]
-    return sorted(membres, key=lambda m: (not m.president, m.pseudonyme.casefold()))
+    encadreurs = await db.execute(
+        select(Rattachement, Utilisateur, Encadreur)
+        .join(Utilisateur, Utilisateur.id == Rattachement.encadreur_id)
+        .join(Encadreur, Encadreur.utilisateur_id == Rattachement.encadreur_id)
+        .where(Rattachement.club_id == club.id, Rattachement.etat == EtatRattachement.actif)
+        .order_by(Utilisateur.nom, Utilisateur.prenom)
+    )
+    return MembresDuClub(
+        membres=sorted(membres, key=lambda m: (not m.president, m.pseudonyme.casefold())),
+        encadreurs=[
+            EncadreurDuClub(
+                id=rattachement.id,
+                prenom=compte.prenom,
+                nom=compte.nom,
+                fonction=encadreur.fonction.value,
+                version=rattachement.version,
+            )
+            for rattachement, compte, encadreur in encadreurs.all()
+        ],
+    )
 
 
-async def membres_du_club(db: AsyncSession, utilisateur: Utilisateur, club_id: UUID) -> list[MembreClub]:
+async def membres_du_club(db: AsyncSession, utilisateur: Utilisateur, club_id: UUID) -> MembresDuClub:
     """La liste n'est visible que du président, des membres et des encadreurs rattachés ; pour tout autre, le
     club n'existe pas (404) : rien n'indique qu'il y aurait une liste à voir."""
     club = await club_actif(db, club_id)

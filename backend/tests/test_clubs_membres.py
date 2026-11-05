@@ -67,10 +67,10 @@ def test_le_president_et_les_membres_voient_la_liste(client: TestClient, avec_me
     reponse = client.get(f"/api/clubs/{avec_membres.id}/membres")
 
     assert reponse.status_code == 200
-    assert reponse.json() == [
-        {"pseudonyme": "Zoé la Présidente", "depuis": reponse.json()[0]["depuis"], "president": True},
-        {"pseudonyme": "Ama", "depuis": reponse.json()[1]["depuis"], "president": False},
-    ]
+    membres = reponse.json()["membres"]
+    assert [(m["pseudonyme"], m["president"]) for m in membres] == [("Zoé la Présidente", True), ("Ama", False)]
+    # Le pseudonyme seulement : ni nom, ni classe.
+    assert set(membres[0]) == {"id", "pseudonyme", "depuis", "president", "version"}
 
 
 def test_un_encadreur_rattache_voit_la_liste(
@@ -79,7 +79,10 @@ def test_un_encadreur_rattache_voit_la_liste(
     rattacher(en_base, creer_encadreur("prof"), avec_membres)
     connecter(client, "prof")
 
-    assert client.get(f"/api/clubs/{avec_membres.id}/membres").status_code == 200
+    reponse = client.get(f"/api/clubs/{avec_membres.id}/membres")
+
+    assert reponse.status_code == 200
+    assert [(e["prenom"], e["fonction"]) for e in reponse.json()["encadreurs"]] == [("Jean", "enseignant")]
 
 
 @pytest.mark.parametrize("identifiant", ["kofi", "voisin", "prof.libre"])
@@ -113,7 +116,7 @@ def test_un_collaborateur_voit_la_liste_dans_son_perimetre_seulement(
     connecter_admin(client, "dre.kara")
     assert client.get(url).status_code == 404
     connecter_admin(client, "dre.lome")
-    assert [m["pseudonyme"] for m in client.get(url).json()] == ["Zoé la Présidente", "Ama"]
+    assert [m["pseudonyme"] for m in client.get(url).json()["membres"]] == ["Zoé la Présidente", "Ama"]
 
 
 # Changements d'établissement --------------------------------------------------------------------------------

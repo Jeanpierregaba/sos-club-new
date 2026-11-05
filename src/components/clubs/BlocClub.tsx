@@ -3,29 +3,43 @@ import { ArrowRight, CircleAlert, Crown, Hourglass, Send, ShieldCheck } from "lu
 import { useState } from "react";
 
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
+import { AdhesionClub } from "@/components/clubs/AdhesionClub";
 import { DialogueDemandeClub } from "@/components/clubs/DialogueDemandeClub";
+import { GestionClub } from "@/components/clubs/GestionClub";
 import { Button } from "@/components/ui/button";
 import {
   annulerPassation,
   ErreurApi,
   proposerPassation,
   renvoyerDemandeClub,
+  type AdhesionResume,
   type AxePublic,
   type ClubPublic,
   type ClubResume,
+  type DemandeAdhesion,
+  type DemandeRattachement,
   type EtablissementRattache,
+  type MembresDuClub,
   type PassationApercu,
 } from "@/lib/api/client";
 import { dateCourte } from "@/lib/dates";
 import { ETATS_CLUB } from "@/lib/clubs";
 
+const enAttente = (passation: PassationApercu) =>
+  passation.etat === "en_attente" || passation.etat === "en_attente_encadreur";
+
 // Le bloc « Club » de l'espace élève (spec 019) : demande, état, passation de présidence.
+// Spec 020 : un élève rejoint le club de son établissement ; le président gère demandes et membres.
 export function BlocClub({
   club,
   passation,
   etablissement,
   axes,
   clubEtablissement = null,
+  adhesion = null,
+  membres = null,
+  demandesAdhesion = [],
+  demandesRattachement = [],
   onRafraichir,
 }: {
   club: ClubResume | null;
@@ -33,6 +47,10 @@ export function BlocClub({
   etablissement: EtablissementRattache;
   axes: AxePublic[];
   clubEtablissement?: ClubPublic | null;
+  adhesion?: AdhesionResume | null;
+  membres?: MembresDuClub | null;
+  demandesAdhesion?: DemandeAdhesion[];
+  demandesRattachement?: DemandeRattachement[];
   onRafraichir: () => Promise<unknown>;
 }) {
   const [demandeOuverte, setDemandeOuverte] = useState(false);
@@ -42,29 +60,16 @@ export function BlocClub({
   const [pseudonyme, setPseudonyme] = useState("");
 
   if (club === null) {
-    // Un autre club est déjà actif dans l'établissement : la demande n'est plus proposable (§1).
+    // Un club est déjà actif dans l'établissement : la demande de création n'est plus proposable (spec 019,
+    // §1) ; l'élève peut le rejoindre (spec 020).
     if (clubEtablissement) {
       return (
-        <section
-          aria-labelledby="titre-club"
-          className="mt-6 rounded-3xl bg-white p-6 shadow-card ring-1 ring-border"
-        >
-          <h2 id="titre-club" className="text-2xl">
-            <span className="text-logo-blue">Mon</span> <span className="text-primary">club</span>
-          </h2>
-          <p className="mt-2 max-w-2xl font-medium text-ink/80">
-            Ton établissement a déjà un club actif :{" "}
-            <strong className="text-ink">{clubEtablissement.nom}</strong>. Pour le rejoindre ou
-            proposer de le présider un jour, adresse-toi à l'équipe nationale.
-          </p>
-          <Link
-            to="/clubs/$id"
-            params={{ id: clubEtablissement.id }}
-            className="mt-4 inline-flex items-center gap-1 font-bold text-logo-blue hover:underline"
-          >
-            Voir la fiche publique <ArrowRight aria-hidden className="size-4" />
-          </Link>
-        </section>
+        <AdhesionClub
+          club={clubEtablissement}
+          adhesion={adhesion}
+          membres={membres}
+          onRafraichir={onRafraichir}
+        />
       );
     }
     // L'ancre attendue par le parcours : le formulaire s'ouvre depuis l'état vide de l'espace.
@@ -102,6 +107,7 @@ export function BlocClub({
   }
 
   const etat = ETATS_CLUB[club.etat as keyof typeof ETATS_CLUB] ?? ETATS_CLUB.en_attente;
+  const successeurs = membres?.membres.filter((m) => !m.president) ?? [];
 
   return (
     <section
@@ -191,15 +197,19 @@ export function BlocClub({
                 <Crown aria-hidden className="size-5 text-primary" /> Tu présides ce club
               </p>
               <p className="mt-1 text-sm font-medium text-muted-foreground">
-                Tu peux transmettre la présidence à un autre élève de ton établissement. L'équipe
-                nationale valide la passation.
+                Tu peux transmettre la présidence à un autre membre du club. Un encadreur rattaché
+                au club la confirme, puis l'équipe nationale la valide.
               </p>
 
-              {passation?.etat === "en_attente" && (
+              {passation && enAttente(passation) && (
                 <div className="mt-3 space-y-2">
                   <p className="rounded-xl bg-sun/20 px-3 py-2 text-sm font-semibold text-ink">
-                    Passation en attente : <strong>{passation.successeur_pseudonyme}</strong>,
-                    proposée le {dateCourte(passation.propose_le)}.
+                    Passation en attente{" "}
+                    {passation.etat === "en_attente_encadreur"
+                      ? "de la confirmation d'un encadreur"
+                      : "de l'équipe nationale"}{" "}
+                    : <strong>{passation.successeur_pseudonyme}</strong>, proposée le{" "}
+                    {dateCourte(passation.propose_le)}.
                   </p>
                   <Button
                     variant="outline"
@@ -231,7 +241,7 @@ export function BlocClub({
                 </p>
               )}
 
-              {(!passation || passation.etat !== "en_attente") && (
+              {(!passation || !enAttente(passation)) && (
                 <Button
                   onClick={() => {
                     setPseudonyme("");
@@ -247,24 +257,35 @@ export function BlocClub({
                 ouvert={passationOuverte}
                 onOuvert={setPassationOuverte}
                 titre="Passer la présidence"
-                description="Indique le pseudonyme exact d'un élève actif de ton établissement, puis l'équipe nationale validera cette proposition."
+                description="Choisis un membre du club. Un encadreur rattaché confirmera ton choix, puis l'équipe nationale le validera."
                 bouton="Proposer cette passation"
                 onEnvoie={async () => {
-                  if (pseudonyme.trim().length < 3) {
-                    throw new ErreurApi(422, "Indique le pseudonyme du successeur.");
+                  if (pseudonyme.trim().length < 1) {
+                    throw new ErreurApi(422, "Choisis le membre qui te succède.");
                   }
                   await proposerPassation(pseudonyme.trim(), club.version);
                   await onRafraichir();
                 }}
               >
-                <Champ libelle="Pseudonyme du successeur">
-                  <input
-                    value={pseudonyme}
-                    onChange={(e) => setPseudonyme(e.target.value)}
-                    maxLength={60}
-                    placeholder="Ex. : Kofi Curieux"
-                    className={CHAMP_ADMIN}
-                  />
+                <Champ libelle="Ton successeur">
+                  {successeurs.length > 0 ? (
+                    <select
+                      value={pseudonyme}
+                      onChange={(e) => setPseudonyme(e.target.value)}
+                      className={CHAMP_ADMIN}
+                    >
+                      <option value="">Choisis un membre</option>
+                      {successeurs.map((m) => (
+                        <option key={m.id} value={m.pseudonyme}>
+                          {m.pseudonyme}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <p className="rounded-xl bg-mist-soft px-3 py-2 text-sm font-medium text-muted-foreground">
+                      Ton club n'a pas encore d'autre membre : un élève doit d'abord le rejoindre.
+                    </p>
+                  )}
                 </Champ>
               </DialogueFormulaire>
             </div>
@@ -272,6 +293,16 @@ export function BlocClub({
             <p className="rounded-2xl bg-mist-soft px-4 py-3 text-sm font-medium text-muted-foreground">
               Tu n'es pas président de ce club : seul le président peut proposer une passation.
             </p>
+          )}
+
+          {club.president && (
+            <GestionClub
+              clubId={club.id}
+              demandesAdhesion={demandesAdhesion}
+              demandesRattachement={demandesRattachement}
+              membres={membres}
+              onRafraichir={onRafraichir}
+            />
           )}
         </div>
       )}

@@ -2306,6 +2306,25 @@ export interface components {
             /** Telephone */
             telephone?: string | null;
         };
+        /**
+         * EncadreurDuClub
+         * @description Un encadreur rattaché au club : un adulte, identifié par son nom et sa fonction.
+         */
+        EncadreurDuClub: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            /** Fonction */
+            fonction: string;
+            /** Version */
+            version: number;
+        };
         /** Enrolement */
         Enrolement: {
             /** Secret */
@@ -2938,8 +2957,14 @@ export interface components {
         /**
          * MembreClub
          * @description Un membre, dans la liste du club : son pseudonyme seulement, jamais son nom ni sa classe (docs/RULES.md).
+         *     `id` et `version` sont ceux de l'adhésion : le président s'en sert pour retirer un membre.
          */
         MembreClub: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
             /** Pseudonyme */
             pseudonyme: string;
             /**
@@ -2949,6 +2974,15 @@ export interface components {
             depuis: string;
             /** President */
             president: boolean;
+            /** Version */
+            version: number;
+        };
+        /** MembresDuClub */
+        MembresDuClub: {
+            /** Membres */
+            membres: components["schemas"]["MembreClub"][];
+            /** Encadreurs */
+            encadreurs: components["schemas"]["EncadreurDuClub"][];
         };
         /**
          * MesClubs
@@ -5910,7 +5944,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MembreClub"][];
+                    "application/json": components["schemas"]["MembresDuClub"];
                 };
             };
             /** @description Validation Error */
@@ -6433,7 +6467,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MembreClub"][];
+                    "application/json": components["schemas"]["MembresDuClub"];
                 };
             };
             /** @description Validation Error */

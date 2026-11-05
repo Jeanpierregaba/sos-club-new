@@ -3563,11 +3563,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MembreClub"
-                  },
-                  "title": "Response Membres Api Clubs  Club Id  Membres Get"
+                  "$ref": "#/components/schemas/MembresDuClub"
                 }
               }
             }
@@ -4342,11 +4338,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MembreClub"
-                  },
-                  "title": "Response Membres Admin Du Club Api Admin Clubs  Club Id  Membres Get"
+                  "$ref": "#/components/schemas/MembresDuClub"
                 }
               }
             }
@@ -6551,6 +6543,41 @@
         ],
         "title": "EncadreurAssocie"
       },
+      "EncadreurDuClub": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "fonction": {
+            "type": "string",
+            "title": "Fonction"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "prenom",
+          "nom",
+          "fonction",
+          "version"
+        ],
+        "title": "EncadreurDuClub",
+        "description": "Un encadreur rattaché au club : un adulte, identifié par son nom et sa fonction."
+      },
       "Enrolement": {
         "properties": {
           "secret": {
@@ -8475,6 +8502,11 @@
       },
       "MembreClub": {
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
           "pseudonyme": {
             "type": "string",
             "title": "Pseudonyme"
@@ -8487,16 +8519,46 @@
           "president": {
             "type": "boolean",
             "title": "President"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
           }
         },
         "type": "object",
         "required": [
+          "id",
           "pseudonyme",
           "depuis",
-          "president"
+          "president",
+          "version"
         ],
         "title": "MembreClub",
-        "description": "Un membre, dans la liste du club : son pseudonyme seulement, jamais son nom ni sa classe (docs/RULES.md)."
+        "description": "Un membre, dans la liste du club : son pseudonyme seulement, jamais son nom ni sa classe (docs/RULES.md).\n`id` et `version` sont ceux de l'adhésion : le président s'en sert pour retirer un membre."
+      },
+      "MembresDuClub": {
+        "properties": {
+          "membres": {
+            "items": {
+              "$ref": "#/components/schemas/MembreClub"
+            },
+            "type": "array",
+            "title": "Membres"
+          },
+          "encadreurs": {
+            "items": {
+              "$ref": "#/components/schemas/EncadreurDuClub"
+            },
+            "type": "array",
+            "title": "Encadreurs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "membres",
+          "encadreurs"
+        ],
+        "title": "MembresDuClub"
       },
       "MesClubs": {
         "properties": {
