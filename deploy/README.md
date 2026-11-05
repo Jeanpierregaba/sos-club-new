@@ -121,6 +121,20 @@ remplace `prod` par `preprod` :
 cd /opt/sosclub/prod && docker compose exec -it api python -m app.comptes.creer_compte --role admin --identifiant ton-identifiant --prenom Prénom --nom Nom --email adresse@exemple.tg
 ```
 
+**Comptes de test de la preprod** (facultatif) : un super-administrateur (2FA active), un encadreur actif, un
+élève et un élève président d'un club actif, tous du même établissement de la DRE Grand Lomé. Le script est
+refusé hors de la preprod. Relancé, il change les mots de passe et coupe les sessions en cours.
+
+```bash
+cd /opt/sosclub/preprod && docker compose exec -T api python -m app.seed_preprod
+docker compose exec -T api cat /tmp/comptes-preprod.txt
+```
+
+Le fichier d'accès est dans le `/tmp` du conteneur, effacé au prochain déploiement : copie les accès dans un
+gestionnaire de mots de passe, efface le terminal (`clear`), puis supprime le fichier
+(`docker compose exec -T api rm /tmp/comptes-preprod.txt`). Le script refuse de tourner si l'établissement de
+test a déjà un autre club actif, ou si une passation du club de test est en attente : il dit quoi faire.
+
 **8. Programmer les sauvegardes**, sur le VPS, avec `crontab -e` (chaque nuit à 2 h et 3 h, heure du serveur) :
 
 ```cron

@@ -39,6 +39,8 @@ ne doit JAMAIS enfreindre, quelle que soit la demande. Les règles déjà impos�
 - Ne jamais ajouter de messagerie privée ni de moyen de contacter un élève sans décision écrite dans un ADR.
 - Ne jamais collecter de donnée de santé individuelle (dépistage inclus) sans spec et validation juridique.
 - Ne jamais charger de vraies données d'élèves avant le récépissé de l'IPDCP (voir `docs/PRD.md`, Q9).
+- Comptes fictifs : ceux de développement (`app.seed_dev`) seulement sur la base locale, ceux de test
+  (`app.seed_preprod`) seulement en préproduction (`ENVIRONNEMENT=preprod`). Jamais en production.
 - Ne jamais écrire de points ailleurs que dans le journal `mouvement_points`, via le domaine `points`
   (ADR-0004), ni calculer un résultat de quiz ou de score dans le navigateur.
 - Ne jamais inventer un contenu médical présenté comme réel : quiz, article et fiche de test sont

@@ -52,6 +52,10 @@ class Settings(BaseSettings):
     # Clé Fernet qui chiffre les secrets de double authentification. Obligatoire en production.
     cle_chiffrement: str | None = None
 
+    # Environnement de déploiement : « develop » en local, « preprod » ou « prod » sur le VPS (deploy/compose.yaml).
+    # Sert à autoriser les comptes de test uniquement en préproduction (docs/RULES.md).
+    environnement: Literal["develop", "preprod", "prod"] = "develop"
+
     # Envoi des e-mails. Sans hôte, hors production, les liens sont seulement écrits dans le terminal.
     smtp_hote: str | None = None
     smtp_port: int = 587

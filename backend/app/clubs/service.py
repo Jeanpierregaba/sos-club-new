@@ -110,7 +110,7 @@ async def _derniere_passation(db: AsyncSession, club_id: UUID) -> PassationAperc
     return await _appercu_passation(db, passation)
 
 
-def _nom_normalise(nom: str) -> str:
+def normaliser_nom(nom: str) -> str:
     return " ".join(normaliser(nom).replace("-", " ").split())
 
 
@@ -119,7 +119,7 @@ async def demarrer(
 ) -> ClubResume:
     """Une demande de création : le demandeur vient de son établissement, jamais d'un champ libre."""
     eleve = await eleve_de(db, utilisateur)
-    nom_normalise = _nom_normalise(entree.nom)
+    nom_normalise = normaliser_nom(entree.nom)
     if not 3 <= len(nom_normalise) <= 150:
         raise Refus("Le nom du club fait de 3 à 150 caractères.")
     if len(set(entree.axes)) != len(entree.axes):

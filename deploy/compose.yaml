@@ -21,8 +21,10 @@ x-durci: &durci
 x-base: &base
   DATABASE_URL: postgresql+asyncpg://sosclub:${POSTGRES_PASSWORD:?}@db:5432/sosclub
   SITE_ORIGINE: ${SITE_ORIGINE:?}
-  # La configuration de l'API l'exige en HTTPS, y compris pour lancer les migrations.
+  # L'API l'exige en HTTPS, y compris pour lancer les migrations.
   CLE_CHIFFREMENT: ${CLE_CHIFFREMENT:?CLE_CHIFFREMENT est obligatoire, voir env.example}
+  # « preprod » ou « prod » : l'API s'en sert pour refuser les comptes de test hors de la préproduction.
+  ENVIRONNEMENT: ${ENVIRONNEMENT:?preprod ou prod}
 
 services:
   db:
