@@ -30,6 +30,7 @@ from app.clubs.schemas import (
     FileRattachements,
     LotEntree,
     LotRefusEntree,
+    MembreClub,
     MonClub,
     Passation,
     PassationApercu,
@@ -157,6 +158,13 @@ async def retirer_membre(
         )
 
 
+@router.get("/{club_id}/membres")
+async def membres(club_id: UUID, utilisateur: Connecte, db: Base) -> list[MembreClub]:
+    """Les membres du club : visibles du président, des membres et des encadreurs rattachés seulement."""
+    with _traduire_refus():
+        return await adhesions.membres_du_club(db, utilisateur, club_id)
+
+
 # Rattachements (spec 020) : l'encadreur demande ou se retire, le président confirme, refuse ou retire -------
 
 
@@ -275,6 +283,12 @@ async def valider_affiliations(entree: LotEntree, request: Request, acces: Decid
 @router_admin.post("/affiliations/refuser")
 async def refuser_affiliations(entree: LotRefusEntree, request: Request, acces: Decideur, db: Base) -> ResultatLot:
     return await membres_admin.refuser_affiliations(db, acces, entree.elements, entree.motif, adresse_ip(request))
+
+
+@router_admin.get("/{club_id}/membres")
+async def membres_admin_du_club(club_id: UUID, acces: Lecteur, db: Base) -> list[MembreClub]:
+    with _traduire_refus():
+        return await membres_admin.membres_du_club(db, acces, club_id)
 
 
 @router_admin.get("/rattachements")

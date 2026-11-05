@@ -3537,6 +3537,54 @@
         }
       }
     },
+    "/api/clubs/{club_id}/membres": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Membres",
+        "description": "Les membres du club : visibles du président, des membres et des encadreurs rattachés seulement.",
+        "operationId": "membres_api_clubs__club_id__membres_get",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MembreClub"
+                  },
+                  "title": "Response Membres Api Clubs  Club Id  Membres Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clubs/{club_id}/rattachements": {
       "post": {
         "tags": [
@@ -4146,6 +4194,53 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ResultatLot"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/{club_id}/membres": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Membres Admin Du Club",
+        "operationId": "membres_admin_du_club_api_admin_clubs__club_id__membres_get",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MembreClub"
+                  },
+                  "title": "Response Membres Admin Du Club Api Admin Clubs  Club Id  Membres Get"
                 }
               }
             }
@@ -8271,6 +8366,31 @@
           "motif"
         ],
         "title": "LotRefusEntree"
+      },
+      "MembreClub": {
+        "properties": {
+          "pseudonyme": {
+            "type": "string",
+            "title": "Pseudonyme"
+          },
+          "depuis": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Depuis"
+          },
+          "president": {
+            "type": "boolean",
+            "title": "President"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pseudonyme",
+          "depuis",
+          "president"
+        ],
+        "title": "MembreClub",
+        "description": "Un membre, dans la liste du club : son pseudonyme seulement, jamais son nom ni sa classe (docs/RULES.md)."
       },
       "MesClubs": {
         "properties": {

@@ -269,3 +269,36 @@ async def retirer(
     )
     await db.commit()
     return await resume(db, rattachement)
+
+
+async def quitter_au_changement_detablissement(
+    db: AsyncSession, utilisateur: Utilisateur, ancien_etablissement_id: UUID, adresse_ip: str
+) -> None:
+    """Avant qu'un encadreur change d'établissement : ses rattachements en cours au club de l'ancien
+    établissement prennent fin. Ceux d'autres établissements (clubs supplémentaires) restent."""
+    rattachements = (
+        await db.scalars(
+            select(Rattachement)
+            .join(Club, Club.id == Rattachement.club_id)
+            .where(
+                Rattachement.encadreur_id == utilisateur.id,
+                Rattachement.etat.in_(RATTACHEMENT_EN_COURS),
+                Club.etablissement_id == ancien_etablissement_id,
+            )
+            .with_for_update(of=Rattachement)
+        )
+    ).all()
+    for rattachement in rattachements:
+        rattachement.etat = EtatRattachement.retire
+        rattachement.retire_le = datetime.now(UTC)
+        rattachement.retire_par = utilisateur.id
+        rattachement.motif_retrait = "Changement d'établissement."
+        journaliser(
+            db,
+            "rattachement_retire",
+            utilisateur,
+            cible_type="rattachement",
+            cible_id=rattachement.id,
+            details={"club_id": str(rattachement.club_id), "par": "changement_etablissement"},
+            adresse_ip=adresse_ip,
+        )

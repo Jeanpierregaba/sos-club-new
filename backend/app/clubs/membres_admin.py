@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
-from app.clubs.adhesions import DEJA_TRAITEE
+from app.clubs.adhesions import DEJA_TRAITEE, liste_membres
 from app.clubs.models import Adhesion, Club, EtatAdhesion, EtatClub, EtatRattachement, Rattachement
 from app.clubs.rattachements import a_un_rattachement_actif
 from app.clubs.schemas import (
@@ -27,6 +27,7 @@ from app.clubs.schemas import (
     ElementLot,
     FileAffiliations,
     FileRattachements,
+    MembreClub,
     RattachementAValider,
     ResultatLot,
 )
@@ -304,3 +305,13 @@ async def refuser_rattachements(
         await db.flush()
 
     return await _en_lot(db, elements, refuser)
+
+
+async def membres_du_club(db: AsyncSession, acces: Acces, club_id: UUID) -> list[MembreClub]:
+    """La liste des membres pour un collaborateur habilité, dans son périmètre ; hors périmètre, 404."""
+    club = await db.scalar(
+        _dans_le_perimetre(select(Club).where(Club.id == club_id, Club.etat == EtatClub.actif), acces)
+    )
+    if club is None:
+        raise Refus("Ce club est introuvable.", 404)
+    return await liste_membres(db, club)

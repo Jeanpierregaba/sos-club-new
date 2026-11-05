@@ -312,3 +312,11 @@ class ResultatLot(BaseModel):
 
     reussies: list[UUID]
     echecs: list[EchecLot]
+
+
+class MembreClub(BaseModel):
+    """Un membre, dans la liste du club : son pseudonyme seulement, jamais son nom ni sa classe (docs/RULES.md)."""
+
+    pseudonyme: str
+    depuis: datetime
+    president: bool

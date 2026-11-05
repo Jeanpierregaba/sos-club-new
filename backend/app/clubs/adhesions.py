@@ -13,8 +13,16 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.journal import journaliser
-from app.clubs.models import ADHESION_EN_COURS, Adhesion, Club, EtatAdhesion, EtatClub
-from app.clubs.schemas import AdhesionResume, DemandeAdhesion
+from app.clubs.models import (
+    ADHESION_EN_COURS,
+    Adhesion,
+    Club,
+    EtatAdhesion,
+    EtatClub,
+    EtatRattachement,
+    Rattachement,
+)
+from app.clubs.schemas import AdhesionResume, DemandeAdhesion, MembreClub
 from app.clubs.service import eleve_de
 from app.comptes.inscription import Refus
 from app.comptes.models import Utilisateur
@@ -272,3 +280,73 @@ async def retirer(
     )
     await db.commit()
     return await resume(db, adhesion)
+
+
+# Liste des membres et changement d'établissement -------------------------------------------------------------
+
+
+async def liste_membres(db: AsyncSession, club: Club) -> list[MembreClub]:
+    """Les membres actifs du club, le président en tête, puis par pseudonyme."""
+    lignes = await db.execute(
+        select(Adhesion, Eleve.pseudonyme)
+        .join(Eleve, Eleve.utilisateur_id == Adhesion.eleve_id)
+        .where(Adhesion.club_id == club.id, Adhesion.etat == EtatAdhesion.active)
+    )
+    membres = [
+        MembreClub(
+            pseudonyme=pseudo,
+            depuis=adhesion.decide_le or adhesion.demande_le,
+            president=adhesion.eleve_id == club.president_id,
+        )
+        for adhesion, pseudo in lignes.all()
+    ]
+    return sorted(membres, key=lambda m: (not m.president, m.pseudonyme.casefold()))
+
+
+async def membres_du_club(db: AsyncSession, utilisateur: Utilisateur, club_id: UUID) -> list[MembreClub]:
+    """La liste n'est visible que du président, des membres et des encadreurs rattachés ; pour tout autre, le
+    club n'existe pas (404) : rien n'indique qu'il y aurait une liste à voir."""
+    club = await club_actif(db, club_id)
+    membre = await db.scalar(
+        select(Adhesion.id).where(
+            Adhesion.club_id == club.id, Adhesion.eleve_id == utilisateur.id, Adhesion.etat == EtatAdhesion.active
+        )
+    )
+    encadreur = await db.scalar(
+        select(Rattachement.id).where(
+            Rattachement.club_id == club.id,
+            Rattachement.encadreur_id == utilisateur.id,
+            Rattachement.etat == EtatRattachement.actif,
+        )
+    )
+    if club.president_id != utilisateur.id and membre is None and encadreur is None:
+        raise Refus("Ce club est introuvable.", 404)
+    return await liste_membres(db, club)
+
+
+async def quitter_au_changement_detablissement(db: AsyncSession, utilisateur: Utilisateur, adresse_ip: str) -> None:
+    """Avant qu'un élève change d'établissement : un président doit d'abord passer la main ; sinon son adhésion
+    en cours prend fin. Appelé dans la transaction du changement de profil, qui la valide."""
+    preside = await db.scalar(select(Club.id).where(Club.president_id == utilisateur.id, Club.etat == EtatClub.actif))
+    if preside is not None:
+        raise Refus("Tu présides le club de ton établissement : propose d'abord une passation à un autre membre.", 409)
+    adhesion = await db.scalar(
+        select(Adhesion)
+        .where(Adhesion.eleve_id == utilisateur.id, Adhesion.etat.in_(ADHESION_EN_COURS))
+        .with_for_update()
+    )
+    if adhesion is None:
+        return
+    adhesion.etat = EtatAdhesion.retiree
+    adhesion.retire_le = datetime.now(UTC)
+    adhesion.retire_par = utilisateur.id
+    adhesion.motif_retrait = "Changement d'établissement."
+    journaliser(
+        db,
+        "adhesion_retiree",
+        utilisateur,
+        cible_type="adhesion",
+        cible_id=adhesion.id,
+        details={"club_id": str(adhesion.club_id), "par": "changement_etablissement"},
+        adresse_ip=adresse_ip,
+    )

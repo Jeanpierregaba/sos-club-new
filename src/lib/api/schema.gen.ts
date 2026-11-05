@@ -1218,6 +1218,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/clubs/{club_id}/membres": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Membres
+         * @description Les membres du club : visibles du président, des membres et des encadreurs rattachés seulement.
+         */
+        get: operations["membres_api_clubs__club_id__membres_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/clubs/{club_id}/rattachements": {
         parameters: {
             query?: never;
@@ -1453,6 +1473,23 @@ export interface paths {
         put?: never;
         /** Refuser Affiliations */
         post: operations["refuser_affiliations_api_admin_clubs_affiliations_refuser_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/clubs/{club_id}/membres": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Membres Admin Du Club */
+        get: operations["membres_admin_du_club_api_admin_clubs__club_id__membres_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2863,6 +2900,21 @@ export interface components {
             elements: components["schemas"]["ElementLot"][];
             /** Motif */
             motif: string;
+        };
+        /**
+         * MembreClub
+         * @description Un membre, dans la liste du club : son pseudonyme seulement, jamais son nom ni sa classe (docs/RULES.md).
+         */
+        MembreClub: {
+            /** Pseudonyme */
+            pseudonyme: string;
+            /**
+             * Depuis
+             * Format: date-time
+             */
+            depuis: string;
+            /** President */
+            president: boolean;
         };
         /**
          * MesClubs
@@ -5770,6 +5822,37 @@ export interface operations {
             };
         };
     };
+    membres_api_clubs__club_id__membres_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembreClub"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     demander_rattachement_api_clubs__club_id__rattachements_post: {
         parameters: {
             query?: never;
@@ -6179,6 +6262,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ResultatLot"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    membres_admin_du_club_api_admin_clubs__club_id__membres_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembreClub"][];
                 };
             };
             /** @description Validation Error */

@@ -151,6 +151,10 @@ async def modifier_profil(
         eleve.classe = entree.classe
     if entree.etablissement_id and entree.etablissement_id != eleve.etablissement_id:
         await etablissement_actif(db, entree.etablissement_id)
+        # Spec 020 : un président passe d'abord la main ; l'adhésion en cours prend fin.
+        from app.clubs.adhesions import quitter_au_changement_detablissement
+
+        await quitter_au_changement_detablissement(db, utilisateur, adresse_ip)
         avant["etablissement_id"], apres["etablissement_id"] = str(eleve.etablissement_id), str(entree.etablissement_id)
         eleve.etablissement_id = entree.etablissement_id
     if "email" in entree.model_fields_set:

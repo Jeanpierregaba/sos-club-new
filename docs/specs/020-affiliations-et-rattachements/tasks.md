@@ -43,9 +43,9 @@ Chaque tâche est autonome et committable ; lint, typecheck et tests passent ava
 
 ## Tâche 5 — API : membres et changements d'établissement
 
-- [ ] `GET /api/clubs/{id}/membres` (pseudonymes, 404 pour les autres)
-- [ ] Fin d'adhésion ou de rattachement au changement d'établissement ; refus pour un président
-- [ ] Tests par profil (membre, président, encadreur, DRE, autre DRE, visiteur)
+- [x] `GET /api/clubs/{id}/membres` (pseudonymes, 404 pour les autres)
+- [x] Fin d'adhésion ou de rattachement au changement d'établissement ; refus pour un président
+- [x] Tests par profil (membre, président, encadreur, DRE, autre DRE, visiteur)
 
 **Commit :** `feat(clubs): liste des membres et changement d'établissement`
 

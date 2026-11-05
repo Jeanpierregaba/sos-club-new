@@ -149,6 +149,10 @@ async def modifier_profil(
         utilisateur.telephone = entree.telephone
     if entree.etablissement_id and entree.etablissement_id != encadreur.etablissement_id:
         await etablissement_actif(db, entree.etablissement_id)
+        # Spec 020 : les rattachements au club de l'ancien établissement prennent fin.
+        from app.clubs.rattachements import quitter_au_changement_detablissement
+
+        await quitter_au_changement_detablissement(db, utilisateur, encadreur.etablissement_id, adresse_ip)
         avant["etablissement_id"], apres["etablissement_id"] = (
             str(encadreur.etablissement_id), str(entree.etablissement_id)
         )  # fmt: skip
