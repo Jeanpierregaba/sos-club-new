@@ -14,6 +14,23 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-06 (suite) — Accueil : « Quel axe », défi du jour, podium (spec 021)
+
+- Fait : spec 020 close (corrections de la relecture, poussée sur develop). Spec 021 validée et livrée
+  (tâches 1–6) : API `jeux` — « Quel axe est fait pour toi ? » réservé aux élèves actifs (questions et table du
+  document fonctionnel, départages côté serveur, rien d'enregistré), banque `defi_question` (30 questions,
+  migration, chargement idempotent), défi du jour tiré par date et corrigé à part ; `GET /api/clubs/podium`
+  sur `points.scores_des_clubs` (vide jusqu'à R13). Site : section « Quel axe » refaite d'après la maquette
+  (caméléon, téléphone des mascottes, test en fenêtre, cas élève / visiteur / autre profil, retour après
+  connexion par `?test=quel-axe`), bulle du défi branchée sur l'API, podium sombre avec mascottes et état
+  vide. 664 tests API et 95 tests site verts ; vérifié sur ordinateur et téléphone.
+- Pièges rencontrés : un seul club actif par établissement (tests du podium) ; ruff refuse les chaînes
+  concaténées sans parenthèses dans une liste (ISC004) ; les captures Playwright qui ajoutent des classes avant
+  l'hydratation provoquent un faux écart d'hydratation.
+- Décisions : spec 021 (banque en base, podium réel avec état vide, jeu contrôlé par l'API).
+- Prochaine étape : relancer la relecture `reviewer` de la spec 021, puis pousser sur develop. Faire relire les
+  30 questions du défi par l'équipe nationale ; trancher les noms des axes (document du jeu contre site).
+
 ### 2026-11-06 — Seed préprod, retouches du site et affiliations (spec 020, R5)
 
 - Fait : seed préprod finalisée (`seed_preprod.py`, `environnement` dans la config, relance sans doublon).

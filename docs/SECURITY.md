@@ -35,7 +35,7 @@ par la spec indiquée.
 - [x] CSRF : `SameSite=Lax` et contrôle de l'en-tête `Origin` sur les actions modifiantes.
 - Sans objet : CORS. Le site et l'API sont sur la même origine (ADR-0006).
 - [x] Les messages d'erreur ne révèlent pas d'information interne ni l'existence d'un compte.
-- [ ] Quiz : réponses jamais envoyées avant la réponse de l'élève, temps et score calculés par le serveur (ADR-0004). (Aucun quiz n'existe encore ; à revalider en R9/R11.)
+- [ ] Quiz : réponses jamais envoyées avant la réponse de l'élève, temps et score calculés par le serveur (ADR-0004). (Aucun quiz n'existe encore ; à revalider en R9/R11. En 021 : le défi du jour part sans sa bonne réponse, la correction vient d'une seconde requête ; « Quel axe » est calculé par l'API, réservé aux élèves actifs (401/403), et n'enregistre rien. Ni l'un ni l'autre ne donne de point.)
 - [ ] Points : clé d'idempotence unique, plafonds et annulations tracées (ADR-0004). (Clé d'idempotence et plafonds : en place, spec 017 ; aucune action d'annulation n'est encore exposée.)
 
 ## Dépendances

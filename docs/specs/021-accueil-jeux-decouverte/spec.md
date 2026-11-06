@@ -40,20 +40,20 @@ démarre bientôt » à la place du podium.
 
 ## Critères d'acceptation
 
-- [ ] Étant donné un élève actif connecté, quand il demande les questions, alors il reçoit les 5 questions et
+- [x] Étant donné un élève actif connecté, quand il demande les questions, alors il reçoit les 5 questions et
       leurs 4 réponses, sans les axes associés.
-- [ ] Étant donné un visiteur, un encadreur ou un collaborateur, quand il demande les questions ou un résultat,
+- [x] Étant donné un visiteur, un encadreur ou un collaborateur, quand il demande les questions ou un résultat,
       alors l'API répond 401 (non connecté) ou 403 (autre profil, ou élève non actif).
-- [ ] Étant donné les réponses [A, A, A, D, B], quand l'élève demande le résultat, alors il obtient TV (11 points),
+- [x] Étant donné les réponses [A, A, A, D, B], quand l'élève demande le résultat, alors il obtient TV (11 points),
       puis EVSS (6) et LM (2), identique pour tous.
-- [ ] Les 20 réponses de la table sont couvertes par un test, ainsi que chaque règle de départage.
-- [ ] Une liste de réponses incomplète ou invalide est refusée (422).
-- [ ] Le site affiche les cas A, B et C ; après la connexion (cas B), le test s'ouvre.
-- [ ] Le défi du jour est le même pour deux visiteurs le même jour, et change le lendemain.
-- [ ] La question du défi arrive sans sa bonne réponse ; la correction vient d'une seconde requête.
-- [ ] Une question désactivée n'est plus jamais tirée.
-- [ ] Le podium ne montre que des clubs actifs, au plus trois, triés par points ; sans points, l'état vide.
-- [ ] Aucune de ces actions n'écrit de ligne dans `mouvement_points`.
+- [x] Les 20 réponses de la table sont couvertes par un test, ainsi que chaque règle de départage.
+- [x] Une liste de réponses incomplète ou invalide est refusée (422).
+- [x] Le site affiche les cas A, B et C ; après la connexion (cas B), le test s'ouvre.
+- [x] Le défi du jour est le même pour deux visiteurs le même jour, et change le lendemain.
+- [x] La question du défi arrive sans sa bonne réponse ; la correction vient d'une seconde requête.
+- [x] Une question désactivée n'est plus jamais tirée.
+- [x] Le podium ne montre que des clubs actifs, au plus trois, triés par points ; sans points, l'état vide.
+- [x] Aucune de ces actions n'écrit de ligne dans `mouvement_points`.
 
 ## Cas limites et erreurs
 

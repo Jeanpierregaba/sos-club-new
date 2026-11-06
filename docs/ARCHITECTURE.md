@@ -94,6 +94,11 @@ Champs structurants :
 - `rattachement` (spec 020) : le lien d'un encadreur à un club, mêmes états au masculin (`actif`, `refuse`,
   `retire`). `supplementaire` : l'encadreur avait déjà un club actif ; recalculé sous verrou à la décision,
   seule l'équipe nationale le valide (Q16). Une seule demande en cours par encadreur et par club.
+- `defi_question` (spec 021) : la banque du défi du jour de l'accueil. `ordre` unique (rang dans la
+  rotation), `categorie`, `question`, `options` (JSONB, 2 à 4 libellés), `bonne_reponse` (index, contrôlé par la
+  base), `explication`, `actif`. Le défi du jour est la question active de rang (numéro du jour de Lomé modulo
+  leur nombre) ; la réponse ne part qu'avec la correction. Remplie par `app.jeux.banque_initiale` (seeds, ou
+  `python -m app.jeux.banque_initiale` en prod) ; pas encore d'écran admin (R9). Aucun point.
 - `article` : `type` (activite, magazine, parole_eleve), `titre`, `contenu` en texte simple, `axe_id`,
   `club_id` facultatif, `auteur_id`, `photo`, `statut` (brouillon, soumis, publie, rejete),
   `motif_rejet`, `modere_par`, `publie_le`.
@@ -168,6 +173,8 @@ pour la ressource demandée.
 | Voir la liste des membres d'un club (spec 020)                            | Non      | Membre ou président       | Clubs où il est rattaché  | Sa DRE                                        |
 | Valider une affiliation ou un rattachement (spec 020)                     | Non      | Non                       | Non                       | Sa DRE (national pour un club supplémentaire) |
 | Confirmer le nouveau président d'un club (Q19, spec 020)                  | Non      | Non                       | Clubs où il est rattaché  | Non                                           |
+| Jouer à « Quel axe est fait pour toi ? » (spec 021)                       | Non      | Élève actif               | Non                       | Non                                           |
+| Répondre au défi du jour, voir le podium des clubs (spec 021)             | Oui      | Oui                       | Oui                       | Oui                                           |
 | Modérer, publier vidéos et documents, valider un club, attribuer un badge | Non      | Non                       | Non                       | Oui                                           |
 
 Un élève ne peut ni voir les coordonnées d'un autre utilisateur, ni être contacté par un autre
