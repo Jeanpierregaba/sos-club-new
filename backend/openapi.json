@@ -4685,6 +4685,68 @@
         }
       }
     },
+    "/api/jeux/quel-axe": {
+      "get": {
+        "tags": [
+          "jeux"
+        ],
+        "summary": "Questionnaire Quel Axe",
+        "operationId": "questionnaire_quel_axe_api_jeux_quel_axe_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionnaireQuelAxe"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jeux/quel-axe/resultat": {
+      "post": {
+        "tags": [
+          "jeux"
+        ],
+        "summary": "Resultat Quel Axe",
+        "operationId": "resultat_quel_axe_api_jeux_quel_axe_resultat_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReponsesQuelAxe"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultatQuelAxe"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -9318,6 +9380,48 @@
         ],
         "title": "PseudonymeEntree"
       },
+      "QuestionQuelAxe": {
+        "properties": {
+          "numero": {
+            "type": "integer",
+            "title": "Numero"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "reponses": {
+            "items": {
+              "$ref": "#/components/schemas/ReponseQuelAxe"
+            },
+            "type": "array",
+            "title": "Reponses"
+          }
+        },
+        "type": "object",
+        "required": [
+          "numero",
+          "libelle",
+          "reponses"
+        ],
+        "title": "QuestionQuelAxe"
+      },
+      "QuestionnaireQuelAxe": {
+        "properties": {
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionQuelAxe"
+            },
+            "type": "array",
+            "title": "Questions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "questions"
+        ],
+        "title": "QuestionnaireQuelAxe"
+      },
       "RattachementAValider": {
         "properties": {
           "id": {
@@ -9554,6 +9658,55 @@
         "title": "Remplacement",
         "description": "Remplace un établissement proposé par un établissement existant : ses élèves y sont rattachés (spec 017)."
       },
+      "ReponseQuelAxe": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ],
+            "title": "Id"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "libelle"
+        ],
+        "title": "ReponseQuelAxe"
+      },
+      "ReponsesQuelAxe": {
+        "properties": {
+          "reponses": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "A",
+                "B",
+                "C",
+                "D"
+              ]
+            },
+            "type": "array",
+            "maxItems": 5,
+            "minItems": 5,
+            "title": "Reponses"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reponses"
+        ],
+        "title": "ReponsesQuelAxe"
+      },
       "ResultatLot": {
         "properties": {
           "reussies": {
@@ -9579,6 +9732,64 @@
         ],
         "title": "ResultatLot",
         "description": "Chaque demande d'un lot est traitée à part : celles qui échouent n'empêchent pas les autres."
+      },
+      "ResultatQuelAxe": {
+        "properties": {
+          "principal": {
+            "type": "string",
+            "enum": [
+              "GI",
+              "EVSS",
+              "TV",
+              "SS",
+              "GB",
+              "LM",
+              "SE"
+            ],
+            "title": "Principal"
+          },
+          "autres": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "GI",
+                "EVSS",
+                "TV",
+                "SS",
+                "GB",
+                "LM",
+                "SE"
+              ]
+            },
+            "type": "array",
+            "title": "Autres"
+          },
+          "scores": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "enum": [
+                "GI",
+                "EVSS",
+                "TV",
+                "SS",
+                "GB",
+                "LM",
+                "SE"
+              ]
+            },
+            "type": "object",
+            "title": "Scores"
+          }
+        },
+        "type": "object",
+        "required": [
+          "principal",
+          "autres",
+          "scores"
+        ],
+        "title": "ResultatQuelAxe"
       },
       "ResumePoints": {
         "properties": {

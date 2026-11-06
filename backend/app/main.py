@@ -23,6 +23,7 @@ from app.db import engine, get_session
 from app.eleves.router import router as router_eleves
 from app.encadreurs.router import router as router_encadreurs
 from app.encadreurs.router import router_admin as router_encadreurs_admin
+from app.jeux.router import router as router_jeux
 from app.points.router import router_admin as router_points_admin
 from app.referentiel.router import router_admin as router_referentiel_admin
 from app.referentiel.router import router_public as router_referentiel
@@ -56,6 +57,7 @@ api.include_router(router_encadreurs)
 api.include_router(router_encadreurs_admin)
 api.include_router(router_clubs)
 api.include_router(router_clubs_admin)
+api.include_router(router_jeux)
 app.include_router(api)
 
 

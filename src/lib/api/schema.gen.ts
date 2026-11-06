@@ -1649,6 +1649,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/jeux/quel-axe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Questionnaire Quel Axe */
+        get: operations["questionnaire_quel_axe_api_jeux_quel_axe_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/jeux/quel-axe/resultat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resultat Quel Axe */
+        post: operations["resultat_quel_axe_api_jeux_quel_axe_resultat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -3248,6 +3282,20 @@ export interface components {
             /** Motif */
             motif: string;
         };
+        /** QuestionQuelAxe */
+        QuestionQuelAxe: {
+            /** Numero */
+            numero: number;
+            /** Libelle */
+            libelle: string;
+            /** Reponses */
+            reponses: components["schemas"]["ReponseQuelAxe"][];
+        };
+        /** QuestionnaireQuelAxe */
+        QuestionnaireQuelAxe: {
+            /** Questions */
+            questions: components["schemas"]["QuestionQuelAxe"][];
+        };
         /**
          * RattachementAValider
          * @description Un rattachement confirmé par le président, dans la file d'un collaborateur.
@@ -3354,6 +3402,21 @@ export interface components {
              */
             cible_id: string;
         };
+        /** ReponseQuelAxe */
+        ReponseQuelAxe: {
+            /**
+             * Id
+             * @enum {string}
+             */
+            id: "A" | "B" | "C" | "D";
+            /** Libelle */
+            libelle: string;
+        };
+        /** ReponsesQuelAxe */
+        ReponsesQuelAxe: {
+            /** Reponses */
+            reponses: ("A" | "B" | "C" | "D")[];
+        };
         /**
          * ResultatLot
          * @description Chaque demande d'un lot est traitée à part : celles qui échouent n'empêchent pas les autres.
@@ -3363,6 +3426,20 @@ export interface components {
             reussies: string[];
             /** Echecs */
             echecs: components["schemas"]["EchecLot"][];
+        };
+        /** ResultatQuelAxe */
+        ResultatQuelAxe: {
+            /**
+             * Principal
+             * @enum {string}
+             */
+            principal: "GI" | "EVSS" | "TV" | "SS" | "GB" | "LM" | "SE";
+            /** Autres */
+            autres: ("GI" | "EVSS" | "TV" | "SS" | "GB" | "LM" | "SE")[];
+            /** Scores */
+            scores: {
+                [key: string]: number;
+            };
         };
         /** ResumePoints */
         ResumePoints: {
@@ -6694,6 +6771,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DemandeClub"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    questionnaire_quel_axe_api_jeux_quel_axe_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionnaireQuelAxe"];
+                };
+            };
+        };
+    };
+    resultat_quel_axe_api_jeux_quel_axe_resultat_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReponsesQuelAxe"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResultatQuelAxe"];
                 };
             };
             /** @description Validation Error */
