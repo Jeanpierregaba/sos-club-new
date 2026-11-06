@@ -18,8 +18,8 @@ from app.clubs.models import (
     EtatRattachement,
     Rattachement,
 )
-from app.comptes.models import Utilisateur
-from tests.conftest import MOT_DE_PASSE, Navigateur
+from app.comptes.models import StatutCompte, Utilisateur
+from tests.conftest import MOT_DE_PASSE, Navigateur, connecter_admin
 
 pytestmark = pytest.mark.usefixtures("annuaire")
 
@@ -89,7 +89,7 @@ def test_le_successeur_doit_etre_membre_du_club(
 
     reponse = proposer(client, club, "Voisin")
 
-    assert reponse.status_code == 422
+    assert reponse.status_code == 409
     assert "membre" in reponse.json()["detail"]
 
 
@@ -207,7 +207,82 @@ def test_un_successeur_qui_a_quitte_le_club_nest_pas_valide(
     connecter(navigateur, "kofi")
     assert navigateur.delete(f"/api/clubs/{club.id}/adhesions/moi").status_code == 200
 
+    # Son départ a annulé la passation : le président sortant peut en proposer une autre.
+    passation = passation_du_club(en_base, club)
+    assert passation.etat is EtatPassation.refusee
+    assert passation.motif_refus == "Le successeur proposé a quitté le club."
+
     reponse = verificateur_clubs.post(f"/api/admin/clubs/passations/{corps['id']}/valider")
 
     assert reponse.status_code == 409
     assert en_base(lambda db: db.get(Club, club.id)).president_id == club.president_id
+
+
+def test_le_successeur_retire_par_le_president_annule_la_passation(
+    client: TestClient, club: Any, successeur: Utilisateur, en_base: Callable[..., Any]
+) -> None:
+    proposer(client, club)
+    adhesion = en_base(
+        lambda db: db.scalar(select(Adhesion).where(Adhesion.eleve_id == successeur.id, Adhesion.club_id == club.id))
+    )
+
+    reponse = client.post(f"/api/clubs/{club.id}/adhesions/{adhesion.id}/retirer", json={"version": adhesion.version})
+
+    assert reponse.status_code == 200, reponse.text
+    assert passation_du_club(en_base, club).etat is EtatPassation.refusee
+
+
+def suspendre_compte(en_base: Callable[..., Any], utilisateur: Utilisateur) -> None:
+    async def modifier(db: AsyncSession) -> None:
+        (await db.get(Utilisateur, utilisateur.id)).statut = StatutCompte.suspendu
+
+    en_base(modifier)
+
+
+def test_un_encadreur_suspendu_ne_retient_pas_la_passation(
+    client: TestClient, club: Any, successeur: Utilisateur, prof: Utilisateur, en_base: Callable[..., Any]
+) -> None:
+    suspendre_compte(en_base, prof)
+
+    reponse = proposer(client, club)
+
+    assert reponse.json()["etat"] == "en_attente"
+    connecter(client, "kofi")
+    assert client.get(f"/api/clubs/{club.id}/membres").json()["encadreurs"] == []
+
+
+def test_suspendre_le_seul_encadreur_libere_la_passation(
+    client: TestClient,
+    club: Any,
+    successeur: Utilisateur,
+    prof: Utilisateur,
+    creer_collaborateur: Callable[..., Any],
+    en_base: Callable[..., Any],
+) -> None:
+    assert proposer(Navigateur(client), club).json()["etat"] == "en_attente_encadreur"
+    creer_collaborateur("chef", super_admin=True, double_auth=True)
+    connecter_admin(client, "chef")
+
+    reponse = client.post(f"/api/admin/inscrits/{prof.id}/suspendre", json={"motif": "Compte usurpé"})
+
+    assert reponse.status_code == 200, reponse.text
+    assert passation_du_club(en_base, club).etat is EtatPassation.en_attente
+
+
+def test_avec_un_autre_encadreur_actif_la_passation_attend_toujours(
+    client: TestClient,
+    club: Any,
+    successeur: Utilisateur,
+    prof: Utilisateur,
+    creer_encadreur: Callable[..., Utilisateur],
+    creer_collaborateur: Callable[..., Any],
+    en_base: Callable[..., Any],
+) -> None:
+    rattacher(en_base, creer_encadreur("prof2", etablissement_id=club.etablissement_id), club)
+    proposer(Navigateur(client), club)
+    creer_collaborateur("chef", super_admin=True, double_auth=True)
+    connecter_admin(client, "chef")
+
+    client.post(f"/api/admin/inscrits/{prof.id}/suspendre", json={"motif": "Compte usurpé"})
+
+    assert passation_du_club(en_base, club).etat is EtatPassation.en_attente_encadreur

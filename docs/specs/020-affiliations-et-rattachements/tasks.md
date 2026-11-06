@@ -84,9 +84,9 @@ Chaque tâche est autonome et committable ; lint, typecheck et tests passent ava
 
 ## Tâche 10 — Clôture
 
-- [ ] Vérification sur téléphone (viewport mobile) des trois espaces
-- [ ] Relecture par le sous-agent `reviewer`, constats corrigés
-- [ ] `ARCHITECTURE.md` (tables, routes), `SECURITY.md` (droits par ressource), note sur Q4 restant à faire
-- [ ] `TASKS.md`, `docs/SESSION-LOG.md`
+- [ ] Vérification sur téléphone (viewport mobile) des trois espaces : celui du président est vérifié ; ceux de l'encadreur et de l'admin ne l'ont été que sur ordinateur
+- [x] Relecture par le sous-agent `reviewer`, constats corrigés
+- [x] `ARCHITECTURE.md` (tables, routes), `SECURITY.md` (droits par ressource), note sur Q4 restant à faire
+- [x] `TASKS.md`, `docs/SESSION-LOG.md`
 
 **Commit :** `docs: clôture de la spec 020`

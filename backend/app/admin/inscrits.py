@@ -20,7 +20,8 @@ from app.admin.schemas import (
     ProfilEleveAdmin,
     ProfilEncadreurAdmin,
 )
-from app.clubs.models import Club, EtatClub
+from app.clubs.models import Club, EtatClub, EtatRattachement, Rattachement
+from app.clubs.rattachements import liberer_passation
 from app.comptes.inscription import etablissement_rattache
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.comptes.service import couper_sessions
@@ -199,6 +200,16 @@ async def changer_statut(
     utilisateur.statut = nouveau
     if nouveau is not StatutCompte.actif:
         await couper_sessions(db, utilisateur.id)
+        if utilisateur.role is Role.encadreur:
+            # Un encadreur suspendu ne confirme plus de passation : celles qui l'attendaient passent à l'admin
+            # si le club n'a pas d'autre encadreur actif (spec 020).
+            clubs = await db.scalars(
+                select(Rattachement.club_id).where(
+                    Rattachement.encadreur_id == utilisateur.id, Rattachement.etat == EtatRattachement.actif
+                )
+            )
+            for club_id in clubs.all():
+                await liberer_passation(db, club_id)
     journaliser(
         db,
         "inscrit_suspendu" if nouveau is StatutCompte.suspendu else "inscrit_reactive",

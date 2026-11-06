@@ -321,11 +321,14 @@ async def valider_passation(
     if avant == passation.successeur_id:
         raise Refus("Ce successeur est déjà président du club.", 409)
     if not await db.scalar(
-        select(Adhesion.id).where(
+        select(Adhesion.id)
+        .where(
             Adhesion.club_id == club.id,
             Adhesion.eleve_id == passation.successeur_id,
             Adhesion.etat == EtatAdhesion.active,
         )
+        # Verrou : le successeur ne peut pas quitter le club pendant qu'il en devient président.
+        .with_for_update()
     ):
         raise Refus("Le successeur n'est plus membre du club : la passation ne peut pas être validée.", 409)
     club.president_id = passation.successeur_id

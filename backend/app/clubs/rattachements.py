@@ -22,6 +22,7 @@ from app.clubs.models import (
     EtatRattachement,
     Rattachement,
 )
+from app.clubs.requetes import encadreurs_actifs
 from app.clubs.schemas import DemandeRattachement, MesClubs, PassationAConfirmer, RattachementResume
 from app.comptes.inscription import Refus
 from app.comptes.models import Role, Utilisateur
@@ -434,11 +435,11 @@ async def _apercu_a_confirmer(db: AsyncSession, passation: ClubPassation) -> Pas
 
 
 async def liberer_passation(db: AsyncSession, club_id: UUID) -> None:
-    """Quand le club n'a plus d'encadreur rattaché, une passation qui l'attendait passe directement à l'admin."""
+    """Quand le club n'a plus d'encadreur actif rattaché (retrait, départ, suspension), une passation qui
+    l'attendait passe directement à l'admin."""
     await db.flush()
-    if await db.scalar(
-        select(Rattachement.id).where(Rattachement.club_id == club_id, Rattachement.etat == EtatRattachement.actif)
-    ):
+    await db.execute(select(Club.id).where(Club.id == club_id).with_for_update())
+    if await db.scalar(encadreurs_actifs(club_id).limit(1)):
         return
     passation = await db.scalar(
         select(ClubPassation)

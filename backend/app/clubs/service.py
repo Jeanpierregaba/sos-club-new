@@ -22,9 +22,8 @@ from app.clubs.models import (
     EtatAdhesion,
     EtatClub,
     EtatPassation,
-    EtatRattachement,
-    Rattachement,
 )
+from app.clubs.requetes import encadreurs_actifs
 from app.clubs.schemas import (
     ClubFiche,
     ClubPublic,
@@ -304,14 +303,15 @@ async def proposer_passation(
         )
     )
     if membre is None:
-        raise Refus("Cet élève n'est pas membre de ton club : il doit d'abord le rejoindre.")
+        raise Refus("Cet élève n'est pas membre de ton club : il doit d'abord le rejoindre.", 409)
     if await db.scalar(
         select(ClubPassation).where(ClubPassation.club_id == club.id, ClubPassation.etat.in_(PASSATION_EN_ATTENTE))
     ):
         raise Refus("Une passation est déjà en attente pour ce club.", 409)
-    encadre = await db.scalar(
-        select(Rattachement.id).where(Rattachement.club_id == club.id, Rattachement.etat == EtatRattachement.actif)
-    )
+    # Verrou du club : un rattachement qui se termine en même temps ne laisse pas la passation attendre un
+    # encadreur qui n'existe plus (`rattachements.liberer_passation` prend le même verrou).
+    await db.execute(select(Club.id).where(Club.id == club.id).with_for_update())
+    encadre = await db.scalar(encadreurs_actifs(club.id).limit(1))
     passation = ClubPassation(
         club_id=club.id,
         successeur_id=eleve_succ.utilisateur_id,

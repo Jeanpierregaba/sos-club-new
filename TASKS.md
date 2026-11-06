@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] R5 — [020 Affiliations et rattachements](docs/specs/020-affiliations-et-rattachements/) : spec et plan validés le 2026-11-05 ; en cours : tâche 1
+Rien en cours : prochaine spec, R6 (centre de modération).
 
 ## À faire
 
@@ -22,8 +22,9 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 **Phase 1 — Comptes et clubs (P0, jalon A)**
 
-- [ ] R4 — Clubs et présidence : création par l'élève président, validation, passation, carte des clubs réelle ; amender l'ADR-0003 (Q5, Q6, Q16, Q19)
-- [ ] R5 — Affiliations des élèves et rattachements des encadreurs (Q16, Q18)
+- [x] R4 — Clubs et présidence : création par l'élève président, validation, passation, carte des clubs réelle ; amender l'ADR-0003 (Q5, Q6, Q16, Q19)
+- [x] R5 — Affiliations des élèves et rattachements des encadreurs (Q16, Q18)
+- [ ] Q4 — Réinitialisation du mot de passe d'un élève par un encadreur rattaché : spec à part (signalée par la spec 020)
 
 **Phase 2 — Modération et publications (P0, jalon A)**
 
@@ -53,7 +54,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 - [ ] R16 — Agenda et invitations (Q22)
 - [ ] R17 — Partage du classement et partages vérifiés (Q23)
 - [ ] R18 — Forums et co-animation, avec un ADR sur les échanges entre élèves (Q26)
-- [ ] R19 — Comptes visiteurs (Q27)
+- [ ] R19 — Comptes visiteurs (Q27) : le choix « Particulier / visiteur » est déjà sur `/inscription`, sans formulaire ; le PRD exclut la certification des visiteurs alors que la page l'annonce, à trancher dans la spec
 - [ ] R20 — Capsules vidéo par axe
 - [ ] R21 — Campagnes et pages institutionnelles
 - [ ] R22 — Détection d'anomalies et analyses
@@ -69,6 +70,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] [020 — Affiliations et rattachements](docs/specs/020-affiliations-et-rattachements/spec.md) (R5 : adhésion de l'élève confirmée par le président puis validée en lot par la DRE, rattachement des encadreurs avec club supplémentaire réservé au national, liste des membres, passation confirmée par un encadreur rattaché — Q19)
 - [x] [019 — Clubs et présidence](docs/specs/019-clubs-et-presidence/spec.md) (R4 : demande de création par l'élève président, vérification par DRE, carte et fiches publiques, passations de présidence)
 - [x] [018 — Compte encadreur](docs/specs/018-compte-encadreur/spec.md) (R3 : inscription en attente d'activation, +100 de bienvenue après vérification, file admin filtrable par DRE, refus motivé et renvoi de demande)
 - [x] [017 — Compte élève et registre des points](docs/specs/017-compte-eleve/spec.md) (R2 : inscription avec pseudonyme et établissement proposé, +100 de bienvenue, espace élève, registre `mouvement_points`, semestres et barème réglables dans l'admin)

@@ -24,10 +24,10 @@ erDiagram
   utilisateur ||--o{ session : ouvre
   utilisateur ||--o| eleve : "profil (spec 017)"
   etablissement ||--o{ eleve : scolarise
-  utilisateur ||--o| adhesion : "élève, adhésion active"
+  utilisateur ||--o{ adhesion : "élève, une en cours (spec 020)"
   club ||--o{ adhesion : regroupe
-  utilisateur ||--o{ encadrement : "encadreur"
-  club ||--o{ encadrement : "3 à l'enregistrement"
+  encadreur ||--o{ rattachement : "plusieurs clubs (Q16)"
+  club ||--o{ rattachement : encadre
   dre ||--o{ iesg : regroupe
   iesg ||--o{ etablissement : regroupe
   etablissement ||--o{ club : accueille
@@ -78,15 +78,22 @@ Champs structurants :
   cas de refus, CHECK), `demande_le`, `decide_le`, `decide_par`, `actif_le`, `version` (verrou
   optimiste). Un seul club actif par établissement (index partiel unique). Voir aussi `club_axe`.
 - `club_axe` (spec 019) : jusqu'à 3 axes privilégiés par club, jointure `club_id` + code de l'axe.
-- `club_passation` (spec 019) : proposition de transmission de la présidence par le président
-  sortant vers un élève du même établissement (`successeur_id`, `propose_par`, `propose_le`,
-  `etat` en_attente / validee / refusee, `motif_refus`, `decide_le`, `decide_par`, `version`).
-  Une seule passation en attente par club (index partiel unique). La décision change le
-  gestionnaire du club, jamais le rôle des comptes.
-- `adhesion` : `eleve_id`, `club_id`, `depuis`, `jusqu_a`. Une seule adhésion active par élève
-  (index unique partiel), l'historique reste conservé.
-- `encadrement` : `club_id`, `utilisateur_id`, `specialite`, `statut`. Un encadreur n'a qu'un
-  encadrement actif (Q16).
+- `club_passation` (spec 019, Q19 en spec 020) : proposition de transmission de la présidence par le
+  président sortant vers un **membre** du club (`successeur_id`, `propose_par`, `propose_le`, `etat`
+  en_attente_encadreur / en_attente / validee / refusee, `confirmee_par`, `confirmee_le`, `motif_refus`,
+  `decide_le`, `decide_par`, `version`). Si le club a un encadreur rattaché, celui-ci confirme d'abord
+  (`en_attente_encadreur`) ; sans encadreur, la passation va directement à l'admin. Une seule passation en
+  attente par club (index partiel unique sur les deux états d'attente). La décision change le gestionnaire
+  du club, jamais le rôle des comptes.
+- `adhesion` (spec 020) : l'affiliation d'un élève. `eleve_id`, `club_id`, `etat`
+  (en_attente_president, en_attente_validation, active, refusee, retiree), `confirme_*` (le président),
+  `decide_*` (le collaborateur, ou le président pour un refus), `motif_refus` (obligatoire au refus),
+  `retire_*`, `motif_retrait`, `version`. Une seule adhésion en cours par élève, tous clubs confondus
+  (index unique partiel) ; une nouvelle demande crée une nouvelle ligne, l'historique reste. Le président
+  est membre de droit de son club.
+- `rattachement` (spec 020) : le lien d'un encadreur à un club, mêmes états au masculin (`actif`, `refuse`,
+  `retire`). `supplementaire` : l'encadreur avait déjà un club actif ; recalculé sous verrou à la décision,
+  seule l'équipe nationale le valide (Q16). Une seule demande en cours par encadreur et par club.
 - `article` : `type` (activite, magazine, parole_eleve), `titre`, `contenu` en texte simple, `axe_id`,
   `club_id` facultatif, `auteur_id`, `photo`, `statut` (brouillon, soumis, publie, rejete),
   `motif_rejet`, `modere_par`, `publie_le`.
@@ -146,17 +153,22 @@ flowchart LR
 Sessions en base et cookie sécurisé (ADR-0003). Les droits sont contrôlés dans l'API, sur chaque route,
 pour la ressource demandée.
 
-| Action                                                                    | Visiteur | Élève   | Encadreur          | Admin |
-| ------------------------------------------------------------------------- | -------- | ------- | ------------------ | ----- |
-| Lire les contenus publiés                                                 | Oui      | Oui     | Oui                | Oui   |
-| Passer un quiz avec points                                                | Non      | Oui     | Non                | Non   |
-| Voir son Passeport                                                        | Non      | Le sien | Non                | Oui   |
-| Soumettre un témoignage                                                   | Non      | Oui     | Non                | Non   |
-| Soumettre une activité, ajouter à l'agenda                                | Non      | Non     | Pour son club      | Oui   |
-| Voir la console d'un club                                                 | Non      | Non     | Son club           | Oui   |
-| Retirer un élève, réinitialiser son accès                                 | Non      | Non     | Élèves de son club | Oui   |
-| Commenter                                                                 | Non      | Non     | Oui                | Oui   |
-| Modérer, publier vidéos et documents, valider un club, attribuer un badge | Non      | Non     | Non                | Oui   |
+| Action                                                                    | Visiteur | Élève                     | Encadreur                 | Admin                                         |
+| ------------------------------------------------------------------------- | -------- | ------------------------- | ------------------------- | --------------------------------------------- |
+| Lire les contenus publiés                                                 | Oui      | Oui                       | Oui                       | Oui                                           |
+| Passer un quiz avec points                                                | Non      | Oui                       | Non                       | Non                                           |
+| Voir son Passeport                                                        | Non      | Le sien                   | Non                       | Oui                                           |
+| Soumettre un témoignage                                                   | Non      | Oui                       | Non                       | Non                                           |
+| Soumettre une activité, ajouter à l'agenda                                | Non      | Non                       | Pour son club             | Oui                                           |
+| Voir la console d'un club                                                 | Non      | Non                       | Son club                  | Oui                                           |
+| Retirer un élève, réinitialiser son accès                                 | Non      | Non                       | Élèves de son club        | Oui                                           |
+| Commenter                                                                 | Non      | Non                       | Oui                       | Oui                                           |
+| Demander à rejoindre un club (spec 020)                                   | Non      | Club de son établissement | N'importe quel club actif | Non                                           |
+| Confirmer ou refuser une demande, retirer un membre (spec 020)            | Non      | Président de ce club      | Non                       | Non                                           |
+| Voir la liste des membres d'un club (spec 020)                            | Non      | Membre ou président       | Clubs où il est rattaché  | Sa DRE                                        |
+| Valider une affiliation ou un rattachement (spec 020)                     | Non      | Non                       | Non                       | Sa DRE (national pour un club supplémentaire) |
+| Confirmer le nouveau président d'un club (Q19, spec 020)                  | Non      | Non                       | Clubs où il est rattaché  | Non                                           |
+| Modérer, publier vidéos et documents, valider un club, attribuer un badge | Non      | Non                       | Non                       | Oui                                           |
 
 Un élève ne peut ni voir les coordonnées d'un autre utilisateur, ni être contacté par un autre
 utilisateur. Sur les pages publiques, un élève apparaît par son pseudonyme et le nom de son club.

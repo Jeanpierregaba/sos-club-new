@@ -15,13 +15,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.journal import journaliser
 from app.clubs.models import (
     ADHESION_EN_COURS,
+    PASSATION_EN_ATTENTE,
     Adhesion,
     Club,
+    ClubPassation,
     EtatAdhesion,
     EtatClub,
-    EtatRattachement,
+    EtatPassation,
     Rattachement,
 )
+from app.clubs.requetes import encadreurs_actifs
 from app.clubs.schemas import AdhesionResume, DemandeAdhesion, EncadreurDuClub, MembreClub, MembresDuClub
 from app.clubs.service import eleve_de
 from app.comptes.inscription import Refus
@@ -90,6 +93,7 @@ async def adhesion_president(db: AsyncSession, club: Club) -> None:
         en_cours.etat = EtatAdhesion.retiree
         en_cours.retire_le = datetime.now(UTC)
         en_cours.motif_retrait = "Devenu président d'un autre club."
+        await annuler_passation_du_successeur(db, en_cours)
         await db.flush()
     db.add(
         Adhesion(
@@ -98,6 +102,32 @@ async def adhesion_president(db: AsyncSession, club: Club) -> None:
             etat=EtatAdhesion.active,
             decide_le=datetime.now(UTC),
         )
+    )
+
+
+async def annuler_passation_du_successeur(db: AsyncSession, adhesion: Adhesion) -> None:
+    """Un élève qui quitte le club ne peut plus en devenir président : la passation qui le désignait est refusée,
+    et le président sortant pourra en proposer une autre."""
+    passation = await db.scalar(
+        select(ClubPassation)
+        .where(
+            ClubPassation.club_id == adhesion.club_id,
+            ClubPassation.successeur_id == adhesion.eleve_id,
+            ClubPassation.etat.in_(PASSATION_EN_ATTENTE),
+        )
+        .with_for_update()
+    )
+    if passation is None:
+        return
+    passation.etat = EtatPassation.refusee
+    passation.motif_refus = "Le successeur proposé a quitté le club."
+    passation.decide_le = datetime.now(UTC)
+    journaliser(
+        db,
+        "club_passation_annulee",
+        cible_type="club",
+        cible_id=adhesion.club_id,
+        details={"passation_id": str(passation.id), "raison": "successeur_parti"},
     )
 
 
@@ -164,6 +194,7 @@ async def se_retirer(db: AsyncSession, utilisateur: Utilisateur, club_id: UUID, 
         details={"club_id": str(club_id), "par": "eleve", "etat_precedent": etat_precedent.value},
         adresse_ip=adresse_ip,
     )
+    await annuler_passation_du_successeur(db, adhesion)
     await db.commit()
     return await resume(db, adhesion)
 
@@ -279,6 +310,7 @@ async def retirer(
         details={"club_id": str(club.id), "par": "president", "motif": motif},
         adresse_ip=adresse_ip,
     )
+    await annuler_passation_du_successeur(db, adhesion)
     await db.commit()
     return await resume(db, adhesion)
 
@@ -307,7 +339,7 @@ async def liste_membres(db: AsyncSession, club: Club) -> MembresDuClub:
         select(Rattachement, Utilisateur, Encadreur)
         .join(Utilisateur, Utilisateur.id == Rattachement.encadreur_id)
         .join(Encadreur, Encadreur.utilisateur_id == Rattachement.encadreur_id)
-        .where(Rattachement.club_id == club.id, Rattachement.etat == EtatRattachement.actif)
+        .where(Rattachement.id.in_(encadreurs_actifs(club.id).with_only_columns(Rattachement.id)))
         .order_by(Utilisateur.nom, Utilisateur.prenom)
     )
     return MembresDuClub(
@@ -334,13 +366,7 @@ async def membres_du_club(db: AsyncSession, utilisateur: Utilisateur, club_id: U
             Adhesion.club_id == club.id, Adhesion.eleve_id == utilisateur.id, Adhesion.etat == EtatAdhesion.active
         )
     )
-    encadreur = await db.scalar(
-        select(Rattachement.id).where(
-            Rattachement.club_id == club.id,
-            Rattachement.encadreur_id == utilisateur.id,
-            Rattachement.etat == EtatRattachement.actif,
-        )
-    )
+    encadreur = await db.scalar(encadreurs_actifs(club.id).where(Rattachement.encadreur_id == utilisateur.id))
     if club.president_id != utilisateur.id and membre is None and encadreur is None:
         raise Refus("Ce club est introuvable.", 404)
     return await liste_membres(db, club)
@@ -372,3 +398,4 @@ async def quitter_au_changement_detablissement(db: AsyncSession, utilisateur: Ut
         details={"club_id": str(adhesion.club_id), "par": "changement_etablissement"},
         adresse_ip=adresse_ip,
     )
+    await annuler_passation_du_successeur(db, adhesion)

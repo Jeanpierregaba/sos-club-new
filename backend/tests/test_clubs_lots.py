@@ -246,6 +246,41 @@ def test_le_caractere_supplementaire_est_recalcule_a_la_decision(
     assert en_base(lambda db: db.get(Rattachement, demande.id)).etat is EtatRattachement.en_attente_validation
 
 
+def test_un_rattachement_hors_du_perimetre_est_introuvable(
+    collaborateur_dre: Callable[[str], TestClient],
+    club: Any,
+    creer_encadreur: Callable[..., Utilisateur],
+    en_base: Callable[..., Any],
+) -> None:
+    demande = rattachement(en_base, creer_encadreur("prof"), club)
+    client = collaborateur_dre("kara")
+
+    assert client.get("/api/admin/clubs/rattachements").json()["total"] == 0
+    reponse = client.post("/api/admin/clubs/rattachements/valider", json=lot(demande))
+
+    assert reponse.json()["echecs"] == [{"id": str(demande.id), "message": "Cette demande est introuvable."}]
+    assert en_base(lambda db: db.get(Rattachement, demande.id)).etat is EtatRattachement.en_attente_validation
+
+
+def test_la_file_recalcule_le_caractere_supplementaire(
+    collaborateur_dre: Callable[[str], TestClient],
+    club: Any,
+    autre_club: Any,
+    creer_encadreur: Callable[..., Utilisateur],
+    en_base: Callable[..., Any],
+) -> None:
+    prof = creer_encadreur("prof")
+    # Demandé comme supplémentaire, mais le premier club s'est terminé depuis : la DRE peut décider.
+    demande = rattachement(en_base, prof, club, supplementaire=True)
+    rattachement(en_base, prof, autre_club, etat=EtatRattachement.retire)
+    client = collaborateur_dre("grand-lome")
+
+    ligne = client.get("/api/admin/clubs/rattachements").json()["demandes"][0]
+
+    assert (ligne["id"], ligne["supplementaire"], ligne["decidable"]) == (str(demande.id), False, True)
+    assert client.get("/api/admin/moi").json()["clubs_a_valider"] == 1
+
+
 def test_un_refus_de_rattachement_porte_le_motif(
     verificateur_clubs: TestClient, club: Any, creer_encadreur: Callable[..., Utilisateur], en_base: Callable[..., Any]
 ) -> None:
@@ -275,7 +310,9 @@ def test_le_compteur_compte_les_demandes_decidables(
     confirmee(en_base, creer_eleve("kofi", "Kofi", etablissement_id=club.etablissement_id), club)
     rattachement(en_base, creer_encadreur("prof"), club)
     # Un club supplémentaire ne compte pas pour une DRE : elle ne peut pas le décider.
-    rattachement(en_base, creer_encadreur("prof2"), club, supplementaire=True)
+    prof2 = creer_encadreur("prof2")
+    rattachement(en_base, prof2, autre_club, etat=EtatRattachement.actif)
+    rattachement(en_base, prof2, club)
     client = collaborateur_dre("grand-lome")
 
     assert client.get("/api/admin/moi").json()["clubs_a_valider"] == 2

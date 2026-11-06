@@ -13,8 +13,9 @@ from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
 from uuid import UUID
 
-from sqlalchemy import Select, func, select
+from sqlalchemy import ColumnElement, Select, exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
@@ -40,6 +41,17 @@ from app.referentiel.models import Dre, Etablissement, Iesg
 LIMITE_FILE = 200
 INTROUVABLE = "Cette demande est introuvable."
 NATIONAL_REQUIS = "Autorisation nationale requise : cet encadreur est déjà rattaché à un autre club."
+
+
+def _supplementaire() -> ColumnElement[bool]:
+    """Vrai si l'encadreur du rattachement a déjà un autre club actif, calculé à la lecture : la colonne
+    `supplementaire` peut dater de la demande (le premier club a pu se terminer depuis)."""
+    autre = aliased(Rattachement)
+    return exists().where(
+        autre.encadreur_id == Rattachement.encadreur_id,
+        autre.etat == EtatRattachement.actif,
+        autre.club_id != Rattachement.club_id,
+    )
 
 
 def _dans_le_perimetre[T: Select](requete: T, acces: Acces) -> T:
@@ -68,7 +80,7 @@ async def compter_a_valider(db: AsyncSession, acces: Acces) -> int:
     rattachements = select(func.count()).select_from(Rattachement).join(Club, Club.id == Rattachement.club_id)
     rattachements = rattachements.where(Rattachement.etat == EtatRattachement.en_attente_validation)
     if not acces.national:
-        rattachements = rattachements.where(Rattachement.supplementaire.is_(False))
+        rattachements = rattachements.where(~_supplementaire())
     return (adhesions or 0) + (await db.scalar(_dans_le_perimetre(rattachements, acces)) or 0)
 
 
@@ -108,7 +120,16 @@ async def file_affiliations(db: AsyncSession, acces: Acces) -> FileAffiliations:
 async def file_rattachements(db: AsyncSession, acces: Acces) -> FileRattachements:
     EtablissementEncadreur = Etablissement.__table__.alias("etablissement_encadreur")
     requete = _dans_le_perimetre(
-        select(Rattachement, Utilisateur, Encadreur, Club, Etablissement.nom, Dre.nom, EtablissementEncadreur.c.nom)
+        select(
+            Rattachement,
+            Utilisateur,
+            Encadreur,
+            Club,
+            Etablissement.nom,
+            Dre.nom,
+            EtablissementEncadreur.c.nom,
+            _supplementaire().label("supplementaire"),
+        )
         .join(Utilisateur, Utilisateur.id == Rattachement.encadreur_id)
         .join(Encadreur, Encadreur.utilisateur_id == Rattachement.encadreur_id)
         .join(EtablissementEncadreur, EtablissementEncadreur.c.id == Encadreur.etablissement_id)
@@ -131,13 +152,13 @@ async def file_rattachements(db: AsyncSession, acces: Acces) -> FileRattachement
                 club_nom=club.nom,
                 club_etablissement=etablissement,
                 dre=dre,
-                supplementaire=rattachement.supplementaire,
-                decidable=acces.national or not rattachement.supplementaire,
+                supplementaire=supplementaire,
+                decidable=acces.national or not supplementaire,
                 demande_le=rattachement.demande_le,
                 confirme_le=rattachement.confirme_le,
                 version=rattachement.version,
             )
-            for rattachement, compte, encadreur, club, etablissement, dre, etablissement_encadreur in lignes
+            for rattachement, compte, encadreur, club, etablissement, dre, etablissement_encadreur, supplementaire in lignes
         ],
     )
 
@@ -231,6 +252,16 @@ async def refuser_affiliations(
     return await _en_lot(db, elements, refuser)
 
 
+async def _par_encadreur(db: AsyncSession, elements: list[ElementLot]) -> list[ElementLot]:
+    """Les rattachements d'un lot dans l'ordre de leurs encadreurs : deux lots simultanés verrouillent les
+    profils d'encadreur dans le même ordre et ne peuvent pas s'attendre l'un l'autre (pas d'interblocage)."""
+    lignes = await db.execute(
+        select(Rattachement.id, Rattachement.encadreur_id).where(Rattachement.id.in_([e.id for e in elements]))
+    )
+    encadreurs = {id_: encadreur_id for id_, encadreur_id in lignes}
+    return sorted(elements, key=lambda e: (str(encadreurs.get(e.id, "")), str(e.id)))
+
+
 async def _rattachement_a_decider(
     db: AsyncSession, acces: Acces, element: ElementLot, *, valider: bool
 ) -> tuple[Rattachement, Club, str]:
@@ -280,7 +311,7 @@ async def valider_rattachements(db: AsyncSession, acces: Acces, elements: list[E
         )
         await db.flush()
 
-    return await _en_lot(db, elements, valider)
+    return await _en_lot(db, await _par_encadreur(db, elements), valider)
 
 
 async def refuser_rattachements(
@@ -304,7 +335,7 @@ async def refuser_rattachements(
         )
         await db.flush()
 
-    return await _en_lot(db, elements, refuser)
+    return await _en_lot(db, await _par_encadreur(db, elements), refuser)
 
 
 async def membres_du_club(db: AsyncSession, acces: Acces, club_id: UUID) -> MembresDuClub:

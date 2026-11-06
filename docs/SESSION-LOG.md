@@ -14,6 +14,30 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-06 — Seed préprod, retouches du site et affiliations (spec 020, R5)
+
+- Fait : seed préprod finalisée (`seed_preprod.py`, `environnement` dans la config, relance sans doublon).
+  Retouches du site demandées en urgence : tags de la galerie par axe, bouton de retour en haut, décors animés
+  des heros (`DecorAnime`), éclairs derrière les mascottes des 7 axes, section caméléon, « Quel axe est fait
+  pour toi ? », défi du jour en bulle flottante, Hall of Fame et Palmarès avec une section des éditions et une
+  page par édition (compte à rebours jusqu'au 1er mars 2027), heros bleu et rouge, nouveau hero de la
+  certification, choix « Particulier / visiteur » sur `/inscription` (sans formulaire). Spec 020 livrée
+  (tâches 1–10) : tables `adhesion` et `rattachement`, adhésion du président reprise par la migration,
+  confirmation par le président puis validation en lot par la DRE (points de sauvegarde, résultat par ligne),
+  club supplémentaire réservé au national, liste des membres réservée au club, sortie au changement
+  d'établissement, passation confirmée par un encadreur rattaché (Q19). Relecture `reviewer` : 0 bloquant ;
+  corrigés : verrou de l'adhésion du successeur, encadreurs suspendus ignorés (`clubs/requetes.py`), 409 pour
+  un successeur non membre, passation annulée quand le successeur part, verrou du club, lots triés par
+  encadreur, « supplémentaire » recalculé à la lecture, texte de passation sans encadreur.
+- Pièges rencontrés : le plugin du routeur réécrit le chemin de `createFileRoute` quand on déplace une route ;
+  la convention de nommage doublait le préfixe d'une contrainte (utiliser `op.f()`) ; le port 8000 est pris
+  en local (API sur 8003, `API_URL_INTERNE`).
+- Décisions : spec 020 (1er club par la DRE, suivants par le national ; liste des membres selon `RULES.md` ;
+  gestion dans `/mon-espace` ; confirmation Q19). Nouveaux heros toujours clairs.
+- Prochaine étape : pousser sur develop (la migration crée les adhésions des présidents en préprod), puis
+  `/spec` R6. Questions ouvertes : « 5 badges » sur le hero de la certification contre 4 paliers ; passer ou
+  non les anciens heros sombres en clair.
+
 ### 2026-11-05 — Clubs et présidence (spec 019, R4)
 
 - Fait : spec 019 livrée (tâches 1–18). API : tables `club`, `club_axe`, `club_passation`, demande et renvoi de

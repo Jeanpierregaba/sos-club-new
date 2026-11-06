@@ -197,8 +197,8 @@ export function BlocClub({
                 <Crown aria-hidden className="size-5 text-primary" /> Tu présides ce club
               </p>
               <p className="mt-1 text-sm font-medium text-muted-foreground">
-                Tu peux transmettre la présidence à un autre membre du club. Un encadreur rattaché
-                au club la confirme, puis l'équipe nationale la valide.
+                Tu peux transmettre la présidence à un autre membre du club. Si ton club a un
+                encadreur rattaché, il confirme ton choix ; l'équipe nationale le valide ensuite.
               </p>
 
               {passation && enAttente(passation) && (
@@ -257,7 +257,7 @@ export function BlocClub({
                 ouvert={passationOuverte}
                 onOuvert={setPassationOuverte}
                 titre="Passer la présidence"
-                description="Choisis un membre du club. Un encadreur rattaché confirmera ton choix, puis l'équipe nationale le validera."
+                description="Choisis un membre du club. Si ton club a un encadreur rattaché, il confirmera ton choix ; l'équipe nationale le validera ensuite."
                 bouton="Proposer cette passation"
                 onEnvoie={async () => {
                   if (pseudonyme.trim().length < 1) {
