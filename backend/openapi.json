@@ -4035,6 +4035,32 @@
         }
       }
     },
+    "/api/clubs/podium": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Podium Des Clubs",
+        "description": "Les trois clubs qui ont le plus de points, pour l'accueil (spec 021).",
+        "operationId": "podium_des_clubs_api_clubs_podium_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ClubPodium"
+                  },
+                  "type": "array",
+                  "title": "Response Podium Des Clubs Api Clubs Podium Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clubs/par-etablissement": {
       "get": {
         "tags": [
@@ -5481,6 +5507,46 @@
         ],
         "title": "ClubInscrit",
         "description": "Le club d'un élève, vu dans sa fiche admin (spec 019). Aucune donnée nominative de plus."
+      },
+      "ClubPodium": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "etablissement": {
+            "type": "string",
+            "title": "Etablissement"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rang",
+          "id",
+          "nom",
+          "etablissement",
+          "dre",
+          "points"
+        ],
+        "title": "ClubPodium",
+        "description": "Un club du podium de l'accueil (spec 021) : public, sans aucun élève."
       },
       "ClubPublic": {
         "properties": {

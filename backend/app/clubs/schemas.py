@@ -355,3 +355,14 @@ class EncadreurDuClub(BaseModel):
 class MembresDuClub(BaseModel):
     membres: list[MembreClub]
     encadreurs: list[EncadreurDuClub]
+
+
+class ClubPodium(BaseModel):
+    """Un club du podium de l'accueil (spec 021) : public, sans aucun élève."""
+
+    rang: int
+    id: UUID
+    nom: str
+    etablissement: str
+    dre: str
+    points: int

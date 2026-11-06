@@ -110,3 +110,10 @@ async def resume(db: AsyncSession, utilisateur_id: UUID, nombre: int) -> ResumeP
         total=calcul.total,
         lignes=[LignePoints(**ligne.__dict__) for ligne in lignes],
     )
+
+
+async def scores_des_clubs(db: AsyncSession, club_ids: list[UUID]) -> dict[UUID, int]:
+    """Le score de chaque club : la somme de ses propres lignes (Q15). Le registre ne crédite pas encore les
+    clubs, qui n'ont pas de compte (ADR-0003) : R13 branchera ici leurs lignes. D'ici là, aucun club n'a de
+    points, et le podium de l'accueil affiche son état vide."""
+    return {}

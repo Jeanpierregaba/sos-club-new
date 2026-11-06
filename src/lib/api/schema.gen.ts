@@ -1394,6 +1394,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/clubs/podium": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Podium Des Clubs
+         * @description Les trois clubs qui ont le plus de points, pour l'accueil (spec 021).
+         */
+        get: operations["podium_des_clubs_api_clubs_podium_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/clubs/par-etablissement": {
         parameters: {
             query?: never;
@@ -1969,6 +1989,27 @@ export interface components {
             president: boolean;
             /** Motif Refus */
             motif_refus?: string | null;
+        };
+        /**
+         * ClubPodium
+         * @description Un club du podium de l'accueil (spec 021) : public, sans aucun élève.
+         */
+        ClubPodium: {
+            /** Rang */
+            rang: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            /** Etablissement */
+            etablissement: string;
+            /** Dre */
+            dre: string;
+            /** Points */
+            points: number;
         };
         /** ClubPublic */
         ClubPublic: {
@@ -6384,6 +6425,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClubPublic"][];
+                };
+            };
+        };
+    };
+    podium_des_clubs_api_clubs_podium_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClubPodium"][];
                 };
             };
         };

@@ -17,6 +17,7 @@ from app.clubs.schemas import (
     ActivationEntree,
     AdhesionResume,
     ClubFiche,
+    ClubPodium,
     ClubPublic,
     ClubResume,
     DecisionEntree,
@@ -252,6 +253,12 @@ async def refuser_passation_encadreur(
 @router.get("")
 async def lister_clubs(db: Base) -> list[ClubPublic]:
     return await service.clubs_publics(db)
+
+
+@router.get("/podium")
+async def podium_des_clubs(db: Base) -> list[ClubPodium]:
+    """Les trois clubs qui ont le plus de points, pour l'accueil (spec 021)."""
+    return await service.podium(db)
 
 
 @router.get("/par-etablissement", response_model=None)

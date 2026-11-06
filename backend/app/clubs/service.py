@@ -26,6 +26,7 @@ from app.clubs.models import (
 from app.clubs.requetes import encadreurs_actifs
 from app.clubs.schemas import (
     ClubFiche,
+    ClubPodium,
     ClubPublic,
     ClubResume,
     DemandeClubEntree,
@@ -37,7 +38,8 @@ from app.comptes.inscription import Refus, etablissement_rattache
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.eleves import pseudonyme
 from app.eleves.models import Eleve
-from app.referentiel.models import Axe
+from app.points import service as points
+from app.referentiel.models import Axe, Dre, Etablissement, Iesg
 from app.referentiel.normalisation import normaliser
 
 logger = logging.getLogger(__name__)
@@ -240,6 +242,29 @@ async def clubs_publics(db: AsyncSession) -> list[ClubPublic]:
     """Les clubs actifs seulement, dans l'ordre de leur activation."""
     clubs = (await db.scalars(select(Club).where(Club.etat == EtatClub.actif).order_by(Club.actif_le, Club.nom))).all()
     return [await _club_public(db, club) for club in clubs]
+
+
+async def podium(db: AsyncSession, limite: int = 3) -> list[ClubPodium]:
+    """Les clubs actifs qui ont le plus de points (au moins un), à égalité par nom (spec 021)."""
+    lignes = (
+        await db.execute(
+            select(Club, Etablissement.nom, Dre.nom)
+            .join(Etablissement, Etablissement.id == Club.etablissement_id)
+            .join(Iesg, Iesg.id == Etablissement.iesg_id)
+            .join(Dre, Dre.code == Iesg.dre_code)
+            .where(Club.etat == EtatClub.actif)
+        )
+    ).all()
+    scores = await points.scores_des_clubs(db, [club.id for club, _, _ in lignes])
+    classes = sorted(
+        ((scores.get(club.id, 0), club, etablissement, dre) for club, etablissement, dre in lignes),
+        key=lambda ligne: (-ligne[0], ligne[1].nom.casefold()),
+    )
+    retenus = [ligne for ligne in classes if ligne[0] > 0][:limite]
+    return [
+        ClubPodium(rang=rang, id=club.id, nom=club.nom, etablissement=etablissement, dre=dre, points=score)
+        for rang, (score, club, etablissement, dre) in enumerate(retenus, start=1)
+    ]
 
 
 async def club_public(db: AsyncSession, club_id: UUID) -> ClubFiche | None:
