@@ -12,7 +12,7 @@ import {
   UserPlus,
 } from "lucide-react";
 
-import mascotteArcEnCiel from "@/assets/mascot.png";
+import mascotteMedias from "@/assets/mascotte-medias.webp";
 import { useMoi } from "@/hooks/use-moi";
 import {
   calculerQuelAxe,
@@ -355,11 +355,11 @@ function Message({ titre, children }: { titre: string; children: ReactNode }) {
   return (
     <div role="status" className="p-8 text-center md:p-12">
       <img
-        src={mascotteArcEnCiel}
+        src={mascotteMedias}
         alt=""
-        width={1024}
-        height={1024}
-        className="mx-auto h-32 w-auto drop-shadow-xl"
+        width={1414}
+        height={2000}
+        className="mx-auto h-40 w-auto drop-shadow-xl"
       />
       <p className="mt-4 font-display text-2xl leading-tight text-grape md:text-3xl">{titre}</p>
       <div className="mt-3 font-medium text-ink/80">{children}</div>

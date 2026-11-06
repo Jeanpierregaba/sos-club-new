@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, BarChart3, Gamepad2, MessageCircleQuestion, Trophy } from "lucide-react";
+import { BarChart3, Gamepad2, MessageCircleQuestion, Trophy } from "lucide-react";
 
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
 import mascotteMedias from "@/assets/mascotte-medias.webp";
@@ -41,16 +41,24 @@ export function PodiumClubs() {
         className="absolute -bottom-40 right-0 -z-10 size-[32rem] rounded-full bg-grape/40 blur-3xl motion-safe:animate-derive"
       />
 
-      <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-[1.1fr_1fr]">
-        <div data-reveal="left" className="relative lg:pl-36">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 lg:grid-cols-[auto_minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-8">
+        {/* La mascotte de l'axe Génie Imhotep, en pied, sur un halo bleu. */}
+        <div className="relative mx-auto lg:self-end">
+          <span
+            aria-hidden
+            className="absolute bottom-6 left-1/2 aspect-square w-[115%] -translate-x-1/2 rounded-full bg-sky/35 blur-sm"
+          />
           <img
             src={mascotteImhotep}
-            alt=""
+            alt="La mascotte de l’axe Génie Imhotep"
             width={1414}
             height={2000}
             loading="lazy"
-            className="absolute -left-6 top-6 hidden h-80 w-auto drop-shadow-2xl motion-safe:animate-float lg:block"
+            className="relative h-80 w-auto drop-shadow-[0_25px_35px_rgba(0,0,0,0.45)] lg:h-[30rem]"
           />
+        </div>
+
+        <div data-reveal="left" className="relative text-center lg:text-left">
           <p className="inline-flex items-center gap-2 rounded-full border-2 border-sun/80 px-4 py-1.5 text-sm font-extrabold uppercase tracking-wide">
             <Gamepad2 aria-hidden className="size-5 text-sun" /> Jeux & classement
           </p>
@@ -61,7 +69,7 @@ export function PodiumClubs() {
             Teste tes connaissances en santé et fais grimper ton Club Santé dans le classement
             national&#8239;!
           </p>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <div className="mt-6 grid gap-3 text-left sm:grid-cols-2">
             <Atout
               icone={MessageCircleQuestion}
               titre="Des quiz santé"
@@ -75,21 +83,21 @@ export function PodiumClubs() {
           </div>
           <Link
             to="/jeux"
-            className="btn-fx mt-8 inline-flex items-center gap-3 rounded-full bg-sun px-8 py-4 text-lg font-extrabold text-ink shadow-lg shadow-sun/20"
+            className="btn-fx mt-8 inline-flex rounded-full bg-sun px-10 py-4 text-lg font-extrabold text-ink shadow-lg shadow-sun/20"
           >
-            <Gamepad2 aria-hidden className="size-6" /> Découvrir les jeux{" "}
-            <ArrowRight aria-hidden className="size-5" />
+            Découvrir les jeux
           </Link>
         </div>
 
-        <div data-reveal="right" className="relative mx-auto w-full max-w-md pt-16">
+        {/* La mascotte de l'axe Production TV & médias, accoudée au-dessus du podium. */}
+        <div data-reveal="right" className="relative mx-auto w-full max-w-md pt-52 sm:pt-60">
           <img
             src={mascotteMedias}
-            alt=""
+            alt="La mascotte de l’axe Production TV & médias"
             width={1414}
             height={2000}
             loading="lazy"
-            className="absolute -top-6 right-2 z-10 h-44 w-auto drop-shadow-2xl motion-safe:animate-float [animation-delay:-2s]"
+            className="absolute right-0 top-0 z-10 h-72 w-auto drop-shadow-[0_20px_30px_rgba(0,0,0,0.45)] sm:-right-4 sm:h-80"
           />
           <div className="relative rounded-[2rem] bg-white/10 p-6 ring-1 ring-white/25 backdrop-blur-md md:p-8">
             <Trophy aria-hidden className="mx-auto size-12 text-sun drop-shadow" />
