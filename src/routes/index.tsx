@@ -33,6 +33,7 @@ import { Compteur } from "@/components/Compteur";
 import { SiteMotion, retard } from "@/components/SiteMotion";
 import { DecorAnime } from "@/components/DecorAnime";
 import { BulleDefi } from "@/components/BulleDefi";
+import { PodiumClubs } from "@/components/PodiumClubs";
 import { QuelAxe } from "@/components/QuelAxe";
 import hero from "@/assets/hero.jpg";
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
@@ -887,6 +888,7 @@ function Index() {
 
       <QuelAxe />
       <ClubsSection liste={dre} />
+      <PodiumClubs />
       <ActualitesSection />
       <CampagnesSection />
       <GalerieSection />
