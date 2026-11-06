@@ -37,8 +37,9 @@ def connecter(client: TestClient, identifiant: str) -> None:
     assert reponse.status_code == 200, reponse.text
 
 
-def question_du_jour(en_base: Callable[..., Any]) -> DefiQuestion:
-    return en_base(defis.du_jour)
+def question_du_jour(en_base: Callable[..., Any], eleve: Utilisateur | None = None) -> DefiQuestion:
+    """La question publique, ou celle de l'élève (chacun a la sienne)."""
+    return en_base(lambda db: defis.du_jour(db, utilisateur=eleve))
 
 
 def repondre(client: TestClient, defi: DefiQuestion, choix: int) -> dict[str, Any]:
@@ -70,7 +71,7 @@ def reponses_enregistrees(en_base: Callable[..., Any]) -> int:
 def test_une_bonne_reponse_rapporte_20_points_une_seule_fois(
     client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any]
 ) -> None:
-    defi = question_du_jour(en_base)
+    defi = question_du_jour(en_base, eleve)
 
     corps = repondre(client, defi, defi.bonne_reponse)
 
@@ -81,7 +82,7 @@ def test_une_bonne_reponse_rapporte_20_points_une_seule_fois(
 def test_une_deuxieme_reponse_du_jour_ne_compte_pas(
     client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any]
 ) -> None:
-    defi = question_du_jour(en_base)
+    defi = question_du_jour(en_base, eleve)
     repondre(client, defi, defi.bonne_reponse)
 
     encore = repondre(client, defi, fausse(defi))
@@ -96,7 +97,7 @@ def test_une_deuxieme_reponse_du_jour_ne_compte_pas(
 def test_une_reponse_fausse_ne_rapporte_rien_et_bloque_la_journee(
     client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any]
 ) -> None:
-    defi = question_du_jour(en_base)
+    defi = question_du_jour(en_base, eleve)
 
     premiere = repondre(client, defi, fausse(defi))
     seconde = repondre(client, defi, defi.bonne_reponse)
@@ -109,7 +110,7 @@ def test_une_reponse_fausse_ne_rapporte_rien_et_bloque_la_journee(
 def test_apres_reconnexion_la_question_montre_la_reponse_deja_donnee(
     client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any]
 ) -> None:
-    defi = question_du_jour(en_base)
+    defi = question_du_jour(en_base, eleve)
     repondre(client, defi, defi.bonne_reponse)
     client.post("/api/comptes/deconnexion")
 
@@ -152,7 +153,7 @@ def test_un_collaborateur_ne_gagne_rien(
 def test_la_question_dun_autre_jour_ne_rapporte_rien(
     client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any]
 ) -> None:
-    hier = en_base(lambda db: defis.du_jour(db, aujourd_hui() - timedelta(days=1)))
+    hier = en_base(lambda db: defis.du_jour(db, aujourd_hui() - timedelta(days=1), eleve))
 
     corps = repondre(client, hier, hier.bonne_reponse)
 
@@ -169,7 +170,7 @@ def test_un_bareme_a_zero_enregistre_la_reponse_sans_point(
         await db.execute(update(LigneBareme).where(LigneBareme.code == "eleve.question_jour").values(montant=0))
 
     en_base(couper)
-    defi = question_du_jour(en_base)
+    defi = question_du_jour(en_base, eleve)
 
     assert repondre(client, defi, defi.bonne_reponse)["points"] == 0
     assert reponses_enregistrees(en_base) == 1
@@ -180,7 +181,7 @@ def test_deux_reponses_simultanees_ne_creditent_quune_fois(
     client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """La seconde requête n'a pas encore vu la première : la contrainte unique tranche."""
-    defi = question_du_jour(en_base)
+    defi = question_du_jour(en_base, eleve)
     repondre(client, defi, defi.bonne_reponse)
     vraie = defis.reponse_du_jour
     appels = {"n": 0}
@@ -196,3 +197,86 @@ def test_deux_reponses_simultanees_ne_creditent_quune_fois(
     assert corps["deja_repondu"] is True
     assert len(gains(en_base, eleve)) == 1
     assert reponses_enregistrees(en_base) == 1
+
+
+def test_chaque_eleve_a_sa_question_differente_de_la_publique(
+    client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any]
+) -> None:
+    publique = question_du_jour(en_base)
+
+    recue = client.get(DU_JOUR).json()
+
+    assert recue["id"] == str(question_du_jour(en_base, eleve).id)
+    assert recue["id"] != str(publique.id)
+
+
+def test_le_rang_dun_eleve_nest_jamais_celui_du_public() -> None:
+    from datetime import date
+    from uuid import uuid7
+
+    for _ in range(200):
+        identifiant = uuid7()
+        for nombre in (2, 3, 30):
+            jour = date(2026, 11, 6)
+            assert defis.rang(jour, nombre, identifiant) != defis.rang(jour, nombre)
+
+
+def test_la_correction_vue_en_visiteur_ne_sert_pas_a_leleve(
+    client: TestClient, creer_eleve: Callable[..., Utilisateur], en_base: Callable[..., Any]
+) -> None:
+    """La faille relevée : répondre en visiteur pour lire la bonne réponse, puis se connecter."""
+    ama = creer_eleve("ama", "Ama")
+    sienne = question_du_jour(en_base, ama)
+
+    # Sans compte, la question de l'élève n'est pas corrigée : on ne dit même pas qu'elle existe.
+    reponse = client.post(f"/api/jeux/defis/{sienne.id}/reponse", json={"choix": 0})
+    assert reponse.status_code == 404
+    # La question publique, elle, ne rapporte rien une fois connecté.
+    publique = question_du_jour(en_base)
+    connecter(client, "ama")
+    assert repondre(client, publique, publique.bonne_reponse)["points"] == 0
+    assert gains(en_base) == []
+
+
+def test_un_eleve_ne_lit_pas_la_reponse_de_la_question_dun_autre(
+    client: TestClient, creer_eleve: Callable[..., Utilisateur], en_base: Callable[..., Any]
+) -> None:
+    ama = creer_eleve("ama", "Ama")
+    autres = [creer_eleve(f"autre{i}", f"Autre {i}") for i in range(6)]
+    a_moi = {question_du_jour(en_base, ama).id, question_du_jour(en_base).id}
+    connecter(client, "ama")
+    hier = aujourd_hui() - timedelta(days=1)
+    a_moi |= {
+        en_base(lambda db: defis.du_jour(db, hier, ama)).id,
+        en_base(lambda db: defis.du_jour(db, hier)).id,
+    }
+    etrangere = next(q for q in (question_du_jour(en_base, a) for a in autres) if q.id not in a_moi)
+
+    reponse = client.post(f"/api/jeux/defis/{etrangere.id}/reponse", json={"choix": 0})
+
+    assert reponse.status_code == 404
+
+
+def test_deja_repondu_ne_renvoie_pas_la_correction_dune_autre_question(
+    client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any]
+) -> None:
+    sienne = question_du_jour(en_base, eleve)
+    repondre(client, sienne, sienne.bonne_reponse)
+    publique = question_du_jour(en_base)
+
+    corps = repondre(client, publique, fausse(publique))
+
+    # La correction de la question demandée, marquée « déjà répondu », sans point.
+    assert (corps["bonne_reponse"], corps["deja_repondu"], corps["points"]) == (publique.bonne_reponse, True, 0)
+    assert corps["explication"] == publique.explication
+    assert len(gains(en_base, eleve)) == 1
+
+
+def test_en_prod_la_banque_se_charge_desactivee(en_base: Callable[..., Any]) -> None:
+    async def recharger(db: AsyncSession) -> int:
+        await db.execute(DefiReponse.__table__.delete())
+        await db.execute(DefiQuestion.__table__.delete())
+        return await banque_initiale.charger(db, actives=False)
+
+    assert en_base(recharger) == 30
+    assert en_base(lambda db: db.scalar(select(func.count()).where(DefiQuestion.actif))) == 0

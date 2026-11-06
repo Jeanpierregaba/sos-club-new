@@ -7,4 +7,4 @@
 - [x] 5. Site : défi du jour branché sur l'API, tests
 - [x] 6. Site : section podium après « Trouve toi aussi ton club Santé », tests
 - [x] 7a. Vérification sur téléphone (390 px) des trois blocs, docs (`ARCHITECTURE.md`, `SECURITY.md`, `TASKS.md`), suites complètes (API 664, site 95)
-- [ ] 7b. Relecture `reviewer` : interrompue le 2026-11-06 (quota atteint), à relancer
+- [x] 7b. Relecture `reviewer` (faite avec la spec 022 le 2026-11-06 ; constats corrigés)

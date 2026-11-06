@@ -35,7 +35,7 @@ par la spec indiquée.
 - [x] CSRF : `SameSite=Lax` et contrôle de l'en-tête `Origin` sur les actions modifiantes.
 - Sans objet : CORS. Le site et l'API sont sur la même origine (ADR-0006).
 - [x] Les messages d'erreur ne révèlent pas d'information interne ni l'existence d'un compte.
-- [ ] Quiz : réponses jamais envoyées avant la réponse de l'élève, temps et score calculés par le serveur (ADR-0004). (Aucun quiz n'existe encore ; à revalider en R9/R11. En 021 : le défi du jour part sans sa bonne réponse, la correction vient d'une seconde requête ; « Quel axe » est calculé par l'API, réservé aux élèves actifs (401/403), et n'enregistre rien. En 022 : le défi du jour rapporte +20 à un élève actif, une seule réponse comptée par jour (contrainte unique), crédit idempotent `question_jour:<élève>:<jour>` ; « Quel axe » ne donne aucun point.)
+- [ ] Quiz : réponses jamais envoyées avant la réponse de l'élève, temps et score calculés par le serveur (ADR-0004). (Aucun quiz n'existe encore ; à revalider en R9/R11. En 021 : le défi du jour part sans sa bonne réponse, la correction vient d'une seconde requête ; « Quel axe » est calculé par l'API, réservé aux élèves actifs (401/403), et n'enregistre rien. En 022 : le défi du jour rapporte +20 à un élève actif, une seule réponse comptée par jour (contrainte unique), crédit idempotent `question_jour:<élève>:<jour>` ; chaque élève a sa propre question, différente de la publique, et la correction n'est donnée que pour une question reçue (404 sinon) ; « Quel axe » ne donne aucun point.)
 - [ ] Points : clé d'idempotence unique, plafonds et annulations tracées (ADR-0004). (Clé d'idempotence et plafonds : en place, spec 017 ; aucune action d'annulation n'est encore exposée.)
 
 ## Dépendances

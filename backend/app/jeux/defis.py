@@ -2,12 +2,16 @@
 
 La question part sans sa réponse ; la correction vient d'une seconde requête (ADR-0004). Un élève actif connecté
 répond une fois par jour : sa première réponse est enregistrée, et rapporte les points du barème si elle est
-juste. Les réponses suivantes du jour ne comptent pas : la correction lui révèle la bonne réponse. Un visiteur
-ou un autre profil reçoit la correction, sans point.
+juste. Les réponses suivantes du jour ne comptent pas : la correction lui révèle la bonne réponse.
+
+Les visiteurs et les autres profils jouent la question publique, sans point. Chaque élève reçoit sa propre
+question du jour, toujours différente de la publique : la correction vue sans être connecté ne lui sert à rien.
+La correction n'est donnée que pour une question qu'on a pu recevoir (aujourd'hui ou hier, pour le passage de
+minuit) : un compte ne peut pas lire la réponse de la question d'un autre élève.
 """
 
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from uuid import UUID
 
 from sqlalchemy import func, select
@@ -44,14 +48,35 @@ def peut_gagner(utilisateur: Utilisateur | None) -> bool:
     return utilisateur is not None and utilisateur.role is Role.eleve and utilisateur.statut is StatutCompte.actif
 
 
-async def du_jour(db: AsyncSession, jour: date | None = None) -> DefiQuestion:
-    """La question active de rang (numéro du jour modulo leur nombre), dans l'ordre de la rotation."""
+def rang(jour: date, nombre: int, eleve_id: UUID | None = None) -> int:
+    """Le rang de la question dans la rotation. Public : le numéro du jour modulo le nombre de questions. Élève :
+    décalé d'au moins 1 et d'au plus `nombre - 1` selon son identifiant, donc jamais la question publique."""
+    public = jour.toordinal() % nombre
+    if eleve_id is None or nombre < 2:
+        return public
+    return (public + 1 + eleve_id.int % (nombre - 1)) % nombre
+
+
+async def du_jour(db: AsyncSession, jour: date | None = None, utilisateur: Utilisateur | None = None) -> DefiQuestion:
+    """La question active du jour : la publique, ou celle de l'élève s'il peut gagner des points."""
     jour = jour or aujourd_hui()
     actives = select(DefiQuestion).where(DefiQuestion.actif.is_(True))
     nombre = await db.scalar(select(func.count()).select_from(actives.subquery()))
     if not nombre:
         raise AucunDefi
-    return await db.scalar(actives.order_by(DefiQuestion.ordre).offset(jour.toordinal() % nombre).limit(1))
+    eleve_id = utilisateur.id if peut_gagner(utilisateur) else None
+    return await db.scalar(actives.order_by(DefiQuestion.ordre).offset(rang(jour, nombre, eleve_id)).limit(1))
+
+
+async def _accessibles(db: AsyncSession, utilisateur: Utilisateur | None, jour: date) -> set[UUID]:
+    """Les questions dont on peut demander la correction : la publique et, pour un élève, la sienne, du jour et de
+    la veille (une bulle ouverte avant minuit)."""
+    ids: set[UUID] = set()
+    for j in (jour, jour - timedelta(days=1)):
+        ids.add((await du_jour(db, j)).id)
+        if peut_gagner(utilisateur):
+            ids.add((await du_jour(db, j, utilisateur)).id)
+    return ids
 
 
 async def reponse_du_jour(db: AsyncSession, utilisateur: Utilisateur | None, jour: date) -> Correction | None:
@@ -80,16 +105,23 @@ async def corriger(db: AsyncSession, defi_id: UUID, choix: int, utilisateur: Uti
         raise AucunDefi
     if choix >= len(defi.options):
         raise ValueError("Cette réponse n'existe pas.")
+    jour = aujourd_hui()
+    if defi.id not in await _accessibles(db, utilisateur, jour):
+        # Une question qu'on n'a pas pu recevoir : on ne dit même pas qu'elle existe.
+        raise AucunDefi
     correcte = choix == defi.bonne_reponse
     if not peut_gagner(utilisateur):
         return Correction(defi, choix, correcte, 0, deja_repondu=False)
 
-    jour = aujourd_hui()
     deja = await reponse_du_jour(db, utilisateur, jour)
     if deja is not None:
-        return deja
-    if (await du_jour(db, jour)).id != defi.id:
-        # Une question d'un autre jour : corrigée, mais ni comptée ni créditée.
+        if deja.defi.id == defi.id:
+            return deja
+        # L'élève a déjà répondu aujourd'hui, à une autre question (la banque a changé, ou il corrige la
+        # publique) : cette correction-ci, sans point.
+        return Correction(defi, choix, correcte, 0, deja_repondu=True)
+    if (await du_jour(db, jour, utilisateur)).id != defi.id:
+        # La question publique, ou la sienne d'hier : corrigée, mais ni comptée ni créditée.
         return Correction(defi, choix, correcte, 0, deja_repondu=False)
 
     reponse = DefiReponse(eleve_id=utilisateur.id, defi_id=defi.id, jour=jour, choix=choix, correcte=correcte)

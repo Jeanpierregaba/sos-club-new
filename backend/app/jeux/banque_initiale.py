@@ -1,7 +1,9 @@
 """Les premières questions du défi du jour (spec 021), à relire par l'équipe nationale avant la prod.
 
 Chargement idempotent, par rang : une question déjà en base n'est ni dupliquée ni modifiée (l'équipe a pu la
-corriger ou la désactiver). Appelé par les seeds ; en prod : `uv run python -m app.jeux.banque_initiale`.
+corriger ou la désactiver). Appelé par les seeds ; en prod : `uv run python -m app.jeux.banque_initiale`, qui
+charge les questions désactivées : rien n'est publié sans validation de l'équipe nationale (docs/RULES.md). Elle
+les active une fois relues.
 """
 
 import asyncio
@@ -9,6 +11,7 @@ import asyncio
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.db import SessionLocal
 from app.jeux.models import DefiQuestion
 
@@ -56,13 +59,13 @@ QUESTIONS: list[tuple[str, str, list[str], int, str]] = [
         "Face à une petite brûlure, que faut-il faire d'abord ?",
         [
             "Mettre du beurre ou de l'huile",
-            "Passer la brûlure sous l'eau fraîche au moins 10 minutes",
+            "La passer sous l'eau tempérée pendant 15 minutes",
             "Percer les cloques",
         ],
         1,
         (
-            "L'eau fraîche refroidit la peau et limite la brûlure. Le beurre, l'huile ou le dentifrice gardent la "
-            "chaleur et salissent la plaie."
+            "C'est la règle des 15 : une eau à 15 °C environ, pendant 15 minutes. Elle refroidit la peau et limite "
+            "la brûlure ; le beurre, l'huile ou le dentifrice gardent la chaleur et salissent la plaie."
         ),
     ),
     (
@@ -177,8 +180,8 @@ QUESTIONS: list[tuple[str, str, list[str], int, str]] = [
         ["Les moustiques y pondent leurs œufs", "Pour économiser l'eau", "Pour éloigner les fourmis"],
         0,
         (
-            "Pots, pneus, boîtes : une eau qui stagne devient un nid de moustiques. La vider réduit le risque de "
-            "paludisme."
+            "Pots, pneus, boîtes, flaques : une eau qui stagne devient un nid de moustiques. La vider réduit le "
+            "risque de paludisme et de dengue."
         ),
     ),
     (
@@ -257,8 +260,8 @@ QUESTIONS: list[tuple[str, str, list[str], int, str]] = [
         ["La faire bouillir", "Y ajouter du sucre", "La laisser une heure au soleil"],
         0,
         (
-            "Faire bouillir l'eau quelques minutes tue la plupart des microbes. Garde-la ensuite dans un récipient "
-            "propre et fermé."
+            "Faire bouillir l'eau quelques minutes tue la plupart des microbes. Au soleil, il faut au moins 6 heures "
+            "dans une bouteille transparente : une heure ne suffit pas. Garde-la ensuite dans un récipient propre."
         ),
     ),
     (
@@ -285,8 +288,9 @@ QUESTIONS: list[tuple[str, str, list[str], int, str]] = [
 ]
 
 
-async def charger(db: AsyncSession) -> int:
-    """Ajoute les questions absentes (par rang) ; renvoie le nombre de questions ajoutées."""
+async def charger(db: AsyncSession, *, actives: bool = True) -> int:
+    """Ajoute les questions absentes (par rang) ; renvoie le nombre de questions ajoutées. `actives=False` : à
+    relire avant d'être tirées."""
     presents = set((await db.scalars(select(DefiQuestion.ordre))).all())
     ajoutees = 0
     for ordre, (categorie, question, options, bonne, explication) in enumerate(QUESTIONS, start=1):
@@ -300,6 +304,7 @@ async def charger(db: AsyncSession) -> int:
                 options=options,
                 bonne_reponse=bonne,
                 explication=explication,
+                actif=actives,
             )
         )
         ajoutees += 1
@@ -308,10 +313,13 @@ async def charger(db: AsyncSession) -> int:
 
 
 async def _main() -> None:
+    # En prod, les questions attendent la relecture de l'équipe nationale avant d'être tirées.
+    actives = settings.environnement != "prod"
     async with SessionLocal() as db:
-        ajoutees = await charger(db)
+        ajoutees = await charger(db, actives=actives)
         await db.commit()
-    print(f"{ajoutees} question(s) ajoutée(s) à la banque des défis.")
+    etat = "actives" if actives else "désactivées, à relire puis activer"
+    print(f"{ajoutees} question(s) ajoutée(s) à la banque des défis ({etat}).")
 
 
 if __name__ == "__main__":

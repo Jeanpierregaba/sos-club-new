@@ -8,8 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] [021 Accueil : « Quel axe », défi du jour, podium des clubs](docs/specs/021-accueil-jeux-decouverte/) : livrée (tâches 1–7a) ; reste la relecture `reviewer`, interrompue par le quota
-- [ ] [022 Harmonisation du barème](docs/specs/022-harmonisation-bareme/) : tâches 1–4 faites ; en cours : clôture (docs, relecture `reviewer`)
+Rien en cours : prochaine spec, R6 (centre de modération).
 
 ## À faire
 
@@ -66,7 +65,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 - [ ] Mettre à jour les dépendances du site : 13 failles élevées signalées par `bun audit` (zod, vite, nanoid…), puis rendre cet audit bloquant dans la CI
 - [ ] Remplacer les liens vers des pages absentes et les contenus provisoires de l'accueil au fil des specs (dates d'Agenda, chiffres des clubs)
 - [ ] Pages du menu : brancher sur l'API les contenus repris du site de référence (agenda, magazine, bibliothèque, Hall of Fame, quiz), mettre en ligne les fichiers (plaquette, documentaire, documents de la bibliothèque, liens en `#`) et ouvrir les formulaires d'inscription Génie Imhotep ; faire confirmer les 6 doublons de l'annuaire écartés au chargement du référentiel (5 dans l'IESG Aného, 1 dans celle de Dapaong)
-- [ ] Défi du jour : faire relire les 30 questions de `backend/app/jeux/banque_initiale.py` par l'équipe nationale avant la prod, puis les charger en prod (`python -m app.jeux.banque_initiale`) ; écran admin de la banque avec les quiz (R9)
+- [ ] Défi du jour : faire relire les 30 questions de `backend/app/jeux/banque_initiale.py` par l'équipe nationale ; en prod, `python -m app.jeux.banque_initiale` les charge désactivées, à activer après relecture ; agrandir la banque ; écran admin de la banque avec les quiz (R9)
 - [ ] Noms des axes : le document du jeu « Quel axe » (« Gamification & Bourses », « Leadership & Masculinité positive »…) diffère du site (« Bourses & excellence », « Leadership & mentorat »…) : faire trancher et aligner
 - [ ] Faire valider par l'équipe nationale (référentiel du 2026-11-05) : noms, visuels et jalons des 5 badges (provisoires sur `/certification` : 3, 5, 7, 9, 12 quiz), seuil de réussite d'un quiz, plafonds et preuve des partages, barème encadreur
 - [ ] Renommer le paquet `tanstack_start_ts`
@@ -74,6 +73,8 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] [022 — Harmonisation du barème](docs/specs/022-harmonisation-bareme/spec.md) (référentiel de gamification du 2026-11-05 : barème unique API, admin et site ; question du jour à +20, une réponse par élève et par jour, question propre à chaque élève)
+- [x] [021 — Accueil : « Quel axe », défi du jour, podium](docs/specs/021-accueil-jeux-decouverte/spec.md) (jeu de découverte réservé aux élèves, banque de défis en base, Top 3 des lycées avec état d'attente)
 - [x] [020 — Affiliations et rattachements](docs/specs/020-affiliations-et-rattachements/spec.md) (R5 : adhésion de l'élève confirmée par le président puis validée en lot par la DRE, rattachement des encadreurs avec club supplémentaire réservé au national, liste des membres, passation confirmée par un encadreur rattaché — Q19)
 - [x] [019 — Clubs et présidence](docs/specs/019-clubs-et-presidence/spec.md) (R4 : demande de création par l'élève président, vérification par DRE, carte et fiches publiques, passations de présidence)
 - [x] [018 — Compte encadreur](docs/specs/018-compte-encadreur/spec.md) (R3 : inscription en attente d'activation, +100 de bienvenue après vérification, file admin filtrable par DRE, refus motivé et renvoi de demande)

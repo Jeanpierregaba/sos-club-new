@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Loader2, X } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
 import mascotteBourses from "@/assets/mascotte-bourses.webp";
 
 import { useMoi } from "@/hooks/use-moi";
@@ -185,14 +185,34 @@ function Bulle({ defi, joueur, cle }: { defi: DefiDuJour; joueur: Joueur; cle: u
                 >
                   {"ABCD"[i]}
                 </span>
-                {o}
+                <span className="flex-1">{o}</span>
+                {/* La correction ne passe pas que par la couleur (WCAG 1.4.1) : une icône et un texte lu. */}
+                {valide && i === bonne && (
+                  <>
+                    <Check aria-hidden className="size-5 shrink-0" />
+                    <span className="sr-only">(bonne réponse)</span>
+                  </>
+                )}
+                {valide && i === choix && i !== bonne && (
+                  <>
+                    <X aria-hidden className="size-5 shrink-0" />
+                    <span className="sr-only">(ta réponse)</span>
+                  </>
+                )}
               </button>
             ))}
           </div>
           {!valide && <Gains joueur={joueur} />}
           <div className="mt-4 flex items-center justify-between gap-3">
             <p role="status" className="text-sm font-bold">
-              {correction ? <Verdict correction={correction} /> : erreur}
+              {correction ? (
+                <Verdict
+                  correction={correction}
+                  bonne={defi.options[correction.bonne_reponse] ?? ""}
+                />
+              ) : (
+                erreur
+              )}
             </p>
             {!valide && (
               <button
@@ -291,12 +311,13 @@ function Gains({ joueur }: { joueur: Joueur }) {
   );
 }
 
-function Verdict({ correction }: { correction: CorrectionDefi }) {
+// Le verdict nomme la bonne réponse : il ne repose pas sur la couleur.
+function Verdict({ correction, bonne }: { correction: CorrectionDefi; bonne: string }) {
   if (correction.deja_repondu)
     return correction.points > 0
       ? `Tu as déjà répondu aujourd'hui : déjà récompensée, ${points(correction.points)} points.`
-      : "Tu as déjà répondu aujourd'hui : la bonne réponse est en vert.";
-  if (!correction.correcte) return "Pas tout à fait : la bonne réponse est en vert.";
+      : `Tu as déjà répondu aujourd'hui. La bonne réponse : « ${bonne} ».`;
+  if (!correction.correcte) return `Pas tout à fait : la bonne réponse est « ${bonne} ».`;
   return correction.points > 0
     ? `Bravo ! ${points(correction.points)} points pour toi.`
     : "Bravo, c'est la bonne réponse !";

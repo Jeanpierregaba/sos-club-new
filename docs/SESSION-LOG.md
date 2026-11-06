@@ -14,6 +14,25 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-06 (soir) — Harmonisation du barème (spec 022) et retouches de l'accueil
+
+- Fait : nouveau design de « Quel axe » (pleine largeur, sept mascottes officielles), mascottes du podium agrandies
+  et sans animation, carreaux sur son fond bleu. Spec 022 livrée : barème aligné sur le référentiel de
+  gamification du 2026-11-05 (migration qui n'écrase pas un montant réglé par l'admin, 8 actions ajoutées), table
+  `defi_reponse` (une réponse comptée par élève et par jour, +20 au registre), question du jour propre à chaque
+  élève, correction limitée aux questions reçues, banque chargée désactivée en prod. Site : `src/lib/bareme.ts`
+  pour tous les montants, Jeux à +50 / +25 pour tout quiz, Certification à 5 badges (jalons provisoires 3, 5, 7,
+  9, 12), « Top 3 des lycées ». Relecture `reviewer` des specs 021 et 022 : constats corrigés (faille du visiteur,
+  correction d'une autre question, contenu non validé en prod, 3 questions de santé, correction lisible sans la
+  couleur). API 681 tests, site 99 tests.
+- Pièges rencontrés : deux `pytest` en même temps sur la base de test (le relecteur en lançait aussi) donnent des
+  centaines d'échecs trompeurs : toujours lancer la suite seule. Un `rollback` complet expire l'utilisateur de la
+  session : utiliser un point de sauvegarde. `Intl` ne sépare pas les milliers pendant le rendu serveur.
+- Décisions : spec 022 (part du club du quiz +25 et du défi +10 ; +50 au club pour le compte d'un élève affilié,
+  Q7 revue ; rapport du club +500 proposé ; une seule réponse comptée par jour ; une question par élève).
+- Prochaine étape : pousser sur develop (deux migrations : barème et `defi_reponse`), puis `/spec` R6. À faire
+  valider par l'équipe : les 5 badges, le seuil de réussite d'un quiz, les 30 questions du défi.
+
 ### 2026-11-06 (suite) — Accueil : « Quel axe », défi du jour, podium (spec 021)
 
 - Fait : spec 020 close (corrections de la relecture, poussée sur develop). Spec 021 validée et livrée

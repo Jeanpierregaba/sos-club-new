@@ -124,11 +124,12 @@ function Classement({ podium }: { podium: ClubPodium[] }) {
           className={`flex items-center gap-4 rounded-2xl px-4 py-3 shadow-lg ${LIGNES[i]}`}
         >
           <span
-            aria-label={`${club.rang}${club.rang === 1 ? "er" : "e"}`}
+            aria-hidden
             className={`inline-flex size-11 shrink-0 items-center justify-center rounded-full font-display text-xl ring-2 ring-white/70 ${MEDAILLES[i]}`}
           >
             {club.rang}
           </span>
+          <span className="sr-only">{`${club.rang}${club.rang === 1 ? "er" : "e"}`}</span>
           <Link to="/clubs/$id" params={{ id: club.id }} className="min-w-0 flex-1 hover:underline">
             <span className="block truncate font-extrabold">{club.etablissement}</span>
             <span className="block truncate text-sm font-medium opacity-75">

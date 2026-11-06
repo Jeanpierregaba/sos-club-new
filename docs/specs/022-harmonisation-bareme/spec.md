@@ -12,17 +12,17 @@ du jour : seule la première réponse du jour compte.
 
 **Barème (API, admin).** Les montants deviennent :
 
-| Action | Élève | Club (élève affilié) |
-| --- | --- | --- |
-| Compte validé | +100 | +50 (affiliation active au moment du crédit) |
-| Commentaire approuvé | +5 | +20 |
-| Republication vérifiée | +10 | +2 |
-| Article personnel publié | +50 | +20 |
-| Partage de son article, par réseau | +50 | +2 |
-| Quiz santé réussi, première fois | +50 | +25 |
-| Bonne réponse à la question du jour | +20 | +10 |
-| Badge de certification (5 au plus) | +500 par badge | +200 par badge |
-| Certification obtenue | +1 000 | +500 |
+| Action                              | Élève          | Club (élève affilié)                         |
+| ----------------------------------- | -------------- | -------------------------------------------- |
+| Compte validé                       | +100           | +50 (affiliation active au moment du crédit) |
+| Commentaire approuvé                | +5             | +20                                          |
+| Republication vérifiée              | +10            | +2                                           |
+| Article personnel publié            | +50            | +20                                          |
+| Partage de son article, par réseau  | +50            | +2                                           |
+| Quiz santé réussi, première fois    | +50            | +25                                          |
+| Bonne réponse à la question du jour | +20            | +10                                          |
+| Badge de certification (5 au plus)  | +500 par badge | +200 par badge                               |
+| Certification obtenue               | +1 000         | +500                                         |
 
 Club, actions propres : rapport d'activité +500 (proposé), bilan semestriel +100 (proposé). Le barème encadreur
 reste « proposé » ; le quiz réussi par un encadreur passe à 0 (proposé). Un montant déjà modifié par l'admin n'est
@@ -34,6 +34,12 @@ a gagné), même après rechargement ou reconnexion. Un visiteur ou un autre pro
 l'invitation « Connecte-toi à ton compte Élève pour gagner des points ». La bulle affiche le barème : +20 pour toi,
 +10 pour ton club.
 
+Décision du 2026-11-06, après relecture : chaque élève connecté reçoit sa propre question du jour, toujours
+différente de la question publique des visiteurs. Sinon, un élève pourrait lire la correction sans être connecté,
+puis se connecter et gagner les +20 à coup sûr. La correction n'est donnée que pour une question qu'on a pu
+recevoir (la publique, ou celle de l'élève, du jour ou de la veille) : 404 sinon. Limite connue : avec une banque
+de 30 questions, toutes finissent par circuler ; agrandir la banque réduit ce risque.
+
 **Site.** Toutes les mentions de points suivent le barème :
 
 - Jeux : chaque quiz affiche +50 (et +25 pour le club) ; plus aucun barème variable selon le niveau.
@@ -44,15 +50,15 @@ l'invitation « Connecte-toi à ton compte Élève pour gagner des points ». La
 
 ## Critères d'acceptation
 
-- [ ] Après la migration, le barème contient les montants ci-dessus ; une ligne modifiée par l'admin garde sa
+- [x] Après la migration, le barème contient les montants ci-dessus ; une ligne modifiée par l'admin garde sa
       valeur.
-- [ ] Un élève actif qui répond juste à la question du jour gagne +20, une seule ligne de registre.
-- [ ] Une deuxième réponse le même jour (juste ou non, même après reconnexion) ne crédite rien et renvoie la
+- [x] Un élève actif qui répond juste à la question du jour gagne +20, une seule ligne de registre.
+- [x] Une deuxième réponse le même jour (juste ou non, même après reconnexion) ne crédite rien et renvoie la
       première réponse avec « déjà répondu ».
-- [ ] Une réponse fausse ne crédite rien et bloque les réponses suivantes du jour.
-- [ ] Un visiteur, un encadreur ou un collaborateur reçoit la correction sans aucun point.
-- [ ] Répondre à une question qui n'est plus celle du jour ne crédite rien.
-- [ ] Le site n'affiche plus +150, +250, +25 par quiz, ni de points variables selon le niveau, ni « 4 paliers ».
+- [x] Une réponse fausse ne crédite rien et bloque les réponses suivantes du jour.
+- [x] Un visiteur, un encadreur ou un collaborateur reçoit la correction sans aucun point.
+- [x] Répondre à une question qui n'est plus celle du jour ne crédite rien.
+- [x] Le site n'affiche plus +150, +250, +25 par quiz, ni de points variables selon le niveau, ni « 4 paliers ».
 
 ## Cas limites et erreurs
 

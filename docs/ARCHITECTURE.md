@@ -97,8 +97,9 @@ Champs structurants :
 - `defi_question` (spec 021) : la banque du défi du jour de l'accueil. `ordre` unique (rang dans la
   rotation), `categorie`, `question`, `options` (JSONB, 2 à 4 libellés), `bonne_reponse` (index, contrôlé par la
   base), `explication`, `actif`. Le défi du jour est la question active de rang (numéro du jour de Lomé modulo
-  leur nombre) ; la réponse ne part qu'avec la correction. Remplie par `app.jeux.banque_initiale` (seeds, ou
-  `python -m app.jeux.banque_initiale` en prod) ; pas encore d'écran admin (R9).
+  leur nombre) ; un élève connecté reçoit la sienne, décalée selon son identifiant et jamais égale à la
+  publique (spec 022) ; la réponse ne part qu'avec la correction. Remplie par `app.jeux.banque_initiale` (seeds, ou
+  `python -m app.jeux.banque_initiale` en prod, qui charge les questions désactivées jusqu'à leur relecture) ; pas encore d'écran admin (R9).
 - `defi_reponse` (spec 022) : la réponse comptée d'un élève au défi du jour, une par élève et par jour
   (contrainte unique). `defi_id`, `jour` (date de Lomé), `choix`, `correcte`, `mouvement_id` (le crédit de
   +20, nul pour une réponse fausse). La correction suivante du même jour renvoie cette réponse, sans crédit.

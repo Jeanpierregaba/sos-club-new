@@ -112,8 +112,15 @@ describe("BulleDefi", () => {
     fireEvent.click(screen.getByRole("button", { name: /Cinq secondes/ }));
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Valider" })));
 
-    expect(screen.getByRole("status")).toHaveTextContent("la bonne réponse est en vert");
-    expect(screen.getByRole("button", { name: /Au moins 20 secondes/ })).toHaveClass("bg-leaf");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "la bonne réponse est « Au moins 20 secondes, avec du savon »",
+    );
+    expect(
+      screen.getByRole("button", { name: /Au moins 20 secondes.*\(bonne réponse\)/ }),
+    ).toHaveClass("bg-leaf");
+    expect(
+      screen.getByRole("button", { name: /Cinq secondes.*\(ta réponse\)/ }),
+    ).toBeInTheDocument();
   });
 
   it("ne s'affiche pas sans défi", async () => {

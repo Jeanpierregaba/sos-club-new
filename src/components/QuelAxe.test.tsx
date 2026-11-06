@@ -136,13 +136,14 @@ describe("Quel axe est fait pour toi ?", () => {
     await act(async () => suivant());
 
     expect(api.calculerQuelAxe).toHaveBeenCalledWith(["A", "A", "A", "D", "B"]);
-    const resultat = await screen.findByRole("status");
-    expect(resultat).toHaveTextContent("Ton axe principal");
-    expect(resultat).toHaveTextContent("Production TV & Médias");
-    expect(resultat).toHaveTextContent("Ta force : La créativité");
-    expect(resultat).toHaveTextContent("Éducation aux Valeurs et à la Santé Sexuelle");
-    expect(resultat).toHaveTextContent("Leadership & Masculinité positive");
-    expect(resultat).not.toHaveTextContent(/univers/i);
+    const titre = await screen.findByRole("status");
+    expect(titre).toHaveTextContent("Ton axe principal");
+    expect(titre).toHaveTextContent("Production TV & Médias");
+    const page = document.body;
+    expect(page).toHaveTextContent("Ta force : La créativité");
+    expect(page).toHaveTextContent("Éducation aux Valeurs et à la Santé Sexuelle");
+    expect(page).toHaveTextContent("Leadership & Masculinité positive");
+    expect(page).not.toHaveTextContent(/univers/i);
     expect(screen.getByRole("link", { name: /Découvrir cet axe/ })).toHaveAttribute(
       "href",
       "/les-7-axes#axe-3",

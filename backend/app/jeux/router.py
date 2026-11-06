@@ -75,7 +75,7 @@ def _correction(c: defis.Correction) -> CorrectionDefi:
 @router.get("/defi-du-jour")
 async def defi_du_jour(db: Base, utilisateur: Facultatif) -> DefiDuJour:
     try:
-        defi = await defis.du_jour(db)
+        defi = await defis.du_jour(db, utilisateur=utilisateur)
     except defis.AucunDefi:
         raise HTTPException(status.HTTP_404_NOT_FOUND, AUCUN_DEFI) from None
     deja = await defis.reponse_du_jour(db, utilisateur, aujourd_hui())

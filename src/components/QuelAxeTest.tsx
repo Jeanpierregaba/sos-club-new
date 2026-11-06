@@ -237,7 +237,6 @@ function Resultat({
 
   return (
     <div
-      role="status"
       style={{ "--axe": axe.couleur } as CSSProperties}
       className="animate-in fade-in zoom-in-95"
     >
@@ -250,7 +249,8 @@ function Resultat({
             height={2000}
             className="mx-auto h-44 w-auto drop-shadow-2xl motion-safe:animate-float sm:h-52"
           />
-          <div className={axe.encre}>
+          {/* Seul le titre est annoncé aux lecteurs d'écran, pas tout l'écran de résultat. */}
+          <div role="status" className={axe.encre}>
             <p className="text-sm font-extrabold uppercase tracking-widest opacity-90">
               Ton axe principal
             </p>
