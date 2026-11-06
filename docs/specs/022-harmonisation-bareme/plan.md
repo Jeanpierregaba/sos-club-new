@@ -23,7 +23,7 @@ unique (élève, jour) garantit une seule réponse comptée, et la clé d'idempo
 ## Données
 
 - `bareme` : montants mis à jour (`eleve.quiz` 25→50, `club.quiz_eleve` 10→25, `club.certification_eleve`
-  100→500, `club.rapport_activite` 50→500, `encadreur.quiz` 25→0) et 8 lignes ajoutées. Non destructif.
+  100→500, `encadreur.quiz` 25→0 ; `club.rapport_activite` reste à 50, proposé) et 8 lignes ajoutées. Non destructif.
 - `defi_reponse` : `id`, `eleve_id` (FK utilisateur), `defi_id` (FK defi_question), `jour` (date de Lomé),
   `choix`, `correcte`, `mouvement_id` (FK mouvement_points, nul sans crédit), `repondu_le` ; unique
   (`eleve_id`, `jour`).

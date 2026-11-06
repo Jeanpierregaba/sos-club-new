@@ -29,7 +29,7 @@ Format :
   centaines d'échecs trompeurs : toujours lancer la suite seule. Un `rollback` complet expire l'utilisateur de la
   session : utiliser un point de sauvegarde. `Intl` ne sépare pas les milliers pendant le rendu serveur.
 - Décisions : spec 022 (part du club du quiz +25 et du défi +10 ; +50 au club pour le compte d'un élève affilié,
-  Q7 revue ; rapport du club +500 proposé ; une seule réponse comptée par jour ; une question par élève).
+  Q7 revue ; rapport du club +50 proposé, après correction ; une seule réponse comptée par jour ; une question par élève).
 - Prochaine étape : pousser sur develop (deux migrations : barème et `defi_reponse`), puis `/spec` R6. À faire
   valider par l'équipe : les 5 badges, le seuil de réussite d'un quiz, les 30 questions du défi.
 

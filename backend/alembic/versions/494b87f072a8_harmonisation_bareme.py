@@ -27,7 +27,6 @@ CHANGEMENTS = [
     ("encadreur.quiz", 25, 0, "Quiz réussi, première fois"),
     ("club.quiz_eleve", 10, 25, "Quiz santé réussi par un élève affilié"),
     ("club.certification_eleve", 100, 500, "Certification d'un élève affilié"),
-    ("club.rapport_activite", 50, 500, "Rapport d'activité validé"),
 ]
 
 # (code, bénéficiaire, libellé, montant, proposé)

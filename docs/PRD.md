@@ -200,7 +200,7 @@ d'établissement ne transfère pas les points déjà acquis.
 | Discussion animée et attestée                     | —              | +50 (proposé)    | —                    |
 | Réponse utile validée à un élève                  | —              | +10 (proposé)    | —                    |
 | Événement approuvé dans l'agenda                  | —              | +30 (proposé)    | —                    |
-| Rapport d'activité validé                         | —              | +100 (proposé)   | +500 (proposé)       |
+| Rapport d'activité validé                         | —              | +100 (proposé)   | +50 (proposé)        |
 | Rapport mensuel validé                            | —              | +75 (proposé)    | —                    |
 | Bilan semestriel validé                           | —              | +200 (proposé)   | +100 (proposé)       |
 | Projet d'élèves accompagné et réalisé             | —              | +150 (proposé)   | à arbitrer           |

@@ -66,7 +66,7 @@ GRILLE: tuple[Action, ...] = (
     Action(QUESTION_JOUR_CLUB, "club", "Question du jour réussie par un élève affilié", 10),
     Action("club.badge_eleve", "club", "Badge obtenu par un élève affilié (5 au plus)", 200),
     Action("club.certification_eleve", "club", "Certification d'un élève affilié", 500),
-    Action("club.rapport_activite", "club", "Rapport d'activité validé", 500, propose=True),
+    Action("club.rapport_activite", "club", "Rapport d'activité validé", 50, propose=True),
     Action("club.bilan_semestriel", "club", "Bilan semestriel validé", 100, propose=True),
 )
 

@@ -5,7 +5,7 @@
 Appliquer partout le document « Harmonisation de la gamification » (référentiel du 2026-11-05, fourni le
 2026-11-06) : un seul barème, le même dans l'API, dans l'admin et sur le site. Décisions prises le 2026-11-06
 sur ses contradictions : part du club du quiz +25 et de la question du jour +10 (sections 1, 3, 12) ; +50 au club
-pour le compte validé d'un élève affilié (remplace Q7) ; rapport d'activité du club +500 « à valider » ; question
+pour le compte validé d'un élève affilié (remplace Q7) ; rapport d’activité du club laissé à +50 « à valider » (correction du 2026-11-06) ; question
 du jour : seule la première réponse du jour compte.
 
 ## Comportement attendu
@@ -24,7 +24,7 @@ du jour : seule la première réponse du jour compte.
 | Badge de certification (5 au plus)  | +500 par badge | +200 par badge                               |
 | Certification obtenue               | +1 000         | +500                                         |
 
-Club, actions propres : rapport d'activité +500 (proposé), bilan semestriel +100 (proposé). Le barème encadreur
+Club, actions propres : rapport d'activité +50 (proposé, corrigé le 2026-11-06 : la section 4 du référentiel fait foi), bilan semestriel +100 (proposé). Le barème encadreur
 reste « proposé » ; le quiz réussi par un encadreur passe à 0 (proposé). Un montant déjà modifié par l'admin n'est
 pas écrasé.
 

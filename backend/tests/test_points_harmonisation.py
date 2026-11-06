@@ -30,7 +30,7 @@ ATTENDU = {
     "club.question_jour_eleve": 10,
     "club.badge_eleve": 200,
     "club.certification_eleve": 500,
-    "club.rapport_activite": 500,
+    "club.rapport_activite": 50,
     "club.bilan_semestriel": 100,
     "encadreur.quiz": 0,
 }
