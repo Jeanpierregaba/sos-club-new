@@ -9,6 +9,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 ## En cours
 
 - [ ] [021 Accueil : « Quel axe », défi du jour, podium des clubs](docs/specs/021-accueil-jeux-decouverte/) : livrée (tâches 1–7a) ; reste la relecture `reviewer`, interrompue par le quota
+- [ ] [022 Harmonisation du barème](docs/specs/022-harmonisation-bareme/) : tâches 1–4 faites ; en cours : clôture (docs, relecture `reviewer`)
 
 ## À faire
 
@@ -44,7 +45,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 **Phase 5 — Classements (P0, jalon B)**
 
-- [ ] R13 — Classements Club, DRE et national, tableaux de bord, module Points (Q21) ; brancher les lignes des clubs dans `points.service.scores_des_clubs`, que lit déjà le podium de l'accueil (spec 021)
+- [ ] R13 — Classements Club, DRE et national, tableaux de bord, module Points (Q21) ; brancher les lignes des clubs dans `points.service.scores_des_clubs`, que lit déjà le podium de l'accueil (spec 021), et créditer les parts Club du barème harmonisé (spec 022 : compte, commentaire, quiz, question du jour +10, badges, certification), affiliation active au moment du crédit
 - [ ] R14 — Clôture de semestre et Top 3 (Q21, Q25)
 - [ ] Avant l'ouverture : récépissé de l'IPDCP, avis juridique, sauvegardes hors du VPS, audit de sécurité (Q8, Q9)
 
@@ -67,6 +68,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 - [ ] Pages du menu : brancher sur l'API les contenus repris du site de référence (agenda, magazine, bibliothèque, Hall of Fame, quiz), mettre en ligne les fichiers (plaquette, documentaire, documents de la bibliothèque, liens en `#`) et ouvrir les formulaires d'inscription Génie Imhotep ; faire confirmer les 6 doublons de l'annuaire écartés au chargement du référentiel (5 dans l'IESG Aného, 1 dans celle de Dapaong)
 - [ ] Défi du jour : faire relire les 30 questions de `backend/app/jeux/banque_initiale.py` par l'équipe nationale avant la prod, puis les charger en prod (`python -m app.jeux.banque_initiale`) ; écran admin de la banque avec les quiz (R9)
 - [ ] Noms des axes : le document du jeu « Quel axe » (« Gamification & Bourses », « Leadership & Masculinité positive »…) diffère du site (« Bourses & excellence », « Leadership & mentorat »…) : faire trancher et aligner
+- [ ] Faire valider par l'équipe nationale (référentiel du 2026-11-05) : noms, visuels et jalons des 5 badges (provisoires sur `/certification` : 3, 5, 7, 9, 12 quiz), seuil de réussite d'un quiz, plafonds et preuve des partages, barème encadreur
 - [ ] Renommer le paquet `tanstack_start_ts`
 - [ ] Suite Playwright des parcours de connexion (garde, en-tête, retour arrière), vérifiés à la main pour l'instant, avant l'ouverture
 

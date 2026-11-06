@@ -2,7 +2,8 @@
 
 ## Objectif
 
-Rendre l'accueil plus vivant avec trois blocs de gamification légère, qui ne rapportent aucun point :
+Rendre l'accueil plus vivant avec trois blocs de gamification légère, qui ne rapportaient aucun point. Depuis la
+spec 022, la première bonne réponse du jour d'un élève au défi du jour rapporte +20 points (voir `../022-harmonisation-bareme/`) :
 
 - le jeu de découverte « Quel axe est fait pour toi ? », réservé aux élèves connectés (document fonctionnel
   « Jeu de découverte des 7 axes », fourni le 2026-11-06) ;
@@ -30,7 +31,8 @@ le test ». Le texte ne présente jamais le résultat comme un diagnostic. Le mo
 
 **Défi du jour.** La bulle flottante de l'accueil montre la question du jour : la même pour tous, elle change
 à minuit (heure de Lomé). Le visiteur choisit une réponse et la valide ; l'API dit si elle est juste, donne la
-bonne réponse et une courte explication. Aucun point, aucun compte nécessaire.
+bonne réponse et une courte explication. Aucun compte nécessaire. (Amendé par la spec 022 : un élève connecté
+répond une fois par jour et gagne +20 si c'est juste.)
 
 **Podium des clubs.** Après « Trouve toi aussi ton club Santé », une section sombre d'après la maquette
 (mascottes bleue et violette, « Et si ton lycée devenait N°1 du Togo ? », deux pastilles « Des quiz santé » et

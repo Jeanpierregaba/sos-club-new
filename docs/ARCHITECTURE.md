@@ -98,7 +98,10 @@ Champs structurants :
   rotation), `categorie`, `question`, `options` (JSONB, 2 à 4 libellés), `bonne_reponse` (index, contrôlé par la
   base), `explication`, `actif`. Le défi du jour est la question active de rang (numéro du jour de Lomé modulo
   leur nombre) ; la réponse ne part qu'avec la correction. Remplie par `app.jeux.banque_initiale` (seeds, ou
-  `python -m app.jeux.banque_initiale` en prod) ; pas encore d'écran admin (R9). Aucun point.
+  `python -m app.jeux.banque_initiale` en prod) ; pas encore d'écran admin (R9).
+- `defi_reponse` (spec 022) : la réponse comptée d'un élève au défi du jour, une par élève et par jour
+  (contrainte unique). `defi_id`, `jour` (date de Lomé), `choix`, `correcte`, `mouvement_id` (le crédit de
+  +20, nul pour une réponse fausse). La correction suivante du même jour renvoie cette réponse, sans crédit.
 - `article` : `type` (activite, magazine, parole_eleve), `titre`, `contenu` en texte simple, `axe_id`,
   `club_id` facultatif, `auteur_id`, `photo`, `statut` (brouillon, soumis, publie, rejete),
   `motif_rejet`, `modere_par`, `publie_le`.
@@ -175,6 +178,7 @@ pour la ressource demandée.
 | Confirmer le nouveau président d'un club (Q19, spec 020)                  | Non      | Non                       | Clubs où il est rattaché  | Non                                           |
 | Jouer à « Quel axe est fait pour toi ? » (spec 021)                       | Non      | Élève actif               | Non                       | Non                                           |
 | Répondre au défi du jour, voir le podium des clubs (spec 021)             | Oui      | Oui                       | Oui                       | Oui                                           |
+| Gagner des points au défi du jour (spec 022)                              | Non      | Élève actif, 1 fois/jour  | Non                       | Non                                           |
 | Modérer, publier vidéos et documents, valider un club, attribuer un badge | Non      | Non                       | Non                       | Oui                                           |
 
 Un élève ne peut ni voir les coordonnées d'un autre utilisateur, ni être contacté par un autre

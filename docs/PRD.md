@@ -179,29 +179,37 @@ groupe deviendra une ou plusieurs specs dans `docs/specs/`.
 
 ### Barème des points
 
-Les montants sont réglés dans l'espace admin, à partir de ces valeurs. Ceux marqués « proposé » restent
-à valider par les organisateurs (Q22). Un point n'est crédité qu'une fois l'action validée, une seule
-fois par action.
+Référentiel « Harmonisation de la gamification » du 2026-11-05 (spec 022). Les montants sont réglés dans
+l'espace admin, à partir de ces valeurs. Ceux marqués « proposé » restent à valider par les organisateurs
+(Q22). Un point n'est crédité qu'une fois l'action validée, une seule fois par action. La part du club n'est
+créditée que pour un élève dont l'affiliation est active et validée au moment du crédit ; un changement
+d'établissement ne transfère pas les points déjà acquis.
 
-| Action validée                               | Élève  | Encadreur        | Club                       |
-| -------------------------------------------- | ------ | ---------------- | -------------------------- |
-| Compte validé                                | +100   | +100 (proposé)   | —                          |
-| Commentaire approuvé                         | +5     | +5 (proposé)     | —                          |
-| Republication d'un article du site, vérifiée | +10    | +10 (proposé)    | —                          |
-| Article personnel approuvé                   | +50    | +50 (proposé)    | +20 pour un élève affilié  |
-| Partage de son article, par réseau, vérifié  | +50    | +50 (proposé)    | —                          |
-| Quiz réussi, première fois                   | +25    | +25 (proposé)    | +10 pour un élève affilié  |
-| Certification Génie Imhotep                  | +1 000 | +1 000 (proposé) | +100 pour un élève affilié |
-| Sujet de forum validé                        | —      | +30 (proposé)    | —                          |
-| Discussion animée et attestée                | —      | +50 (proposé)    | —                          |
-| Réponse utile validée à un élève             | —      | +10 (proposé)    | —                          |
-| Événement approuvé dans l'agenda             | —      | +30 (proposé)    | —                          |
-| Rapport d'activité validé                    | —      | +100 (proposé)   | +50 (proposé)              |
-| Rapport mensuel validé                       | —      | +75 (proposé)    | —                          |
-| Bilan semestriel validé                      | —      | +200 (proposé)   | +100 (proposé)             |
-| Projet d'élèves accompagné et réalisé        | —      | +150 (proposé)   | à arbitrer                 |
-| Élève accompagné jusqu'à la certification    | —      | +50 (proposé)    | —                          |
-| Mobilisation vérifiée de 10 participants     | —      | +50 (proposé)    | —                          |
+| Action validée                                    | Élève          | Encadreur        | Club (élève affilié) |
+| ------------------------------------------------- | -------------- | ---------------- | -------------------- |
+| Compte validé                                     | +100           | +100 (proposé)   | +50                  |
+| Commentaire approuvé                              | +5             | +5 (proposé)     | +20                  |
+| Republication d'un article du site, vérifiée      | +10            | +10 (proposé)    | +2                   |
+| Article personnel approuvé                        | +50            | +50 (proposé)    | +20                  |
+| Partage de son article, par réseau, vérifié       | +50            | +50 (proposé)    | +2 par réseau        |
+| Quiz santé réussi, première fois                  | +50            | 0 (proposé)      | +25                  |
+| Bonne réponse à la question du jour (1re du jour) | +20            | —                | +10                  |
+| Badge de certification (5 au plus)                | +500 par badge | —                | +200 par badge       |
+| Certification Génie Imhotep                       | +1 000         | +1 000 (proposé) | +500                 |
+| Sujet de forum validé                             | —              | +30 (proposé)    | —                    |
+| Discussion animée et attestée                     | —              | +50 (proposé)    | —                    |
+| Réponse utile validée à un élève                  | —              | +10 (proposé)    | —                    |
+| Événement approuvé dans l'agenda                  | —              | +30 (proposé)    | —                    |
+| Rapport d'activité validé                         | —              | +100 (proposé)   | +500 (proposé)       |
+| Rapport mensuel validé                            | —              | +75 (proposé)    | —                    |
+| Bilan semestriel validé                           | —              | +200 (proposé)   | +100 (proposé)       |
+| Projet d'élèves accompagné et réalisé             | —              | +150 (proposé)   | à arbitrer           |
+| Élève accompagné jusqu'à la certification         | —              | +50 (proposé)    | —                    |
+| Mobilisation vérifiée de 10 participants          | —              | +50 (proposé)    | —                    |
+
+Le barème est le même pour tous les quiz : jamais de montant variable selon le niveau. « Quel axe est fait pour
+toi ? » ne rapporte rien. Restent à valider : les noms et jalons des 5 badges, le seuil de réussite d'un quiz,
+les plafonds et la preuve des partages.
 
 Ne rapportent aucun point : la carte membre, une invitation, le partage d'un classement, un contenu en
 attente, refusé ou dépublié pour infraction. Le score d'un club est la somme de ses seules lignes, sans
@@ -250,7 +258,7 @@ CDC du 2026-11-04 sont gardées pour mémoire.
 | Q4  | Comment un élève sans email récupère-t-il son mot de passe ?                                                 | Identifiant choisi et mot de passe, email facultatif. Un encadreur rattaché à son club, ou l'admin, réinitialise le mot de passe ; l'action est journalisée.                                                                                                                              | R2, R5           |
 | Q5  | Les 844 clubs affichés sur le site existent-ils vraiment ? Faut-il les importer ?                            | Ils s'enregistrent eux-mêmes, par leur président. Les chiffres du site sont provisoires. Un import se traiterait à part.                                                                                                                                                                  | R4               |
 | Q6  | L'admin valide-t-il chaque nouveau club ?                                                                    | **Tranché (CDC club et admin)** : oui, après vérification du président, de l'établissement et des doublons.                                                                                                                                                                               | R4               |
-| Q7  | L'inscription à +50 points au club permet de gonfler un score avec de faux comptes.                          | **Tranché (CDC élève)** : l'inscription ne rapporte plus rien au club, et seule une affiliation validée compte.                                                                                                                                                                           | —                |
+| Q7  | L'inscription à +50 points au club permet de gonfler un score avec de faux comptes.                          | **Tranché à nouveau (référentiel du 2026-11-05)** : +50 au club pour le compte validé d'un élève, seulement si son affiliation est active et validée au moment du crédit, une fois par élève (pas de nouveau bonus après un changement d'école).                                          | R13              |
 | Q8  | Quel consentement pour un élève mineur et pour les photos d'élèves (articles, carte membre) ?                | Case cochée à l'inscription (l'élève confirme l'accord de son parent ou tuteur), attestation de l'auteur pour chaque photo, contrôle par le modérateur. Photo de carte facultative. À valider par un juriste.                                                                             | R2, R6, R15      |
 | Q9  | Qui est responsable du traitement au sens de la loi, et qui fait la démarche auprès de l'IPDCP ?             | AIMES-AFRIQUE. Aucune donnée réelle d'élève avant le récépissé.                                                                                                                                                                                                                           | Ouverture        |
 | Q10 | Quel fournisseur de VPS, dans quel pays, et quel budget mensuel ?                                            | VPS retenu par le porteur du projet, un seul serveur pour la preprod et la prod (ADR-0007). Fournisseur et pays à confirmer selon le budget et Q9.                                                                                                                                        | Préproduction    |
