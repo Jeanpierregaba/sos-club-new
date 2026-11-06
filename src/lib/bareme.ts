@@ -12,4 +12,5 @@ export const BAREME = {
 export const QUIZ_CERTIFICATION = 12;
 export const BADGES_CERTIFICATION = 5;
 
-export const points = (n: number) => `+${n.toLocaleString("fr-FR")}`;
+// « +1 000 » avec une espace fine insécable, à l'identique côté serveur et navigateur (sans dépendre d'Intl).
+export const points = (n: number) => `+${String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f")}`;

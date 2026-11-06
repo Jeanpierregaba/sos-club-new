@@ -570,7 +570,7 @@ function ClubSante() {
                 Lancer ma certification <ArrowRight className="size-4" />
               </a>
               <p className="text-sm font-bold text-white/80">
-                12 Quiz · 5 paliers de badges · 1 certificat officiel téléchargeable
+                12 Quiz · 5 badges · 1 certificat officiel téléchargeable
               </p>
             </div>
           </div>

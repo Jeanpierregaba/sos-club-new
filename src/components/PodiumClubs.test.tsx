@@ -57,12 +57,10 @@ describe("PodiumClubs", () => {
 
     const lignes = await screen.findAllByRole("listitem");
     expect(lignes).toHaveLength(3);
+    expect(lignes[0]).toHaveTextContent("Lycée 1");
     expect(lignes[0]).toHaveTextContent("Club Tokoin");
     expect(lignes[0]).toHaveTextContent(/15\s800\s*pts/);
-    expect(screen.getByRole("link", { name: /Club Tokoin/ })).toHaveAttribute(
-      "href",
-      "/clubs/club-1",
-    );
+    expect(screen.getByRole("link", { name: /Lycée 1/ })).toHaveAttribute("href", "/clubs/club-1");
     expect(screen.getByRole("link", { name: /Découvrir les jeux/ })).toHaveAttribute(
       "href",
       "/jeux",
@@ -73,7 +71,7 @@ describe("PodiumClubs", () => {
     api.chargerPodiumClubs.mockResolvedValue([]);
     await afficher();
 
-    expect(screen.getByText("Le classement démarre bientôt !")).toBeInTheDocument();
+    expect(screen.getByText("Le classement arrive bientôt !")).toBeInTheDocument();
     expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
   });
 
@@ -81,6 +79,6 @@ describe("PodiumClubs", () => {
     api.chargerPodiumClubs.mockRejectedValue(new Error("hors ligne"));
     await afficher();
 
-    expect(screen.getByText("Le classement démarre bientôt !")).toBeInTheDocument();
+    expect(screen.getByText("Le classement arrive bientôt !")).toBeInTheDocument();
   });
 });

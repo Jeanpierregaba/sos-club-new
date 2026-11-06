@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion, retard } from "@/components/SiteMotion";
 import { DecorAnime } from "@/components/DecorAnime";
+import { BAREME, points } from "@/lib/bareme";
 import { niveauDe, poles, type Niveau } from "@/lib/quiz";
 import mascottesVs from "@/assets/mascottes-vs.webp";
 import mascottesTrophees from "@/assets/mascottes-trophees.webp";
@@ -67,11 +68,12 @@ const etapes = [
   },
 ];
 
-const niveaux: { n: Niveau; pts: string; c: string }[] = [
-  { n: "Débutant", pts: "50 pts", c: "bg-primary/15 text-primary" },
-  { n: "Intermédiaire", pts: "60–65 pts", c: "bg-sky/15 text-sky" },
-  { n: "Avancé", pts: "70–75 pts", c: "bg-tangerine/15 text-tangerine" },
-  { n: "Championnat", pts: "80–100 pts", c: "bg-grape/15 text-grape" },
+// Le niveau dit la difficulté, pas les points : tout quiz réussi rapporte le même barème (spec 022).
+const niveaux: { n: Niveau; c: string }[] = [
+  { n: "Débutant", c: "bg-primary/15 text-primary" },
+  { n: "Intermédiaire", c: "bg-sky/15 text-sky" },
+  { n: "Avancé", c: "bg-tangerine/15 text-tangerine" },
+  { n: "Championnat", c: "bg-grape/15 text-grape" },
 ];
 
 function Jeux() {
@@ -79,7 +81,7 @@ function Jeux() {
   const [niveau, setNiveau] = useState<Niveau | null>(null);
   const p = poles[pole] ?? poles[0]!;
   const quiz = p.quiz
-    .map(([t, pts], i) => ({ t, pts, n: (departs[pole] ?? 1) + i, niveau: niveauDe(pts) }))
+    .map(([t, cotation], i) => ({ t, n: (departs[pole] ?? 1) + i, niveau: niveauDe(cotation) }))
     .filter((q) => !niveau || q.niveau === niveau);
 
   return (
@@ -272,11 +274,18 @@ function Jeux() {
                       on ? "bg-ink text-white" : "bg-mist-soft ring-1 ring-border hover:ring-ink/30"
                     }`}
                   >
-                    {x ? `${x.n} (${x.pts})` : "Toutes"}
+                    {x ? x.n : "Toutes"}
                   </button>
                 );
               })}
             </div>
+
+            <p className="mt-4 rounded-2xl bg-mist-soft px-4 py-3 text-sm font-semibold text-ink/80">
+              Chaque quiz réussi pour la première fois rapporte{" "}
+              <strong className="text-ink">{points(BAREME.quiz.eleve)} points</strong>, et{" "}
+              {points(BAREME.quiz.club)} à ton Club Santé si tu y es affilié. Rejouer un quiz déjà
+              réussi ne rapporte rien de plus.
+            </p>
 
             {quiz.length === 0 ? (
               <p className="mt-6 rounded-2xl border border-dashed p-8 text-center font-semibold text-muted-foreground">
@@ -304,8 +313,13 @@ function Jeux() {
                       <Clock className="size-3.5" /> 10 QCM · 20 s par question
                     </p>
                     <div className="mt-4 flex items-center justify-between gap-3 border-t pt-4">
-                      <span className="font-display text-xl text-sun [text-shadow:0_1px_0_var(--ink)]">
-                        +{q.pts} pts
+                      <span className="leading-tight">
+                        <span className="block font-display text-xl text-sun [text-shadow:0_1px_0_var(--ink)]">
+                          {points(BAREME.quiz.eleve)} pts
+                        </span>
+                        <span className="block text-[11px] font-bold text-muted-foreground">
+                          {points(BAREME.quiz.club)} pour ton club
+                        </span>
                       </span>
                       <a
                         href="/connexion"

@@ -1,11 +1,19 @@
 // Catalogue des 100 quiz de gamification, repris du parcours officiel publié par la coordination nationale.
-// Chaque quiz compte 10 questions tirées du référentiel des 922 QCM. Le niveau se déduit des points.
+// Chaque quiz compte 10 questions tirées du référentiel des 922 QCM. Le nombre qui suit chaque titre est la
+// cotation du parcours officiel : il ne sert plus qu'à classer le niveau. Tout quiz réussi rapporte le même
+// barème (spec 022, `src/lib/bareme.ts`).
 // Les questions elles-mêmes restent côté API : le serveur seul arbitre les quiz (ADR-0004).
 
 export type Niveau = "Débutant" | "Intermédiaire" | "Avancé" | "Championnat";
 
-export const niveauDe = (pts: number): Niveau =>
-  pts <= 50 ? "Débutant" : pts <= 65 ? "Intermédiaire" : pts <= 75 ? "Avancé" : "Championnat";
+export const niveauDe = (cotation: number): Niveau =>
+  cotation <= 50
+    ? "Débutant"
+    : cotation <= 65
+      ? "Intermédiaire"
+      : cotation <= 75
+        ? "Avancé"
+        : "Championnat";
 
 export type Pole = {
   id: string;
@@ -14,7 +22,7 @@ export type Pole = {
   d: string;
   themes: string[];
   couleur: string;
-  quiz: [titre: string, pts: number][];
+  quiz: [titre: string, cotation: number][];
 };
 
 export const poles: Pole[] = [

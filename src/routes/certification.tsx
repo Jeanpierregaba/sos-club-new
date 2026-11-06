@@ -16,6 +16,7 @@ import {
   Sparkles,
   Trophy,
   type LucideIcon,
+  ShieldCheck,
 } from "lucide-react";
 import { DecorAnime } from "@/components/DecorAnime";
 import { EnTete } from "@/components/EnTete";
@@ -24,6 +25,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion, retard } from "@/components/SiteMotion";
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
+import { BADGES_CERTIFICATION, BAREME, points } from "@/lib/bareme";
 
 export const Route = createFileRoute("/certification")({
   head: () => ({
@@ -32,7 +34,7 @@ export const Route = createFileRoute("/certification")({
       {
         name: "description",
         content:
-          "La Certification Académie Génie Imhotep : 12 quiz santé, 4 paliers de badges, un certificat officiel et jusqu'à 1 million FCFA de lots.",
+          "La Certification Académie Génie Imhotep : 12 quiz santé, 5 badges, un certificat officiel et jusqu'à 1 million FCFA de lots.",
       },
       { property: "og:title", content: "Obtiens ta certification Génie Imhotep" },
     ],
@@ -107,13 +109,15 @@ const etapes = [
   },
 ];
 
-// `fond` : le dégradé de la médaille.
-const paliers: {
+// Les 5 badges du parcours (spec 022) : chacun rapporte +500 points à l'élève et +200 à son club, une fois.
+// Leurs noms et leurs jalons sont provisoires : le référentiel du 2026-11-05 les laisse à valider par l'équipe
+// nationale. `apres` : le nombre de quiz réussis qui débloque le badge ; `fond` : le dégradé de la médaille.
+const badges: {
   n: string;
   metal: string;
   i: LucideIcon;
   t: string;
-  seuil: string;
+  apres: number;
   d: string;
   quiz: string;
   fond: string;
@@ -123,8 +127,8 @@ const paliers: {
     metal: "Bronze",
     i: Medal,
     t: "Ambassadeur junior santé",
-    seuil: "3 / 12",
-    d: "Pour la réussite sans faute du 1er palier : fondamentaux AIMES-AFRIQUE, Clubs Santé et Journées mondiales.",
+    apres: 3,
+    d: "Les fondamentaux : AIMES-AFRIQUE, les Clubs Santé et les premières Journées mondiales.",
     quiz: "Quiz 1, 2, 3",
     fond: "from-tangerine to-bark",
   },
@@ -133,28 +137,38 @@ const paliers: {
     metal: "Argent",
     i: Medal,
     t: "Pair éducateur citoyenneté & santé",
-    seuil: "6 / 12",
-    d: "Pour la validation à 100 % du 2e palier : Journées mondiales de la santé, valeurs et connaissance du corps.",
-    quiz: "Quiz 4, 5, 6",
+    apres: 5,
+    d: "Les Journées mondiales de la santé, les valeurs et l’égalité.",
+    quiz: "Quiz 4, 5",
     fond: "from-[oklch(0.82_0.02_257)] to-[oklch(0.58_0.03_257)]",
   },
   {
     n: "03",
     metal: "Or",
     i: Crown,
-    t: "Champion prévention & hygiène",
-    seuil: "9 / 12",
-    d: "Pour la réussite à 100 % du 3e palier : prévention EVSS, hygiène bucco-dentaire, sommeil et nutrition.",
-    quiz: "Quiz 7, 8, 9",
+    t: "Champion prévention & EVSS",
+    apres: 7,
+    d: "La connaissance du corps et la prévention des IST et du VIH.",
+    quiz: "Quiz 6, 7",
     fond: "from-sun to-tangerine",
   },
   {
     n: "04",
+    metal: "Platine",
+    i: ShieldCheck,
+    t: "Sentinelle de la santé",
+    apres: 9,
+    d: "La protection, le consentement, l’hygiène et l’alimentation équilibrée.",
+    quiz: "Quiz 8, 9",
+    fond: "from-[oklch(0.85_0.04_200)] to-sky",
+  },
+  {
+    n: "05",
     metal: "Diamant Imhotep",
     i: Gem,
-    t: "Maître certifié Génie Imhotep",
-    seuil: "12 / 12",
-    d: "Distinction suprême, après la validation intégrale des 12 quiz à 100 %. Elle ouvre droit au certificat officiel.",
+    t: "Maître Génie Imhotep",
+    apres: 12,
+    d: "La distinction suprême, après les 12 quiz obligatoires : elle accompagne le certificat officiel.",
     quiz: "Quiz 10, 11, 12",
     fond: "from-sky to-grape",
   },
@@ -169,111 +183,100 @@ const groupes: Record<Groupe, { t: string; c: string }> = {
   sante: { t: "Santé générale & publique", c: "text-primary bg-primary/10" },
 };
 
-const parcours: { g: Groupe; sur: string; t: string; themes: string; pts: number }[] = [
+// Chaque quiz obligatoire réussi rapporte le barème standard du quiz santé (spec 022), le dernier comme les autres.
+const parcours: { g: Groupe; sur: string; t: string; themes: string }[] = [
   {
     g: "aimes",
     sur: "Institutionnel & vision",
     t: "AIMES-AFRIQUE, Dr Kodom et SOS Docteur TV",
     themes: "ONG AIMES-AFRIQUE · Le Docteur Kodom · SOS Docteur TV",
-    pts: 150,
   },
   {
     g: "aimes",
     sur: "Clubs Santé & émulation",
     t: "Club Santé SOS Docteur TV et Génie Imhotep",
     themes: "Le Club Santé · Organisation du club · Les 7 axes",
-    pts: 150,
   },
   {
     g: "jms",
     sur: "JMS internationales",
     t: "Les Journées mondiales de la santé (janvier à mai)",
     themes: "Janvier et février · Avril · Mai",
-    pts: 150,
   },
   {
     g: "jms",
     sur: "JMS internationales",
     t: "Les Journées mondiales de la santé (juin à décembre & révision)",
     themes: "Juin à décembre · Révision",
-    pts: 150,
   },
   {
     g: "evss",
     sur: "EVSS & citoyenneté",
     t: "Genre, égalité, valeurs & droits de l’enfant",
     themes: "Genre, égalité et valeurs",
-    pts: 150,
   },
   {
     g: "evss",
     sur: "EVSS & anatomie",
     t: "Puberté, connaissance du corps & cycle menstruel",
     themes: "Puberté et corps",
-    pts: 150,
   },
   {
     g: "evss",
     sur: "EVSS & prévention",
     t: "IST, VIH/sida, contraception & planification familiale",
     themes: "IST et VIH/sida",
-    pts: 150,
   },
   {
     g: "evss",
     sur: "EVSS & protection",
     t: "Grossesse précoce, consentement, violences & compétences de vie",
     themes: "Consentement et protection",
-    pts: 150,
   },
   {
     g: "sante",
     sur: "Hygiène & nutrition",
     t: "Hygiène corporelle, salubrité & alimentation équilibrée",
     themes: "Hygiène corporelle · Nutrition",
-    pts: 150,
   },
   {
     g: "sante",
     sur: "Physiologie & épidémies",
     t: "Le corps humain & les maladies infectieuses courantes",
     themes: "Le corps humain",
-    pts: 150,
   },
   {
     g: "sante",
     sur: "Bien-être & prévention",
     t: "Maladies non transmissibles, addictions & santé mentale",
     themes: "Prévention et bien-être",
-    pts: 150,
   },
   {
     g: "sante",
     sur: "Épreuve finale & secourisme",
     t: "Vaccination, premiers secours & système de santé au Togo",
     themes: "Vaccination · Premiers secours · Système de santé",
-    pts: 250,
   },
 ];
 
 // L'anneau des 12 quiz : un segment par quiz, qui s'allume à tour de rôle ; au centre, le certificat.
-// Chaque badge de palier est posé à l'endroit où il se débloque : après le 3e, le 6e, le 9e et le 12e quiz.
+// Chaque badge est posé sur l'anneau à l'endroit où il se débloque (après le 3e, 5e, 7e, 9e et 12e quiz).
 const RAYON = 130;
 const TOUR = 2 * Math.PI * RAYON;
 const SEGMENT = TOUR / 12;
-const placesPaliers = [
-  "right-0 top-1/2 translate-x-1/3 -translate-y-1/2",
-  "bottom-0 left-1/2 -translate-x-1/2 translate-y-1/3",
-  "left-0 top-1/2 -translate-x-1/3 -translate-y-1/2",
-  "left-1/2 top-0 -translate-x-1/2 -translate-y-1/3",
-];
+// La place d'un badge, en % du cadre de 300 : l'anneau part du haut et tourne dans le sens des aiguilles.
+const placeBadge = (apres: number) => {
+  const angle = (apres / 12) * 2 * Math.PI;
+  const rayon = (RAYON / 300) * 100;
+  return { left: `${50 + rayon * Math.sin(angle)}%`, top: `${50 - rayon * Math.cos(angle)}%` };
+};
 
 function AnneauCertification() {
   return (
     <div
       data-reveal="zoom"
       role="img"
-      aria-label="Les 12 quiz forment un anneau autour du certificat officiel ; 4 badges se débloquent en chemin."
+      aria-label="Les 12 quiz forment un anneau autour du certificat officiel ; 5 badges se débloquent en chemin."
       className="relative mx-auto size-[19rem] sm:size-[24rem] lg:size-[27rem]"
     >
       <svg viewBox="0 0 300 300" className="absolute inset-0 size-full -rotate-90">
@@ -315,15 +318,16 @@ function AnneauCertification() {
           Génie Imhotep
         </p>
         <p className="mt-1 font-display text-3xl tabular-nums text-primary sm:text-4xl">12 / 12</p>
-        <p className="text-[11px] font-bold text-muted-foreground">quiz validés à 100 %</p>
+        <p className="text-[11px] font-bold text-muted-foreground">quiz obligatoires réussis</p>
       </div>
 
-      {/* Les 4 badges de paliers, posés sur l'anneau. */}
-      {paliers.map((p, i) => (
+      {/* Les 5 badges, posés sur l'anneau. */}
+      {badges.map((p, i) => (
         <span
           key={p.n}
-          title={`Palier ${p.n} · ${p.metal}`}
-          className={`absolute ${placesPaliers[i]}`}
+          title={`Badge ${p.n} · ${p.metal}`}
+          style={placeBadge(p.apres)}
+          className="absolute -translate-x-1/2 -translate-y-1/2"
         >
           <span
             style={{ animationDelay: `${-i * 1.2}s` }}
@@ -332,7 +336,7 @@ function AnneauCertification() {
             <p.i className="size-6 sm:size-7" />
           </span>
           <span className="absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded-full bg-night px-2 py-0.5 ring-1 ring-white/20 text-[10px] font-extrabold uppercase tracking-wide text-white/80">
-            {p.seuil.split(" ")[0]} quiz
+            {p.apres} quiz
           </span>
         </span>
       ))}
@@ -359,7 +363,7 @@ function Certification() {
       <SiteHeader />
 
       {/* Bannière « cérémonie » : nuit et or. À droite, l'anneau des 12 quiz s'allume segment après segment
-          autour du certificat, et les 4 badges de paliers sont posés là où ils se débloquent (3, 6, 9, 12). */}
+          autour du certificat, et les 5 badges sont posés là où ils se débloquent (3, 5, 7, 9, 12). */}
       <section className="relative isolate overflow-hidden bg-night text-white">
         <div
           aria-hidden
@@ -548,20 +552,22 @@ function Certification() {
         </div>
       </section>
 
-      {/* Les 4 paliers de badges : des médailles sur fond nuit. */}
+      {/* Les 5 badges : des médailles sur fond nuit, et le barème du parcours. */}
       <section className="bg-night py-20 text-white">
         <div className="mx-auto max-w-7xl px-5">
           <EnTete
-            sur="Récompenses progressives · 4 paliers"
-            bleu="Tes badges"
-            vert="de paliers"
+            sur="Récompenses progressives · 5 badges"
+            bleu="Tes 5 badges"
+            vert="officiels"
             sombre
           >
-            Chaque palier de 3 quiz validés à 100 % débloque un badge officiel, à télécharger et à
-            partager sur tes réseaux sociaux.
+            Chaque badge débloqué rapporte {points(BAREME.badge.eleve)} points à toi et{" "}
+            {points(BAREME.badge.club)} à ton Club Santé, une seule fois. Télécharge-le et
+            partage-le sur tes réseaux sociaux.
           </EnTete>
-          <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {paliers.map((p, i) => (
+          <Bareme />
+          <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+            {badges.map((p, i) => (
               <li
                 key={p.n}
                 data-reveal
@@ -574,17 +580,24 @@ function Certification() {
                   <p.i className="size-9" />
                 </span>
                 <p className="mt-5 text-xs font-extrabold uppercase tracking-widest text-sun">
-                  Palier {p.n} · {p.metal}
+                  Badge {p.n} · {p.metal}
                 </p>
                 <h3 className="mt-1 font-display text-2xl leading-tight">{p.t}</h3>
-                <p className="mt-1 text-sm font-bold text-primary">{p.seuil} quiz à 100 %</p>
+                <p className="mt-1 text-sm font-bold text-primary">Après {p.apres} quiz réussis</p>
                 <p className="mt-3 flex-1 text-sm font-medium text-white/70">{p.d}</p>
                 <p className="mt-4 rounded-full bg-white/10 px-3 py-1 text-center text-xs font-bold">
                   {p.quiz}
                 </p>
+                <p className="mt-2 text-center text-sm font-extrabold text-sun">
+                  {points(BAREME.badge.eleve)} pts · {points(BAREME.badge.club)} club
+                </p>
               </li>
             ))}
           </ul>
+          <p className="mt-6 text-center text-sm font-medium text-white/60">
+            Noms et jalons provisoires : l’équipe nationale confirmera les conditions de déblocage
+            des badges.
+          </p>
         </div>
       </section>
 
@@ -634,7 +647,7 @@ function Certification() {
                     <span className="text-muted-foreground"> / 12</span>
                   </span>
                   <span className="rounded-full bg-sun px-2.5 py-0.5 text-xs font-extrabold text-ink">
-                    +{q.pts} pts
+                    {points(BAREME.quiz.eleve)} pts
                   </span>
                 </div>
                 <span
@@ -670,5 +683,29 @@ function Certification() {
 
       <SiteFooter />
     </div>
+  );
+}
+
+// Le barème du parcours, en trois chiffres (référentiel du 2026-11-05).
+function Bareme() {
+  const lignes = [
+    { t: "Chaque quiz obligatoire réussi", b: BAREME.quiz, d: "une seule fois par quiz" },
+    { t: "Chaque badge débloqué", b: BAREME.badge, d: `${BADGES_CERTIFICATION} badges au plus` },
+    { t: "Certification obtenue", b: BAREME.certification, d: "bonus final, une seule fois" },
+  ];
+  return (
+    <ul className="mt-8 grid gap-3 md:grid-cols-3">
+      {lignes.map((l) => (
+        <li key={l.t} className="rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
+          <p className="text-sm font-bold text-white/80">{l.t}</p>
+          <p className="mt-1 font-display text-2xl text-sun">
+            {points(l.b.eleve)} <span className="text-base text-white">pts</span>
+          </p>
+          <p className="text-sm font-semibold text-white/70">
+            {points(l.b.club)} pour ton club · {l.d}
+          </p>
+        </li>
+      ))}
+    </ul>
   );
 }

@@ -294,7 +294,7 @@ const PROMESSES_VISITEUR = [
   {
     i: Share2,
     t: "Des badges partageables",
-    d: "Un badge à chaque palier, à montrer sur tes réseaux.",
+    d: "5 badges à débloquer, à montrer sur tes réseaux.",
   },
   { i: Award, t: "Ta certification", d: "Le certificat Génie Imhotep, après les 12 quiz réussis." },
 ];

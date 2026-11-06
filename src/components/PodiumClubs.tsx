@@ -17,7 +17,7 @@ const LIGNES = [
   "bg-white/70 text-ink",
 ];
 
-// Le podium des clubs de l'accueil (spec 021) : les trois clubs qui ont le plus de points. Le registre ne
+// Le podium de l'accueil (spec 021, spec 022) : les trois lycées dont le Club Santé a le plus de points. Le registre ne
 // crédite pas encore les clubs (R13) : tant que personne n'a de points, la carte annonce le classement.
 export function PodiumClubs() {
   const { data: podium = [] } = useQuery({
@@ -106,7 +106,7 @@ export function PodiumClubs() {
           />
           <div className="relative rounded-[2rem] bg-white/10 p-6 ring-1 ring-white/25 backdrop-blur-md md:p-8">
             <Trophy aria-hidden className="mx-auto size-12 text-sun drop-shadow" />
-            <p className="mt-2 text-center font-display text-3xl">Top 3 des clubs</p>
+            <p className="mt-2 text-center font-display text-3xl">Top 3 des lycées</p>
             {podium.length > 0 ? <Classement podium={podium} /> : <BientotLa />}
           </div>
         </div>
@@ -130,9 +130,9 @@ function Classement({ podium }: { podium: ClubPodium[] }) {
             {club.rang}
           </span>
           <Link to="/clubs/$id" params={{ id: club.id }} className="min-w-0 flex-1 hover:underline">
-            <span className="block truncate font-extrabold">{club.nom}</span>
+            <span className="block truncate font-extrabold">{club.etablissement}</span>
             <span className="block truncate text-sm font-medium opacity-75">
-              {club.etablissement} · {club.dre}
+              {club.nom} · {club.dre}
             </span>
           </Link>
           <span className="shrink-0 font-display text-xl">
@@ -162,9 +162,9 @@ function BientotLa() {
           <span className="font-display text-xl text-white/60">? pts</span>
         </div>
       ))}
-      <p className="pt-2 text-center font-bold">Le classement démarre bientôt&#8239;!</p>
+      <p className="pt-2 text-center font-bold">Le classement arrive bientôt&#8239;!</p>
       <p className="text-center text-sm font-medium text-white/75">
-        Les points des clubs s’afficheront ici : le tien peut prendre la première place.
+        Les points des Clubs Santé s’afficheront ici : ton lycée peut prendre la première place.
       </p>
     </div>
   );
