@@ -95,6 +95,13 @@ export type FileAffiliations = Schemas["FileAffiliations"];
 export type FileRattachements = Schemas["FileRattachements"];
 export type ResultatLot = Schemas["ResultatLot"];
 export type ElementLot = Schemas["ElementLot"];
+export type QuestionnaireQuelAxe = Schemas["QuestionnaireQuelAxe"];
+export type QuestionQuelAxe = Schemas["QuestionQuelAxe"];
+export type ResultatQuelAxe = Schemas["ResultatQuelAxe"];
+export type CodeAxe = ResultatQuelAxe["principal"];
+export type DefiDuJour = Schemas["DefiDuJour"];
+export type CorrectionDefi = Schemas["CorrectionDefi"];
+export type ClubPodium = Schemas["ClubPodium"];
 
 export const MESSAGE_SAISIE = "Vérifie le formulaire : un champ est vide, trop long ou mal rempli.";
 
@@ -439,3 +446,12 @@ export const adminDeciderRattachements = (
     `${CLUBS_ADMIN}/rattachements/${decision}`,
     decision === "refuser" ? { elements, motif } : { elements },
   );
+
+// Jeux de l'accueil (spec 021). « Quel axe » est réservé aux élèves actifs : l'API répond 401 ou 403 sinon.
+export const chargerQuelAxe = () => requeteApi<QuestionnaireQuelAxe>("/api/jeux/quel-axe");
+export const calculerQuelAxe = (reponses: string[]) =>
+  envoyerJson<ResultatQuelAxe>("/api/jeux/quel-axe/resultat", { reponses });
+export const chargerDefiDuJour = () => requeteApi<DefiDuJour>("/api/jeux/defi-du-jour");
+export const corrigerDefi = (id: string, choix: number) =>
+  envoyerJson<CorrectionDefi>(`/api/jeux/defis/${id}/reponse`, { choix });
+export const chargerPodiumClubs = () => requeteApi<ClubPodium[]>("/api/clubs/podium");
