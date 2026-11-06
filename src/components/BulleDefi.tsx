@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { Loader2, X } from "lucide-react";
 import mascotteBourses from "@/assets/mascotte-bourses.webp";
+
+import { useMoi } from "@/hooks/use-moi";
+import { BAREME, points } from "@/lib/bareme";
 
 import {
   chargerDefiDuJour,
@@ -15,6 +19,8 @@ import {
 // la tête de la mascotte ouvre une fenêtre avec la question. Le bouton « Retour en haut » remonte au-dessus.
 // La question vient de la banque de l'API (spec 021) : la même pour tous, elle change à minuit ; la bonne
 // réponse n'arrive qu'avec la correction. Sans défi (banque vide, API arrêtée), la bulle ne s'affiche pas.
+// Spec 022 : un élève connecté répond une fois par jour et gagne +20 (et +10 pour son club) si c'est juste ;
+// sa réponse reste affichée ensuite. Un visiteur joue sans points.
 
 function TeteMascotte({ className }: { className: string }) {
   return (
@@ -30,22 +36,30 @@ function TeteMascotte({ className }: { className: string }) {
   );
 }
 
+type Joueur = "eleve" | "visiteur" | "autre";
+
 export function BulleDefi() {
+  const { data: moi, isPending } = useMoi();
+  // La question dépend du compte : un élève qui a déjà répondu la reçoit avec sa réponse.
+  const cle = ["defi-du-jour", moi?.id ?? null];
   const { data: defi } = useQuery({
-    queryKey: ["defi-du-jour"],
+    queryKey: cle,
     queryFn: chargerDefiDuJour,
     retry: false,
     staleTime: 10 * 60_000,
+    enabled: !isPending,
   });
-  return defi ? <Bulle key={defi.id} defi={defi} /> : null;
+  const joueur: Joueur = !moi ? "visiteur" : moi.role === "eleve" ? "eleve" : "autre";
+  return defi ? <Bulle key={`${defi.id}-${joueur}`} defi={defi} joueur={joueur} cle={cle} /> : null;
 }
 
-function Bulle({ defi }: { defi: DefiDuJour }) {
+function Bulle({ defi, joueur, cle }: { defi: DefiDuJour; joueur: Joueur; cle: unknown[] }) {
+  const clientRequetes = useQueryClient();
   const [ouverte, setOuverte] = useState(false);
   const [vue, setVue] = useState(false);
   const [invite, setInvite] = useState(false);
-  const [choix, setChoix] = useState<number | null>(null);
-  const [correction, setCorrection] = useState<CorrectionDefi | null>(null);
+  const [choix, setChoix] = useState<number | null>(defi.ma_reponse?.choix ?? null);
+  const [correction, setCorrection] = useState<CorrectionDefi | null>(defi.ma_reponse ?? null);
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const valide = correction !== null;
@@ -56,7 +70,12 @@ function Bulle({ defi }: { defi: DefiDuJour }) {
     setEnvoi(true);
     setErreur(null);
     try {
-      setCorrection(await corrigerDefi(defi.id, choix));
+      const reponse = await corrigerDefi(defi.id, choix);
+      setCorrection(reponse);
+      setChoix(reponse.choix);
+      // Rouverte plus tard, la bulle montre la réponse comptée.
+      if (joueur === "eleve")
+        clientRequetes.setQueryData<DefiDuJour>(cle, (d) => d && { ...d, ma_reponse: reponse });
     } catch {
       setErreur(MESSAGE_INDISPONIBLE);
     } finally {
@@ -170,13 +189,10 @@ function Bulle({ defi }: { defi: DefiDuJour }) {
               </button>
             ))}
           </div>
+          {!valide && <Gains joueur={joueur} />}
           <div className="mt-4 flex items-center justify-between gap-3">
             <p role="status" className="text-sm font-bold">
-              {correction
-                ? correction.correcte
-                  ? "Bravo, c'est la bonne réponse !"
-                  : "Pas tout à fait : la bonne réponse est en vert."
-                : erreur}
+              {correction ? <Verdict correction={correction} /> : erreur}
             </p>
             {!valide && (
               <button
@@ -243,4 +259,45 @@ function Bulle({ defi }: { defi: DefiDuJour }) {
       </button>
     </div>
   );
+}
+
+// Ce que rapporte une bonne réponse, selon qui joue.
+function Gains({ joueur }: { joueur: Joueur }) {
+  if (joueur === "eleve")
+    return (
+      <p className="mt-3 text-xs font-semibold text-muted-foreground">
+        Bonne réponse :{" "}
+        <strong className="text-leaf">{points(BAREME.questionDuJour.eleve)} points</strong> pour
+        toi, {points(BAREME.questionDuJour.club)} pour ton club. Une seule réponse par jour.
+      </p>
+    );
+  if (joueur === "visiteur")
+    return (
+      <p className="mt-3 text-xs font-semibold text-muted-foreground">
+        <Link
+          to="/connexion"
+          search={{ redirection: "/" }}
+          className="font-bold text-logo-blue underline"
+        >
+          Connecte-toi à ton compte Élève
+        </Link>{" "}
+        pour gagner {points(BAREME.questionDuJour.eleve)} points avec une bonne réponse.
+      </p>
+    );
+  return (
+    <p className="mt-3 text-xs font-semibold text-muted-foreground">
+      Les points du défi du jour sont réservés aux élèves.
+    </p>
+  );
+}
+
+function Verdict({ correction }: { correction: CorrectionDefi }) {
+  if (correction.deja_repondu)
+    return correction.points > 0
+      ? `Tu as déjà répondu aujourd'hui : déjà récompensée, ${points(correction.points)} points.`
+      : "Tu as déjà répondu aujourd'hui : la bonne réponse est en vert.";
+  if (!correction.correcte) return "Pas tout à fait : la bonne réponse est en vert.";
+  return correction.points > 0
+    ? `Bravo ! ${points(correction.points)} points pour toi.`
+    : "Bravo, c'est la bonne réponse !";
 }
