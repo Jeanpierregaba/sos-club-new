@@ -27,6 +27,7 @@ from app.config import RACINE_PROJET, settings
 from app.db import SessionLocal, engine
 from app.eleves.models import Classe, Eleve
 from app.encadreurs.models import EtatVerification, Fonction
+from app.jeux import banque_initiale
 from app.referentiel.models import Etablissement, Iesg, StatutEtablissement
 from app.seed_commun import (
     activer_double_auth,
@@ -155,6 +156,7 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
         raise ProductionRefusee
     acces: list[dict[str, str]] = []
     await preparer_semestre(db)
+    await banque_initiale.charger(db)
     for identifiant, prenom, nom, role, role_depart, dre in COMPTES:
         mot_de_passe = mot_de_passe_aleatoire()
         email = None if role is Role.eleve else f"{identifiant}@{DOMAINE}"

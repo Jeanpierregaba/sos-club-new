@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -31,3 +32,23 @@ class ResultatQuelAxe(BaseModel):
     principal: CodeAxe
     autres: list[CodeAxe]
     scores: dict[CodeAxe, int]
+
+
+class DefiDuJour(BaseModel):
+    # Sans la bonne réponse : elle vient de la correction.
+    id: UUID
+    categorie: str
+    question: str
+    options: list[str]
+
+
+class ReponseDefi(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    choix: Annotated[int, Field(ge=0, le=3)]
+
+
+class CorrectionDefi(BaseModel):
+    correcte: bool
+    bonne_reponse: int
+    explication: str

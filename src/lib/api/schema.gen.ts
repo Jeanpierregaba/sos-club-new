@@ -1683,6 +1683,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/jeux/defi-du-jour": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Defi Du Jour */
+        get: operations["defi_du_jour_api_jeux_defi_du_jour_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/jeux/defis/{defi_id}/reponse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Repondre Au Defi */
+        post: operations["repondre_au_defi_api_jeux_defis__defi_id__reponse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -2082,10 +2116,33 @@ export interface components {
             /** Mot De Passe */
             mot_de_passe: string;
         };
+        /** CorrectionDefi */
+        CorrectionDefi: {
+            /** Correcte */
+            correcte: boolean;
+            /** Bonne Reponse */
+            bonne_reponse: number;
+            /** Explication */
+            explication: string;
+        };
         /** DecisionEntree */
         DecisionEntree: {
             /** Version */
             version: number;
+        };
+        /** DefiDuJour */
+        DefiDuJour: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Categorie */
+            categorie: string;
+            /** Question */
+            question: string;
+            /** Options */
+            options: string[];
         };
         /**
          * DemandeAdhesion
@@ -3401,6 +3458,11 @@ export interface components {
              * Format: uuid
              */
             cible_id: string;
+        };
+        /** ReponseDefi */
+        ReponseDefi: {
+            /** Choix */
+            choix: number;
         };
         /** ReponseQuelAxe */
         ReponseQuelAxe: {
@@ -6824,6 +6886,61 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ResultatQuelAxe"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    defi_du_jour_api_jeux_defi_du_jour_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DefiDuJour"];
+                };
+            };
+        };
+    };
+    repondre_au_defi_api_jeux_defis__defi_id__reponse_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                defi_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReponseDefi"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CorrectionDefi"];
                 };
             };
             /** @description Validation Error */

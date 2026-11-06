@@ -4747,6 +4747,80 @@
         }
       }
     },
+    "/api/jeux/defi-du-jour": {
+      "get": {
+        "tags": [
+          "jeux"
+        ],
+        "summary": "Defi Du Jour",
+        "operationId": "defi_du_jour_api_jeux_defi_du_jour_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefiDuJour"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jeux/defis/{defi_id}/reponse": {
+      "post": {
+        "tags": [
+          "jeux"
+        ],
+        "summary": "Repondre Au Defi",
+        "operationId": "repondre_au_defi_api_jeux_defis__defi_id__reponse_post",
+        "parameters": [
+          {
+            "name": "defi_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Defi Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReponseDefi"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorrectionDefi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -5875,6 +5949,29 @@
         ],
         "title": "ConnexionEntree"
       },
+      "CorrectionDefi": {
+        "properties": {
+          "correcte": {
+            "type": "boolean",
+            "title": "Correcte"
+          },
+          "bonne_reponse": {
+            "type": "integer",
+            "title": "Bonne Reponse"
+          },
+          "explication": {
+            "type": "string",
+            "title": "Explication"
+          }
+        },
+        "type": "object",
+        "required": [
+          "correcte",
+          "bonne_reponse",
+          "explication"
+        ],
+        "title": "CorrectionDefi"
+      },
       "DecisionEntree": {
         "properties": {
           "version": {
@@ -5889,6 +5986,38 @@
           "version"
         ],
         "title": "DecisionEntree"
+      },
+      "DefiDuJour": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "categorie": {
+            "type": "string",
+            "title": "Categorie"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "options": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Options"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "categorie",
+          "question",
+          "options"
+        ],
+        "title": "DefiDuJour"
       },
       "DemandeAdhesion": {
         "properties": {
@@ -9657,6 +9786,22 @@
         ],
         "title": "Remplacement",
         "description": "Remplace un établissement proposé par un établissement existant : ses élèves y sont rattachés (spec 017)."
+      },
+      "ReponseDefi": {
+        "properties": {
+          "choix": {
+            "type": "integer",
+            "maximum": 3.0,
+            "minimum": 0.0,
+            "title": "Choix"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "choix"
+        ],
+        "title": "ReponseDefi"
       },
       "ReponseQuelAxe": {
         "properties": {

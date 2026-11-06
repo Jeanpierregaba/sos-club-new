@@ -29,6 +29,7 @@ from app.config import settings
 from app.db import SessionLocal, engine
 from app.eleves.models import Classe
 from app.encadreurs.models import EtatVerification, Fonction
+from app.jeux import banque_initiale
 from app.referentiel.models import Axe, Etablissement, Iesg, StatutEtablissement
 from app.seed_commun import (
     activer_double_auth,
@@ -148,6 +149,7 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
         raise PreprodRefusee
     etablissement_id = await _etablissement(db)
     await preparer_semestre(db)
+    await banque_initiale.charger(db)
     acces: list[dict[str, str]] = []
     president: Utilisateur | None = None
     for identifiant, prenom, nom, role, profil in COMPTES:
