@@ -30,7 +30,8 @@ def test_la_question_part_sans_sa_reponse(client: TestClient, banque: None) -> N
     reponse = client.get(DU_JOUR)
 
     assert reponse.status_code == 200
-    assert set(reponse.json()) == {"id", "categorie", "question", "options"}
+    assert set(reponse.json()) == {"id", "categorie", "question", "options", "ma_reponse"}
+    assert reponse.json()["ma_reponse"] is None
 
 
 def test_la_meme_question_toute_la_journee_et_une_autre_le_lendemain(
@@ -74,7 +75,15 @@ def test_la_correction_donne_la_bonne_reponse_et_lexplication(
     juste = client.post(url, json={"choix": question.bonne_reponse}).json()
     fausse = client.post(url, json={"choix": (question.bonne_reponse + 1) % len(question.options)}).json()
 
-    assert juste == {"correcte": True, "bonne_reponse": question.bonne_reponse, "explication": question.explication}
+    # Un visiteur : la correction, sans point ni réponse enregistrée.
+    assert juste == {
+        "choix": question.bonne_reponse,
+        "correcte": True,
+        "bonne_reponse": question.bonne_reponse,
+        "explication": question.explication,
+        "points": 0,
+        "deja_repondu": False,
+    }
     assert fausse["correcte"] is False
     assert en_base(lambda db: db.scalar(select(func.count()).select_from(MouvementPoints))) == avant
 

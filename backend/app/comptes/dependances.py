@@ -36,3 +36,11 @@ def exiger_role(*roles: Role) -> Callable[..., Awaitable[Utilisateur]]:
         return utilisateur
 
     return verifier_role
+
+
+async def utilisateur_facultatif(
+    request: Request, db: Annotated[AsyncSession, Depends(get_session)]
+) -> Utilisateur | None:
+    """L'utilisateur connecté, ou None pour un visiteur : pour une route publique qui en fait plus pour un compte."""
+    jeton = request.cookies.get(settings.cookie_session)
+    return await utilisateur_de_la_session(db, jeton) if jeton else None

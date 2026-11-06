@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.comptes.models import Utilisateur
 from app.points import service
-from app.points.bareme import BIENVENUE_ELEVE, BIENVENUE_ENCADREUR
+from app.points.bareme import BIENVENUE_ELEVE, BIENVENUE_ENCADREUR, QUESTION_JOUR_ELEVE
 from app.points.models import LigneBareme, MouvementPoints, Semestre
 from tests.conftest import moteur_test
 
@@ -209,5 +209,5 @@ def test_le_bareme_initial_contient_toute_la_grille(en_base: Callable[..., Any])
         )
         return nombre, en_service
 
-    # Les actions écrites par une spec livrée : la bienvenue élève (017), puis encadreur (018).
-    assert en_base(lire) == (37, [BIENVENUE_ELEVE, BIENVENUE_ENCADREUR])
+    # Les actions écrites par une spec livrée : la bienvenue élève (017), encadreur (018), la question du jour (022).
+    assert en_base(lire) == (37, [BIENVENUE_ELEVE, QUESTION_JOUR_ELEVE, BIENVENUE_ENCADREUR])

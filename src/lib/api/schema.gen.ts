@@ -1729,7 +1729,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Repondre Au Defi */
+        /**
+         * Repondre Au Defi
+         * @description Ouverte à tous ; un élève actif gagne les points du barème à sa première réponse juste du jour.
+         */
         post: operations["repondre_au_defi_api_jeux_defis__defi_id__reponse_post"];
         delete?: never;
         options?: never;
@@ -2159,12 +2162,24 @@ export interface components {
         };
         /** CorrectionDefi */
         CorrectionDefi: {
+            /** Choix */
+            choix: number;
             /** Correcte */
             correcte: boolean;
             /** Bonne Reponse */
             bonne_reponse: number;
             /** Explication */
             explication: string;
+            /**
+             * Points
+             * @default 0
+             */
+            points: number;
+            /**
+             * Deja Repondu
+             * @default false
+             */
+            deja_repondu: boolean;
         };
         /** DecisionEntree */
         DecisionEntree: {
@@ -2184,6 +2199,7 @@ export interface components {
             question: string;
             /** Options */
             options: string[];
+            ma_reponse?: components["schemas"]["CorrectionDefi"] | null;
         };
         /**
          * DemandeAdhesion

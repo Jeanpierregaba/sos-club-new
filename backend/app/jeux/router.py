@@ -1,5 +1,5 @@
-"""Jeux de l'accueil (spec 021) : « Quel axe est fait pour toi ? », réservé aux élèves actifs, et le défi du
-jour, ouvert à tous. Aucun point n'est gagné et rien n'est enregistré."""
+"""Jeux de l'accueil (spec 021) : « Quel axe est fait pour toi ? », réservé aux élèves actifs, sans point ni
+enregistrement ; et le défi du jour, ouvert à tous, qui rapporte des points à un élève actif (spec 022)."""
 
 from typing import Annotated
 from uuid import UUID
@@ -7,7 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.comptes.dependances import utilisateur_courant
+from app.comptes.dependances import utilisateur_courant, utilisateur_facultatif
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.db import get_session
 from app.jeux import defis, quel_axe
@@ -21,6 +21,7 @@ from app.jeux.schemas import (
     ReponsesQuelAxe,
     ResultatQuelAxe,
 )
+from app.points.service import aujourd_hui
 
 router = APIRouter(prefix="/jeux", tags=["jeux"])
 
@@ -56,24 +57,42 @@ async def resultat_quel_axe(entree: ReponsesQuelAxe, _: EleveActif) -> ResultatQ
 
 
 Base = Annotated[AsyncSession, Depends(get_session)]
+Facultatif = Annotated[Utilisateur | None, Depends(utilisateur_facultatif)]
 AUCUN_DEFI = "Aucun défi n'est disponible pour l'instant."
 
 
+def _correction(c: defis.Correction) -> CorrectionDefi:
+    return CorrectionDefi(
+        choix=c.choix,
+        correcte=c.correcte,
+        bonne_reponse=c.defi.bonne_reponse,
+        explication=c.defi.explication,
+        points=c.points,
+        deja_repondu=c.deja_repondu,
+    )
+
+
 @router.get("/defi-du-jour")
-async def defi_du_jour(db: Base) -> DefiDuJour:
+async def defi_du_jour(db: Base, utilisateur: Facultatif) -> DefiDuJour:
     try:
         defi = await defis.du_jour(db)
     except defis.AucunDefi:
         raise HTTPException(status.HTTP_404_NOT_FOUND, AUCUN_DEFI) from None
-    return DefiDuJour(id=defi.id, categorie=defi.categorie, question=defi.question, options=defi.options)
+    deja = await defis.reponse_du_jour(db, utilisateur, aujourd_hui())
+    # Une réponse d'avant un changement de la banque peut viser une autre question : elle ne vaut que pour la sienne.
+    ma_reponse = _correction(deja) if deja is not None and deja.defi.id == defi.id else None
+    return DefiDuJour(
+        id=defi.id, categorie=defi.categorie, question=defi.question, options=defi.options, ma_reponse=ma_reponse
+    )
 
 
 @router.post("/defis/{defi_id}/reponse")
-async def repondre_au_defi(defi_id: UUID, entree: ReponseDefi, db: Base) -> CorrectionDefi:
+async def repondre_au_defi(defi_id: UUID, entree: ReponseDefi, db: Base, utilisateur: Facultatif) -> CorrectionDefi:
+    """Ouverte à tous ; un élève actif gagne les points du barème à sa première réponse juste du jour."""
     try:
-        defi, correcte = await defis.corriger(db, defi_id, entree.choix)
+        correction = await defis.corriger(db, defi_id, entree.choix, utilisateur)
     except defis.AucunDefi:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Ce défi est introuvable.") from None
     except ValueError as erreur:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(erreur)) from None
-    return CorrectionDefi(correcte=correcte, bonne_reponse=defi.bonne_reponse, explication=defi.explication)
+    return _correction(correction)

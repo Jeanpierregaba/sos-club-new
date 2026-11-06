@@ -72,7 +72,7 @@ GRILLE: tuple[Action, ...] = (
 
 
 # Actions déjà écrites par une spec livrée. Chaque nouvelle spec ajoute la sienne ici et dans sa migration.
-EN_SERVICE: frozenset[str] = frozenset({BIENVENUE_ELEVE, BIENVENUE_ENCADREUR})
+EN_SERVICE: frozenset[str] = frozenset({BIENVENUE_ELEVE, BIENVENUE_ENCADREUR, QUESTION_JOUR_ELEVE})
 
 
 def lignes_initiales() -> list[dict[str, object]]:

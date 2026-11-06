@@ -34,21 +34,28 @@ class ResultatQuelAxe(BaseModel):
     scores: dict[CodeAxe, int]
 
 
+class CorrectionDefi(BaseModel):
+    choix: int
+    correcte: bool
+    bonne_reponse: int
+    explication: str
+    # Points gagnés par cette réponse ; 0 si elle est fausse, déjà comptée, ou d'un visiteur.
+    points: int = 0
+    # Vrai si l'élève avait déjà répondu aujourd'hui : c'est sa première réponse qui est renvoyée.
+    deja_repondu: bool = False
+
+
 class DefiDuJour(BaseModel):
     # Sans la bonne réponse : elle vient de la correction.
     id: UUID
     categorie: str
     question: str
     options: list[str]
+    # Pour un élève qui a déjà répondu aujourd'hui : sa réponse et la correction, rien d'autre à jouer.
+    ma_reponse: CorrectionDefi | None = None
 
 
 class ReponseDefi(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     choix: Annotated[int, Field(ge=0, le=3)]
-
-
-class CorrectionDefi(BaseModel):
-    correcte: bool
-    bonne_reponse: int
-    explication: str

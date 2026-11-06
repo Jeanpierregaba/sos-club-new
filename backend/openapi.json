@@ -4800,6 +4800,7 @@
           "jeux"
         ],
         "summary": "Repondre Au Defi",
+        "description": "Ouverte à tous ; un élève actif gagne les points du barème à sa première réponse juste du jour.",
         "operationId": "repondre_au_defi_api_jeux_defis__defi_id__reponse_post",
         "parameters": [
           {
@@ -6017,6 +6018,10 @@
       },
       "CorrectionDefi": {
         "properties": {
+          "choix": {
+            "type": "integer",
+            "title": "Choix"
+          },
           "correcte": {
             "type": "boolean",
             "title": "Correcte"
@@ -6028,10 +6033,21 @@
           "explication": {
             "type": "string",
             "title": "Explication"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points",
+            "default": 0
+          },
+          "deja_repondu": {
+            "type": "boolean",
+            "title": "Deja Repondu",
+            "default": false
           }
         },
         "type": "object",
         "required": [
+          "choix",
           "correcte",
           "bonne_reponse",
           "explication"
@@ -6074,6 +6090,16 @@
             },
             "type": "array",
             "title": "Options"
+          },
+          "ma_reponse": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CorrectionDefi"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
