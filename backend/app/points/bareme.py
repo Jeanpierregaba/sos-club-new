@@ -25,21 +25,27 @@ class Action(NamedTuple):
 
 BIENVENUE_ELEVE = "eleve.bienvenue"
 BIENVENUE_ENCADREUR = "encadreur.bienvenue"
+QUESTION_JOUR_ELEVE = "eleve.question_jour"
+QUESTION_JOUR_CLUB = "club.question_jour_eleve"
 
+# Référentiel « Harmonisation de la gamification » du 2026-11-05 (spec 022). La part du club n'est créditée que
+# pour un élève dont l'affiliation est active au moment du crédit.
 GRILLE: tuple[Action, ...] = (
     Action(BIENVENUE_ELEVE, "eleve", "Compte créé", 100),
     Action("eleve.commentaire", "eleve", "Commentaire approuvé", 5),
     Action("eleve.republication", "eleve", "Republication d'un article du site, vérifiée", 10),
     Action("eleve.article", "eleve", "Article personnel approuvé", 50),
     Action("eleve.partage", "eleve", "Partage de son article, par réseau, vérifié", 50),
-    Action("eleve.quiz", "eleve", "Quiz réussi, première fois", 25),
+    Action("eleve.quiz", "eleve", "Quiz santé réussi, première fois", 50),
+    Action(QUESTION_JOUR_ELEVE, "eleve", "Bonne réponse à la question du jour", 20),
+    Action("eleve.badge", "eleve", "Badge de certification obtenu (5 au plus)", 500),
     Action("eleve.certification", "eleve", "Certification Génie Imhotep", 1000),
     Action("encadreur.bienvenue", "encadreur", "Compte validé", 100, propose=True),
     Action("encadreur.commentaire", "encadreur", "Commentaire approuvé", 5, propose=True),
     Action("encadreur.republication", "encadreur", "Republication d'un article du site, vérifiée", 10, propose=True),
     Action("encadreur.article", "encadreur", "Article personnel approuvé", 50, propose=True),
     Action("encadreur.partage", "encadreur", "Partage de son article, par réseau, vérifié", 50, propose=True),
-    Action("encadreur.quiz", "encadreur", "Quiz réussi, première fois", 25, propose=True),
+    Action("encadreur.quiz", "encadreur", "Quiz réussi, première fois", 0, propose=True),
     Action("encadreur.certification", "encadreur", "Certification Génie Imhotep", 1000, propose=True),
     Action("encadreur.sujet_forum", "encadreur", "Sujet de forum validé", 30, propose=True),
     Action("encadreur.discussion", "encadreur", "Discussion animée et attestée", 50, propose=True),
@@ -51,12 +57,19 @@ GRILLE: tuple[Action, ...] = (
     Action("encadreur.projet_eleves", "encadreur", "Projet d'élèves accompagné et réalisé", 150, propose=True),
     Action("encadreur.certification_eleve", "encadreur", "Élève accompagné jusqu'à la certification", 50, propose=True),
     Action("encadreur.mobilisation", "encadreur", "Mobilisation vérifiée de 10 participants", 50, propose=True),
+    Action("club.bienvenue_eleve", "club", "Compte validé d'un élève affilié", 50),
+    Action("club.commentaire_eleve", "club", "Commentaire approuvé d'un élève affilié", 20),
+    Action("club.republication_eleve", "club", "Republication vérifiée par un élève affilié", 2),
     Action("club.article_eleve", "club", "Article approuvé d'un élève affilié", 20),
-    Action("club.quiz_eleve", "club", "Quiz réussi par un élève affilié", 10),
-    Action("club.certification_eleve", "club", "Certification d'un élève affilié", 100),
-    Action("club.rapport_activite", "club", "Rapport d'activité validé", 50, propose=True),
+    Action("club.partage_eleve", "club", "Partage vérifié de son article par un élève affilié, par réseau", 2),
+    Action("club.quiz_eleve", "club", "Quiz santé réussi par un élève affilié", 25),
+    Action(QUESTION_JOUR_CLUB, "club", "Question du jour réussie par un élève affilié", 10),
+    Action("club.badge_eleve", "club", "Badge obtenu par un élève affilié (5 au plus)", 200),
+    Action("club.certification_eleve", "club", "Certification d'un élève affilié", 500),
+    Action("club.rapport_activite", "club", "Rapport d'activité validé", 500, propose=True),
     Action("club.bilan_semestriel", "club", "Bilan semestriel validé", 100, propose=True),
 )
+
 
 # Actions déjà écrites par une spec livrée. Chaque nouvelle spec ajoute la sienne ici et dans sa migration.
 EN_SERVICE: frozenset[str] = frozenset({BIENVENUE_ELEVE, BIENVENUE_ENCADREUR})

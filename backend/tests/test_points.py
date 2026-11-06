@@ -154,9 +154,9 @@ def test_les_totaux_separent_le_semestre_et_lhistorique(
     totaux = en_base(lambda db: service.totaux(db, eleve.id))
 
     assert totaux.semestre is not None and totaux.semestre.id == semestre.id
-    assert (totaux.points_semestre, totaux.total) == (125, 175)
+    assert (totaux.points_semestre, totaux.total) == (150, 200)
     dernieres = en_base(lambda db: service.dernieres_lignes(db, eleve.id, 2))
-    assert [(ligne.montant, ligne.semestre) for ligne in dernieres] == [(25, "En cours"), (100, "En cours")]
+    assert [(ligne.montant, ligne.semestre) for ligne in dernieres] == [(50, "En cours"), (100, "En cours")]
 
 
 def test_un_eleve_sans_ligne_a_zero(eleve: Utilisateur, semestre: Semestre, en_base: Callable[..., Any]) -> None:
@@ -181,7 +181,9 @@ def test_une_annulation_est_une_ligne_negative_unique(
     def annuler(cle: str) -> None:
         async def inserer(db: AsyncSession) -> None:
             db.add(
-                MouvementPoints(utilisateur_id=eleve.id, action="eleve.quiz", montant=-25, cle=cle, annule_id=gain.id)
+                MouvementPoints(
+                    utilisateur_id=eleve.id, action="eleve.quiz", montant=-gain.montant, cle=cle, annule_id=gain.id
+                )
             )
 
         en_base(inserer)
@@ -208,4 +210,4 @@ def test_le_bareme_initial_contient_toute_la_grille(en_base: Callable[..., Any])
         return nombre, en_service
 
     # Les actions écrites par une spec livrée : la bienvenue élève (017), puis encadreur (018).
-    assert en_base(lire) == (29, [BIENVENUE_ELEVE, BIENVENUE_ENCADREUR])
+    assert en_base(lire) == (37, [BIENVENUE_ELEVE, BIENVENUE_ENCADREUR])

@@ -202,7 +202,7 @@ def test_prolonger_ne_peut_pas_chevaucher_le_suivant(gestionnaire: TestClient, e
 def test_le_bareme_affiche_toute_la_grille(lecteur: TestClient) -> None:
     grille = lecteur.get(BAREME).json()
 
-    assert len(grille) == 29
+    assert len(grille) == 37
     bienvenue = ligne(lecteur, "eleve.bienvenue")
     assert (bienvenue["montant"], bienvenue["en_service"], bienvenue["propose"]) == (100, True, False)
     assert ligne(lecteur, "encadreur.sujet_forum")["propose"] is True
