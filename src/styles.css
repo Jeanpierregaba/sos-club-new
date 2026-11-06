@@ -404,6 +404,13 @@
     );
   background-size: 24px 24px;
 }
+/* Les mêmes carreaux en lignes claires, pour les sections à fond sombre. */
+@utility bg-carnet-sombre {
+  background-image:
+    linear-gradient(color-mix(in oklch, white 9%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, white 9%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
 @utility shadow-card {
   box-shadow: var(--shadow-card);
 }

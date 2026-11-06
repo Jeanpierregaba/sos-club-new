@@ -32,6 +32,11 @@ export function PodiumClubs() {
       aria-labelledby="titre-podium"
       className="relative isolate overflow-hidden bg-linear-to-br from-[oklch(0.28_0.12_265)] via-[oklch(0.32_0.15_270)] to-[oklch(0.25_0.1_255)] py-20 text-white"
     >
+      {/* Les carreaux du site, plus marqués au centre et fondus vers les bords. */}
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 bg-carnet-sombre [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_85%)]"
+      />
       <div
         aria-hidden
         className="absolute -left-32 top-0 -z-10 size-[28rem] rounded-full bg-[oklch(0.65_0.15_200)]/25 blur-3xl motion-safe:animate-respire"
