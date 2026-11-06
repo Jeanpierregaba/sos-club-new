@@ -1,15 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2, X } from "lucide-react";
 import mascotteBourses from "@/assets/mascotte-bourses.webp";
+
+import {
+  chargerDefiDuJour,
+  corrigerDefi,
+  MESSAGE_INDISPONIBLE,
+  type CorrectionDefi,
+  type DefiDuJour,
+} from "@/lib/api/client";
 
 // Le défi du jour, en bulle flottante en bas à droite de l'accueil, comme un assistant de discussion :
 // la tête de la mascotte ouvre une fenêtre avec la question. Le bouton « Retour en haut » remonte au-dessus.
-const defi = {
-  categorie: "Santé & bien-être",
-  question: "Quelle est la meilleure façon de se protéger contre le paludisme ?",
-  options: ["Dormir sous une moustiquaire", "Boire beaucoup d'eau", "Éviter les fruits la nuit"],
-  bonne: 0,
-};
+// La question vient de la banque de l'API (spec 021) : la même pour tous, elle change à minuit ; la bonne
+// réponse n'arrive qu'avec la correction. Sans défi (banque vide, API arrêtée), la bulle ne s'affiche pas.
 
 function TeteMascotte({ className }: { className: string }) {
   return (
@@ -26,11 +31,38 @@ function TeteMascotte({ className }: { className: string }) {
 }
 
 export function BulleDefi() {
+  const { data: defi } = useQuery({
+    queryKey: ["defi-du-jour"],
+    queryFn: chargerDefiDuJour,
+    retry: false,
+    staleTime: 10 * 60_000,
+  });
+  return defi ? <Bulle key={defi.id} defi={defi} /> : null;
+}
+
+function Bulle({ defi }: { defi: DefiDuJour }) {
   const [ouverte, setOuverte] = useState(false);
   const [vue, setVue] = useState(false);
   const [invite, setInvite] = useState(false);
   const [choix, setChoix] = useState<number | null>(null);
-  const [valide, setValide] = useState(false);
+  const [correction, setCorrection] = useState<CorrectionDefi | null>(null);
+  const [envoi, setEnvoi] = useState(false);
+  const [erreur, setErreur] = useState<string | null>(null);
+  const valide = correction !== null;
+  const bonne = correction?.bonne_reponse;
+
+  const valider = async () => {
+    if (choix === null) return;
+    setEnvoi(true);
+    setErreur(null);
+    try {
+      setCorrection(await corrigerDefi(defi.id, choix));
+    } catch {
+      setErreur(MESSAGE_INDISPONIBLE);
+    } finally {
+      setEnvoi(false);
+    }
+  };
   const bouton = useRef<HTMLButtonElement>(null);
   const fermer = useRef<HTMLButtonElement>(null);
 
@@ -67,14 +99,14 @@ export function BulleDefi() {
   };
 
   const couleur = (i: number) => {
-    if (valide && i === defi.bonne) return "border-leaf bg-leaf text-primary-foreground";
+    if (valide && i === bonne) return "border-leaf bg-leaf text-primary-foreground";
     if (valide && i === choix)
       return "animate-shake border-logo-red bg-logo-red text-primary-foreground";
     if (i === choix) return "border-logo-blue bg-logo-blue text-primary-foreground";
     return valide ? "border-border opacity-60" : "border-border hover:border-logo-blue";
   };
   const pastille = (i: number) =>
-    (valide && i === defi.bonne) || i === choix ? "bg-white/25" : "bg-mist text-logo-blue";
+    (valide && i === bonne) || i === choix ? "bg-white/25" : "bg-mist text-logo-blue";
 
   return (
     <div className="print:hidden">
@@ -132,7 +164,7 @@ export function BulleDefi() {
                 <span
                   className={`inline-flex size-8 shrink-0 items-center justify-center rounded-xl font-display ${pastille(i)}`}
                 >
-                  {"ABC"[i]}
+                  {"ABCD"[i]}
                 </span>
                 {o}
               </button>
@@ -140,33 +172,30 @@ export function BulleDefi() {
           </div>
           <div className="mt-4 flex items-center justify-between gap-3">
             <p role="status" className="text-sm font-bold">
-              {valide &&
-                (choix === defi.bonne
+              {correction
+                ? correction.correcte
                   ? "Bravo, c'est la bonne réponse !"
-                  : "Pas tout à fait : la bonne réponse est en vert.")}
+                  : "Pas tout à fait : la bonne réponse est en vert."
+                : erreur}
             </p>
-            {valide ? (
+            {!valide && (
               <button
                 type="button"
-                onClick={() => {
-                  setValide(false);
-                  setChoix(null);
-                }}
-                className="btn-fx ml-auto shrink-0 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground"
+                disabled={choix === null || envoi}
+                onClick={valider}
+                className="btn-fx ml-auto inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-50"
               >
-                Rejouer
-              </button>
-            ) : (
-              <button
-                type="button"
-                disabled={choix === null}
-                onClick={() => setValide(true)}
-                className="btn-fx ml-auto shrink-0 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-50"
-              >
+                {envoi && <Loader2 aria-hidden className="size-4 animate-spin" />}
                 Valider
               </button>
             )}
           </div>
+          {correction && (
+            <div className="mt-3 rounded-2xl bg-leaf/10 p-3 text-sm font-medium text-ink">
+              <p>{correction.explication}</p>
+              <p className="mt-2 font-bold text-logo-blue">Reviens demain pour un nouveau défi !</p>
+            </div>
+          )}
         </div>
       </div>
 
