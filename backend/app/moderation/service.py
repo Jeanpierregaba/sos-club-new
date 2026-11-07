@@ -54,8 +54,15 @@ async def version(db: AsyncSession, version_id: UUID | None) -> VersionContenu |
 
 
 async def version_visible_auteur(db: AsyncSession, contenu: Contenu) -> VersionContenu:
-    """La version de travail si elle existe, sinon celle en ligne."""
+    """La version de travail si elle existe, sinon celle en ligne, sinon (contenu dépublié) la dernière."""
     courante = await version(db, contenu.version_travail_id or contenu.version_publiee_id)
+    if courante is None:
+        courante = await db.scalar(
+            select(VersionContenu)
+            .where(VersionContenu.contenu_id == contenu.id)
+            .order_by(VersionContenu.numero.desc())
+            .limit(1)
+        )
     assert courante is not None
     return courante
 

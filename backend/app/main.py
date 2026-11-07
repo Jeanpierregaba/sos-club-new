@@ -25,6 +25,7 @@ from app.eleves.router import router as router_eleves
 from app.encadreurs.router import router as router_encadreurs
 from app.encadreurs.router import router_admin as router_encadreurs_admin
 from app.jeux.router import router as router_jeux
+from app.moderation.router import router_admin as router_moderation_admin
 from app.notifications.router import router as router_notifications
 from app.points.router import router_admin as router_points_admin
 from app.referentiel.router import router_admin as router_referentiel_admin
@@ -62,6 +63,7 @@ api.include_router(router_clubs_admin)
 api.include_router(router_jeux)
 api.include_router(router_notifications)
 api.include_router(router_articles_auteur)
+api.include_router(router_moderation_admin)
 app.include_router(api)
 
 
