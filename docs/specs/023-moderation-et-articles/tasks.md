@@ -13,7 +13,7 @@
 
 - [x] 3. Registre des types, schémas des articles, service de l'auteur (`creer`, `modifier`, `soumettre`, `retirer`,
       `supprimer`) et routes `/mes-articles`. Avec `test_articles_auteur.py`.
-- [ ] 4. Tests des décisions (`test_moderation_decisions.py`) écrits **avant** le code. Ils doivent échouer.
+- [x] 4. Tests des décisions (`test_moderation_decisions.py`) écrits **avant** le code. Ils doivent échouer.
 - [ ] 5. `moderation/decisions.py` et les routes `/admin/moderation` (file, aperçu, quatre décisions). La tâche 4
       passe.
 - [ ] 6. Lecture publique `/articles`, signature, adresse. Avec `test_articles_publics.py`.
