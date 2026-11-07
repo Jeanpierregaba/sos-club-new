@@ -234,6 +234,29 @@
       opacity: 1;
     }
   }
+  /* « Quel axe » : les bulles des cartes se gonflent tour à tour, le halo du bouton s'élargit. */
+  --animate-bulle: bulle 4.5s ease-in-out infinite;
+  --animate-halo: halo 2.6s ease-out infinite;
+  @keyframes bulle {
+    0%,
+    30%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+    12% {
+      transform: translateY(-6px) scale(1.12);
+    }
+  }
+  @keyframes halo {
+    from {
+      transform: scale(1);
+      opacity: 0.55;
+    }
+    to {
+      transform: scale(1.35, 1.7);
+      opacity: 0;
+    }
+  }
   /* La mascotte change de couleur mais reste la même (page des 7 axes). */
   --animate-cameleon: cameleon 14s linear infinite;
   @keyframes cameleon {
@@ -413,4 +436,26 @@
 }
 @utility shadow-card {
   box-shadow: var(--shadow-card);
+}
+
+/* « Quel axe » : le trait sous « axe » se dessine, s'efface puis se redessine. */
+.trait-axe {
+  stroke-dasharray: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .trait-axe {
+    animation: trait-axe 5s ease-in-out infinite;
+  }
+}
+@keyframes trait-axe {
+  0% {
+    stroke-dashoffset: 1;
+  }
+  20%,
+  85% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -1;
+  }
 }
