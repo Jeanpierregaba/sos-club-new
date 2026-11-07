@@ -35,6 +35,8 @@ class AdminMoi(BaseModel):
     # Les compteurs du menu : None sans le droit de consulter la file (specs 018 et 019).
     encadreurs_a_verifier: int | None = None
     clubs_a_valider: int | None = None
+    # Contenus en attente de modération dans le périmètre (spec 023).
+    contenus_a_moderer: int | None = None
 
 
 class ModuleCatalogue(BaseModel):
@@ -317,4 +319,6 @@ class TableauDeBord(BaseModel):
     # Demandes d'encadreurs et de clubs en attente dans le périmètre ; None sans le droit de les consulter.
     encadreurs_a_verifier: int | None = None
     clubs_a_valider: int | None = None
+    # Contenus en attente de modération dans le périmètre (spec 023).
+    contenus_a_moderer: int | None = None
     derniers_evenements: list[EvenementJournal] | None

@@ -4848,6 +4848,862 @@
         }
       }
     },
+    "/api/notifications": {
+      "get": {
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Mes Notifications",
+        "operationId": "mes_notifications_api_notifications_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notifications"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/compte": {
+      "get": {
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Compte",
+        "operationId": "compte_api_notifications_compte_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompteNotifications"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/{notification_id}/lue": {
+      "post": {
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Marquer Lue",
+        "operationId": "marquer_lue_api_notifications__notification_id__lue_post",
+        "parameters": [
+          {
+            "name": "notification_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Notification Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/lues": {
+      "post": {
+        "tags": [
+          "notifications"
+        ],
+        "summary": "Tout Marquer Lu",
+        "operationId": "tout_marquer_lu_api_notifications_lues_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
+    "/api/mes-articles": {
+      "get": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Mes Articles",
+        "operationId": "mes_articles_api_mes_articles_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MesArticles"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Creer",
+        "operationId": "creer_api_mes_articles_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArticleEcriture"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mes-articles/{contenu_id}": {
+      "get": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Lire",
+        "operationId": "lire_api_mes_articles__contenu_id__get",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Modifier",
+        "operationId": "modifier_api_mes_articles__contenu_id__patch",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArticleEcriture"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Supprimer",
+        "operationId": "supprimer_api_mes_articles__contenu_id__delete",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mes-articles/{contenu_id}/soumettre": {
+      "post": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Soumettre",
+        "operationId": "soumettre_api_mes_articles__contenu_id__soumettre_post",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mes-articles/{contenu_id}/retirer": {
+      "post": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Retirer",
+        "operationId": "retirer_api_mes_articles__contenu_id__retirer_post",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/articles": {
+      "get": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Articles",
+        "operationId": "articles_api_articles_get",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "axe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Axe"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticlesPublics"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/articles/{adresse}": {
+      "get": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Article",
+        "operationId": "article_api_articles__adresse__get",
+        "parameters": [
+          {
+            "name": "adresse",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 140,
+              "title": "Adresse"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticlePublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderation": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "File Moderation",
+        "operationId": "file_moderation_api_admin_moderation_get",
+        "parameters": [
+          {
+            "name": "etat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/EtatContenu",
+              "default": "en_attente"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type"
+            }
+          },
+          {
+            "name": "axe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Axe"
+            }
+          },
+          {
+            "name": "dre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dre"
+            }
+          },
+          {
+            "name": "profil",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "eleve",
+                    "encadreur"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Profil"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileModeration"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderation/{contenu_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Apercu",
+        "operationId": "apercu_api_admin_moderation__contenu_id__get",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApercuModeration"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderation/{contenu_id}/approuver": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Approuver",
+        "operationId": "approuver_api_admin_moderation__contenu_id__approuver_post",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprobationEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApercuModeration"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderation/{contenu_id}/corriger": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Corriger",
+        "operationId": "corriger_api_admin_moderation__contenu_id__corriger_post",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionModerationEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApercuModeration"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderation/{contenu_id}/refuser": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Refuser",
+        "operationId": "refuser_api_admin_moderation__contenu_id__refuser_post",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionModerationEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApercuModeration"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderation/{contenu_id}/depublier": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Depublier",
+        "operationId": "depublier_api_admin_moderation__contenu_id__depublier_post",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionModerationEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApercuModeration"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -5061,6 +5917,17 @@
               }
             ],
             "title": "Clubs A Valider"
+          },
+          "contenus_a_moderer": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contenus A Moderer"
           }
         },
         "type": "object",
@@ -5166,6 +6033,424 @@
         ],
         "title": "Apercu"
       },
+      "ApercuModeration": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatContenu"
+          },
+          "axe_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Axe Code"
+          },
+          "auteur": {
+            "$ref": "#/components/schemas/AuteurFile"
+          },
+          "nouvelle_version": {
+            "type": "boolean",
+            "title": "Nouvelle Version"
+          },
+          "en_ligne": {
+            "type": "boolean",
+            "title": "En Ligne"
+          },
+          "adresse": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adresse"
+          },
+          "soumis_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soumis Le"
+          },
+          "modifie_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Modifie Le"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "soumise": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soumise"
+          },
+          "publiee": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publiee"
+          },
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionPassee"
+            },
+            "type": "array",
+            "title": "Decisions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "titre",
+          "etat",
+          "axe_code",
+          "auteur",
+          "nouvelle_version",
+          "en_ligne",
+          "adresse",
+          "soumis_le",
+          "modifie_le",
+          "version",
+          "soumise",
+          "publiee",
+          "decisions"
+        ],
+        "title": "ApercuModeration"
+      },
+      "ApprobationEntree": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "ApprobationEntree"
+      },
+      "ArticleAuteur": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatContenu"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "champs": {
+            "$ref": "#/components/schemas/ChampsArticle"
+          },
+          "en_ligne": {
+            "type": "boolean",
+            "title": "En Ligne"
+          },
+          "adresse": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adresse"
+          },
+          "modifiable": {
+            "type": "boolean",
+            "title": "Modifiable"
+          },
+          "soumettable": {
+            "type": "boolean",
+            "title": "Soumettable"
+          },
+          "supprimable": {
+            "type": "boolean",
+            "title": "Supprimable"
+          },
+          "derniere_decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DerniereDecision"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "soumis_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soumis Le"
+          },
+          "publie_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publie Le"
+          },
+          "modifie_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Modifie Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "etat",
+          "version",
+          "champs",
+          "en_ligne",
+          "adresse",
+          "modifiable",
+          "soumettable",
+          "supprimable",
+          "derniere_decision",
+          "soumis_le",
+          "publie_le",
+          "modifie_le"
+        ],
+        "title": "ArticleAuteur"
+      },
+      "ArticleEcriture": {
+        "properties": {
+          "titre": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 3,
+            "title": "Titre"
+          },
+          "chapo": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 10,
+            "title": "Chapo"
+          },
+          "texte": {
+            "type": "string",
+            "maxLength": 20000,
+            "minLength": 1,
+            "title": "Texte"
+          },
+          "axe_code": {
+            "type": "string",
+            "maxLength": 40,
+            "title": "Axe Code"
+          },
+          "afficher_club": {
+            "type": "boolean",
+            "title": "Afficher Club",
+            "default": true
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "titre",
+          "chapo",
+          "texte",
+          "axe_code"
+        ],
+        "title": "ArticleEcriture",
+        "description": "Création et modification. `version` (verrou optimiste) est exigée pour une modification."
+      },
+      "ArticlePublic": {
+        "properties": {
+          "adresse": {
+            "type": "string",
+            "title": "Adresse"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "chapo": {
+            "type": "string",
+            "title": "Chapo"
+          },
+          "axe": {
+            "$ref": "#/components/schemas/AxeArticle"
+          },
+          "signature": {
+            "$ref": "#/components/schemas/Signature"
+          },
+          "publie_le": {
+            "type": "string",
+            "format": "date",
+            "title": "Publie Le"
+          },
+          "texte": {
+            "type": "string",
+            "title": "Texte"
+          }
+        },
+        "type": "object",
+        "required": [
+          "adresse",
+          "titre",
+          "chapo",
+          "axe",
+          "signature",
+          "publie_le",
+          "texte"
+        ],
+        "title": "ArticlePublic"
+      },
+      "ArticlesPublics": {
+        "properties": {
+          "articles": {
+            "items": {
+              "$ref": "#/components/schemas/ResumeArticle"
+            },
+            "type": "array",
+            "title": "Articles"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "pages": {
+            "type": "integer",
+            "title": "Pages"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "articles",
+          "page",
+          "pages",
+          "total"
+        ],
+        "title": "ArticlesPublics"
+      },
+      "AuteurFile": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "identifiant": {
+            "type": "string",
+            "title": "Identifiant"
+          },
+          "profil": {
+            "type": "string",
+            "title": "Profil"
+          },
+          "etablissement": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Etablissement"
+          },
+          "dre_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dre Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "identifiant",
+          "profil",
+          "etablissement",
+          "dre_code"
+        ],
+        "title": "AuteurFile",
+        "description": "Le modérateur voit qui écrit (nom complet, établissement) : la file est réservée à l'espace admin."
+      },
       "AxeAdmin": {
         "properties": {
           "code": {
@@ -5203,6 +6488,24 @@
           "version"
         ],
         "title": "AxeAdmin"
+      },
+      "AxeArticle": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "libelle"
+        ],
+        "title": "AxeArticle"
       },
       "AxeCreation": {
         "properties": {
@@ -5399,6 +6702,47 @@
           "dre_actives"
         ],
         "title": "Catalogue"
+      },
+      "ChampsArticle": {
+        "properties": {
+          "titre": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 3,
+            "title": "Titre"
+          },
+          "chapo": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 10,
+            "title": "Chapo"
+          },
+          "texte": {
+            "type": "string",
+            "maxLength": 20000,
+            "minLength": 1,
+            "title": "Texte"
+          },
+          "axe_code": {
+            "type": "string",
+            "maxLength": 40,
+            "title": "Axe Code"
+          },
+          "afficher_club": {
+            "type": "boolean",
+            "title": "Afficher Club",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "titre",
+          "chapo",
+          "texte",
+          "axe_code"
+        ],
+        "title": "ChampsArticle",
+        "description": "Les champs d'une version, stockés en JSONB (`version_contenu.donnees`)."
       },
       "Classe": {
         "type": "string",
@@ -5994,6 +7338,19 @@
         ],
         "title": "CollaborateurResume"
       },
+      "CompteNotifications": {
+        "properties": {
+          "non_lues": {
+            "type": "integer",
+            "title": "Non Lues"
+          }
+        },
+        "type": "object",
+        "required": [
+          "non_lues"
+        ],
+        "title": "CompteNotifications"
+      },
       "ConnexionEntree": {
         "properties": {
           "identifiant": {
@@ -6068,6 +7425,69 @@
           "version"
         ],
         "title": "DecisionEntree"
+      },
+      "DecisionModerationEntree": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "motif": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Motif"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "motif"
+        ],
+        "title": "DecisionModerationEntree",
+        "description": "Correction, refus ou dépublication : le motif est obligatoire, et l'auteur le lit."
+      },
+      "DecisionPassee": {
+        "properties": {
+          "decision": {
+            "$ref": "#/components/schemas/TypeDecision"
+          },
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          },
+          "decide_par": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Par"
+          },
+          "decide_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Decide Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "decision",
+          "motif",
+          "decide_par",
+          "decide_le"
+        ],
+        "title": "DecisionPassee"
       },
       "DefiDuJour": {
         "properties": {
@@ -6454,6 +7874,36 @@
         "title": "DemandeRattachement",
         "description": "Une demande de rattachement, vue par le président : un encadreur est un adulte identifié par son nom."
       },
+      "DerniereDecision": {
+        "properties": {
+          "decision": {
+            "$ref": "#/components/schemas/TypeDecision"
+          },
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          },
+          "decide_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Decide Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "decision",
+          "motif",
+          "decide_le"
+        ],
+        "title": "DerniereDecision"
+      },
       "DreAdmin": {
         "properties": {
           "code": {
@@ -6764,6 +8214,96 @@
           "message"
         ],
         "title": "EchecLot"
+      },
+      "ElementFile": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatContenu"
+          },
+          "axe_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Axe Code"
+          },
+          "auteur": {
+            "$ref": "#/components/schemas/AuteurFile"
+          },
+          "nouvelle_version": {
+            "type": "boolean",
+            "title": "Nouvelle Version"
+          },
+          "en_ligne": {
+            "type": "boolean",
+            "title": "En Ligne"
+          },
+          "adresse": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adresse"
+          },
+          "soumis_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soumis Le"
+          },
+          "modifie_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Modifie Le"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "titre",
+          "etat",
+          "axe_code",
+          "auteur",
+          "nouvelle_version",
+          "en_ligne",
+          "adresse",
+          "soumis_le",
+          "modifie_le",
+          "version"
+        ],
+        "title": "ElementFile"
       },
       "ElementLot": {
         "properties": {
@@ -7374,6 +8914,18 @@
         ],
         "title": "EtatClub"
       },
+      "EtatContenu": {
+        "type": "string",
+        "enum": [
+          "brouillon",
+          "en_attente",
+          "a_corriger",
+          "refuse",
+          "publie",
+          "depublie"
+        ],
+        "title": "EtatContenu"
+      },
       "EtatInscription": {
         "properties": {
           "ouvertes": {
@@ -7716,6 +9268,27 @@
           "demandes"
         ],
         "title": "FileEncadreurs"
+      },
+      "FileModeration": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "contenus": {
+            "items": {
+              "$ref": "#/components/schemas/ElementFile"
+            },
+            "type": "array",
+            "title": "Contenus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "contenus"
+        ],
+        "title": "FileModeration"
       },
       "FilePassations": {
         "properties": {
@@ -8843,6 +10416,22 @@
         ],
         "title": "MembresDuClub"
       },
+      "MesArticles": {
+        "properties": {
+          "articles": {
+            "items": {
+              "$ref": "#/components/schemas/ResumeArticleAuteur"
+            },
+            "type": "array",
+            "title": "Articles"
+          }
+        },
+        "type": "object",
+        "required": [
+          "articles"
+        ],
+        "title": "MesArticles"
+      },
       "MesClubs": {
         "properties": {
           "rattachements": {
@@ -9009,6 +10598,86 @@
           "motif"
         ],
         "title": "MotifEntree"
+      },
+      "NotificationSortie": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "lien": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lien"
+          },
+          "lue": {
+            "type": "boolean",
+            "title": "Lue"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "titre",
+          "message",
+          "lien",
+          "lue",
+          "cree_le"
+        ],
+        "title": "NotificationSortie"
+      },
+      "Notifications": {
+        "properties": {
+          "notifications": {
+            "items": {
+              "$ref": "#/components/schemas/NotificationSortie"
+            },
+            "type": "array",
+            "title": "Notifications"
+          },
+          "non_lues": {
+            "type": "integer",
+            "title": "Non Lues"
+          }
+        },
+        "type": "object",
+        "required": [
+          "notifications",
+          "non_lues"
+        ],
+        "title": "Notifications"
       },
       "PageEtablissements": {
         "properties": {
@@ -10028,6 +11697,89 @@
         ],
         "title": "ResultatQuelAxe"
       },
+      "ResumeArticle": {
+        "properties": {
+          "adresse": {
+            "type": "string",
+            "title": "Adresse"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "chapo": {
+            "type": "string",
+            "title": "Chapo"
+          },
+          "axe": {
+            "$ref": "#/components/schemas/AxeArticle"
+          },
+          "signature": {
+            "$ref": "#/components/schemas/Signature"
+          },
+          "publie_le": {
+            "type": "string",
+            "format": "date",
+            "title": "Publie Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "adresse",
+          "titre",
+          "chapo",
+          "axe",
+          "signature",
+          "publie_le"
+        ],
+        "title": "ResumeArticle"
+      },
+      "ResumeArticleAuteur": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatContenu"
+          },
+          "en_ligne": {
+            "type": "boolean",
+            "title": "En Ligne"
+          },
+          "adresse": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adresse"
+          },
+          "modifie_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Modifie Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "titre",
+          "etat",
+          "en_ligne",
+          "adresse",
+          "modifie_le"
+        ],
+        "title": "ResumeArticleAuteur"
+      },
       "ResumePoints": {
         "properties": {
           "semestre": {
@@ -10287,6 +12039,47 @@
         ],
         "title": "SemestreResume"
       },
+      "Signature": {
+        "properties": {
+          "profil": {
+            "type": "string",
+            "title": "Profil"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "fonction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fonction"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profil",
+          "nom"
+        ],
+        "title": "Signature",
+        "description": "Jamais de nom complet : un élève par son pseudonyme (et son club s'il l'a choisi), un encadreur par son\nprénom, l'initiale de son nom et sa fonction."
+      },
       "StatutCompte": {
         "type": "string",
         "enum": [
@@ -10399,6 +12192,17 @@
             ],
             "title": "Clubs A Valider"
           },
+          "contenus_a_moderer": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contenus A Moderer"
+          },
           "derniers_evenements": {
             "anyOf": [
               {
@@ -10425,6 +12229,16 @@
           "derniers_evenements"
         ],
         "title": "TableauDeBord"
+      },
+      "TypeDecision": {
+        "type": "string",
+        "enum": [
+          "approuver",
+          "corriger",
+          "refuser",
+          "depublier"
+        ],
+        "title": "TypeDecision"
       },
       "TypeEtablissement": {
         "type": "string",
@@ -10483,6 +12297,19 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VersionEntree": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "VersionEntree"
       },
       "app__admin__schemas__ActivationEntree": {
         "properties": {

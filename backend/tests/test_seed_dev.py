@@ -122,4 +122,18 @@ def test_les_eleves_ont_un_profil_et_leur_bienvenue(client: TestClient, en_base:
     assert espace["pseudonyme"] == "Ama du Golfe"
     assert espace["etablissement"]["nom"] == "Lycée de Tokoin I"
     assert espace["points"]["semestre"] is not None
-    assert (espace["points"]["points_semestre"], espace["points"]["total"]) == (100, 100)
+    # La bienvenue (+100) et l'article de test publié (+50, spec 023).
+    assert (espace["points"]["points_semestre"], espace["points"]["total"]) == (150, 150)
+
+
+def test_le_seed_prepare_trois_articles_de_test_une_seule_fois(client: TestClient, en_base: Callable[..., Any]) -> None:
+    from app.moderation.models import Contenu
+
+    en_base(semer)
+    en_base(semer)
+
+    etats = sorted(en_base(lambda db: db.scalars(select(Contenu.etat))).all())
+    assert etats == ["a_corriger", "en_attente", "publie"]
+    publics = client.get("/api/articles").json()["articles"]
+    assert [a["titre"] for a in publics] == ["Article de test — Un point d'eau dans la cour"]
+    assert publics[0]["signature"]["club"] == "Club Santé Tokoin"

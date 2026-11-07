@@ -17,12 +17,12 @@
 - [x] 5. `moderation/decisions.py` et les routes `/admin/moderation` (file, aperçu, quatre décisions). La tâche 4
       passe.
 - [x] 6. Lecture publique `/articles`, signature, adresse. Avec `test_articles_publics.py`.
-- [ ] 7. Admin existant : indicateur du tableau de bord et compteur du menu, historique de la fiche, libellés du
+- [x] 7. Admin existant : indicateur du tableau de bord et compteur du menu, historique de la fiche, libellés du
       journal. Seed de démonstration. Export OpenAPI et `npm run api:types`.
 
 **Site**
 
-- [ ] 8. `react-markdown`, `TexteArticle` (test Vitest), `EtatContenu`, client d'API.
+- [x] 8. `react-markdown`, `TexteArticle` (test Vitest), `EtatContenu`, client d'API.
 - [ ] 9. « Mes articles » : liste, création, édition avec aperçu, soumission, retrait ; lien depuis `/mon-espace`.
 - [ ] 10. Pages publiques `/articles` et `/articles/$adresse` ; lien depuis `/magazine`.
 - [ ] 11. Admin : page `/admin/moderation` (file, filtres, aperçu avant / après, décisions), menu et compteur.

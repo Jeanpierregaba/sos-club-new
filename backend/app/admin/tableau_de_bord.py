@@ -14,6 +14,7 @@ from app.clubs.models import Club, EtatClub
 from app.clubs.verification import compter_en_attente as compter_clubs_en_attente
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.encadreurs.verification import compter_en_attente as compter_encadreurs_en_attente
+from app.moderation.decisions import compter_en_attente as compter_contenus_en_attente
 from app.points.service import semestre_en_cours
 from app.referentiel.models import Dre, Etablissement, StatutEtablissement
 
@@ -106,6 +107,11 @@ async def calculer(db: AsyncSession, acces: Acces) -> TableauDeBord:
         clubs_a_valider=(
             await compter_clubs_en_attente(db, acces)
             if acces.a("clubs", Action.consulter) and not acces.double_auth_requise
+            else None
+        ),
+        contenus_a_moderer=(
+            await compter_contenus_en_attente(db, acces)
+            if acces.a("moderation", Action.consulter) and not acces.double_auth_requise
             else None
         ),
         derniers_evenements=derniers,

@@ -66,6 +66,7 @@ from app.config import settings
 from app.db import get_session
 from app.eleves import administration as administration_eleves
 from app.encadreurs.verification import compter_en_attente as compter_encadreurs_en_attente
+from app.moderation.decisions import compter_en_attente as compter_contenus_en_attente
 from app.referentiel.models import Dre
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -111,6 +112,9 @@ async def moi(acces: Collaborateur_, db: Base) -> AdminMoi:
         else None,
         clubs_a_valider=await compter_clubs_en_attente(db, acces)
         if acces.a("clubs", Action.consulter) and not acces.double_auth_requise
+        else None,
+        contenus_a_moderer=await compter_contenus_en_attente(db, acces)
+        if acces.a("moderation", Action.consulter) and not acces.double_auth_requise
         else None,
     )
 

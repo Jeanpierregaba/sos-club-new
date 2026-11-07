@@ -12,7 +12,7 @@ import asyncio
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid7
 
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,13 +21,16 @@ from app.admin.catalogue import LIBELLES_ROLES, RoleDepart
 from app.admin.journal import journaliser
 from app.admin.models import DoubleAuth
 from app.clubs.adhesions import adhesion_president
-from app.clubs.models import Club, ClubAxe, EtatClub
+from app.clubs.models import Adhesion, Club, ClubAxe, EtatAdhesion, EtatClub
 from app.comptes.models import Role, Utilisateur
 from app.config import RACINE_PROJET, settings
 from app.db import SessionLocal, engine
 from app.eleves.models import Classe, Eleve
 from app.encadreurs.models import EtatVerification, Fonction
 from app.jeux import banque_initiale
+from app.moderation.models import Contenu, DecisionModeration, EtatContenu, EtatVersion, TypeDecision, VersionContenu
+from app.points import service as points
+from app.points.bareme import ARTICLE_ELEVE
 from app.referentiel.models import Etablissement, Iesg, StatutEtablissement
 from app.seed_commun import (
     activer_double_auth,
@@ -150,6 +153,78 @@ async def _preparer_clubs(db: AsyncSession) -> None:
     )
 
 
+def _article_de_test(titre: str, axe_code: str) -> dict[str, object]:
+    """Un article de démonstration, signalé comme tel : aucun contenu de santé inventé n'est présenté comme réel."""
+    return {
+        "titre": f"Article de test — {titre}",
+        "chapo": "Article de démonstration, rédigé pour essayer la plateforme : son contenu n'est pas validé.",
+        "texte": "## Ce que nous avons fait\n\nTexte de **démonstration**.\n\n- une étape\n- une autre étape",
+        "axe_code": axe_code,
+        "afficher_club": True,
+    }
+
+
+async def _preparer_articles(db: AsyncSession) -> None:
+    """Un article publié (élève 1), un en attente (encadreur actif), un à corriger (élève 2), une seule fois."""
+    if await db.scalar(select(Contenu.id)):
+        return
+    ids = {
+        identifiant: await db.scalar(select(Utilisateur.id).where(Utilisateur.identifiant == identifiant))
+        for identifiant in ("dev.eleve1", "dev.eleve2", "dev.encadreur")
+    }
+    if None in ids.values():
+        return
+    maintenant = datetime.now(UTC)
+
+    async def article(auteur: str, titre: str, axe: str, etat: EtatContenu) -> tuple[Contenu, VersionContenu]:
+        contenu = Contenu(
+            id=uuid7(), type="article", auteur_id=ids[auteur], etat=EtatContenu.brouillon, dre_code="grand-lome"
+        )
+        db.add(contenu)
+        await db.flush()
+        version = VersionContenu(
+            id=uuid7(), contenu_id=contenu.id, numero=1, donnees=_article_de_test(titre, axe),
+            etat=EtatVersion.soumise, soumise_le=maintenant,
+        )  # fmt: skip
+        db.add(version)
+        await db.flush()
+        contenu.version_travail_id = version.id
+        contenu.soumis_le = maintenant
+        contenu.etat = etat
+        return contenu, version
+
+    publie, version = await article(
+        "dev.eleve1", "Un point d'eau dans la cour", "sante-environnement", EtatContenu.brouillon
+    )
+    club_id = await db.scalar(
+        select(Adhesion.club_id).where(Adhesion.eleve_id == ids["dev.eleve1"], Adhesion.etat == EtatAdhesion.active)
+    )
+    version.etat = EtatVersion.approuvee
+    publie.adresse = "article-de-test-un-point-d-eau-dans-la-cour"
+    publie.axe_code = "sante-environnement"
+    publie.publie_le = maintenant
+    publie.club_beneficiaire_id = club_id
+    publie.version_publiee_id = version.id
+    publie.version_travail_id = None
+    publie.etat = EtatContenu.publie
+    db.add(DecisionModeration(contenu_id=publie.id, version_id=version.id, decision=TypeDecision.approuver))
+    await points.crediter(db, ARTICLE_ELEVE, ids["dev.eleve1"], f"article:{publie.id}")
+
+    await article("dev.encadreur", "Le sport, c'est la santé", "sport-secourisme", EtatContenu.en_attente)
+    corriger, version = await article(
+        "dev.eleve2", "Bien dormir avant les examens", "genie-imhotep", EtatContenu.a_corriger
+    )
+    version.etat = EtatVersion.a_corriger
+    db.add(
+        DecisionModeration(
+            contenu_id=corriger.id,
+            version_id=version.id,
+            decision=TypeDecision.corriger,
+            motif="Ajoute la source de tes conseils.",
+        )
+    )
+
+
 async def semer(db: AsyncSession) -> list[dict[str, str]]:
     """Prépare tous les comptes `dev.*` et renvoie leurs accès. Valide la transaction."""
     if settings.production:
@@ -190,6 +265,7 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
                 ligne["profil"] += " (actif)" if etat is EtatVerification.actif else " (en attente)"
         acces.append(ligne)
     await _preparer_clubs(db)
+    await _preparer_articles(db)
     journaliser(db, "comptes_de_developpement_prepares", details={"comptes": [c[0] for c in COMPTES]})
     await db.commit()
     return acces

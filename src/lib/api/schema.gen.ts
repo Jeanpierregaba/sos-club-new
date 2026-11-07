@@ -1740,6 +1740,281 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mes Notifications */
+        get: operations["mes_notifications_api_notifications_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/compte": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Compte */
+        get: operations["compte_api_notifications_compte_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/{notification_id}/lue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Marquer Lue */
+        post: operations["marquer_lue_api_notifications__notification_id__lue_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/lues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Tout Marquer Lu */
+        post: operations["tout_marquer_lu_api_notifications_lues_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mes-articles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mes Articles */
+        get: operations["mes_articles_api_mes_articles_get"];
+        put?: never;
+        /** Creer */
+        post: operations["creer_api_mes_articles_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mes-articles/{contenu_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire */
+        get: operations["lire_api_mes_articles__contenu_id__get"];
+        put?: never;
+        post?: never;
+        /** Supprimer */
+        delete: operations["supprimer_api_mes_articles__contenu_id__delete"];
+        options?: never;
+        head?: never;
+        /** Modifier */
+        patch: operations["modifier_api_mes_articles__contenu_id__patch"];
+        trace?: never;
+    };
+    "/api/mes-articles/{contenu_id}/soumettre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Soumettre */
+        post: operations["soumettre_api_mes_articles__contenu_id__soumettre_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mes-articles/{contenu_id}/retirer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retirer */
+        post: operations["retirer_api_mes_articles__contenu_id__retirer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/articles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Articles */
+        get: operations["articles_api_articles_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/articles/{adresse}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Article */
+        get: operations["article_api_articles__adresse__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/moderation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** File Moderation */
+        get: operations["file_moderation_api_admin_moderation_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/moderation/{contenu_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Apercu */
+        get: operations["apercu_api_admin_moderation__contenu_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/moderation/{contenu_id}/approuver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approuver */
+        post: operations["approuver_api_admin_moderation__contenu_id__approuver_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/moderation/{contenu_id}/corriger": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Corriger */
+        post: operations["corriger_api_admin_moderation__contenu_id__corriger_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/moderation/{contenu_id}/refuser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refuser */
+        post: operations["refuser_api_admin_moderation__contenu_id__refuser_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/moderation/{contenu_id}/depublier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Depublier */
+        post: operations["depublier_api_admin_moderation__contenu_id__depublier_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -1838,6 +2113,8 @@ export interface components {
             encadreurs_a_verifier?: number | null;
             /** Clubs A Valider */
             clubs_a_valider?: number | null;
+            /** Contenus A Moderer */
+            contenus_a_moderer?: number | null;
         };
         /**
          * AffiliationAValider
@@ -1881,6 +2158,155 @@ export interface components {
             /** Plafond */
             plafond: number;
         };
+        /** ApercuModeration */
+        ApercuModeration: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Type */
+            type: string;
+            /** Titre */
+            titre: string;
+            etat: components["schemas"]["EtatContenu"];
+            /** Axe Code */
+            axe_code: string | null;
+            auteur: components["schemas"]["AuteurFile"];
+            /** Nouvelle Version */
+            nouvelle_version: boolean;
+            /** En Ligne */
+            en_ligne: boolean;
+            /** Adresse */
+            adresse: string | null;
+            /** Soumis Le */
+            soumis_le: string | null;
+            /**
+             * Modifie Le
+             * Format: date-time
+             */
+            modifie_le: string;
+            /** Version */
+            version: number;
+            /** Soumise */
+            soumise: {
+                [key: string]: unknown;
+            } | null;
+            /** Publiee */
+            publiee: {
+                [key: string]: unknown;
+            } | null;
+            /** Decisions */
+            decisions: components["schemas"]["DecisionPassee"][];
+        };
+        /** ApprobationEntree */
+        ApprobationEntree: {
+            /** Version */
+            version: number;
+        };
+        /** ArticleAuteur */
+        ArticleAuteur: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            etat: components["schemas"]["EtatContenu"];
+            /** Version */
+            version: number;
+            champs: components["schemas"]["ChampsArticle"];
+            /** En Ligne */
+            en_ligne: boolean;
+            /** Adresse */
+            adresse: string | null;
+            /** Modifiable */
+            modifiable: boolean;
+            /** Soumettable */
+            soumettable: boolean;
+            /** Supprimable */
+            supprimable: boolean;
+            derniere_decision: components["schemas"]["DerniereDecision"] | null;
+            /** Soumis Le */
+            soumis_le: string | null;
+            /** Publie Le */
+            publie_le: string | null;
+            /**
+             * Modifie Le
+             * Format: date-time
+             */
+            modifie_le: string;
+        };
+        /**
+         * ArticleEcriture
+         * @description Création et modification. `version` (verrou optimiste) est exigée pour une modification.
+         */
+        ArticleEcriture: {
+            /** Titre */
+            titre: string;
+            /** Chapo */
+            chapo: string;
+            /** Texte */
+            texte: string;
+            /** Axe Code */
+            axe_code: string;
+            /**
+             * Afficher Club
+             * @default true
+             */
+            afficher_club: boolean;
+            /** Version */
+            version?: number | null;
+        };
+        /** ArticlePublic */
+        ArticlePublic: {
+            /** Adresse */
+            adresse: string;
+            /** Titre */
+            titre: string;
+            /** Chapo */
+            chapo: string;
+            axe: components["schemas"]["AxeArticle"];
+            signature: components["schemas"]["Signature"];
+            /**
+             * Publie Le
+             * Format: date
+             */
+            publie_le: string;
+            /** Texte */
+            texte: string;
+        };
+        /** ArticlesPublics */
+        ArticlesPublics: {
+            /** Articles */
+            articles: components["schemas"]["ResumeArticle"][];
+            /** Page */
+            page: number;
+            /** Pages */
+            pages: number;
+            /** Total */
+            total: number;
+        };
+        /**
+         * AuteurFile
+         * @description Le modérateur voit qui écrit (nom complet, établissement) : la file est réservée à l'espace admin.
+         */
+        AuteurFile: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            /** Identifiant */
+            identifiant: string;
+            /** Profil */
+            profil: string;
+            /** Etablissement */
+            etablissement: string | null;
+            /** Dre Code */
+            dre_code: string | null;
+        };
         /** AxeAdmin */
         AxeAdmin: {
             /** Code */
@@ -1895,6 +2321,13 @@ export interface components {
             actif: boolean;
             /** Version */
             version: number;
+        };
+        /** AxeArticle */
+        AxeArticle: {
+            /** Code */
+            code: string;
+            /** Libelle */
+            libelle: string;
         };
         /** AxeCreation */
         AxeCreation: {
@@ -1952,6 +2385,25 @@ export interface components {
             };
             /** Dre Actives */
             dre_actives: string[];
+        };
+        /**
+         * ChampsArticle
+         * @description Les champs d'une version, stockés en JSONB (`version_contenu.donnees`).
+         */
+        ChampsArticle: {
+            /** Titre */
+            titre: string;
+            /** Chapo */
+            chapo: string;
+            /** Texte */
+            texte: string;
+            /** Axe Code */
+            axe_code: string;
+            /**
+             * Afficher Club
+             * @default true
+             */
+            afficher_club: boolean;
         };
         /**
          * Classe
@@ -2153,6 +2605,11 @@ export interface components {
              */
             cree_le: string;
         };
+        /** CompteNotifications */
+        CompteNotifications: {
+            /** Non Lues */
+            non_lues: number;
+        };
         /** ConnexionEntree */
         ConnexionEntree: {
             /** Identifiant */
@@ -2185,6 +2642,29 @@ export interface components {
         DecisionEntree: {
             /** Version */
             version: number;
+        };
+        /**
+         * DecisionModerationEntree
+         * @description Correction, refus ou dépublication : le motif est obligatoire, et l'auteur le lit.
+         */
+        DecisionModerationEntree: {
+            /** Version */
+            version: number;
+            /** Motif */
+            motif: string;
+        };
+        /** DecisionPassee */
+        DecisionPassee: {
+            decision: components["schemas"]["TypeDecision"];
+            /** Motif */
+            motif: string | null;
+            /** Decide Par */
+            decide_par: string | null;
+            /**
+             * Decide Le
+             * Format: date-time
+             */
+            decide_le: string;
         };
         /** DefiDuJour */
         DefiDuJour: {
@@ -2336,6 +2816,17 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** DerniereDecision */
+        DerniereDecision: {
+            decision: components["schemas"]["TypeDecision"];
+            /** Motif */
+            motif: string | null;
+            /**
+             * Decide Le
+             * Format: date-time
+             */
+            decide_le: string;
+        };
         /** DreAdmin */
         DreAdmin: {
             /** Code */
@@ -2434,6 +2925,37 @@ export interface components {
             id: string;
             /** Message */
             message: string;
+        };
+        /** ElementFile */
+        ElementFile: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Type */
+            type: string;
+            /** Titre */
+            titre: string;
+            etat: components["schemas"]["EtatContenu"];
+            /** Axe Code */
+            axe_code: string | null;
+            auteur: components["schemas"]["AuteurFile"];
+            /** Nouvelle Version */
+            nouvelle_version: boolean;
+            /** En Ligne */
+            en_ligne: boolean;
+            /** Adresse */
+            adresse: string | null;
+            /** Soumis Le */
+            soumis_le: string | null;
+            /**
+             * Modifie Le
+             * Format: date-time
+             */
+            modifie_le: string;
+            /** Version */
+            version: number;
         };
         /** ElementLot */
         ElementLot: {
@@ -2659,6 +3181,11 @@ export interface components {
          * @enum {string}
          */
         EtatClub: "en_attente" | "actif" | "refuse";
+        /**
+         * EtatContenu
+         * @enum {string}
+         */
+        EtatContenu: "brouillon" | "en_attente" | "a_corriger" | "refuse" | "publie" | "depublie";
         /** EtatInscription */
         EtatInscription: {
             /** Ouvertes */
@@ -2775,6 +3302,13 @@ export interface components {
             total: number;
             /** Demandes */
             demandes: components["schemas"]["DemandeEncadreur"][];
+        };
+        /** FileModeration */
+        FileModeration: {
+            /** Total */
+            total: number;
+            /** Contenus */
+            contenus: components["schemas"]["ElementFile"][];
         };
         /** FilePassations */
         FilePassations: {
@@ -3132,6 +3666,11 @@ export interface components {
             /** Encadreurs */
             encadreurs: components["schemas"]["EncadreurDuClub"][];
         };
+        /** MesArticles */
+        MesArticles: {
+            /** Articles */
+            articles: components["schemas"]["ResumeArticleAuteur"][];
+        };
         /**
          * MesClubs
          * @description L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés, et les
@@ -3193,6 +3732,36 @@ export interface components {
         MotifEntree: {
             /** Motif */
             motif: string;
+        };
+        /** NotificationSortie */
+        NotificationSortie: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Type */
+            type: string;
+            /** Titre */
+            titre: string;
+            /** Message */
+            message: string | null;
+            /** Lien */
+            lien: string | null;
+            /** Lue */
+            lue: boolean;
+            /**
+             * Cree Le
+             * Format: date-time
+             */
+            cree_le: string;
+        };
+        /** Notifications */
+        Notifications: {
+            /** Notifications */
+            notifications: components["schemas"]["NotificationSortie"][];
+            /** Non Lues */
+            non_lues: number;
         };
         /** PageEtablissements */
         PageEtablissements: {
@@ -3560,6 +4129,42 @@ export interface components {
                 [key: string]: number;
             };
         };
+        /** ResumeArticle */
+        ResumeArticle: {
+            /** Adresse */
+            adresse: string;
+            /** Titre */
+            titre: string;
+            /** Chapo */
+            chapo: string;
+            axe: components["schemas"]["AxeArticle"];
+            signature: components["schemas"]["Signature"];
+            /**
+             * Publie Le
+             * Format: date
+             */
+            publie_le: string;
+        };
+        /** ResumeArticleAuteur */
+        ResumeArticleAuteur: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Titre */
+            titre: string;
+            etat: components["schemas"]["EtatContenu"];
+            /** En Ligne */
+            en_ligne: boolean;
+            /** Adresse */
+            adresse: string | null;
+            /**
+             * Modifie Le
+             * Format: date-time
+             */
+            modifie_le: string;
+        };
         /** ResumePoints */
         ResumePoints: {
             semestre: components["schemas"]["SemestreResume"] | null;
@@ -3667,6 +4272,21 @@ export interface components {
             fin: string;
         };
         /**
+         * Signature
+         * @description Jamais de nom complet : un élève par son pseudonyme (et son club s'il l'a choisi), un encadreur par son
+         *     prénom, l'initiale de son nom et sa fonction.
+         */
+        Signature: {
+            /** Profil */
+            profil: string;
+            /** Nom */
+            nom: string;
+            /** Club */
+            club?: string | null;
+            /** Fonction */
+            fonction?: string | null;
+        };
+        /**
          * StatutCompte
          * @enum {string}
          */
@@ -3709,9 +4329,16 @@ export interface components {
             encadreurs_a_verifier?: number | null;
             /** Clubs A Valider */
             clubs_a_valider?: number | null;
+            /** Contenus A Moderer */
+            contenus_a_moderer?: number | null;
             /** Derniers Evenements */
             derniers_evenements: components["schemas"]["EvenementJournal"][] | null;
         };
+        /**
+         * TypeDecision
+         * @enum {string}
+         */
+        TypeDecision: "approuver" | "corriger" | "refuser" | "depublier";
         /**
          * TypeEtablissement
          * @enum {string}
@@ -3734,6 +4361,11 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** VersionEntree */
+        VersionEntree: {
+            /** Version */
+            version: number;
         };
         /** ActivationEntree */
         app__admin__schemas__ActivationEntree: {
@@ -7018,6 +7650,580 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CorrectionDefi"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mes_notifications_api_notifications_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Notifications"];
+                };
+            };
+        };
+    };
+    compte_api_notifications_compte_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompteNotifications"];
+                };
+            };
+        };
+    };
+    marquer_lue_api_notifications__notification_id__lue_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                notification_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tout_marquer_lu_api_notifications_lues_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    mes_articles_api_mes_articles_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MesArticles"];
+                };
+            };
+        };
+    };
+    creer_api_mes_articles_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ArticleEcriture"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_api_mes_articles__contenu_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    supprimer_api_mes_articles__contenu_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modifier_api_mes_articles__contenu_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ArticleEcriture"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    soumettre_api_mes_articles__contenu_id__soumettre_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retirer_api_mes_articles__contenu_id__retirer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    articles_api_articles_get: {
+        parameters: {
+            query?: {
+                page?: number;
+                axe?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticlesPublics"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    article_api_articles__adresse__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                adresse: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticlePublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    file_moderation_api_admin_moderation_get: {
+        parameters: {
+            query?: {
+                etat?: components["schemas"]["EtatContenu"];
+                type?: string | null;
+                axe?: string | null;
+                dre?: string | null;
+                profil?: ("eleve" | "encadreur") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileModeration"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    apercu_api_admin_moderation__contenu_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApercuModeration"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approuver_api_admin_moderation__contenu_id__approuver_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprobationEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApercuModeration"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    corriger_api_admin_moderation__contenu_id__corriger_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionModerationEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApercuModeration"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refuser_api_admin_moderation__contenu_id__refuser_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionModerationEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApercuModeration"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    depublier_api_admin_moderation__contenu_id__depublier_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionModerationEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApercuModeration"];
                 };
             };
             /** @description Validation Error */

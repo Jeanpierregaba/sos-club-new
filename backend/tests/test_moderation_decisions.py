@@ -577,3 +577,47 @@ def test_chaque_version_en_base_respecte_le_schema_de_son_type(
 
     for version in en_base(lambda db: db.scalars(select(VersionContenu))).all():
         ChampsArticle.model_validate(version.donnees)
+
+
+# Écrans admin existants ------------------------------------------------------------------------------------------
+
+
+def test_le_tableau_de_bord_et_le_menu_comptent_les_contenus_du_perimetre(
+    client: TestClient,
+    creer_collaborateur: Callable[..., Any],
+    auteur: Navigateur,
+    creer_eleve: Callable[..., Utilisateur],
+) -> None:
+    soumettre(auteur)
+    creer_eleve("eleve2", "Kofi de Kara", dre="kara")
+    kara = Navigateur(client)
+    connecter(kara, "eleve2")
+    soumettre(kara)
+    creer_collaborateur("national", droits=MODERATION, double_auth=True)
+    creer_collaborateur("kara", droits=MODERATION, perimetre_dre="kara", double_auth=True)
+    creer_collaborateur("autre", droits={("tableau_de_bord", "consulter")})
+
+    comptes = {}
+    for identifiant in ("national", "kara", "autre"):
+        navigateur = Navigateur(client)
+        connecter_admin(navigateur, identifiant)  # type: ignore[arg-type]
+        comptes[identifiant] = (
+            navigateur.get("/api/admin/tableau-de-bord").json()["contenus_a_moderer"],
+            navigateur.get("/api/admin/moi").json()["contenus_a_moderer"],
+        )
+
+    assert comptes == {"national": (2, 2), "kara": (1, 1), "autre": (None, None)}
+
+
+def test_la_fiche_dun_inscrit_montre_lhistorique_de_ses_articles(
+    client: TestClient, creer_collaborateur: Callable[..., Any], auteur: Navigateur, en_base: Callable[..., Any]
+) -> None:
+    creer_collaborateur("gestion", droits=MODERATION | {("inscrits", "consulter")}, double_auth=True)
+    connecter_admin(client, "gestion")
+    article = soumettre(auteur)
+    decider(client, article["id"], "approuver")
+
+    fiche = client.get(f"/api/admin/inscrits/{eleve1(en_base).id}").json()
+
+    actions = [e["action"] for e in fiche["historique"]]
+    assert actions[:2] == ["article_approuve", "article_soumis"]

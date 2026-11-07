@@ -13,7 +13,7 @@ class ApprobationEntree(BaseModel):
     version: int
 
 
-class DecisionEntree(BaseModel):
+class DecisionModerationEntree(BaseModel):
     """Correction, refus ou dépublication : le motif est obligatoire, et l'auteur le lit."""
 
     version: int
@@ -59,7 +59,7 @@ class DecisionPassee(BaseModel):
     decide_le: datetime
 
 
-class Apercu(ElementFile):
+class ApercuModeration(ElementFile):
     # Les champs de la version soumise (ou de travail), et ceux de la version en ligne : l'admin compare.
     soumise: dict[str, Any] | None
     publiee: dict[str, Any] | None

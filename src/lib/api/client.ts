@@ -102,6 +102,22 @@ export type CodeAxe = ResultatQuelAxe["principal"];
 export type DefiDuJour = Schemas["DefiDuJour"];
 export type CorrectionDefi = Schemas["CorrectionDefi"];
 export type ClubPodium = Schemas["ClubPodium"];
+export type ChampsArticle = Schemas["ChampsArticle"];
+export type ArticleEcriture = Schemas["ArticleEcriture"];
+export type ArticleAuteur = Schemas["ArticleAuteur"];
+export type ResumeArticleAuteur = Schemas["ResumeArticleAuteur"];
+export type MesArticles = Schemas["MesArticles"];
+export type EtatContenu = Schemas["EtatContenu"];
+export type TypeDecision = Schemas["TypeDecision"];
+export type ArticlePublic = Schemas["ArticlePublic"];
+export type ResumeArticle = Schemas["ResumeArticle"];
+export type ArticlesPublics = Schemas["ArticlesPublics"];
+export type Signature = Schemas["Signature"];
+export type FileModeration = Schemas["FileModeration"];
+export type ElementFile = Schemas["ElementFile"];
+export type ApercuModeration = Schemas["ApercuModeration"];
+export type NotificationSortie = Schemas["NotificationSortie"];
+export type Notifications = Schemas["Notifications"];
 
 export const MESSAGE_SAISIE = "Vérifie le formulaire : un champ est vide, trop long ou mal rempli.";
 
@@ -455,3 +471,47 @@ export const chargerDefiDuJour = () => requeteApi<DefiDuJour>("/api/jeux/defi-du
 export const corrigerDefi = (id: string, choix: number) =>
   envoyerJson<CorrectionDefi>(`/api/jeux/defis/${id}/reponse`, { choix });
 export const chargerPodiumClubs = () => requeteApi<ClubPodium[]>("/api/clubs/podium");
+
+// Articles (spec 023) : rédaction par l'auteur, lecture publique, modération.
+const MES_ARTICLES = "/api/mes-articles";
+export const chargerMesArticles = () => requeteApi<MesArticles>(MES_ARTICLES);
+export const chargerMonArticle = (id: string) => requeteApi<ArticleAuteur>(`${MES_ARTICLES}/${id}`);
+export const creerArticle = (entree: ArticleEcriture) =>
+  envoyerJson<ArticleAuteur>(MES_ARTICLES, entree);
+export const modifierArticle = (id: string, entree: ArticleEcriture) =>
+  envoyerJson<ArticleAuteur>(`${MES_ARTICLES}/${id}`, entree, "PATCH");
+export const soumettreArticle = (id: string, version: number) =>
+  envoyerJson<ArticleAuteur>(`${MES_ARTICLES}/${id}/soumettre`, { version });
+export const retirerArticle = (id: string, version: number) =>
+  envoyerJson<ArticleAuteur>(`${MES_ARTICLES}/${id}/retirer`, { version });
+export const supprimerArticle = (id: string) =>
+  envoyerJson<void>(`${MES_ARTICLES}/${id}`, undefined, "DELETE");
+
+export const chargerArticles = (filtres: { page?: number; axe?: string } = {}) =>
+  requeteApi<ArticlesPublics>(avecParametres("/api/articles", filtres));
+export const chargerArticle = (adresse: string) =>
+  requeteApi<ArticlePublic>(`/api/articles/${encodeURIComponent(adresse)}`);
+
+const MODERATION = "/api/admin/moderation";
+export const chargerFileModeration = (filtres: Record<string, string | undefined> = {}) =>
+  requeteApi<FileModeration>(avecParametres(MODERATION, filtres));
+export const chargerApercuModeration = (id: string) =>
+  requeteApi<ApercuModeration>(`${MODERATION}/${id}`);
+export const deciderModeration = (
+  id: string,
+  decision: "approuver" | "corriger" | "refuser" | "depublier",
+  version: number,
+  motif?: string,
+) =>
+  envoyerJson<ApercuModeration>(
+    `${MODERATION}/${id}/${decision}`,
+    decision === "approuver" ? { version } : { version, motif },
+  );
+
+// Centre de notifications (spec 023).
+export const chargerNotifications = () => requeteApi<Notifications>("/api/notifications");
+export const compterNotifications = () =>
+  requeteApi<{ non_lues: number }>("/api/notifications/compte");
+export const marquerNotificationLue = (id: string) =>
+  envoyerJson<void>(`/api/notifications/${id}/lue`);
+export const marquerToutesLues = () => envoyerJson<void>("/api/notifications/lues");

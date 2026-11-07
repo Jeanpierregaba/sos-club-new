@@ -24,7 +24,7 @@ from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur
 from app.moderation.models import Contenu, DecisionModeration, EtatContenu, EtatVersion, TypeDecision, VersionContenu
-from app.moderation.schemas import Apercu, AuteurFile, DecisionPassee, ElementFile, FileModeration
+from app.moderation.schemas import ApercuModeration, AuteurFile, DecisionPassee, ElementFile, FileModeration
 from app.moderation.service import Introuvable
 from app.moderation.types import type_de
 from app.notifications.service import notifier
@@ -130,7 +130,7 @@ async def compter_en_attente(db: AsyncSession, acces: Acces) -> int:
     return (await db.scalar(requete)) or 0
 
 
-async def apercu(db: AsyncSession, acces: Acces, contenu_id: UUID) -> Apercu:
+async def apercu(db: AsyncSession, acces: Acces, contenu_id: UUID) -> ApercuModeration:
     ligne = (await db.execute(_requete(acces).where(Contenu.id == contenu_id))).one_or_none()
     if ligne is None:
         raise Introuvable
@@ -144,7 +144,7 @@ async def apercu(db: AsyncSession, acces: Acces, contenu_id: UUID) -> Apercu:
         .where(DecisionModeration.contenu_id == contenu.id)
         .order_by(DecisionModeration.decide_le.desc(), DecisionModeration.id.desc())
     )
-    return Apercu(
+    return ApercuModeration(
         **_element(*ligne).model_dump(),
         soumise=travail.donnees if travail else None,
         publiee=publiee.donnees if publiee else None,

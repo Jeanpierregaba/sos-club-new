@@ -15,7 +15,7 @@ from app.comptes.models import Role
 from app.db import get_session
 from app.moderation import decisions
 from app.moderation.models import EtatContenu
-from app.moderation.schemas import Apercu, ApprobationEntree, DecisionEntree, FileModeration
+from app.moderation.schemas import ApercuModeration, ApprobationEntree, DecisionModerationEntree, FileModeration
 from app.moderation.service import Introuvable
 
 Base = Annotated[AsyncSession, Depends(get_session)]
@@ -56,34 +56,42 @@ async def file_moderation(
 
 
 @router_admin.get("/{contenu_id}")
-async def apercu(contenu_id: UUID, db: Base, acces: Lecteur) -> Apercu:
+async def apercu(contenu_id: UUID, db: Base, acces: Lecteur) -> ApercuModeration:
     with _traduire():
         return await decisions.apercu(db, acces, contenu_id)
 
 
 @router_admin.post("/{contenu_id}/approuver")
-async def approuver(contenu_id: UUID, entree: ApprobationEntree, request: Request, db: Base, acces: Decideur) -> Apercu:
+async def approuver(
+    contenu_id: UUID, entree: ApprobationEntree, request: Request, db: Base, acces: Decideur
+) -> ApercuModeration:
     with _traduire():
         await decisions.approuver(db, acces, contenu_id, entree.version, adresse_ip(request))
         return await decisions.apercu(db, acces, contenu_id)
 
 
 @router_admin.post("/{contenu_id}/corriger")
-async def corriger(contenu_id: UUID, entree: DecisionEntree, request: Request, db: Base, acces: Decideur) -> Apercu:
+async def corriger(
+    contenu_id: UUID, entree: DecisionModerationEntree, request: Request, db: Base, acces: Decideur
+) -> ApercuModeration:
     with _traduire():
         await decisions.demander_correction(db, acces, contenu_id, entree.version, entree.motif, adresse_ip(request))
         return await decisions.apercu(db, acces, contenu_id)
 
 
 @router_admin.post("/{contenu_id}/refuser")
-async def refuser(contenu_id: UUID, entree: DecisionEntree, request: Request, db: Base, acces: Decideur) -> Apercu:
+async def refuser(
+    contenu_id: UUID, entree: DecisionModerationEntree, request: Request, db: Base, acces: Decideur
+) -> ApercuModeration:
     with _traduire():
         await decisions.refuser(db, acces, contenu_id, entree.version, entree.motif, adresse_ip(request))
         return await decisions.apercu(db, acces, contenu_id)
 
 
 @router_admin.post("/{contenu_id}/depublier")
-async def depublier(contenu_id: UUID, entree: DecisionEntree, request: Request, db: Base, acces: Depublieur) -> Apercu:
+async def depublier(
+    contenu_id: UUID, entree: DecisionModerationEntree, request: Request, db: Base, acces: Depublieur
+) -> ApercuModeration:
     with _traduire():
         await decisions.depublier(db, acces, contenu_id, entree.version, entree.motif, adresse_ip(request))
         return await decisions.apercu(db, acces, contenu_id)

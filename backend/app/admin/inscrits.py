@@ -4,7 +4,7 @@ specs des clubs."""
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Select, case, false, func, or_, select
+from sqlalchemy import Select, String, and_, case, cast, false, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.dependances import Acces
@@ -27,6 +27,7 @@ from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.comptes.service import couper_sessions
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur
+from app.moderation.models import Contenu
 from app.points import service as points
 
 HISTORIQUE = [
@@ -50,6 +51,13 @@ HISTORIQUE = [
     "club_passation",
     "club_passation_refusee",
     "club_passation_annulee",
+    # Ses articles (spec 023) : soumission, retrait et décisions.
+    "article_soumis",
+    "article_retire",
+    "article_approuve",
+    "article_a_corriger",
+    "article_refuse",
+    "article_depublie",
 ]
 
 
@@ -111,7 +119,18 @@ async def historique(db: AsyncSession, utilisateur_id: UUID) -> list[EvenementJo
     """Événements d'un compte, lus dans le journal : il fait foi."""
     requete = (
         select(JournalAudit)
-        .where(JournalAudit.cible_type == "utilisateur", JournalAudit.cible_id == str(utilisateur_id))
+        .where(
+            or_(
+                and_(JournalAudit.cible_type == "utilisateur", JournalAudit.cible_id == str(utilisateur_id)),
+                # Les événements de ses contenus (spec 023) : le journal les cible par contenu.
+                and_(
+                    JournalAudit.cible_type == "contenu",
+                    JournalAudit.cible_id.in_(
+                        select(cast(Contenu.id, String)).where(Contenu.auteur_id == utilisateur_id)
+                    ),
+                ),
+            )
+        )
         .where(JournalAudit.action.in_(HISTORIQUE))
         .order_by(JournalAudit.quand.desc())
     )
