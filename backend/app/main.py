@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.exports import purger_regulierement
 from app.admin.router import router as router_admin
 from app.admin.router import router_activation
+from app.articles.router import router_auteur as router_articles_auteur
 from app.clubs.router import router as router_clubs
 from app.clubs.router import router_admin as router_clubs_admin
 from app.comptes.dependances import verifier_origine
@@ -60,6 +61,7 @@ api.include_router(router_clubs)
 api.include_router(router_clubs_admin)
 api.include_router(router_jeux)
 api.include_router(router_notifications)
+api.include_router(router_articles_auteur)
 app.include_router(api)
 
 

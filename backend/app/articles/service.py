@@ -1,0 +1,152 @@
+"""Articles des élèves et des encadreurs (spec 023) : rédaction par l'auteur, sur le moteur de modération."""
+
+from typing import Any
+from uuid import UUID
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.articles.schemas import (
+    ArticleAuteur,
+    ArticleEcriture,
+    ChampsArticle,
+    DerniereDecision,
+    MesArticles,
+    ResumeArticleAuteur,
+)
+from app.comptes.inscription import Refus
+from app.comptes.models import Role, Utilisateur
+from app.moderation import service as moteur
+from app.moderation.models import Contenu, DecisionModeration, EtatVersion
+from app.moderation.types import TypeContenu, enregistrer
+from app.points.bareme import ARTICLE_ELEVE, ARTICLE_ENCADREUR
+from app.referentiel.models import Axe
+
+TYPE = "article"
+
+ARTICLE = enregistrer(
+    TypeContenu(
+        code=TYPE,
+        libelle="article",
+        schema=ChampsArticle,
+        actions_auteur={Role.eleve: ARTICLE_ELEVE, Role.encadreur: ARTICLE_ENCADREUR},
+        titre=lambda donnees: str(donnees["titre"]),
+        lien_auteur=lambda contenu_id: f"/mes-articles/{contenu_id}",
+    )
+)
+
+
+async def _verifier_axe(db: AsyncSession, axe_code: str, actuel: str | None) -> None:
+    """Un axe désactivé reste accepté s'il était déjà celui de l'article (spec 016) ; sinon, il doit être actif."""
+    if axe_code == actuel:
+        return
+    axe = await db.get(Axe, axe_code)
+    if axe is None or not axe.actif:
+        raise Refus("Choisis un axe parmi les axes proposés.")
+
+
+def _donnees(entree: ArticleEcriture) -> dict[str, Any]:
+    return ChampsArticle.model_validate(entree.model_dump(exclude={"version"})).model_dump()
+
+
+async def _derniere_decision(db: AsyncSession, contenu: Contenu) -> DerniereDecision | None:
+    decision = await db.scalar(
+        select(DecisionModeration)
+        .where(DecisionModeration.contenu_id == contenu.id)
+        .order_by(DecisionModeration.decide_le.desc(), DecisionModeration.id.desc())
+        .limit(1)
+    )
+    if decision is None:
+        return None
+    return DerniereDecision(decision=decision.decision, motif=decision.motif, decide_le=decision.decide_le)
+
+
+async def article_auteur(db: AsyncSession, contenu: Contenu) -> ArticleAuteur:
+    # Les dates calculées par la base (`modifie_le`) sont relues après chaque écriture.
+    await db.refresh(contenu)
+    visible = await moteur.version_visible_auteur(db, contenu)
+    travail = await moteur.version(db, contenu.version_travail_id)
+    return ArticleAuteur(
+        id=contenu.id,
+        etat=contenu.etat,
+        version=contenu.version,
+        champs=ChampsArticle.model_validate(visible.donnees),
+        en_ligne=contenu.version_publiee_id is not None,
+        adresse=contenu.adresse,
+        modifiable=contenu.etat in moteur.MODIFIABLES,
+        soumettable=contenu.etat in moteur.SOUMETTABLES and travail is not None and travail.etat is EtatVersion.travail,
+        supprimable=await moteur.jamais_soumis(db, contenu),
+        derniere_decision=await _derniere_decision(db, contenu),
+        soumis_le=contenu.soumis_le,
+        publie_le=contenu.publie_le,
+        modifie_le=contenu.modifie_le,
+    )
+
+
+async def mes_articles(db: AsyncSession, auteur: Utilisateur) -> MesArticles:
+    contenus = await db.scalars(
+        select(Contenu)
+        .where(Contenu.auteur_id == auteur.id, Contenu.type == TYPE)
+        .order_by(Contenu.modifie_le.desc(), Contenu.id.desc())
+    )
+    articles = []
+    for contenu in contenus:
+        visible = await moteur.version_visible_auteur(db, contenu)
+        articles.append(
+            ResumeArticleAuteur(
+                id=contenu.id,
+                titre=visible.donnees["titre"],
+                etat=contenu.etat,
+                en_ligne=contenu.version_publiee_id is not None,
+                adresse=contenu.adresse,
+                modifie_le=contenu.modifie_le,
+            )
+        )
+    return MesArticles(articles=articles)
+
+
+async def creer(db: AsyncSession, auteur: Utilisateur, entree: ArticleEcriture) -> ArticleAuteur:
+    await _verifier_axe(db, entree.axe_code, None)
+    contenu = await moteur.creer(db, auteur, TYPE, _donnees(entree))
+    await db.commit()
+    return await article_auteur(db, contenu)
+
+
+async def lire(db: AsyncSession, auteur: Utilisateur, contenu_id: UUID) -> ArticleAuteur:
+    return await article_auteur(db, await moteur.contenu_de(db, auteur, contenu_id, TYPE))
+
+
+async def modifier(db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, entree: ArticleEcriture) -> ArticleAuteur:
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+    moteur.verifier_version(contenu, entree.version)
+    actuelle = await moteur.version_visible_auteur(db, contenu)
+    await _verifier_axe(db, entree.axe_code, actuelle.donnees.get("axe_code"))
+    await moteur.modifier(db, contenu, _donnees(entree))
+    await db.commit()
+    return await article_auteur(db, contenu)
+
+
+async def soumettre(
+    db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, version: int, adresse_ip: str
+) -> ArticleAuteur:
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+    moteur.verifier_version(contenu, version)
+    await moteur.soumettre(db, contenu, auteur, adresse_ip)
+    await db.commit()
+    return await article_auteur(db, contenu)
+
+
+async def retirer(
+    db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, version: int, adresse_ip: str
+) -> ArticleAuteur:
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+    moteur.verifier_version(contenu, version)
+    await moteur.retirer(db, contenu, auteur, adresse_ip)
+    await db.commit()
+    return await article_auteur(db, contenu)
+
+
+async def supprimer(db: AsyncSession, auteur: Utilisateur, contenu_id: UUID) -> None:
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+    await moteur.supprimer(db, contenu)
+    await db.commit()
