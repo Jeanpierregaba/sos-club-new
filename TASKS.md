@@ -8,7 +8,8 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-Rien en cours : prochaine spec, R6 (centre de modération).
+- [ ] R6 — [023 Centre de modération, articles et notifications](docs/specs/023-moderation-et-articles/spec.md)
+  (moteur ADR-0009 ; les photos suivront dans la spec 024)
 
 ## À faire
 
@@ -30,6 +31,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 - [ ] R6 — Centre de modération, articles et notifications internes, avec un ADR sur le moteur de modération (Q8)
 - [ ] R7 — Commentaires prémodérés (Q22)
+- [ ] Purge des notifications lues de plus d'un an (signalée par la spec 023)
 - [ ] R8 — Espace du président : tableau de bord, fiche, actualités du club (Q20)
 
 **Phase 3 — Quiz et certification (P0)**

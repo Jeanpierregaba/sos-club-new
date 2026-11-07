@@ -93,6 +93,10 @@ pièces jointes (suite de l'ADR-0005).
 | R13  | Classements et tableaux de bord | Classements séparés des élèves et des encadreurs (club, DRE, national) et des clubs (DRE, national), semestre et historique ; tableaux de bord complets ; Hall of Fame sur les vraies données | Module « Points » : registre consultable, correction manuelle motivée et journalisée                 | L      | Q21       |
 | R14  | Clôture de semestre et Top 3    | Palmarès archivé, Grand Champion, Vice-Champion, Jeune Talent                                                                                                                                 | Gel, contrôle antifraude, ex æquo, validation, publication ; distinctions des encadreurs si retenues | M      | Q21, Q25  |
 
+R13 crédite aussi les points des clubs laissés en attente par les specs précédentes : par exemple, pour chaque
+article approuvé d'un élève affilié (spec 023), `club.article_eleve` au club enregistré dans
+`contenu.club_beneficiaire_id`, avec la clé `club_article:<contenu>`.
+
 ## Phase 6 — Vie du réseau (P1)
 
 | Code | Spec                   | Contenu                                                                                                                                               | Taille | Questions |
