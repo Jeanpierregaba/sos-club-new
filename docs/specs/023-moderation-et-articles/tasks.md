@@ -16,7 +16,7 @@
 - [x] 4. Tests des décisions (`test_moderation_decisions.py`) écrits **avant** le code. Ils doivent échouer.
 - [x] 5. `moderation/decisions.py` et les routes `/admin/moderation` (file, aperçu, quatre décisions). La tâche 4
       passe.
-- [ ] 6. Lecture publique `/articles`, signature, adresse. Avec `test_articles_publics.py`.
+- [x] 6. Lecture publique `/articles`, signature, adresse. Avec `test_articles_publics.py`.
 - [ ] 7. Admin existant : indicateur du tableau de bord et compteur du menu, historique de la fiche, libellés du
       journal. Seed de démonstration. Export OpenAPI et `npm run api:types`.
 

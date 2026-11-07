@@ -16,6 +16,7 @@ from app.admin.exports import purger_regulierement
 from app.admin.router import router as router_admin
 from app.admin.router import router_activation
 from app.articles.router import router_auteur as router_articles_auteur
+from app.articles.router import router_public as router_articles
 from app.clubs.router import router as router_clubs
 from app.clubs.router import router_admin as router_clubs_admin
 from app.comptes.dependances import verifier_origine
@@ -63,6 +64,7 @@ api.include_router(router_clubs_admin)
 api.include_router(router_jeux)
 api.include_router(router_notifications)
 api.include_router(router_articles_auteur)
+api.include_router(router_articles)
 api.include_router(router_moderation_admin)
 app.include_router(api)
 
