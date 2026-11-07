@@ -50,9 +50,10 @@ async def file_moderation(
     dre: str | None = None,
     profil: Literal["eleve", "encadreur"] | None = None,
 ) -> FileModeration:
-    return await decisions.file_attente(
-        db, acces, etat, type=type, axe=axe, dre=dre, profil=Role(profil) if profil else None
-    )
+    with _traduire():
+        return await decisions.file_attente(
+            db, acces, etat, type=type, axe=axe, dre=dre, profil=Role(profil) if profil else None
+        )
 
 
 @router_admin.get("/{contenu_id}")

@@ -471,10 +471,11 @@ def test_un_motif_est_obligatoire(moderateur: TestClient, auteur: Navigateur, de
 def test_une_decision_sur_un_contenu_qui_nest_pas_en_attente_repond_409(
     moderateur: TestClient, auteur: Navigateur
 ) -> None:
-    article = auteur.post(ARTICLES, json=champs()).json()
+    article = soumettre(auteur)
+    decider(moderateur, article["id"], "refuser", "Hors sujet.")
 
     assert decider(moderateur, article["id"], "approuver").status_code == 409
-    assert decider(moderateur, article["id"], "refuser", "Motif.").status_code == 409
+    assert decider(moderateur, article["id"], "corriger", "Motif.").status_code == 409
 
 
 # Droits ---------------------------------------------------------------------------------------------------------
@@ -621,3 +622,147 @@ def test_la_fiche_dun_inscrit_montre_lhistorique_de_ses_articles(
 
     actions = [e["action"] for e in fiche["historique"]]
     assert actions[:2] == ["article_approuve", "article_soumis"]
+
+
+# Constats de la relecture ------------------------------------------------------------------------------------------
+
+
+def test_une_revision_approuvee_ne_rapporte_rien_meme_si_laction_a_ete_reactivee(
+    moderateur: TestClient, auteur: Navigateur, en_base: Callable[..., Any]
+) -> None:
+    article = soumettre(auteur)
+    bareme = update(LigneBareme).where(LigneBareme.code == "eleve.article")
+    en_base(lambda db: db.execute(bareme.values(actif=False)))
+    decider(moderateur, article["id"], "approuver")
+    en_base(lambda db: db.execute(bareme.values(actif=True)))
+
+    reviser(auteur, article["id"], titre="Une révision")
+    decider(moderateur, article["id"], "approuver")
+
+    assert lignes(en_base, eleve1(en_base).id) == []
+
+
+def test_un_article_en_ligne_avec_une_revision_en_brouillon_reste_dans_longlet_publies(
+    moderateur: TestClient, auteur: Navigateur
+) -> None:
+    article = soumettre(auteur)
+    decider(moderateur, article["id"], "approuver")
+    actuel = auteur.get(f"{ARTICLES}/{article['id']}").json()
+    auteur.request(
+        "PATCH", f"{ARTICLES}/{article['id']}", json=champs(titre="Brouillon") | {"version": actuel["version"]}
+    )
+
+    publies = moderateur.get(FILE, params={"etat": "publie"}).json()["contenus"]
+
+    assert [(c["id"], c["etat"], c["en_ligne"]) for c in publies] == [(article["id"], "brouillon", True)]
+    # L'aperçu montre la version en ligne, jamais le brouillon de l'auteur.
+    apercu = moderateur.get(f"{FILE}/{article['id']}").json()
+    assert apercu["soumise"] is None
+    assert apercu["publiee"]["titre"] == "Le lavage des mains au lycée"
+    assert decider(moderateur, article["id"], "depublier", "Signalé.").status_code == 200
+
+
+def test_la_file_ne_montre_jamais_un_brouillon(moderateur: TestClient, auteur: Navigateur) -> None:
+    brouillon = auteur.post(ARTICLES, json=champs()).json()
+
+    assert moderateur.get(FILE, params={"etat": "brouillon"}).status_code == 422
+    assert moderateur.get(f"{FILE}/{brouillon['id']}").status_code == 404
+
+
+def test_depublier_pendant_une_revision_garde_la_trace_du_refus_de_la_revision(
+    moderateur: TestClient, auteur: Navigateur
+) -> None:
+    article = soumettre(auteur)
+    decider(moderateur, article["id"], "approuver")
+    reviser(auteur, article["id"], titre="Une révision en attente")
+
+    decider(moderateur, article["id"], "depublier", "Contenu signalé.")
+
+    decisions_passees = moderateur.get(f"{FILE}/{article['id']}").json()["decisions"]
+    assert [(d["decision"], d["motif"]) for d in decisions_passees[:2]] == [
+        ("depublier", "Contenu signalé."),
+        ("refuser", "Contenu signalé."),
+    ] or [(d["decision"], d["motif"]) for d in decisions_passees[:2]] == [
+        ("refuser", "Contenu signalé."),
+        ("depublier", "Contenu signalé."),
+    ]
+
+
+def test_le_club_beneficiaire_doit_etre_actif(
+    moderateur: TestClient,
+    client: TestClient,
+    creer_eleve: Callable[..., Utilisateur],
+    creer_club: Callable[..., Any],
+    en_base: Callable[..., Any],
+) -> None:
+    from app.clubs.models import Club, EtatClub
+
+    president = creer_eleve("president", "La Présidente")
+    club = creer_club(president)
+    navigateur = Navigateur(client)
+    connecter(navigateur, "president")
+    article = soumettre(navigateur)
+    en_base(
+        lambda db: db.execute(update(Club).where(Club.id == club.id).values(etat=EtatClub.refuse, motif_refus="Test."))
+    )
+
+    decider(moderateur, article["id"], "approuver")
+
+    assert contenu(en_base, article["id"]).club_beneficiaire_id is None
+
+
+def test_un_encadreur_qui_nest_plus_verifie_nest_pas_publie(
+    moderateur: TestClient, client: TestClient, creer_encadreur: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    from app.encadreurs.models import Encadreur, EtatVerification
+
+    encadreur = creer_encadreur()
+    navigateur = Navigateur(client)
+    connecter(navigateur, "encadreur1")
+    article = soumettre(navigateur)
+    en_base(
+        lambda db: db.execute(
+            update(Encadreur)
+            .where(Encadreur.utilisateur_id == encadreur.id)
+            .values(etat=EtatVerification.refuse, motif_refus="Test.")
+        )
+    )
+
+    assert decider(moderateur, article["id"], "approuver").status_code == 409
+    assert lignes(en_base, encadreur.id) == []
+
+
+def test_deux_approbations_simultanees_de_meme_titre_donnent_deux_adresses(
+    auteur: Navigateur,
+    client: TestClient,
+    creer_eleve: Callable[..., Utilisateur],
+    creer_collaborateur: Callable[..., Any],
+    en_base: Callable[..., Any],
+) -> None:
+    premier = soumettre(auteur)
+    creer_eleve("eleve2", "Kofi de Lomé")
+    autre = Navigateur(client)
+    connecter(autre, "eleve2")
+    second = soumettre(autre)
+    chef = creer_collaborateur("moderateur", droits=MODERATION, double_auth=True)
+
+    async def une_decision(contenu_id: str) -> None:
+        async with AsyncSession(moteur_test, expire_on_commit=False) as db:
+            collaborateur = await db.scalar(select(Collaborateur).where(Collaborateur.utilisateur_id == chef.id))
+            assert collaborateur is not None
+            acces = Acces(
+                utilisateur=await db.get(Utilisateur, chef.id),  # type: ignore[arg-type]
+                collaborateur=collaborateur,
+                droits={("moderation", Action.consulter), ("moderation", Action.approuver)},
+                double_auth_active=True,
+            )
+            version = (await db.get(Contenu, UUID(contenu_id))).version  # type: ignore[union-attr]
+            await decisions.approuver(db, acces, UUID(contenu_id), version, "127.0.0.1")
+
+    async def scenario() -> None:
+        await asyncio.gather(une_decision(premier["id"]), une_decision(second["id"]))
+
+    asyncio.run(scenario())
+
+    adresses = {contenu(en_base, premier["id"]).adresse, contenu(en_base, second["id"]).adresse}
+    assert adresses == {"le-lavage-des-mains-au-lycee", "le-lavage-des-mains-au-lycee-2"}

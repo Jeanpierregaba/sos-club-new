@@ -18,11 +18,11 @@ from sqlalchemy.orm import aliased
 
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
-from app.clubs.models import Adhesion, EtatAdhesion
+from app.clubs.models import Adhesion, Club, EtatAdhesion, EtatClub
 from app.comptes.inscription import Refus
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.eleves.models import Eleve
-from app.encadreurs.models import Encadreur
+from app.encadreurs.models import Encadreur, EtatVerification
 from app.moderation.models import Contenu, DecisionModeration, EtatContenu, EtatVersion, TypeDecision, VersionContenu
 from app.moderation.schemas import ApercuModeration, AuteurFile, DecisionPassee, ElementFile, FileModeration
 from app.moderation.service import Introuvable
@@ -107,7 +107,14 @@ async def file_attente(
     dre: str | None = None,
     profil: Role | None = None,
 ) -> FileModeration:
-    requete = _requete(acces).where(Contenu.etat == etat)
+    if etat is EtatContenu.brouillon:
+        # Un brouillon est un travail privé de l'auteur : il n'entre jamais dans la file.
+        raise Refus("La file ne montre pas les brouillons.", 422)
+    if etat is EtatContenu.publie:
+        # « En ligne » : un article publié reste en ligne pendant qu'une nouvelle version se prépare.
+        requete = _requete(acces).where(Contenu.version_publiee_id.is_not(None))
+    else:
+        requete = _requete(acces).where(Contenu.etat == etat)
     if type:
         requete = requete.where(Contenu.type == type)
     if axe:
@@ -135,7 +142,15 @@ async def apercu(db: AsyncSession, acces: Acces, contenu_id: UUID) -> ApercuMode
     if ligne is None:
         raise Introuvable
     contenu = ligne[0]
-    travail = await db.get(VersionContenu, contenu.version_travail_id) if contenu.version_travail_id else None
+    # La dernière version soumise : jamais une version de travail, que l'auteur n'a pas envoyée.
+    soumise = await db.scalar(
+        select(VersionContenu)
+        .where(VersionContenu.contenu_id == contenu.id, VersionContenu.etat != EtatVersion.travail)
+        .order_by(VersionContenu.numero.desc())
+        .limit(1)
+    )
+    if soumise is None:
+        raise Introuvable
     publiee = await db.get(VersionContenu, contenu.version_publiee_id) if contenu.version_publiee_id else None
     decideurs = aliased(Utilisateur)
     passees = await db.execute(
@@ -146,7 +161,7 @@ async def apercu(db: AsyncSession, acces: Acces, contenu_id: UUID) -> ApercuMode
     )
     return ApercuModeration(
         **_element(*ligne).model_dump(),
-        soumise=travail.donnees if travail else None,
+        soumise=soumise.donnees if soumise.id != contenu.version_publiee_id else None,
         publiee=publiee.donnees if publiee else None,
         decisions=[
             DecisionPassee(
@@ -193,6 +208,9 @@ def _adresse_de(titre: str) -> str:
 
 async def _adresse_libre(db: AsyncSession, titre: str) -> str:
     base = _adresse_de(titre)
+    # Verrou de transaction sur cette adresse : deux approbations simultanées de même titre passent l'une après
+    # l'autre, et la seconde voit l'adresse prise par la première.
+    await db.execute(select(func.pg_advisory_xact_lock(func.hashtext(f"adresse:{base}"))))
     adresse, numero = base, 1
     while await db.scalar(select(Contenu.id).where(Contenu.adresse == adresse)):
         numero += 1
@@ -241,6 +259,10 @@ async def approuver(db: AsyncSession, acces: Acces, contenu_id: UUID, version: i
     assert auteur is not None
     if auteur.statut is not StatutCompte.actif:
         raise Refus("Le compte de l'auteur est suspendu : rien n'est publié tant qu'il l'est.", 409)
+    if auteur.role is Role.encadreur:
+        encadreur = await db.get(Encadreur, auteur.id)
+        if encadreur is None or encadreur.etat is not EtatVerification.actif:
+            raise Refus("L'encadreur n'est plus vérifié : son article ne peut pas être publié.", 409)
     type_contenu = type_de(contenu.type)
     travail = await _travail(db, contenu)
     donnees = type_contenu.schema.model_validate(travail.donnees).model_dump()
@@ -254,7 +276,9 @@ async def approuver(db: AsyncSession, acces: Acces, contenu_id: UUID, version: i
     if premiere and auteur.role is Role.eleve:
         # Le club de l'élève affilié à la première approbation : R13 lui créditera ses points.
         club_id = await db.scalar(
-            select(Adhesion.club_id).where(Adhesion.eleve_id == auteur.id, Adhesion.etat == EtatAdhesion.active)
+            select(Adhesion.club_id)
+            .join(Club, Club.id == Adhesion.club_id)
+            .where(Adhesion.eleve_id == auteur.id, Adhesion.etat == EtatAdhesion.active, Club.etat == EtatClub.actif)
         )
 
     travail.etat = EtatVersion.approuvee
@@ -267,9 +291,10 @@ async def approuver(db: AsyncSession, acces: Acces, contenu_id: UUID, version: i
     if premiere:
         contenu.publie_le = datetime.now(UTC)
         contenu.club_beneficiaire_id = club_id
-    # Une seule ligne par contenu : la clé tient même après une dépublication suivie d'une nouvelle approbation.
+    # Les points à la première approbation seulement (jamais pour une révision ni une republication), et une seule
+    # ligne par contenu grâce à la clé.
     action = type_contenu.actions_auteur.get(auteur.role)
-    if action:
+    if action and premiere:
         await points.crediter(db, action, auteur.id, f"{contenu.type}:{contenu.id}", valide_par=acces.utilisateur.id)
     titre_avis = (
         f"Ta nouvelle version de « {titre} » est en ligne"
@@ -323,9 +348,18 @@ async def depublier(db: AsyncSession, acces: Acces, contenu_id: UUID, version: i
     if contenu.version_travail_id is not None:
         travail = await _travail(db, contenu)
         if travail.etat is EtatVersion.soumise:
-            # Une révision en attente tombe avec la version en ligne.
+            # Une révision en attente tombe avec la version en ligne : elle est refusée, avec le même motif.
             travail.etat = EtatVersion.refusee
             contenu.version_travail_id = None
+            db.add(
+                DecisionModeration(
+                    contenu_id=contenu.id,
+                    version_id=travail.id,
+                    decision=TypeDecision.refuser,
+                    motif=motif,
+                    decide_par=acces.utilisateur.id,
+                )
+            )
     contenu.version_publiee_id = None
     contenu.etat = EtatContenu.depublie
     _consigner(

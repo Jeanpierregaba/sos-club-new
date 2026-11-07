@@ -186,5 +186,12 @@ Stress-test du 2026-11-07 (spec et plan). Points retenus et réponse apportée :
   et un test relit chaque version en base avec ce schéma.
 - **Mineur — volume des notifications.** Aucune purge pour l'instant ; une purge des notifications lues de plus
   d'un an viendra plus tard, notée dans `TASKS.md`.
+- **Relecture `reviewer` (2026-11-07).** Corrigés : points à la première approbation seulement (même si l'action
+  est réactivée entre-temps), onglet « Publiés » fondé sur la version en ligne, adresse sous verrou de
+  transaction (deux approbations simultanées de même titre), brouillons hors de la file et de l'aperçu, trace du
+  refus d'une révision tombée avec une dépublication, plafonds sous verrou de l'auteur, club bénéficiaire actif
+  seulement, encadreur non vérifié refusé à l'approbation, fonction libre jamais publiée. Écarts assumés : la
+  cloche n'apparaît pas dans l'en-tête admin, puisqu'aucune notification ne vise encore un collaborateur ; le cas
+  d'une même personne avec deux comptes est noté dans la spec.
 - **Sur-engineering écarté.** Pas de bibliothèque de flux de travail, pas de comparaison mot à mot entre versions
   (avant / après par champ suffit), pas de temps réel pour la cloche (rechargée à chaque navigation).

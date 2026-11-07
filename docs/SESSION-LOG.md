@@ -14,6 +14,24 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-07 — « Quel axe » animée, spec 023 (centre de modération, articles, notifications)
+
+- Fait : section « Quel axe » plus haute et animée (poussée sur develop). Spec 023 livrée, R6 en deux temps
+  (photos en spec 024) : moteur de modération commun (ADR-0009 : `contenu`, `version_contenu`,
+  `decision_moderation`, six états, quatre décisions avec motif, verrou et version, périmètre DRE, auteur jamais
+  juge de son contenu), articles en Markdown restreint (`react-markdown` 10.1.0, sans HTML ni lien), pages
+  `/articles`, « Mes articles », centre de modération admin, cloche et `/notifications`. +50 à la première
+  approbation seulement ; le club bénéficiaire est enregistré pour R13. Relecture `reviewer` : 3 constats
+  importants et 10 mineurs corrigés ou documentés. API 761 tests, site 102.
+- Pièges rencontrés : l'autoflush écrit l'en-tête avant la fin d'une transition (contraintes CHECK) : faire les
+  lectures avant de modifier. Deux schémas Pydantic de même nom (`Apercu`, `DecisionEntree`) cassent les types
+  du site. Bun n'est pas installé : `npx -y bun@1.4.4 add …` garde `bun.lock` à jour. La lecture des mots de
+  passe de démonstration est refusée à l'agent : le parcours connecté n'a pas été vérifié dans le navigateur.
+- Décisions : spec 023 (photos sur le disque du VPS, modération nationale ou DRE, signature « Prénom N.,
+  fonction », livraison en deux temps).
+- Prochaine étape : pousser sur develop (migration `moderation_articles_notifications`), essayer le parcours
+  connecté en local, puis `/spec` 024 (photos).
+
 ### 2026-11-06 (soir) — Harmonisation du barème (spec 022) et retouches de l'accueil
 
 - Fait : nouveau design de « Quel axe » (pleine largeur, sept mascottes officielles), mascottes du podium agrandies

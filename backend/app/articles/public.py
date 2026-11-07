@@ -54,13 +54,8 @@ async def signature(db: AsyncSession, contenu: Contenu) -> Signature:
             )
         return Signature(profil="eleve", nom=eleve.pseudonyme if eleve else "Un élève", club=club)
     encadreur = await db.get(Encadreur, auteur.id)
-    fonction = None
-    if encadreur:
-        fonction = (
-            encadreur.fonction_precision
-            if encadreur.fonction is Fonction.autre and encadreur.fonction_precision
-            else FONCTIONS[encadreur.fonction]
-        )
+    # Le libellé de la liste seulement : la précision d'une fonction « autre » est un texte libre, jamais publié.
+    fonction = FONCTIONS[encadreur.fonction] if encadreur else None
     initiale = f" {auteur.nom.strip()[:1].upper()}." if auteur.nom.strip() else ""
     return Signature(profil="encadreur", nom=f"{auteur.prenom.strip()}{initiale}", fonction=fonction)
 

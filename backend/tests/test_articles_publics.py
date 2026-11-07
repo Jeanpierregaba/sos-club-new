@@ -194,3 +194,117 @@ def test_la_liste_se_filtre_par_axe_et_se_pagine(
     assert [a["titre"] for a in page2["articles"]] == ["Premier"]
     assert [a["titre"] for a in imhotep["articles"]] == ["Premier"]
     assert client.get(PUBLICS, params={"page": 0}).status_code == 422
+
+
+# Constats de la relecture ------------------------------------------------------------------------------------------
+
+
+def test_seule_la_version_en_ligne_se_lit_pendant_une_correction_ou_un_brouillon(
+    client: TestClient, auteur: Navigateur, moderateur: Navigateur
+) -> None:
+    adresse = publier(auteur, moderateur)
+    article_id = auteur.get(ARTICLES).json()["articles"][0]["id"]
+    actuel = auteur.get(f"{ARTICLES}/{article_id}").json()
+    auteur.request(
+        "PATCH", f"{ARTICLES}/{article_id}", json=champs(titre="Brouillon privé") | {"version": actuel["version"]}
+    )
+    assert client.get(f"{PUBLICS}/{adresse}").json()["titre"] == "Le lavage des mains au lycée"
+
+    actuel = auteur.get(f"{ARTICLES}/{article_id}").json()
+    auteur.post(f"{ARTICLES}/{article_id}/soumettre", json={"version": actuel["version"]})
+    decider(moderateur, article_id, "corriger", "Précise.")
+
+    assert client.get(f"{PUBLICS}/{adresse}").json()["titre"] == "Le lavage des mains au lycée"
+    assert [a["titre"] for a in client.get(PUBLICS).json()["articles"]] == ["Le lavage des mains au lycée"]
+
+
+def test_un_article_depublie_avec_un_brouillon_reste_invisible(
+    client: TestClient, auteur: Navigateur, moderateur: Navigateur
+) -> None:
+    adresse = publier(auteur, moderateur)
+    article_id = auteur.get(ARTICLES).json()["articles"][0]["id"]
+    decider(moderateur, article_id, "depublier", "Signalé.")
+    actuel = auteur.get(f"{ARTICLES}/{article_id}").json()
+    auteur.request(
+        "PATCH", f"{ARTICLES}/{article_id}", json=champs(titre="Version corrigée") | {"version": actuel["version"]}
+    )
+
+    assert client.get(f"{PUBLICS}/{adresse}").status_code == 404
+    assert client.get(PUBLICS).json()["total"] == 0
+
+
+def test_un_auteur_suspendu_garde_son_article_publie(
+    client: TestClient, auteur: Navigateur, moderateur: Navigateur, en_base: Callable[..., Any]
+) -> None:
+    from sqlalchemy import update
+
+    from app.comptes.models import StatutCompte
+
+    adresse = publier(auteur, moderateur)
+    en_base(
+        lambda db: db.execute(
+            update(Utilisateur).where(Utilisateur.identifiant == "eleve1").values(statut=StatutCompte.suspendu)
+        )
+    )
+
+    assert client.get(f"{PUBLICS}/{adresse}").status_code == 200
+
+
+def test_le_club_disparait_de_la_signature_quand_laffiliation_prend_fin(
+    client: TestClient,
+    creer_eleve: Callable[..., Utilisateur],
+    creer_club: Callable[..., Any],
+    moderateur: Navigateur,
+    en_base: Callable[..., Any],
+) -> None:
+    from sqlalchemy import update
+
+    from app.clubs.models import Adhesion, EtatAdhesion
+
+    president = creer_eleve("president", "La Présidente")
+    creer_club(president)
+    navigateur = Navigateur(client)
+    connecter(navigateur, "president")
+    adresse = publier(navigateur, moderateur)
+    en_base(lambda db: db.execute(update(Adhesion).values(etat=EtatAdhesion.retiree)))
+
+    assert client.get(f"{PUBLICS}/{adresse}").json()["signature"]["club"] is None
+
+
+def test_un_axe_desactive_apres_publication_garde_ses_articles(
+    client: TestClient, auteur: Navigateur, moderateur: Navigateur, en_base: Callable[..., Any]
+) -> None:
+    from sqlalchemy import update
+
+    from app.referentiel.models import Axe
+
+    adresse = publier(auteur, moderateur)
+    en_base(lambda db: db.execute(update(Axe).where(Axe.code == "sante-environnement").values(actif=False)))
+
+    assert client.get(f"{PUBLICS}/{adresse}").status_code == 200
+    assert client.get(PUBLICS, params={"axe": "sante-environnement"}).json()["total"] == 1
+
+
+def test_une_fonction_libre_nest_jamais_publiee(
+    client: TestClient, creer_encadreur: Callable[..., Any], moderateur: Navigateur, en_base: Callable[..., Any]
+) -> None:
+    from sqlalchemy import update
+
+    from app.encadreurs.models import Encadreur, Fonction
+
+    encadreur = creer_encadreur()
+    en_base(
+        lambda db: db.execute(
+            update(Encadreur)
+            .where(Encadreur.utilisateur_id == encadreur.id)
+            .values(fonction=Fonction.autre, fonction_precision="Jean Kodjo, surveillant")
+        )
+    )
+    navigateur = Navigateur(client)
+    connecter(navigateur, "encadreur1")
+
+    adresse = publier(navigateur, moderateur)
+
+    reponse = client.get(f"{PUBLICS}/{adresse}")
+    assert reponse.json()["signature"]["fonction"] == "encadreur"
+    assert "Kodjo" not in reponse.text

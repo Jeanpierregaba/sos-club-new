@@ -52,6 +52,7 @@ const CHAMPS: { cle: string; libelle: string }[] = [
   { cle: "chapo", libelle: "Chapô" },
   { cle: "axe_code", libelle: "Axe" },
   { cle: "texte", libelle: "Texte" },
+  { cle: "afficher_club", libelle: "Club affiché" },
 ];
 
 const DECISIONS: Record<Decision, { titre: string; bouton: string; aide: string }> = {
@@ -299,10 +300,17 @@ function Apercu({
 
   const soumise = apercu?.soumise as Record<string, string> | null | undefined;
   const publiee = apercu?.publiee as Record<string, string> | null | undefined;
-  const affichee = soumise ?? publiee;
+  const enAttente = apercu?.etat === "en_attente";
+  // En attente : la version soumise. Sinon : ce qui est en ligne (le modérateur qui dépublie lit ce qui est publié).
+  const affichee = enAttente ? soumise : (publiee ?? soumise);
   const changements =
     soumise && publiee ? CHAMPS.filter((c) => soumise[c.cle] !== publiee[c.cle]) : [];
-  const enAttente = apercu?.etat === "en_attente";
+  const valeur = (cle: string, champs: Record<string, string> | null | undefined) => {
+    const v: unknown = champs?.[cle];
+    if (cle === "axe_code") return libelleAxe(typeof v === "string" ? v : null);
+    if (typeof v === "boolean") return v ? "Oui" : "Non";
+    return typeof v === "string" ? v : "";
+  };
 
   return (
     <Dialog open={id !== null} onOpenChange={(o) => !o && onFerme()}>
@@ -365,7 +373,7 @@ function Apercu({
                         {c.libelle} · avant
                       </p>
                       <p className="mt-1 max-h-48 overflow-y-auto whitespace-pre-line rounded-xl bg-white p-3">
-                        {c.cle === "axe_code" ? libelleAxe(publiee?.[c.cle]) : publiee?.[c.cle]}
+                        {valeur(c.cle, publiee)}
                       </p>
                     </div>
                     <div>
@@ -373,7 +381,7 @@ function Apercu({
                         {c.libelle} · après
                       </p>
                       <p className="mt-1 max-h-48 overflow-y-auto whitespace-pre-line rounded-xl bg-white p-3 ring-2 ring-sky/40">
-                        {c.cle === "axe_code" ? libelleAxe(soumise?.[c.cle]) : soumise?.[c.cle]}
+                        {valeur(c.cle, soumise)}
                       </p>
                     </div>
                   </div>

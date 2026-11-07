@@ -78,6 +78,11 @@ async def _nouvelle_version(db: AsyncSession, contenu: Contenu, donnees: dict[st
     return nouvelle
 
 
+async def _verrouiller_auteur(db: AsyncSession, auteur: Utilisateur) -> None:
+    """Sérialise les créations et soumissions d'un même auteur : les plafonds se comptent sans course."""
+    await db.execute(select(Utilisateur.id).where(Utilisateur.id == auteur.id).with_for_update())
+
+
 async def dre_de(db: AsyncSession, auteur: Utilisateur) -> str | None:
     """DRE de l'établissement de l'auteur : elle fixe le périmètre de la file."""
     profil: type[Eleve | Encadreur] = Eleve if auteur.role is Role.eleve else Encadreur
@@ -90,6 +95,7 @@ async def dre_de(db: AsyncSession, auteur: Utilisateur) -> str | None:
 
 
 async def creer(db: AsyncSession, auteur: Utilisateur, type: str, donnees: dict[str, Any]) -> Contenu:
+    await _verrouiller_auteur(db, auteur)
     brouillons = await db.scalar(
         select(func.count())
         .select_from(Contenu)
@@ -136,6 +142,7 @@ async def soumettre(db: AsyncSession, contenu: Contenu, auteur: Utilisateur, adr
     travail = await version(db, contenu.version_travail_id)
     if travail is None or travail.etat is not EtatVersion.travail:
         raise Refus("Corrige ton contenu avant de le soumettre de nouveau.", 409)
+    await _verrouiller_auteur(db, auteur)
     en_attente = await db.scalar(
         select(func.count())
         .select_from(Contenu)

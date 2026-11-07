@@ -30,6 +30,6 @@
 
 **Clôture**
 
-- [ ] 13. Documentation (`ARCHITECTURE.md`, `SECURITY.md`, index des ADR), vérification de chaque critère en local
+- [x] 13. Documentation (`ARCHITECTURE.md`, `SECURITY.md`, index des ADR), vérification de chaque critère en local
       et dans le navigateur, sur téléphone ; relecture par le sous-agent `reviewer` et corrections ; `TASKS.md` et
       `docs/SESSION-LOG.md`.

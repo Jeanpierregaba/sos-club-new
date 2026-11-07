@@ -8,8 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] R6 — [023 Centre de modération, articles et notifications](docs/specs/023-moderation-et-articles/spec.md)
-  (moteur ADR-0009 ; les photos suivront dans la spec 024)
+Rien en cours : prochaine spec, 024 (photos des articles : stockage sur le disque du VPS, attestation Q8), puis R7.
 
 ## À faire
 
@@ -29,7 +28,8 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 **Phase 2 — Modération et publications (P0, jalon A)**
 
-- [ ] R6 — Centre de modération, articles et notifications internes, avec un ADR sur le moteur de modération (Q8)
+- [x] R6 — Centre de modération, articles et notifications internes (spec 023, ADR-0009)
+- [ ] 024 — Photos des articles : stockage sur le disque du VPS (ADR-0005), attestation de l'auteur (Q8), recompression et retrait des métadonnées
 - [ ] R7 — Commentaires prémodérés (Q22)
 - [ ] Purge des notifications lues de plus d'un an (signalée par la spec 023)
 - [ ] R8 — Espace du président : tableau de bord, fiche, actualités du club (Q20)
@@ -46,7 +46,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 **Phase 5 — Classements (P0, jalon B)**
 
-- [ ] R13 — Classements Club, DRE et national, tableaux de bord, module Points (Q21) ; brancher les lignes des clubs dans `points.service.scores_des_clubs`, que lit déjà le podium de l'accueil (spec 021), et créditer les parts Club du barème harmonisé (spec 022 : compte, commentaire, quiz, question du jour +10, badges, certification), affiliation active au moment du crédit
+- [ ] R13 — Classements Club, DRE et national, tableaux de bord, module Points (Q21) ; brancher les lignes des clubs dans `points.service.scores_des_clubs`, que lit déjà le podium de l'accueil (spec 021), et créditer `club.article_eleve` aux clubs enregistrés dans `contenu.club_beneficiaire_id` (spec 023) et les parts Club du barème harmonisé (spec 022 : compte, commentaire, quiz, question du jour +10, badges, certification), affiliation active au moment du crédit
 - [ ] R14 — Clôture de semestre et Top 3 (Q21, Q25)
 - [ ] Avant l'ouverture : récépissé de l'IPDCP, avis juridique, sauvegardes hors du VPS, audit de sécurité (Q8, Q9)
 
@@ -75,6 +75,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] [023 — Centre de modération, articles et notifications](docs/specs/023-moderation-et-articles/spec.md) (moteur commun ADR-0009 : six états, versions, quatre décisions, périmètre DRE ; articles en texte, pages publiques, cloche des notifications ; +50 à la première approbation, club bénéficiaire enregistré pour R13)
 - [x] [022 — Harmonisation du barème](docs/specs/022-harmonisation-bareme/spec.md) (référentiel de gamification du 2026-11-05 : barème unique API, admin et site ; question du jour à +20, une réponse par élève et par jour, question propre à chaque élève)
 - [x] [021 — Accueil : « Quel axe », défi du jour, podium](docs/specs/021-accueil-jeux-decouverte/spec.md) (jeu de découverte réservé aux élèves, banque de défis en base, Top 3 des lycées avec état d'attente)
 - [x] [020 — Affiliations et rattachements](docs/specs/020-affiliations-et-rattachements/spec.md) (R5 : adhésion de l'élève confirmée par le président puis validée en lot par la DRE, rattachement des encadreurs avec club supplémentaire réservé au national, liste des membres, passation confirmée par un encadreur rattaché — Q19)

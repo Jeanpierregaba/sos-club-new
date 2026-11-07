@@ -69,35 +69,36 @@ des articles : stockage, attestations Q8, recompression). Les articles de la spe
 
 ## Critères d'acceptation
 
-- [ ] Étant donné un élève ou un encadreur actif, quand il enregistre un brouillon puis le soumet, alors l'article
+- [x] Étant donné un élève ou un encadreur actif, quand il enregistre un brouillon puis le soumet, alors l'article
       passe « en attente » et apparaît dans la file de modération.
-- [ ] Étant donné un encadreur en attente de vérification, ou un compte suspendu, quand il crée ou soumet un
+- [x] Étant donné un encadreur en attente de vérification, ou un compte suspendu, quand il crée ou soumet un
       article, alors l'API répond 403.
-- [ ] Étant donné un article en brouillon, en attente, à corriger, refusé ou dépublié, alors il n'apparaît ni sur
+- [x] Étant donné un article en brouillon, en attente, à corriger, refusé ou dépublié, alors il n'apparaît ni sur
       `/articles`, ni par son adresse (404), ni dans l'API publique, ni dans une recherche, ni dans une
       notification adressée à quelqu'un d'autre que son auteur.
-- [ ] Étant donné un article en attente, quand un collaborateur habilité l'approuve, alors il est publié, l'auteur
+- [x] Étant donné un article en attente, quand un collaborateur habilité l'approuve, alors il est publié, l'auteur
       reçoit une seule ligne de points au montant du barème, et le club de l'élève affilié est enregistré comme
       bénéficiaire.
-- [ ] Étant donné deux approbations simultanées du même article, alors une seule réussit et une seule ligne de
+- [x] Étant donné deux approbations simultanées du même article, alors une seule réussit et une seule ligne de
       points existe pour l'auteur.
-- [ ] Étant donné un article publié, quand l'auteur soumet une nouvelle version, alors l'ancienne reste en ligne
+- [x] Étant donné un article publié, quand l'auteur soumet une nouvelle version, alors l'ancienne reste en ligne
       jusqu'à la décision, et l'approbation de la nouvelle ne crédite aucun point.
-- [ ] Étant donné un refus, une demande de correction ou une dépublication sans motif, alors l'API répond 422.
-- [ ] Étant donné une décision, alors l'auteur reçoit une notification avec le motif, et elle figure au journal
+- [x] Étant donné un refus, une demande de correction ou une dépublication sans motif, alors l'API répond 422.
+- [x] Étant donné une décision, alors l'auteur reçoit une notification avec le motif, et elle figure au journal
       d'audit avec son auteur.
-- [ ] Étant donné un collaborateur sans le droit de modération, ou hors de son périmètre, quand il lit la file ou
+- [x] Étant donné un collaborateur sans le droit de modération, ou hors de son périmètre, quand il lit la file ou
       décide, alors l'API répond 403 (ou ne lui montre pas le contenu).
-- [ ] Étant donné un collaborateur qui est aussi l'auteur du contenu, quand il tente de le décider, alors l'API
+- [x] Étant donné un collaborateur qui est aussi l'auteur du contenu, quand il tente de le décider, alors l'API
       répond 403 (un auteur ne valide jamais son propre contenu).
-- [ ] Étant donné un article publié d'un encadreur, alors la page et l'API publique ne montrent que son prénom,
+- [x] Étant donné un article publié d'un encadreur, alors la page et l'API publique ne montrent que son prénom,
       l'initiale de son nom et sa fonction ; pour un élève, que son pseudonyme et son club.
-- [ ] Étant donné un texte contenant du HTML ou un lien `javascript:`, alors il est affiché comme du texte, sans
+- [x] Étant donné un texte contenant du HTML ou un lien `javascript:`, alors il est affiché comme du texte, sans
       être interprété.
-- [ ] Étant donné des notifications non lues, quand l'utilisateur les marque comme lues, alors le compteur de la
+- [x] Étant donné des notifications non lues, quand l'utilisateur les marque comme lues, alors le compteur de la
       cloche baisse ; personne ne lit les notifications d'un autre.
 - [ ] Le site affiche l'éditeur, la liste « Mes articles », la file et l'aperçu admin, les pages publiques et le
-      centre de notifications, lisibles sur téléphone.
+      centre de notifications, lisibles sur téléphone. (Pages publiques vérifiées sur téléphone ; éditeur, file
+      admin et cloche à vérifier connecté, le 2026-11-07.)
 
 ## Cas limites et erreurs
 
@@ -111,6 +112,12 @@ des articles : stockage, attestations Q8, recompression). Les articles de la spe
   l'affiliation est validée au moment de l'approbation.
 - **Dépublication** : les points restent acquis ; l'admin peut les corriger par un ajustement manuel du
   registre (spec 015). Un article dépublié ne se republie pas : l'auteur peut proposer une nouvelle version.
+- **Axe désactivé** entre la soumission et la première approbation : l'article est publié avec cet axe ; il
+  était valide quand l'auteur l'a choisi, et le modérateur peut demander une correction.
+- **Encadreur qui n'est plus vérifié** au moment de l'approbation : 409, rien n'est publié ni crédité.
+- **Une même personne avec deux comptes** (encadreur et collaborateur) : les rôles sont exclusifs, un compte
+  admin ne rédige pas. La règle « un auteur ne décide jamais de son contenu » se vérifie par compte ; le cas de
+  deux comptes d'une même personne relève de la charte des collaborateurs, pas du code.
 - **Axe désactivé** après la publication : l'article reste publié et rattaché à cet axe (spec 016).
 - **Action du barème désactivée** à l'approbation : la publication réussit sans ligne de points.
 - **Brouillon abandonné** : l'auteur peut le supprimer ; un contenu déjà soumis ne se supprime pas, il garde
