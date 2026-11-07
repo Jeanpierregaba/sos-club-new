@@ -23,8 +23,25 @@ from app.comptes.inscription import Refus
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur, EtatVerification
-from app.moderation.models import Contenu, DecisionModeration, EtatContenu, EtatVersion, TypeDecision, VersionContenu
-from app.moderation.schemas import ApercuModeration, AuteurFile, DecisionPassee, ElementFile, FileModeration
+from app.moderation.models import (
+    Contenu,
+    DecisionModeration,
+    EtatContenu,
+    EtatVersion,
+    Photo,
+    TypeDecision,
+    VersionContenu,
+    VersionPhoto,
+)
+from app.moderation.photos import photos_de
+from app.moderation.schemas import (
+    ApercuModeration,
+    AuteurFile,
+    DecisionPassee,
+    ElementFile,
+    FileModeration,
+    PhotoModeration,
+)
 from app.moderation.service import Introuvable
 from app.moderation.types import type_de
 from app.notifications.service import notifier
@@ -159,9 +176,12 @@ async def apercu(db: AsyncSession, acces: Acces, contenu_id: UUID) -> ApercuMode
         .where(DecisionModeration.contenu_id == contenu.id)
         .order_by(DecisionModeration.decide_le.desc(), DecisionModeration.id.desc())
     )
+    autre = soumise.id != contenu.version_publiee_id
     return ApercuModeration(
         **_element(*ligne).model_dump(),
-        soumise=soumise.donnees if soumise.id != contenu.version_publiee_id else None,
+        soumise=soumise.donnees if autre else None,
+        photos_soumises=[_photo(p, ph) for p, ph in await photos_de(db, soumise.id)] if autre else [],
+        photos_publiees=[_photo(p, ph) for p, ph in await photos_de(db, contenu.version_publiee_id)],
         publiee=publiee.donnees if publiee else None,
         decisions=[
             DecisionPassee(
@@ -173,6 +193,14 @@ async def apercu(db: AsyncSession, acces: Acces, contenu_id: UUID) -> ApercuMode
             for decision, decideur in passees
         ],
     )
+
+
+def _photo(placement: VersionPhoto, photo: Photo) -> PhotoModeration:
+    return PhotoModeration(
+        id=photo.id, legende=placement.legende, couverture=placement.couverture, ordre=placement.ordre,
+        largeur=photo.largeur, hauteur=photo.hauteur, attestation=photo.attestation, attestee_le=photo.attestee_le,
+        effacee=photo.efface_le is not None,
+    )  # fmt: skip
 
 
 # Décisions -----------------------------------------------------------------------------------------------------

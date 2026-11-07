@@ -59,8 +59,22 @@ class DecisionPassee(BaseModel):
     decide_le: datetime
 
 
+class PhotoModeration(BaseModel):
+    id: UUID
+    legende: str | None
+    couverture: bool
+    ordre: int
+    largeur: int
+    hauteur: int
+    attestation: str
+    attestee_le: datetime
+    effacee: bool
+
+
 class ApercuModeration(ElementFile):
     # Les champs de la version soumise (ou de travail), et ceux de la version en ligne : l'admin compare.
     soumise: dict[str, Any] | None
     publiee: dict[str, Any] | None
+    photos_soumises: list[PhotoModeration]
+    photos_publiees: list[PhotoModeration]
     decisions: list[DecisionPassee]

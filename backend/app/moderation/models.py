@@ -119,3 +119,40 @@ class DecisionModeration(Base):
     motif: Mapped[str | None] = mapped_column(String(1000))
     decide_par: Mapped[UUID | None] = mapped_column(ForeignKey("utilisateur.id", ondelete="SET NULL"))
     decide_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Photo(Base):
+    """Une photo envoyée par l'auteur d'un contenu (spec 024) : ses fichiers et son attestation (Q8). Son placement
+    (légende, ordre, couverture) appartient à chaque version qui l'utilise (`VersionPhoto`)."""
+
+    __tablename__ = "photo"
+    __table_args__ = (Index("ix_photo_contenu_id", "contenu_id"),)
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    contenu_id: Mapped[UUID] = mapped_column(ForeignKey("contenu.id", ondelete="CASCADE"))
+    auteur_id: Mapped[UUID] = mapped_column(ForeignKey("utilisateur.id", ondelete="RESTRICT"))
+    cle_grande: Mapped[str] = mapped_column(String(120))
+    cle_vignette: Mapped[str] = mapped_column(String(120))
+    largeur: Mapped[int] = mapped_column(Integer)
+    hauteur: Mapped[int] = mapped_column(Integer)
+    octets: Mapped[int] = mapped_column(Integer)
+    # Le texte accepté par l'auteur, copié tel qu'il était affiché.
+    attestation: Mapped[str] = mapped_column(String(500))
+    attestee_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    cree_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    # Fichiers effacés (90 jours après un refus) : la ligne reste pour l'historique.
+    efface_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class VersionPhoto(Base):
+    __tablename__ = "version_photo"
+    __table_args__ = (
+        Index("uq_version_photo_couverture", "version_id", unique=True, postgresql_where=text("couverture")),
+        Index("ix_version_photo_photo_id", "photo_id"),
+    )
+
+    version_id: Mapped[UUID] = mapped_column(ForeignKey("version_contenu.id", ondelete="CASCADE"), primary_key=True)
+    photo_id: Mapped[UUID] = mapped_column(ForeignKey("photo.id", ondelete="RESTRICT"), primary_key=True)
+    ordre: Mapped[int] = mapped_column(Integer)
+    legende: Mapped[str | None] = mapped_column(String(200))
+    couverture: Mapped[bool] = mapped_column(server_default=text("false"))

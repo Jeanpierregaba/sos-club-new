@@ -62,6 +62,29 @@ class DerniereDecision(BaseModel):
     decide_le: datetime
 
 
+Legende = Annotated[
+    str, StringConstraints(strip_whitespace=True, max_length=200), AfterValidator(_propre), AfterValidator(_une_ligne)
+]
+
+
+class PhotoAuteur(BaseModel):
+    id: UUID
+    legende: str | None
+    couverture: bool
+    ordre: int
+    largeur: int
+    hauteur: int
+    # Fichiers effacés 90 jours après un refus : il ne reste que la légende et l'attestation.
+    effacee: bool
+
+
+class PhotoModification(BaseModel):
+    version: int
+    legende: Legende | None = None
+    couverture: bool | None = None
+    ordre: int | None = Field(default=None, ge=0, le=100)
+
+
 class ArticleAuteur(BaseModel):
     id: UUID
     etat: EtatContenu
@@ -75,6 +98,7 @@ class ArticleAuteur(BaseModel):
     soumettable: bool
     supprimable: bool
     derniere_decision: DerniereDecision | None
+    photos: list[PhotoAuteur]
     soumis_le: datetime | None
     publie_le: datetime | None
     modifie_le: datetime
@@ -111,12 +135,20 @@ class AxeArticle(BaseModel):
     libelle: str
 
 
+class PhotoPublique(BaseModel):
+    id: UUID
+    legende: str | None
+    largeur: int
+    hauteur: int
+
+
 class ResumeArticle(BaseModel):
     adresse: str
     titre: str
     chapo: str
     axe: AxeArticle
     signature: Signature
+    couverture: PhotoPublique | None
     publie_le: date
 
 
@@ -129,3 +161,5 @@ class ArticlesPublics(BaseModel):
 
 class ArticlePublic(ResumeArticle):
     texte: str
+    # Les autres photos, en galerie sous le texte (spec 024).
+    photos: list[PhotoPublique]

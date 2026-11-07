@@ -9,7 +9,7 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID, uuid7
 
-from sqlalchemy import func, select
+from sqlalchemy import Uuid, func, insert, literal, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.journal import journaliser
@@ -17,7 +17,7 @@ from app.comptes.inscription import Refus
 from app.comptes.models import Role, Utilisateur
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur
-from app.moderation.models import Contenu, EtatContenu, EtatVersion, VersionContenu
+from app.moderation.models import Contenu, EtatContenu, EtatVersion, VersionContenu, VersionPhoto
 from app.referentiel.models import Etablissement, Iesg
 
 MAX_EN_ATTENTE = 3
@@ -68,12 +68,24 @@ async def version_visible_auteur(db: AsyncSession, contenu: Contenu) -> VersionC
 
 
 async def _nouvelle_version(db: AsyncSession, contenu: Contenu, donnees: dict[str, Any]) -> VersionContenu:
+    """Une version de travail, qui reprend les photos de la version qu'elle remplace (spec 024)."""
     numero = (
         await db.scalar(select(func.max(VersionContenu.numero)).where(VersionContenu.contenu_id == contenu.id))
     ) or 0
+    precedente = (await version_visible_auteur(db, contenu)).id if numero else None
     nouvelle = VersionContenu(id=uuid7(), contenu_id=contenu.id, numero=numero + 1, donnees=donnees)
     db.add(nouvelle)
     await db.flush()
+    if precedente:
+        await db.execute(
+            insert(VersionPhoto).from_select(
+                ["version_id", "photo_id", "ordre", "legende", "couverture"],
+                select(
+                    literal(nouvelle.id, type_=Uuid), VersionPhoto.photo_id, VersionPhoto.ordre, VersionPhoto.legende,
+                    VersionPhoto.couverture,
+                ).where(VersionPhoto.version_id == precedente),
+            )
+        )  # fmt: skip
     contenu.version_travail_id = nouvelle.id
     return nouvelle
 
@@ -116,8 +128,9 @@ async def creer(db: AsyncSession, auteur: Utilisateur, type: str, donnees: dict[
     return contenu
 
 
-async def modifier(db: AsyncSession, contenu: Contenu, donnees: dict[str, Any]) -> None:
-    """À appeler sur un contenu verrouillé, version contrôlée."""
+async def ouvrir_travail(db: AsyncSession, contenu: Contenu) -> VersionContenu:
+    """La version de travail, ouverte au besoin à partir de la version visible (texte et photos). À appeler sur un
+    contenu verrouillé, version contrôlée."""
     if contenu.etat not in MODIFIABLES:
         raise Refus(
             "Ce contenu est en cours de modération : retire-le de la file pour le modifier."
@@ -126,14 +139,20 @@ async def modifier(db: AsyncSession, contenu: Contenu, donnees: dict[str, Any]) 
             409,
         )
     travail = await version(db, contenu.version_travail_id)
-    if travail is not None and travail.etat is EtatVersion.travail:
-        travail.donnees = donnees
-    else:
+    if travail is None or travail.etat is not EtatVersion.travail:
         # Une version à corriger reste dans l'historique ; un contenu publié garde sa version en ligne.
-        await _nouvelle_version(db, contenu, donnees)
+        visible = await version_visible_auteur(db, contenu)
+        travail = await _nouvelle_version(db, contenu, dict(visible.donnees))
     if contenu.etat in {EtatContenu.publie, EtatContenu.depublie}:
         contenu.etat = EtatContenu.brouillon
     contenu.modifie_le = datetime.now(UTC)
+    return travail
+
+
+async def modifier(db: AsyncSession, contenu: Contenu, donnees: dict[str, Any]) -> None:
+    """À appeler sur un contenu verrouillé, version contrôlée."""
+    travail = await ouvrir_travail(db, contenu)
+    travail.donnees = donnees
 
 
 async def soumettre(db: AsyncSession, contenu: Contenu, auteur: Utilisateur, adresse_ip: str) -> None:

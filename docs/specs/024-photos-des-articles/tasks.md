@@ -6,7 +6,7 @@
 
 - [x] 1. Pillow (doc relue), `app/fichiers/stockage.py` et `images.py`, `dossier_fichiers` dans la configuration.
       Avec `test_fichiers.py`.
-- [ ] 2. Modèles `Photo` et `VersionPhoto`, migration `photos_des_contenus` ; `_nouvelle_version` recopie les
+- [x] 2. Modèles `Photo` et `VersionPhoto`, migration `photos_des_contenus` ; `_nouvelle_version` recopie les
       photos.
 
 **API, photos**

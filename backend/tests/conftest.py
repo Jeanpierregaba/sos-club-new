@@ -71,6 +71,16 @@ def tables_vides() -> None:
     asyncio.run(_vider_tables())
 
 
+@pytest.fixture(autouse=True)
+def dossier_fichiers(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Chaque test écrit ses fichiers (spec 024) dans un dossier temporaire, jamais dans backend/var."""
+    from app.config import settings
+
+    dossier = tmp_path / "fichiers"
+    monkeypatch.setattr(settings, "dossier_fichiers", dossier)
+    return dossier
+
+
 @pytest.fixture
 def annuaire() -> None:
     """Charge en plus les établissements de l'annuaire (838 lignes)."""
