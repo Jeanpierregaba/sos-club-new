@@ -34,6 +34,7 @@ type Recherche = {
   etat?: Etat | undefined;
   axe?: string | undefined;
   profil?: "eleve" | "encadreur" | undefined;
+  dre?: string | undefined;
 };
 type Decision = "corriger" | "refuser" | "depublier";
 
@@ -76,12 +77,14 @@ export const Route = createFileRoute("/_connecte/admin/moderation")({
     const etat =
       typeof search["etat"] === "string" && ETATS.has(search["etat"]) ? search["etat"] : null;
     const axe = typeof search["axe"] === "string" ? search["axe"] : null;
+    const dre = typeof search["dre"] === "string" ? search["dre"] : null;
     const profil =
       search["profil"] === "eleve" || search["profil"] === "encadreur" ? search["profil"] : null;
     return {
       ...(etat && etat !== "en_attente" ? { etat: etat as Etat } : {}),
       ...(axe ? { axe } : {}),
       ...(profil ? { profil } : {}),
+      ...(dre ? { dre } : {}),
     };
   },
   beforeLoad: ({ context }) => {
@@ -94,6 +97,7 @@ export const Route = createFileRoute("/_connecte/admin/moderation")({
         etat: deps.etat ?? "en_attente",
         axe: deps.axe,
         profil: deps.profil,
+        dre: deps.dre,
       }),
       chargerAxes().catch(() => []),
     ]);
@@ -174,6 +178,24 @@ function Moderation() {
           <option value="eleve">Élèves</option>
           <option value="encadreur">Encadreurs</option>
         </select>
+        {/* Un collaborateur de DRE ne voit que la sienne : le filtre ne sert qu'au niveau national. */}
+        {!admin.perimetre_dre && (
+          <select
+            aria-label="Filtrer par DRE"
+            value={recherche.dre ?? ""}
+            onChange={(e) =>
+              void navigate({ search: { ...recherche, dre: e.target.value || undefined } })
+            }
+            className="h-10 rounded-full border bg-white px-4 text-sm font-semibold"
+          >
+            <option value="">Toutes les DRE</option>
+            {Object.entries(catalogue.dre).map(([code, nom]) => (
+              <option key={code} value={code}>
+                {nom}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {file.contenus.length === 0 ? (

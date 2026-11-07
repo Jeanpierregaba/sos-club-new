@@ -56,6 +56,9 @@ erDiagram
   badge ||--o{ badge_attribue : "attribué via"
   utilisateur ||--o{ badge_attribue : recoit
   utilisateur ||--o{ notification : recoit
+  utilisateur ||--o{ contenu : "rédige (spec 023)"
+  contenu ||--o{ version_contenu : "versions"
+  contenu ||--o{ decision_moderation : "décisions"
 ```
 
 Champs structurants :
@@ -121,6 +124,17 @@ Champs structurants :
   `demande_le`, `decide_le`, `decide_par`, `motif_refus`, `charte_version`. L'état est distinct de
   `utilisateur.statut` (la suspension, qui prime). Seul un encadreur actif passera la dépendance
   `encadreur_actif`, que les clubs et les rattachements (R4, R5) utiliseront.
+- `contenu`, `version_contenu`, `decision_moderation` (spec 023, ADR-0009) : le moteur commun de modération.
+  L'en-tête `contenu` porte le `type` (`article` pour l'instant), l'auteur, l'`etat` (brouillon, en_attente,
+  a_corriger, refuse, publie, depublie), `version_publiee_id` (seule source de ce qui est en ligne),
+  `version_travail_id`, l'`adresse` publique (fixée à la première approbation), l'axe et `afficher_club` de la
+  version en ligne, `dre_code` (copiée à la soumission, périmètre de la file) et `club_beneficiaire_id` (club de
+  l'élève affilié à la première approbation, que R13 créditera). Les champs du type vivent dans
+  `version_contenu.donnees` (JSONB, validés par le schéma du type à chaque écriture) ; une version soumise ne
+  change plus. Chaque décision (approuver, corriger, refuser, depublier) a sa ligne, motif obligatoire sauf
+  pour approuver.
+- `notification` (spec 023) : `utilisateur_id`, `type`, `titre`, `message`, `lien`, `lue_le`. Écrite dans la
+  transaction de l'événement ; seul son destinataire la lit.
 - `mouvement_points` (spec 017, ADR-0004) : `utilisateur_id` (R4 ajoutera `club_id`), `action` (code du
   barème), `montant` copié du barème au moment du gain, `semestre_id` (nul hors semestre), `cle` unique
   d'idempotence, `valide_par`, `annule_id` (une annulation est une ligne négative), `cree_le`. Jamais
@@ -152,7 +166,7 @@ flowchart LR
 - **Site** : rendu serveur pour les pages publiques (référencement, affichage rapide sur réseau lent).
   Il n'a aucune logique métier et n'accède jamais à la base (ADR-0002).
 - **API** : seule détentrice des données et des règles. Chaque domaine vit dans son dossier sous
-  `backend/app/` (`comptes/`, `admin/`, `referentiel/`, `eleves/`, `encadreurs/`, `points/`, `clubs/`, `articles/`, `agenda/`, `mediatheque/`, `quiz/`),
+  `backend/app/` (`comptes/`, `admin/`, `referentiel/`, `eleves/`, `encadreurs/`, `points/`, `clubs/`, `moderation/`, `articles/`, `notifications/`, `agenda/`, `mediatheque/`, `quiz/`),
   avec `router.py` (HTTP), `schemas.py` (Pydantic), `models.py` (SQLAlchemy) et `service.py` (règles).
 - **Types partagés** : `backend/openapi.json` est versionné, et `npm run api:types` en génère les types
   TypeScript avec `openapi-typescript`. La CI vérifie que les deux restent à jour.
