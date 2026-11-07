@@ -26,6 +26,7 @@ from app.eleves.router import router as router_eleves
 from app.encadreurs.router import router as router_encadreurs
 from app.encadreurs.router import router_admin as router_encadreurs_admin
 from app.jeux.router import router as router_jeux
+from app.moderation.photos import purger_regulierement as purger_photos_regulierement
 from app.moderation.router import router_admin as router_moderation_admin
 from app.notifications.router import router as router_notifications
 from app.points.router import router_admin as router_points_admin
@@ -37,12 +38,14 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    # Efface les fichiers d'export expirés au démarrage, puis toutes les heures (spec 015).
-    purge = asyncio.create_task(purger_regulierement())
+    # Efface les fichiers d'export expirés au démarrage, puis toutes les heures (spec 015), et les photos refusées
+    # depuis plus de 90 jours, une fois par jour (spec 024).
+    purges = [asyncio.create_task(purger_regulierement()), asyncio.create_task(purger_photos_regulierement())]
     yield
-    purge.cancel()
-    with contextlib.suppress(asyncio.CancelledError):
-        await purge
+    for purge in purges:
+        purge.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await purge
     await engine.dispose()
 
 

@@ -1879,6 +1879,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/mes-articles/{contenu_id}/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ajouter Photo */
+        post: operations["ajouter_photo_api_mes_articles__contenu_id__photos_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mes-articles/{contenu_id}/photos/{photo_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Retirer Photo */
+        delete: operations["retirer_photo_api_mes_articles__contenu_id__photos__photo_id__delete"];
+        options?: never;
+        head?: never;
+        /** Modifier Photo */
+        patch: operations["modifier_photo_api_mes_articles__contenu_id__photos__photo_id__patch"];
+        trace?: never;
+    };
+    "/api/mes-articles/{contenu_id}/photos/{photo_id}/{taille}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire Photo */
+        get: operations["lire_photo_api_mes_articles__contenu_id__photos__photo_id___taille__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/articles": {
         parameters: {
             query?: never;
@@ -1905,6 +1957,23 @@ export interface paths {
         };
         /** Article */
         get: operations["article_api_articles__adresse__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/articles/{adresse}/photos/{photo_id}/{taille}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Photo Publique */
+        get: operations["photo_publique_api_articles__adresse__photos__photo_id___taille__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2009,6 +2078,23 @@ export interface paths {
         put?: never;
         /** Depublier */
         post: operations["depublier_api_admin_moderation__contenu_id__depublier_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/moderation/{contenu_id}/photos/{photo_id}/{taille}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Photo */
+        get: operations["photo_api_admin_moderation__contenu_id__photos__photo_id___taille__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2196,6 +2282,10 @@ export interface components {
             publiee: {
                 [key: string]: unknown;
             } | null;
+            /** Photos Soumises */
+            photos_soumises: components["schemas"]["PhotoModeration"][];
+            /** Photos Publiees */
+            photos_publiees: components["schemas"]["PhotoModeration"][];
             /** Decisions */
             decisions: components["schemas"]["DecisionPassee"][];
         };
@@ -2226,6 +2316,8 @@ export interface components {
             /** Supprimable */
             supprimable: boolean;
             derniere_decision: components["schemas"]["DerniereDecision"] | null;
+            /** Photos */
+            photos: components["schemas"]["PhotoAuteur"][];
             /** Soumis Le */
             soumis_le: string | null;
             /** Publie Le */
@@ -2267,6 +2359,7 @@ export interface components {
             chapo: string;
             axe: components["schemas"]["AxeArticle"];
             signature: components["schemas"]["Signature"];
+            couverture: components["schemas"]["PhotoPublique"] | null;
             /**
              * Publie Le
              * Format: date
@@ -2274,6 +2367,8 @@ export interface components {
             publie_le: string;
             /** Texte */
             texte: string;
+            /** Photos */
+            photos: components["schemas"]["PhotoPublique"][];
         };
         /** ArticlesPublics */
         ArticlesPublics: {
@@ -2367,6 +2462,25 @@ export interface components {
          * @enum {string}
          */
         Beneficiaire: "eleve" | "encadreur" | "club";
+        /** Body_ajouter_photo_api_mes_articles__contenu_id__photos_post */
+        Body_ajouter_photo_api_mes_articles__contenu_id__photos_post: {
+            /** Fichier */
+            fichier: string;
+            /** Version */
+            version: number;
+            /**
+             * Attestation
+             * @default false
+             */
+            attestation: boolean;
+            /** Legende */
+            legende?: string | null;
+            /**
+             * Couverture
+             * @default false
+             */
+            couverture: boolean;
+        };
         /** Catalogue */
         Catalogue: {
             /** Modules */
@@ -3890,6 +4004,78 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** PhotoAuteur */
+        PhotoAuteur: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Legende */
+            legende: string | null;
+            /** Couverture */
+            couverture: boolean;
+            /** Ordre */
+            ordre: number;
+            /** Largeur */
+            largeur: number;
+            /** Hauteur */
+            hauteur: number;
+            /** Effacee */
+            effacee: boolean;
+        };
+        /** PhotoModeration */
+        PhotoModeration: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Legende */
+            legende: string | null;
+            /** Couverture */
+            couverture: boolean;
+            /** Ordre */
+            ordre: number;
+            /** Largeur */
+            largeur: number;
+            /** Hauteur */
+            hauteur: number;
+            /** Attestation */
+            attestation: string;
+            /**
+             * Attestee Le
+             * Format: date-time
+             */
+            attestee_le: string;
+            /** Effacee */
+            effacee: boolean;
+        };
+        /** PhotoModification */
+        PhotoModification: {
+            /** Version */
+            version: number;
+            /** Legende */
+            legende?: string | null;
+            /** Couverture */
+            couverture?: boolean | null;
+            /** Ordre */
+            ordre?: number | null;
+        };
+        /** PhotoPublique */
+        PhotoPublique: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Legende */
+            legende: string | null;
+            /** Largeur */
+            largeur: number;
+            /** Hauteur */
+            hauteur: number;
+        };
         /** ProfilEleveAdmin */
         ProfilEleveAdmin: {
             /** Pseudonyme */
@@ -4139,6 +4325,7 @@ export interface components {
             chapo: string;
             axe: components["schemas"]["AxeArticle"];
             signature: components["schemas"]["Signature"];
+            couverture: components["schemas"]["PhotoPublique"] | null;
             /**
              * Publie Le
              * Format: date
@@ -7968,6 +8155,142 @@ export interface operations {
             };
         };
     };
+    ajouter_photo_api_mes_articles__contenu_id__photos_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_ajouter_photo_api_mes_articles__contenu_id__photos_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retirer_photo_api_mes_articles__contenu_id__photos__photo_id__delete: {
+        parameters: {
+            query: {
+                version: number;
+            };
+            header?: never;
+            path: {
+                contenu_id: string;
+                photo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modifier_photo_api_mes_articles__contenu_id__photos__photo_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+                photo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PhotoModification"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_photo_api_mes_articles__contenu_id__photos__photo_id___taille__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+                photo_id: string;
+                taille: "grande" | "vignette";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     articles_api_articles_get: {
         parameters: {
             query?: {
@@ -8019,6 +8342,37 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ArticlePublic"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    photo_publique_api_articles__adresse__photos__photo_id___taille__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                adresse: string;
+                photo_id: string;
+                taille: "grande" | "vignette";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -8225,6 +8579,37 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ApercuModeration"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    photo_api_admin_moderation__contenu_id__photos__photo_id___taille__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+                photo_id: string;
+                taille: "grande" | "vignette";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

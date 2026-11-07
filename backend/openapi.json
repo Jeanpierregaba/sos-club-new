@@ -5234,6 +5234,241 @@
         }
       }
     },
+    "/api/mes-articles/{contenu_id}/photos": {
+      "post": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Ajouter Photo",
+        "operationId": "ajouter_photo_api_mes_articles__contenu_id__photos_post",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_ajouter_photo_api_mes_articles__contenu_id__photos_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mes-articles/{contenu_id}/photos/{photo_id}": {
+      "patch": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Modifier Photo",
+        "operationId": "modifier_photo_api_mes_articles__contenu_id__photos__photo_id__patch",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          },
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Photo Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhotoModification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Retirer Photo",
+        "operationId": "retirer_photo_api_mes_articles__contenu_id__photos__photo_id__delete",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          },
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Photo Id"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mes-articles/{contenu_id}/photos/{photo_id}/{taille}": {
+      "get": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Lire Photo",
+        "operationId": "lire_photo_api_mes_articles__contenu_id__photos__photo_id___taille__get",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          },
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Photo Id"
+            }
+          },
+          {
+            "name": "taille",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "grande",
+                "vignette"
+              ],
+              "type": "string",
+              "title": "Taille"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/articles": {
       "get": {
         "tags": [
@@ -5325,6 +5560,65 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/articles/{adresse}/photos/{photo_id}/{taille}": {
+      "get": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Photo Publique",
+        "operationId": "photo_publique_api_articles__adresse__photos__photo_id___taille__get",
+        "parameters": [
+          {
+            "name": "adresse",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 140,
+              "title": "Adresse"
+            }
+          },
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Photo Id"
+            }
+          },
+          {
+            "name": "taille",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "grande",
+                "vignette"
+              ],
+              "type": "string",
+              "title": "Taille"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -5690,6 +5984,65 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderation/{contenu_id}/photos/{photo_id}/{taille}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Photo",
+        "operationId": "photo_api_admin_moderation__contenu_id__photos__photo_id___taille__get",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          },
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Photo Id"
+            }
+          },
+          {
+            "name": "taille",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "grande",
+                "vignette"
+              ],
+              "type": "string",
+              "title": "Taille"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -6129,6 +6482,20 @@
             ],
             "title": "Publiee"
           },
+          "photos_soumises": {
+            "items": {
+              "$ref": "#/components/schemas/PhotoModeration"
+            },
+            "type": "array",
+            "title": "Photos Soumises"
+          },
+          "photos_publiees": {
+            "items": {
+              "$ref": "#/components/schemas/PhotoModeration"
+            },
+            "type": "array",
+            "title": "Photos Publiees"
+          },
           "decisions": {
             "items": {
               "$ref": "#/components/schemas/DecisionPassee"
@@ -6153,6 +6520,8 @@
           "version",
           "soumise",
           "publiee",
+          "photos_soumises",
+          "photos_publiees",
           "decisions"
         ],
         "title": "ApercuModeration"
@@ -6224,6 +6593,13 @@
               }
             ]
           },
+          "photos": {
+            "items": {
+              "$ref": "#/components/schemas/PhotoAuteur"
+            },
+            "type": "array",
+            "title": "Photos"
+          },
           "soumis_le": {
             "anyOf": [
               {
@@ -6266,6 +6642,7 @@
           "soumettable",
           "supprimable",
           "derniere_decision",
+          "photos",
           "soumis_le",
           "publie_le",
           "modifie_le"
@@ -6344,6 +6721,16 @@
           "signature": {
             "$ref": "#/components/schemas/Signature"
           },
+          "couverture": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PhotoPublique"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "publie_le": {
             "type": "string",
             "format": "date",
@@ -6352,6 +6739,13 @@
           "texte": {
             "type": "string",
             "title": "Texte"
+          },
+          "photos": {
+            "items": {
+              "$ref": "#/components/schemas/PhotoPublique"
+            },
+            "type": "array",
+            "title": "Photos"
           }
         },
         "type": "object",
@@ -6361,8 +6755,10 @@
           "chapo",
           "axe",
           "signature",
+          "couverture",
           "publie_le",
-          "texte"
+          "texte",
+          "photos"
         ],
         "title": "ArticlePublic"
       },
@@ -6643,6 +7039,47 @@
           "club"
         ],
         "title": "Beneficiaire"
+      },
+      "Body_ajouter_photo_api_mes_articles__contenu_id__photos_post": {
+        "properties": {
+          "fichier": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Fichier"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "attestation": {
+            "type": "boolean",
+            "title": "Attestation",
+            "default": false
+          },
+          "legende": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 400
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Legende"
+          },
+          "couverture": {
+            "type": "boolean",
+            "title": "Couverture",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "fichier",
+          "version"
+        ],
+        "title": "Body_ajouter_photo_api_mes_articles__contenu_id__photos_post"
       },
       "Catalogue": {
         "properties": {
@@ -10993,6 +11430,204 @@
         ],
         "title": "PassationEntree"
       },
+      "PhotoAuteur": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "legende": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Legende"
+          },
+          "couverture": {
+            "type": "boolean",
+            "title": "Couverture"
+          },
+          "ordre": {
+            "type": "integer",
+            "title": "Ordre"
+          },
+          "largeur": {
+            "type": "integer",
+            "title": "Largeur"
+          },
+          "hauteur": {
+            "type": "integer",
+            "title": "Hauteur"
+          },
+          "effacee": {
+            "type": "boolean",
+            "title": "Effacee"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "legende",
+          "couverture",
+          "ordre",
+          "largeur",
+          "hauteur",
+          "effacee"
+        ],
+        "title": "PhotoAuteur"
+      },
+      "PhotoModeration": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "legende": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Legende"
+          },
+          "couverture": {
+            "type": "boolean",
+            "title": "Couverture"
+          },
+          "ordre": {
+            "type": "integer",
+            "title": "Ordre"
+          },
+          "largeur": {
+            "type": "integer",
+            "title": "Largeur"
+          },
+          "hauteur": {
+            "type": "integer",
+            "title": "Hauteur"
+          },
+          "attestation": {
+            "type": "string",
+            "title": "Attestation"
+          },
+          "attestee_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Attestee Le"
+          },
+          "effacee": {
+            "type": "boolean",
+            "title": "Effacee"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "legende",
+          "couverture",
+          "ordre",
+          "largeur",
+          "hauteur",
+          "attestation",
+          "attestee_le",
+          "effacee"
+        ],
+        "title": "PhotoModeration"
+      },
+      "PhotoModification": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "legende": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Legende"
+          },
+          "couverture": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Couverture"
+          },
+          "ordre": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ordre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "PhotoModification"
+      },
+      "PhotoPublique": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "legende": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Legende"
+          },
+          "largeur": {
+            "type": "integer",
+            "title": "Largeur"
+          },
+          "hauteur": {
+            "type": "integer",
+            "title": "Hauteur"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "legende",
+          "largeur",
+          "hauteur"
+        ],
+        "title": "PhotoPublique"
+      },
       "ProfilEleveAdmin": {
         "properties": {
           "pseudonyme": {
@@ -11717,6 +12352,16 @@
           "signature": {
             "$ref": "#/components/schemas/Signature"
           },
+          "couverture": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PhotoPublique"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "publie_le": {
             "type": "string",
             "format": "date",
@@ -11730,6 +12375,7 @@
           "chapo",
           "axe",
           "signature",
+          "couverture",
           "publie_le"
         ],
         "title": "ResumeArticle"

@@ -8,6 +8,8 @@ Les fichiers sont écrits avant la validation de la base et effacés aussitôt s
 effacé du disque qu'après la validation qui le libère.
 """
 
+import asyncio
+import logging
 from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid7
 
@@ -18,6 +20,7 @@ from app.admin.dependances import Acces
 from app.admin.journal import journaliser
 from app.comptes.inscription import Refus
 from app.comptes.models import Utilisateur
+from app.db import SessionLocal
 from app.fichiers import images
 from app.fichiers.stockage import StockageIndisponible, stockage
 from app.moderation import service as moteur
@@ -41,6 +44,8 @@ ATTESTATION = (
 )
 DELAI_EFFACEMENT = timedelta(days=90)
 TAILLES = ("grande", "vignette")
+
+logger = logging.getLogger(__name__)
 
 
 async def photos_de(db: AsyncSession, version_id: UUID | None) -> list[tuple[VersionPhoto, Photo]]:
@@ -288,3 +293,16 @@ async def purger(db: AsyncSession, maintenant: datetime | None = None) -> int:
     for photo in effacees:
         await _effacer_fichiers(photo)
     return len(effacees)
+
+
+async def purger_regulierement() -> None:
+    """Au démarrage, puis une fois par jour."""
+    while True:
+        try:
+            async with SessionLocal() as db:
+                nombre = await purger(db)
+            if nombre:
+                logger.info("%s photo(s) refusée(s) depuis plus de 90 jours effacée(s)", nombre)
+        except Exception:
+            logger.exception("Échec de la purge des photos")
+        await asyncio.sleep(86_400)
