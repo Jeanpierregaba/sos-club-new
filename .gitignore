@@ -49,3 +49,6 @@ coverage/
 __pycache__/
 .pytest_cache/
 .ruff_cache/
+
+# Fichiers envoyés en local (spec 024)
+backend/var/
