@@ -3,6 +3,7 @@ import { Bold, Eye, Heading2, Italic, List, PenLine, Send, Trash2, Undo2 } from 
 import { useRef, useState, type ReactNode } from "react";
 
 import { EtatContenu } from "@/components/articles/EtatContenu";
+import { Photos } from "@/components/articles/Photos";
 import { TexteArticle } from "@/components/articles/TexteArticle";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -287,6 +288,8 @@ export function Editeur({
           <TexteArticle texte={champs.texte} className="mt-6" />
         </article>
       )}
+
+      <Photos article={actuel} modifiable={modifiable} onArticle={setActuel} />
 
       {erreur && (
         <Alert variant="destructive">

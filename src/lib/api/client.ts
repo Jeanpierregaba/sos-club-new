@@ -118,6 +118,9 @@ export type ElementFile = Schemas["ElementFile"];
 export type ApercuModeration = Schemas["ApercuModeration"];
 export type NotificationSortie = Schemas["NotificationSortie"];
 export type Notifications = Schemas["Notifications"];
+export type PhotoAuteur = Schemas["PhotoAuteur"];
+export type PhotoPublique = Schemas["PhotoPublique"];
+export type PhotoModeration = Schemas["PhotoModeration"];
 
 export const MESSAGE_SAISIE = "Vérifie le formulaire : un champ est vide, trop long ou mal rempli.";
 
@@ -515,3 +518,55 @@ export const compterNotifications = () =>
 export const marquerNotificationLue = (id: string) =>
   envoyerJson<void>(`/api/notifications/${id}/lue`);
 export const marquerToutesLues = () => envoyerJson<void>("/api/notifications/lues");
+
+// Photos des articles (spec 024). L'envoi passe par XMLHttpRequest pour suivre la progression sur un réseau lent.
+export type TaillePhoto = "grande" | "vignette";
+export const urlPhotoAuteur = (articleId: string, photoId: string, taille: TaillePhoto) =>
+  `${MES_ARTICLES}/${articleId}/photos/${photoId}/${taille}`;
+export const urlPhotoPublique = (adresse: string, photoId: string, taille: TaillePhoto) =>
+  `/api/articles/${encodeURIComponent(adresse)}/photos/${photoId}/${taille}`;
+export const urlPhotoModeration = (contenuId: string, photoId: string, taille: TaillePhoto) =>
+  `${MODERATION}/${contenuId}/photos/${photoId}/${taille}`;
+
+export function envoyerPhoto(
+  articleId: string,
+  entree: { fichier: File; version: number; legende: string; couverture: boolean },
+  progression: (fraction: number) => void,
+): Promise<ArticleAuteur> {
+  const donnees = new FormData();
+  donnees.append("fichier", entree.fichier);
+  donnees.append("version", String(entree.version));
+  donnees.append("attestation", "true");
+  if (entree.legende.trim()) donnees.append("legende", entree.legende.trim());
+  donnees.append("couverture", entree.couverture ? "true" : "false");
+  return new Promise((resoudre, rejeter) => {
+    const requete = new XMLHttpRequest();
+    requete.open("POST", `${MES_ARTICLES}/${articleId}/photos`);
+    requete.timeout = 120_000;
+    requete.upload.onprogress = (e) => e.lengthComputable && progression(e.loaded / e.total);
+    requete.onload = () => {
+      let corps: unknown = null;
+      try {
+        corps = JSON.parse(requete.responseText);
+      } catch {
+        corps = null;
+      }
+      if (requete.status >= 200 && requete.status < 300) return resoudre(corps as ArticleAuteur);
+      const detail = (corps as { detail?: unknown } | null)?.detail;
+      rejeter(new ErreurApi(requete.status, typeof detail === "string" ? detail : MESSAGE_SAISIE));
+    };
+    requete.onerror = requete.ontimeout = () => rejeter(new ErreurApi(0, MESSAGE_INDISPONIBLE));
+    requete.send(donnees);
+  });
+}
+export const modifierPhoto = (
+  articleId: string,
+  photoId: string,
+  entree: { version: number; legende?: string | null; couverture?: boolean; ordre?: number },
+) => envoyerJson<ArticleAuteur>(`${MES_ARTICLES}/${articleId}/photos/${photoId}`, entree, "PATCH");
+export const retirerPhoto = (articleId: string, photoId: string, version: number) =>
+  envoyerJson<ArticleAuteur>(
+    `${MES_ARTICLES}/${articleId}/photos/${photoId}?version=${version}`,
+    undefined,
+    "DELETE",
+  );

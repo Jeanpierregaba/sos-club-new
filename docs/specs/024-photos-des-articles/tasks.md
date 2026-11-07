@@ -25,7 +25,7 @@
 
 **Site**
 
-- [ ] 7. `Photos.tsx` dans l'éditeur (attestation obligatoire, progression, légende, couverture, ordre, retrait),
+- [x] 7. `Photos.tsx` dans l'éditeur (attestation obligatoire, progression, légende, couverture, ordre, retrait),
       avec un test Vitest.
 - [ ] 8. `Galerie.tsx` : couverture dans `/articles`, couverture et galerie sur la page de l'article.
 - [ ] 9. Aperçu admin : photos, attestations, photos ajoutées et retirées.
