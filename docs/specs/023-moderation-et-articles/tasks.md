@@ -23,10 +23,10 @@
 **Site**
 
 - [x] 8. `react-markdown`, `TexteArticle` (test Vitest), `EtatContenu`, client d'API.
-- [ ] 9. « Mes articles » : liste, création, édition avec aperçu, soumission, retrait ; lien depuis `/mon-espace`.
-- [ ] 10. Pages publiques `/articles` et `/articles/$adresse` ; lien depuis `/magazine`.
-- [ ] 11. Admin : page `/admin/moderation` (file, filtres, aperçu avant / après, décisions), menu et compteur.
-- [ ] 12. Cloche des notifications dans les en-têtes et page `/notifications`.
+- [x] 9. « Mes articles » : liste, création, édition avec aperçu, soumission, retrait ; lien depuis `/mon-espace`.
+- [x] 10. Pages publiques `/articles` et `/articles/$adresse` ; lien depuis `/magazine`.
+- [x] 11. Admin : page `/admin/moderation` (file, filtres, aperçu avant / après, décisions), menu et compteur.
+- [x] 12. Cloche des notifications dans les en-têtes et page `/notifications`.
 
 **Clôture**
 

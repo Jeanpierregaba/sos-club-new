@@ -5,6 +5,7 @@ import {
   Clock,
   Download,
   Flag,
+  ShieldCheck,
   UserCheck,
   UserPlus,
   Users,
@@ -106,6 +107,23 @@ function TableauDeBordPage() {
                 </Link>
               )}
             </p>
+          )}
+          {Boolean(tableau.contenus_a_moderer) && (
+            <Link
+              to="/admin/moderation"
+              className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-ink shadow-sm ring-1 ring-border transition hover:ring-night/30"
+            >
+              <ShieldCheck aria-hidden className="size-5 shrink-0 text-logo-red" />
+              <span>
+                <strong className="text-logo-blue">{tableau.contenus_a_moderer}</strong>{" "}
+                {tableau.contenus_a_moderer === 1
+                  ? "contenu attend sa modération."
+                  : "contenus attendent leur modération."}
+              </span>
+              <span className="ml-auto inline-flex items-center gap-1 font-bold text-logo-blue">
+                Modérer <ArrowRight aria-hidden className="size-4" />
+              </span>
+            </Link>
           )}
           {Boolean(tableau.encadreurs_a_verifier) && (
             <Link

@@ -89,6 +89,13 @@ function entrees(admin: AdminMoi): Entree[] {
     },
     { to: "/admin/inscrits", libelle: "Inscrits", i: Users, visible: peutVoirInscrits(admin) },
     {
+      to: "/admin/moderation",
+      libelle: "Modération",
+      i: ShieldCheck,
+      visible: peut(admin, "moderation", "consulter"),
+      compteur: admin.contenus_a_moderer ?? 0,
+    },
+    {
       to: "/admin/encadreurs",
       libelle: "Encadreurs",
       i: UserCheck,

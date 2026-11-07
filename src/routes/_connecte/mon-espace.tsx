@@ -243,7 +243,7 @@ function EspaceDeLEleve({
   return (
     <main className="min-h-screen bg-carnet px-4 py-10 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <EnTeteEspace nom={espace.pseudonyme}>
+        <EnTeteEspace nom={espace.pseudonyme} articles>
           {motDePasseChange && <MotDePasseChange />}
         </EnTeteEspace>
         {bienvenue && (

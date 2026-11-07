@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { CalendarRange, LogOut, Star, Trophy } from "lucide-react";
+import { CalendarRange, LogOut, PenLine, Star, Trophy } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
@@ -11,7 +11,16 @@ import { dateCourte } from "@/lib/dates";
 
 // Les morceaux communs aux espaces de l'élève (spec 017) et de l'encadreur (spec 018).
 
-export function EnTeteEspace({ nom, children }: { nom: string; children?: ReactNode }) {
+export function EnTeteEspace({
+  nom,
+  articles = false,
+  children,
+}: {
+  nom: string;
+  // Le lien « Mes articles » : élève, ou encadreur vérifié (spec 023).
+  articles?: boolean;
+  children?: ReactNode;
+}) {
   const { seDeconnecter, erreur, enCours } = useDeconnexion();
   return (
     <>
@@ -33,6 +42,14 @@ export function EnTeteEspace({ nom, children }: { nom: string; children?: ReactN
           >
             Accueil
           </Link>
+          {articles && (
+            <Link
+              to="/mes-articles"
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
+            >
+              <PenLine className="size-4" /> Mes articles
+            </Link>
+          )}
           <Button
             variant="outline"
             onClick={seDeconnecter}

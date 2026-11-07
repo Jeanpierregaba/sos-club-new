@@ -53,7 +53,7 @@ export function EspaceEncadreur({
   return (
     <main className="min-h-screen bg-carnet px-4 py-10 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <EnTeteEspace nom={prenom}>
+        <EnTeteEspace nom={prenom} articles={espace.etat === "actif"}>
           {motDePasseChange && <MotDePasseChange />}
           {espace.etat === "en_attente" && <EnAttente espace={espace} />}
           {espace.etat === "refuse" && <Refuse espace={espace} />}

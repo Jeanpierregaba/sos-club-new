@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, Eye, Heart, Newspaper, PenLine } from "lucide-react";
 import { EnTete } from "@/components/EnTete";
 import { FilAriane } from "@/components/FilAriane";
@@ -134,6 +134,13 @@ function Magazine() {
               >
                 Lire les articles <ArrowDown className="size-4" />
               </a>
+              {/* Les articles des élèves et des encadreurs, publiés après modération (spec 023). */}
+              <Link
+                to="/articles"
+                className="btn-fx ml-3 mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-[15px] font-bold text-logo-red shadow-card"
+              >
+                <PenLine className="size-4" /> Articles des clubs
+              </Link>
             </div>
           </div>
 

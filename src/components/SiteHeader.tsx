@@ -9,6 +9,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Cloche } from "@/components/notifications/Cloche";
 import { useMoi } from "@/hooks/use-moi";
 import logo from "@/assets/logo.webp";
 
@@ -128,6 +129,7 @@ export function SiteHeader() {
           </NavigationMenuPrimitive.List>
         </NavigationMenuPrimitive.Root>
         <div className="flex items-center gap-3">
+          <Cloche />
           <div className="hidden items-center gap-3 sm:flex">
             {join}
             {login}
