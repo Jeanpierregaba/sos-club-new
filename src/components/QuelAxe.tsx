@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 
-import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
+import mascotteEnvironnement from "@/assets/mascotte-environnement.webp";
 import mascotteLeadership from "@/assets/mascotte-leadership.webp";
 import mascotteMedias from "@/assets/mascotte-medias.webp";
 import mascotteSecourisme from "@/assets/mascotte-secourisme.webp";
@@ -10,13 +10,6 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 
 // Le paramètre ajouté à l'adresse de retour après la connexion : le test s'ouvre dès l'arrivée sur l'accueil.
 export const PARAMETRE_TEST = "test";
-
-const VALEURS = [
-  "Une génération en bonne santé",
-  "Des jeunes responsables",
-  "Des talents qui s’expriment",
-  "Des communautés qui agissent",
-];
 
 // Les trois cartes de la maquette : une mascotte officielle, la couleur de fond et la question de sa bulle.
 const CARTES = [
@@ -62,20 +55,10 @@ export function QuelAxe() {
       id="quel-axe"
       className="relative isolate w-full scroll-mt-16 overflow-hidden bg-white"
     >
-      {/* Les valeurs du programme, en bandeau. */}
-      <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-b border-grape/10 px-5 py-3 text-sm font-bold text-ink/80">
-        {VALEURS.map((v, i) => (
-          <li key={v} className="flex items-center gap-6">
-            {i > 0 && <span aria-hidden className="hidden h-4 w-px bg-ink/20 sm:block" />}
-            {v}
-          </li>
-        ))}
-      </ul>
-
       <div className="bg-linear-to-r from-lilac via-[oklch(0.97_0.02_300)] to-lilac">
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-10 md:py-12 lg:grid-cols-[auto_1fr_auto] lg:gap-10">
-          {/* La mascotte Génie Imhotep, pensive, entourée de points d'interrogation. */}
-          <div className="relative mx-auto w-36 sm:w-40 lg:w-44">
+          {/* La mascotte Santé & environnement, entourée de points d'interrogation. */}
+          <div className="relative mx-auto w-44 sm:w-48 lg:w-52">
             <span
               aria-hidden
               className="absolute -left-3 top-0 font-display text-5xl text-sky drop-shadow-sm"
@@ -89,12 +72,12 @@ export function QuelAxe() {
               ?
             </span>
             <img
-              src={mascotteImhotep}
-              alt="La mascotte de l’axe Génie Imhotep, qui réfléchit"
+              src={mascotteEnvironnement}
+              alt="La mascotte de l’axe Santé & environnement"
               width={1414}
               height={2000}
               loading="lazy"
-              className="relative mt-6 h-56 w-auto drop-shadow-xl lg:h-60"
+              className="relative mt-4 h-60 w-auto drop-shadow-xl lg:h-72"
             />
           </div>
 
