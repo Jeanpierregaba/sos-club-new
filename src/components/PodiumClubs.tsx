@@ -30,7 +30,7 @@ export function PodiumClubs() {
   return (
     <section
       aria-labelledby="titre-podium"
-      className="relative isolate overflow-hidden bg-linear-to-br from-[oklch(0.28_0.12_265)] via-[oklch(0.32_0.15_270)] to-[oklch(0.25_0.1_255)] py-20 text-white"
+      className="relative isolate overflow-hidden bg-linear-to-br from-[oklch(0.28_0.12_265)] via-[oklch(0.32_0.15_270)] to-[oklch(0.25_0.1_255)] py-12 text-white md:py-14"
     >
       {/* Les carreaux du site, plus marqués au centre et fondus vers les bords. */}
       <div
@@ -59,7 +59,7 @@ export function PodiumClubs() {
             width={1414}
             height={2000}
             loading="lazy"
-            className="relative h-80 w-auto drop-shadow-[0_25px_35px_rgba(0,0,0,0.45)] lg:h-[30rem]"
+            className="relative h-64 w-auto drop-shadow-[0_25px_35px_rgba(0,0,0,0.45)] lg:h-[24rem]"
           />
         </div>
 
@@ -95,17 +95,17 @@ export function PodiumClubs() {
         </div>
 
         {/* La mascotte de l'axe Production TV & médias, accoudée au-dessus du podium. */}
-        <div data-reveal="right" className="relative mx-auto w-full max-w-md pt-52 sm:pt-60">
+        <div data-reveal="right" className="relative mx-auto w-full max-w-md pt-40 sm:pt-44">
           <img
             src={mascotteMedias}
             alt="La mascotte de l’axe Production TV & médias"
             width={1414}
             height={2000}
             loading="lazy"
-            className="absolute right-0 top-0 z-10 h-72 w-auto drop-shadow-[0_20px_30px_rgba(0,0,0,0.45)] sm:-right-4 sm:h-80"
+            className="absolute right-0 top-0 z-10 h-56 w-auto drop-shadow-[0_20px_30px_rgba(0,0,0,0.45)] sm:-right-4 sm:h-60"
           />
           <div className="relative rounded-[2rem] bg-white/10 p-6 ring-1 ring-white/25 backdrop-blur-md md:p-8">
-            <Trophy aria-hidden className="mx-auto size-12 text-sun drop-shadow" />
+            <Trophy aria-hidden className="mx-auto size-10 text-sun drop-shadow" />
             <p className="mt-2 text-center font-display text-3xl">Top 3 des lycées</p>
             {podium.length > 0 ? <Classement podium={podium} /> : <BientotLa />}
           </div>
@@ -117,7 +117,7 @@ export function PodiumClubs() {
 
 function Classement({ podium }: { podium: ClubPodium[] }) {
   return (
-    <ol className="mt-6 space-y-3">
+    <ol className="mt-4 space-y-2.5">
       {podium.map((club, i) => (
         <li
           key={club.id}
@@ -147,7 +147,7 @@ function Classement({ podium }: { podium: ClubPodium[] }) {
 
 function BientotLa() {
   return (
-    <div className="mt-6 space-y-3">
+    <div className="mt-4 space-y-2.5">
       {[1, 2, 3].map((rang, i) => (
         <div
           key={rang}

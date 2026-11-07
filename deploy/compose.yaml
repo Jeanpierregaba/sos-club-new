@@ -52,7 +52,9 @@ services:
     profiles:
       - migrations
     <<: [*journaux, *durci]
-    command: ["alembic", "upgrade", "head"]
+    # Puis la banque du défi du jour (spec 021) : ajoute seulement les questions absentes ; en prod, désactivées
+    # jusqu'à la relecture de l'équipe nationale. Sans elle, la bulle du défi ne s'affiche pas.
+    command: ["sh", "-c", "alembic upgrade head && python -m app.jeux.banque_initiale"]
     environment: *base
     depends_on:
       db:

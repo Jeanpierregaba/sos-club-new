@@ -10,7 +10,9 @@ Un seul VPS héberge la preprod et la prod, derrière un même proxy HTTPS. La d
 
 À chaque push, GitHub Actions vérifie le code, construit les images, les publie sur GitHub Container Registry,
 puis lance `deployer.sh` sur le VPS : sauvegarde, migrations, nouveaux conteneurs, et retour automatique à la
-version précédente s'ils ne démarrent pas. **Un push sur `main` part en production sans validation
+version précédente s'ils ne démarrent pas. Après les migrations, le même service charge la banque du défi du jour
+(`python -m app.jeux.banque_initiale`) : il n'ajoute que les questions absentes, actives en preprod et désactivées en
+prod tant que l'équipe nationale ne les a pas relues. **Un push sur `main` part en production sans validation
 supplémentaire** : sur un dépôt privé en GitHub Free, les approbations de déploiement ne sont pas disponibles.
 
 ## Avant la production
