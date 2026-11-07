@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-Rien en cours : prochaine spec, 024 (photos des articles : stockage sur le disque du VPS, attestation Q8), puis R7.
+- [ ] [024 Photos des articles](docs/specs/024-photos-des-articles/spec.md) (stockage ADR-0010, attestation Q8)
 
 ## À faire
 
@@ -32,6 +32,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 - [ ] 024 — Photos des articles : stockage sur le disque du VPS (ADR-0005), attestation de l'auteur (Q8), recompression et retrait des métadonnées
 - [ ] R7 — Commentaires prémodérés (Q22)
 - [ ] Purge des notifications lues de plus d'un an (signalée par la spec 023)
+- [ ] Balayage des fichiers orphelins du stockage (signalé par la spec 024)
 - [ ] R8 — Espace du président : tableau de bord, fiche, actualités du club (Q20)
 
 **Phase 3 — Quiz et certification (P0)**
