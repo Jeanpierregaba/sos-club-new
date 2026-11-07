@@ -8,12 +8,13 @@ import math
 from sqlalchemy import Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.articles.schemas import ArticlePublic, ArticlesPublics, AxeArticle, ResumeArticle, Signature
+from app.articles.schemas import ArticlePublic, ArticlesPublics, AxeArticle, PhotoPublique, ResumeArticle, Signature
 from app.articles.service import TYPE
 from app.clubs.models import Adhesion, Club, EtatAdhesion, EtatClub
 from app.comptes.models import Role, Utilisateur
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur, Fonction
+from app.moderation import photos
 from app.moderation.models import Contenu, VersionContenu
 from app.referentiel.models import Axe
 
@@ -60,14 +61,27 @@ async def signature(db: AsyncSession, contenu: Contenu) -> Signature:
     return Signature(profil="encadreur", nom=f"{auteur.prenom.strip()}{initiale}", fonction=fonction)
 
 
+async def _photos(db: AsyncSession, version: VersionContenu) -> list[tuple[bool, PhotoPublique]]:
+    return [
+        (
+            placement.couverture,
+            PhotoPublique(id=photo.id, legende=placement.legende, largeur=photo.largeur, hauteur=photo.hauteur),
+        )
+        for placement, photo in await photos.photos_de(db, version.id)
+        if photo.efface_le is None
+    ]
+
+
 async def _resume(db: AsyncSession, contenu: Contenu, version: VersionContenu, axe: Axe) -> ResumeArticle:
     assert contenu.adresse is not None and contenu.publie_le is not None
+    couverture = next((p for est_couverture, p in await _photos(db, version) if est_couverture), None)
     return ResumeArticle(
         adresse=contenu.adresse,
         titre=version.donnees["titre"],
         chapo=version.donnees["chapo"],
         axe=AxeArticle(code=axe.code, libelle=axe.libelle),
         signature=await signature(db, contenu),
+        couverture=couverture,
         publie_le=contenu.publie_le.date(),
     )
 
@@ -96,4 +110,5 @@ async def lire(db: AsyncSession, adresse: str) -> ArticlePublic | None:
         return None
     contenu, version, axe = ligne
     resume = await _resume(db, contenu, version, axe)
-    return ArticlePublic(**resume.model_dump(), texte=version.donnees["texte"])
+    galerie = [p for est_couverture, p in await _photos(db, version) if not est_couverture]
+    return ArticlePublic(**resume.model_dump(), texte=version.donnees["texte"], photos=galerie)

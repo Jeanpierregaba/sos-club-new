@@ -11,8 +11,8 @@
 
 **API, photos**
 
-- [ ] 3. Tests d'accès aux photos (`test_photos_acces.py`) écrits **avant** le code. Ils doivent échouer.
-- [ ] 4. `moderation/photos.py` et les routes : envoi, modification, retrait, lecture par l'auteur, le modérateur
+- [x] 3. Tests d'accès aux photos (`test_photos_acces.py`) écrits **avant** le code. Ils doivent échouer.
+- [x] 4. `moderation/photos.py` et les routes : envoi, modification, retrait, lecture par l'auteur, le modérateur
       et le public ; photos dans `ArticleAuteur`, l'aperçu et les articles publics. Les tâches 3 et
       `test_photos_auteur.py` passent.
 - [ ] 5. Effacements : brouillon supprimé, purge à 90 jours dans la boucle horaire. Avec `test_photos_purge.py`.

@@ -72,7 +72,8 @@ app.include_router(api)
 @app.middleware("http")
 async def interdire_le_cache(request: Request, suivant: Callable[[Request], Awaitable[Response]]) -> Response:
     reponse = await suivant(request)
-    if request.url.path.startswith("/api/"):
+    # Rien de l'API en cache, sauf ce qu'une route déclare elle-même : les photos publiques (spec 024).
+    if request.url.path.startswith("/api/") and "cache-control" not in reponse.headers:
         reponse.headers["Cache-Control"] = "no-store"
     return reponse
 

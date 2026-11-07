@@ -12,10 +12,13 @@ from app.articles.schemas import (
     ChampsArticle,
     DerniereDecision,
     MesArticles,
+    PhotoAuteur,
+    PhotoModification,
     ResumeArticleAuteur,
 )
 from app.comptes.inscription import Refus
 from app.comptes.models import Role, Utilisateur
+from app.moderation import photos
 from app.moderation import service as moteur
 from app.moderation.models import Contenu, DecisionModeration, EtatVersion
 from app.moderation.types import TypeContenu, enregistrer
@@ -77,6 +80,18 @@ async def article_auteur(db: AsyncSession, contenu: Contenu) -> ArticleAuteur:
         soumettable=contenu.etat in moteur.SOUMETTABLES and travail is not None and travail.etat is EtatVersion.travail,
         supprimable=await moteur.jamais_soumis(db, contenu),
         derniere_decision=await _derniere_decision(db, contenu),
+        photos=[
+            PhotoAuteur(
+                id=photo.id,
+                legende=placement.legende,
+                couverture=placement.couverture,
+                ordre=placement.ordre,
+                largeur=photo.largeur,
+                hauteur=photo.hauteur,
+                effacee=photo.efface_le is not None,
+            )
+            for placement, photo in await photos.photos_de(db, visible.id)
+        ],
         soumis_le=contenu.soumis_le,
         publie_le=contenu.publie_le,
         modifie_le=contenu.modifie_le,
@@ -148,5 +163,50 @@ async def retirer(
 
 async def supprimer(db: AsyncSession, auteur: Utilisateur, contenu_id: UUID) -> None:
     contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+    if not await moteur.jamais_soumis(db, contenu):
+        raise Refus("Seul un brouillon jamais soumis peut être supprimé.", 409)
+    a_effacer = await photos.effacer_du_brouillon(db, contenu)
     await moteur.supprimer(db, contenu)
     await db.commit()
+    # Les fichiers après la validation : jamais un fichier effacé pour une suppression annulée.
+    await photos.effacer_fichiers(a_effacer)
+
+
+# Photos (spec 024) ----------------------------------------------------------------------------------------------
+
+
+async def ajouter_photo(
+    db: AsyncSession,
+    auteur: Utilisateur,
+    contenu_id: UUID,
+    version: int,
+    octets: bytes,
+    legende: str | None,
+    couverture: bool,
+    adresse_ip: str,
+) -> ArticleAuteur:
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+    moteur.verifier_version(contenu, version)
+    await photos.ajouter(db, contenu, auteur, octets, legende, couverture, adresse_ip)
+    return await article_auteur(db, contenu)
+
+
+async def modifier_photo(
+    db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, photo_id: UUID, entree: PhotoModification
+) -> ArticleAuteur:
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+    moteur.verifier_version(contenu, entree.version)
+    await photos.modifier(
+        db, contenu, photo_id, legende=entree.legende or None, changer_legende="legende" in entree.model_fields_set,
+        couverture=entree.couverture, ordre=entree.ordre,
+    )  # fmt: skip
+    return await article_auteur(db, contenu)
+
+
+async def retirer_photo(
+    db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, photo_id: UUID, version: int, adresse_ip: str
+) -> ArticleAuteur:
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+    moteur.verifier_version(contenu, version)
+    await photos.retirer(db, contenu, auteur, photo_id, adresse_ip)
+    return await article_auteur(db, contenu)

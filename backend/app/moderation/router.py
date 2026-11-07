@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.catalogue import Action
@@ -13,7 +13,8 @@ from app.admin.dependances import Acces, adresse_ip, exiger_permission
 from app.comptes.inscription import Refus
 from app.comptes.models import Role
 from app.db import get_session
-from app.moderation import decisions
+from app.fichiers import reponse
+from app.moderation import decisions, photos
 from app.moderation.models import EtatContenu
 from app.moderation.schemas import ApercuModeration, ApprobationEntree, DecisionModerationEntree, FileModeration
 from app.moderation.service import Introuvable
@@ -96,3 +97,12 @@ async def depublier(
     with _traduire():
         await decisions.depublier(db, acces, contenu_id, entree.version, entree.motif, adresse_ip(request))
         return await decisions.apercu(db, acces, contenu_id)
+
+
+@router_admin.get("/{contenu_id}/photos/{photo_id}/{taille}", response_class=Response)
+async def photo(
+    contenu_id: UUID, photo_id: UUID, taille: Literal["grande", "vignette"], db: Base, acces: Lecteur
+) -> Response:
+    with _traduire():
+        octets = await photos.lire_pour_moderateur(db, acces, contenu_id, photo_id, taille)
+    return reponse.image(octets, publique=False)

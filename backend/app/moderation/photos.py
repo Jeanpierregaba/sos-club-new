@@ -52,7 +52,7 @@ async def photos_de(db: AsyncSession, version_id: UUID | None) -> list[tuple[Ver
         .where(VersionPhoto.version_id == version_id)
         .order_by(VersionPhoto.couverture.desc(), VersionPhoto.ordre, Photo.cree_le)
     )
-    return [(placement, photo) for placement, photo in lignes.tuples()]
+    return [(placement, photo) for placement, photo in lignes]
 
 
 async def _placement(db: AsyncSession, version_id: UUID, photo_id: UUID) -> VersionPhoto:
