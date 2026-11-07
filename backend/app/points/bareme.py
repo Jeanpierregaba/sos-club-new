@@ -26,6 +26,9 @@ class Action(NamedTuple):
 BIENVENUE_ELEVE = "eleve.bienvenue"
 BIENVENUE_ENCADREUR = "encadreur.bienvenue"
 QUESTION_JOUR_ELEVE = "eleve.question_jour"
+# Article approuvé (spec 023), à la première approbation seulement.
+ARTICLE_ELEVE = "eleve.article"
+ARTICLE_ENCADREUR = "encadreur.article"
 QUESTION_JOUR_CLUB = "club.question_jour_eleve"
 
 # Référentiel « Harmonisation de la gamification » du 2026-11-05 (spec 022). La part du club n'est créditée que
@@ -34,7 +37,7 @@ GRILLE: tuple[Action, ...] = (
     Action(BIENVENUE_ELEVE, "eleve", "Compte créé", 100),
     Action("eleve.commentaire", "eleve", "Commentaire approuvé", 5),
     Action("eleve.republication", "eleve", "Republication d'un article du site, vérifiée", 10),
-    Action("eleve.article", "eleve", "Article personnel approuvé", 50),
+    Action(ARTICLE_ELEVE, "eleve", "Article personnel approuvé", 50),
     Action("eleve.partage", "eleve", "Partage de son article, par réseau, vérifié", 50),
     Action("eleve.quiz", "eleve", "Quiz santé réussi, première fois", 50),
     Action(QUESTION_JOUR_ELEVE, "eleve", "Bonne réponse à la question du jour", 20),
@@ -43,7 +46,7 @@ GRILLE: tuple[Action, ...] = (
     Action("encadreur.bienvenue", "encadreur", "Compte validé", 100, propose=True),
     Action("encadreur.commentaire", "encadreur", "Commentaire approuvé", 5, propose=True),
     Action("encadreur.republication", "encadreur", "Republication d'un article du site, vérifiée", 10, propose=True),
-    Action("encadreur.article", "encadreur", "Article personnel approuvé", 50, propose=True),
+    Action(ARTICLE_ENCADREUR, "encadreur", "Article personnel approuvé", 50, propose=True),
     Action("encadreur.partage", "encadreur", "Partage de son article, par réseau, vérifié", 50, propose=True),
     Action("encadreur.quiz", "encadreur", "Quiz réussi, première fois", 0, propose=True),
     Action("encadreur.certification", "encadreur", "Certification Génie Imhotep", 1000, propose=True),
@@ -72,7 +75,9 @@ GRILLE: tuple[Action, ...] = (
 
 
 # Actions déjà écrites par une spec livrée. Chaque nouvelle spec ajoute la sienne ici et dans sa migration.
-EN_SERVICE: frozenset[str] = frozenset({BIENVENUE_ELEVE, BIENVENUE_ENCADREUR, QUESTION_JOUR_ELEVE})
+EN_SERVICE: frozenset[str] = frozenset(
+    {BIENVENUE_ELEVE, BIENVENUE_ENCADREUR, QUESTION_JOUR_ELEVE, ARTICLE_ELEVE, ARTICLE_ENCADREUR}
+)
 
 
 def lignes_initiales() -> list[dict[str, object]]:

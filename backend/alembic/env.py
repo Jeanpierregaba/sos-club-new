@@ -11,6 +11,8 @@ import app.comptes.models
 import app.eleves.models
 import app.encadreurs.models
 import app.jeux.models
+import app.moderation.models
+import app.notifications.models
 import app.points.models
 import app.referentiel.models  # noqa: F401
 from alembic import context

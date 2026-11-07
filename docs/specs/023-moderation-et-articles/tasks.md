@@ -4,7 +4,7 @@
 
 **API, socle**
 
-- [ ] 1. Modèles `Contenu`, `VersionContenu`, `DecisionModeration`, `Notification` et migration
+- [x] 1. Modèles `Contenu`, `VersionContenu`, `DecisionModeration`, `Notification` et migration
       `moderation_articles_notifications` (tables, contraintes, index, `eleve.article` et `encadreur.article` en
       service). Module `moderation` disponible, `consulter` sensible.
 - [ ] 2. Domaine `notifications` : service, routes, `test_notifications.py`.

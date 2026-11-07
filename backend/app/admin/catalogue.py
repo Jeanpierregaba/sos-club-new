@@ -44,7 +44,8 @@ MODULES: dict[str, tuple[str, bool, tuple[Action, ...]]] = {
     "inscrits": ("Inscrits", True, (C, M, E)),
     "statistiques": ("Statistiques", True, (C, E)),
     "journal": ("Journal d'audit", True, (C,)),
-    "moderation": ("Modération", False, (C, A, D)),
+    # File de modération (spec 023) : un collaborateur de DRE ne voit que les contenus des auteurs de sa DRE.
+    "moderation": ("Modération", True, (C, A, D)),
     # La file des clubs et des passations arrive avec la spec 019 ; le droit `clubs` existait déjà.
     "clubs": ("Clubs et DRE", True, (C, CR, M, A)),
     "contenus": ("Contenus et rubriques", False, (C, CR, M, S, A, D)),
@@ -62,6 +63,8 @@ MODULES: dict[str, tuple[str, bool, tuple[Action, ...]]] = {
 # Droits qui exigent la double authentification (CDC admin, 12A.1).
 SENSIBLES: frozenset[tuple[str, Action]] = frozenset(
     {
+        # La file montre le nom complet et l'établissement de l'auteur.
+        ("moderation", C),
         ("moderation", A),
         ("moderation", D),
         ("contenus", A),
