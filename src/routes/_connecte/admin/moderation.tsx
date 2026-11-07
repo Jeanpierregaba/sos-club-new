@@ -26,6 +26,7 @@ import {
   ErreurApi,
   MESSAGE_INDISPONIBLE,
   type ApercuModeration,
+  urlPhotoModeration,
   type EtatContenu as Etat,
 } from "@/lib/api/client";
 import { dateCourte } from "@/lib/dates";
@@ -303,6 +304,17 @@ function Apercu({
   const enAttente = apercu?.etat === "en_attente";
   // En attente : la version soumise. Sinon : ce qui est en ligne (le modérateur qui dépublie lit ce qui est publié).
   const affichee = enAttente ? soumise : (publiee ?? soumise);
+  // Les photos de la version affichée, et ce qui change par rapport à la version en ligne (spec 024).
+  const photosAffichees = apercu
+    ? enAttente || !publiee
+      ? apercu.photos_soumises
+      : apercu.photos_publiees
+    : [];
+  const enLigneIds = new Set(apercu?.photos_publiees.map((p) => p.id) ?? []);
+  const soumisesIds = new Set(apercu?.photos_soumises.map((p) => p.id) ?? []);
+  const comparer = Boolean(apercu?.nouvelle_version && enAttente);
+  const ajoutees = comparer ? apercu!.photos_soumises.filter((p) => !enLigneIds.has(p.id)) : [];
+  const retirees = comparer ? apercu!.photos_publiees.filter((p) => !soumisesIds.has(p.id)) : [];
   const changements =
     soumise && publiee ? CHAMPS.filter((c) => soumise[c.cle] !== publiee[c.cle]) : [];
   const valeur = (cle: string, champs: Record<string, string> | null | undefined) => {
@@ -393,6 +405,65 @@ function Apercu({
               <p className="text-lg font-semibold text-ink/80">{affichee["chapo"]}</p>
               <TexteArticle texte={affichee["texte"] ?? ""} className="mt-4" />
             </article>
+
+            {photosAffichees.length > 0 && (
+              <section>
+                <h3 className="font-extrabold text-logo-blue">Photos ({photosAffichees.length})</h3>
+                <ul className="mt-2 grid gap-3 sm:grid-cols-2">
+                  {photosAffichees.map((p) => (
+                    <li key={p.id} className="rounded-2xl bg-white p-3 ring-1 ring-border">
+                      {p.effacee ? (
+                        <p className="flex aspect-[4/3] items-center justify-center rounded-xl bg-mist text-sm text-muted-foreground">
+                          Photo effacée
+                        </p>
+                      ) : (
+                        <a
+                          href={urlPhotoModeration(apercu.id, p.id, "grande")}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <img
+                            src={urlPhotoModeration(apercu.id, p.id, "grande")}
+                            alt={p.legende ?? "Photo soumise"}
+                            width={p.largeur}
+                            height={p.hauteur}
+                            loading="lazy"
+                            className="w-full rounded-xl object-contain"
+                          />
+                        </a>
+                      )}
+                      <p className="mt-2 flex flex-wrap gap-2 text-xs font-bold">
+                        {p.couverture && (
+                          <span className="rounded-full bg-sun/30 px-2 py-0.5">Couverture</span>
+                        )}
+                        {ajoutees.some((a) => a.id === p.id) && (
+                          <span className="rounded-full bg-sky/20 px-2 py-0.5 text-logo-blue">
+                            Ajoutée
+                          </span>
+                        )}
+                      </p>
+                      {p.legende && <p className="mt-1 text-sm">{p.legende}</p>}
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Attestée le {dateCourte(p.attestee_le)} : « {p.attestation} »
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+                {retirees.length > 0 && (
+                  <p className="mt-2 text-sm font-semibold text-muted-foreground">
+                    {retirees.length} photo{retirees.length > 1 ? "s" : ""} de la version en ligne
+                    retirée{retirees.length > 1 ? "s" : ""} dans cette version
+                    {retirees.some((r) => r.legende)
+                      ? ` : ${retirees
+                          .map((r) => r.legende)
+                          .filter(Boolean)
+                          .join(", ")}`
+                      : ""}
+                    .
+                  </p>
+                )}
+              </section>
+            )}
 
             {apercu.decisions.length > 0 && (
               <section>

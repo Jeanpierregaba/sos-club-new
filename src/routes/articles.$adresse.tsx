@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
+import { Couverture, Galerie } from "@/components/articles/Galerie";
 import { TexteArticle } from "@/components/articles/TexteArticle";
 import { FilAriane } from "@/components/FilAriane";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
@@ -64,7 +65,22 @@ function Article() {
         </div>
       </section>
       <article className="mx-auto max-w-3xl px-5 py-10">
+        {article.couverture && (
+          <figure className="mb-8">
+            <Couverture
+              adresse={article.adresse}
+              photo={article.couverture}
+              className="rounded-3xl shadow-card"
+            />
+            {article.couverture.legende && (
+              <figcaption className="mt-2 text-sm text-muted-foreground">
+                {article.couverture.legende}
+              </figcaption>
+            )}
+          </figure>
+        )}
         <TexteArticle texte={article.texte} />
+        <Galerie adresse={article.adresse} photos={article.photos} />
         <Link
           to="/articles"
           className="mt-12 inline-flex items-center gap-2 font-bold text-logo-blue hover:underline"

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Newspaper, PenLine } from "lucide-react";
 
+import { Couverture } from "@/components/articles/Galerie";
 import { DecorAnime } from "@/components/DecorAnime";
 import { FilAriane } from "@/components/FilAriane";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
@@ -104,8 +105,16 @@ function Articles() {
                 <Link
                   to="/articles/$adresse"
                   params={{ adresse: a.adresse }}
-                  className="group flex h-full flex-col rounded-3xl bg-card p-6 shadow-card transition hover:-translate-y-1"
+                  className="group flex h-full flex-col overflow-hidden rounded-3xl bg-card p-6 shadow-card transition hover:-translate-y-1"
                 >
+                  {a.couverture && (
+                    <Couverture
+                      adresse={a.adresse}
+                      photo={a.couverture}
+                      taille="vignette"
+                      className="-mx-6 -mt-6 mb-5 aspect-[16/9] max-w-none !w-[calc(100%+3rem)]"
+                    />
+                  )}
                   <span className="self-start rounded-full bg-mist px-3 py-1 text-xs font-bold text-logo-blue">
                     {a.axe.libelle}
                   </span>

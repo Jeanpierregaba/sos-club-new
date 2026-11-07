@@ -9,11 +9,13 @@ Refusé en production : aucune base réelle ne doit recevoir ces comptes (docs/R
 """
 
 import asyncio
+import io
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID, uuid7
 
+from PIL import Image
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,8 +29,20 @@ from app.config import RACINE_PROJET, settings
 from app.db import SessionLocal, engine
 from app.eleves.models import Classe, Eleve
 from app.encadreurs.models import EtatVerification, Fonction
+from app.fichiers import images
+from app.fichiers.stockage import stockage
 from app.jeux import banque_initiale
-from app.moderation.models import Contenu, DecisionModeration, EtatContenu, EtatVersion, TypeDecision, VersionContenu
+from app.moderation.models import (
+    Contenu,
+    DecisionModeration,
+    EtatContenu,
+    EtatVersion,
+    Photo,
+    TypeDecision,
+    VersionContenu,
+    VersionPhoto,
+)
+from app.moderation.photos import ATTESTATION
 from app.points import service as points
 from app.points.bareme import ARTICLE_ELEVE
 from app.referentiel.models import Etablissement, Iesg, StatutEtablissement
@@ -225,6 +239,36 @@ async def _preparer_articles(db: AsyncSession) -> None:
     )
 
 
+async def _preparer_photo(db: AsyncSession) -> None:
+    """Une photo de démonstration (une image unie générée, aucune personne) sur l'article de test publié, une fois."""
+    contenu = await db.scalar(select(Contenu).where(Contenu.adresse == "article-de-test-un-point-d-eau-dans-la-cour"))
+    if contenu is None or contenu.version_publiee_id is None:
+        return
+    if await db.scalar(select(VersionPhoto.photo_id).where(VersionPhoto.version_id == contenu.version_publiee_id)):
+        return
+    sortie = io.BytesIO()
+    Image.new("RGB", (1200, 800), (46, 140, 90)).save(sortie, "JPEG")
+    preparees = await images.preparer(sortie.getvalue())
+    photo_id = uuid7()
+    cles = {taille: f"photos/{photo_id}-{taille}.webp" for taille in ("grande", "vignette")}
+    await stockage().enregistrer(cles["grande"], preparees.grande.octets)
+    await stockage().enregistrer(cles["vignette"], preparees.vignette.octets)
+    db.add(
+        Photo(
+            id=photo_id, contenu_id=contenu.id, auteur_id=contenu.auteur_id, cle_grande=cles["grande"],
+            cle_vignette=cles["vignette"], largeur=preparees.grande.largeur, hauteur=preparees.grande.hauteur,
+            octets=len(preparees.grande.octets), attestation=ATTESTATION,
+        )
+    )  # fmt: skip
+    await db.flush()
+    db.add(
+        VersionPhoto(
+            version_id=contenu.version_publiee_id, photo_id=photo_id, ordre=1, legende="Photo de test",
+            couverture=True,
+        )
+    )  # fmt: skip
+
+
 async def semer(db: AsyncSession) -> list[dict[str, str]]:
     """Prépare tous les comptes `dev.*` et renvoie leurs accès. Valide la transaction."""
     if settings.production:
@@ -266,6 +310,7 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
         acces.append(ligne)
     await _preparer_clubs(db)
     await _preparer_articles(db)
+    await _preparer_photo(db)
     journaliser(db, "comptes_de_developpement_prepares", details={"comptes": [c[0] for c in COMPTES]})
     await db.commit()
     return acces
