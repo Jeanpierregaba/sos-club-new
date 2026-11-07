@@ -20,7 +20,7 @@
 
 **Déploiement**
 
-- [ ] 6. Volume `fichiers` dans `deploy/compose.yaml`, `DOSSIER_FICHIERS`, sauvegarde et restauration du volume,
+- [x] 6. Volume `fichiers` dans `deploy/compose.yaml`, `DOSSIER_FICHIERS`, sauvegarde et restauration du volume,
       `.gitignore`.
 
 **Site**

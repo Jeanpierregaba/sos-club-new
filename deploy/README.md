@@ -180,6 +180,13 @@ docker compose exec -T db dropdb --username sosclub --force sosclub && docker co
 docker compose exec -T db pg_restore --username sosclub --dbname sosclub --single-transaction --exit-on-error < sauvegardes/FICHIER.dump
 ```
 
+Restaure aussi les fichiers (photos des articles) de la même sauvegarde, API arrêtée. Les fichiers plus récents
+que la sauvegarde restent sur le volume sans être référencés : ils sont sans effet.
+
+```bash
+docker compose run --rm --no-deps -T --entrypoint tar api -C /donnees/fichiers -xzf - < sauvegardes/FICHIER-fichiers.tar.gz
+```
+
 Redéploie ensuite, en retour arrière, **la version qui tournait quand la sauvegarde a été faite** : son nom de
 fichier l'indique (`depuis-SHA`). Le schéma de la base correspond alors au code.
 

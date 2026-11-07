@@ -80,6 +80,10 @@ services:
       SMTP_UTILISATEUR: ${SMTP_UTILISATEUR:-}
       SMTP_MOT_DE_PASSE: ${SMTP_MOT_DE_PASSE:-}
       SMTP_EXPEDITEUR: ${SMTP_EXPEDITEUR:-}
+      # Photos des articles (spec 024, ADR-0010) : le seul dossier inscriptible, sauvegardé par sauvegarder.sh.
+      DOSSIER_FICHIERS: /donnees/fichiers
+    volumes:
+      - fichiers:/donnees/fichiers
     depends_on:
       db:
         condition: service_healthy
@@ -102,6 +106,7 @@ services:
 
 volumes:
   pgdata:
+  fichiers:
 
 networks:
   interne:

@@ -12,7 +12,9 @@ COPY alembic.ini ./
 COPY alembic ./alembic
 COPY app ./app
 
-RUN useradd --create-home --uid 1000 api
+# Le dossier des fichiers (spec 024, ADR-0010) appartient à l'utilisateur de l'API : un volume Docker neuf hérite de ce
+# propriétaire au premier montage, et c'est le seul endroit inscriptible d'un conteneur en lecture seule.
+RUN useradd --create-home --uid 1000 api && mkdir -p /donnees/fichiers && chown api:api /donnees/fichiers
 USER api
 ENV PATH=/app/.venv/bin:$PATH PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 EXPOSE 8000

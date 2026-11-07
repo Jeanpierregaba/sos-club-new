@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sauvegarde la base de l'environnement dans ./sauvegardes et garde 14 jours d'historique.
+# Sauvegarde la base et les fichiers de l'environnement dans ./sauvegardes et garde 14 jours d'historique.
 # Attention : ces fichiers restent sur le VPS. Il faut encore les copier ailleurs (voir deploy/README.md).
 #
 # Usage : sauvegarder.sh [étiquette]
@@ -19,6 +19,14 @@ docker compose exec -T db pg_dump --username sosclub --format custom sosclub > "
 docker compose exec -T db pg_restore --list < "$fichier.partiel" > /dev/null
 mv "$fichier.partiel" "$fichier"
 
+# Les fichiers (photos des articles, spec 024) : archive du volume, vérifiée avant d'être gardée.
+archive="${fichier%.dump}-fichiers.tar.gz"
+docker compose exec -T api tar -C /donnees/fichiers -czf - . > "$archive.partiel"
+tar -tzf "$archive.partiel" > /dev/null
+mv "$archive.partiel" "$archive"
+
 find sauvegardes -name '*.dump' -mtime +14 -delete
+find sauvegardes -name '*-fichiers.tar.gz' -mtime +14 -delete
 find sauvegardes -name '*.partiel' -mtime +1 -delete
 echo "Sauvegarde : $PWD/$fichier"
+echo "Fichiers   : $PWD/$archive"
