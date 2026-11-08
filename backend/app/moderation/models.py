@@ -55,9 +55,13 @@ class Contenu(Suivi, Base):
     __table_args__ = (
         # Une adresse publique n'existe qu'une fois le contenu approuvé, et ne change plus ensuite.
         # Un commentaire (spec 025) n'en a pas : il se lit sous son article.
+        # Une proposition de fiche (spec 026) non plus : elle s'applique à la fiche du club.
         CheckConstraint(
-            "version_publiee_id IS NULL OR adresse IS NOT NULL OR parent_id IS NOT NULL", name="adresse_si_publie"
+            "version_publiee_id IS NULL OR adresse IS NOT NULL OR parent_id IS NOT NULL OR type = 'fiche_club'",
+            name="adresse_si_publie",
         ),
+        # Les contenus du club (spec 026), et eux seuls, portent leur club.
+        CheckConstraint("(type IN ('actualite', 'fiche_club')) = (club_id IS NOT NULL)", name="contenu_du_club"),
         # Un commentaire, et lui seul, a un contenu parent : son article.
         CheckConstraint("(type = 'commentaire') = (parent_id IS NOT NULL)", name="commentaire_a_un_parent"),
         # Un contenu refusé, dépublié ou retiré n'a plus de version en ligne ; un contenu « publié » en a toujours une.
@@ -73,6 +77,14 @@ class Contenu(Suivi, Base):
             "parent_id",
             "publie_le",
             postgresql_where=text("version_publiee_id IS NOT NULL"),
+        ),
+        Index("ix_contenu_club_id_type", "club_id", "type"),
+        # Une seule proposition de fiche en attente par club, même sous concurrence (spec 026).
+        Index(
+            "uq_contenu_fiche_en_attente",
+            "club_id",
+            unique=True,
+            postgresql_where=text("type = 'fiche_club' AND etat = 'en_attente'"),
         ),
         # Les plafonds du jour d'un auteur (spec 025 : 20 commentaires envoyés, 5 rémunérés).
         Index("ix_contenu_auteur_id_type_cree_le", "auteur_id", "type", "cree_le"),
@@ -93,6 +105,9 @@ class Contenu(Suivi, Base):
     # Choix de l'élève : son club apparaît à côté de son pseudonyme (Q20).
     # L'article d'un commentaire (spec 025) ; nul pour tout autre contenu.
     parent_id: Mapped[UUID | None] = mapped_column(ForeignKey("contenu.id", ondelete="RESTRICT"))
+    # Le club au nom duquel le président écrit (spec 026) : actualité ou proposition de fiche. L'auteur est le
+    # président en place ; une passation le transfère au successeur.
+    club_id: Mapped[UUID | None] = mapped_column(ForeignKey("club.id", ondelete="RESTRICT"))
     afficher_club: Mapped[bool] = mapped_column(server_default=text("true"))
     # DRE de l'établissement de l'auteur, copiée à chaque soumission : elle fixe le périmètre de la file.
     dre_code: Mapped[str | None] = mapped_column(ForeignKey("dre.code", ondelete="RESTRICT"))

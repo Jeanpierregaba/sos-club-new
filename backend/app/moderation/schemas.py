@@ -38,10 +38,26 @@ class ParentContenu(BaseModel):
     titre: str
 
 
+class ClubContenu(BaseModel):
+    """Le club au nom duquel le président écrit (spec 026)."""
+
+    id: UUID
+    nom: str
+
+
+class FicheActuelle(BaseModel):
+    """La fiche publique du club au moment de la lecture : l'« avant » d'une proposition de fiche."""
+
+    description: str | None
+    axes: list[str]
+
+
 class ElementFile(BaseModel):
     id: UUID
     type: str
     parent: ParentContenu | None = None
+    club: ClubContenu | None = None
+    depublication_possible: bool = True
     # Faux pour un type sans décision « à corriger » (un commentaire).
     correction_possible: bool = True
     titre: str
@@ -88,3 +104,4 @@ class ApercuModeration(ElementFile):
     photos_soumises: list[PhotoModeration]
     photos_publiees: list[PhotoModeration]
     decisions: list[DecisionPassee]
+    fiche_actuelle: FicheActuelle | None = None

@@ -6,7 +6,7 @@ Chaque tâche se termine par lint, typecheck et tests verts, puis un commit.
 
 - [x] 1. Tests de la vue du club, des propositions de fiche et des actualités (`test_espace_club.py`,
       `test_fiche_club.py`, `test_actualites.py`) écrits **avant** le code. Ils doivent échouer.
-- [ ] 2. Migration `contenus_du_club` (`club_id`, contraintes, index unique de la proposition en attente) et
+- [x] 2. Migration `contenus_du_club` (`club_id`, contraintes, index unique de la proposition en attente) et
       réglages du moteur (`depublication`, fiche actuelle dans l'aperçu, club bénéficiaire des seuls types à
       points).
 - [ ] 3. Vue « Mon club » et propositions de fiche (`clubs/espace.py`, dépendance `President`). Les tests de

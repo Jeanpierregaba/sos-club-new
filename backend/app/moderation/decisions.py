@@ -18,7 +18,7 @@ from sqlalchemy.orm import aliased
 
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
-from app.clubs.models import Adhesion, Club, EtatAdhesion, EtatClub
+from app.clubs.models import Adhesion, Club, ClubAxe, EtatAdhesion, EtatClub
 from app.comptes.inscription import Refus
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.eleves.models import Eleve
@@ -37,8 +37,10 @@ from app.moderation.photos import photos_de
 from app.moderation.schemas import (
     ApercuModeration,
     AuteurFile,
+    ClubContenu,
     DecisionPassee,
     ElementFile,
+    FicheActuelle,
     FileModeration,
     ParentContenu,
     PhotoModeration,
@@ -85,16 +87,17 @@ _titre_parent = (
     .scalar_subquery()
 )
 
-Ligne = tuple[Contenu, Utilisateur, VersionContenu, str | None, str | None, str | None]
+Ligne = tuple[Contenu, Utilisateur, VersionContenu, str | None, str | None, str | None, str | None]
 
 
 def _requete(acces: Acces) -> Select[Ligne]:
     """Chaque contenu avec son auteur, la version qu'on modère (de travail, sinon en ligne, sinon la dernière) et l'établissement de
     l'auteur, filtrés par le périmètre du collaborateur."""
     requete = (
-        select(Contenu, Utilisateur, _Travail, _EtablissementAuteur.nom, _Parent.adresse, _titre_parent)
+        select(Contenu, Utilisateur, _Travail, _EtablissementAuteur.nom, _Parent.adresse, _titre_parent, Club.nom)
         .join(Utilisateur, Utilisateur.id == Contenu.auteur_id)
         .outerjoin(_Parent, _Parent.id == Contenu.parent_id)
+        .outerjoin(Club, Club.id == Contenu.club_id)
         .join(_Travail, _Travail.id == func.coalesce(Contenu.version_travail_id, Contenu.version_publiee_id, _derniere))
         .outerjoin(Eleve, Eleve.utilisateur_id == Contenu.auteur_id)
         .outerjoin(Encadreur, Encadreur.utilisateur_id == Contenu.auteur_id)
@@ -115,10 +118,13 @@ def _element(
     etablissement: str | None,
     adresse_parent: str | None,
     titre_parent: str | None,
+    nom_club: str | None,
 ) -> ElementFile:
     return ElementFile(
         id=contenu.id,
         type=contenu.type,
+        club=ClubContenu(id=contenu.club_id, nom=nom_club or "") if contenu.club_id is not None else None,
+        depublication_possible=type_de(contenu.type).depublication,
         parent=ParentContenu(adresse=adresse_parent, titre=titre_parent or "")
         if contenu.parent_id is not None
         else None,
@@ -206,7 +212,15 @@ async def apercu(db: AsyncSession, acces: Acces, contenu_id: UUID) -> ApercuMode
         .order_by(DecisionModeration.decide_le.desc(), DecisionModeration.id.desc())
     )
     autre = soumise.id != contenu.version_publiee_id
+    fiche_actuelle = None
+    if contenu.club_id is not None and contenu.type == "fiche_club":
+        club = await db.get(Club, contenu.club_id)
+        axes = await db.scalars(
+            select(ClubAxe.axe_code).where(ClubAxe.club_id == contenu.club_id).order_by(ClubAxe.axe_code)
+        )
+        fiche_actuelle = FicheActuelle(description=club.description if club else None, axes=list(axes))
     return ApercuModeration(
+        fiche_actuelle=fiche_actuelle,
         **_element(*ligne).model_dump(),
         soumise=soumise.donnees if autre else None,
         photos_soumises=[_photo(p, ph) for p, ph in await photos_de(db, soumise.id)] if autre else [],
@@ -330,7 +344,8 @@ async def approuver(db: AsyncSession, acces: Acces, contenu_id: UUID, version: i
     # Les lectures d'abord : une requête déclenche l'écriture des changements en attente (autoflush).
     adresse = await _adresse_libre(db, titre) if premiere and type_contenu.adresse else contenu.adresse
     club_id = None
-    if premiere and auteur.role is Role.eleve:
+    # Le club bénéficiaire (R13) d'un contenu qui rapporte des points seulement : pas d'une actualité ni d'une fiche.
+    if premiere and auteur.role is Role.eleve and type_contenu.actions_auteur:
         # Le club de l'élève affilié à la première approbation : R13 lui créditera ses points.
         club_id = await db.scalar(
             select(Adhesion.club_id)
@@ -401,6 +416,8 @@ async def refuser(db: AsyncSession, acces: Acces, contenu_id: UUID, version: int
 
 async def depublier(db: AsyncSession, acces: Acces, contenu_id: UUID, version: int, motif: str, ip: str) -> None:
     contenu = await _a_decider(db, acces, contenu_id, version)
+    if not type_de(contenu.type).depublication:
+        raise Refus("Ce contenu ne se retire pas du site : il a déjà été appliqué.", 409)
     if contenu.version_publiee_id is None:
         raise Refus("Ce contenu n'est pas en ligne.", 409)
     publiee = await db.get(VersionContenu, contenu.version_publiee_id)

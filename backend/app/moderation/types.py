@@ -30,6 +30,8 @@ class TypeContenu:
     adresse: bool = True
     # La décision « à corriger » : un commentaire est court, son auteur en écrit un autre.
     correction: bool = True
+    # La décision « retirer du site » : une proposition de fiche (spec 026) s'applique, elle ne se dépublie pas.
+    depublication: bool = True
     # Appelée à la première approbation, sous le verrou de l'auteur : faux = publié sans points (plafond du jour).
     points_permis: Callable[[AsyncSession, Contenu], Awaitable[bool]] | None = None
     # Appelée à la première approbation, dans la transaction de la décision (notifier l'auteur de l'article…).
