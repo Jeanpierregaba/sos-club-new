@@ -53,30 +53,30 @@ encadreurs rattachés.
 
 ## Critères d'acceptation
 
-- [ ] Étant donné le président d'un club actif, quand il ouvre `/api/clubs/moi/espace`, alors il reçoit
+- [x] Étant donné le président d'un club actif, quand il ouvre `/api/clubs/moi/espace`, alors il reçoit
       l'identité, les indicateurs, les demandes en attente et le suivi de ses propositions.
-- [ ] Étant donné un membre actif ou un encadreur rattaché, alors il reçoit l'identité, les indicateurs, les
+- [x] Étant donné un membre actif ou un encadreur rattaché, alors il reçoit l'identité, les indicateurs, les
       actualités publiées et les membres, sans demandes ni suivi ; tout autre compte reçoit 404.
-- [ ] Étant donné un membre, un encadreur ou un ancien président, quand il tente une action de gestion (modifier
+- [x] Étant donné un membre, un encadreur ou un ancien président, quand il tente une action de gestion (modifier
       la fiche, écrire, soumettre ou retirer une actualité, traiter une demande), alors l'API répond 403 ou 404 et
       rien ne change.
-- [ ] Étant donné une proposition de fiche en attente, alors la fiche publique reste l'ancienne ; une seconde
+- [x] Étant donné une proposition de fiche en attente, alors la fiche publique reste l'ancienne ; une seconde
       proposition est refusée (409) tant que la première n'est pas décidée ou retirée.
-- [ ] Étant donné une proposition approuvée, alors la description et les axes de la fiche publique changent, et le
+- [x] Étant donné une proposition approuvée, alors la description et les axes de la fiche publique changent, et le
       président est notifié ; refusée, rien ne change et le motif est notifié.
-- [ ] Étant donné une description de plus de 300 caractères, aucun axe, plus de 3 axes ou un axe inconnu, alors
+- [x] Étant donné une description de plus de 300 caractères, aucun axe, plus de 3 axes ou un axe inconnu, alors
       l'API répond 422.
-- [ ] Étant donné une actualité en brouillon, en attente, à corriger, refusée ou dépubliée, alors elle n'apparaît
+- [x] Étant donné une actualité en brouillon, en attente, à corriger, refusée ou dépubliée, alors elle n'apparaît
       ni sur la fiche publique, ni dans `/articles`, ni par son adresse.
-- [ ] Étant donné une actualité approuvée, alors elle apparaît sur la fiche du club et dans `/articles` avec la
+- [x] Étant donné une actualité approuvée, alors elle apparaît sur la fiche du club et dans `/articles` avec la
       mention « Actualité du club », signée du nom du club, sans nom ni pseudonyme d'élève, et sans point crédité.
-- [ ] Étant donné une modification de fiche ou une actualité, alors elle arrive dans le centre de modération,
+- [x] Étant donné une modification de fiche ou une actualité, alors elle arrive dans le centre de modération,
       visible d'un modérateur national ou de la DRE du club, jamais d'un autre ; le président ne décide jamais.
-- [ ] Étant donné une passation validée, alors le nouveau président voit et gère les actualités et propositions du
+- [x] Étant donné une passation validée, alors le nouveau président voit et gère les actualités et propositions du
       club, et l'ancien reçoit 403 ou 404 sur chacune.
-- [ ] Étant donné un club non actif (en attente ou refusé), alors son président ne gère rien (403). La suspension d'un club
+- [x] Étant donné un club non actif (en attente ou refusé), alors son président ne gère rien (403). La suspension d'un club
       n'existe pas encore (spec 019) : le jour où elle existera, l'approbation d'une actualité devra la vérifier.
-- [ ] Le site affiche « Mon club » pour le président (gestion) et pour les membres (lecture), l'écriture d'une
+- [x] Le site affiche « Mon club » pour le président (gestion) et pour les membres (lecture), l'écriture d'une
       actualité, la proposition de fiche et leur modération, lisibles sur téléphone.
 
 ## Cas limites et erreurs

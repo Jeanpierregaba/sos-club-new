@@ -8,7 +8,6 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] [026 Espace du président](docs/specs/026-espace-du-president/spec.md) (R8, Q3, Q20)
 
 ## À faire
 
@@ -73,6 +72,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] [026 — Espace du président](docs/specs/026-espace-du-president/spec.md) (R8 : « Mon club » pour le président, lecture pour les membres et encadreurs ; propositions de fiche et actualités du club modérées, signées du club, sans point ; passation qui transmet les contenus)
 - [x] [025 — Commentaires prémodérés](docs/specs/025-commentaires/spec.md) (R7 : type `commentaire` du moteur ADR-0009, rattaché à l'article ; élèves et encadreurs actifs, liste à plat, +5 dans la limite de 5 par jour, 20 envois par jour au plus ; auteur de l'article notifié ; retrait par l'auteur)
 - [x] [024 — Photos des articles](docs/specs/024-photos-des-articles/spec.md) (disque du VPS derrière `Stockage`, ADR-0010 ; attestation Q8 ; WebP sans métadonnées ; couverture et galerie, 5 photos de 8 Mo ; purge à 90 jours ; volume sauvegardé)
 - [x] [023 — Centre de modération, articles et notifications](docs/specs/023-moderation-et-articles/spec.md) (moteur commun ADR-0009 : six états, versions, quatre décisions, périmètre DRE ; articles en texte, pages publiques, cloche des notifications ; +50 à la première approbation, club bénéficiaire enregistré pour R13)

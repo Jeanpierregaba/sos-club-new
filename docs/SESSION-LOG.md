@@ -14,7 +14,7 @@ Format :
 - Prochaine étape :
 -->
 
-### 2026-11-08 — Photos des articles (spec 024) et commentaires (spec 025)
+### 2026-11-08 — Photos (spec 024), commentaires (spec 025) et espace du président (spec 026)
 
 - Fait : spec 024 livrée (photos stockées sur le disque du VPS derrière l'interface `Stockage` de l'ADR-0010,
   attestation de l'auteur pour chaque photo, recompression en WebP sans métadonnées, couverture et galerie,
@@ -34,8 +34,13 @@ Format :
   toujours affiché, `EN_SERVICE`, brouillons qui bloquaient) et 4 mineurs corrigés.
 - Piège : `op.create_check_constraint` applique la convention de nommage (préfixe doublé) : passer `op.f(...)`.
   Un `downgrade -1` après une montée échouée descend d'une migration de trop.
-- Prochaine étape : pousser develop (migrations 023, 024 et 025, volume `fichiers`), puis R8 (espace du
-  président).
+- Spec 026 livrée (espace du président, R8) : « Mon club » (gestion pour le président, lecture pour les membres
+  et encadreurs rattachés), propositions de fiche (description et axes) et actualités du club, deux types du
+  moteur rattachés par `contenu.club_id` ; l'auteur est le président en place, transféré à la passation ;
+  rédaction des articles réutilisée (`routes_de_redaction`). Relecture `reviewer` : 2 constats importants
+  (commentaires affichés sous une actualité, course entre création et passation, corrigée par un verrou partagé
+  sur le club) et 7 mineurs corrigés.
+- Prochaine étape : pousser develop (migrations 023 à 026, volume `fichiers`), puis R9 (quiz).
 
 ### 2026-11-07 — « Quel axe » animée, spec 023 (centre de modération, articles, notifications)
 
