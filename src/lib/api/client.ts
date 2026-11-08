@@ -500,7 +500,8 @@ export const chargerArticle = (adresse: string) =>
   requeteApi<ArticlePublic>(`/api/articles/${encodeURIComponent(adresse)}`);
 
 // Commentaires (spec 025) : en attente jusqu'à leur approbation, puis lisibles sous l'article.
-const commentairesDe = (adresse: string) => `/api/articles/${encodeURIComponent(adresse)}/commentaires`;
+const commentairesDe = (adresse: string) =>
+  `/api/articles/${encodeURIComponent(adresse)}/commentaires`;
 export const chargerCommentaires = (adresse: string, page = 1) =>
   requeteApi<CommentairesPublics>(avecParametres(commentairesDe(adresse), { page }));
 export const commenterArticle = (adresse: string, texte: string) =>

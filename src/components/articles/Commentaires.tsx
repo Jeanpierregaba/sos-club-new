@@ -18,7 +18,7 @@ import {
 import { signer } from "@/lib/articles";
 import { dateCourte } from "@/lib/dates";
 
-export const LONGUEUR_MAX = 1000;
+const LONGUEUR_MAX = 1000;
 const CONFIRMATION = "Merci ! Ton commentaire sera visible après sa validation.";
 
 // Les commentaires d'un article (spec 025). Le texte est affiché tel quel, jamais interprété : ni HTML, ni
