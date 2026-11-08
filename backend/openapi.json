@@ -6899,6 +6899,194 @@
         }
       }
     },
+    "/api/quiz": {
+      "get": {
+        "tags": [
+          "quiz"
+        ],
+        "summary": "Lister",
+        "operationId": "lister_api_quiz_get",
+        "parameters": [
+          {
+            "name": "axe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Axe"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListeQuiz"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/quiz/{quiz_id}/tentatives": {
+      "post": {
+        "tags": [
+          "quiz"
+        ],
+        "summary": "Lancer",
+        "operationId": "lancer_api_quiz__quiz_id__tentatives_post",
+        "parameters": [
+          {
+            "name": "quiz_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Quiz Id"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatPartie"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/quiz/tentatives/{tentative_id}": {
+      "get": {
+        "tags": [
+          "quiz"
+        ],
+        "summary": "Reprendre",
+        "operationId": "reprendre_api_quiz_tentatives__tentative_id__get",
+        "parameters": [
+          {
+            "name": "tentative_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tentative Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatPartie"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/quiz/tentatives/{tentative_id}/reponses": {
+      "post": {
+        "tags": [
+          "quiz"
+        ],
+        "summary": "Repondre",
+        "operationId": "repondre_api_quiz_tentatives__tentative_id__reponses_post",
+        "parameters": [
+          {
+            "name": "tentative_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tentative Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReponseJoueur"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatPartie"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -10676,6 +10864,58 @@
         ],
         "title": "EtatInscription"
       },
+      "EtatPartie": {
+        "properties": {
+          "tentative_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tentative Id"
+          },
+          "quiz_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Quiz Id"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "question": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuestionJoueur"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resultat": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResultatPartie"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "tentative_id",
+          "quiz_id",
+          "titre",
+          "total",
+          "question",
+          "resultat"
+        ],
+        "title": "EtatPartie"
+      },
       "EtatVerification": {
         "type": "string",
         "enum": [
@@ -12108,6 +12348,32 @@
         ],
         "title": "LignePoints"
       },
+      "ListeQuiz": {
+        "properties": {
+          "nb_questions": {
+            "type": "integer",
+            "title": "Nb Questions"
+          },
+          "seuil": {
+            "type": "integer",
+            "title": "Seuil"
+          },
+          "quiz": {
+            "items": {
+              "$ref": "#/components/schemas/QuizJoueur"
+            },
+            "type": "array",
+            "title": "Quiz"
+          }
+        },
+        "type": "object",
+        "required": [
+          "nb_questions",
+          "seuil",
+          "quiz"
+        ],
+        "title": "ListeQuiz"
+      },
       "LotEntree": {
         "properties": {
           "elements": {
@@ -13405,6 +13671,42 @@
         ],
         "title": "PseudonymeEntree"
       },
+      "QuestionJoueur": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "enonce": {
+            "type": "string",
+            "title": "Enonce"
+          },
+          "choix": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Choix"
+          },
+          "temps_ms": {
+            "type": "integer",
+            "title": "Temps Ms"
+          },
+          "restant_ms": {
+            "type": "integer",
+            "title": "Restant Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rang",
+          "enonce",
+          "choix",
+          "temps_ms",
+          "restant_ms"
+        ],
+        "title": "QuestionJoueur"
+      },
       "QuestionQuelAxe": {
         "properties": {
           "numero": {
@@ -13446,6 +13748,75 @@
           "questions"
         ],
         "title": "QuestionnaireQuelAxe"
+      },
+      "QuizJoueur": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "axe_code": {
+            "type": "string",
+            "title": "Axe Code"
+          },
+          "contenu_de_test": {
+            "type": "boolean",
+            "title": "Contenu De Test"
+          },
+          "publie_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publie Le"
+          },
+          "reussi": {
+            "type": "boolean",
+            "title": "Reussi"
+          },
+          "meilleur_score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meilleur Score"
+          },
+          "tentatives_restantes": {
+            "type": "integer",
+            "title": "Tentatives Restantes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "titre",
+          "description",
+          "axe_code",
+          "contenu_de_test",
+          "publie_le",
+          "reussi",
+          "meilleur_score",
+          "tentatives_restantes"
+        ],
+        "title": "QuizJoueur"
       },
       "RattachementAValider": {
         "properties": {
@@ -13699,6 +14070,27 @@
         ],
         "title": "ReponseDefi"
       },
+      "ReponseJoueur": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Rang"
+          },
+          "choix": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Choix"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rang",
+          "choix"
+        ],
+        "title": "ReponseJoueur"
+      },
       "ReponseQuelAxe": {
         "properties": {
           "id": {
@@ -13773,6 +14165,39 @@
         ],
         "title": "ResultatLot",
         "description": "Chaque demande d'un lot est traitée à part : celles qui échouent n'empêchent pas les autres."
+      },
+      "ResultatPartie": {
+        "properties": {
+          "score": {
+            "type": "integer",
+            "title": "Score"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "seuil": {
+            "type": "integer",
+            "title": "Seuil"
+          },
+          "reussie": {
+            "type": "boolean",
+            "title": "Reussie"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "score",
+          "total",
+          "seuil",
+          "reussie",
+          "points"
+        ],
+        "title": "ResultatPartie"
       },
       "ResultatQuelAxe": {
         "properties": {

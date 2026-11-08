@@ -34,6 +34,7 @@ from app.moderation.photos import purger_regulierement as purger_photos_regulier
 from app.moderation.router import router_admin as router_moderation_admin
 from app.notifications.router import router as router_notifications
 from app.points.router import router_admin as router_points_admin
+from app.quiz.router import router as router_quiz
 from app.referentiel.router import router_admin as router_referentiel_admin
 from app.referentiel.router import router_public as router_referentiel
 
@@ -78,6 +79,7 @@ api.include_router(router_articles)
 api.include_router(router_commentaires)
 api.include_router(router_commentaires_auteur)
 api.include_router(router_moderation_admin)
+api.include_router(router_quiz)
 app.include_router(api)
 
 

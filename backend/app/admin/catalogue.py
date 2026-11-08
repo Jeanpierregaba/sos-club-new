@@ -51,7 +51,7 @@ MODULES: dict[str, tuple[str, bool, tuple[Action, ...]]] = {
     "contenus": ("Contenus et rubriques", False, (C, CR, M, S, A, D)),
     "agenda": ("Agenda et campagnes", False, (C, CR, M, S, A, D)),
     "rapports": ("Rapports d'activités", False, (C, A)),
-    "quiz": ("Quiz et certification", False, (C, CR, M, S, A, D)),
+    "quiz": ("Quiz et certification", True, (C, CR, M, S, A, D)),
     "points": ("Points et classements", True, (C, M)),
     # Vérification des encadreurs (spec 018) : un collaborateur de DRE ne voit que les demandes de sa DRE.
     "encadreurs": ("Encadreurs à vérifier", True, (C, A)),

@@ -8,6 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
+- [ ] [027 — Quiz chronométrés et banque de quiz](docs/specs/027-quiz/spec.md) (R9 ; tâches dans `tasks.md`)
 
 ## À faire
 

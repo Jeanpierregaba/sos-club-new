@@ -216,7 +216,7 @@ def test_le_bareme_initial_contient_toute_la_grille(en_base: Callable[..., Any])
         return nombre, en_service
 
     # Les actions écrites par une spec livrée : la bienvenue élève (017), encadreur (018), la question du jour (022),
-    # les articles (023), les commentaires (025).
+    # les articles (023), les commentaires (025), les quiz (027).
     assert en_base(lire) == (
         37,
         [
@@ -224,6 +224,7 @@ def test_le_bareme_initial_contient_toute_la_grille(en_base: Callable[..., Any])
             BIENVENUE_ELEVE,
             "eleve.commentaire",
             QUESTION_JOUR_ELEVE,
+            "eleve.quiz",
             ARTICLE_ENCADREUR,
             BIENVENUE_ENCADREUR,
             "encadreur.commentaire",

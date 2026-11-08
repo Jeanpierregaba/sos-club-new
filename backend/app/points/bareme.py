@@ -31,6 +31,7 @@ ARTICLE_ELEVE = "eleve.article"
 ARTICLE_ENCADREUR = "encadreur.article"
 COMMENTAIRE_ELEVE = "eleve.commentaire"
 COMMENTAIRE_ENCADREUR = "encadreur.commentaire"
+QUIZ_ELEVE = "eleve.quiz"
 QUESTION_JOUR_CLUB = "club.question_jour_eleve"
 
 # Référentiel « Harmonisation de la gamification » du 2026-11-05 (spec 022). La part du club n'est créditée que
@@ -41,7 +42,7 @@ GRILLE: tuple[Action, ...] = (
     Action("eleve.republication", "eleve", "Republication d'un article du site, vérifiée", 10),
     Action(ARTICLE_ELEVE, "eleve", "Article personnel approuvé", 50),
     Action("eleve.partage", "eleve", "Partage de son article, par réseau, vérifié", 50),
-    Action("eleve.quiz", "eleve", "Quiz santé réussi, première fois", 50),
+    Action(QUIZ_ELEVE, "eleve", "Quiz santé réussi, première fois", 50),
     Action(QUESTION_JOUR_ELEVE, "eleve", "Bonne réponse à la question du jour", 20),
     Action("eleve.badge", "eleve", "Badge de certification obtenu (5 au plus)", 500),
     Action("eleve.certification", "eleve", "Certification Génie Imhotep", 1000),
@@ -86,6 +87,7 @@ EN_SERVICE: frozenset[str] = frozenset(
         ARTICLE_ENCADREUR,
         COMMENTAIRE_ELEVE,
         COMMENTAIRE_ENCADREUR,
+        QUIZ_ELEVE,
     }
 )
 

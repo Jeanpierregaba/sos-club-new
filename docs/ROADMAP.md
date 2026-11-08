@@ -74,11 +74,11 @@ pièces jointes (suite de l'ADR-0005).
 
 ## Phase 3 — Quiz et certification (P0)
 
-| Code | Spec                        | Côté utilisateurs                                                                                                         | Côté admin                                                                                                       | Taille | Questions     |
-| ---- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------ | ------------- |
-| R9   | Quiz                        | Quiz chronométrés arbitrés par le serveur (ADR-0004) ; points à la première réussite seulement (+25 / +10, +25 encadreur) | Banque de quiz : créer, tester, publier, paramètres versionnés ; aucun droit pour les encadreurs, même par l'API | L      | Q11, Q12, Q24 |
-| R10  | Ressources et fascicules    | Bibliothèque : fascicules, magazines, guides PDF                                                                          | Gestion des ressources                                                                                           | S      | Q11           |
-| R11  | Certification Génie Imhotep | Parcours des 12 quiz obligatoires, 5 badges, certificat vérifiable, +1 000 (élève et encadreur) et +100 au club           | Seuils et règles des badges, réémission et révocation des certificats                                            | M      | Q24, Q25      |
+| Code | Spec                        | Côté utilisateurs                                                                                                                                     | Côté admin                                                                                                       | Taille | Questions     |
+| ---- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------ | ------------- |
+| R9   | Quiz                        | Quiz chronométrés arbitrés par le serveur (ADR-0004) ; points à la première réussite seulement (+50 élève, encadreur à 0 ; +25 club en R13, spec 022) | Banque de quiz : créer, tester, publier, paramètres versionnés ; aucun droit pour les encadreurs, même par l'API | L      | Q11, Q12, Q24 |
+| R10  | Ressources et fascicules    | Bibliothèque : fascicules, magazines, guides PDF                                                                                                      | Gestion des ressources                                                                                           | S      | Q11           |
+| R11  | Certification Génie Imhotep | Parcours des 12 quiz obligatoires, 5 badges, certificat vérifiable, +1 000 (élève et encadreur) et +100 au club                                       | Seuils et règles des badges, réémission et révocation des certificats                                            | M      | Q24, Q25      |
 
 ## Phase 4 — Rapports d'activités (P0)
 

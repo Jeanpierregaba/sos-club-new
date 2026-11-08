@@ -2327,6 +2327,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/quiz": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister */
+        get: operations["lister_api_quiz_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/quiz/{quiz_id}/tentatives": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Lancer */
+        post: operations["lancer_api_quiz__quiz_id__tentatives_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/quiz/tentatives/{tentative_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reprendre */
+        get: operations["reprendre_api_quiz_tentatives__tentative_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/quiz/tentatives/{tentative_id}/reponses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Repondre */
+        post: operations["repondre_api_quiz_tentatives__tentative_id__reponses_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -3711,6 +3779,25 @@ export interface components {
             /** Version Charte */
             version_charte: string;
         };
+        /** EtatPartie */
+        EtatPartie: {
+            /**
+             * Tentative Id
+             * Format: uuid
+             */
+            tentative_id: string;
+            /**
+             * Quiz Id
+             * Format: uuid
+             */
+            quiz_id: string;
+            /** Titre */
+            titre: string;
+            /** Total */
+            total: number;
+            question: components["schemas"]["QuestionJoueur"] | null;
+            resultat: components["schemas"]["ResultatPartie"] | null;
+        };
         /**
          * EtatVerification
          * @enum {string}
@@ -4162,6 +4249,15 @@ export interface components {
             cree_le: string;
             /** Semestre */
             semestre: string | null;
+        };
+        /** ListeQuiz */
+        ListeQuiz: {
+            /** Nb Questions */
+            nb_questions: number;
+            /** Seuil */
+            seuil: number;
+            /** Quiz */
+            quiz: components["schemas"]["QuizJoueur"][];
         };
         /** LotEntree */
         LotEntree: {
@@ -4617,6 +4713,19 @@ export interface components {
             /** Motif */
             motif: string;
         };
+        /** QuestionJoueur */
+        QuestionJoueur: {
+            /** Rang */
+            rang: number;
+            /** Enonce */
+            enonce: string;
+            /** Choix */
+            choix: string[];
+            /** Temps Ms */
+            temps_ms: number;
+            /** Restant Ms */
+            restant_ms: number;
+        };
         /** QuestionQuelAxe */
         QuestionQuelAxe: {
             /** Numero */
@@ -4630,6 +4739,30 @@ export interface components {
         QuestionnaireQuelAxe: {
             /** Questions */
             questions: components["schemas"]["QuestionQuelAxe"][];
+        };
+        /** QuizJoueur */
+        QuizJoueur: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Titre */
+            titre: string;
+            /** Description */
+            description: string;
+            /** Axe Code */
+            axe_code: string;
+            /** Contenu De Test */
+            contenu_de_test: boolean;
+            /** Publie Le */
+            publie_le: string | null;
+            /** Reussi */
+            reussi: boolean;
+            /** Meilleur Score */
+            meilleur_score: number | null;
+            /** Tentatives Restantes */
+            tentatives_restantes: number;
         };
         /**
          * RattachementAValider
@@ -4742,6 +4875,13 @@ export interface components {
             /** Choix */
             choix: number;
         };
+        /** ReponseJoueur */
+        ReponseJoueur: {
+            /** Rang */
+            rang: number;
+            /** Choix */
+            choix: number;
+        };
         /** ReponseQuelAxe */
         ReponseQuelAxe: {
             /**
@@ -4766,6 +4906,19 @@ export interface components {
             reussies: string[];
             /** Echecs */
             echecs: components["schemas"]["EchecLot"][];
+        };
+        /** ResultatPartie */
+        ResultatPartie: {
+            /** Score */
+            score: number;
+            /** Total */
+            total: number;
+            /** Seuil */
+            seuil: number;
+            /** Reussie */
+            reussie: boolean;
+            /** Points */
+            points: number;
         };
         /** ResultatQuelAxe */
         ResultatQuelAxe: {
@@ -9670,6 +9823,134 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lister_api_quiz_get: {
+        parameters: {
+            query?: {
+                axe?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListeQuiz"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lancer_api_quiz__quiz_id__tentatives_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatPartie"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reprendre_api_quiz_tentatives__tentative_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tentative_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatPartie"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    repondre_api_quiz_tentatives__tentative_id__reponses_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tentative_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReponseJoueur"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatPartie"];
+                };
             };
             /** @description Validation Error */
             422: {
