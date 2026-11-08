@@ -8,6 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
+- [ ] [026 Espace du président](docs/specs/026-espace-du-president/spec.md) (R8, Q3, Q20)
 
 ## À faire
 
@@ -30,7 +31,6 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 - [x] R6 — Centre de modération, articles et notifications internes (spec 023, ADR-0009)
 - [ ] Purge des notifications lues de plus d'un an (signalée par la spec 023)
 - [ ] Balayage des fichiers orphelins du stockage (signalé par la spec 024)
-- [ ] R8 — Espace du président : tableau de bord, fiche, actualités du club (Q20)
 
 **Phase 3 — Quiz et certification (P0)**
 
