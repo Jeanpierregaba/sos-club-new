@@ -1,5 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { CalendarRange, LogOut, MessageCircle, PenLine, Star, Trophy, Users } from "lucide-react";
+import {
+  Brain,
+  CalendarRange,
+  LogOut,
+  MessageCircle,
+  PenLine,
+  Star,
+  Trophy,
+  Users,
+} from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
@@ -21,7 +30,8 @@ export function EnTeteEspace({
   // Le lien « Mon club » (spec 026) : un élève président ou membre actif d'un club. Un encadreur ouvre l'espace
   // de chacun de ses clubs depuis « Mes clubs ».
   monClub?: boolean;
-  // Les liens « Mes articles » et « Mes commentaires » : élève, ou encadreur vérifié (specs 023 et 025).
+  // Les liens « Mes articles », « Mes commentaires » et « Quiz » : élève, ou encadreur vérifié (specs 023, 025
+  // et 027).
   articles?: boolean;
   children?: ReactNode;
 }) {
@@ -60,6 +70,14 @@ export function EnTeteEspace({
               className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
             >
               <Users className="size-4" /> Mon club
+            </Link>
+          )}
+          {articles && (
+            <Link
+              to="/quiz"
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
+            >
+              <Brain className="size-4" /> Quiz
             </Link>
           )}
           {articles && (

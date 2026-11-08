@@ -8,6 +8,7 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import {
+  Brain,
   Download,
   ExternalLink,
   Flag,
@@ -94,6 +95,12 @@ function entrees(admin: AdminMoi): Entree[] {
       i: ShieldCheck,
       visible: peut(admin, "moderation", "consulter"),
       compteur: admin.contenus_a_moderer ?? 0,
+    },
+    {
+      to: "/admin/quiz",
+      libelle: "Quiz",
+      i: Brain,
+      visible: peut(admin, "quiz", "consulter"),
     },
     {
       to: "/admin/encadreurs",

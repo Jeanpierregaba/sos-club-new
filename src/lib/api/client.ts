@@ -127,6 +127,21 @@ export type PropositionFiche = Schemas["PropositionFiche"];
 export type MesCommentaires = Schemas["MesCommentaires"];
 export type CommentairePublic = Schemas["CommentairePublic"];
 export type CommentairesPublics = Schemas["CommentairesPublics"];
+export type EtatPartie = Schemas["EtatPartie"];
+export type QuestionJoueur = Schemas["QuestionJoueur"];
+export type ResultatPartie = Schemas["ResultatPartie"];
+export type ListeQuiz = Schemas["ListeQuiz"];
+export type QuizJoueur = Schemas["QuizJoueur"];
+export type EtatQuiz = Schemas["EtatQuiz"];
+export type QuizBanque = Schemas["QuizBanque"];
+export type QuizDetail = Schemas["QuizDetail"];
+export type QuestionBanque = Schemas["QuestionBanque"];
+export type QuestionEntree = Schemas["QuestionEntree"];
+export type QuizEntree = Schemas["QuizEntree"];
+export type ListeBanque = Schemas["ListeBanque"];
+export type ParametresEntree = Schemas["ParametresEntree"];
+export type ParametresSortie = Schemas["ParametresSortie"];
+export type HistoriqueParametres = Schemas["HistoriqueParametres"];
 
 export const MESSAGE_SAISIE = "Vérifie le formulaire : un champ est vide, trop long ou mal rempli.";
 
@@ -624,3 +639,55 @@ export const retirerPhoto = (
     undefined,
     "DELETE",
   );
+
+// Quiz (spec 027) ----------------------------------------------------------------------------------------
+// Le serveur arbitre la partie : il envoie une question à la fois, sans sa réponse, et calcule seul le score.
+
+// Les appels d'une partie : ceux du joueur, ou ceux du mode test de l'espace admin.
+export type AppelsPartie = {
+  reprendre: (tentativeId: string) => Promise<EtatPartie>;
+  repondre: (tentativeId: string, rang: number, choix: number) => Promise<EtatPartie>;
+};
+
+export const chargerQuiz = (axe?: string) =>
+  requeteApi<ListeQuiz>(avecParametres("/api/quiz", { axe }));
+export const lancerQuiz = (quizId: string) =>
+  envoyerJson<EtatPartie>(`/api/quiz/${quizId}/tentatives`);
+export const partieJoueur: AppelsPartie = {
+  reprendre: (id) => requeteApi<EtatPartie>(`/api/quiz/tentatives/${id}`),
+  repondre: (id, rang, choix) =>
+    envoyerJson<EtatPartie>(`/api/quiz/tentatives/${id}/reponses`, { rang, choix }),
+};
+
+const BANQUE = "/api/admin/quiz";
+export const chargerBanque = (etat?: EtatQuiz) =>
+  requeteApi<ListeBanque>(avecParametres(BANQUE, { etat }));
+export const chargerQuizBanque = (id: string) => requeteApi<QuizDetail>(`${BANQUE}/${id}`);
+export const creerQuiz = (entree: QuizEntree) => envoyerJson<QuizDetail>(BANQUE, entree);
+export const modifierQuiz = (id: string, entree: QuizEntree) =>
+  envoyerJson<QuizDetail>(`${BANQUE}/${id}`, entree, "PUT");
+export const ajouterQuestion = (id: string, entree: QuestionEntree) =>
+  envoyerJson<QuizDetail>(`${BANQUE}/${id}/questions`, entree);
+export const modifierQuestion = (id: string, questionId: string, entree: QuestionEntree) =>
+  envoyerJson<QuizDetail>(`${BANQUE}/${id}/questions/${questionId}`, entree, "PUT");
+export const retirerQuestion = (id: string, questionId: string) =>
+  envoyerJson<QuizDetail>(`${BANQUE}/${id}/questions/${questionId}`, undefined, "DELETE");
+export const soumettreQuiz = (id: string) => envoyerJson<QuizDetail>(`${BANQUE}/${id}/soumettre`);
+export const reprendreQuiz = (id: string) => envoyerJson<QuizDetail>(`${BANQUE}/${id}/reprendre`);
+export const approuverQuiz = (
+  id: string,
+  entree: { validateur_nom: string; validateur_qualite: string },
+) => envoyerJson<QuizDetail>(`${BANQUE}/${id}/approuver`, entree);
+export const refuserQuiz = (id: string, motif: string) =>
+  envoyerJson<QuizDetail>(`${BANQUE}/${id}/refuser`, { motif });
+export const depublierQuiz = (id: string, motif: string) =>
+  envoyerJson<QuizDetail>(`${BANQUE}/${id}/depublier`, { motif });
+export const lancerEssai = (id: string) => envoyerJson<EtatPartie>(`${BANQUE}/${id}/essais`);
+export const partieEssai: AppelsPartie = {
+  reprendre: (id) => requeteApi<EtatPartie>(`${BANQUE}/essais/${id}`),
+  repondre: (id, rang, choix) =>
+    envoyerJson<EtatPartie>(`${BANQUE}/essais/${id}/reponses`, { rang, choix }),
+};
+export const chargerParametresQuiz = () => requeteApi<HistoriqueParametres>(`${BANQUE}/parametres`);
+export const changerParametresQuiz = (entree: ParametresEntree) =>
+  envoyerJson<ParametresSortie>(`${BANQUE}/parametres`, entree, "PUT");

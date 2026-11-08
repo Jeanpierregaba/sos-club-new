@@ -322,7 +322,7 @@ function Jeux() {
                         </span>
                       </span>
                       <a
-                        href="/connexion"
+                        href="/quiz"
                         className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition group-hover:brightness-105"
                       >
                         Relever le défi <ArrowRight className="size-3.5" />

@@ -41,11 +41,14 @@ import { Route as ConnecteAdminExportsRouteImport } from './routes/_connecte/adm
 import { Route as ConnecteAdminJournalRouteImport } from './routes/_connecte/admin/journal'
 import { Route as ConnecteAdminModerationRouteImport } from './routes/_connecte/admin/moderation'
 import { Route as ConnecteAdminPointsRouteImport } from './routes/_connecte/admin/points'
+import { Route as ConnecteAdminQuizRouteImport } from './routes/_connecte/admin/quiz'
 import { Route as ConnecteAdminReferentielRouteImport } from './routes/_connecte/admin/referentiel'
 import { Route as ConnecteMesArticlesIndexRouteImport } from './routes/_connecte/mes-articles.index'
 import { Route as ConnecteMesArticlesIdRouteImport } from './routes/_connecte/mes-articles.$id'
 import { Route as ConnecteMesArticlesNouveauRouteImport } from './routes/_connecte/mes-articles.nouveau'
 import { Route as ConnecteMonClubIndexRouteImport } from './routes/_connecte/mon-club.index'
+import { Route as ConnecteQuizIndexRouteImport } from './routes/_connecte/quiz.index'
+import { Route as ConnecteQuizIdRouteImport } from './routes/_connecte/quiz.$id'
 import { Route as GenieImhotepHallOfFameIndexRouteImport } from './routes/genie-imhotep/hall-of-fame/index'
 import { Route as GenieImhotepHallOfFameEditionRouteImport } from './routes/genie-imhotep/hall-of-fame/$edition'
 import { Route as GenieImhotepPalmaresIndexRouteImport } from './routes/genie-imhotep/palmares/index'
@@ -56,6 +59,9 @@ import { Route as ConnecteAdminInscritsIndexRouteImport } from './routes/_connec
 import { Route as ConnecteAdminInscritsIdRouteImport } from './routes/_connecte/admin/inscrits.$id'
 import { Route as ConnecteAdminPointsIndexRouteImport } from './routes/_connecte/admin/points.index'
 import { Route as ConnecteAdminPointsBaremeRouteImport } from './routes/_connecte/admin/points.bareme'
+import { Route as ConnecteAdminQuizIndexRouteImport } from './routes/_connecte/admin/quiz.index'
+import { Route as ConnecteAdminQuizIdRouteImport } from './routes/_connecte/admin/quiz.$id'
+import { Route as ConnecteAdminQuizParametresRouteImport } from './routes/_connecte/admin/quiz.parametres'
 import { Route as ConnecteAdminReferentielIndexRouteImport } from './routes/_connecte/admin/referentiel.index'
 import { Route as ConnecteAdminReferentielAxesRouteImport } from './routes/_connecte/admin/referentiel.axes'
 import { Route as ConnecteAdminReferentielEtablissementsRouteImport } from './routes/_connecte/admin/referentiel.etablissements'
@@ -222,6 +228,11 @@ const ConnecteAdminPointsRoute = ConnecteAdminPointsRouteImport.update({
   path: '/points',
   getParentRoute: () => ConnecteAdminRoute,
 } as any)
+const ConnecteAdminQuizRoute = ConnecteAdminQuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => ConnecteAdminRoute,
+} as any)
 const ConnecteAdminReferentielRoute =
   ConnecteAdminReferentielRouteImport.update({
     id: '/referentiel',
@@ -248,6 +259,16 @@ const ConnecteMesArticlesNouveauRoute =
 const ConnecteMonClubIndexRoute = ConnecteMonClubIndexRouteImport.update({
   id: '/mon-club/',
   path: '/mon-club/',
+  getParentRoute: () => ConnecteRoute,
+} as any)
+const ConnecteQuizIndexRoute = ConnecteQuizIndexRouteImport.update({
+  id: '/quiz/',
+  path: '/quiz/',
+  getParentRoute: () => ConnecteRoute,
+} as any)
+const ConnecteQuizIdRoute = ConnecteQuizIdRouteImport.update({
+  id: '/quiz/$id',
+  path: '/quiz/$id',
   getParentRoute: () => ConnecteRoute,
 } as any)
 const GenieImhotepHallOfFameIndexRoute =
@@ -308,6 +329,22 @@ const ConnecteAdminPointsBaremeRoute =
     id: '/bareme',
     path: '/bareme',
     getParentRoute: () => ConnecteAdminPointsRoute,
+  } as any)
+const ConnecteAdminQuizIndexRoute = ConnecteAdminQuizIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ConnecteAdminQuizRoute,
+} as any)
+const ConnecteAdminQuizIdRoute = ConnecteAdminQuizIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ConnecteAdminQuizRoute,
+} as any)
+const ConnecteAdminQuizParametresRoute =
+  ConnecteAdminQuizParametresRouteImport.update({
+    id: '/parametres',
+    path: '/parametres',
+    getParentRoute: () => ConnecteAdminQuizRoute,
   } as any)
 const ConnecteAdminReferentielIndexRoute =
   ConnecteAdminReferentielIndexRouteImport.update({
@@ -371,19 +408,24 @@ export interface FileRoutesByFullPath {
   '/admin/journal': typeof ConnecteAdminJournalRoute
   '/admin/moderation': typeof ConnecteAdminModerationRoute
   '/admin/points': typeof ConnecteAdminPointsRouteWithChildren
+  '/admin/quiz': typeof ConnecteAdminQuizRouteWithChildren
   '/admin/referentiel': typeof ConnecteAdminReferentielRouteWithChildren
   '/mes-articles/$id': typeof ConnecteMesArticlesIdRoute
   '/mes-articles/nouveau': typeof ConnecteMesArticlesNouveauRoute
+  '/quiz/$id': typeof ConnecteQuizIdRoute
   '/genie-imhotep/hall-of-fame/$edition': typeof GenieImhotepHallOfFameEditionRoute
   '/genie-imhotep/palmares/$edition': typeof GenieImhotepPalmaresEditionRoute
   '/admin/': typeof ConnecteAdminIndexRoute
   '/mes-articles/': typeof ConnecteMesArticlesIndexRoute
   '/mon-club/': typeof ConnecteMonClubIndexRoute
+  '/quiz/': typeof ConnecteQuizIndexRoute
   '/genie-imhotep/hall-of-fame/': typeof GenieImhotepHallOfFameIndexRoute
   '/genie-imhotep/palmares/': typeof GenieImhotepPalmaresIndexRoute
   '/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
   '/admin/points/bareme': typeof ConnecteAdminPointsBaremeRoute
+  '/admin/quiz/$id': typeof ConnecteAdminQuizIdRoute
+  '/admin/quiz/parametres': typeof ConnecteAdminQuizParametresRoute
   '/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
   '/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
   '/mon-club/actualites/$id': typeof ConnecteMonClubActualitesIdRoute
@@ -391,6 +433,7 @@ export interface FileRoutesByFullPath {
   '/admin/collaborateurs/': typeof ConnecteAdminCollaborateursIndexRoute
   '/admin/inscrits/': typeof ConnecteAdminInscritsIndexRoute
   '/admin/points/': typeof ConnecteAdminPointsIndexRoute
+  '/admin/quiz/': typeof ConnecteAdminQuizIndexRoute
   '/admin/referentiel/': typeof ConnecteAdminReferentielIndexRoute
 }
 export interface FileRoutesByTo {
@@ -424,16 +467,20 @@ export interface FileRoutesByTo {
   '/admin/moderation': typeof ConnecteAdminModerationRoute
   '/mes-articles/$id': typeof ConnecteMesArticlesIdRoute
   '/mes-articles/nouveau': typeof ConnecteMesArticlesNouveauRoute
+  '/quiz/$id': typeof ConnecteQuizIdRoute
   '/genie-imhotep/hall-of-fame/$edition': typeof GenieImhotepHallOfFameEditionRoute
   '/genie-imhotep/palmares/$edition': typeof GenieImhotepPalmaresEditionRoute
   '/admin': typeof ConnecteAdminIndexRoute
   '/mes-articles': typeof ConnecteMesArticlesIndexRoute
   '/mon-club': typeof ConnecteMonClubIndexRoute
+  '/quiz': typeof ConnecteQuizIndexRoute
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameIndexRoute
   '/genie-imhotep/palmares': typeof GenieImhotepPalmaresIndexRoute
   '/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
   '/admin/points/bareme': typeof ConnecteAdminPointsBaremeRoute
+  '/admin/quiz/$id': typeof ConnecteAdminQuizIdRoute
+  '/admin/quiz/parametres': typeof ConnecteAdminQuizParametresRoute
   '/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
   '/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
   '/mon-club/actualites/$id': typeof ConnecteMonClubActualitesIdRoute
@@ -441,6 +488,7 @@ export interface FileRoutesByTo {
   '/admin/collaborateurs': typeof ConnecteAdminCollaborateursIndexRoute
   '/admin/inscrits': typeof ConnecteAdminInscritsIndexRoute
   '/admin/points': typeof ConnecteAdminPointsIndexRoute
+  '/admin/quiz': typeof ConnecteAdminQuizIndexRoute
   '/admin/referentiel': typeof ConnecteAdminReferentielIndexRoute
 }
 export interface FileRoutesById {
@@ -476,19 +524,24 @@ export interface FileRoutesById {
   '/_connecte/admin/journal': typeof ConnecteAdminJournalRoute
   '/_connecte/admin/moderation': typeof ConnecteAdminModerationRoute
   '/_connecte/admin/points': typeof ConnecteAdminPointsRouteWithChildren
+  '/_connecte/admin/quiz': typeof ConnecteAdminQuizRouteWithChildren
   '/_connecte/admin/referentiel': typeof ConnecteAdminReferentielRouteWithChildren
   '/_connecte/mes-articles/$id': typeof ConnecteMesArticlesIdRoute
   '/_connecte/mes-articles/nouveau': typeof ConnecteMesArticlesNouveauRoute
+  '/_connecte/quiz/$id': typeof ConnecteQuizIdRoute
   '/genie-imhotep/hall-of-fame/$edition': typeof GenieImhotepHallOfFameEditionRoute
   '/genie-imhotep/palmares/$edition': typeof GenieImhotepPalmaresEditionRoute
   '/_connecte/admin/': typeof ConnecteAdminIndexRoute
   '/_connecte/mes-articles/': typeof ConnecteMesArticlesIndexRoute
   '/_connecte/mon-club/': typeof ConnecteMonClubIndexRoute
+  '/_connecte/quiz/': typeof ConnecteQuizIndexRoute
   '/genie-imhotep/hall-of-fame/': typeof GenieImhotepHallOfFameIndexRoute
   '/genie-imhotep/palmares/': typeof GenieImhotepPalmaresIndexRoute
   '/_connecte/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/_connecte/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
   '/_connecte/admin/points/bareme': typeof ConnecteAdminPointsBaremeRoute
+  '/_connecte/admin/quiz/$id': typeof ConnecteAdminQuizIdRoute
+  '/_connecte/admin/quiz/parametres': typeof ConnecteAdminQuizParametresRoute
   '/_connecte/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
   '/_connecte/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
   '/_connecte/mon-club/actualites/$id': typeof ConnecteMonClubActualitesIdRoute
@@ -496,6 +549,7 @@ export interface FileRoutesById {
   '/_connecte/admin/collaborateurs/': typeof ConnecteAdminCollaborateursIndexRoute
   '/_connecte/admin/inscrits/': typeof ConnecteAdminInscritsIndexRoute
   '/_connecte/admin/points/': typeof ConnecteAdminPointsIndexRoute
+  '/_connecte/admin/quiz/': typeof ConnecteAdminQuizIndexRoute
   '/_connecte/admin/referentiel/': typeof ConnecteAdminReferentielIndexRoute
 }
 export interface FileRouteTypes {
@@ -531,19 +585,24 @@ export interface FileRouteTypes {
     | '/admin/journal'
     | '/admin/moderation'
     | '/admin/points'
+    | '/admin/quiz'
     | '/admin/referentiel'
     | '/mes-articles/$id'
     | '/mes-articles/nouveau'
+    | '/quiz/$id'
     | '/genie-imhotep/hall-of-fame/$edition'
     | '/genie-imhotep/palmares/$edition'
     | '/admin/'
     | '/mes-articles/'
     | '/mon-club/'
+    | '/quiz/'
     | '/genie-imhotep/hall-of-fame/'
     | '/genie-imhotep/palmares/'
     | '/admin/collaborateurs/$id'
     | '/admin/inscrits/$id'
     | '/admin/points/bareme'
+    | '/admin/quiz/$id'
+    | '/admin/quiz/parametres'
     | '/admin/referentiel/axes'
     | '/admin/referentiel/etablissements'
     | '/mon-club/actualites/$id'
@@ -551,6 +610,7 @@ export interface FileRouteTypes {
     | '/admin/collaborateurs/'
     | '/admin/inscrits/'
     | '/admin/points/'
+    | '/admin/quiz/'
     | '/admin/referentiel/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -584,16 +644,20 @@ export interface FileRouteTypes {
     | '/admin/moderation'
     | '/mes-articles/$id'
     | '/mes-articles/nouveau'
+    | '/quiz/$id'
     | '/genie-imhotep/hall-of-fame/$edition'
     | '/genie-imhotep/palmares/$edition'
     | '/admin'
     | '/mes-articles'
     | '/mon-club'
+    | '/quiz'
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/palmares'
     | '/admin/collaborateurs/$id'
     | '/admin/inscrits/$id'
     | '/admin/points/bareme'
+    | '/admin/quiz/$id'
+    | '/admin/quiz/parametres'
     | '/admin/referentiel/axes'
     | '/admin/referentiel/etablissements'
     | '/mon-club/actualites/$id'
@@ -601,6 +665,7 @@ export interface FileRouteTypes {
     | '/admin/collaborateurs'
     | '/admin/inscrits'
     | '/admin/points'
+    | '/admin/quiz'
     | '/admin/referentiel'
   id:
     | '__root__'
@@ -635,19 +700,24 @@ export interface FileRouteTypes {
     | '/_connecte/admin/journal'
     | '/_connecte/admin/moderation'
     | '/_connecte/admin/points'
+    | '/_connecte/admin/quiz'
     | '/_connecte/admin/referentiel'
     | '/_connecte/mes-articles/$id'
     | '/_connecte/mes-articles/nouveau'
+    | '/_connecte/quiz/$id'
     | '/genie-imhotep/hall-of-fame/$edition'
     | '/genie-imhotep/palmares/$edition'
     | '/_connecte/admin/'
     | '/_connecte/mes-articles/'
     | '/_connecte/mon-club/'
+    | '/_connecte/quiz/'
     | '/genie-imhotep/hall-of-fame/'
     | '/genie-imhotep/palmares/'
     | '/_connecte/admin/collaborateurs/$id'
     | '/_connecte/admin/inscrits/$id'
     | '/_connecte/admin/points/bareme'
+    | '/_connecte/admin/quiz/$id'
+    | '/_connecte/admin/quiz/parametres'
     | '/_connecte/admin/referentiel/axes'
     | '/_connecte/admin/referentiel/etablissements'
     | '/_connecte/mon-club/actualites/$id'
@@ -655,6 +725,7 @@ export interface FileRouteTypes {
     | '/_connecte/admin/collaborateurs/'
     | '/_connecte/admin/inscrits/'
     | '/_connecte/admin/points/'
+    | '/_connecte/admin/quiz/'
     | '/_connecte/admin/referentiel/'
   fileRoutesById: FileRoutesById
 }
@@ -911,6 +982,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteAdminPointsRouteImport
       parentRoute: typeof ConnecteAdminRoute
     }
+    '/_connecte/admin/quiz': {
+      id: '/_connecte/admin/quiz'
+      path: '/quiz'
+      fullPath: '/admin/quiz'
+      preLoaderRoute: typeof ConnecteAdminQuizRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
     '/_connecte/admin/referentiel': {
       id: '/_connecte/admin/referentiel'
       path: '/referentiel'
@@ -944,6 +1022,20 @@ declare module '@tanstack/react-router' {
       path: '/mon-club'
       fullPath: '/mon-club/'
       preLoaderRoute: typeof ConnecteMonClubIndexRouteImport
+      parentRoute: typeof ConnecteRoute
+    }
+    '/_connecte/quiz/': {
+      id: '/_connecte/quiz/'
+      path: '/quiz'
+      fullPath: '/quiz/'
+      preLoaderRoute: typeof ConnecteQuizIndexRouteImport
+      parentRoute: typeof ConnecteRoute
+    }
+    '/_connecte/quiz/$id': {
+      id: '/_connecte/quiz/$id'
+      path: '/quiz/$id'
+      fullPath: '/quiz/$id'
+      preLoaderRoute: typeof ConnecteQuizIdRouteImport
       parentRoute: typeof ConnecteRoute
     }
     '/genie-imhotep/hall-of-fame/': {
@@ -1016,6 +1108,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteAdminPointsBaremeRouteImport
       parentRoute: typeof ConnecteAdminPointsRoute
     }
+    '/_connecte/admin/quiz/': {
+      id: '/_connecte/admin/quiz/'
+      path: '/'
+      fullPath: '/admin/quiz/'
+      preLoaderRoute: typeof ConnecteAdminQuizIndexRouteImport
+      parentRoute: typeof ConnecteAdminQuizRoute
+    }
+    '/_connecte/admin/quiz/$id': {
+      id: '/_connecte/admin/quiz/$id'
+      path: '/$id'
+      fullPath: '/admin/quiz/$id'
+      preLoaderRoute: typeof ConnecteAdminQuizIdRouteImport
+      parentRoute: typeof ConnecteAdminQuizRoute
+    }
+    '/_connecte/admin/quiz/parametres': {
+      id: '/_connecte/admin/quiz/parametres'
+      path: '/parametres'
+      fullPath: '/admin/quiz/parametres'
+      preLoaderRoute: typeof ConnecteAdminQuizParametresRouteImport
+      parentRoute: typeof ConnecteAdminQuizRoute
+    }
     '/_connecte/admin/referentiel/': {
       id: '/_connecte/admin/referentiel/'
       path: '/'
@@ -1067,6 +1180,21 @@ const ConnecteAdminPointsRouteChildren: ConnecteAdminPointsRouteChildren = {
 const ConnecteAdminPointsRouteWithChildren =
   ConnecteAdminPointsRoute._addFileChildren(ConnecteAdminPointsRouteChildren)
 
+interface ConnecteAdminQuizRouteChildren {
+  ConnecteAdminQuizIdRoute: typeof ConnecteAdminQuizIdRoute
+  ConnecteAdminQuizParametresRoute: typeof ConnecteAdminQuizParametresRoute
+  ConnecteAdminQuizIndexRoute: typeof ConnecteAdminQuizIndexRoute
+}
+
+const ConnecteAdminQuizRouteChildren: ConnecteAdminQuizRouteChildren = {
+  ConnecteAdminQuizIdRoute: ConnecteAdminQuizIdRoute,
+  ConnecteAdminQuizParametresRoute: ConnecteAdminQuizParametresRoute,
+  ConnecteAdminQuizIndexRoute: ConnecteAdminQuizIndexRoute,
+}
+
+const ConnecteAdminQuizRouteWithChildren =
+  ConnecteAdminQuizRoute._addFileChildren(ConnecteAdminQuizRouteChildren)
+
 interface ConnecteAdminReferentielRouteChildren {
   ConnecteAdminReferentielAxesRoute: typeof ConnecteAdminReferentielAxesRoute
   ConnecteAdminReferentielEtablissementsRoute: typeof ConnecteAdminReferentielEtablissementsRoute
@@ -1094,6 +1222,7 @@ interface ConnecteAdminRouteChildren {
   ConnecteAdminJournalRoute: typeof ConnecteAdminJournalRoute
   ConnecteAdminModerationRoute: typeof ConnecteAdminModerationRoute
   ConnecteAdminPointsRoute: typeof ConnecteAdminPointsRouteWithChildren
+  ConnecteAdminQuizRoute: typeof ConnecteAdminQuizRouteWithChildren
   ConnecteAdminReferentielRoute: typeof ConnecteAdminReferentielRouteWithChildren
   ConnecteAdminIndexRoute: typeof ConnecteAdminIndexRoute
   ConnecteAdminCollaborateursIdRoute: typeof ConnecteAdminCollaborateursIdRoute
@@ -1111,6 +1240,7 @@ const ConnecteAdminRouteChildren: ConnecteAdminRouteChildren = {
   ConnecteAdminJournalRoute: ConnecteAdminJournalRoute,
   ConnecteAdminModerationRoute: ConnecteAdminModerationRoute,
   ConnecteAdminPointsRoute: ConnecteAdminPointsRouteWithChildren,
+  ConnecteAdminQuizRoute: ConnecteAdminQuizRouteWithChildren,
   ConnecteAdminReferentielRoute: ConnecteAdminReferentielRouteWithChildren,
   ConnecteAdminIndexRoute: ConnecteAdminIndexRoute,
   ConnecteAdminCollaborateursIdRoute: ConnecteAdminCollaborateursIdRoute,
@@ -1130,8 +1260,10 @@ interface ConnecteRouteChildren {
   ConnecteNotificationsRoute: typeof ConnecteNotificationsRoute
   ConnecteMesArticlesIdRoute: typeof ConnecteMesArticlesIdRoute
   ConnecteMesArticlesNouveauRoute: typeof ConnecteMesArticlesNouveauRoute
+  ConnecteQuizIdRoute: typeof ConnecteQuizIdRoute
   ConnecteMesArticlesIndexRoute: typeof ConnecteMesArticlesIndexRoute
   ConnecteMonClubIndexRoute: typeof ConnecteMonClubIndexRoute
+  ConnecteQuizIndexRoute: typeof ConnecteQuizIndexRoute
   ConnecteMonClubActualitesIdRoute: typeof ConnecteMonClubActualitesIdRoute
   ConnecteMonClubActualitesNouveauRoute: typeof ConnecteMonClubActualitesNouveauRoute
 }
@@ -1143,8 +1275,10 @@ const ConnecteRouteChildren: ConnecteRouteChildren = {
   ConnecteNotificationsRoute: ConnecteNotificationsRoute,
   ConnecteMesArticlesIdRoute: ConnecteMesArticlesIdRoute,
   ConnecteMesArticlesNouveauRoute: ConnecteMesArticlesNouveauRoute,
+  ConnecteQuizIdRoute: ConnecteQuizIdRoute,
   ConnecteMesArticlesIndexRoute: ConnecteMesArticlesIndexRoute,
   ConnecteMonClubIndexRoute: ConnecteMonClubIndexRoute,
+  ConnecteQuizIndexRoute: ConnecteQuizIndexRoute,
   ConnecteMonClubActualitesIdRoute: ConnecteMonClubActualitesIdRoute,
   ConnecteMonClubActualitesNouveauRoute: ConnecteMonClubActualitesNouveauRoute,
 }
