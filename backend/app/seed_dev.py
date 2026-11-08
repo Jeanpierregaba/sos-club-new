@@ -269,6 +269,46 @@ async def _preparer_photo(db: AsyncSession) -> None:
     )  # fmt: skip
 
 
+async def _preparer_commentaires(db: AsyncSession) -> None:
+    """Deux commentaires de démonstration sur l'article de test publié (spec 025) : un publié (élève 2), un en attente
+    (encadreur actif), une seule fois. Signalés comme tests, sans points."""
+    article = await db.scalar(select(Contenu).where(Contenu.adresse == "article-de-test-un-point-d-eau-dans-la-cour"))
+    if article is None or await db.scalar(select(Contenu.id).where(Contenu.type == "commentaire")):
+        return
+    ids = {
+        identifiant: await db.scalar(select(Utilisateur.id).where(Utilisateur.identifiant == identifiant))
+        for identifiant in ("dev.eleve2", "dev.encadreur")
+    }
+    if None in ids.values():
+        return
+    maintenant = datetime.now(UTC)
+    for auteur, texte, publie in (
+        ("dev.eleve2", "[Commentaire de test] Bravo au club, on veut faire pareil chez nous !", True),
+        ("dev.encadreur", "[Commentaire de test] Pensez à vérifier la qualité de l'eau chaque mois.", False),
+    ):
+        contenu = Contenu(
+            id=uuid7(), type="commentaire", auteur_id=ids[auteur], etat=EtatContenu.brouillon,
+            dre_code="grand-lome", parent_id=article.id,
+        )  # fmt: skip
+        db.add(contenu)
+        await db.flush()
+        version = VersionContenu(
+            id=uuid7(), contenu_id=contenu.id, numero=1, donnees={"texte": texte},
+            etat=EtatVersion.approuvee if publie else EtatVersion.soumise, soumise_le=maintenant,
+        )  # fmt: skip
+        db.add(version)
+        await db.flush()
+        contenu.soumis_le = maintenant
+        if publie:
+            contenu.version_publiee_id = version.id
+            contenu.publie_le = maintenant
+            contenu.etat = EtatContenu.publie
+            db.add(DecisionModeration(contenu_id=contenu.id, version_id=version.id, decision=TypeDecision.approuver))
+        else:
+            contenu.version_travail_id = version.id
+            contenu.etat = EtatContenu.en_attente
+
+
 async def semer(db: AsyncSession) -> list[dict[str, str]]:
     """Prépare tous les comptes `dev.*` et renvoie leurs accès. Valide la transaction."""
     if settings.production:
@@ -311,6 +351,7 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
     await _preparer_clubs(db)
     await _preparer_articles(db)
     await _preparer_photo(db)
+    await _preparer_commentaires(db)
     journaliser(db, "comptes_de_developpement_prepares", details={"comptes": [c[0] for c in COMPTES]})
     await db.commit()
     return acces

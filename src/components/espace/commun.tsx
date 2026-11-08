@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { CalendarRange, LogOut, PenLine, Star, Trophy } from "lucide-react";
+import { CalendarRange, LogOut, MessageCircle, PenLine, Star, Trophy } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
@@ -17,7 +17,7 @@ export function EnTeteEspace({
   children,
 }: {
   nom: string;
-  // Le lien « Mes articles » : élève, ou encadreur vérifié (spec 023).
+  // Les liens « Mes articles » et « Mes commentaires » : élève, ou encadreur vérifié (specs 023 et 025).
   articles?: boolean;
   children?: ReactNode;
 }) {
@@ -48,6 +48,14 @@ export function EnTeteEspace({
               className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
             >
               <PenLine className="size-4" /> Mes articles
+            </Link>
+          )}
+          {articles && (
+            <Link
+              to="/mes-commentaires"
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
+            >
+              <MessageCircle className="size-4" /> Mes commentaires
             </Link>
           )}
           <Button

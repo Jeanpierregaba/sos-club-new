@@ -132,8 +132,22 @@ def test_le_seed_prepare_trois_articles_de_test_une_seule_fois(client: TestClien
     en_base(semer)
     en_base(semer)
 
-    etats = sorted(en_base(lambda db: db.scalars(select(Contenu.etat))).all())
+    etats = sorted(en_base(lambda db: db.scalars(select(Contenu.etat).where(Contenu.type == "article"))).all())
     assert etats == ["a_corriger", "en_attente", "publie"]
     publics = client.get("/api/articles").json()["articles"]
     assert [a["titre"] for a in publics] == ["Article de test — Un point d'eau dans la cour"]
     assert publics[0]["signature"]["club"] == "Club Santé Tokoin"
+
+
+def test_le_seed_prepare_deux_commentaires_de_test_une_seule_fois(
+    client: TestClient, en_base: Callable[..., Any]
+) -> None:
+    from app.moderation.models import Contenu
+
+    en_base(semer)
+    en_base(semer)
+
+    etats = sorted(en_base(lambda db: db.scalars(select(Contenu.etat).where(Contenu.type == "commentaire"))).all())
+    assert etats == ["en_attente", "publie"]
+    publics = client.get("/api/articles/article-de-test-un-point-d-eau-dans-la-cour/commentaires").json()
+    assert [c["texte"][:22] for c in publics["commentaires"]] == ["[Commentaire de test] "]

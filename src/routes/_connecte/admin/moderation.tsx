@@ -33,6 +33,7 @@ import { dateCourte } from "@/lib/dates";
 
 type Recherche = {
   etat?: Etat | undefined;
+  type?: "article" | "commentaire" | undefined;
   axe?: string | undefined;
   profil?: "eleve" | "encadreur" | undefined;
   dre?: string | undefined;
@@ -68,9 +69,9 @@ const DECISIONS: Record<Decision, { titre: string; bouton: string; aide: string 
     aide: "L'auteur lit ce motif. Un article jamais publié est alors clos ; pour une nouvelle version, la version en ligne reste.",
   },
   depublier: {
-    titre: "Retirer cet article du site ?",
+    titre: "Retirer ce contenu du site ?",
     bouton: "Retirer du site",
-    aide: "L'article disparaît du site tout de suite. L'auteur lit ce motif ; ses points restent acquis.",
+    aide: "Le contenu disparaît du site tout de suite. L'auteur lit ce motif ; ses points restent acquis.",
   },
 };
 
@@ -82,8 +83,11 @@ export const Route = createFileRoute("/_connecte/admin/moderation")({
     const dre = typeof search["dre"] === "string" ? search["dre"] : null;
     const profil =
       search["profil"] === "eleve" || search["profil"] === "encadreur" ? search["profil"] : null;
+    const type =
+      search["type"] === "article" || search["type"] === "commentaire" ? search["type"] : null;
     return {
       ...(etat && etat !== "en_attente" ? { etat: etat as Etat } : {}),
+      ...(type ? { type } : {}),
       ...(axe ? { axe } : {}),
       ...(profil ? { profil } : {}),
       ...(dre ? { dre } : {}),
@@ -97,6 +101,7 @@ export const Route = createFileRoute("/_connecte/admin/moderation")({
     const [file, axes] = await Promise.all([
       chargerFileModeration({
         etat: deps.etat ?? "en_attente",
+        type: deps.type,
         axe: deps.axe,
         profil: deps.profil,
         dre: deps.dre,
@@ -148,6 +153,23 @@ function Moderation() {
       </nav>
 
       <div className="flex flex-wrap gap-3">
+        <select
+          aria-label="Filtrer par type"
+          value={recherche.type ?? ""}
+          onChange={(e) =>
+            void navigate({
+              search: {
+                ...recherche,
+                type: (e.target.value || undefined) as Recherche["type"],
+              },
+            })
+          }
+          className="h-10 rounded-full border bg-white px-4 text-sm font-semibold"
+        >
+          <option value="">Articles et commentaires</option>
+          <option value="article">Articles</option>
+          <option value="commentaire">Commentaires</option>
+        </select>
         <select
           aria-label="Filtrer par axe"
           value={recherche.axe ?? ""}
@@ -220,11 +242,21 @@ function Moderation() {
                       Nouvelle version
                     </span>
                   )}
+                  {c.type === "commentaire" && (
+                    <span className="rounded-full bg-lilac px-2.5 py-0.5 text-xs font-bold text-ink">
+                      Commentaire
+                    </span>
+                  )}
                   <span className="text-xs font-semibold text-muted-foreground">
                     {libelleAxe(c.axe_code)}
                   </span>
                 </div>
                 <p className="mt-2 text-lg font-extrabold text-logo-blue">{c.titre}</p>
+                {c.parent && (
+                  <p className="text-sm font-semibold text-muted-foreground">
+                    Sur l'article « {c.parent.titre} »
+                  </p>
+                )}
                 <p className="text-sm font-semibold text-ink">
                   {c.auteur.nom}{" "}
                   <span className="font-medium text-muted-foreground">
@@ -302,6 +334,8 @@ function Apercu({
   const soumise = apercu?.soumise as Record<string, string> | null | undefined;
   const publiee = apercu?.publiee as Record<string, string> | null | undefined;
   const enAttente = apercu?.etat === "en_attente";
+  // Un commentaire (spec 025) : un texte simple, jugé avec l'article qu'il commente.
+  const commentaire = apercu?.type === "commentaire";
   // En attente : la version soumise. Sinon : ce qui est en ligne (le modérateur qui dépublie lit ce qui est publié).
   const affichee = enAttente ? soumise : (publiee ?? soumise);
   // Les photos de la version affichée, et ce qui change par rapport à la version en ligne (spec 024).
@@ -329,7 +363,7 @@ function Apercu({
       <DialogContent className="max-h-[92dvh] w-full max-w-3xl overflow-y-auto sm:rounded-[2rem]">
         <DialogHeader>
           <DialogTitle className="pr-6 text-2xl text-logo-blue">
-            {affichee?.["titre"] ?? "Aperçu"}
+            {commentaire ? "Commentaire" : (affichee?.["titre"] ?? "Aperçu")}
           </DialogTitle>
           <DialogDescription>
             {apercu
@@ -360,6 +394,23 @@ function Apercu({
                 >
                   Fiche de l'auteur
                 </Link>
+              )}
+              {apercu.parent && (
+                <span className="font-semibold">
+                  Sur{" "}
+                  {apercu.parent.adresse ? (
+                    <a
+                      href={`/articles/${apercu.parent.adresse}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-bold text-logo-blue underline-offset-4 hover:underline"
+                    >
+                      « {apercu.parent.titre} »
+                    </a>
+                  ) : (
+                    `« ${apercu.parent.titre} »`
+                  )}
+                </span>
               )}
               {apercu.en_ligne && apercu.adresse && (
                 <a
@@ -401,10 +452,16 @@ function Apercu({
               </section>
             )}
 
-            <article className="rounded-2xl bg-carnet p-5">
-              <p className="text-lg font-semibold text-ink/80">{affichee["chapo"]}</p>
-              <TexteArticle texte={affichee["texte"] ?? ""} className="mt-4" />
-            </article>
+            {commentaire ? (
+              <p className="whitespace-pre-line break-words rounded-2xl bg-carnet p-5 text-ink">
+                {affichee["texte"]}
+              </p>
+            ) : (
+              <article className="rounded-2xl bg-carnet p-5">
+                <p className="text-lg font-semibold text-ink/80">{affichee["chapo"]}</p>
+                <TexteArticle texte={affichee["texte"] ?? ""} className="mt-4" />
+              </article>
+            )}
 
             {photosAffichees.length > 0 && (
               <section>
@@ -486,13 +543,15 @@ function Apercu({
                   <Button className="rounded-full font-bold" onClick={() => setApprobation(true)}>
                     <Check className="size-4" /> Approuver
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="rounded-full font-bold"
-                    onClick={() => setDecision("corriger")}
-                  >
-                    <PenLine className="size-4" /> Demander une correction
-                  </Button>
+                  {apercu.correction_possible && (
+                    <Button
+                      variant="outline"
+                      className="rounded-full font-bold"
+                      onClick={() => setDecision("corriger")}
+                    >
+                      <PenLine className="size-4" /> Demander une correction
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     className="rounded-full font-bold"
