@@ -148,11 +148,35 @@ function FicheClubPage() {
             </ul>
           )}
 
+          {club.actualites.length > 0 && (
+            <>
+              <h3 className="mt-8 text-lg font-extrabold text-ink">Actualités du club</h3>
+              <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+                {club.actualites.map((a) => (
+                  <li key={a.adresse}>
+                    <Link
+                      to="/articles/$adresse"
+                      params={{ adresse: a.adresse }}
+                      className="block h-full rounded-2xl bg-mist-soft p-4 ring-1 ring-border transition hover:ring-logo-blue/40"
+                    >
+                      <p className="font-display text-lg leading-tight text-ink">{a.titre}</p>
+                      <p className="mt-1 line-clamp-2 text-sm text-ink/70">{a.chapo}</p>
+                      <p className="mt-2 text-xs font-semibold text-muted-foreground">
+                        {dateCourte(a.publie_le)}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
           {mesClubs && <RattachementFiche clubId={club.id} mesClubs={mesClubs} />}
 
           <div className="mt-8 rounded-2xl bg-mist-soft p-4 text-sm font-medium text-muted-foreground">
-            Seuls le nom du club, son établissement et ses axes sont publics. La liste des membres
-            n'est visible que de ses membres, de ses encadreurs et de l'équipe des Clubs Santé.
+            Seuls le nom du club, son établissement, ses axes et ses actualités validées sont
+            publics. La liste des membres n'est visible que de ses membres, de ses encadreurs et de
+            l'équipe des Clubs Santé.
           </div>
 
           <Link

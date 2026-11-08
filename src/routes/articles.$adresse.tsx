@@ -55,6 +55,11 @@ function Article() {
           >
             {article.axe.libelle}
           </Link>
+          {article.nature === "actualite" && (
+            <span className="ml-2 mt-8 inline-block rounded-full bg-sun/30 px-3 py-1 text-xs font-bold text-ink">
+              Actualité du club
+            </span>
+          )}
           <h1 className="mt-4 text-4xl leading-tight text-logo-blue md:text-5xl">
             {article.titre}
           </h1>

@@ -115,8 +115,15 @@ function Articles() {
                       className="-mx-6 -mt-6 mb-5 aspect-[16/9] max-w-none !w-[calc(100%+3rem)]"
                     />
                   )}
-                  <span className="self-start rounded-full bg-mist px-3 py-1 text-xs font-bold text-logo-blue">
-                    {a.axe.libelle}
+                  <span className="flex flex-wrap gap-2">
+                    <span className="rounded-full bg-mist px-3 py-1 text-xs font-bold text-logo-blue">
+                      {a.axe.libelle}
+                    </span>
+                    {a.nature === "actualite" && (
+                      <span className="rounded-full bg-sun/30 px-3 py-1 text-xs font-bold text-ink">
+                        Actualité du club
+                      </span>
+                    )}
                   </span>
                   <h2 className="mt-3 font-display text-2xl leading-tight text-ink">{a.titre}</h2>
                   <p className="mt-2 line-clamp-3 text-ink/75">{a.chapo}</p>

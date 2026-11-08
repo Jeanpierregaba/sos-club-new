@@ -33,12 +33,25 @@ import { dateCourte } from "@/lib/dates";
 
 type Recherche = {
   etat?: Etat | undefined;
-  type?: "article" | "commentaire" | undefined;
+  type?: TypeContenu | undefined;
   axe?: string | undefined;
   profil?: "eleve" | "encadreur" | undefined;
   dre?: string | undefined;
 };
 type Decision = "corriger" | "refuser" | "depublier";
+// Les types du moteur de modération (specs 023, 025 et 026).
+type TypeContenu = "article" | "commentaire" | "actualite" | "fiche_club";
+const TYPES: { code: TypeContenu; libelle: string }[] = [
+  { code: "article", libelle: "Articles" },
+  { code: "actualite", libelle: "Actualités des clubs" },
+  { code: "fiche_club", libelle: "Fiches des clubs" },
+  { code: "commentaire", libelle: "Commentaires" },
+];
+const BADGES: Partial<Record<string, string>> = {
+  commentaire: "Commentaire",
+  actualite: "Actualité du club",
+  fiche_club: "Fiche du club",
+};
 
 const ONGLETS: { etat: Etat; libelle: string }[] = [
   { etat: "en_attente", libelle: "À modérer" },
@@ -83,8 +96,7 @@ export const Route = createFileRoute("/_connecte/admin/moderation")({
     const dre = typeof search["dre"] === "string" ? search["dre"] : null;
     const profil =
       search["profil"] === "eleve" || search["profil"] === "encadreur" ? search["profil"] : null;
-    const type =
-      search["type"] === "article" || search["type"] === "commentaire" ? search["type"] : null;
+    const type = TYPES.find((t) => t.code === search["type"])?.code ?? null;
     return {
       ...(etat && etat !== "en_attente" ? { etat: etat as Etat } : {}),
       ...(type ? { type } : {}),
@@ -166,9 +178,12 @@ function Moderation() {
           }
           className="h-10 rounded-full border bg-white px-4 text-sm font-semibold"
         >
-          <option value="">Articles et commentaires</option>
-          <option value="article">Articles</option>
-          <option value="commentaire">Commentaires</option>
+          <option value="">Tous les contenus</option>
+          {TYPES.map((t) => (
+            <option key={t.code} value={t.code}>
+              {t.libelle}
+            </option>
+          ))}
         </select>
         <select
           aria-label="Filtrer par axe"
@@ -242,9 +257,9 @@ function Moderation() {
                       Nouvelle version
                     </span>
                   )}
-                  {c.type === "commentaire" && (
+                  {BADGES[c.type] && (
                     <span className="rounded-full bg-lilac px-2.5 py-0.5 text-xs font-bold text-ink">
-                      Commentaire
+                      {BADGES[c.type]}
                     </span>
                   )}
                   <span className="text-xs font-semibold text-muted-foreground">
@@ -255,6 +270,11 @@ function Moderation() {
                 {c.parent && (
                   <p className="text-sm font-semibold text-muted-foreground">
                     Sur l'article « {c.parent.titre} »
+                  </p>
+                )}
+                {c.club && (
+                  <p className="text-sm font-semibold text-muted-foreground">
+                    Au nom du {c.club.nom}
                   </p>
                 )}
                 <p className="text-sm font-semibold text-ink">
@@ -336,6 +356,8 @@ function Apercu({
   const enAttente = apercu?.etat === "en_attente";
   // Un commentaire (spec 025) : un texte simple, jugé avec l'article qu'il commente.
   const commentaire = apercu?.type === "commentaire";
+  // Une proposition de fiche (spec 026) : l'avant est la fiche actuelle du club, l'après la proposition.
+  const fiche = apercu?.type === "fiche_club";
   // En attente : la version soumise. Sinon : ce qui est en ligne (le modérateur qui dépublie lit ce qui est publié).
   const affichee = enAttente ? soumise : (publiee ?? soumise);
   // Les photos de la version affichée, et ce qui change par rapport à la version en ligne (spec 024).
@@ -363,7 +385,11 @@ function Apercu({
       <DialogContent className="max-h-[92dvh] w-full max-w-3xl overflow-y-auto sm:rounded-[2rem]">
         <DialogHeader>
           <DialogTitle className="pr-6 text-2xl text-logo-blue">
-            {commentaire ? "Commentaire" : (affichee?.["titre"] ?? "Aperçu")}
+            {commentaire
+              ? "Commentaire"
+              : fiche
+                ? `Fiche du ${apercu?.club?.nom ?? "club"}`
+                : (affichee?.["titre"] ?? "Aperçu")}
           </DialogTitle>
           <DialogDescription>
             {apercu
@@ -452,7 +478,13 @@ function Apercu({
               </section>
             )}
 
-            {commentaire ? (
+            {fiche ? (
+              <FicheAvantApres
+                avant={apercu.fiche_actuelle}
+                apres={affichee as unknown as { description: string | null; axes: string[] }}
+                libelleAxe={libelleAxe}
+              />
+            ) : commentaire ? (
               <p className="whitespace-pre-line break-words rounded-2xl bg-carnet p-5 text-ink">
                 {affichee["texte"]}
               </p>
@@ -561,7 +593,7 @@ function Apercu({
                   </Button>
                 </>
               )}
-              {depublieur && apercu.en_ligne && (
+              {depublieur && apercu.en_ligne && apercu.depublication_possible && (
                 <Button
                   variant="outline"
                   className="rounded-full font-bold text-logo-red"
@@ -581,9 +613,13 @@ function Apercu({
           description={
             apercu?.nouvelle_version
               ? "Cette nouvelle version remplace la version en ligne. Aucun point n'est crédité de nouveau."
-              : apercu?.type === "commentaire"
-                ? "Le commentaire apparaît sous l'article. Son auteur reçoit +5 points, dans la limite de 5 commentaires rémunérés par jour."
-                : "L'article est publié sur le site et l'auteur reçoit ses points."
+              : apercu?.type === "fiche_club"
+                ? "La fiche publique du club prend aussitôt cette description et ces axes."
+                : apercu?.type === "actualite"
+                  ? "L'actualité est publiée au nom du club, sur sa fiche et dans les articles. Elle ne rapporte pas de points."
+                  : apercu?.type === "commentaire"
+                    ? "Le commentaire apparaît sous l'article. Son auteur reçoit +5 points, dans la limite de 5 commentaires rémunérés par jour."
+                    : "L'article est publié sur le site et l'auteur reçoit ses points."
           }
           bouton="Approuver"
           onEnvoie={async () => {
@@ -614,3 +650,38 @@ const LIBELLES_DECISIONS: Record<ApercuModeration["decisions"][number]["decision
   refuser: "Refusé",
   depublier: "Retiré du site",
 };
+
+// L'avant / après d'une proposition de fiche (spec 026) : description et axes.
+function FicheAvantApres({
+  avant,
+  apres,
+  libelleAxe,
+}: {
+  avant: { description: string | null; axes: string[] } | null | undefined;
+  apres: { description: string | null; axes: string[] };
+  libelleAxe: (code: string | null | undefined) => string;
+}) {
+  const colonne = (
+    titre: string,
+    fiche: { description: string | null; axes: string[] } | null | undefined,
+    accent: boolean,
+  ) => (
+    <div>
+      <p className="text-xs font-extrabold uppercase text-muted-foreground">{titre}</p>
+      <div
+        className={`mt-1 space-y-2 rounded-xl bg-white p-3 text-sm ${accent ? "ring-2 ring-sky/40" : ""}`}
+      >
+        <p className="whitespace-pre-line">{fiche?.description ?? "(sans description)"}</p>
+        <p className="text-muted-foreground">
+          Axes : {fiche && fiche.axes.length > 0 ? fiche.axes.map(libelleAxe).join(", ") : "aucun"}
+        </p>
+      </div>
+    </div>
+  );
+  return (
+    <section className="grid gap-3 rounded-2xl bg-sky/10 p-4 ring-1 ring-sky/30 sm:grid-cols-2">
+      {colonne("Fiche actuelle", avant, false)}
+      {colonne("Proposition", apres, true)}
+    </section>
+  );
+}
