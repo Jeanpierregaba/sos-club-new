@@ -35,6 +35,7 @@ from app.moderation.router import router_admin as router_moderation_admin
 from app.notifications.router import router as router_notifications
 from app.points.router import router_admin as router_points_admin
 from app.quiz.router import router as router_quiz
+from app.quiz.router_banque import router_banque as router_quiz_banque
 from app.referentiel.router import router_admin as router_referentiel_admin
 from app.referentiel.router import router_public as router_referentiel
 
@@ -80,6 +81,7 @@ api.include_router(router_commentaires)
 api.include_router(router_commentaires_auteur)
 api.include_router(router_moderation_admin)
 api.include_router(router_quiz)
+api.include_router(router_quiz_banque)
 app.include_router(api)
 
 

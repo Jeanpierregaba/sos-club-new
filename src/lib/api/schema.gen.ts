@@ -2395,6 +2395,231 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/quiz/parametres": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire Parametres */
+        get: operations["lire_parametres_api_admin_quiz_parametres_get"];
+        /** Changer Parametres */
+        put: operations["changer_parametres_api_admin_quiz_parametres_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/quiz/essais/{tentative_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reprendre Essai */
+        get: operations["reprendre_essai_api_admin_quiz_essais__tentative_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/quiz/essais/{tentative_id}/reponses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Repondre Essai */
+        post: operations["repondre_essai_api_admin_quiz_essais__tentative_id__reponses_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/quiz": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister */
+        get: operations["lister_api_admin_quiz_get"];
+        put?: never;
+        /** Creer */
+        post: operations["creer_api_admin_quiz_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/quiz/{quiz_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire */
+        get: operations["lire_api_admin_quiz__quiz_id__get"];
+        /** Modifier */
+        put: operations["modifier_api_admin_quiz__quiz_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/quiz/{quiz_id}/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ajouter Question */
+        post: operations["ajouter_question_api_admin_quiz__quiz_id__questions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/quiz/{quiz_id}/questions/{question_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Modifier Question */
+        put: operations["modifier_question_api_admin_quiz__quiz_id__questions__question_id__put"];
+        post?: never;
+        /** Retirer Question */
+        delete: operations["retirer_question_api_admin_quiz__quiz_id__questions__question_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/quiz/{quiz_id}/soumettre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Soumettre */
+        post: operations["soumettre_api_admin_quiz__quiz_id__soumettre_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/quiz/{quiz_id}/reprendre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reprendre */
+        post: operations["reprendre_api_admin_quiz__quiz_id__reprendre_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/quiz/{quiz_id}/approuver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approuver */
+        post: operations["approuver_api_admin_quiz__quiz_id__approuver_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/quiz/{quiz_id}/refuser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refuser */
+        post: operations["refuser_api_admin_quiz__quiz_id__refuser_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/quiz/{quiz_id}/depublier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Depublier */
+        post: operations["depublier_api_admin_quiz__quiz_id__depublier_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/quiz/{quiz_id}/essais": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Lancer Essai */
+        post: operations["lancer_essai_api_admin_quiz__quiz_id__essais_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -2595,6 +2820,13 @@ export interface components {
             /** Decisions */
             decisions: components["schemas"]["DecisionPassee"][];
             fiche_actuelle?: components["schemas"]["FicheActuelle"] | null;
+        };
+        /** Approbation */
+        Approbation: {
+            /** Validateur Nom */
+            validateur_nom: string;
+            /** Validateur Qualite */
+            validateur_qualite: string;
         };
         /** ApprobationEntree */
         ApprobationEntree: {
@@ -3799,6 +4031,11 @@ export interface components {
             resultat: components["schemas"]["ResultatPartie"] | null;
         };
         /**
+         * EtatQuiz
+         * @enum {string}
+         */
+        EtatQuiz: "brouillon" | "soumis" | "publie" | "depublie";
+        /**
          * EtatVerification
          * @enum {string}
          */
@@ -3964,6 +4201,12 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** HistoriqueParametres */
+        HistoriqueParametres: {
+            en_cours: components["schemas"]["ParametresSortie"];
+            /** Versions */
+            versions: components["schemas"]["ParametresSortie"][];
         };
         /** IesgAdmin */
         IesgAdmin: {
@@ -4250,6 +4493,13 @@ export interface components {
             /** Semestre */
             semestre: string | null;
         };
+        /** ListeBanque */
+        ListeBanque: {
+            /** Questions Requises */
+            questions_requises: number;
+            /** Quiz */
+            quiz: components["schemas"]["QuizBanque"][];
+        };
         /** ListeQuiz */
         ListeQuiz: {
             /** Nb Questions */
@@ -4368,6 +4618,11 @@ export interface components {
             /** Mot De Passe */
             mot_de_passe: string;
         };
+        /** Motif */
+        Motif: {
+            /** Motif */
+            motif: string;
+        };
         /** MotifEntree */
         MotifEntree: {
             /** Motif */
@@ -4435,6 +4690,39 @@ export interface components {
             par_page: number;
             /** Evenements */
             evenements: components["schemas"]["EvenementJournal"][];
+        };
+        /** ParametresEntree */
+        ParametresEntree: {
+            /** Nb Questions */
+            nb_questions: number;
+            /** Temps Ms */
+            temps_ms: number;
+            /** Tolerance Ms */
+            tolerance_ms: number;
+            /** Seuil */
+            seuil: number;
+            /** Tentatives Par Jour */
+            tentatives_par_jour: number;
+        };
+        /** ParametresSortie */
+        ParametresSortie: {
+            /** Version */
+            version: number;
+            /** Nb Questions */
+            nb_questions: number;
+            /** Temps Ms */
+            temps_ms: number;
+            /** Tolerance Ms */
+            tolerance_ms: number;
+            /** Seuil */
+            seuil: number;
+            /** Tentatives Par Jour */
+            tentatives_par_jour: number;
+            /**
+             * Cree Le
+             * Format: date-time
+             */
+            cree_le: string;
         };
         /**
          * ParentContenu
@@ -4713,6 +5001,37 @@ export interface components {
             /** Motif */
             motif: string;
         };
+        /** QuestionBanque */
+        QuestionBanque: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Enonce */
+            enonce: string;
+            /** Choix */
+            choix: string[];
+            /** Bonne Reponse */
+            bonne_reponse: number;
+            /** Explication */
+            explication: string | null;
+            /** Ordre */
+            ordre: number;
+            /** Active */
+            active: boolean;
+        };
+        /** QuestionEntree */
+        QuestionEntree: {
+            /** Enonce */
+            enonce: string;
+            /** Choix */
+            choix: string[];
+            /** Bonne Reponse */
+            bonne_reponse: number;
+            /** Explication */
+            explication?: string | null;
+        };
         /** QuestionJoueur */
         QuestionJoueur: {
             /** Rang */
@@ -4739,6 +5058,98 @@ export interface components {
         QuestionnaireQuelAxe: {
             /** Questions */
             questions: components["schemas"]["QuestionQuelAxe"][];
+        };
+        /** QuizBanque */
+        QuizBanque: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Titre */
+            titre: string;
+            /** Description */
+            description: string;
+            /** Axe Code */
+            axe_code: string;
+            etat: components["schemas"]["EtatQuiz"];
+            /** Contenu De Test */
+            contenu_de_test: boolean;
+            /** Questions Actives */
+            questions_actives: number;
+            /** Soumis Le */
+            soumis_le: string | null;
+            /** Decide Le */
+            decide_le: string | null;
+            /** Motif */
+            motif: string | null;
+            /** Validateur Nom */
+            validateur_nom: string | null;
+            /** Validateur Qualite */
+            validateur_qualite: string | null;
+            /** Publie Le */
+            publie_le: string | null;
+            /**
+             * Modifie Le
+             * Format: date-time
+             */
+            modifie_le: string;
+            /** Contributeur */
+            contributeur: boolean;
+        };
+        /** QuizDetail */
+        QuizDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Titre */
+            titre: string;
+            /** Description */
+            description: string;
+            /** Axe Code */
+            axe_code: string;
+            etat: components["schemas"]["EtatQuiz"];
+            /** Contenu De Test */
+            contenu_de_test: boolean;
+            /** Questions Actives */
+            questions_actives: number;
+            /** Soumis Le */
+            soumis_le: string | null;
+            /** Decide Le */
+            decide_le: string | null;
+            /** Motif */
+            motif: string | null;
+            /** Validateur Nom */
+            validateur_nom: string | null;
+            /** Validateur Qualite */
+            validateur_qualite: string | null;
+            /** Publie Le */
+            publie_le: string | null;
+            /**
+             * Modifie Le
+             * Format: date-time
+             */
+            modifie_le: string;
+            /** Contributeur */
+            contributeur: boolean;
+            /** Questions */
+            questions: components["schemas"]["QuestionBanque"][];
+            /** Questions Requises */
+            questions_requises: number;
+        };
+        /** QuizEntree */
+        QuizEntree: {
+            /** Titre */
+            titre: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Axe Code */
+            axe_code: string;
         };
         /** QuizJoueur */
         QuizJoueur: {
@@ -9945,6 +10356,556 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatPartie"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_parametres_api_admin_quiz_parametres_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HistoriqueParametres"];
+                };
+            };
+        };
+    };
+    changer_parametres_api_admin_quiz_parametres_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParametresEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParametresSortie"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reprendre_essai_api_admin_quiz_essais__tentative_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tentative_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatPartie"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    repondre_essai_api_admin_quiz_essais__tentative_id__reponses_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tentative_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReponseJoueur"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatPartie"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lister_api_admin_quiz_get: {
+        parameters: {
+            query?: {
+                etat?: components["schemas"]["EtatQuiz"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListeBanque"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    creer_api_admin_quiz_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuizEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_api_admin_quiz__quiz_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modifier_api_admin_quiz__quiz_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuizEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ajouter_question_api_admin_quiz__quiz_id__questions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modifier_question_api_admin_quiz__quiz_id__questions__question_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retirer_question_api_admin_quiz__quiz_id__questions__question_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    soumettre_api_admin_quiz__quiz_id__soumettre_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reprendre_api_admin_quiz__quiz_id__reprendre_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approuver_api_admin_quiz__quiz_id__approuver_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Approbation"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refuser_api_admin_quiz__quiz_id__refuser_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Motif"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    depublier_api_admin_quiz__quiz_id__depublier_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Motif"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lancer_essai_api_admin_quiz__quiz_id__essais_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };

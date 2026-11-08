@@ -165,3 +165,14 @@ def test_le_seed_prepare_une_actualite_et_une_proposition_de_fiche(
     assert sorted((t, e.value) for t, e in lignes) == [("actualite", "publie"), ("fiche_club", "en_attente")]
     natures = [a["nature"] for a in client.get("/api/articles").json()["articles"]]
     assert sorted(natures) == ["actualite", "article"]
+
+
+def test_le_seed_prepare_trois_quiz_de_test_une_seule_fois(en_base: Callable[..., Any]) -> None:
+    from app.quiz.models import Quiz
+
+    en_base(semer)
+    en_base(semer)
+
+    lignes = en_base(lambda db: db.execute(select(Quiz.etat, Quiz.contenu_de_test, Quiz.titre)))
+    assert sorted(e.value for e, _, _ in lignes) == ["brouillon", "publie", "soumis"]
+    assert all(test and titre.startswith("[Test]") for _, test, titre in lignes)

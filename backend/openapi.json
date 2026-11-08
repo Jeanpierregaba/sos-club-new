@@ -7087,6 +7087,799 @@
         }
       }
     },
+    "/api/admin/quiz/parametres": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lire Parametres",
+        "operationId": "lire_parametres_api_admin_quiz_parametres_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoriqueParametres"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Changer Parametres",
+        "operationId": "changer_parametres_api_admin_quiz_parametres_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParametresEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParametresSortie"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quiz/essais/{tentative_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Reprendre Essai",
+        "operationId": "reprendre_essai_api_admin_quiz_essais__tentative_id__get",
+        "parameters": [
+          {
+            "name": "tentative_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tentative Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatPartie"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quiz/essais/{tentative_id}/reponses": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Repondre Essai",
+        "operationId": "repondre_essai_api_admin_quiz_essais__tentative_id__reponses_post",
+        "parameters": [
+          {
+            "name": "tentative_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tentative Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReponseJoueur"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatPartie"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quiz": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister",
+        "operationId": "lister_api_admin_quiz_get",
+        "parameters": [
+          {
+            "name": "etat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EtatQuiz"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Etat"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListeBanque"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Creer",
+        "operationId": "creer_api_admin_quiz_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quiz/{quiz_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lire",
+        "operationId": "lire_api_admin_quiz__quiz_id__get",
+        "parameters": [
+          {
+            "name": "quiz_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Quiz Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Modifier",
+        "operationId": "modifier_api_admin_quiz__quiz_id__put",
+        "parameters": [
+          {
+            "name": "quiz_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Quiz Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quiz/{quiz_id}/questions": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Ajouter Question",
+        "operationId": "ajouter_question_api_admin_quiz__quiz_id__questions_post",
+        "parameters": [
+          {
+            "name": "quiz_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Quiz Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quiz/{quiz_id}/questions/{question_id}": {
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Modifier Question",
+        "operationId": "modifier_question_api_admin_quiz__quiz_id__questions__question_id__put",
+        "parameters": [
+          {
+            "name": "quiz_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Quiz Id"
+            }
+          },
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Question Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Retirer Question",
+        "operationId": "retirer_question_api_admin_quiz__quiz_id__questions__question_id__delete",
+        "parameters": [
+          {
+            "name": "quiz_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Quiz Id"
+            }
+          },
+          {
+            "name": "question_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Question Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quiz/{quiz_id}/soumettre": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Soumettre",
+        "operationId": "soumettre_api_admin_quiz__quiz_id__soumettre_post",
+        "parameters": [
+          {
+            "name": "quiz_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Quiz Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quiz/{quiz_id}/reprendre": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Reprendre",
+        "operationId": "reprendre_api_admin_quiz__quiz_id__reprendre_post",
+        "parameters": [
+          {
+            "name": "quiz_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Quiz Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quiz/{quiz_id}/approuver": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Approuver",
+        "operationId": "approuver_api_admin_quiz__quiz_id__approuver_post",
+        "parameters": [
+          {
+            "name": "quiz_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Quiz Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Approbation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quiz/{quiz_id}/refuser": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Refuser",
+        "operationId": "refuser_api_admin_quiz__quiz_id__refuser_post",
+        "parameters": [
+          {
+            "name": "quiz_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Quiz Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Motif"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quiz/{quiz_id}/depublier": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Depublier",
+        "operationId": "depublier_api_admin_quiz__quiz_id__depublier_post",
+        "parameters": [
+          {
+            "name": "quiz_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Quiz Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Motif"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quiz/{quiz_id}/essais": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lancer Essai",
+        "operationId": "lancer_essai_api_admin_quiz__quiz_id__essais_post",
+        "parameters": [
+          {
+            "name": "quiz_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Quiz Id"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatPartie"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -7595,6 +8388,29 @@
           "decisions"
         ],
         "title": "ApercuModeration"
+      },
+      "Approbation": {
+        "properties": {
+          "validateur_nom": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Validateur Nom"
+          },
+          "validateur_qualite": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Validateur Qualite"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "validateur_nom",
+          "validateur_qualite"
+        ],
+        "title": "Approbation"
       },
       "ApprobationEntree": {
         "properties": {
@@ -10916,6 +11732,16 @@
         ],
         "title": "EtatPartie"
       },
+      "EtatQuiz": {
+        "type": "string",
+        "enum": [
+          "brouillon",
+          "soumis",
+          "publie",
+          "depublie"
+        ],
+        "title": "EtatQuiz"
+      },
       "EtatVerification": {
         "type": "string",
         "enum": [
@@ -11426,6 +12252,26 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "HistoriqueParametres": {
+        "properties": {
+          "en_cours": {
+            "$ref": "#/components/schemas/ParametresSortie"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/ParametresSortie"
+            },
+            "type": "array",
+            "title": "Versions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "en_cours",
+          "versions"
+        ],
+        "title": "HistoriqueParametres"
       },
       "IesgAdmin": {
         "properties": {
@@ -12348,6 +13194,27 @@
         ],
         "title": "LignePoints"
       },
+      "ListeBanque": {
+        "properties": {
+          "questions_requises": {
+            "type": "integer",
+            "title": "Questions Requises"
+          },
+          "quiz": {
+            "items": {
+              "$ref": "#/components/schemas/QuizBanque"
+            },
+            "type": "array",
+            "title": "Quiz"
+          }
+        },
+        "type": "object",
+        "required": [
+          "questions_requises",
+          "quiz"
+        ],
+        "title": "ListeBanque"
+      },
       "ListeQuiz": {
         "properties": {
           "nb_questions": {
@@ -12662,6 +13529,22 @@
         ],
         "title": "MotDePasseProvisoire"
       },
+      "Motif": {
+        "properties": {
+          "motif": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Motif"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "motif"
+        ],
+        "title": "Motif"
+      },
       "MotifEntree": {
         "properties": {
           "motif": {
@@ -12849,6 +13732,93 @@
           "evenements"
         ],
         "title": "PageJournal"
+      },
+      "ParametresEntree": {
+        "properties": {
+          "nb_questions": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Nb Questions"
+          },
+          "temps_ms": {
+            "type": "integer",
+            "maximum": 60000.0,
+            "minimum": 1000.0,
+            "title": "Temps Ms"
+          },
+          "tolerance_ms": {
+            "type": "integer",
+            "maximum": 30000.0,
+            "minimum": 0.0,
+            "title": "Tolerance Ms"
+          },
+          "seuil": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Seuil"
+          },
+          "tentatives_par_jour": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Tentatives Par Jour"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nb_questions",
+          "temps_ms",
+          "tolerance_ms",
+          "seuil",
+          "tentatives_par_jour"
+        ],
+        "title": "ParametresEntree"
+      },
+      "ParametresSortie": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "nb_questions": {
+            "type": "integer",
+            "title": "Nb Questions"
+          },
+          "temps_ms": {
+            "type": "integer",
+            "title": "Temps Ms"
+          },
+          "tolerance_ms": {
+            "type": "integer",
+            "title": "Tolerance Ms"
+          },
+          "seuil": {
+            "type": "integer",
+            "title": "Seuil"
+          },
+          "tentatives_par_jour": {
+            "type": "integer",
+            "title": "Tentatives Par Jour"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "nb_questions",
+          "temps_ms",
+          "tolerance_ms",
+          "seuil",
+          "tentatives_par_jour",
+          "cree_le"
+        ],
+        "title": "ParametresSortie"
       },
       "ParentContenu": {
         "properties": {
@@ -13671,6 +14641,106 @@
         ],
         "title": "PseudonymeEntree"
       },
+      "QuestionBanque": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "enonce": {
+            "type": "string",
+            "title": "Enonce"
+          },
+          "choix": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Choix"
+          },
+          "bonne_reponse": {
+            "type": "integer",
+            "title": "Bonne Reponse"
+          },
+          "explication": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explication"
+          },
+          "ordre": {
+            "type": "integer",
+            "title": "Ordre"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "enonce",
+          "choix",
+          "bonne_reponse",
+          "explication",
+          "ordre",
+          "active"
+        ],
+        "title": "QuestionBanque"
+      },
+      "QuestionEntree": {
+        "properties": {
+          "enonce": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Enonce"
+          },
+          "choix": {
+            "items": {
+              "type": "string",
+              "maxLength": 150,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 4,
+            "minItems": 2,
+            "title": "Choix"
+          },
+          "bonne_reponse": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Bonne Reponse"
+          },
+          "explication": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explication"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "enonce",
+          "choix",
+          "bonne_reponse"
+        ],
+        "title": "QuestionEntree"
+      },
       "QuestionJoueur": {
         "properties": {
           "rang": {
@@ -13748,6 +14818,305 @@
           "questions"
         ],
         "title": "QuestionnaireQuelAxe"
+      },
+      "QuizBanque": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "axe_code": {
+            "type": "string",
+            "title": "Axe Code"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatQuiz"
+          },
+          "contenu_de_test": {
+            "type": "boolean",
+            "title": "Contenu De Test"
+          },
+          "questions_actives": {
+            "type": "integer",
+            "title": "Questions Actives"
+          },
+          "soumis_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soumis Le"
+          },
+          "decide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Le"
+          },
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          },
+          "validateur_nom": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validateur Nom"
+          },
+          "validateur_qualite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validateur Qualite"
+          },
+          "publie_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publie Le"
+          },
+          "modifie_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Modifie Le"
+          },
+          "contributeur": {
+            "type": "boolean",
+            "title": "Contributeur"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "titre",
+          "description",
+          "axe_code",
+          "etat",
+          "contenu_de_test",
+          "questions_actives",
+          "soumis_le",
+          "decide_le",
+          "motif",
+          "validateur_nom",
+          "validateur_qualite",
+          "publie_le",
+          "modifie_le",
+          "contributeur"
+        ],
+        "title": "QuizBanque"
+      },
+      "QuizDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "axe_code": {
+            "type": "string",
+            "title": "Axe Code"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatQuiz"
+          },
+          "contenu_de_test": {
+            "type": "boolean",
+            "title": "Contenu De Test"
+          },
+          "questions_actives": {
+            "type": "integer",
+            "title": "Questions Actives"
+          },
+          "soumis_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soumis Le"
+          },
+          "decide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Le"
+          },
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          },
+          "validateur_nom": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validateur Nom"
+          },
+          "validateur_qualite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validateur Qualite"
+          },
+          "publie_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publie Le"
+          },
+          "modifie_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Modifie Le"
+          },
+          "contributeur": {
+            "type": "boolean",
+            "title": "Contributeur"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionBanque"
+            },
+            "type": "array",
+            "title": "Questions"
+          },
+          "questions_requises": {
+            "type": "integer",
+            "title": "Questions Requises"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "titre",
+          "description",
+          "axe_code",
+          "etat",
+          "contenu_de_test",
+          "questions_actives",
+          "soumis_le",
+          "decide_le",
+          "motif",
+          "validateur_nom",
+          "validateur_qualite",
+          "publie_le",
+          "modifie_le",
+          "contributeur",
+          "questions",
+          "questions_requises"
+        ],
+        "title": "QuizDetail"
+      },
+      "QuizEntree": {
+        "properties": {
+          "titre": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 3,
+            "title": "Titre"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Description",
+            "default": ""
+          },
+          "axe_code": {
+            "type": "string",
+            "maxLength": 40,
+            "title": "Axe Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "titre",
+          "axe_code"
+        ],
+        "title": "QuizEntree"
       },
       "QuizJoueur": {
         "properties": {

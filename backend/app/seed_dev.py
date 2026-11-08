@@ -45,6 +45,7 @@ from app.moderation.models import (
 from app.moderation.photos import ATTESTATION
 from app.points import service as points
 from app.points.bareme import ARTICLE_ELEVE
+from app.quiz.models import EtatQuiz, QuestionQuiz, Quiz
 from app.referentiel.models import Etablissement, Iesg, StatutEtablissement
 from app.seed_commun import (
     activer_double_auth,
@@ -352,6 +353,43 @@ async def _preparer_contenus_du_club(db: AsyncSession) -> None:
             contenu.etat = EtatContenu.en_attente
 
 
+async def _preparer_quiz(db: AsyncSession) -> None:
+    """Trois quiz de démonstration (spec 027), une fois : un publié (18 questions), un soumis par le gestionnaire
+    pédagogique (à publier par un autre compte), un brouillon. Marqués « Contenu de test » : des calculs, aucun
+    contenu de santé inventé (docs/RULES.md)."""
+    if await db.scalar(select(Quiz.id)):
+        return
+    pedagogie = await db.scalar(select(Utilisateur.id).where(Utilisateur.identifiant == "dev.pedagogie"))
+    if pedagogie is None:
+        return
+    maintenant = datetime.now(UTC)
+    quiz_de_test = (
+        ("[Test] Quiz de démonstration — calcul", EtatQuiz.publie, 18),
+        ("[Test] Quiz à publier", EtatQuiz.soumis, 15),
+        ("[Test] Quiz en préparation", EtatQuiz.brouillon, 5),
+    )
+    for titre, etat, nombre in quiz_de_test:
+        publie = etat is EtatQuiz.publie
+        quiz = Quiz(
+            id=uuid7(), titre=titre, description="Quiz de démonstration pour essayer la plateforme, non validé.",
+            axe_code="sante-environnement", etat=etat, contenu_de_test=True, contributeurs=[pedagogie],
+            soumis_par=pedagogie if etat is not EtatQuiz.brouillon else None,
+            soumis_le=maintenant if etat is not EtatQuiz.brouillon else None,
+            validateur_nom="Compte de test" if publie else None,
+            validateur_qualite="Contenu de démonstration" if publie else None,
+            publie_le=maintenant if publie else None,
+        )  # fmt: skip
+        db.add(quiz)
+        await db.flush()
+        for i in range(1, nombre + 1):
+            somme = i + 2
+            question = QuestionQuiz(
+                quiz_id=quiz.id, enonce=f"Question de test {i} : combien font {i} + 2 ?",
+                choix=[str(somme), str(somme + 1), str(somme - 1)], bonne_reponse=0, ordre=i,
+            )  # fmt: skip
+            db.add(question)
+
+
 async def semer(db: AsyncSession) -> list[dict[str, str]]:
     """Prépare tous les comptes `dev.*` et renvoie leurs accès. Valide la transaction."""
     if settings.production:
@@ -396,6 +434,7 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
     await _preparer_photo(db)
     await _preparer_commentaires(db)
     await _preparer_contenus_du_club(db)
+    await _preparer_quiz(db)
     journaliser(db, "comptes_de_developpement_prepares", details={"comptes": [c[0] for c in COMPTES]})
     await db.commit()
     return acces
