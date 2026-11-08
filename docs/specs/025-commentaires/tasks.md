@@ -16,7 +16,7 @@ Chaque tâche se termine par lint, typecheck et tests verts, puis un commit.
 
 **Site**
 
-- [ ] 4. `Commentaires.tsx` sous l'article (liste, champ, confirmation, invitation à se connecter), avec un test
+- [x] 4. `Commentaires.tsx` sous l'article (liste, champ, confirmation, invitation à se connecter), avec un test
       Vitest.
 - [ ] 5. Page « Mes commentaires » et lien dans le menu ; centre de modération : type, article parent, « À
       corriger » masqué pour un commentaire. Commentaires de démonstration dans `seed_dev.py`.

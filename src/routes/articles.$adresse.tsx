@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
+import { Commentaires } from "@/components/articles/Commentaires";
 import { Couverture, Galerie } from "@/components/articles/Galerie";
 import { TexteArticle } from "@/components/articles/TexteArticle";
 import { FilAriane } from "@/components/FilAriane";
@@ -81,6 +82,7 @@ function Article() {
         )}
         <TexteArticle texte={article.texte} />
         <Galerie adresse={article.adresse} photos={article.photos} />
+        <Commentaires adresse={article.adresse} />
         <Link
           to="/articles"
           className="mt-12 inline-flex items-center gap-2 font-bold text-logo-blue hover:underline"

@@ -121,6 +121,10 @@ export type Notifications = Schemas["Notifications"];
 export type PhotoAuteur = Schemas["PhotoAuteur"];
 export type PhotoPublique = Schemas["PhotoPublique"];
 export type PhotoModeration = Schemas["PhotoModeration"];
+export type CommentaireAuteur = Schemas["CommentaireAuteur"];
+export type MesCommentaires = Schemas["MesCommentaires"];
+export type CommentairePublic = Schemas["CommentairePublic"];
+export type CommentairesPublics = Schemas["CommentairesPublics"];
 
 export const MESSAGE_SAISIE = "Vérifie le formulaire : un champ est vide, trop long ou mal rempli.";
 
@@ -494,6 +498,17 @@ export const chargerArticles = (filtres: { page?: number; axe?: string } = {}) =
   requeteApi<ArticlesPublics>(avecParametres("/api/articles", filtres));
 export const chargerArticle = (adresse: string) =>
   requeteApi<ArticlePublic>(`/api/articles/${encodeURIComponent(adresse)}`);
+
+// Commentaires (spec 025) : en attente jusqu'à leur approbation, puis lisibles sous l'article.
+const commentairesDe = (adresse: string) => `/api/articles/${encodeURIComponent(adresse)}/commentaires`;
+export const chargerCommentaires = (adresse: string, page = 1) =>
+  requeteApi<CommentairesPublics>(avecParametres(commentairesDe(adresse), { page }));
+export const commenterArticle = (adresse: string, texte: string) =>
+  envoyerJson<CommentaireAuteur>(commentairesDe(adresse), { texte });
+export const chargerMesCommentaires = (article?: string) =>
+  requeteApi<MesCommentaires>(avecParametres("/api/mes-commentaires", { article }));
+export const retirerCommentaire = (id: string) =>
+  envoyerJson<void>(`/api/mes-commentaires/${id}`, undefined, "DELETE");
 
 const MODERATION = "/api/admin/moderation";
 export const chargerFileModeration = (filtres: Record<string, string | undefined> = {}) =>
