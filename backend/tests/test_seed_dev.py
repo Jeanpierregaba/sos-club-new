@@ -134,7 +134,7 @@ def test_le_seed_prepare_trois_articles_de_test_une_seule_fois(client: TestClien
 
     etats = sorted(en_base(lambda db: db.scalars(select(Contenu.etat).where(Contenu.type == "article"))).all())
     assert etats == ["a_corriger", "en_attente", "publie"]
-    publics = client.get("/api/articles").json()["articles"]
+    publics = [a for a in client.get("/api/articles").json()["articles"] if a["nature"] == "article"]
     assert [a["titre"] for a in publics] == ["Article de test — Un point d'eau dans la cour"]
     assert publics[0]["signature"]["club"] == "Club Santé Tokoin"
 
@@ -151,3 +151,17 @@ def test_le_seed_prepare_deux_commentaires_de_test_une_seule_fois(
     assert etats == ["en_attente", "publie"]
     publics = client.get("/api/articles/article-de-test-un-point-d-eau-dans-la-cour/commentaires").json()
     assert [c["texte"][:22] for c in publics["commentaires"]] == ["[Commentaire de test] "]
+
+
+def test_le_seed_prepare_une_actualite_et_une_proposition_de_fiche(
+    client: TestClient, en_base: Callable[..., Any]
+) -> None:
+    from app.moderation.models import Contenu
+
+    en_base(semer)
+    en_base(semer)
+
+    lignes = en_base(lambda db: db.execute(select(Contenu.type, Contenu.etat).where(Contenu.club_id.is_not(None))))
+    assert sorted((t, e.value) for t, e in lignes) == [("actualite", "publie"), ("fiche_club", "en_attente")]
+    natures = [a["nature"] for a in client.get("/api/articles").json()["articles"]]
+    assert sorted(natures) == ["actualite", "article"]

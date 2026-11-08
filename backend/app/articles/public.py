@@ -4,8 +4,10 @@ par son pseudonyme (et son club s'il l'a choisi), un encadreur par son prénom, 
 """
 
 import math
+from collections.abc import Sequence
+from uuid import UUID
 
-from sqlalchemy import Select, func, select
+from sqlalchemy import Row, Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.articles.schemas import ArticlePublic, ArticlesPublics, AxeArticle, PhotoPublique, ResumeArticle, Signature
@@ -30,16 +32,25 @@ FONCTIONS = {
 }
 
 
+# Les articles personnels et les actualités des clubs (spec 026) : même lecture publique, même adresse.
+ACTUALITE = "actualite"
+TYPES = (TYPE, ACTUALITE)
+
+
 def _publics() -> Select[tuple[Contenu, VersionContenu, Axe]]:
     return (
         select(Contenu, VersionContenu, Axe)
         .join(VersionContenu, VersionContenu.id == Contenu.version_publiee_id)
         .join(Axe, Axe.code == Contenu.axe_code)
-        .where(Contenu.type == TYPE, Contenu.version_publiee_id.is_not(None))
+        .where(Contenu.type.in_(TYPES), Contenu.version_publiee_id.is_not(None))
     )
 
 
 async def signature(db: AsyncSession, contenu: Contenu) -> Signature:
+    if contenu.club_id is not None:
+        # Une actualité parle au nom du club : jamais le nom ni le pseudonyme du président.
+        nom = await db.scalar(select(Club.nom).where(Club.id == contenu.club_id))
+        return Signature(profil="club", nom=nom or "Club Santé")
     auteur = await db.get(Utilisateur, contenu.auteur_id)
     assert auteur is not None
     if auteur.role is Role.eleve:
@@ -81,6 +92,7 @@ async def _resume(
 ) -> ResumeArticle:
     assert contenu.adresse is not None and contenu.publie_le is not None
     return ResumeArticle(
+        nature="actualite" if contenu.type == ACTUALITE else "article",
         adresse=contenu.adresse,
         titre=version.donnees["titre"],
         chapo=version.donnees["chapo"],
@@ -89,6 +101,28 @@ async def _resume(
         couverture=couverture,
         publie_le=contenu.publie_le.date(),
     )
+
+
+async def _resumes(db: AsyncSession, lignes: Sequence[Row[tuple[Contenu, VersionContenu, Axe]]]) -> list[ResumeArticle]:
+    # Les couvertures en une seule requête.
+    trouvees = await photos.couvertures(db, [version.id for _, version, _ in lignes])
+    return [
+        await _resume(db, contenu, version, axe, _publique(*trouvees[version.id]) if version.id in trouvees else None)
+        for contenu, version, axe in lignes
+    ]
+
+
+async def actualites_du_club(db: AsyncSession, club_id: UUID, limite: int = 6) -> list[ResumeArticle]:
+    """Les dernières actualités publiées d'un club (spec 026), pour sa fiche et « Mon club »."""
+    lignes = (
+        await db.execute(
+            _publics()
+            .where(Contenu.type == ACTUALITE, Contenu.club_id == club_id)
+            .order_by(Contenu.publie_le.desc(), Contenu.id.desc())
+            .limit(limite)
+        )
+    ).all()
+    return await _resumes(db, lignes)
 
 
 async def lister(db: AsyncSession, page: int, axe: str | None) -> ArticlesPublics:
@@ -101,19 +135,8 @@ async def lister(db: AsyncSession, page: int, axe: str | None) -> ArticlesPublic
             requete.order_by(Contenu.publie_le.desc(), Contenu.id.desc()).offset((page - 1) * PAR_PAGE).limit(PAR_PAGE)
         )
     ).all()
-    # Les couvertures de la page en une seule requête.
-    trouvees = await photos.couvertures(db, [version.id for _, version, _ in lignes])
     return ArticlesPublics(
-        articles=[
-            await _resume(
-                db,
-                contenu,
-                version,
-                axe,
-                _publique(*trouvees[version.id]) if version.id in trouvees else None,
-            )
-            for contenu, version, axe in lignes
-        ],
+        articles=await _resumes(db, lignes),
         page=page,
         pages=max(1, math.ceil(total / PAR_PAGE)),
         total=total,

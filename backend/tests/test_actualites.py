@@ -103,7 +103,7 @@ def test_le_president_ajoute_une_photo(club: dict[str, Any]) -> None:
         files={"fichier": ("photo.jpg", image(), "image/jpeg")},
     )
 
-    assert reponse.status_code == 201, reponse.text
+    assert reponse.status_code == 200, reponse.text
     assert len(reponse.json()["photos"]) == 1
 
 

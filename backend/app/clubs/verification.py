@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
 from app.clubs.adhesions import adhesion_president
+from app.clubs.espace import transferer_contenus
 from app.clubs.membres_admin import compter_a_valider
 from app.clubs.models import Adhesion, Club, ClubAxe, ClubPassation, EtatAdhesion, EtatClub, EtatPassation
 from app.clubs.schemas import DemandeClub, EncadreurAssocie, FileClubs, FilePassations, Passation
@@ -332,6 +333,8 @@ async def valider_passation(
     ):
         raise Refus("Le successeur n'est plus membre du club : la passation ne peut pas être validée.", 409)
     club.president_id = passation.successeur_id
+    # Les actualités et propositions du club passent au nouveau président (spec 026) : l'ancien perd la main.
+    await transferer_contenus(db, club.id, passation.successeur_id)
     passation.etat = EtatPassation.validee
     passation.decide_le = datetime.now(UTC)
     passation.decide_par = acces.utilisateur.id

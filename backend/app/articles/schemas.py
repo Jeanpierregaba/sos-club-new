@@ -3,7 +3,7 @@ les paragraphes, intertitres, gras, italique et listes, jamais de HTML ni de lie
 
 import re
 from datetime import date, datetime
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
 from pydantic import AfterValidator, BaseModel, Field, StringConstraints
@@ -122,7 +122,7 @@ class MesArticles(BaseModel):
 
 class Signature(BaseModel):
     """Jamais de nom complet : un élève par son pseudonyme (et son club s'il l'a choisi), un encadreur par son
-    prénom, l'initiale de son nom et sa fonction."""
+    prénom, l'initiale de son nom et sa fonction, une actualité par le nom du club (`profil="club"`)."""
 
     profil: str
     nom: str
@@ -143,6 +143,8 @@ class PhotoPublique(BaseModel):
 
 
 class ResumeArticle(BaseModel):
+    # « article » : un article personnel ; « actualite » : une actualité du club (spec 026), signée du club.
+    nature: Literal["article", "actualite"]
     adresse: str
     titre: str
     chapo: str

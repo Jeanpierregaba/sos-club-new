@@ -4,9 +4,11 @@ from datetime import datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import AfterValidator, BaseModel, ConfigDict, Field, field_validator
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field, StringConstraints, field_validator
 
+from app.articles.schemas import ResumeArticle, ResumeArticleAuteur
 from app.clubs.models import EtatClub
+from app.moderation.models import EtatContenu
 from app.referentiel.schemas import EtablissementRattache
 
 
@@ -109,6 +111,8 @@ class ClubFiche(BaseModel):
     etablissement: EtablissementRattache
     axes: list[str]
     actif_le: datetime | None
+    # Les dernières actualités publiées du club (spec 026).
+    actualites: list[ResumeArticle] = []
 
 
 # Passation --------------------------------------------------------------------------------------------------
@@ -366,3 +370,75 @@ class ClubPodium(BaseModel):
     etablissement: str
     dre: str
     points: int
+
+
+# Espace du président (spec 026) -----------------------------------------------------------------------------
+
+
+class PropositionFicheEntree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    description: Annotated[str | None, StringConstraints(strip_whitespace=True, max_length=300)] = None
+    axes: Annotated[list[str], Field(min_length=1, max_length=3)]
+
+    @field_validator("description")
+    @classmethod
+    def _vide(cls, valeur: str | None) -> str | None:
+        return valeur or None
+
+    @field_validator("axes")
+    @classmethod
+    def _uniques(cls, valeur: list[str]) -> list[str]:
+        if len(set(valeur)) != len(valeur):
+            raise ValueError("Chaque axe ne compte qu'une fois.")
+        return valeur
+
+
+class PropositionFiche(BaseModel):
+    id: UUID
+    etat: EtatContenu
+    description: str | None
+    axes: list[str]
+    motif: str | None
+    soumis_le: datetime | None
+    version: int
+
+
+class ClubEspace(BaseModel):
+    id: UUID
+    nom: str
+    description: str | None
+    etablissement: EtablissementRattache
+    axes: list[str]
+    actif_le: datetime | None
+
+
+class IndicateursClub(BaseModel):
+    membres: int
+    encadreurs: int
+    actualites: int
+    # Pour le président seulement.
+    demandes: int | None
+
+
+class DemandesClub(BaseModel):
+    adhesions: list[DemandeAdhesion]
+    rattachements: list[DemandeRattachement]
+
+
+class SuiviClub(BaseModel):
+    propositions: list[PropositionFiche]
+    actualites: list[ResumeArticleAuteur]
+
+
+class EspaceClub(BaseModel):
+    """La vue « Mon club » : la gestion (demandes, suivi) pour le président seul ; la lecture pour les membres et
+    les encadreurs rattachés."""
+
+    club: ClubEspace
+    role: Literal["president", "membre", "encadreur"]
+    indicateurs: IndicateursClub
+    actualites: list[ResumeArticle]
+    membres: MembresDuClub
+    demandes: DemandesClub | None
+    suivi: SuiviClub | None

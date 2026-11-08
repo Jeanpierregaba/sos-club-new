@@ -11,7 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.catalogue import Action
 from app.admin.dependances import Acces, adresse_ip, exiger_permission
-from app.clubs import adhesions, membres_admin, rattachements, service, verification
+from app.articles.router import routes_de_redaction
+from app.clubs import adhesions, espace, membres_admin, rattachements, service, verification
 from app.clubs.models import EtatClub
 from app.clubs.schemas import (
     ActivationEntree,
@@ -25,6 +26,7 @@ from app.clubs.schemas import (
     DemandeClub,
     DemandeClubEntree,
     DemandeRattachement,
+    EspaceClub,
     FileAffiliations,
     FileClubs,
     FilePassations,
@@ -37,6 +39,8 @@ from app.clubs.schemas import (
     PassationAConfirmer,
     PassationApercu,
     PassationEntree,
+    PropositionFiche,
+    PropositionFicheEntree,
     RattachementResume,
     RefusDemandeEntree,
     RefusEntree,
@@ -158,6 +162,30 @@ async def retirer_membre(
         return await adhesions.retirer(
             db, utilisateur, club_id, adhesion_id, entree.motif, entree.version, _adresse(request)
         )
+
+
+# Espace du président (spec 026) : « Mon club », propositions de fiche ; les actualités sont dans `router_actualites`.
+
+
+@router.post("/moi/fiche", status_code=status.HTTP_201_CREATED)
+async def proposer_fiche(
+    entree: PropositionFicheEntree, request: Request, president: espace.President, db: Base
+) -> PropositionFiche:
+    with _traduire_refus():
+        return await espace.proposer_fiche(db, president, entree.description, entree.axes, adresse_ip(request))
+
+
+@router.delete("/moi/fiche/{contenu_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def retirer_fiche(contenu_id: UUID, request: Request, president: espace.President, db: Base) -> Response:
+    with _traduire_refus():
+        await espace.retirer_fiche(db, president, contenu_id, adresse_ip(request))
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/{club_id}/espace")
+async def espace_du_club(club_id: UUID, utilisateur: Connecte, db: Base) -> EspaceClub:
+    with _traduire_refus():
+        return await espace.espace(db, utilisateur, club_id)
 
 
 @router.get("/{club_id}/membres")
@@ -367,3 +395,8 @@ async def activer(
 async def refuser(club_id: UUID, entree: RefusEntree, request: Request, acces: Decideur, db: Base) -> DemandeClub:
     with _traduire_refus():
         return await verification.refuser(db, acces, club_id, entree.motif, adresse_ip(request), entree.version)
+
+
+# Actualités du club (spec 026) : les routes de rédaction des articles, pour le président en place.
+router_actualites = APIRouter(prefix="/clubs/moi/actualites", tags=["clubs"])
+routes_de_redaction(router_actualites, espace.President, espace.ACTUALITE, espace.club_du_president)

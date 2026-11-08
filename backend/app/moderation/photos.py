@@ -297,9 +297,11 @@ async def lire_pour_moderateur(db: AsyncSession, acces: Acces, contenu_id: UUID,
     return await _octets(db, contenu.id, photo_id, taille, version_id=None)
 
 
-async def lire_publique(db: AsyncSession, type: str, adresse: str, photo_id: UUID, taille: str) -> bytes:
+async def lire_publique(db: AsyncSession, types: tuple[str, ...], adresse: str, photo_id: UUID, taille: str) -> bytes:
     contenu = await db.scalar(
-        select(Contenu).where(Contenu.type == type, Contenu.adresse == adresse, Contenu.version_publiee_id.is_not(None))
+        select(Contenu).where(
+            Contenu.type.in_(types), Contenu.adresse == adresse, Contenu.version_publiee_id.is_not(None)
+        )
     )
     if contenu is None:
         raise Introuvable

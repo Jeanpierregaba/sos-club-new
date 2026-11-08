@@ -111,7 +111,13 @@ async def dre_de(db: AsyncSession, auteur: Utilisateur) -> str | None:
 
 
 async def creer(
-    db: AsyncSession, auteur: Utilisateur, type: str, donnees: dict[str, Any], *, parent_id: UUID | None = None
+    db: AsyncSession,
+    auteur: Utilisateur,
+    type: str,
+    donnees: dict[str, Any],
+    *,
+    parent_id: UUID | None = None,
+    club_id: UUID | None = None,
 ) -> Contenu:
     await verrouiller_auteur(db, auteur)
     brouillons = await db.scalar(
@@ -128,7 +134,9 @@ async def creer(
         raise Refus(
             f"Tu as déjà {MAX_BROUILLONS} brouillons : termine ou supprime-en un avant d'en commencer un autre.", 409
         )
-    contenu = Contenu(id=uuid7(), type=type, auteur_id=auteur.id, etat=EtatContenu.brouillon, parent_id=parent_id)
+    contenu = Contenu(
+        id=uuid7(), type=type, auteur_id=auteur.id, etat=EtatContenu.brouillon, parent_id=parent_id, club_id=club_id
+    )
     db.add(contenu)
     await db.flush()
     await _nouvelle_version(db, contenu, donnees)

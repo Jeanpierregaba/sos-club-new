@@ -373,7 +373,7 @@ async def approuver(db: AsyncSession, acces: Acces, contenu_id: UUID, version: i
     titre_avis = (
         f"Ta nouvelle version de « {titre} » est en ligne"
         if revision
-        else f"Ton {type_contenu.libelle} « {titre} » est publié"
+        else f"{type_contenu.determinant} {type_contenu.libelle} « {titre} » est publié{type_contenu.accord}"
     )
     _consigner(db, acces, contenu, travail, TypeDecision.approuver, None, ip, titre_avis, "approuve")
     await db.commit()

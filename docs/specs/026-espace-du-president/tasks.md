@@ -9,9 +9,9 @@ Chaque tâche se termine par lint, typecheck et tests verts, puis un commit.
 - [x] 2. Migration `contenus_du_club` (`club_id`, contraintes, index unique de la proposition en attente) et
       réglages du moteur (`depublication`, fiche actuelle dans l'aperçu, club bénéficiaire des seuls types à
       points).
-- [ ] 3. Vue « Mon club » et propositions de fiche (`clubs/espace.py`, dépendance `President`). Les tests de
+- [x] 3. Vue « Mon club » et propositions de fiche (`clubs/espace.py`, dépendance `President`). Les tests de
       `test_espace_club.py` et `test_fiche_club.py` passent.
-- [ ] 4. Actualités : rédaction paramétrée par le type, routes `/clubs/moi/actualites` avec photos, lecture
+- [x] 4. Actualités : rédaction paramétrée par le type, routes `/clubs/moi/actualites` avec photos, lecture
       publique (fiche du club, `/articles`), transfert d'auteur à la passation. `test_actualites.py` passe.
       Export OpenAPI et `npm run api:types`.
 

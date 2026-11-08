@@ -3069,6 +3069,535 @@
         }
       }
     },
+    "/api/clubs/moi/actualites": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Mes Articles",
+        "operationId": "mes_articles_api_clubs_moi_actualites_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MesArticles"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Creer",
+        "operationId": "creer_api_clubs_moi_actualites_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArticleEcriture"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/actualites/{contenu_id}": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Lire",
+        "operationId": "lire_api_clubs_moi_actualites__contenu_id__get",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Modifier",
+        "operationId": "modifier_api_clubs_moi_actualites__contenu_id__patch",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArticleEcriture"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Supprimer",
+        "operationId": "supprimer_api_clubs_moi_actualites__contenu_id__delete",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/actualites/{contenu_id}/soumettre": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Soumettre",
+        "operationId": "soumettre_api_clubs_moi_actualites__contenu_id__soumettre_post",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/actualites/{contenu_id}/retirer": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Retirer",
+        "operationId": "retirer_api_clubs_moi_actualites__contenu_id__retirer_post",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/actualites/{contenu_id}/photos": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Ajouter Photo",
+        "operationId": "ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/actualites/{contenu_id}/photos/{photo_id}": {
+      "patch": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Modifier Photo",
+        "operationId": "modifier_photo_api_clubs_moi_actualites__contenu_id__photos__photo_id__patch",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          },
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Photo Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhotoModification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Retirer Photo",
+        "operationId": "retirer_photo_api_clubs_moi_actualites__contenu_id__photos__photo_id__delete",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          },
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Photo Id"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/actualites/{contenu_id}/photos/{photo_id}/{taille}": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Lire Photo",
+        "operationId": "lire_photo_api_clubs_moi_actualites__contenu_id__photos__photo_id___taille__get",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          },
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Photo Id"
+            }
+          },
+          {
+            "name": "taille",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "grande",
+                "vignette"
+              ],
+              "type": "string",
+              "title": "Taille"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clubs/demande": {
       "post": {
         "tags": [
@@ -3520,6 +4049,126 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AdhesionResume"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/fiche": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Proposer Fiche",
+        "operationId": "proposer_fiche_api_clubs_moi_fiche_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropositionFicheEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropositionFiche"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/fiche/{contenu_id}": {
+      "delete": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Retirer Fiche",
+        "operationId": "retirer_fiche_api_clubs_moi_fiche__contenu_id__delete",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{club_id}/espace": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Espace Du Club",
+        "operationId": "espace_du_club_api_clubs__club_id__espace_get",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EspaceClub"
                 }
               }
             }
@@ -6600,6 +7249,21 @@
               }
             ]
           },
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubContenu"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "depublication_possible": {
+            "type": "boolean",
+            "title": "Depublication Possible",
+            "default": true
+          },
           "correction_possible": {
             "type": "boolean",
             "title": "Correction Possible",
@@ -6710,6 +7374,16 @@
             },
             "type": "array",
             "title": "Decisions"
+          },
+          "fiche_actuelle": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FicheActuelle"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -6936,6 +7610,14 @@
       },
       "ArticlePublic": {
         "properties": {
+          "nature": {
+            "type": "string",
+            "enum": [
+              "article",
+              "actualite"
+            ],
+            "title": "Nature"
+          },
           "adresse": {
             "type": "string",
             "title": "Adresse"
@@ -6983,6 +7665,7 @@
         },
         "type": "object",
         "required": [
+          "nature",
           "adresse",
           "titre",
           "chapo",
@@ -7273,6 +7956,47 @@
         ],
         "title": "Beneficiaire"
       },
+      "Body_ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post": {
+        "properties": {
+          "fichier": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Fichier"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "attestation": {
+            "type": "boolean",
+            "title": "Attestation",
+            "default": false
+          },
+          "legende": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 400
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Legende"
+          },
+          "couverture": {
+            "type": "boolean",
+            "title": "Couverture",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "fichier",
+          "version"
+        ],
+        "title": "Body_ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post"
+      },
       "Body_ajouter_photo_api_mes_articles__contenu_id__photos_post": {
         "properties": {
           "fichier": {
@@ -7427,6 +8151,82 @@
         ],
         "title": "Classe"
       },
+      "ClubContenu": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom"
+        ],
+        "title": "ClubContenu",
+        "description": "Le club au nom duquel le président écrit (spec 026)."
+      },
+      "ClubEspace": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "etablissement": {
+            "$ref": "#/components/schemas/EtablissementRattache"
+          },
+          "axes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Axes"
+          },
+          "actif_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actif Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "description",
+          "etablissement",
+          "axes",
+          "actif_le"
+        ],
+        "title": "ClubEspace"
+      },
       "ClubFiche": {
         "properties": {
           "id": {
@@ -7470,6 +8270,14 @@
               }
             ],
             "title": "Actif Le"
+          },
+          "actualites": {
+            "items": {
+              "$ref": "#/components/schemas/ResumeArticle"
+            },
+            "type": "array",
+            "title": "Actualites",
+            "default": []
           }
         },
         "type": "object",
@@ -8682,6 +9490,30 @@
         "title": "DemandeRattachement",
         "description": "Une demande de rattachement, vue par le président : un encadreur est un adulte identifié par son nom."
       },
+      "DemandesClub": {
+        "properties": {
+          "adhesions": {
+            "items": {
+              "$ref": "#/components/schemas/DemandeAdhesion"
+            },
+            "type": "array",
+            "title": "Adhesions"
+          },
+          "rattachements": {
+            "items": {
+              "$ref": "#/components/schemas/DemandeRattachement"
+            },
+            "type": "array",
+            "title": "Rattachements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "adhesions",
+          "rattachements"
+        ],
+        "title": "DemandesClub"
+      },
       "DerniereDecision": {
         "properties": {
           "decision": {
@@ -9044,6 +9876,21 @@
               }
             ]
           },
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubContenu"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "depublication_possible": {
+            "type": "boolean",
+            "title": "Depublication Possible",
+            "default": true
+          },
           "correction_possible": {
             "type": "boolean",
             "title": "Correction Possible",
@@ -9241,6 +10088,67 @@
           "qr_svg"
         ],
         "title": "Enrolement"
+      },
+      "EspaceClub": {
+        "properties": {
+          "club": {
+            "$ref": "#/components/schemas/ClubEspace"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "president",
+              "membre",
+              "encadreur"
+            ],
+            "title": "Role"
+          },
+          "indicateurs": {
+            "$ref": "#/components/schemas/IndicateursClub"
+          },
+          "actualites": {
+            "items": {
+              "$ref": "#/components/schemas/ResumeArticle"
+            },
+            "type": "array",
+            "title": "Actualites"
+          },
+          "membres": {
+            "$ref": "#/components/schemas/MembresDuClub"
+          },
+          "demandes": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DemandesClub"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "suivi": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SuiviClub"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "club",
+          "role",
+          "indicateurs",
+          "actualites",
+          "membres",
+          "demandes",
+          "suivi"
+        ],
+        "title": "EspaceClub",
+        "description": "La vue « Mon club » : la gestion (demandes, suivi) pour le président seul ; la lecture pour les membres et\nles encadreurs rattachés."
       },
       "EspaceEleve": {
         "properties": {
@@ -10030,6 +10938,35 @@
         ],
         "title": "ExportResume"
       },
+      "FicheActuelle": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "axes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Axes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "description",
+          "axes"
+        ],
+        "title": "FicheActuelle",
+        "description": "La fiche publique du club au moment de la lecture : l'« avant » d'une proposition de fiche."
+      },
       "FileAffiliations": {
         "properties": {
           "total": {
@@ -10516,6 +11453,41 @@
           "valeur"
         ],
         "title": "Indicateur"
+      },
+      "IndicateursClub": {
+        "properties": {
+          "membres": {
+            "type": "integer",
+            "title": "Membres"
+          },
+          "encadreurs": {
+            "type": "integer",
+            "title": "Encadreurs"
+          },
+          "actualites": {
+            "type": "integer",
+            "title": "Actualites"
+          },
+          "demandes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Demandes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "membres",
+          "encadreurs",
+          "actualites",
+          "demandes"
+        ],
+        "title": "IndicateursClub"
       },
       "InscriptionEncadreur": {
         "properties": {
@@ -12313,6 +13285,105 @@
         "title": "Proposition",
         "description": "Un établissement absent du référentiel, proposé à l'inscription : créé « proposé », invisible du public, validé par l'admin."
       },
+      "PropositionFiche": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatContenu"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "axes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Axes"
+          },
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          },
+          "soumis_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soumis Le"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "etat",
+          "description",
+          "axes",
+          "motif",
+          "soumis_le",
+          "version"
+        ],
+        "title": "PropositionFiche"
+      },
+      "PropositionFicheEntree": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "axes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Axes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "axes"
+        ],
+        "title": "PropositionFicheEntree"
+      },
       "PseudonymeEntree": {
         "properties": {
           "pseudonyme": {
@@ -12763,6 +13834,14 @@
       },
       "ResumeArticle": {
         "properties": {
+          "nature": {
+            "type": "string",
+            "enum": [
+              "article",
+              "actualite"
+            ],
+            "title": "Nature"
+          },
           "adresse": {
             "type": "string",
             "title": "Adresse"
@@ -12799,6 +13878,7 @@
         },
         "type": "object",
         "required": [
+          "nature",
           "adresse",
           "titre",
           "chapo",
@@ -13153,7 +14233,7 @@
           "nom"
         ],
         "title": "Signature",
-        "description": "Jamais de nom complet : un élève par son pseudonyme (et son club s'il l'a choisi), un encadreur par son\nprénom, l'initiale de son nom et sa fonction."
+        "description": "Jamais de nom complet : un élève par son pseudonyme (et son club s'il l'a choisi), un encadreur par son\nprénom, l'initiale de son nom et sa fonction, une actualité par le nom du club (`profil=\"club\"`)."
       },
       "StatutCompte": {
         "type": "string",
@@ -13182,6 +14262,30 @@
           "echec"
         ],
         "title": "StatutExport"
+      },
+      "SuiviClub": {
+        "properties": {
+          "propositions": {
+            "items": {
+              "$ref": "#/components/schemas/PropositionFiche"
+            },
+            "type": "array",
+            "title": "Propositions"
+          },
+          "actualites": {
+            "items": {
+              "$ref": "#/components/schemas/ResumeArticleAuteur"
+            },
+            "type": "array",
+            "title": "Actualites"
+          }
+        },
+        "type": "object",
+        "required": [
+          "propositions",
+          "actualites"
+        ],
+        "title": "SuiviClub"
       },
       "TableauDeBord": {
         "properties": {

@@ -1028,6 +1028,129 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/clubs/moi/actualites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mes Articles */
+        get: operations["mes_articles_api_clubs_moi_actualites_get"];
+        put?: never;
+        /** Creer */
+        post: operations["creer_api_clubs_moi_actualites_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/actualites/{contenu_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire */
+        get: operations["lire_api_clubs_moi_actualites__contenu_id__get"];
+        put?: never;
+        post?: never;
+        /** Supprimer */
+        delete: operations["supprimer_api_clubs_moi_actualites__contenu_id__delete"];
+        options?: never;
+        head?: never;
+        /** Modifier */
+        patch: operations["modifier_api_clubs_moi_actualites__contenu_id__patch"];
+        trace?: never;
+    };
+    "/api/clubs/moi/actualites/{contenu_id}/soumettre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Soumettre */
+        post: operations["soumettre_api_clubs_moi_actualites__contenu_id__soumettre_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/actualites/{contenu_id}/retirer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retirer */
+        post: operations["retirer_api_clubs_moi_actualites__contenu_id__retirer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/actualites/{contenu_id}/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ajouter Photo */
+        post: operations["ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/actualites/{contenu_id}/photos/{photo_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Retirer Photo */
+        delete: operations["retirer_photo_api_clubs_moi_actualites__contenu_id__photos__photo_id__delete"];
+        options?: never;
+        head?: never;
+        /** Modifier Photo */
+        patch: operations["modifier_photo_api_clubs_moi_actualites__contenu_id__photos__photo_id__patch"];
+        trace?: never;
+    };
+    "/api/clubs/moi/actualites/{contenu_id}/photos/{photo_id}/{taille}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire Photo */
+        get: operations["lire_photo_api_clubs_moi_actualites__contenu_id__photos__photo_id___taille__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/clubs/demande": {
         parameters: {
             query?: never;
@@ -1212,6 +1335,57 @@ export interface paths {
         put?: never;
         /** Retirer Membre */
         post: operations["retirer_membre_api_clubs__club_id__adhesions__adhesion_id__retirer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/fiche": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Proposer Fiche */
+        post: operations["proposer_fiche_api_clubs_moi_fiche_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/fiche/{contenu_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Retirer Fiche */
+        delete: operations["retirer_fiche_api_clubs_moi_fiche__contenu_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/{club_id}/espace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Espace Du Club */
+        get: operations["espace_du_club_api_clubs__club_id__espace_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2306,6 +2480,12 @@ export interface components {
             /** Type */
             type: string;
             parent?: components["schemas"]["ParentContenu"] | null;
+            club?: components["schemas"]["ClubContenu"] | null;
+            /**
+             * Depublication Possible
+             * @default true
+             */
+            depublication_possible: boolean;
             /**
              * Correction Possible
              * @default true
@@ -2346,6 +2526,7 @@ export interface components {
             photos_publiees: components["schemas"]["PhotoModeration"][];
             /** Decisions */
             decisions: components["schemas"]["DecisionPassee"][];
+            fiche_actuelle?: components["schemas"]["FicheActuelle"] | null;
         };
         /** ApprobationEntree */
         ApprobationEntree: {
@@ -2416,6 +2597,11 @@ export interface components {
         };
         /** ArticlePublic */
         ArticlePublic: {
+            /**
+             * Nature
+             * @enum {string}
+             */
+            nature: "article" | "actualite";
             /** Adresse */
             adresse: string;
             /** Titre */
@@ -2527,6 +2713,25 @@ export interface components {
          * @enum {string}
          */
         Beneficiaire: "eleve" | "encadreur" | "club";
+        /** Body_ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post */
+        Body_ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post: {
+            /** Fichier */
+            fichier: string;
+            /** Version */
+            version: number;
+            /**
+             * Attestation
+             * @default false
+             */
+            attestation: boolean;
+            /** Legende */
+            legende?: string | null;
+            /**
+             * Couverture
+             * @default false
+             */
+            couverture: boolean;
+        };
         /** Body_ajouter_photo_api_mes_articles__contenu_id__photos_post */
         Body_ajouter_photo_api_mes_articles__contenu_id__photos_post: {
             /** Fichier */
@@ -2589,6 +2794,36 @@ export interface components {
          * @enum {string}
          */
         Classe: "6e" | "5e" | "4e" | "3e" | "2nde" | "1re" | "tle";
+        /**
+         * ClubContenu
+         * @description Le club au nom duquel le président écrit (spec 026).
+         */
+        ClubContenu: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+        };
+        /** ClubEspace */
+        ClubEspace: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            /** Description */
+            description: string | null;
+            etablissement: components["schemas"]["EtablissementRattache"];
+            /** Axes */
+            axes: string[];
+            /** Actif Le */
+            actif_le: string | null;
+        };
         /** ClubFiche */
         ClubFiche: {
             /**
@@ -2605,6 +2840,11 @@ export interface components {
             axes: string[];
             /** Actif Le */
             actif_le: string | null;
+            /**
+             * Actualites
+             * @default []
+             */
+            actualites: components["schemas"]["ResumeArticle"][];
         };
         /**
          * ClubInscrit
@@ -3056,6 +3296,13 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** DemandesClub */
+        DemandesClub: {
+            /** Adhesions */
+            adhesions: components["schemas"]["DemandeAdhesion"][];
+            /** Rattachements */
+            rattachements: components["schemas"]["DemandeRattachement"][];
+        };
         /** DerniereDecision */
         DerniereDecision: {
             decision: components["schemas"]["TypeDecision"];
@@ -3176,6 +3423,12 @@ export interface components {
             /** Type */
             type: string;
             parent?: components["schemas"]["ParentContenu"] | null;
+            club?: components["schemas"]["ClubContenu"] | null;
+            /**
+             * Depublication Possible
+             * @default true
+             */
+            depublication_possible: boolean;
             /**
              * Correction Possible
              * @default true
@@ -3247,6 +3500,25 @@ export interface components {
             secret: string;
             /** Qr Svg */
             qr_svg: string;
+        };
+        /**
+         * EspaceClub
+         * @description La vue « Mon club » : la gestion (demandes, suivi) pour le président seul ; la lecture pour les membres et
+         *     les encadreurs rattachés.
+         */
+        EspaceClub: {
+            club: components["schemas"]["ClubEspace"];
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "president" | "membre" | "encadreur";
+            indicateurs: components["schemas"]["IndicateursClub"];
+            /** Actualites */
+            actualites: components["schemas"]["ResumeArticle"][];
+            membres: components["schemas"]["MembresDuClub"];
+            demandes: components["schemas"]["DemandesClub"] | null;
+            suivi: components["schemas"]["SuiviClub"] | null;
         };
         /** EspaceEleve */
         EspaceEleve: {
@@ -3528,6 +3800,16 @@ export interface components {
              */
             cree_le: string;
         };
+        /**
+         * FicheActuelle
+         * @description La fiche publique du club au moment de la lecture : l'« avant » d'une proposition de fiche.
+         */
+        FicheActuelle: {
+            /** Description */
+            description: string | null;
+            /** Axes */
+            axes: string[];
+        };
         /** FileAffiliations */
         FileAffiliations: {
             /** Total */
@@ -3678,6 +3960,17 @@ export interface components {
             valeur: number | null;
             /** Disponible Avec */
             disponible_avec?: string | null;
+        };
+        /** IndicateursClub */
+        IndicateursClub: {
+            /** Membres */
+            membres: number;
+            /** Encadreurs */
+            encadreurs: number;
+            /** Actualites */
+            actualites: number;
+            /** Demandes */
+            demandes: number | null;
         };
         /** InscriptionEncadreur */
         InscriptionEncadreur: {
@@ -4291,6 +4584,32 @@ export interface components {
             /** Nom */
             nom: string;
         };
+        /** PropositionFiche */
+        PropositionFiche: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            etat: components["schemas"]["EtatContenu"];
+            /** Description */
+            description: string | null;
+            /** Axes */
+            axes: string[];
+            /** Motif */
+            motif: string | null;
+            /** Soumis Le */
+            soumis_le: string | null;
+            /** Version */
+            version: number;
+        };
+        /** PropositionFicheEntree */
+        PropositionFicheEntree: {
+            /** Description */
+            description?: string | null;
+            /** Axes */
+            axes: string[];
+        };
         /** PseudonymeEntree */
         PseudonymeEntree: {
             /** Pseudonyme */
@@ -4464,6 +4783,11 @@ export interface components {
         };
         /** ResumeArticle */
         ResumeArticle: {
+            /**
+             * Nature
+             * @enum {string}
+             */
+            nature: "article" | "actualite";
             /** Adresse */
             adresse: string;
             /** Titre */
@@ -4608,7 +4932,7 @@ export interface components {
         /**
          * Signature
          * @description Jamais de nom complet : un élève par son pseudonyme (et son club s'il l'a choisi), un encadreur par son
-         *     prénom, l'initiale de son nom et sa fonction.
+         *     prénom, l'initiale de son nom et sa fonction, une actualité par le nom du club (`profil="club"`).
          */
         Signature: {
             /** Profil */
@@ -4635,6 +4959,13 @@ export interface components {
          * @enum {string}
          */
         StatutExport: "pret" | "telecharge" | "expire" | "echec";
+        /** SuiviClub */
+        SuiviClub: {
+            /** Propositions */
+            propositions: components["schemas"]["PropositionFiche"][];
+            /** Actualites */
+            actualites: components["schemas"]["ResumeArticleAuteur"][];
+        };
         /** TableauDeBord */
         TableauDeBord: {
             /**
@@ -6762,6 +7093,360 @@ export interface operations {
             };
         };
     };
+    mes_articles_api_clubs_moi_actualites_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MesArticles"];
+                };
+            };
+        };
+    };
+    creer_api_clubs_moi_actualites_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ArticleEcriture"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_api_clubs_moi_actualites__contenu_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    supprimer_api_clubs_moi_actualites__contenu_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modifier_api_clubs_moi_actualites__contenu_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ArticleEcriture"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    soumettre_api_clubs_moi_actualites__contenu_id__soumettre_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retirer_api_clubs_moi_actualites__contenu_id__retirer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retirer_photo_api_clubs_moi_actualites__contenu_id__photos__photo_id__delete: {
+        parameters: {
+            query: {
+                version: number;
+            };
+            header?: never;
+            path: {
+                contenu_id: string;
+                photo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modifier_photo_api_clubs_moi_actualites__contenu_id__photos__photo_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+                photo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PhotoModification"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArticleAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_photo_api_clubs_moi_actualites__contenu_id__photos__photo_id___taille__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+                photo_id: string;
+                taille: "grande" | "vignette";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     demander_api_clubs_demande_post: {
         parameters: {
             query?: never;
@@ -7076,6 +7761,99 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdhesionResume"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    proposer_fiche_api_clubs_moi_fiche_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PropositionFicheEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropositionFiche"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retirer_fiche_api_clubs_moi_fiche__contenu_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    espace_du_club_api_clubs__club_id__espace_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EspaceClub"];
                 };
             };
             /** @description Validation Error */

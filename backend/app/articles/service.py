@@ -98,10 +98,10 @@ async def article_auteur(db: AsyncSession, contenu: Contenu) -> ArticleAuteur:
     )
 
 
-async def mes_articles(db: AsyncSession, auteur: Utilisateur) -> MesArticles:
+async def mes_articles(db: AsyncSession, auteur: Utilisateur, *, type: str = TYPE) -> MesArticles:
     contenus = await db.scalars(
         select(Contenu)
-        .where(Contenu.auteur_id == auteur.id, Contenu.type == TYPE)
+        .where(Contenu.auteur_id == auteur.id, Contenu.type == type)
         .order_by(Contenu.modifie_le.desc(), Contenu.id.desc())
     )
     articles = []
@@ -120,19 +120,23 @@ async def mes_articles(db: AsyncSession, auteur: Utilisateur) -> MesArticles:
     return MesArticles(articles=articles)
 
 
-async def creer(db: AsyncSession, auteur: Utilisateur, entree: ArticleEcriture) -> ArticleAuteur:
+async def creer(
+    db: AsyncSession, auteur: Utilisateur, entree: ArticleEcriture, *, type: str = TYPE, club_id: UUID | None = None
+) -> ArticleAuteur:
     await _verifier_axe(db, entree.axe_code, None)
-    contenu = await moteur.creer(db, auteur, TYPE, _donnees(entree))
+    contenu = await moteur.creer(db, auteur, type, _donnees(entree), club_id=club_id)
     await db.commit()
     return await article_auteur(db, contenu)
 
 
-async def lire(db: AsyncSession, auteur: Utilisateur, contenu_id: UUID) -> ArticleAuteur:
-    return await article_auteur(db, await moteur.contenu_de(db, auteur, contenu_id, TYPE))
+async def lire(db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, *, type: str = TYPE) -> ArticleAuteur:
+    return await article_auteur(db, await moteur.contenu_de(db, auteur, contenu_id, type))
 
 
-async def modifier(db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, entree: ArticleEcriture) -> ArticleAuteur:
-    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+async def modifier(
+    db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, entree: ArticleEcriture, *, type: str = TYPE
+) -> ArticleAuteur:
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, type, verrouiller=True)
     moteur.verifier_version(contenu, entree.version)
     actuelle = await moteur.version_visible_auteur(db, contenu)
     await _verifier_axe(db, entree.axe_code, actuelle.donnees.get("axe_code"))
@@ -142,9 +146,9 @@ async def modifier(db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, entr
 
 
 async def soumettre(
-    db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, version: int, adresse_ip: str
+    db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, version: int, adresse_ip: str, *, type: str = TYPE
 ) -> ArticleAuteur:
-    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, type, verrouiller=True)
     moteur.verifier_version(contenu, version)
     await moteur.soumettre(db, contenu, auteur, adresse_ip)
     await db.commit()
@@ -152,17 +156,17 @@ async def soumettre(
 
 
 async def retirer(
-    db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, version: int, adresse_ip: str
+    db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, version: int, adresse_ip: str, *, type: str = TYPE
 ) -> ArticleAuteur:
-    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, type, verrouiller=True)
     moteur.verifier_version(contenu, version)
     await moteur.retirer(db, contenu, auteur, adresse_ip)
     await db.commit()
     return await article_auteur(db, contenu)
 
 
-async def supprimer(db: AsyncSession, auteur: Utilisateur, contenu_id: UUID) -> None:
-    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+async def supprimer(db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, *, type: str = TYPE) -> None:
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, type, verrouiller=True)
     if not await moteur.jamais_soumis(db, contenu):
         raise Refus("Seul un brouillon jamais soumis peut être supprimé.", 409)
     a_effacer = await photos.effacer_du_brouillon(db, contenu)
@@ -184,19 +188,27 @@ async def ajouter_photo(
     legende: str | None,
     couverture: bool,
     adresse_ip: str,
+    *,
+    type: str = TYPE,
 ) -> ArticleAuteur:
     # L'image d'abord, sans verrou ni transaction : le traitement est long, et un refus ne touche à rien.
     preparees = await photos.preparer(octets)
-    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, type, verrouiller=True)
     moteur.verifier_version(contenu, version)
     await photos.ajouter(db, contenu, auteur, preparees, legende, couverture, adresse_ip)
     return await article_auteur(db, contenu)
 
 
 async def modifier_photo(
-    db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, photo_id: UUID, entree: PhotoModification
+    db: AsyncSession,
+    auteur: Utilisateur,
+    contenu_id: UUID,
+    photo_id: UUID,
+    entree: PhotoModification,
+    *,
+    type: str = TYPE,
 ) -> ArticleAuteur:
-    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, type, verrouiller=True)
     moteur.verifier_version(contenu, entree.version)
     await photos.modifier(
         db, contenu, photo_id, legende=entree.legende or None, changer_legende="legende" in entree.model_fields_set,
@@ -206,9 +218,16 @@ async def modifier_photo(
 
 
 async def retirer_photo(
-    db: AsyncSession, auteur: Utilisateur, contenu_id: UUID, photo_id: UUID, version: int, adresse_ip: str
+    db: AsyncSession,
+    auteur: Utilisateur,
+    contenu_id: UUID,
+    photo_id: UUID,
+    version: int,
+    adresse_ip: str,
+    *,
+    type: str = TYPE,
 ) -> ArticleAuteur:
-    contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
+    contenu = await moteur.contenu_de(db, auteur, contenu_id, type, verrouiller=True)
     moteur.verifier_version(contenu, version)
     await photos.retirer(db, contenu, auteur, photo_id, adresse_ip)
     return await article_auteur(db, contenu)

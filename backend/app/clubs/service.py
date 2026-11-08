@@ -13,6 +13,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.journal import journaliser
+from app.articles.public import actualites_du_club
 from app.clubs.models import (
     PASSATION_EN_ATTENTE,
     Adhesion,
@@ -281,6 +282,7 @@ async def club_public(db: AsyncSession, club_id: UUID) -> ClubFiche | None:
         etablissement=await etablissement_rattache(db, club.etablissement_id),
         axes=list(axes),
         actif_le=club.actif_le,
+        actualites=await actualites_du_club(db, club.id),
     )
 
 
