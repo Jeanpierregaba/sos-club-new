@@ -18,6 +18,7 @@ from app.comptes.models import Role, Utilisateur
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur
 from app.moderation.models import Contenu, EtatContenu, EtatVersion, Photo, VersionContenu, VersionPhoto
+from app.moderation.types import type_de
 from app.referentiel.models import Etablissement, Iesg
 
 MAX_EN_ATTENTE = 3
@@ -168,12 +169,13 @@ async def soumettre(db: AsyncSession, contenu: Contenu, auteur: Utilisateur, adr
     en_attente = await db.scalar(
         select(func.count())
         .select_from(Contenu)
-        .where(Contenu.auteur_id == auteur.id, Contenu.etat == EtatContenu.en_attente)
+        .where(Contenu.auteur_id == auteur.id, Contenu.type == contenu.type, Contenu.etat == EtatContenu.en_attente)
     )
+    # Compté par type : des commentaires en attente ne bloquent pas un article, et l'inverse.
     if (en_attente or 0) >= MAX_EN_ATTENTE:
         raise Refus(
-            f"Tu as déjà {MAX_EN_ATTENTE} contenus en attente de modération : attends une décision avant d'en soumettre "
-            "un autre.",
+            f"Tu as déjà {MAX_EN_ATTENTE} {type_de(contenu.type).libelle}s en attente de modération : attends une "
+            "décision avant d'en envoyer un autre.",
             409,
         )
     maintenant = datetime.now(UTC)
@@ -200,6 +202,23 @@ async def retirer(db: AsyncSession, contenu: Contenu, auteur: Utilisateur, adres
     journaliser(
         db, f"{contenu.type}_retire", auteur, cible_type="contenu", cible_id=contenu.id,
         perimetre=contenu.dre_code or "national", details={"version": travail.numero}, adresse_ip=adresse_ip,
+    )  # fmt: skip
+
+
+async def retirer_definitivement(db: AsyncSession, contenu: Contenu, auteur: Utilisateur, adresse_ip: str) -> None:
+    """L'auteur retire son contenu (un commentaire, spec 025), en attente ou publié : il quitte la file et le site,
+    sans décision de modérateur ; ses versions et les points acquis restent. À appeler sur un contenu verrouillé."""
+    if contenu.etat not in {EtatContenu.en_attente, EtatContenu.publie}:
+        raise Refus("Ce contenu n'est ni en attente ni en ligne : il ne peut plus être retiré.", 409)
+    travail = await version(db, contenu.version_travail_id)
+    if travail is not None and travail.etat is EtatVersion.soumise:
+        travail.etat = EtatVersion.retiree
+    contenu.version_travail_id = None
+    contenu.version_publiee_id = None
+    contenu.etat = EtatContenu.retire
+    journaliser(
+        db, f"{contenu.type}_retire", auteur, cible_type="contenu", cible_id=contenu.id,
+        perimetre=contenu.dre_code or "national", details={}, adresse_ip=adresse_ip,
     )  # fmt: skip
 
 

@@ -31,9 +31,19 @@ class AuteurFile(BaseModel):
     dre_code: str | None
 
 
+class ParentContenu(BaseModel):
+    """L'article d'un commentaire (spec 025) : le modérateur juge le commentaire dans son contexte."""
+
+    adresse: str | None
+    titre: str
+
+
 class ElementFile(BaseModel):
     id: UUID
     type: str
+    parent: ParentContenu | None = None
+    # Faux pour un type sans décision « à corriger » (un commentaire).
+    correction_possible: bool = True
     titre: str
     etat: EtatContenu
     axe_code: str | None

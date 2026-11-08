@@ -40,6 +40,7 @@ from app.moderation.schemas import (
     DecisionPassee,
     ElementFile,
     FileModeration,
+    ParentContenu,
     PhotoModeration,
 )
 from app.moderation.service import Introuvable
@@ -71,12 +72,29 @@ _derniere = (
 )
 
 
-def _requete(acces: Acces) -> Select[tuple[Contenu, Utilisateur, VersionContenu, str | None]]:
+# Le contenu parent d'un commentaire (spec 025) : son adresse et son titre, celui de la version en ligne de
+# préférence, sinon celui de la dernière version (un article dépublié depuis).
+_Parent = aliased(Contenu)
+_VersionParent = aliased(VersionContenu)
+_titre_parent = (
+    select(_VersionParent.donnees["titre"].astext)
+    .where(_VersionParent.contenu_id == Contenu.parent_id)
+    .order_by((_VersionParent.id == _Parent.version_publiee_id).desc(), _VersionParent.numero.desc())
+    .limit(1)
+    .correlate(Contenu, _Parent)
+    .scalar_subquery()
+)
+
+Ligne = tuple[Contenu, Utilisateur, VersionContenu, str | None, str | None, str | None]
+
+
+def _requete(acces: Acces) -> Select[Ligne]:
     """Chaque contenu avec son auteur, la version qu'on modère (de travail, sinon en ligne, sinon la dernière) et l'établissement de
     l'auteur, filtrés par le périmètre du collaborateur."""
     requete = (
-        select(Contenu, Utilisateur, _Travail, _EtablissementAuteur.nom)
+        select(Contenu, Utilisateur, _Travail, _EtablissementAuteur.nom, _Parent.adresse, _titre_parent)
         .join(Utilisateur, Utilisateur.id == Contenu.auteur_id)
+        .outerjoin(_Parent, _Parent.id == Contenu.parent_id)
         .join(_Travail, _Travail.id == func.coalesce(Contenu.version_travail_id, Contenu.version_publiee_id, _derniere))
         .outerjoin(Eleve, Eleve.utilisateur_id == Contenu.auteur_id)
         .outerjoin(Encadreur, Encadreur.utilisateur_id == Contenu.auteur_id)
@@ -90,10 +108,21 @@ def _requete(acces: Acces) -> Select[tuple[Contenu, Utilisateur, VersionContenu,
     return requete
 
 
-def _element(contenu: Contenu, auteur: Utilisateur, version: VersionContenu, etablissement: str | None) -> ElementFile:
+def _element(
+    contenu: Contenu,
+    auteur: Utilisateur,
+    version: VersionContenu,
+    etablissement: str | None,
+    adresse_parent: str | None,
+    titre_parent: str | None,
+) -> ElementFile:
     return ElementFile(
         id=contenu.id,
         type=contenu.type,
+        parent=ParentContenu(adresse=adresse_parent, titre=titre_parent or "")
+        if contenu.parent_id is not None
+        else None,
+        correction_possible=type_de(contenu.type).correction,
         titre=type_de(contenu.type).titre(version.donnees),
         etat=contenu.etat,
         axe_code=version.donnees.get("axe_code"),
@@ -290,7 +319,7 @@ async def approuver(db: AsyncSession, acces: Acces, contenu_id: UUID, version: i
     if auteur.role is Role.encadreur:
         encadreur = await db.get(Encadreur, auteur.id)
         if encadreur is None or encadreur.etat is not EtatVerification.actif:
-            raise Refus("L'encadreur n'est plus vérifié : son article ne peut pas être publié.", 409)
+            raise Refus("L'encadreur n'est plus vérifié : son contenu ne peut pas être publié.", 409)
     type_contenu = type_de(contenu.type)
     travail = await _travail(db, contenu)
     donnees = type_contenu.schema.model_validate(travail.donnees).model_dump()
@@ -299,7 +328,7 @@ async def approuver(db: AsyncSession, acces: Acces, contenu_id: UUID, version: i
     revision = contenu.version_publiee_id is not None
 
     # Les lectures d'abord : une requête déclenche l'écriture des changements en attente (autoflush).
-    adresse = await _adresse_libre(db, titre) if premiere else contenu.adresse
+    adresse = await _adresse_libre(db, titre) if premiere and type_contenu.adresse else contenu.adresse
     club_id = None
     if premiere and auteur.role is Role.eleve:
         # Le club de l'élève affilié à la première approbation : R13 lui créditera ses points.
@@ -322,8 +351,10 @@ async def approuver(db: AsyncSession, acces: Acces, contenu_id: UUID, version: i
     # Les points à la première approbation seulement (jamais pour une révision ni une republication), et une seule
     # ligne par contenu grâce à la clé.
     action = type_contenu.actions_auteur.get(auteur.role)
-    if action and premiere:
+    if action and premiere and (type_contenu.points_permis is None or await type_contenu.points_permis(db, contenu)):
         await points.crediter(db, action, auteur.id, f"{contenu.type}:{contenu.id}", valide_par=acces.utilisateur.id)
+    if premiere and type_contenu.a_la_publication is not None:
+        await type_contenu.a_la_publication(db, contenu)
     titre_avis = (
         f"Ta nouvelle version de « {titre} » est en ligne"
         if revision
@@ -338,6 +369,8 @@ async def demander_correction(
 ) -> None:
     contenu = await _a_decider(db, acces, contenu_id, version)
     _en_attente(contenu)
+    if not type_de(contenu.type).correction:
+        raise Refus("Ce contenu ne se corrige pas : approuve-le ou refuse-le avec un motif.", 409)
     travail = await _travail(db, contenu)
     titre = type_de(contenu.type).titre(travail.donnees)
     travail.etat = EtatVersion.a_corriger

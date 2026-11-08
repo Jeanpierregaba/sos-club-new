@@ -7,7 +7,7 @@ Chaque tâche se termine par lint, typecheck et tests verts, puis un commit.
 - [x] 1. Tests de l'envoi, de la modération et de la lecture publique des commentaires
       (`test_commentaires_envoi.py`, `test_commentaires_moderation.py`, `test_commentaires_publics.py`) écrits
       **avant** le code. Ils doivent échouer.
-- [ ] 2. Migration `commentaires` (`parent_id`, état `retire`, contraintes, index, barème en service) et
+- [x] 2. Migration `commentaires` (`parent_id`, état `retire`, contraintes, index, barème en service) et
       réglages par type du moteur (`adresse`, `correction`, `points_permis`, `a_la_publication`, attente comptée
       par type). Les suites de la spec 023 restent vertes.
 - [ ] 3. Domaine `commentaires` : envoi (normalisation, anti double envoi, 20 par jour), liste publique,

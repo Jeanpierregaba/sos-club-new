@@ -112,7 +112,7 @@ def test_trois_articles_en_attente_au_plus(eleve: TestClient) -> None:
         reponse = eleve.post(f"{ARTICLES}/{article['id']}/soumettre", json={"version": article["version"]})
 
     assert reponse.status_code == 409
-    assert "3 contenus en attente" in reponse.json()["detail"]
+    assert "3 articles en attente" in reponse.json()["detail"]
 
 
 def test_vingt_brouillons_au_plus(eleve: TestClient, monkeypatch: pytest.MonkeyPatch) -> None:

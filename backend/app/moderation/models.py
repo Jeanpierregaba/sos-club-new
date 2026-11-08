@@ -24,6 +24,8 @@ class EtatContenu(StrEnum):
     refuse = "refuse"
     publie = "publie"
     depublie = "depublie"
+    # Retiré par son auteur (un commentaire, spec 025) : hors ligne et hors de la file, sans décision de modérateur.
+    retire = "retire"
 
 
 class EtatVersion(StrEnum):
@@ -52,15 +54,28 @@ class Contenu(Suivi, Base):
     __tablename__ = "contenu"
     __table_args__ = (
         # Une adresse publique n'existe qu'une fois le contenu approuvé, et ne change plus ensuite.
-        CheckConstraint("version_publiee_id IS NULL OR adresse IS NOT NULL", name="adresse_si_publie"),
-        # Un contenu refusé ou dépublié n'a plus de version en ligne ; un contenu « publié » en a toujours une.
+        # Un commentaire (spec 025) n'en a pas : il se lit sous son article.
         CheckConstraint(
-            "version_publiee_id IS NULL OR etat NOT IN ('refuse', 'depublie')", name="hors_ligne_si_retire"
+            "version_publiee_id IS NULL OR adresse IS NOT NULL OR parent_id IS NOT NULL", name="adresse_si_publie"
+        ),
+        # Un commentaire, et lui seul, a un contenu parent : son article.
+        CheckConstraint("(type = 'commentaire') = (parent_id IS NOT NULL)", name="commentaire_a_un_parent"),
+        # Un contenu refusé, dépublié ou retiré n'a plus de version en ligne ; un contenu « publié » en a toujours une.
+        CheckConstraint(
+            "version_publiee_id IS NULL OR etat NOT IN ('refuse', 'depublie', 'retire')", name="hors_ligne_si_retire"
         ),
         CheckConstraint("etat <> 'publie' OR version_publiee_id IS NOT NULL", name="en_ligne_si_publie"),
         Index("ix_contenu_file", "soumis_le", postgresql_where=text("etat = 'en_attente'")),
         Index("ix_contenu_publics", "type", "publie_le", postgresql_where=text("version_publiee_id IS NOT NULL")),
         Index("ix_contenu_auteur_id_etat", "auteur_id", "etat"),
+        Index(
+            "ix_contenu_commentaires_publics",
+            "parent_id",
+            "publie_le",
+            postgresql_where=text("version_publiee_id IS NOT NULL"),
+        ),
+        # Les plafonds du jour d'un auteur (spec 025 : 20 commentaires envoyés, 5 rémunérés).
+        Index("ix_contenu_auteur_id_type_cree_le", "auteur_id", "type", "cree_le"),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
@@ -76,6 +91,8 @@ class Contenu(Suivi, Base):
     axe_code: Mapped[str | None] = mapped_column(ForeignKey("axe.code", ondelete="RESTRICT"), index=True)
     adresse: Mapped[str | None] = mapped_column(String(140), unique=True)
     # Choix de l'élève : son club apparaît à côté de son pseudonyme (Q20).
+    # L'article d'un commentaire (spec 025) ; nul pour tout autre contenu.
+    parent_id: Mapped[UUID | None] = mapped_column(ForeignKey("contenu.id", ondelete="RESTRICT"))
     afficher_club: Mapped[bool] = mapped_column(server_default=text("true"))
     # DRE de l'établissement de l'auteur, copiée à chaque soumission : elle fixe le périmètre de la file.
     dre_code: Mapped[str | None] = mapped_column(ForeignKey("dre.code", ondelete="RESTRICT"))
