@@ -122,6 +122,8 @@ export type PhotoAuteur = Schemas["PhotoAuteur"];
 export type PhotoPublique = Schemas["PhotoPublique"];
 export type PhotoModeration = Schemas["PhotoModeration"];
 export type CommentaireAuteur = Schemas["CommentaireAuteur"];
+export type EspaceClub = Schemas["EspaceClub"];
+export type PropositionFiche = Schemas["PropositionFiche"];
 export type MesCommentaires = Schemas["MesCommentaires"];
 export type CommentairePublic = Schemas["CommentairePublic"];
 export type CommentairesPublics = Schemas["CommentairesPublics"];
@@ -479,25 +481,40 @@ export const corrigerDefi = (id: string, choix: number) =>
   envoyerJson<CorrectionDefi>(`/api/jeux/defis/${id}/reponse`, { choix });
 export const chargerPodiumClubs = () => requeteApi<ClubPodium[]>("/api/clubs/podium");
 
-// Articles (spec 023) : rédaction par l'auteur, lecture publique, modération.
-const MES_ARTICLES = "/api/mes-articles";
-export const chargerMesArticles = () => requeteApi<MesArticles>(MES_ARTICLES);
-export const chargerMonArticle = (id: string) => requeteApi<ArticleAuteur>(`${MES_ARTICLES}/${id}`);
-export const creerArticle = (entree: ArticleEcriture) =>
-  envoyerJson<ArticleAuteur>(MES_ARTICLES, entree);
-export const modifierArticle = (id: string, entree: ArticleEcriture) =>
-  envoyerJson<ArticleAuteur>(`${MES_ARTICLES}/${id}`, entree, "PATCH");
-export const soumettreArticle = (id: string, version: number) =>
-  envoyerJson<ArticleAuteur>(`${MES_ARTICLES}/${id}/soumettre`, { version });
-export const retirerArticle = (id: string, version: number) =>
-  envoyerJson<ArticleAuteur>(`${MES_ARTICLES}/${id}/retirer`, { version });
-export const supprimerArticle = (id: string) =>
-  envoyerJson<void>(`${MES_ARTICLES}/${id}`, undefined, "DELETE");
+// Articles (spec 023) : rédaction par l'auteur, lecture publique, modération. Les actualités du club (spec 026)
+// passent par les mêmes routes, sous /clubs/moi/actualites : chaque fonction prend la nature du contenu.
+export type Nature = "article" | "actualite";
+const REDACTION: Record<Nature, string> = {
+  article: "/api/mes-articles",
+  actualite: "/api/clubs/moi/actualites",
+};
+export const chargerMesArticles = (nature: Nature = "article") =>
+  requeteApi<MesArticles>(REDACTION[nature]);
+export const chargerMonArticle = (id: string, nature: Nature = "article") =>
+  requeteApi<ArticleAuteur>(`${REDACTION[nature]}/${id}`);
+export const creerArticle = (entree: ArticleEcriture, nature: Nature = "article") =>
+  envoyerJson<ArticleAuteur>(REDACTION[nature], entree);
+export const modifierArticle = (id: string, entree: ArticleEcriture, nature: Nature = "article") =>
+  envoyerJson<ArticleAuteur>(`${REDACTION[nature]}/${id}`, entree, "PATCH");
+export const soumettreArticle = (id: string, version: number, nature: Nature = "article") =>
+  envoyerJson<ArticleAuteur>(`${REDACTION[nature]}/${id}/soumettre`, { version });
+export const retirerArticle = (id: string, version: number, nature: Nature = "article") =>
+  envoyerJson<ArticleAuteur>(`${REDACTION[nature]}/${id}/retirer`, { version });
+export const supprimerArticle = (id: string, nature: Nature = "article") =>
+  envoyerJson<void>(`${REDACTION[nature]}/${id}`, undefined, "DELETE");
 
 export const chargerArticles = (filtres: { page?: number; axe?: string } = {}) =>
   requeteApi<ArticlesPublics>(avecParametres("/api/articles", filtres));
 export const chargerArticle = (adresse: string) =>
   requeteApi<ArticlePublic>(`/api/articles/${encodeURIComponent(adresse)}`);
+
+// Espace du président (spec 026) : « Mon club » et propositions de fiche.
+export const chargerEspaceClub = (clubId: string) =>
+  requeteApi<EspaceClub>(`/api/clubs/${clubId}/espace`);
+export const proposerFiche = (entree: { description: string | null; axes: string[] }) =>
+  envoyerJson<PropositionFiche>("/api/clubs/moi/fiche", entree);
+export const retirerProposition = (id: string) =>
+  envoyerJson<void>(`/api/clubs/moi/fiche/${id}`, undefined, "DELETE");
 
 // Commentaires (spec 025) : en attente jusqu'à leur approbation, puis lisibles sous l'article.
 const commentairesDe = (adresse: string) =>
@@ -537,8 +554,12 @@ export const marquerToutesLues = () => envoyerJson<void>("/api/notifications/lue
 
 // Photos des articles (spec 024). L'envoi passe par XMLHttpRequest pour suivre la progression sur un réseau lent.
 export type TaillePhoto = "grande" | "vignette";
-export const urlPhotoAuteur = (articleId: string, photoId: string, taille: TaillePhoto) =>
-  `${MES_ARTICLES}/${articleId}/photos/${photoId}/${taille}`;
+export const urlPhotoAuteur = (
+  articleId: string,
+  photoId: string,
+  taille: TaillePhoto,
+  nature: Nature = "article",
+) => `${REDACTION[nature]}/${articleId}/photos/${photoId}/${taille}`;
 export const urlPhotoPublique = (adresse: string, photoId: string, taille: TaillePhoto) =>
   `/api/articles/${encodeURIComponent(adresse)}/photos/${photoId}/${taille}`;
 export const urlPhotoModeration = (contenuId: string, photoId: string, taille: TaillePhoto) =>
@@ -548,6 +569,7 @@ export function envoyerPhoto(
   articleId: string,
   entree: { fichier: File; version: number; legende: string; couverture: boolean },
   progression: (fraction: number) => void,
+  nature: Nature = "article",
 ): Promise<ArticleAuteur> {
   const donnees = new FormData();
   donnees.append("fichier", entree.fichier);
@@ -557,7 +579,7 @@ export function envoyerPhoto(
   donnees.append("couverture", entree.couverture ? "true" : "false");
   return new Promise((resoudre, rejeter) => {
     const requete = new XMLHttpRequest();
-    requete.open("POST", `${MES_ARTICLES}/${articleId}/photos`);
+    requete.open("POST", `${REDACTION[nature]}/${articleId}/photos`);
     requete.timeout = 120_000;
     requete.upload.onprogress = (e) => e.lengthComputable && progression(e.loaded / e.total);
     requete.onload = () => {
@@ -584,10 +606,21 @@ export const modifierPhoto = (
   articleId: string,
   photoId: string,
   entree: { version: number; legende?: string | null; couverture?: boolean; ordre?: number },
-) => envoyerJson<ArticleAuteur>(`${MES_ARTICLES}/${articleId}/photos/${photoId}`, entree, "PATCH");
-export const retirerPhoto = (articleId: string, photoId: string, version: number) =>
+  nature: Nature = "article",
+) =>
   envoyerJson<ArticleAuteur>(
-    `${MES_ARTICLES}/${articleId}/photos/${photoId}?version=${version}`,
+    `${REDACTION[nature]}/${articleId}/photos/${photoId}`,
+    entree,
+    "PATCH",
+  );
+export const retirerPhoto = (
+  articleId: string,
+  photoId: string,
+  version: number,
+  nature: Nature = "article",
+) =>
+  envoyerJson<ArticleAuteur>(
+    `${REDACTION[nature]}/${articleId}/photos/${photoId}?version=${version}`,
     undefined,
     "DELETE",
   );

@@ -14,6 +14,7 @@ import {
   retirerPhoto,
   urlPhotoAuteur,
   type ArticleAuteur,
+  type Nature,
 } from "@/lib/api/client";
 
 export const MAX_PHOTOS = 5;
@@ -29,10 +30,12 @@ export function Photos({
   article,
   modifiable,
   onArticle,
+  nature = "article",
 }: {
   article: ArticleAuteur | null;
   modifiable: boolean;
   onArticle: (article: ArticleAuteur) => void;
+  nature?: Nature;
 }) {
   const [fichier, setFichier] = useState<File | null>(null);
   const [legende, setLegende] = useState("");
@@ -91,6 +94,7 @@ export function Photos({
         a.id,
         { fichier, version: a.version, legende, couverture },
         setProgression,
+        nature,
       );
       setFichier(null);
       setLegende("");
@@ -106,11 +110,18 @@ export function Photos({
     const photo = photos[index];
     if (!voisine || !photo) return;
     void agir(async (a) => {
-      const premier = await modifierPhoto(a.id, photo.id, {
-        version: a.version,
-        ordre: voisine.ordre,
-      });
-      return modifierPhoto(a.id, voisine.id, { version: premier.version, ordre: photo.ordre });
+      const premier = await modifierPhoto(
+        a.id,
+        photo.id,
+        { version: a.version, ordre: voisine.ordre },
+        nature,
+      );
+      return modifierPhoto(
+        a.id,
+        voisine.id,
+        { version: premier.version, ordre: photo.ordre },
+        nature,
+      );
     });
   };
 
@@ -134,7 +145,7 @@ export function Photos({
                   </p>
                 ) : (
                   <img
-                    src={urlPhotoAuteur(article.id, p.id, "vignette")}
+                    src={urlPhotoAuteur(article.id, p.id, "vignette", nature)}
                     alt={p.legende ?? "Photo de l'article"}
                     width={p.largeur}
                     height={p.hauteur}
@@ -160,10 +171,12 @@ export function Photos({
                       const valeur = e.target.value.trim();
                       if (valeur !== (p.legende ?? ""))
                         void agir((a) =>
-                          modifierPhoto(a.id, p.id, {
-                            version: a.version,
-                            legende: valeur || null,
-                          }),
+                          modifierPhoto(
+                            a.id,
+                            p.id,
+                            { version: a.version, legende: valeur || null },
+                            nature,
+                          ),
                         );
                     }}
                     className="h-9 text-sm"
@@ -177,7 +190,12 @@ export function Photos({
                         disabled={enCours}
                         onClick={() =>
                           agir((a) =>
-                            modifierPhoto(a.id, p.id, { version: a.version, couverture: true }),
+                            modifierPhoto(
+                              a.id,
+                              p.id,
+                              { version: a.version, couverture: true },
+                              nature,
+                            ),
                           )
                         }
                         className="h-8 rounded-full px-3 text-xs font-bold"
@@ -220,7 +238,7 @@ export function Photos({
                       disabled={enCours}
                       onClick={() => {
                         if (window.confirm("Retirer cette photo de l'article ?"))
-                          void agir((a) => retirerPhoto(a.id, p.id, a.version));
+                          void agir((a) => retirerPhoto(a.id, p.id, a.version, nature));
                       }}
                       className="h-8 rounded-full px-3 text-xs font-bold text-logo-red"
                     >

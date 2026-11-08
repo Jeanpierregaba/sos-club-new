@@ -173,6 +173,15 @@ export function MesClubsEncadreur({
                   >
                     Fiche du club <ArrowRight aria-hidden className="size-4" />
                   </Link>
+                  {r.etat === "actif" && (
+                    <Link
+                      to="/mon-club"
+                      search={{ club: r.club_id }}
+                      className="inline-flex items-center gap-1 text-sm font-bold text-logo-blue hover:underline"
+                    >
+                      Espace du club <ArrowRight aria-hidden className="size-4" />
+                    </Link>
+                  )}
                   {EN_COURS.includes(r.etat) && (
                     <button
                       type="button"

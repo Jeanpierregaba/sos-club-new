@@ -22,6 +22,7 @@ import {
   type ArticleAuteur,
   type AxePublic,
   type ChampsArticle,
+  type Nature,
 } from "@/lib/api/client";
 import { LIMITES } from "@/lib/articles";
 import { dateCourte } from "@/lib/dates";
@@ -40,11 +41,19 @@ export function Editeur({
   article,
   axes,
   eleve,
+  nature = "article",
 }: {
   article: ArticleAuteur | null;
   axes: AxePublic[];
   eleve: boolean;
+  // « actualite » : une actualité au nom du club (spec 026), écrite par le président.
+  nature?: Nature;
 }) {
+  const club = nature === "actualite";
+  const ouvrir = (id: string) =>
+    club
+      ? navigate({ to: "/mon-club/actualites/$id", params: { id }, replace: true })
+      : navigate({ to: "/mes-articles/$id", params: { id }, replace: true });
   const navigate = useNavigate();
   const router = useRouter();
   const [champs, setChamps] = useState<ChampsArticle>(article?.champs ?? VIDE);
@@ -77,12 +86,16 @@ export function Editeur({
 
   async function enregistrer(): Promise<ArticleAuteur> {
     if (!actuel) {
-      const cree = await creerArticle(champs);
+      const cree = await creerArticle(champs, nature);
       setActuel(cree);
       return cree;
     }
     if (!modifie && actuel.soumettable) return actuel;
-    const enregistre = await modifierArticle(actuel.id, { ...champs, version: actuel.version });
+    const enregistre = await modifierArticle(
+      actuel.id,
+      { ...champs, version: actuel.version },
+      nature,
+    );
     setActuel(enregistre);
     setChamps(enregistre.champs);
     return enregistre;
@@ -92,8 +105,7 @@ export function Editeur({
     agir(async () => {
       const nouveau = !actuel;
       const enregistre = await enregistrer();
-      if (nouveau)
-        await navigate({ to: "/mes-articles/$id", params: { id: enregistre.id }, replace: true });
+      if (nouveau) await ouvrir(enregistre.id);
       else setInfo("Brouillon enregistré.");
     });
 
@@ -101,33 +113,39 @@ export function Editeur({
     agir(async () => {
       const nouveau = !actuel;
       const enregistre = await enregistrer();
-      const soumis = await soumettreArticle(enregistre.id, enregistre.version);
+      const soumis = await soumettreArticle(enregistre.id, enregistre.version, nature);
       if (nouveau) {
-        await navigate({ to: "/mes-articles/$id", params: { id: soumis.id }, replace: true });
+        await ouvrir(soumis.id);
         return;
       }
       setActuel(soumis);
       setChamps(soumis.champs);
       setInfo(
-        "Ton article est envoyé à l'équipe : tu recevras sa décision dans tes notifications.",
+        club
+          ? "L'actualité est envoyée à l'équipe : tu recevras sa décision dans tes notifications."
+          : "Ton article est envoyé à l'équipe : tu recevras sa décision dans tes notifications.",
       );
     });
 
   const retirer = () =>
     agir(async () => {
       if (!actuel) return;
-      const retire = await retirerArticle(actuel.id, actuel.version);
+      const retire = await retirerArticle(actuel.id, actuel.version, nature);
       setActuel(retire);
-      setInfo("Ton article est retiré de la file : tu peux le modifier.");
+      setInfo(
+        club
+          ? "L'actualité est retirée de la file : tu peux la modifier."
+          : "Ton article est retiré de la file : tu peux le modifier.",
+      );
     });
 
   const supprimer = () =>
     agir(async () => {
       if (!actuel || !window.confirm("Supprimer ce brouillon ? Il ne pourra pas être récupéré."))
         return;
-      await supprimerArticle(actuel.id);
+      await supprimerArticle(actuel.id, nature);
       await router.invalidate();
-      await navigate({ to: "/mes-articles" });
+      await (club ? navigate({ to: "/mon-club" }) : navigate({ to: "/mes-articles" }));
     });
 
   // Insère une marque Markdown autour de la sélection, ou en début de ligne.
@@ -262,7 +280,7 @@ export function Editeur({
               className="rounded-t-none font-mono text-sm"
             />
           </Bloc>
-          {eleve && (
+          {eleve && !club && (
             <label className="flex items-start gap-3 text-sm">
               <Checkbox
                 checked={champs.afficher_club}
@@ -289,7 +307,7 @@ export function Editeur({
         </article>
       )}
 
-      <Photos article={actuel} modifiable={modifiable} onArticle={setActuel} />
+      <Photos article={actuel} modifiable={modifiable} onArticle={setActuel} nature={nature} />
 
       {erreur && (
         <Alert variant="destructive">

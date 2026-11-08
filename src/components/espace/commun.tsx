@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { CalendarRange, LogOut, MessageCircle, PenLine, Star, Trophy } from "lucide-react";
+import { CalendarRange, LogOut, MessageCircle, PenLine, Star, Trophy, Users } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
@@ -48,6 +48,14 @@ export function EnTeteEspace({
               className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
             >
               <PenLine className="size-4" /> Mes articles
+            </Link>
+          )}
+          {articles && (
+            <Link
+              to="/mon-club"
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
+            >
+              <Users className="size-4" /> Mon club
             </Link>
           )}
           {articles && (

@@ -17,7 +17,7 @@ Chaque tâche se termine par lint, typecheck et tests verts, puis un commit.
 
 **Site**
 
-- [ ] 5. Page « Mon club » (président et lecture), proposition de fiche, lien depuis « Mon espace » et pour les
+- [x] 5. Page « Mon club » (président et lecture), proposition de fiche, lien depuis « Mon espace » et pour les
       encadreurs ; tests Vitest.
 - [ ] 6. Éditeur des actualités (réutilise l'éditeur et les photos des articles), actualités sur la fiche du club
       et dans `/articles`, centre de modération (types `actualite` et `fiche_club`). Démonstration dans
