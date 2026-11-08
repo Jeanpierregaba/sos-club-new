@@ -14,7 +14,7 @@ notifications. Le barème de la spec 022 fixe les points : +5 pour l'auteur, +20
 
 1. Sous un article publié, un élève ou un encadreur actif connecté voit un champ « Ton commentaire ». Un
    visiteur non connecté voit les commentaires publiés et une invitation à se connecter.
-2. Il écrit un texte simple (1 à 1 000 caractères, sans HTML ni lien cliquable) et l'envoie. Le site confirme :
+2. Il écrit un texte simple (1 à 1 000 caractères, sans HTML ni lien cliquable) et l'envoie. Un élève choisit, comme pour un article, d'afficher ou non son club (affiché par défaut). Le site confirme :
    « Merci ! Ton commentaire sera visible après sa validation. » Le commentaire apparaît pour lui seul, marqué
    « En attente ».
 3. Un commentaire envoyé ne se modifie plus. Son auteur peut le retirer à tout moment, en attente ou publié :
@@ -67,7 +67,7 @@ notifications. Le barème de la spec 022 fixe les points : +5 pour l'auteur, +20
       de l'article reçoit une notification ; une republication n'en envoie pas de nouvelle.
 - [ ] Étant donné un modérateur auteur du commentaire ou hors du périmètre DRE, alors il ne peut pas décider.
 - [ ] Étant donné la première approbation d'un commentaire, alors l'auteur reçoit +5 une seule fois (clé
-      `commentaire:<id>`), même après une dépublication puis une nouvelle approbation ; le club d'un élève affilié
+      `commentaire:<id>`), et la ligne reste après une dépublication (un commentaire dépublié ne revient pas en file) ; le club d'un élève affilié
       est enregistré.
 - [ ] Étant donné 5 commentaires d'un même auteur envoyés le même jour et déjà rémunérés, quand un sixième envoyé
       ce jour-là est approuvé, alors il est publié sans points.

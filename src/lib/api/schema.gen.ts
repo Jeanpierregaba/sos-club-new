@@ -2812,6 +2812,11 @@ export interface components {
         CommentaireEntree: {
             /** Texte */
             texte: string;
+            /**
+             * Afficher Club
+             * @default true
+             */
+            afficher_club: boolean;
         };
         /** CommentairePublic */
         CommentairePublic: {

@@ -66,7 +66,7 @@ const DECISIONS: Record<Decision, { titre: string; bouton: string; aide: string 
   refuser: {
     titre: "Refuser ce contenu ?",
     bouton: "Refuser",
-    aide: "L'auteur lit ce motif. Un article jamais publié est alors clos ; pour une nouvelle version, la version en ligne reste.",
+    aide: "L'auteur lit ce motif. Un contenu jamais publié est alors clos ; pour une nouvelle version, la version en ligne reste.",
   },
   depublier: {
     titre: "Retirer ce contenu du site ?",
@@ -581,7 +581,9 @@ function Apercu({
           description={
             apercu?.nouvelle_version
               ? "Cette nouvelle version remplace la version en ligne. Aucun point n'est crédité de nouveau."
-              : "L'article est publié sur le site et l'auteur reçoit ses points."
+              : apercu?.type === "commentaire"
+                ? "Le commentaire apparaît sous l'article. Son auteur reçoit +5 points, dans la limite de 5 commentaires rémunérés par jour."
+                : "L'article est publié sur le site et l'auteur reçoit ses points."
           }
           bouton="Approuver"
           onEnvoie={async () => {

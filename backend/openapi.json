@@ -8073,6 +8073,11 @@
             "type": "string",
             "maxLength": 4000,
             "title": "Texte"
+          },
+          "afficher_club": {
+            "type": "boolean",
+            "title": "Afficher Club",
+            "default": true
           }
         },
         "type": "object",

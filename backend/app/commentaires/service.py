@@ -11,7 +11,7 @@ from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel
-from sqlalchemy import Select, String, cast, func, select
+from sqlalchemy import Select, String, case, cast, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
@@ -27,7 +27,7 @@ from app.commentaires.schemas import (
 from app.comptes.inscription import Refus
 from app.comptes.models import Role, Utilisateur
 from app.moderation import service as moteur
-from app.moderation.models import Contenu, DecisionModeration, EtatContenu, VersionContenu
+from app.moderation.models import Contenu, DecisionModeration, EtatContenu, EtatVersion, VersionContenu
 from app.moderation.types import TypeContenu, enregistrer
 from app.notifications.service import notifier
 from app.points.bareme import COMMENTAIRE_ELEVE, COMMENTAIRE_ENCADREUR
@@ -45,6 +45,8 @@ LONGUEUR_EXTRAIT = 60
 
 class ChampsCommentaire(BaseModel):
     texte: str
+    # Comme pour un article (Q20) : un élève choisit d'afficher son club à côté de son pseudonyme.
+    afficher_club: bool = True
 
 
 def extrait(texte: str) -> str:
@@ -77,22 +79,15 @@ async def _points_permis(db: AsyncSession, contenu: Contenu) -> bool:
 
 
 async def _titre_article(db: AsyncSession, article: Contenu) -> str:
-    version_id = article.version_publiee_id or article.version_travail_id
-    version = await db.get(VersionContenu, version_id) if version_id else None
-    if version is None:
-        version = await db.scalar(
-            select(VersionContenu)
-            .where(VersionContenu.contenu_id == article.id)
-            .order_by(VersionContenu.numero.desc())
-            .limit(1)
-        )
+    version = await db.get(VersionContenu, article.version_publiee_id) if article.version_publiee_id else None
     return str(version.donnees.get("titre", "")) if version else ""
 
 
 async def _prevenir_redacteur(db: AsyncSession, contenu: Contenu) -> None:
     """À la première publication, l'auteur de l'article apprend qu'on l'a commenté (sauf s'il s'est commenté)."""
     article = await db.get(Contenu, contenu.parent_id) if contenu.parent_id else None
-    if article is None or article.auteur_id == contenu.auteur_id:
+    # Article hors ligne (dépublié pendant l'attente) : le commentaire ne se lit pas encore, rien à annoncer.
+    if article is None or article.auteur_id == contenu.auteur_id or article.version_publiee_id is None:
         return
     titre = await _titre_article(db, article)
     notifier(
@@ -136,7 +131,7 @@ async def _article_publie(db: AsyncSession, adresse: str) -> Contenu:
 
 
 async def envoyer(
-    db: AsyncSession, auteur: Utilisateur, adresse: str, texte: str, adresse_ip: str
+    db: AsyncSession, auteur: Utilisateur, adresse: str, texte: str, afficher_club: bool, adresse_ip: str
 ) -> tuple[CommentaireAuteur, bool]:
     """Crée et soumet le commentaire ; renvoie aussi faux s'il s'agissait d'un double envoi (le même commentaire)."""
     article = await _article_publie(db, adresse)
@@ -166,7 +161,8 @@ async def envoyer(
     )
     if (envoyes or 0) >= ENVOIS_PAR_JOUR:
         raise Refus(f"Tu as déjà envoyé {ENVOIS_PAR_JOUR} commentaires aujourd'hui : réessaie demain.", 429)
-    contenu = await moteur.creer(db, auteur, TYPE, {"texte": texte}, parent_id=article.id)
+    donnees = ChampsCommentaire(texte=texte, afficher_club=afficher_club).model_dump()
+    contenu = await moteur.creer(db, auteur, TYPE, donnees, parent_id=article.id)
     await moteur.soumettre(db, contenu, auteur, adresse_ip)
     await db.commit()
     return await commentaire_auteur(db, contenu), True
@@ -176,10 +172,12 @@ async def envoyer(
 
 _Article = aliased(Contenu)
 _VersionArticle = aliased(VersionContenu)
+# Le titre de la dernière version approuvée de l'article : jamais un brouillon de son auteur, que le commentateur
+# n'a pas à lire (ADR-0009).
 _titre = (
     select(_VersionArticle.donnees["titre"].astext)
-    .where(_VersionArticle.contenu_id == _Article.id)
-    .order_by((_VersionArticle.id == _Article.version_publiee_id).desc(), _VersionArticle.numero.desc())
+    .where(_VersionArticle.contenu_id == _Article.id, _VersionArticle.etat == EtatVersion.approuvee)
+    .order_by(_VersionArticle.numero.desc())
     .limit(1)
     .correlate(_Article)
     .scalar_subquery()
@@ -197,7 +195,14 @@ _motif = (
 def _miens() -> Select[tuple[Contenu, VersionContenu, str | None, str | None, str | None]]:
     # Un commentaire n'a qu'une version : il ne se modifie pas après l'envoi.
     return (
-        select(Contenu, VersionContenu, _Article.adresse, _titre, _motif)
+        # L'adresse seulement si l'article est en ligne : sinon le lien mènerait à une page introuvable.
+        select(
+            Contenu,
+            VersionContenu,
+            case((_Article.version_publiee_id.is_not(None), _Article.adresse)),
+            _titre,
+            _motif,
+        )
         .join(VersionContenu, (VersionContenu.contenu_id == Contenu.id) & (VersionContenu.numero == 1))
         .join(_Article, _Article.id == Contenu.parent_id)
         .where(Contenu.type == TYPE)

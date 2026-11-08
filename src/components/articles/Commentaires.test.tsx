@@ -71,6 +71,13 @@ async function afficher() {
   return rendu;
 }
 
+// La case de Radix mesure sa taille dans un formulaire ; jsdom n'a pas ResizeObserver.
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
 beforeEach(() => {
   vi.clearAllMocks();
   api.chargerMesCommentaires.mockResolvedValue({ commentaires: [] });
@@ -114,7 +121,7 @@ describe("Commentaires", () => {
     api.chargerMesCommentaires.mockResolvedValue({ commentaires: [envoye] });
     await act(async () => fireEvent.click(bouton));
 
-    expect(api.commenterArticle).toHaveBeenCalledWith("lavage", "Bravo !");
+    expect(api.commenterArticle).toHaveBeenCalledWith("lavage", "Bravo !", true);
     expect(await screen.findByRole("status")).toHaveTextContent(
       "Merci ! Ton commentaire sera visible après sa validation.",
     );
@@ -146,5 +153,36 @@ describe("Commentaires", () => {
     await screen.findByText(/Personne n'a encore commenté/);
     expect(screen.queryByLabelText("Ton commentaire")).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Connecte-toi" })).not.toBeInTheDocument();
+  });
+
+  it("laisse un élève masquer son club", async () => {
+    api.chargerMoi.mockResolvedValue(eleve);
+    api.chargerCommentaires.mockResolvedValue(aucun);
+    api.commenterArticle.mockResolvedValue(envoye);
+    await afficher();
+
+    fireEvent.change(await screen.findByLabelText("Ton commentaire"), {
+      target: { value: "Bravo !" },
+    });
+    fireEvent.click(screen.getByRole("checkbox", { name: /Afficher mon club/ }));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /Envoyer/ })));
+
+    expect(api.commenterArticle).toHaveBeenCalledWith("lavage", "Bravo !", false);
+  });
+
+  it("explique à un encadreur non vérifié qu'il ne peut pas encore commenter", async () => {
+    api.chargerMoi.mockResolvedValue({ ...eleve, role: "encadreur" });
+    api.chargerCommentaires.mockResolvedValue(aucun);
+    api.chargerMesCommentaires.mockRejectedValue(
+      new ErreurApi(
+        403,
+        "Ton compte encadreur doit d'abord être vérifié par l'équipe des Clubs Santé.",
+      ),
+    );
+    await afficher();
+
+    expect(await screen.findByText(/doit d'abord être vérifié/)).toBeInTheDocument();
+    expect(screen.queryByLabelText("Ton commentaire")).not.toBeInTheDocument();
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
   });
 });

@@ -504,8 +504,8 @@ const commentairesDe = (adresse: string) =>
   `/api/articles/${encodeURIComponent(adresse)}/commentaires`;
 export const chargerCommentaires = (adresse: string, page = 1) =>
   requeteApi<CommentairesPublics>(avecParametres(commentairesDe(adresse), { page }));
-export const commenterArticle = (adresse: string, texte: string) =>
-  envoyerJson<CommentaireAuteur>(commentairesDe(adresse), { texte });
+export const commenterArticle = (adresse: string, texte: string, afficherClub = true) =>
+  envoyerJson<CommentaireAuteur>(commentairesDe(adresse), { texte, afficher_club: afficherClub });
 export const chargerMesCommentaires = (article?: string) =>
   requeteApi<MesCommentaires>(avecParametres("/api/mes-commentaires", { article }));
 export const retirerCommentaire = (id: string) =>

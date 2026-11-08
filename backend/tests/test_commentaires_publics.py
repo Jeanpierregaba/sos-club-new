@@ -158,7 +158,9 @@ def test_un_commentaire_retire_quitte_la_file(scene: Any) -> None:
 
     assert scene["navigateur"].delete(f"{MIENS}/{commentaire['id']}").status_code == 204
     assert commentaire["id"] not in [c["id"] for c in scene["admin"].get(FILE).json()["contenus"]]
-    assert scene["admin"].post(f"{FILE}/{commentaire['id']}/approuver", json={"version": 99}).status_code in {404, 409}
+    # Avec la version à jour : le commentaire n'est plus en attente, la décision est refusée quand même.
+    version = scene["admin"].get(f"{FILE}/{commentaire['id']}").json()["version"]
+    assert scene["admin"].post(f"{FILE}/{commentaire['id']}/approuver", json={"version": version}).status_code == 409
 
 
 def test_un_autre_compte_ne_retire_pas_le_commentaire(client: TestClient, scene: Any) -> None:
@@ -186,3 +188,55 @@ def test_une_decision_sur_une_version_perimee_apres_retrait_repond_409(scene: An
 
     assert reponse.status_code == 409
     assert contenu(en_base, commentaire["id"]).etat is EtatContenu.retire
+
+
+def test_un_eleve_peut_masquer_son_club(client: TestClient, scene: Any, creer_club: Callable[..., Any]) -> None:
+    creer_club(scene["lecteur"], nom="Club Santé du Lycée")
+    commentaire = (
+        scene["navigateur"]
+        .post(f"/api/articles/{scene['adresse']}/commentaires", json={"texte": "Sans mon club", "afficher_club": False})
+        .json()
+    )
+    decider(scene["admin"], commentaire["id"], "approuver")
+
+    assert publics(client, scene["adresse"]).json()["commentaires"][0]["signature"]["club"] is None
+
+
+def test_le_titre_dun_brouillon_de_larticle_nest_jamais_montre_au_commentateur(
+    client: TestClient, scene: Any, en_base: Callable[..., Any]
+) -> None:
+    publie(scene)
+    article_id = str(en_base(lambda db: db.scalar(select(Contenu.id).where(Contenu.adresse == scene["adresse"]))))
+    decider(scene["admin"], article_id, "depublier", "Vérification.")
+    redacteur = connecter(client, "eleve1")
+    actuel = redacteur.get(f"/api/mes-articles/{article_id}").json()
+    modifie = redacteur.request(
+        "PATCH",
+        f"/api/mes-articles/{article_id}",
+        json=actuel["champs"] | {"titre": "Titre jamais relu", "version": actuel["version"]},
+    )
+    assert modifie.status_code == 200, modifie.text
+
+    article = scene["navigateur"].get(MIENS).json()["commentaires"][0]["article"]
+
+    assert article == {"adresse": None, "titre": "Le lavage des mains au lycée"}
+
+
+def test_un_encadreur_dont_la_verification_est_retiree_retire_encore_son_commentaire(
+    client: TestClient, scene: Any, creer_encadreur: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    from sqlalchemy import update
+
+    from app.encadreurs.models import Encadreur, EtatVerification
+
+    encadreur = creer_encadreur()
+    navigateur = connecter(client, "encadreur1")
+    commentaire = envoyer(navigateur, scene["adresse"])
+    en_base(
+        lambda db: db.execute(
+            update(Encadreur).where(Encadreur.utilisateur_id == encadreur.id).values(etat=EtatVerification.en_attente)
+        )
+    )
+
+    assert navigateur.get(MIENS).status_code == 200
+    assert navigateur.delete(f"{MIENS}/{commentaire['id']}").status_code == 204

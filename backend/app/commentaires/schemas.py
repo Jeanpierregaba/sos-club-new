@@ -23,6 +23,7 @@ def normaliser(texte: str) -> str:
 class CommentaireEntree(BaseModel):
     # La limite brute empêche un texte énorme d'être traité ; la vraie limite s'applique après normalisation.
     texte: str = Field(max_length=4 * LONGUEUR_MAX)
+    afficher_club: bool = True
 
     @field_validator("texte")
     @classmethod

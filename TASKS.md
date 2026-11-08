@@ -29,7 +29,6 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 **Phase 2 — Modération et publications (P0, jalon A)**
 
 - [x] R6 — Centre de modération, articles et notifications internes (spec 023, ADR-0009)
-- [ ] R7 — Commentaires prémodérés (Q22)
 - [ ] Purge des notifications lues de plus d'un an (signalée par la spec 023)
 - [ ] Balayage des fichiers orphelins du stockage (signalé par la spec 024)
 - [ ] R8 — Espace du président : tableau de bord, fiche, actualités du club (Q20)
@@ -46,7 +45,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 **Phase 5 — Classements (P0, jalon B)**
 
-- [ ] R13 — Classements Club, DRE et national, tableaux de bord, module Points (Q21) ; brancher les lignes des clubs dans `points.service.scores_des_clubs`, que lit déjà le podium de l'accueil (spec 021), et créditer `club.article_eleve` aux clubs enregistrés dans `contenu.club_beneficiaire_id` (spec 023) et les parts Club du barème harmonisé (spec 022 : compte, commentaire, quiz, question du jour +10, badges, certification), affiliation active au moment du crédit
+- [ ] R13 — Classements Club, DRE et national, tableaux de bord, module Points (Q21) ; brancher les lignes des clubs dans `points.service.scores_des_clubs`, que lit déjà le podium de l'accueil (spec 021), et créditer `club.article_eleve` aux clubs enregistrés dans `contenu.club_beneficiaire_id` (spec 023), ainsi que `club.commentaire_eleve` pour les seuls commentaires qui ont rapporté des points à leur auteur (ligne `commentaire:<id>` au registre, plafond de 5 par jour, spec 025) et les parts Club du barème harmonisé (spec 022 : compte, commentaire, quiz, question du jour +10, badges, certification), affiliation active au moment du crédit
 - [ ] R14 — Clôture de semestre et Top 3 (Q21, Q25)
 - [ ] Avant l'ouverture : récépissé de l'IPDCP, avis juridique, sauvegardes hors du VPS, audit de sécurité (Q8, Q9)
 

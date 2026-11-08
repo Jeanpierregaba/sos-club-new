@@ -56,7 +56,7 @@ def test_la_file_et_lapercu_montrent_larticle_commente(scene: Any) -> None:
     assert element["type"] == "commentaire"
     assert element["parent"] == {"adresse": scene["adresse"], "titre": "Le lavage des mains au lycée"}
     assert "Bravo à tout le club" in element["titre"]
-    assert apercu["soumise"] == {"texte": "Bravo à tout le club !"}
+    assert apercu["soumise"] == {"texte": "Bravo à tout le club !", "afficher_club": True}
     assert apercu["parent"] == element["parent"]
     assert apercu["correction_possible"] is False
     assert apercu["adresse"] is None
@@ -85,7 +85,7 @@ def test_lapprobation_publie_sans_adresse_et_credite_cinq_points_une_fois(
         ("eleve.commentaire", 5, f"commentaire:{commentaire['id']}")
     ]
 
-    # Dépublié puis republié : jamais une seconde ligne.
+    # Dépublié : la ligne reste, et aucune autre ne s'ajoute (un commentaire dépublié ne revient pas en file).
     assert decider(scene["admin"], commentaire["id"], "depublier", "Hors sujet.").status_code == 200
     assert len([g for g in lignes(en_base, scene["lecteur"].id) if g.action.endswith("commentaire")]) == 1
 
@@ -219,3 +219,73 @@ def test_un_collaborateur_ne_commente_pas(client: TestClient, scene: Any, en_bas
 
 def decider_brut(navigateur: Any, contenu_id: str) -> Any:
     return navigateur.post(f"{FILE}/{contenu_id}/approuver", json={"version": 1})
+
+
+def test_un_moderateur_de_la_meme_dre_decide(
+    client: TestClient, scene: Any, creer_collaborateur: Callable[..., Any]
+) -> None:
+    commentaire = envoyer(scene["navigateur"], scene["adresse"])
+    regional = moderateur(client, creer_collaborateur, "regional", perimetre_dre="grand-lome")
+
+    assert decider(regional, commentaire["id"], "approuver").status_code == 200
+
+
+def test_un_eleve_sans_club_recoit_ses_points_sans_club_beneficiaire(scene: Any, en_base: Callable[..., Any]) -> None:
+    commentaire = envoyer(scene["navigateur"], scene["adresse"])
+
+    decider(scene["admin"], commentaire["id"], "approuver")
+
+    assert contenu(en_base, commentaire["id"]).club_beneficiaire_id is None
+    assert any(g.action == "eleve.commentaire" for g in lignes(en_base, scene["lecteur"].id))
+
+
+def test_la_depublication_exige_un_motif(scene: Any) -> None:
+    commentaire = envoyer(scene["navigateur"], scene["adresse"])
+    decider(scene["admin"], commentaire["id"], "approuver")
+
+    assert decider(scene["admin"], commentaire["id"], "depublier").status_code == 422
+
+
+def test_un_compte_suspendu_apres_lenvoi_garde_son_commentaire_en_file(scene: Any, en_base: Callable[..., Any]) -> None:
+    from app.comptes.models import StatutCompte
+
+    commentaire = envoyer(scene["navigateur"], scene["adresse"])
+    en_base(
+        lambda db: db.execute(
+            update(Utilisateur).where(Utilisateur.id == scene["lecteur"].id).values(statut=StatutCompte.suspendu)
+        )
+    )
+
+    assert decider(scene["admin"], commentaire["id"], "approuver").status_code == 409
+    assert contenu(en_base, commentaire["id"]).etat is EtatContenu.en_attente
+
+
+def test_un_article_depublie_pendant_lattente_ne_previent_pas_son_auteur(
+    scene: Any, en_base: Callable[..., Any]
+) -> None:
+    from tests.commentaires import publics
+
+    commentaire = envoyer(scene["navigateur"], scene["adresse"])
+    article_id = en_base(lambda db: db.scalar(select(Contenu.id).where(Contenu.adresse == scene["adresse"])))
+    decider(scene["admin"], str(article_id), "depublier", "Vérification.")
+    avant = len(notifications(en_base, scene["redactrice"].id))
+
+    assert decider(scene["admin"], commentaire["id"], "approuver").status_code == 200
+
+    assert notifications(en_base, scene["redactrice"].id)[avant:] == []
+    # Invisible tant que l'article est hors ligne.
+    assert publics(scene["admin"], scene["adresse"]).status_code == 404
+
+
+def test_vingt_brouillons_darticles_ne_bloquent_pas_un_commentaire(scene: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.moderation import service
+    from tests.commentaires import ARTICLES, commenter
+
+    monkeypatch.setattr(service, "MAX_BROUILLONS", 1)
+    scene["navigateur"].post(
+        ARTICLES,
+        json={"titre": "Mon brouillon", "chapo": "Un chapo assez long.", "texte": "Texte.",
+              "axe_code": "sante-environnement", "afficher_club": True},
+    )  # fmt: skip
+
+    assert commenter(scene["navigateur"], scene["adresse"]).status_code == 201

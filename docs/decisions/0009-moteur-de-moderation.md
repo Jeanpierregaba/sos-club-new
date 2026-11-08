@@ -53,3 +53,14 @@ contenu s'y déclare (schéma de ses champs, action du barème, aperçu) et gard
   jamais un contenu non approuvé destiné à un autre que son auteur.
 - Les photos et pièces jointes privées des contenus (spec 024, puis R12) s'attachent aux versions ; leur
   stockage suit l'ADR-0005, sur le disque du VPS au départ.
+
+## Note (2026-11-08, spec 025)
+
+Les commentaires sont le deuxième type du moteur. Ils ont ajouté :
+
+- `contenu.parent_id` : l'article commenté. Un commentaire n'a pas d'adresse publique ; il se lit sous son article.
+- Un septième état, `retire` : retiré par son auteur, sans décision de modérateur, hors ligne et hors de la file.
+- Des réglages par type dans `TypeContenu`, avec les valeurs de l'article par défaut : `adresse`, `correction`
+  (pas de « à corriger » pour un commentaire), `points_permis` (plafond de 5 commentaires rémunérés par jour
+  d'envoi, sous le verrou de l'auteur) et `a_la_publication` (notifier l'auteur de l'article).
+- La limite de 3 contenus en attente se compte par type.

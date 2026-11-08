@@ -119,6 +119,7 @@ async def creer(
         .select_from(Contenu)
         .where(
             Contenu.auteur_id == auteur.id,
+            Contenu.type == type,
             Contenu.etat == EtatContenu.brouillon,
             Contenu.version_publiee_id.is_(None),
         )

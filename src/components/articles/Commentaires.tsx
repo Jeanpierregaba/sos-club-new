@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useMoi } from "@/hooks/use-moi";
@@ -37,6 +38,9 @@ export function Commentaires({ adresse }: { adresse: string }) {
     enabled: peutCommenter,
   });
   const enAttente = (miens.data?.commentaires ?? []).filter((c) => c.etat === "en_attente");
+  // Un encadreur pas encore vérifié : l'API refuse, on le lui explique au lieu d'un formulaire qui échouerait.
+  const refus =
+    miens.error instanceof ErreurApi && miens.error.statut === 403 ? miens.error.message : null;
   const total = publics.data?.total ?? 0;
 
   return (
@@ -110,8 +114,10 @@ export function Commentaires({ adresse }: { adresse: string }) {
         </div>
       )}
 
-      {peutCommenter ? (
-        <Formulaire adresse={adresse} />
+      {peutCommenter && refus ? (
+        <p className="mt-6 rounded-2xl bg-mist p-4 text-sm">{refus}</p>
+      ) : peutCommenter ? (
+        <Formulaire adresse={adresse} eleve={moi.role === "eleve"} />
       ) : moi ? null : (
         <p className="mt-6 rounded-2xl bg-mist p-4 text-sm">
           <Link to="/connexion" className="font-bold text-logo-blue hover:underline">
@@ -124,12 +130,13 @@ export function Commentaires({ adresse }: { adresse: string }) {
   );
 }
 
-function Formulaire({ adresse }: { adresse: string }) {
+function Formulaire({ adresse, eleve }: { adresse: string; eleve: boolean }) {
   const client = useQueryClient();
   const [texte, setTexte] = useState("");
+  const [afficherClub, setAfficherClub] = useState(true);
   const [confirmation, setConfirmation] = useState(false);
   const envoi = useMutation({
-    mutationFn: () => commenterArticle(adresse, texte),
+    mutationFn: () => commenterArticle(adresse, texte, afficherClub),
     onSuccess: () => {
       setTexte("");
       setConfirmation(true);
@@ -163,6 +170,12 @@ function Formulaire({ adresse }: { adresse: string }) {
         }}
         placeholder="Partage ton avis ou ton expérience, avec respect."
       />
+      {eleve && (
+        <label className="flex items-center gap-3 text-sm">
+          <Checkbox checked={afficherClub} onCheckedChange={(v) => setAfficherClub(v === true)} />
+          Afficher mon club à côté de mon pseudonyme
+        </label>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="text-xs text-muted-foreground">
           {texte.length} / {LONGUEUR_MAX} · visible après validation par l'équipe

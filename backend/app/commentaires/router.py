@@ -13,11 +13,16 @@ from app.admin.dependances import adresse_ip
 from app.articles.dependances import Auteur
 from app.commentaires import service
 from app.commentaires.schemas import CommentaireAuteur, CommentaireEntree, CommentairesPublics, MesCommentaires
+from app.comptes.dependances import utilisateur_courant
 from app.comptes.inscription import Refus
+from app.comptes.models import Utilisateur
 from app.db import get_session
 from app.moderation import service as moteur
 
 Base = Annotated[AsyncSession, Depends(get_session)]
+# Lire et retirer ses commentaires ne demande que d'en être l'auteur (vérifié par le service) : un encadreur dont la
+# vérification a été retirée garde la main sur ce qu'il a écrit.
+Connecte = Annotated[Utilisateur, Depends(utilisateur_courant)]
 
 router_public = APIRouter(prefix="/articles", tags=["commentaires"])
 router_auteur = APIRouter(prefix="/mes-commentaires", tags=["commentaires"])
@@ -48,7 +53,9 @@ async def commenter(
     adresse: str, entree: CommentaireEntree, request: Request, response: Response, db: Base, auteur: Auteur
 ) -> CommentaireAuteur:
     with _traduire("Cet article est introuvable ou n'est plus publié."):
-        commentaire, cree = await service.envoyer(db, auteur, adresse, entree.texte, adresse_ip(request))
+        commentaire, cree = await service.envoyer(
+            db, auteur, adresse, entree.texte, entree.afficher_club, adresse_ip(request)
+        )
     if not cree:
         response.status_code = status.HTTP_200_OK
     return commentaire
@@ -56,13 +63,13 @@ async def commenter(
 
 @router_auteur.get("")
 async def mes_commentaires(
-    db: Base, auteur: Auteur, article: Annotated[str | None, Query(max_length=140)] = None
+    db: Base, auteur: Connecte, article: Annotated[str | None, Query(max_length=140)] = None
 ) -> MesCommentaires:
     return await service.mes_commentaires(db, auteur, article)
 
 
 @router_auteur.delete("/{contenu_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def retirer(contenu_id: UUID, request: Request, db: Base, auteur: Auteur) -> Response:
+async def retirer(contenu_id: UUID, request: Request, db: Base, auteur: Connecte) -> Response:
     with _traduire("Ce commentaire est introuvable."):
         await service.retirer(db, auteur, contenu_id, adresse_ip(request))
     return Response(status_code=status.HTTP_204_NO_CONTENT)

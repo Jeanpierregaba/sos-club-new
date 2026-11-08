@@ -128,6 +128,7 @@ Champs structurants :
   `utilisateur.statut` (la suspension, qui prime). Seul un encadreur actif passera la dépendance
   `encadreur_actif`, que les clubs et les rattachements (R4, R5) utiliseront.
 - `contenu`, `version_contenu`, `decision_moderation` (spec 023, ADR-0009) : le moteur commun de modération.
+  Un commentaire (spec 025) est un `contenu` de type `commentaire`, rattaché à son article par `parent_id`.
   L'en-tête `contenu` porte le `type` (`article` pour l'instant), l'auteur, l'`etat` (brouillon, en_attente,
   a_corriger, refuse, publie, depublie), `version_publiee_id` (seule source de ce qui est en ligne),
   `version_travail_id`, l'`adresse` publique (fixée à la première approbation), l'axe et `afficher_club` de la
@@ -174,7 +175,7 @@ flowchart LR
 - **Site** : rendu serveur pour les pages publiques (référencement, affichage rapide sur réseau lent).
   Il n'a aucune logique métier et n'accède jamais à la base (ADR-0002).
 - **API** : seule détentrice des données et des règles. Chaque domaine vit dans son dossier sous
-  `backend/app/` (`comptes/`, `admin/`, `referentiel/`, `eleves/`, `encadreurs/`, `points/`, `clubs/`, `moderation/`, `articles/`, `notifications/`, `fichiers/`, `agenda/`, `mediatheque/`, `quiz/`),
+  `backend/app/` (`comptes/`, `admin/`, `referentiel/`, `eleves/`, `encadreurs/`, `points/`, `clubs/`, `moderation/`, `articles/`, `commentaires/`, `notifications/`, `fichiers/`, `agenda/`, `mediatheque/`, `quiz/`),
   avec `router.py` (HTTP), `schemas.py` (Pydantic), `models.py` (SQLAlchemy) et `service.py` (règles).
 - **Types partagés** : `backend/openapi.json` est versionné, et `npm run api:types` en génère les types
   TypeScript avec `openapi-typescript`. La CI vérifie que les deux restent à jour.
