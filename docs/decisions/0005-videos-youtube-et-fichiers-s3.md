@@ -1,6 +1,7 @@
 # 0005 — Vidéos sur YouTube, photos et PDF en stockage S3
 
-- **Statut** : Proposé (dépend de Q10 et Q11 du PRD)
+- **Statut** : Proposé (dépend de Q10 et Q11 du PRD). Pour les fichiers, précisé par l'ADR-0010 : disque du VPS
+  au départ, derrière la même couche.
 - **Date** : 2026-11-02
 
 ## Contexte

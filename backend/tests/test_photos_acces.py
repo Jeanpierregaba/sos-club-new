@@ -196,3 +196,36 @@ def test_un_brouillon_dun_article_publie_montre_ses_nouvelles_photos_a_lauteur_s
 
     assert auteur.get(f"{ARTICLES}/{article_id}/photos/{nouvelle}/grande").status_code == 200
     assert client.get(f"{PUBLICS}/{adresse}/photos/{nouvelle}/grande").status_code == 404
+
+
+def test_un_moderateur_ne_voit_pas_une_photo_dune_version_de_travail(
+    auteur: Navigateur, moderateur: Navigateur
+) -> None:
+    brouillon = creer_article(auteur)
+    jamais_soumise = premiere_photo(ajouter(auteur, brouillon["id"]))
+    article_id, en_ligne, _ = publier_avec_photo(auteur, moderateur)
+    en_travail = next(p["id"] for p in ajouter(auteur, article_id)["photos"] if p["id"] != en_ligne)
+
+    assert moderateur.get(f"{FILE}/{brouillon['id']}/photos/{jamais_soumise}/grande").status_code == 404
+    assert moderateur.get(f"{FILE}/{article_id}/photos/{en_travail}/grande").status_code == 404
+    assert moderateur.get(f"{FILE}/{article_id}/photos/{en_ligne}/grande").status_code == 200
+
+
+def test_un_fichier_absent_du_disque_donne_404_et_larticle_reste_lisible(
+    client: TestClient, auteur: Navigateur, moderateur: Navigateur, dossier_fichiers: Any
+) -> None:
+    _, photo, adresse = publier_avec_photo(auteur, moderateur)
+    for fichier in (dossier_fichiers / "photos").glob("*.webp"):
+        fichier.unlink()
+
+    assert client.get(f"{PUBLICS}/{adresse}/photos/{photo}/grande").status_code == 404
+    assert client.get(f"{PUBLICS}/{adresse}").status_code == 200
+
+
+def test_seules_les_photos_publiques_gardent_leur_cache(
+    client: TestClient, auteur: Navigateur, moderateur: Navigateur
+) -> None:
+    _, _, adresse = publier_avec_photo(auteur, moderateur)
+
+    assert client.get(f"{PUBLICS}/{adresse}").headers["cache-control"] == "no-store"
+    assert client.get(PUBLICS).headers["cache-control"] == "no-store"

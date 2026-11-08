@@ -33,7 +33,7 @@ describe("Photos", () => {
     });
     expect(envoyer).toBeDisabled();
 
-    fireEvent.click(screen.getByRole("checkbox", { name: "Attestation" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: /accord des personnes reconnaissables/ }));
     expect(envoyer).toBeEnabled();
   });
 

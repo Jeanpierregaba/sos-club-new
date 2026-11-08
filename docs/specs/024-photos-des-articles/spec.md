@@ -40,30 +40,30 @@ code. Les rapports d'activités (R12) et les cartes (R15) le réutiliseront.
 
 ## Critères d'acceptation
 
-- [ ] Étant donné un article modifiable, quand son auteur envoie une photo JPEG, PNG ou WebP avec l'attestation,
+- [x] Étant donné un article modifiable, quand son auteur envoie une photo JPEG, PNG ou WebP avec l'attestation,
       alors elle est enregistrée, recompressée, sans métadonnées, et rattachée à sa version de travail.
-- [ ] Étant donné une photo sans attestation, un fichier qui n'est pas une image (même renommé), une image
+- [x] Étant donné une photo sans attestation, un fichier qui n'est pas une image (même renommé), une image
       corrompue ou trop lourde, alors l'API répond 422 et rien n'est enregistré.
-- [ ] Étant donné une photo envoyée avec une position GPS dans ses métadonnées, alors le fichier enregistré n'en
+- [x] Étant donné une photo envoyée avec une position GPS dans ses métadonnées, alors le fichier enregistré n'en
       contient plus aucune.
-- [ ] Étant donné un article en attente, refusé ou d'un autre auteur, quand l'auteur ajoute ou retire une photo,
+- [x] Étant donné un article en attente, refusé ou d'un autre auteur, quand l'auteur ajoute ou retire une photo,
       alors l'API répond 409 (ou 404 pour un article d'un autre).
-- [ ] Étant donné une photo d'un article non publié, alors seuls son auteur et les collaborateurs habilités de son
+- [x] Étant donné une photo d'un article non publié, alors seuls son auteur et les collaborateurs habilités de son
       périmètre peuvent l'afficher ; pour toute autre personne, et pour une adresse devinée, l'API répond 404.
-- [ ] Étant donné un article publié avec une nouvelle version en attente qui change ses photos, alors le public
+- [x] Étant donné un article publié avec une nouvelle version en attente qui change ses photos, alors le public
       voit les photos de la version en ligne seulement, jusqu'à l'approbation.
-- [ ] Étant donné un article dépublié, alors ses photos ne sont plus accessibles au public.
-- [ ] Étant donné 5 photos déjà rattachées à la version, quand l'auteur en ajoute une sixième, alors l'API répond
+- [x] Étant donné un article dépublié, alors ses photos ne sont plus accessibles au public.
+- [x] Étant donné 5 photos déjà rattachées à la version, quand l'auteur en ajoute une sixième, alors l'API répond
       409 ; une seule photo de la version est la couverture.
-- [ ] Étant donné un article refusé (ou une version refusée) depuis plus de 90 jours, quand la purge passe, alors
+- [x] Étant donné un article refusé (ou une version refusée) depuis plus de 90 jours, quand la purge passe, alors
       les fichiers de ses photos que plus aucune autre version n'utilise sont effacés du disque ; la légende et
       l'attestation restent dans l'historique, et l'aperçu admin indique « photo effacée ».
-- [ ] Étant donné une photo, alors son attestation (auteur, date, texte accepté) est enregistrée et visible dans
+- [x] Étant donné une photo, alors son attestation (auteur, date, texte accepté) est enregistrée et visible dans
       l'aperçu de modération.
-- [ ] Le stockage passe par une seule interface (`enregistrer`, `lire`, `supprimer`) : changer de disque à S3 ne
+- [x] Le stockage passe par une seule interface (`enregistrer`, `lire`, `supprimer`) : changer de disque à S3 ne
       touche qu'un fichier, et les tests tournent sur un dossier temporaire.
-- [ ] Le volume des photos est inclus dans la sauvegarde du VPS.
-- [ ] Le site affiche l'ajout des photos, la vignette, l'attestation, la galerie publique et l'aperçu admin,
+- [x] Le volume des photos est inclus dans la sauvegarde du VPS.
+- [x] Le site affiche l'ajout des photos, la vignette, l'attestation, la galerie publique et l'aperçu admin,
       lisibles sur téléphone.
 
 ## Cas limites et erreurs

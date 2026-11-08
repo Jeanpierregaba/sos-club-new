@@ -97,7 +97,17 @@ def test_un_article_approuve_se_lit_avec_la_signature_de_leleve(
     brut = client.get(f"{PUBLICS}/{adresse}").text
     for interdit in ("Kodjo", "eleve1", "auteur", "dre_code", "etablissement"):
         assert interdit not in brut
-    assert set(article) == {"adresse", "titre", "chapo", "texte", "axe", "signature", "publie_le"}
+    assert set(article) == {
+        "adresse",
+        "titre",
+        "chapo",
+        "texte",
+        "axe",
+        "signature",
+        "publie_le",
+        "couverture",
+        "photos",
+    }
 
 
 def test_le_club_napparait_que_si_leleve_la_choisi(

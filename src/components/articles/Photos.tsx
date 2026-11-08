@@ -1,5 +1,5 @@
-import { ImagePlus, Loader2, Star, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Star, Trash2 } from "lucide-react";
+import { useRef, useState } from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
 } from "@/lib/api/client";
 
 export const MAX_PHOTOS = 5;
+export const OCTETS_MAX = 8 * 1024 * 1024;
 export const TEXTE_ATTESTATION =
   "J'ai l'accord des personnes reconnaissables sur cette photo et, pour un élève mineur, celui de son parent ou tuteur.";
 // Seuls ces formats : un iPhone convertit alors sa photo en JPEG avant l'envoi.
@@ -41,6 +42,11 @@ export function Photos({
   const [erreur, setErreur] = useState<string | null>(null);
   const [enCours, setEnCours] = useState(false);
   const [champ, setChamp] = useState(0);
+  // Les actions passent l'une après l'autre, chacune avec la version la plus récente : enregistrer une légende
+  // puis cliquer aussitôt sur « Retirer » ne donne jamais de conflit de version.
+  const file = useRef<Promise<unknown>>(Promise.resolve());
+  const courant = useRef(article);
+  courant.current = article;
 
   if (!article)
     return (
@@ -55,25 +61,35 @@ export function Photos({
   const photos = article.photos;
   if (!modifiable && photos.length === 0) return null;
 
-  async function agir(action: () => Promise<ArticleAuteur>) {
-    setErreur(null);
-    setEnCours(true);
-    try {
-      onArticle(await action());
-    } catch (e) {
-      setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
-    } finally {
-      setEnCours(false);
-      setProgression(null);
-    }
+  function agir(action: (a: ArticleAuteur) => Promise<ArticleAuteur>) {
+    const suite = file.current.then(async () => {
+      const actuel = courant.current;
+      if (!actuel) return;
+      setErreur(null);
+      setEnCours(true);
+      try {
+        const resultat = await action(actuel);
+        courant.current = resultat;
+        onArticle(resultat);
+      } catch (e) {
+        setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
+      } finally {
+        setEnCours(false);
+        setProgression(null);
+      }
+    });
+    file.current = suite;
+    return suite;
   }
 
   const envoyer = () =>
-    agir(async () => {
+    agir(async (a) => {
       if (!fichier) throw new ErreurApi(422, "Choisis une photo.");
+      if (fichier.size > OCTETS_MAX)
+        throw new ErreurApi(422, "Cette photo dépasse 8 Mo : réduis-la avant de l'envoyer.");
       const resultat = await envoyerPhoto(
-        article.id,
-        { fichier, version: article.version, legende, couverture },
+        a.id,
+        { fichier, version: a.version, legende, couverture },
         setProgression,
       );
       setFichier(null);
@@ -83,6 +99,20 @@ export function Photos({
       setChamp((c) => c + 1);
       return resultat;
     });
+
+  // Échange l'ordre de deux photos voisines (la couverture reste en tête de la galerie publique).
+  const deplacer = (index: number, sens: -1 | 1) => {
+    const voisine = photos[index + sens];
+    const photo = photos[index];
+    if (!voisine || !photo) return;
+    void agir(async (a) => {
+      const premier = await modifierPhoto(a.id, photo.id, {
+        version: a.version,
+        ordre: voisine.ordre,
+      });
+      return modifierPhoto(a.id, voisine.id, { version: premier.version, ordre: photo.ordre });
+    });
+  };
 
   return (
     <section className="space-y-4 rounded-3xl bg-card p-5 shadow-card sm:p-7">
@@ -95,7 +125,7 @@ export function Photos({
 
       {photos.length > 0 && (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {photos.map((p) => (
+          {photos.map((p, index) => (
             <li key={p.id} className="space-y-2">
               <div className="relative overflow-hidden rounded-2xl bg-mist">
                 {p.effacee ? (
@@ -129,9 +159,9 @@ export function Photos({
                     onBlur={(e) => {
                       const valeur = e.target.value.trim();
                       if (valeur !== (p.legende ?? ""))
-                        void agir(() =>
-                          modifierPhoto(article.id, p.id, {
-                            version: article.version,
+                        void agir((a) =>
+                          modifierPhoto(a.id, p.id, {
+                            version: a.version,
                             legende: valeur || null,
                           }),
                         );
@@ -146,17 +176,42 @@ export function Photos({
                         size="sm"
                         disabled={enCours}
                         onClick={() =>
-                          agir(() =>
-                            modifierPhoto(article.id, p.id, {
-                              version: article.version,
-                              couverture: true,
-                            }),
+                          agir((a) =>
+                            modifierPhoto(a.id, p.id, { version: a.version, couverture: true }),
                           )
                         }
                         className="h-8 rounded-full px-3 text-xs font-bold"
                       >
                         <Star className="size-3" /> En couverture
                       </Button>
+                    )}
+                    {photos.length > 1 && (
+                      <>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          aria-label="Placer avant"
+                          title="Placer avant"
+                          disabled={enCours || index === 0}
+                          onClick={() => deplacer(index, -1)}
+                          className="h-8 rounded-full px-2"
+                        >
+                          <ArrowLeft className="size-3" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          aria-label="Placer après"
+                          title="Placer après"
+                          disabled={enCours || index === photos.length - 1}
+                          onClick={() => deplacer(index, 1)}
+                          className="h-8 rounded-full px-2"
+                        >
+                          <ArrowRight className="size-3" />
+                        </Button>
+                      </>
                     )}
                     <Button
                       type="button"
@@ -165,7 +220,7 @@ export function Photos({
                       disabled={enCours}
                       onClick={() => {
                         if (window.confirm("Retirer cette photo de l'article ?"))
-                          void agir(() => retirerPhoto(article.id, p.id, article.version));
+                          void agir((a) => retirerPhoto(a.id, p.id, a.version));
                       }}
                       className="h-8 rounded-full px-3 text-xs font-bold text-logo-red"
                     >
@@ -210,7 +265,6 @@ export function Photos({
               checked={attestation}
               onCheckedChange={(v) => setAttestation(v === true)}
               className="mt-0.5"
-              aria-label="Attestation"
             />
             <span>{TEXTE_ATTESTATION}</span>
           </label>

@@ -120,7 +120,7 @@ async def ajouter_photo(
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_CONTENT, "La légende tient sur une ligne de 200 caractères au plus."
         ) from None
-    # Jamais plus que la limite + 1 octet en mémoire : au-delà, la photo est refusée sans lire la suite.
+    # Starlette a déjà reçu le formulaire (dans /tmp) : on n'en lit que la limite + 1 octet pour décider.
     octets = await fichier.read(settings.photo_octets_max + 1)
     if len(octets) > settings.photo_octets_max:
         raise HTTPException(

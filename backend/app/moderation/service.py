@@ -17,7 +17,7 @@ from app.comptes.inscription import Refus
 from app.comptes.models import Role, Utilisateur
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur
-from app.moderation.models import Contenu, EtatContenu, EtatVersion, VersionContenu, VersionPhoto
+from app.moderation.models import Contenu, EtatContenu, EtatVersion, Photo, VersionContenu, VersionPhoto
 from app.referentiel.models import Etablissement, Iesg
 
 MAX_EN_ATTENTE = 3
@@ -83,7 +83,10 @@ async def _nouvelle_version(db: AsyncSession, contenu: Contenu, donnees: dict[st
                 select(
                     literal(nouvelle.id, type_=Uuid), VersionPhoto.photo_id, VersionPhoto.ordre, VersionPhoto.legende,
                     VersionPhoto.couverture,
-                ).where(VersionPhoto.version_id == precedente),
+                )
+                .join(Photo, Photo.id == VersionPhoto.photo_id)
+                # Une photo dont les fichiers sont effacés (refus ancien) n'est jamais reprise.
+                .where(VersionPhoto.version_id == precedente, Photo.efface_le.is_(None)),
             )
         )  # fmt: skip
     contenu.version_travail_id = nouvelle.id

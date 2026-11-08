@@ -15,7 +15,7 @@ from app.comptes.models import Role, Utilisateur
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur, Fonction
 from app.moderation import photos
-from app.moderation.models import Contenu, VersionContenu
+from app.moderation.models import Contenu, Photo, VersionContenu, VersionPhoto
 from app.referentiel.models import Axe
 
 PAR_PAGE = 20
@@ -65,16 +65,21 @@ async def _photos(db: AsyncSession, version: VersionContenu) -> list[tuple[bool,
     return [
         (
             placement.couverture,
-            PhotoPublique(id=photo.id, legende=placement.legende, largeur=photo.largeur, hauteur=photo.hauteur),
+            _publique(placement, photo),
         )
         for placement, photo in await photos.photos_de(db, version.id)
         if photo.efface_le is None
     ]
 
 
-async def _resume(db: AsyncSession, contenu: Contenu, version: VersionContenu, axe: Axe) -> ResumeArticle:
+def _publique(placement: VersionPhoto, photo: Photo) -> PhotoPublique:
+    return PhotoPublique(id=photo.id, legende=placement.legende, largeur=photo.largeur, hauteur=photo.hauteur)
+
+
+async def _resume(
+    db: AsyncSession, contenu: Contenu, version: VersionContenu, axe: Axe, couverture: PhotoPublique | None
+) -> ResumeArticle:
     assert contenu.adresse is not None and contenu.publie_le is not None
-    couverture = next((p for est_couverture, p in await _photos(db, version) if est_couverture), None)
     return ResumeArticle(
         adresse=contenu.adresse,
         titre=version.donnees["titre"],
@@ -96,8 +101,19 @@ async def lister(db: AsyncSession, page: int, axe: str | None) -> ArticlesPublic
             requete.order_by(Contenu.publie_le.desc(), Contenu.id.desc()).offset((page - 1) * PAR_PAGE).limit(PAR_PAGE)
         )
     ).all()
+    # Les couvertures de la page en une seule requête.
+    trouvees = await photos.couvertures(db, [version.id for _, version, _ in lignes])
     return ArticlesPublics(
-        articles=[await _resume(db, *ligne) for ligne in lignes],
+        articles=[
+            await _resume(
+                db,
+                contenu,
+                version,
+                axe,
+                _publique(*trouvees[version.id]) if version.id in trouvees else None,
+            )
+            for contenu, version, axe in lignes
+        ],
         page=page,
         pages=max(1, math.ceil(total / PAR_PAGE)),
         total=total,
@@ -109,6 +125,8 @@ async def lire(db: AsyncSession, adresse: str) -> ArticlePublic | None:
     if ligne is None:
         return None
     contenu, version, axe = ligne
-    resume = await _resume(db, contenu, version, axe)
-    galerie = [p for est_couverture, p in await _photos(db, version) if not est_couverture]
+    toutes = await _photos(db, version)
+    couverture = next((p for est_couverture, p in toutes if est_couverture), None)
+    resume = await _resume(db, contenu, version, axe, couverture)
+    galerie = [p for est_couverture, p in toutes if not est_couverture]
     return ArticlePublic(**resume.model_dump(), texte=version.donnees["texte"], photos=galerie)

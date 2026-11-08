@@ -552,6 +552,11 @@ export function envoyerPhoto(
         corps = null;
       }
       if (requete.status >= 200 && requete.status < 300) return resoudre(corps as ArticleAuteur);
+      // Au-delà de 20 Mo, le proxy répond lui-même, sans message de l'API.
+      if (requete.status === 413)
+        return rejeter(
+          new ErreurApi(413, "Cette photo est trop lourde : choisis une photo de 8 Mo au plus."),
+        );
       const detail = (corps as { detail?: unknown } | null)?.detail;
       rejeter(new ErreurApi(requete.status, typeof detail === "string" ? detail : MESSAGE_SAISIE));
     };

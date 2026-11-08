@@ -185,9 +185,11 @@ async def ajouter_photo(
     couverture: bool,
     adresse_ip: str,
 ) -> ArticleAuteur:
+    # L'image d'abord, sans verrou ni transaction : le traitement est long, et un refus ne touche à rien.
+    preparees = await photos.preparer(octets)
     contenu = await moteur.contenu_de(db, auteur, contenu_id, TYPE, verrouiller=True)
     moteur.verifier_version(contenu, version)
-    await photos.ajouter(db, contenu, auteur, octets, legende, couverture, adresse_ip)
+    await photos.ajouter(db, contenu, auteur, preparees, legende, couverture, adresse_ip)
     return await article_auteur(db, contenu)
 
 

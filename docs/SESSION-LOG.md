@@ -14,6 +14,21 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-08 — Photos des articles (spec 024) terminée, spec 025 lancée
+
+- Fait : spec 024 livrée (photos stockées sur le disque du VPS derrière l'interface `Stockage` de l'ADR-0010,
+  attestation de l'auteur pour chaque photo, recompression en WebP sans métadonnées, couverture et galerie,
+  5 photos de 8 Mo au plus, effacement 90 jours après un refus, volume inclus dans la sauvegarde). Relecture
+  `reviewer` corrigée : images MPO, EXIF malformés, limite de pixels explicite, disque indisponible → 503,
+  couverture réattribuée, photos d'une version soumise gardées, cache public limité aux photos publiques.
+  API 815 tests, site 105. Spec 025 (commentaires, R7) rédigée et planifiée.
+- Pièges rencontrés : ne jamais lancer deux suites pytest ni modifier une migration pendant une suite (la base de
+  test est recréée et deux tests rejouent Alembic). Pillow ne refuse qu'au double de `MAX_IMAGE_PIXELS` : la
+  limite est vérifiée à la main.
+- Décisions : spec 025 (élèves et encadreurs, liste à plat, 5 rémunérés puis 20 envois par jour, auteur de
+  l'article notifié).
+- Prochaine étape : implémenter la spec 025 ; pousser develop (migrations 023 et 024, volume `fichiers`).
+
 ### 2026-11-07 — « Quel axe » animée, spec 023 (centre de modération, articles, notifications)
 
 - Fait : section « Quel axe » plus haute et animée (poussée sur develop). Spec 023 livrée, R6 en deux temps

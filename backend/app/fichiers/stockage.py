@@ -67,6 +67,8 @@ class Disque:
             return await asyncio.to_thread(chemin.read_bytes)
         except FileNotFoundError:
             return None
+        except OSError as erreur:
+            raise StockageIndisponible from erreur
 
     async def supprimer(self, cle: str) -> None:
         await asyncio.to_thread(self._chemin(cle).unlink, missing_ok=True)

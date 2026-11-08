@@ -19,14 +19,26 @@ docker compose exec -T db pg_dump --username sosclub --format custom sosclub > "
 docker compose exec -T db pg_restore --list < "$fichier.partiel" > /dev/null
 mv "$fichier.partiel" "$fichier"
 
-# Les fichiers (photos des articles, spec 024) : archive du volume, vérifiée avant d'être gardée.
-archive="${fichier%.dump}-fichiers.tar.gz"
-docker compose exec -T api tar -C /donnees/fichiers -czf - . > "$archive.partiel"
-tar -tzf "$archive.partiel" > /dev/null
-mv "$archive.partiel" "$archive"
+# Les fichiers (photos des articles, spec 024) : archive du volume, vérifiée avant d'être gardée. Elle ne dépend pas
+# du conteneur de l'API, qui peut être arrêté ou d'une version sans ce volume (premier déploiement) : un conteneur
+# jetable, sur l'image de la base déjà présente, lit le volume en lecture seule.
+conteneur_db="$(docker compose ps --quiet db)"
+projet="$(docker inspect --format '{{ index .Config.Labels "com.docker.compose.project" }}' "$conteneur_db")"
+image_db="$(docker inspect --format '{{ .Config.Image }}' "$conteneur_db")"
+volume="${projet}_fichiers"
+archive=""
+if docker volume inspect "$volume" > /dev/null 2>&1; then
+  archive="${fichier%.dump}-fichiers.tar.gz"
+  docker run --rm --network none -v "$volume:/fichiers:ro" "$image_db" tar -C /fichiers -czf - . > "$archive.partiel"
+  tar -tzf "$archive.partiel" > /dev/null
+  mv "$archive.partiel" "$archive"
+else
+  echo "Volume $volume absent : aucun fichier à sauvegarder pour l'instant."
+fi
 
 find sauvegardes -name '*.dump' -mtime +14 -delete
 find sauvegardes -name '*-fichiers.tar.gz' -mtime +14 -delete
 find sauvegardes -name '*.partiel' -mtime +1 -delete
 echo "Sauvegarde : $PWD/$fichier"
-echo "Fichiers   : $PWD/$archive"
+[[ -n "$archive" ]] && echo "Fichiers   : $PWD/$archive"
+exit 0

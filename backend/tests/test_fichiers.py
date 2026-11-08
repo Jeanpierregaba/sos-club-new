@@ -110,3 +110,27 @@ def test_une_image_juste_au_dessus_de_la_limite_est_refusee(monkeypatch: pytest.
 
     with pytest.raises(images.ImageRefusee, match="trop grande"):
         asyncio.run(images.preparer(photo(taille=(100, 100))))
+
+
+def test_un_jpeg_multi_images_de_telephone_est_accepte() -> None:
+    sortie = io.BytesIO()
+    cadres = [Image.new("RGB", (800, 600), couleur) for couleur in ("green", "black")]
+    cadres[0].save(sortie, "MPO", save_all=True, append_images=cadres[1:])
+    with Image.open(io.BytesIO(sortie.getvalue())) as essai:
+        assert essai.format == "MPO"
+
+    preparees = asyncio.run(images.preparer(sortie.getvalue()))
+
+    assert (preparees.grande.largeur, preparees.grande.hauteur) == (800, 600)
+
+
+def test_un_exif_malforme_donne_un_refus_et_non_une_erreur(monkeypatch: pytest.MonkeyPatch) -> None:
+    import struct
+
+    def casse(*_: object, **__: object) -> None:
+        raise struct.error("EXIF mal formé")
+
+    monkeypatch.setattr(images.ImageOps, "exif_transpose", casse)
+
+    with pytest.raises(images.ImageRefusee, match="lisible"):
+        asyncio.run(images.preparer(photo()))

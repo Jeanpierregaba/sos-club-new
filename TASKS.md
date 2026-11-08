@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] [024 Photos des articles](docs/specs/024-photos-des-articles/spec.md) (stockage ADR-0010, attestation Q8)
+- [ ] [025 Commentaires prémodérés](docs/specs/025-commentaires/spec.md) (R7, Q13, Q22)
 
 ## À faire
 
@@ -29,7 +29,6 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 **Phase 2 — Modération et publications (P0, jalon A)**
 
 - [x] R6 — Centre de modération, articles et notifications internes (spec 023, ADR-0009)
-- [ ] 024 — Photos des articles : stockage sur le disque du VPS (ADR-0005), attestation de l'auteur (Q8), recompression et retrait des métadonnées
 - [ ] R7 — Commentaires prémodérés (Q22)
 - [ ] Purge des notifications lues de plus d'un an (signalée par la spec 023)
 - [ ] Balayage des fichiers orphelins du stockage (signalé par la spec 024)
@@ -76,6 +75,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] [024 — Photos des articles](docs/specs/024-photos-des-articles/spec.md) (disque du VPS derrière `Stockage`, ADR-0010 ; attestation Q8 ; WebP sans métadonnées ; couverture et galerie, 5 photos de 8 Mo ; purge à 90 jours ; volume sauvegardé)
 - [x] [023 — Centre de modération, articles et notifications](docs/specs/023-moderation-et-articles/spec.md) (moteur commun ADR-0009 : six états, versions, quatre décisions, périmètre DRE ; articles en texte, pages publiques, cloche des notifications ; +50 à la première approbation, club bénéficiaire enregistré pour R13)
 - [x] [022 — Harmonisation du barème](docs/specs/022-harmonisation-bareme/spec.md) (référentiel de gamification du 2026-11-05 : barème unique API, admin et site ; question du jour à +20, une réponse par élève et par jour, question propre à chaque élève)
 - [x] [021 — Accueil : « Quel axe », défi du jour, podium](docs/specs/021-accueil-jeux-decouverte/spec.md) (jeu de découverte réservé aux élèves, banque de défis en base, Top 3 des lycées avec état d'attente)

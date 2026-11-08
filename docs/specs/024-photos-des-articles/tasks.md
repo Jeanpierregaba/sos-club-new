@@ -32,6 +32,6 @@
 
 **Clôture**
 
-- [ ] 10. Documentation (`ARCHITECTURE.md`, `SECURITY.md`, renvoi de l'ADR-0005), vérification de chaque critère
+- [x] 10. Documentation (`ARCHITECTURE.md`, `SECURITY.md`, renvoi de l'ADR-0005), vérification de chaque critère
       (navigateur, téléphone) ; relecture par le sous-agent `reviewer` et corrections ; `TASKS.md` et
       `docs/SESSION-LOG.md`.

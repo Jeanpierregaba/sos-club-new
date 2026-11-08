@@ -1,6 +1,7 @@
 import asyncio
 import contextlib
 import logging
+import re
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from typing import Annotated
@@ -34,6 +35,8 @@ from app.referentiel.router import router_admin as router_referentiel_admin
 from app.referentiel.router import router_public as router_referentiel
 
 logger = logging.getLogger(__name__)
+
+PHOTOS_PUBLIQUES = re.compile(r"^/api/articles/[^/]+/photos/[^/]+/[a-z]+$")
 
 
 @asynccontextmanager
@@ -75,8 +78,8 @@ app.include_router(api)
 @app.middleware("http")
 async def interdire_le_cache(request: Request, suivant: Callable[[Request], Awaitable[Response]]) -> Response:
     reponse = await suivant(request)
-    # Rien de l'API en cache, sauf ce qu'une route déclare elle-même : les photos publiques (spec 024).
-    if request.url.path.startswith("/api/") and "cache-control" not in reponse.headers:
+    # Rien de l'API en cache, sauf les photos publiques (spec 024) : elles seules gardent leur propre en-tête.
+    if request.url.path.startswith("/api/") and not PHOTOS_PUBLIQUES.match(request.url.path):
         reponse.headers["Cache-Control"] = "no-store"
     return reponse
 

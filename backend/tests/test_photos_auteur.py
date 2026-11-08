@@ -223,3 +223,57 @@ def test_ajouter_une_photo_a_un_article_publie_ouvre_une_nouvelle_version(
 
     assert (resultat["etat"], resultat["en_ligne"]) == ("brouillon", True)
     assert client.get(f"/api/articles/{adresse}").json()["couverture"] is None
+
+
+def test_disque_indisponible_rien_nest_enregistre(
+    auteur: Navigateur, dossier_fichiers: Path, en_base: Callable[..., Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.fichiers.stockage import Disque, StockageIndisponible
+
+    async def plein(self: Disque, cle: str, octets: bytes) -> None:
+        raise StockageIndisponible
+
+    monkeypatch.setattr(Disque, "enregistrer", plein)
+    article = creer_article(auteur)
+
+    reponse = envoyer(auteur, article["id"])
+
+    assert reponse.status_code == 503
+    assert en_base(lambda db: db.scalar(select(Photo.id))) is None
+    assert fichiers(dossier_fichiers) == []
+
+
+def test_retirer_la_couverture_la_donne_a_une_autre_et_la_remettre_la_garde(auteur: Navigateur) -> None:
+    article = creer_article(auteur)
+    ajouter(auteur, article["id"], legende="Première")
+    resultat = ajouter(auteur, article["id"], legende="Seconde")
+    premiere = next(p for p in resultat["photos"] if p["legende"] == "Première")
+
+    deja = auteur.request(
+        "PATCH",
+        f"{ARTICLES}/{article['id']}/photos/{premiere['id']}",
+        json={"version": resultat["version"], "couverture": True},
+    ).json()
+    assert [(p["legende"], p["couverture"]) for p in deja["photos"]] == [("Première", True), ("Seconde", False)]
+
+    sans = auteur.request(
+        "PATCH",
+        f"{ARTICLES}/{article['id']}/photos/{premiere['id']}",
+        json={"version": deja["version"], "couverture": False},
+    ).json()
+    assert [(p["legende"], p["couverture"]) for p in sans["photos"]] == [("Seconde", True), ("Première", False)]
+
+
+def test_une_photo_deja_soumise_reste_dans_lhistorique_apres_un_retrait(
+    auteur: Navigateur, dossier_fichiers: Path, en_base: Callable[..., Any]
+) -> None:
+    article = creer_article(auteur)
+    photo = ajouter(auteur, article["id"])["photos"][0]["id"]
+    soumis = soumettre(auteur, article["id"])
+    retire = auteur.post(f"{ARTICLES}/{article['id']}/retirer", json={"version": soumis["version"]}).json()
+
+    reponse = auteur.delete(f"{ARTICLES}/{article['id']}/photos/{photo}", params={"version": retire["version"]})
+
+    assert reponse.status_code == 200, reponse.text
+    assert en_base(lambda db: db.scalar(select(Photo.id))) is not None
+    assert len(fichiers(dossier_fichiers)) == 2

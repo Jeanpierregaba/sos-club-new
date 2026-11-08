@@ -59,6 +59,9 @@ erDiagram
   utilisateur ||--o{ contenu : "rédige (spec 023)"
   contenu ||--o{ version_contenu : "versions"
   contenu ||--o{ decision_moderation : "décisions"
+  contenu ||--o{ photo : "photos (spec 024)"
+  version_contenu ||--o{ version_photo : "placement"
+  photo ||--o{ version_photo : "utilisée par"
 ```
 
 Champs structurants :
@@ -133,6 +136,11 @@ Champs structurants :
   `version_contenu.donnees` (JSONB, validés par le schéma du type à chaque écriture) ; une version soumise ne
   change plus. Chaque décision (approuver, corriger, refuser, depublier) a sa ligne, motif obligatoire sauf
   pour approuver.
+- `photo`, `version_photo` (spec 024, ADR-0010) : une photo est un fichier attesté par son auteur (`attestation`,
+  `attestee_le`), rangé sur le disque sous deux clés (`cle_grande`, `cle_vignette`, WebP sans métadonnées) ;
+  `efface_le` est posé quand ses fichiers sont effacés (90 jours après un refus). Son placement (`legende`,
+  `ordre`, `couverture`, une seule par version) appartient à chaque version : une nouvelle version recopie les
+  placements de la précédente.
 - `notification` (spec 023) : `utilisateur_id`, `type`, `titre`, `message`, `lien`, `lue_le`. Écrite dans la
   transaction de l'événement ; seul son destinataire la lit.
 - `mouvement_points` (spec 017, ADR-0004) : `utilisateur_id` (R4 ajoutera `club_id`), `action` (code du
@@ -166,7 +174,7 @@ flowchart LR
 - **Site** : rendu serveur pour les pages publiques (référencement, affichage rapide sur réseau lent).
   Il n'a aucune logique métier et n'accède jamais à la base (ADR-0002).
 - **API** : seule détentrice des données et des règles. Chaque domaine vit dans son dossier sous
-  `backend/app/` (`comptes/`, `admin/`, `referentiel/`, `eleves/`, `encadreurs/`, `points/`, `clubs/`, `moderation/`, `articles/`, `notifications/`, `agenda/`, `mediatheque/`, `quiz/`),
+  `backend/app/` (`comptes/`, `admin/`, `referentiel/`, `eleves/`, `encadreurs/`, `points/`, `clubs/`, `moderation/`, `articles/`, `notifications/`, `fichiers/`, `agenda/`, `mediatheque/`, `quiz/`),
   avec `router.py` (HTTP), `schemas.py` (Pydantic), `models.py` (SQLAlchemy) et `service.py` (règles).
 - **Types partagés** : `backend/openapi.json` est versionné, et `npm run api:types` en génère les types
   TypeScript avec `openapi-typescript`. La CI vérifie que les deux restent à jour.

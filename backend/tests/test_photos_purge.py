@@ -114,3 +114,41 @@ def test_les_photos_dun_article_publie_ne_sont_jamais_effacees(
 
     assert purger(en_base) == 0
     assert fichiers(dossier_fichiers) == 2
+
+
+def test_un_refus_recent_sur_le_meme_contenu_retarde_leffacement(
+    auteur: Navigateur, moderateur: Navigateur, dossier_fichiers: Path, en_base: Callable[..., Any]
+) -> None:
+    article = creer_article(auteur)
+    ajouter(auteur, article["id"])
+    soumettre(auteur, article["id"])
+    decider(moderateur, article["id"], "approuver")
+    ajouter(auteur, article["id"])
+    soumettre(auteur, article["id"])
+    decider(moderateur, article["id"], "refuser", "Première révision refusée.")
+    vieillir(en_base, 120)
+    ajouter(auteur, article["id"])
+    soumettre(auteur, article["id"])
+    decider(moderateur, article["id"], "refuser", "Seconde révision refusée.")
+
+    assert purger(en_base) == 0
+    assert fichiers(dossier_fichiers) == 6
+
+
+def test_une_depublication_avec_revision_refusee_garde_les_photos_publiees(
+    auteur: Navigateur, moderateur: Navigateur, dossier_fichiers: Path, en_base: Callable[..., Any]
+) -> None:
+    article = creer_article(auteur)
+    en_ligne = ajouter(auteur, article["id"])["photos"][0]["id"]
+    soumettre(auteur, article["id"])
+    decider(moderateur, article["id"], "approuver")
+    ajouter(auteur, article["id"])
+    soumettre(auteur, article["id"])
+    decider(moderateur, article["id"], "depublier", "Signalé.")
+    vieillir(en_base, 91)
+
+    assert purger(en_base) == 1
+
+    gardee = en_base(lambda db: db.scalar(select(Photo.efface_le).where(Photo.id == en_ligne)))
+    assert gardee is None
+    assert fichiers(dossier_fichiers) == 2

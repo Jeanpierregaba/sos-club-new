@@ -60,6 +60,18 @@ async def photos_de(db: AsyncSession, version_id: UUID | None) -> list[tuple[Ver
     return [(placement, photo) for placement, photo in lignes]
 
 
+async def couvertures(db: AsyncSession, version_ids: list[UUID]) -> dict[UUID, tuple[VersionPhoto, Photo]]:
+    """La couverture de chaque version, en une requête (liste publique des articles)."""
+    if not version_ids:
+        return {}
+    lignes = await db.execute(
+        select(VersionPhoto, Photo)
+        .join(Photo, Photo.id == VersionPhoto.photo_id)
+        .where(VersionPhoto.version_id.in_(version_ids), VersionPhoto.couverture, Photo.efface_le.is_(None))
+    )
+    return {placement.version_id: (placement, photo) for placement, photo in lignes}
+
+
 async def _placement(db: AsyncSession, version_id: UUID, photo_id: UUID) -> VersionPhoto:
     placement = await db.get(VersionPhoto, (version_id, photo_id))
     if placement is None:
@@ -82,27 +94,30 @@ def _journaliser(db: AsyncSession, action: str, auteur: Utilisateur, contenu: Co
     )  # fmt: skip
 
 
+async def preparer(octets: bytes) -> images.ImagesPreparees:
+    try:
+        return await images.preparer(octets)
+    except images.ImageRefusee as refus:
+        raise Refus(str(refus)) from None
+
+
 async def ajouter(
     db: AsyncSession,
     contenu: Contenu,
     auteur: Utilisateur,
-    octets: bytes,
+    preparees: images.ImagesPreparees,
     legende: str | None,
     couverture: bool,
     ip: str,
 ) -> None:
-    """Sur un contenu verrouillé, version contrôlée. Valide la transaction."""
+    """Sur un contenu verrouillé, version contrôlée, avec une image déjà préparée (hors verrou : le traitement est
+    long et ne doit pas garder une connexion ni le verrou de l'article). Valide la transaction."""
     travail = await moteur.ouvrir_travail(db, contenu)
     nombre = (
         await db.scalar(select(func.count()).select_from(VersionPhoto).where(VersionPhoto.version_id == travail.id))
     ) or 0
     if nombre >= MAX_PHOTOS:
         raise Refus(f"Un article compte {MAX_PHOTOS} photos au plus : retires-en une avant d'en ajouter.", 409)
-    try:
-        preparees = await images.preparer(octets)
-    except images.ImageRefusee as refus:
-        raise Refus(str(refus)) from None
-
     photo_id = uuid7()
     cles = {taille: f"photos/{photo_id}-{taille}.webp" for taille in TAILLES}
     disque = stockage()
@@ -163,8 +178,20 @@ async def modifier(
     if couverture:
         await _retirer_couverture(db, travail.id)
         placement.couverture = True
-    elif couverture is False:
+    elif couverture is False and placement.couverture:
+        # Une version qui a des photos garde toujours une couverture : la suivante prend la place.
         placement.couverture = False
+        await db.flush()
+        suivante = await db.scalar(
+            select(VersionPhoto)
+            .where(VersionPhoto.version_id == travail.id, VersionPhoto.photo_id != photo_id)
+            .order_by(VersionPhoto.ordre)
+            .limit(1)
+        )
+        if suivante is None:
+            placement.couverture = True
+        else:
+            suivante.couverture = True
     if ordre is not None:
         placement.ordre = ordre
     await db.commit()
@@ -175,9 +202,13 @@ async def _utilisee(db: AsyncSession, photo_id: UUID) -> bool:
 
 
 async def _effacer_fichiers(photo: Photo) -> None:
+    """Appelée après la validation : un fichier qui résiste est journalisé, l'opération reste réussie."""
     disque = stockage()
-    await disque.supprimer(photo.cle_grande)
-    await disque.supprimer(photo.cle_vignette)
+    for cle in (photo.cle_grande, photo.cle_vignette):
+        try:
+            await disque.supprimer(cle)
+        except OSError:
+            logger.exception("Fichier %s non effacé : à reprendre par le balayage des orphelins", cle)
 
 
 async def retirer(db: AsyncSession, contenu: Contenu, auteur: Utilisateur, photo_id: UUID, ip: str) -> None:
@@ -195,8 +226,9 @@ async def retirer(db: AsyncSession, contenu: Contenu, auteur: Utilisateur, photo
             suivante.couverture = True
     photo = await db.get(Photo, photo_id)
     assert photo is not None
-    # Jamais soumise ni publiée (aucune autre version ne l'utilise) : elle disparaît tout à fait.
-    a_effacer = not await _utilisee(db, photo_id)
+    # Jamais soumise ni publiée (aucune autre version ne l'utilise, et cette version n'a jamais été envoyée) : elle
+    # disparaît tout à fait. Sinon, elle reste dans l'historique.
+    a_effacer = travail.soumise_le is None and not await _utilisee(db, photo_id)
     if a_effacer:
         await db.delete(photo)
     _journaliser(db, "photo_retiree", auteur, contenu, photo_id, ip)
@@ -229,7 +261,10 @@ async def _octets(db: AsyncSession, contenu_id: UUID, photo_id: UUID, taille: st
         raise Introuvable
     if version_id is not None and await db.get(VersionPhoto, (version_id, photo_id)) is None:
         raise Introuvable
-    octets = await stockage().lire(photo.cle_grande if taille == "grande" else photo.cle_vignette)
+    try:
+        octets = await stockage().lire(photo.cle_grande if taille == "grande" else photo.cle_vignette)
+    except StockageIndisponible:
+        raise Refus("Les photos sont indisponibles pour le moment : réessaie plus tard.", 503) from None
     if octets is None:
         raise Introuvable
     return octets
@@ -243,8 +278,21 @@ async def lire_pour_auteur(
 
 
 async def lire_pour_moderateur(db: AsyncSession, acces: Acces, contenu_id: UUID, photo_id: UUID, taille: str) -> bytes:
+    """Comme l'aperçu : seulement une photo d'une version envoyée par l'auteur, jamais d'une version de travail."""
     contenu = await db.get(Contenu, contenu_id)
     if contenu is None or (not acces.national and contenu.dre_code != acces.collaborateur.perimetre_dre):
+        raise Introuvable
+    envoyee = await db.scalar(
+        select(VersionPhoto.version_id)
+        .join(VersionContenu, VersionContenu.id == VersionPhoto.version_id)
+        .where(
+            VersionPhoto.photo_id == photo_id,
+            VersionContenu.contenu_id == contenu.id,
+            VersionContenu.etat != EtatVersion.travail,
+        )
+        .limit(1)
+    )
+    if envoyee is None:
         raise Introuvable
     return await _octets(db, contenu.id, photo_id, taille, version_id=None)
 
