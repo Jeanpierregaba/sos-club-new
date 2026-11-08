@@ -23,5 +23,5 @@ Chaque tâche se termine par lint, typecheck et tests verts, puis un commit.
 
 **Clôture**
 
-- [ ] 6. Documentation (ADR-0009, `ARCHITECTURE.md`, `SECURITY.md`), vérification de chaque critère ; relecture
+- [x] 6. Documentation (ADR-0009, `ARCHITECTURE.md`, `SECURITY.md`), vérification de chaque critère ; relecture
       par le sous-agent `reviewer` et corrections ; `TASKS.md` (note R13) et `docs/SESSION-LOG.md`.

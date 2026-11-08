@@ -14,20 +14,28 @@ Format :
 - Prochaine étape :
 -->
 
-### 2026-11-08 — Photos des articles (spec 024) terminée, spec 025 lancée
+### 2026-11-08 — Photos des articles (spec 024) et commentaires (spec 025)
 
 - Fait : spec 024 livrée (photos stockées sur le disque du VPS derrière l'interface `Stockage` de l'ADR-0010,
   attestation de l'auteur pour chaque photo, recompression en WebP sans métadonnées, couverture et galerie,
   5 photos de 8 Mo au plus, effacement 90 jours après un refus, volume inclus dans la sauvegarde). Relecture
   `reviewer` corrigée : images MPO, EXIF malformés, limite de pixels explicite, disque indisponible → 503,
   couverture réattribuée, photos d'une version soumise gardées, cache public limité aux photos publiques.
-  API 815 tests, site 105. Spec 025 (commentaires, R7) rédigée et planifiée.
+  API 815 tests, site 105 ; après la spec 025 : API 868, site 112. Spec 025 (commentaires, R7) rédigée et planifiée.
 - Pièges rencontrés : ne jamais lancer deux suites pytest ni modifier une migration pendant une suite (la base de
   test est recréée et deux tests rejouent Alembic). Pillow ne refuse qu'au double de `MAX_IMAGE_PIXELS` : la
   limite est vérifiée à la main.
 - Décisions : spec 025 (élèves et encadreurs, liste à plat, 5 rémunérés puis 20 envois par jour, auteur de
   l'article notifié).
-- Prochaine étape : implémenter la spec 025 ; pousser develop (migrations 023 et 024, volume `fichiers`).
+- Spec 025 livrée (commentaires, R7) : deuxième type du moteur de modération (`parent_id`, état `retire`,
+  réglages par type `adresse`, `correction`, `points_permis`, `a_la_publication`, attente comptée par type),
+  domaine `commentaires`, section sous l'article, « Mes commentaires », commentaires dans le centre de
+  modération. Relecture `reviewer` : 4 constats importants (titre d'un brouillon visible du commentateur, club
+  toujours affiché, `EN_SERVICE`, brouillons qui bloquaient) et 4 mineurs corrigés.
+- Piège : `op.create_check_constraint` applique la convention de nommage (préfixe doublé) : passer `op.f(...)`.
+  Un `downgrade -1` après une montée échouée descend d'une migration de trop.
+- Prochaine étape : pousser develop (migrations 023, 024 et 025, volume `fichiers`), puis R8 (espace du
+  président).
 
 ### 2026-11-07 — « Quel axe » animée, spec 023 (centre de modération, articles, notifications)
 

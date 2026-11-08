@@ -48,34 +48,34 @@ notifications. Le barème de la spec 022 fixe les points : +5 pour l'auteur, +20
 
 ## Critères d'acceptation
 
-- [ ] Étant donné un article publié, quand un élève ou un encadreur actif envoie un commentaire valide, alors il
+- [x] Étant donné un article publié, quand un élève ou un encadreur actif envoie un commentaire valide, alors il
       est enregistré « en attente », absent de la liste publique, visible par son auteur, et il entre dans la
       file de modération.
-- [ ] Étant donné un visiteur non connecté, un compte non actif, un article non publié (brouillon, en attente,
+- [x] Étant donné un visiteur non connecté, un compte non actif, un article non publié (brouillon, en attente,
       refusé, dépublié) ou inexistant, quand on envoie un commentaire, alors l'API refuse (401, 403 ou 404) et rien
       n'est enregistré.
-- [ ] Étant donné un texte vide, de plus de 1 000 caractères ou composé seulement d'espaces, alors l'API répond 422. Un texte contenant du HTML ou un lien est affiché tel quel, jamais interprété.
-- [ ] Étant donné un commentaire en attente, refusé, retiré ou dépublié, alors il n'apparaît pas dans les
+- [x] Étant donné un texte vide, de plus de 1 000 caractères ou composé seulement d'espaces, alors l'API répond 422. Un texte contenant du HTML ou un lien est affiché tel quel, jamais interprété.
+- [x] Étant donné un commentaire en attente, refusé, retiré ou dépublié, alors il n'apparaît pas dans les
       commentaires publics de l'article ; son texte n'est lisible que par son auteur et les modérateurs habilités
       de son périmètre.
-- [ ] Étant donné un commentaire approuvé, alors il apparaît sous l'article avec la signature attendue, sans nom
+- [x] Étant donné un commentaire approuvé, alors il apparaît sous l'article avec la signature attendue, sans nom
       complet ni contact d'élève.
-- [ ] Étant donné un article dépublié, alors ses commentaires ne sont plus lisibles publiquement.
-- [ ] Étant donné un commentaire, quand il est approuvé, refusé ou dépublié, alors son auteur reçoit une
+- [x] Étant donné un article dépublié, alors ses commentaires ne sont plus lisibles publiquement.
+- [x] Étant donné un commentaire, quand il est approuvé, refusé ou dépublié, alors son auteur reçoit une
       notification, et un motif est exigé pour le refus et la dépublication.
-- [ ] Étant donné la première publication d'un commentaire d'un autre que l'auteur de l'article, alors l'auteur
+- [x] Étant donné la première publication d'un commentaire d'un autre que l'auteur de l'article, alors l'auteur
       de l'article reçoit une notification ; une republication n'en envoie pas de nouvelle.
-- [ ] Étant donné un modérateur auteur du commentaire ou hors du périmètre DRE, alors il ne peut pas décider.
-- [ ] Étant donné la première approbation d'un commentaire, alors l'auteur reçoit +5 une seule fois (clé
+- [x] Étant donné un modérateur auteur du commentaire ou hors du périmètre DRE, alors il ne peut pas décider.
+- [x] Étant donné la première approbation d'un commentaire, alors l'auteur reçoit +5 une seule fois (clé
       `commentaire:<id>`), et la ligne reste après une dépublication (un commentaire dépublié ne revient pas en file) ; le club d'un élève affilié
       est enregistré.
-- [ ] Étant donné 5 commentaires d'un même auteur envoyés le même jour et déjà rémunérés, quand un sixième envoyé
+- [x] Étant donné 5 commentaires d'un même auteur envoyés le même jour et déjà rémunérés, quand un sixième envoyé
       ce jour-là est approuvé, alors il est publié sans points.
-- [ ] Étant donné plus de 20 commentaires envoyés par une personne dans la journée, alors l'API répond 429 avec un
+- [x] Étant donné plus de 20 commentaires envoyés par une personne dans la journée, alors l'API répond 429 avec un
       message clair.
-- [ ] Étant donné un commentaire de son auteur, quand il le retire, alors il disparaît du public et de la file ;
+- [x] Étant donné un commentaire de son auteur, quand il le retire, alors il disparaît du public et de la file ;
       un autre compte ne peut pas le retirer.
-- [ ] Le site affiche le champ, la confirmation, la liste publique, « Mes commentaires » et la file de
+- [x] Le site affiche le champ, la confirmation, la liste publique, « Mes commentaires » et la file de
       modération, lisibles sur téléphone.
 
 ## Cas limites et erreurs
