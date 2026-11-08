@@ -64,7 +64,7 @@ def test_la_fiche_publique_est_minimale_et_sans_nominatif(
 
     assert reponse.status_code == 200
     fiche = reponse.json()
-    assert set(fiche) == {"id", "nom", "description", "etablissement", "axes", "actif_le"}
+    assert set(fiche) == {"id", "nom", "description", "etablissement", "axes", "actif_le", "actualites"}
     assert fiche["nom"] == "Club Santé de Tokoin"
     assert fiche["axes"] == ["sante-environnement"]
     texte = reponse.text

@@ -10,15 +10,14 @@ from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
 from pydantic import BaseModel
-from sqlalchemy import delete, func, select, update
+from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.journal import journaliser
 from app.articles import public
 from app.articles.dependances import auteur as redacteur
-from app.articles.schemas import ChampsArticle
-from app.articles.service import mes_articles
+from app.articles.schemas import ChampsArticle, ResumeArticleAuteur
 from app.clubs import adhesions, rattachements
 from app.clubs.models import Adhesion, Club, ClubAxe, EtatAdhesion, EtatClub, Rattachement
 from app.clubs.requetes import encadreurs_actifs
@@ -30,7 +29,6 @@ from app.clubs.schemas import (
     PropositionFiche,
     SuiviClub,
 )
-from app.clubs.service import club_preside
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.inscription import Refus, etablissement_rattache
 from app.comptes.models import Utilisateur
@@ -71,7 +69,11 @@ async def _appliquer_fiche(db: AsyncSession, contenu: Contenu) -> None:
         db.add(ClubAxe(club_id=club.id, axe_code=axe))
     journaliser(
         db, "club_fiche_modifiee", None, cible_type="club", cible_id=club.id, perimetre=contenu.dre_code or "national",
-        details={"avant": avant, "apres": {"description": champs.description, "axes": sorted(champs.axes)}},
+        details={
+            "proposition": str(contenu.id),
+            "avant": avant,
+            "apres": {"description": champs.description, "axes": sorted(champs.axes)},
+        },
     )  # fmt: skip
 
 
@@ -108,12 +110,21 @@ enregistrer(
 # Droits ------------------------------------------------------------------------------------------------------
 
 
+async def club_gere(db: AsyncSession, utilisateur: Utilisateur) -> Club | None:
+    """Le club actif présidé par cet utilisateur, sous verrou partagé : une passation (qui verrouille le club pour
+    le modifier) attend la fin de l'opération en cours, et celle-ci ne voit jamais un président déjà remplacé.
+    Aucun contenu créé pendant une passation ne reste ainsi à l'ancien président."""
+    return await db.scalar(
+        select(Club).where(Club.president_id == utilisateur.id, Club.etat == EtatClub.actif).with_for_update(read=True)
+    )
+
+
 async def president_en_place(
     utilisateur: Annotated[Utilisateur, Depends(redacteur)],
     db: Annotated[AsyncSession, Depends(get_session)],
 ) -> Utilisateur:
     """Le président d'un club actif ; sinon 403. Vérifié à chaque route de gestion."""
-    if await club_preside(db, utilisateur) is None:
+    if await club_gere(db, utilisateur) is None:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Seul le président d'un club actif gère son espace.")
     return utilisateur
 
@@ -123,7 +134,7 @@ Connecte = Annotated[Utilisateur, Depends(utilisateur_courant)]
 
 
 async def club_du_president(db: AsyncSession, president: Utilisateur) -> UUID:
-    club = await club_preside(db, president)
+    club = await club_gere(db, president)
     if club is None:
         raise Refus("Seul le président d'un club actif gère son espace.", 403)
     return club.id
@@ -187,6 +198,30 @@ async def _propositions(db: AsyncSession, club_id: UUID) -> list[PropositionFich
     ]
 
 
+async def _actualites_suivies(db: AsyncSession, club_id: UUID) -> list[ResumeArticleAuteur]:
+    """Toutes les actualités du club, quel que soit leur état, pour le suivi du président."""
+    contenus = await db.scalars(
+        select(Contenu)
+        .where(Contenu.club_id == club_id, Contenu.type == ACTUALITE)
+        .order_by(Contenu.modifie_le.desc(), Contenu.id.desc())
+        .limit(LIMITE_SUIVI)
+    )
+    resumes = []
+    for contenu in contenus:
+        visible = await moteur.version_visible_auteur(db, contenu)
+        resumes.append(
+            ResumeArticleAuteur(
+                id=contenu.id,
+                titre=str(visible.donnees["titre"]),
+                etat=contenu.etat,
+                en_ligne=contenu.version_publiee_id is not None,
+                adresse=contenu.adresse,
+                modifie_le=contenu.modifie_le,
+            )
+        )
+    return resumes
+
+
 async def espace(db: AsyncSession, utilisateur: Utilisateur, club_id: UUID) -> EspaceClub:
     club = await db.scalar(select(Club).where(Club.id == club_id, Club.etat == EtatClub.actif))
     role = await _role(db, club, utilisateur) if club else None
@@ -221,7 +256,7 @@ async def espace(db: AsyncSession, utilisateur: Utilisateur, club_id: UUID) -> E
         )
         suivi = SuiviClub(
             propositions=await _propositions(db, club.id),
-            actualites=(await mes_articles(db, utilisateur, type=ACTUALITE)).articles,
+            actualites=await _actualites_suivies(db, club.id),
         )
     return EspaceClub(
         club=ClubEspace(
@@ -252,13 +287,16 @@ async def espace(db: AsyncSession, utilisateur: Utilisateur, club_id: UUID) -> E
 async def proposer_fiche(
     db: AsyncSession, president: Utilisateur, description: str | None, axes: list[str], adresse_ip: str
 ) -> PropositionFiche:
-    club = await club_preside(db, president)
+    club = await club_gere(db, president)
     if club is None:
         raise Refus("Seul le président d'un club actif gère son espace.", 403)
-    connus = set((await db.scalars(select(Axe.code).where(Axe.code.in_(axes)))).all())
-    if connus != set(axes):
-        raise Refus("Choisis des axes parmi les sept axes du programme.", 422)
     actuels = set((await db.scalars(select(ClubAxe.axe_code).where(ClubAxe.club_id == club.id))).all())
+    # Un axe actif, ou déjà sur la fiche (comme pour un article : un axe désactivé depuis reste accepté).
+    connus = set(
+        (await db.scalars(select(Axe.code).where(Axe.code.in_(axes), or_(Axe.actif, Axe.code.in_(actuels))))).all()
+    )
+    if connus != set(axes):
+        raise Refus("Choisis des axes parmi les axes actifs du programme.", 422)
     if description == club.description and set(axes) == actuels:
         raise Refus("Rien n'a changé par rapport à la fiche actuelle.", 422)
     # Le verrou de l'auteur sérialise ses envois ; l'index unique tient même entre deux présidents successifs.
@@ -270,15 +308,17 @@ async def proposer_fiche(
     )
     if en_attente is not None:
         raise Refus("Une proposition attend déjà la modération : retire-la pour en faire une autre.", 409)
-    contenu = await moteur.creer(
-        db, president, FICHE, ChampsFiche(description=description, axes=axes).model_dump(), club_id=club.id
-    )
-    await moteur.soumettre(db, contenu, president, adresse_ip)
     try:
-        await db.commit()
+        contenu = await moteur.creer(
+            db, president, FICHE, ChampsFiche(description=description, axes=axes).model_dump(), club_id=club.id
+        )
+        await moteur.soumettre(db, contenu, president, adresse_ip)
+        await db.flush()
     except IntegrityError:
+        # L'index unique, dernier garde-fou si deux propositions arrivaient malgré le verrou.
         await db.rollback()
         raise Refus("Une proposition attend déjà la modération : retire-la pour en faire une autre.", 409) from None
+    await db.commit()
     return next(p for p in await _propositions(db, club.id) if p.id == contenu.id)
 
 

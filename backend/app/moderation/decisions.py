@@ -46,7 +46,7 @@ from app.moderation.schemas import (
     PhotoModeration,
 )
 from app.moderation.service import Introuvable
-from app.moderation.types import type_de
+from app.moderation.types import TYPES, type_de
 from app.notifications.service import notifier
 from app.points import service as points
 from app.referentiel.models import Etablissement
@@ -164,7 +164,9 @@ async def file_attente(
         raise Refus("La file ne montre pas les brouillons.", 422)
     if etat is EtatContenu.publie:
         # « En ligne » : un article publié reste en ligne pendant qu'une nouvelle version se prépare.
-        requete = _requete(acces).where(Contenu.version_publiee_id.is_not(None))
+        # Une proposition de fiche approuvée (spec 026) est appliquée, pas « en ligne » : elle n'a rien à retirer.
+        appliques = [code for code, t in TYPES.items() if not t.depublication]
+        requete = _requete(acces).where(Contenu.version_publiee_id.is_not(None), Contenu.type.not_in(appliques))
     else:
         requete = _requete(acces).where(Contenu.etat == etat)
     if type:

@@ -98,6 +98,7 @@ def test_un_article_approuve_se_lit_avec_la_signature_de_leleve(
     for interdit in ("Kodjo", "eleve1", "auteur", "dre_code", "etablissement"):
         assert interdit not in brut
     assert set(article) == {
+        "nature",
         "adresse",
         "titre",
         "chapo",

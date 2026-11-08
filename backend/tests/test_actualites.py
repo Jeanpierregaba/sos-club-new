@@ -143,3 +143,88 @@ def test_lapprobation_previent_le_president_en_place(club: dict[str, Any], en_ba
         lambda db: db.scalars(select(Notification).where(Notification.utilisateur_id == club["president"].id))
     )
     assert [(a.type, a.lien) for a in avis] == [("actualite_approuve", "/mon-club")]
+
+
+def test_une_actualite_refusee_ou_depubliee_nest_pas_publique(client: TestClient, club: dict[str, Any]) -> None:
+    refusee = soumettre(club, titre="Refusée")
+    decider(club["admin"], refusee["id"], "refuser", "Hors sujet.")
+    adresse = publier(club, titre="Dépubliée")
+    article_id = next(
+        a["id"] for a in club["nav_president"].get(ACTUALITES).json()["articles"] if a["titre"] == "Dépubliée"
+    )
+    decider(club["admin"], article_id, "depublier", "Retirée.")
+
+    assert client.get("/api/articles").json()["total"] == 0
+    assert client.get(f"/api/articles/{adresse}").status_code == 404
+    assert client.get(f"/api/clubs/{club['club'].id}").json()["actualites"] == []
+
+
+def test_un_article_personnel_du_president_nest_pas_une_actualite(club: dict[str, Any]) -> None:
+    article = club["nav_president"].post("/api/mes-articles", json=champs_actualite(titre="Perso")).json()
+
+    assert club["nav_president"].get(ACTUALITES).json()["articles"] == []
+    assert club["nav_president"].get(f"{ACTUALITES}/{article['id']}").status_code == 404
+
+
+def test_lancien_president_ne_soumet_ni_ne_touche_aux_photos(
+    client: TestClient, club: dict[str, Any], en_base: Callable[..., Any]
+) -> None:
+    brouillon = club["nav_president"].post(ACTUALITES, json=champs_actualite()).json()
+    photo = (
+        club["nav_president"]
+        .post(
+            f"{ACTUALITES}/{brouillon['id']}/photos",
+            data={"version": str(brouillon["version"]), "attestation": "true"},
+            files={"fichier": ("photo.jpg", image(), "image/jpeg")},
+        )
+        .json()
+    )
+    photo_id = photo["photos"][0]["id"]
+    passer_la_main(en_base, club["admin"], club["club"], club["membre"])
+
+    ancien = club["nav_president"]
+    assert ancien.post(f"{ACTUALITES}/{brouillon['id']}/soumettre", json={"version": photo["version"]}).status_code in {
+        403,
+        404,
+    }
+    assert ancien.get(f"{ACTUALITES}/{brouillon['id']}/photos/{photo_id}/vignette").status_code == 404
+    nouveau = connecter(client, "membre")
+    assert nouveau.get(f"{ACTUALITES}/{brouillon['id']}/photos/{photo_id}/vignette").status_code == 200
+
+
+def test_une_decision_apres_la_passation_previent_le_nouveau_president(
+    club: dict[str, Any], en_base: Callable[..., Any]
+) -> None:
+    from app.notifications.models import Notification
+
+    actualite = soumettre(club)
+    passer_la_main(en_base, club["admin"], club["club"], club["membre"])
+
+    assert decider(club["admin"], actualite["id"], "approuver").status_code == 200
+
+    avis = en_base(lambda db: db.scalars(select(Notification).where(Notification.type == "actualite_approuve")))
+    assert [a.utilisateur_id for a in avis] == [club["membre"].id]
+
+
+def test_une_photo_dactualite_nest_pas_publique_avant_lapprobation(client: TestClient, club: dict[str, Any]) -> None:
+    brouillon = club["nav_president"].post(ACTUALITES, json=champs_actualite()).json()
+    photo = (
+        club["nav_president"]
+        .post(
+            f"{ACTUALITES}/{brouillon['id']}/photos",
+            data={"version": str(brouillon["version"]), "attestation": "true"},
+            files={"fichier": ("photo.jpg", image(), "image/jpeg")},
+        )
+        .json()
+    )
+    photo_id = photo["photos"][0]["id"]
+    club["nav_president"].post(f"{ACTUALITES}/{brouillon['id']}/soumettre", json={"version": photo["version"]})
+
+    adresse = decider_et_adresse(club, brouillon["id"])
+    assert client.get(f"/api/articles/{adresse}/photos/{photo_id}/vignette").status_code == 200
+
+
+def decider_et_adresse(club: dict[str, Any], contenu_id: str) -> str:
+    # Avant l'approbation, aucune adresse n'existe : rien à lire publiquement.
+    assert club["admin"].get(f"/api/admin/moderation/{contenu_id}").json()["adresse"] is None
+    return str(decider(club["admin"], contenu_id, "approuver").json()["adresse"])

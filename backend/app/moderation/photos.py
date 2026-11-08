@@ -117,7 +117,9 @@ async def ajouter(
         await db.scalar(select(func.count()).select_from(VersionPhoto).where(VersionPhoto.version_id == travail.id))
     ) or 0
     if nombre >= MAX_PHOTOS:
-        raise Refus(f"Un article compte {MAX_PHOTOS} photos au plus : retires-en une avant d'en ajouter.", 409)
+        raise Refus(
+            f"Un article ou une actualité compte {MAX_PHOTOS} photos au plus : retires-en une avant d'en ajouter.", 409
+        )
     photo_id = uuid7()
     cles = {taille: f"photos/{photo_id}-{taille}.webp" for taille in TAILLES}
     disque = stockage()

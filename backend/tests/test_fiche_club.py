@@ -184,3 +184,34 @@ def test_apres_une_passation_le_nouveau_president_gere_la_proposition(
     assert club["nav_president"].delete(f"{FICHE}/{proposition['id']}").status_code in {403, 404}
     nouveau = connecter(client, "membre")
     assert nouveau.delete(f"{FICHE}/{proposition['id']}").status_code == 204
+
+
+def test_un_axe_desactive_est_refuse(club: dict[str, Any], en_base: Callable[..., Any]) -> None:
+    from sqlalchemy import update
+
+    from app.referentiel.models import Axe
+
+    en_base(lambda db: db.execute(update(Axe).where(Axe.code == "sport-secourisme").values(actif=False)))
+
+    assert proposer(club).status_code == 422
+
+
+def test_une_fiche_approuvee_nencombre_pas_longlet_en_ligne(club: dict[str, Any]) -> None:
+    proposition = proposer(club).json()
+    decider(club["admin"], proposition["id"], "approuver")
+
+    en_ligne = club["admin"].get(FILE, params={"etat": "publie"}).json()["contenus"]
+
+    assert proposition["id"] not in [c["id"] for c in en_ligne]
+
+
+def test_lapprobation_dune_fiche_est_journalisee(club: dict[str, Any], en_base: Callable[..., Any]) -> None:
+    from app.admin.models import JournalAudit
+
+    proposition = proposer(club).json()
+    decider(club["admin"], proposition["id"], "approuver")
+
+    entrees = en_base(lambda db: db.scalars(select(JournalAudit).where(JournalAudit.action == "club_fiche_modifiee")))
+    [entree] = list(entrees)
+    assert entree.details["proposition"] == proposition["id"]
+    assert entree.details["apres"]["description"] == NOUVELLE["description"]
