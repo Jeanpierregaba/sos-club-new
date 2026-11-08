@@ -64,3 +64,13 @@ Les commentaires sont le deuxième type du moteur. Ils ont ajouté :
   (pas de « à corriger » pour un commentaire), `points_permis` (plafond de 5 commentaires rémunérés par jour
   d'envoi, sous le verrou de l'auteur) et `a_la_publication` (notifier l'auteur de l'article).
 - La limite de 3 contenus en attente se compte par type.
+
+## Note (2026-11-08, spec 026)
+
+Deux types de plus, au nom d'un club : `actualite` (un article signé du club, sans point) et `fiche_club` (une
+proposition de description et d'axes, appliquée à la fiche du club par `a_la_publication`). Ils portent le club
+dans `contenu.club_id`. Leur auteur est le président en place : la validation d'une passation transfère
+`auteur_id` au successeur, dans la même transaction, ce qui réutilise tel quel le code de rédaction, de photos et
+de notification. Le journal garde qui a soumis chaque version. Réglage ajouté : `depublication` (une proposition
+de fiche ne se dépublie pas). Un index unique partiel limite à une proposition de fiche en attente par club.
+

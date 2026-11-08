@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { AdhesionClub } from "@/components/clubs/AdhesionClub";
 import { DialogueDemandeClub } from "@/components/clubs/DialogueDemandeClub";
-import { GestionClub } from "@/components/clubs/GestionClub";
 import { Button } from "@/components/ui/button";
 import {
   annulerPassation,
@@ -295,14 +294,18 @@ export function BlocClub({
             </p>
           )}
 
-          {club.president && (
-            <GestionClub
-              clubId={club.id}
-              demandesAdhesion={demandesAdhesion}
-              demandesRattachement={demandesRattachement}
-              membres={membres}
-              onRafraichir={onRafraichir}
-            />
+          {club.president && club.etat === "actif" && (
+            <Link
+              to="/mon-club"
+              className="btn-fx inline-flex h-11 items-center gap-2 self-start rounded-full bg-primary px-5 text-sm font-bold text-primary-foreground"
+            >
+              Gérer mon club
+              {demandesAdhesion.length + demandesRattachement.length > 0 &&
+                ` · ${demandesAdhesion.length + demandesRattachement.length} demande${
+                  demandesAdhesion.length + demandesRattachement.length > 1 ? "s" : ""
+                }`}
+              <ArrowRight className="size-4" />
+            </Link>
           )}
         </div>
       )}

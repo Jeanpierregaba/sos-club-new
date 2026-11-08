@@ -87,7 +87,8 @@ function Article() {
         )}
         <TexteArticle texte={article.texte} />
         <Galerie adresse={article.adresse} photos={article.photos} />
-        <Commentaires adresse={article.adresse} />
+        {/* Les commentaires portent sur les articles personnels (spec 025), pas sur les actualités d'un club. */}
+        {article.nature === "article" && <Commentaires adresse={article.adresse} />}
         <Link
           to="/articles"
           className="mt-12 inline-flex items-center gap-2 font-bold text-logo-blue hover:underline"

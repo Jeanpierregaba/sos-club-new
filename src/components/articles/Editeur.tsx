@@ -49,12 +49,12 @@ export function Editeur({
   // « actualite » : une actualité au nom du club (spec 026), écrite par le président.
   nature?: Nature;
 }) {
+  const navigate = useNavigate();
   const club = nature === "actualite";
   const ouvrir = (id: string) =>
     club
       ? navigate({ to: "/mon-club/actualites/$id", params: { id }, replace: true })
       : navigate({ to: "/mes-articles/$id", params: { id }, replace: true });
-  const navigate = useNavigate();
   const router = useRouter();
   const [champs, setChamps] = useState<ChampsArticle>(article?.champs ?? VIDE);
   const [actuel, setActuel] = useState(article);

@@ -74,7 +74,8 @@ encadreurs rattachés.
       visible d'un modérateur national ou de la DRE du club, jamais d'un autre ; le président ne décide jamais.
 - [ ] Étant donné une passation validée, alors le nouveau président voit et gère les actualités et propositions du
       club, et l'ancien reçoit 403 ou 404 sur chacune.
-- [ ] Étant donné un club suspendu ou non actif, alors ni fiche ni actualité ne peut être proposée (409).
+- [ ] Étant donné un club non actif (en attente ou refusé), alors son président ne gère rien (403). La suspension d'un club
+      n'existe pas encore (spec 019) : le jour où elle existera, l'approbation d'une actualité devra la vérifier.
 - [ ] Le site affiche « Mon club » pour le président (gestion) et pour les membres (lecture), l'écriture d'une
       actualité, la proposition de fiche et leur modération, lisibles sur téléphone.
 

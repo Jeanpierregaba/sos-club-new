@@ -85,7 +85,7 @@ function MonClub() {
           <Espace espace={espace} axes={axes} onRafraichir={rafraichir} />
         ) : (
           <div className="rounded-3xl bg-card p-8 text-center shadow-card">
-            <p className="font-semibold">Tu n'as pas encore de club.</p>
+            <p className="font-semibold">Aucun club à afficher.</p>
             <p className="mt-1 text-sm text-muted-foreground">
               Rejoins le club de ton établissement depuis ton espace pour suivre sa vie ici.
             </p>

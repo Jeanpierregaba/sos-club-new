@@ -14,9 +14,13 @@ import { dateCourte } from "@/lib/dates";
 export function EnTeteEspace({
   nom,
   articles = false,
+  monClub = false,
   children,
 }: {
   nom: string;
+  // Le lien « Mon club » (spec 026) : un élève président ou membre actif d'un club. Un encadreur ouvre l'espace
+  // de chacun de ses clubs depuis « Mes clubs ».
+  monClub?: boolean;
   // Les liens « Mes articles » et « Mes commentaires » : élève, ou encadreur vérifié (specs 023 et 025).
   articles?: boolean;
   children?: ReactNode;
@@ -50,7 +54,7 @@ export function EnTeteEspace({
               <PenLine className="size-4" /> Mes articles
             </Link>
           )}
-          {articles && (
+          {monClub && (
             <Link
               to="/mon-club"
               className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"

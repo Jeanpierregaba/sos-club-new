@@ -129,6 +129,8 @@ Champs structurants :
   `encadreur_actif`, que les clubs et les rattachements (R4, R5) utiliseront.
 - `contenu`, `version_contenu`, `decision_moderation` (spec 023, ADR-0009) : le moteur commun de modération.
   Un commentaire (spec 025) est un `contenu` de type `commentaire`, rattaché à son article par `parent_id`.
+  Une actualité du club et une proposition de fiche (spec 026) sont des `contenu` rattachés à leur club par
+  `club_id`, écrits par le président en place.
   L'en-tête `contenu` porte le `type` (`article` pour l'instant), l'auteur, l'`etat` (brouillon, en_attente,
   a_corriger, refuse, publie, depublie), `version_publiee_id` (seule source de ce qui est en ligne),
   `version_travail_id`, l'`adresse` publique (fixée à la première approbation), l'axe et `afficher_club` de la
