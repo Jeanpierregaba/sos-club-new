@@ -1982,6 +1982,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/articles/{adresse}/commentaires": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Commentaires */
+        get: operations["commentaires_api_articles__adresse__commentaires_get"];
+        put?: never;
+        /** Commenter */
+        post: operations["commenter_api_articles__adresse__commentaires_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mes-commentaires": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mes Commentaires */
+        get: operations["mes_commentaires_api_mes_commentaires_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mes-commentaires/{contenu_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Retirer */
+        delete: operations["retirer_api_mes_commentaires__contenu_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/moderation": {
         parameters: {
             query?: never;
@@ -2253,6 +2305,12 @@ export interface components {
             id: string;
             /** Type */
             type: string;
+            parent?: components["schemas"]["ParentContenu"] | null;
+            /**
+             * Correction Possible
+             * @default true
+             */
+            correction_possible: boolean;
             /** Titre */
             titre: string;
             etat: components["schemas"]["EtatContenu"];
@@ -2327,6 +2385,13 @@ export interface components {
              * Format: date-time
              */
             modifie_le: string;
+        };
+        /** ArticleCommente */
+        ArticleCommente: {
+            /** Adresse */
+            adresse: string | null;
+            /** Titre */
+            titre: string;
         };
         /**
          * ArticleEcriture
@@ -2719,6 +2784,62 @@ export interface components {
              */
             cree_le: string;
         };
+        /**
+         * CommentaireAuteur
+         * @description Ce que l'auteur voit de son commentaire : son état et, après un refus ou une dépublication, le motif.
+         */
+        CommentaireAuteur: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Texte */
+            texte: string;
+            etat: components["schemas"]["EtatContenu"];
+            /**
+             * Cree Le
+             * Format: date-time
+             */
+            cree_le: string;
+            /** Publie Le */
+            publie_le: string | null;
+            article: components["schemas"]["ArticleCommente"];
+            /** Motif */
+            motif: string | null;
+        };
+        /** CommentaireEntree */
+        CommentaireEntree: {
+            /** Texte */
+            texte: string;
+        };
+        /** CommentairePublic */
+        CommentairePublic: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Texte */
+            texte: string;
+            signature: components["schemas"]["Signature"];
+            /**
+             * Publie Le
+             * Format: date-time
+             */
+            publie_le: string;
+        };
+        /** CommentairesPublics */
+        CommentairesPublics: {
+            /** Commentaires */
+            commentaires: components["schemas"]["CommentairePublic"][];
+            /** Page */
+            page: number;
+            /** Pages */
+            pages: number;
+            /** Total */
+            total: number;
+        };
         /** CompteNotifications */
         CompteNotifications: {
             /** Non Lues */
@@ -3049,6 +3170,12 @@ export interface components {
             id: string;
             /** Type */
             type: string;
+            parent?: components["schemas"]["ParentContenu"] | null;
+            /**
+             * Correction Possible
+             * @default true
+             */
+            correction_possible: boolean;
             /** Titre */
             titre: string;
             etat: components["schemas"]["EtatContenu"];
@@ -3299,7 +3426,7 @@ export interface components {
          * EtatContenu
          * @enum {string}
          */
-        EtatContenu: "brouillon" | "en_attente" | "a_corriger" | "refuse" | "publie" | "depublie";
+        EtatContenu: "brouillon" | "en_attente" | "a_corriger" | "refuse" | "publie" | "depublie" | "retire";
         /** EtatInscription */
         EtatInscription: {
             /** Ouvertes */
@@ -3799,6 +3926,11 @@ export interface components {
              */
             passations: components["schemas"]["PassationAConfirmer"][];
         };
+        /** MesCommentaires */
+        MesCommentaires: {
+            /** Commentaires */
+            commentaires: components["schemas"]["CommentaireAuteur"][];
+        };
         /** ModuleCatalogue */
         ModuleCatalogue: {
             /** Id */
@@ -3909,6 +4041,16 @@ export interface components {
             par_page: number;
             /** Evenements */
             evenements: components["schemas"]["EvenementJournal"][];
+        };
+        /**
+         * ParentContenu
+         * @description L'article d'un commentaire (spec 025) : le modérateur juge le commentaire dans son contexte.
+         */
+        ParentContenu: {
+            /** Adresse */
+            adresse: string | null;
+            /** Titre */
+            titre: string;
         };
         /** Passation */
         Passation: {
@@ -8369,6 +8511,141 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    commentaires_api_articles__adresse__commentaires_get: {
+        parameters: {
+            query?: {
+                page?: number;
+            };
+            header?: never;
+            path: {
+                adresse: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentairesPublics"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    commenter_api_articles__adresse__commentaires_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                adresse: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommentaireEntree"];
+            };
+        };
+        responses: {
+            /** @description Double envoi : le commentaire déjà enregistré. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentaireAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mes_commentaires_api_mes_commentaires_get: {
+        parameters: {
+            query?: {
+                article?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MesCommentaires"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retirer_api_mes_commentaires__contenu_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };

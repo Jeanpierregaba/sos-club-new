@@ -5633,6 +5633,199 @@
         }
       }
     },
+    "/api/articles/{adresse}/commentaires": {
+      "get": {
+        "tags": [
+          "commentaires"
+        ],
+        "summary": "Commentaires",
+        "operationId": "commentaires_api_articles__adresse__commentaires_get",
+        "parameters": [
+          {
+            "name": "adresse",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Adresse"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10000,
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentairesPublics"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "commentaires"
+        ],
+        "summary": "Commenter",
+        "operationId": "commenter_api_articles__adresse__commentaires_post",
+        "parameters": [
+          {
+            "name": "adresse",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Adresse"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentaireEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentaireAuteur"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Double envoi : le commentaire déjà enregistré."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mes-commentaires": {
+      "get": {
+        "tags": [
+          "commentaires"
+        ],
+        "summary": "Mes Commentaires",
+        "operationId": "mes_commentaires_api_mes_commentaires_get",
+        "parameters": [
+          {
+            "name": "article",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 140
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Article"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MesCommentaires"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mes-commentaires/{contenu_id}": {
+      "delete": {
+        "tags": [
+          "commentaires"
+        ],
+        "summary": "Retirer",
+        "operationId": "retirer_api_mes_commentaires__contenu_id__delete",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/moderation": {
       "get": {
         "tags": [
@@ -6397,6 +6590,21 @@
             "type": "string",
             "title": "Type"
           },
+          "parent": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ParentContenu"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "correction_possible": {
+            "type": "boolean",
+            "title": "Correction Possible",
+            "default": true
+          },
           "titre": {
             "type": "string",
             "title": "Titre"
@@ -6648,6 +6856,31 @@
           "modifie_le"
         ],
         "title": "ArticleAuteur"
+      },
+      "ArticleCommente": {
+        "properties": {
+          "adresse": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adresse"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "adresse",
+          "titre"
+        ],
+        "title": "ArticleCommente"
       },
       "ArticleEcriture": {
         "properties": {
@@ -7775,6 +8008,139 @@
         ],
         "title": "CollaborateurResume"
       },
+      "CommentaireAuteur": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "texte": {
+            "type": "string",
+            "title": "Texte"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatContenu"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          },
+          "publie_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publie Le"
+          },
+          "article": {
+            "$ref": "#/components/schemas/ArticleCommente"
+          },
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "texte",
+          "etat",
+          "cree_le",
+          "publie_le",
+          "article",
+          "motif"
+        ],
+        "title": "CommentaireAuteur",
+        "description": "Ce que l'auteur voit de son commentaire : son état et, après un refus ou une dépublication, le motif."
+      },
+      "CommentaireEntree": {
+        "properties": {
+          "texte": {
+            "type": "string",
+            "maxLength": 4000,
+            "title": "Texte"
+          }
+        },
+        "type": "object",
+        "required": [
+          "texte"
+        ],
+        "title": "CommentaireEntree"
+      },
+      "CommentairePublic": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "texte": {
+            "type": "string",
+            "title": "Texte"
+          },
+          "signature": {
+            "$ref": "#/components/schemas/Signature"
+          },
+          "publie_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Publie Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "texte",
+          "signature",
+          "publie_le"
+        ],
+        "title": "CommentairePublic"
+      },
+      "CommentairesPublics": {
+        "properties": {
+          "commentaires": {
+            "items": {
+              "$ref": "#/components/schemas/CommentairePublic"
+            },
+            "type": "array",
+            "title": "Commentaires"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "pages": {
+            "type": "integer",
+            "title": "Pages"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "commentaires",
+          "page",
+          "pages",
+          "total"
+        ],
+        "title": "CommentairesPublics"
+      },
       "CompteNotifications": {
         "properties": {
           "non_lues": {
@@ -8663,6 +9029,21 @@
             "type": "string",
             "title": "Type"
           },
+          "parent": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ParentContenu"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "correction_possible": {
+            "type": "boolean",
+            "title": "Correction Possible",
+            "default": true
+          },
           "titre": {
             "type": "string",
             "title": "Titre"
@@ -9359,7 +9740,8 @@
           "a_corriger",
           "refuse",
           "publie",
-          "depublie"
+          "depublie",
+          "retire"
         ],
         "title": "EtatContenu"
       },
@@ -10894,6 +11276,22 @@
         "title": "MesClubs",
         "description": "L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés, et les\npassations de ses clubs qu'il doit confirmer (Q19)."
       },
+      "MesCommentaires": {
+        "properties": {
+          "commentaires": {
+            "items": {
+              "$ref": "#/components/schemas/CommentaireAuteur"
+            },
+            "type": "array",
+            "title": "Commentaires"
+          }
+        },
+        "type": "object",
+        "required": [
+          "commentaires"
+        ],
+        "title": "MesCommentaires"
+      },
       "ModuleCatalogue": {
         "properties": {
           "id": {
@@ -11208,6 +11606,32 @@
           "evenements"
         ],
         "title": "PageJournal"
+      },
+      "ParentContenu": {
+        "properties": {
+          "adresse": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adresse"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "adresse",
+          "titre"
+        ],
+        "title": "ParentContenu",
+        "description": "L'article d'un commentaire (spec 025) : le modérateur juge le commentaire dans son contexte."
       },
       "Passation": {
         "properties": {

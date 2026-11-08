@@ -20,6 +20,8 @@ from app.articles.router import router_auteur as router_articles_auteur
 from app.articles.router import router_public as router_articles
 from app.clubs.router import router as router_clubs
 from app.clubs.router import router_admin as router_clubs_admin
+from app.commentaires.router import router_auteur as router_commentaires_auteur
+from app.commentaires.router import router_public as router_commentaires
 from app.comptes.dependances import verifier_origine
 from app.comptes.router import router as router_comptes
 from app.db import engine, get_session
@@ -71,6 +73,8 @@ api.include_router(router_jeux)
 api.include_router(router_notifications)
 api.include_router(router_articles_auteur)
 api.include_router(router_articles)
+api.include_router(router_commentaires)
+api.include_router(router_commentaires_auteur)
 api.include_router(router_moderation_admin)
 app.include_router(api)
 

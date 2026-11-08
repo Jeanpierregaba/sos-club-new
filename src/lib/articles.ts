@@ -8,6 +8,7 @@ export const ETATS: Record<EtatContenu, { libelle: string; classe: string }> = {
   refuse: { libelle: "Refusé", classe: "bg-logo-red/15 text-logo-red" },
   publie: { libelle: "Publié", classe: "bg-leaf/20 text-ink" },
   depublie: { libelle: "Retiré du site", classe: "bg-logo-red/15 text-logo-red" },
+  retire: { libelle: "Retiré par toi", classe: "bg-muted text-ink/70" },
 };
 
 export const LIMITES = { titre: 120, chapo: 300, texte: 20_000 } as const;

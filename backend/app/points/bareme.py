@@ -29,6 +29,8 @@ QUESTION_JOUR_ELEVE = "eleve.question_jour"
 # Article approuvé (spec 023), à la première approbation seulement.
 ARTICLE_ELEVE = "eleve.article"
 ARTICLE_ENCADREUR = "encadreur.article"
+COMMENTAIRE_ELEVE = "eleve.commentaire"
+COMMENTAIRE_ENCADREUR = "encadreur.commentaire"
 QUESTION_JOUR_CLUB = "club.question_jour_eleve"
 
 # Référentiel « Harmonisation de la gamification » du 2026-11-05 (spec 022). La part du club n'est créditée que

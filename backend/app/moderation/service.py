@@ -94,7 +94,7 @@ async def _nouvelle_version(db: AsyncSession, contenu: Contenu, donnees: dict[st
     return nouvelle
 
 
-async def _verrouiller_auteur(db: AsyncSession, auteur: Utilisateur) -> None:
+async def verrouiller_auteur(db: AsyncSession, auteur: Utilisateur) -> None:
     """Sérialise les créations et soumissions d'un même auteur : les plafonds se comptent sans course."""
     await db.execute(select(Utilisateur.id).where(Utilisateur.id == auteur.id).with_for_update())
 
@@ -110,8 +110,10 @@ async def dre_de(db: AsyncSession, auteur: Utilisateur) -> str | None:
     )
 
 
-async def creer(db: AsyncSession, auteur: Utilisateur, type: str, donnees: dict[str, Any]) -> Contenu:
-    await _verrouiller_auteur(db, auteur)
+async def creer(
+    db: AsyncSession, auteur: Utilisateur, type: str, donnees: dict[str, Any], *, parent_id: UUID | None = None
+) -> Contenu:
+    await verrouiller_auteur(db, auteur)
     brouillons = await db.scalar(
         select(func.count())
         .select_from(Contenu)
@@ -125,7 +127,7 @@ async def creer(db: AsyncSession, auteur: Utilisateur, type: str, donnees: dict[
         raise Refus(
             f"Tu as déjà {MAX_BROUILLONS} brouillons : termine ou supprime-en un avant d'en commencer un autre.", 409
         )
-    contenu = Contenu(id=uuid7(), type=type, auteur_id=auteur.id, etat=EtatContenu.brouillon)
+    contenu = Contenu(id=uuid7(), type=type, auteur_id=auteur.id, etat=EtatContenu.brouillon, parent_id=parent_id)
     db.add(contenu)
     await db.flush()
     await _nouvelle_version(db, contenu, donnees)
@@ -165,7 +167,7 @@ async def soumettre(db: AsyncSession, contenu: Contenu, auteur: Utilisateur, adr
     travail = await version(db, contenu.version_travail_id)
     if travail is None or travail.etat is not EtatVersion.travail:
         raise Refus("Corrige ton contenu avant de le soumettre de nouveau.", 409)
-    await _verrouiller_auteur(db, auteur)
+    await verrouiller_auteur(db, auteur)
     en_attente = await db.scalar(
         select(func.count())
         .select_from(Contenu)

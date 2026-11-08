@@ -92,7 +92,12 @@ def test_un_encadreur_signe_par_son_prenom_linitiale_et_sa_fonction(
     assert signature["fonction"]
 
 
-def test_les_commentaires_vont_du_plus_ancien_au_plus_recent_par_pages_de_50(client: TestClient, scene: Any) -> None:
+def test_les_commentaires_vont_du_plus_ancien_au_plus_recent_par_pages_de_50(
+    client: TestClient, scene: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.commentaires import service
+
+    monkeypatch.setattr(service, "ENVOIS_PAR_JOUR", 100)
     textes = [f"Commentaire {numero:02d}" for numero in range(52)]
     for texte in textes:
         publie(scene, texte)

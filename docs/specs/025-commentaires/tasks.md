@@ -10,7 +10,7 @@ Chaque tâche se termine par lint, typecheck et tests verts, puis un commit.
 - [x] 2. Migration `commentaires` (`parent_id`, état `retire`, contraintes, index, barème en service) et
       réglages par type du moteur (`adresse`, `correction`, `points_permis`, `a_la_publication`, attente comptée
       par type). Les suites de la spec 023 restent vertes.
-- [ ] 3. Domaine `commentaires` : envoi (normalisation, anti double envoi, 20 par jour), liste publique,
+- [x] 3. Domaine `commentaires` : envoi (normalisation, anti double envoi, 20 par jour), liste publique,
       « Mes commentaires », retrait ; file et aperçu avec l'article parent. Les tests de la tâche 1 passent.
       Export OpenAPI et `npm run api:types`.
 
