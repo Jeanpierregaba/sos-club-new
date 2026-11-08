@@ -5,13 +5,13 @@ WORKDIR /app
 COPY package.json bun.lock bunfig.toml ./
 RUN bun install --frozen-lockfile
 
-FROM node:24-slim AS compilation
+FROM node:26-slim AS compilation
 WORKDIR /app
 COPY --from=dependances /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-FROM node:24-slim
+FROM node:26-slim
 WORKDIR /app
 ENV NODE_ENV=production PORT=3000 HOST=0.0.0.0
 COPY --from=compilation /app/.output ./.output
