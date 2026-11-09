@@ -58,6 +58,31 @@ async def crediter(
     return await db.scalar(requete)
 
 
+async def annuler(
+    db: AsyncSession, mouvement: MouvementPoints, *, valide_par: UUID | None = None
+) -> MouvementPoints | None:
+    """Retire un gain par une ligne négative du même montant, dans le semestre en cours (le registre ne se
+    réécrit jamais). Renvoie None si le gain est déjà annulé : l'unicité de `annule_id` tranche, même entre deux
+    requêtes simultanées."""
+    semestre = await semestre_en_cours(db)
+    requete = (
+        insert(MouvementPoints)
+        .values(
+            id=uuid7(),
+            utilisateur_id=mouvement.utilisateur_id,
+            action=mouvement.action,
+            montant=-mouvement.montant,
+            semestre_id=semestre.id if semestre else None,
+            cle=f"annulation:{mouvement.id}",
+            valide_par=valide_par,
+            annule_id=mouvement.id,
+        )
+        .on_conflict_do_nothing()
+        .returning(MouvementPoints)
+    )
+    return await db.scalar(requete)
+
+
 @dataclass(frozen=True)
 class Totaux:
     semestre: Semestre | None

@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-Rien en cours.
+- [ ] 029 — Certification Génie Imhotep : parcours de 12 quiz, badges, certificat vérifiable (R11, Q24) → [`docs/specs/029-certification/`](docs/specs/029-certification/)
 
 ## À faire
 

@@ -200,6 +200,37 @@ def test_une_annulation_est_une_ligne_negative_unique(
         annuler("annulation:quiz:1:bis")
 
 
+def test_annuler_retire_un_gain_une_seule_fois(
+    eleve: Utilisateur, semestre: Semestre, en_base: Callable[..., Any]
+) -> None:
+    gain = crediter(en_base, eleve.id, "quiz:1", action="eleve.quiz")
+
+    annulation = en_base(lambda db: service.annuler(db, gain))
+    deuxieme = en_base(lambda db: service.annuler(db, gain))
+
+    assert (annulation.montant, annulation.annule_id, annulation.action) == (-gain.montant, gain.id, "eleve.quiz")
+    assert annulation.semestre_id == semestre.id
+    assert deuxieme is None
+    assert en_base(lambda db: service.totaux(db, eleve.id)).total == 0
+
+
+def test_deux_annulations_simultanees_ne_retirent_quune_fois(eleve: Utilisateur, en_base: Callable[..., Any]) -> None:
+    gain = crediter(en_base, eleve.id, "quiz:1", action="eleve.quiz")
+
+    async def une_requete() -> bool:
+        async with AsyncSession(moteur_test) as db:
+            ligne = await service.annuler(db, gain)
+            await asyncio.sleep(0.2)
+            await db.commit()
+            return ligne is not None
+
+    async def scenario() -> list[bool]:
+        return await asyncio.gather(une_requete(), une_requete())
+
+    assert sorted(asyncio.run(scenario())) == [False, True]
+    assert en_base(lambda db: service.totaux(db, eleve.id)).total == 0
+
+
 def test_la_base_refuse_deux_semestres_qui_se_chevauchent(creer_semestre: Callable[..., Semestre]) -> None:
     creer_semestre("Premier", date(2027, 1, 1), date(2027, 6, 30))
 
@@ -216,17 +247,20 @@ def test_le_bareme_initial_contient_toute_la_grille(en_base: Callable[..., Any])
         return nombre, en_service
 
     # Les actions écrites par une spec livrée : la bienvenue élève (017), encadreur (018), la question du jour (022),
-    # les articles (023), les commentaires (025), les quiz (027).
+    # les articles (023), les commentaires (025), les quiz (027), la certification (029).
     assert en_base(lire) == (
         37,
         [
             ARTICLE_ELEVE,
+            "eleve.badge",
             BIENVENUE_ELEVE,
+            "eleve.certification",
             "eleve.commentaire",
             QUESTION_JOUR_ELEVE,
             "eleve.quiz",
             ARTICLE_ENCADREUR,
             BIENVENUE_ENCADREUR,
+            "encadreur.certification",
             "encadreur.commentaire",
         ],
     )

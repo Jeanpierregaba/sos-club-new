@@ -33,6 +33,10 @@ COMMENTAIRE_ELEVE = "eleve.commentaire"
 COMMENTAIRE_ENCADREUR = "encadreur.commentaire"
 QUIZ_ELEVE = "eleve.quiz"
 QUESTION_JOUR_CLUB = "club.question_jour_eleve"
+# Certification Génie Imhotep (spec 029). La part des clubs (+200, +500) est créditée avec R13.
+BADGE_ELEVE = "eleve.badge"
+CERTIFICATION_ELEVE = "eleve.certification"
+CERTIFICATION_ENCADREUR = "encadreur.certification"
 
 # Référentiel « Harmonisation de la gamification » du 2026-11-05 (spec 022). La part du club n'est créditée que
 # pour un élève dont l'affiliation est active au moment du crédit.
@@ -44,15 +48,15 @@ GRILLE: tuple[Action, ...] = (
     Action("eleve.partage", "eleve", "Partage de son article, par réseau, vérifié", 50),
     Action(QUIZ_ELEVE, "eleve", "Quiz santé réussi, première fois", 50),
     Action(QUESTION_JOUR_ELEVE, "eleve", "Bonne réponse à la question du jour", 20),
-    Action("eleve.badge", "eleve", "Badge de certification obtenu (5 au plus)", 500),
-    Action("eleve.certification", "eleve", "Certification Génie Imhotep", 1000),
+    Action(BADGE_ELEVE, "eleve", "Badge de certification obtenu (5 au plus)", 500),
+    Action(CERTIFICATION_ELEVE, "eleve", "Certification Génie Imhotep", 1000),
     Action("encadreur.bienvenue", "encadreur", "Compte validé", 100, propose=True),
     Action("encadreur.commentaire", "encadreur", "Commentaire approuvé", 5, propose=True),
     Action("encadreur.republication", "encadreur", "Republication d'un article du site, vérifiée", 10, propose=True),
     Action(ARTICLE_ENCADREUR, "encadreur", "Article personnel approuvé", 50, propose=True),
     Action("encadreur.partage", "encadreur", "Partage de son article, par réseau, vérifié", 50, propose=True),
     Action("encadreur.quiz", "encadreur", "Quiz réussi, première fois", 0, propose=True),
-    Action("encadreur.certification", "encadreur", "Certification Génie Imhotep", 1000, propose=True),
+    Action(CERTIFICATION_ENCADREUR, "encadreur", "Certification Génie Imhotep", 1000, propose=True),
     Action("encadreur.sujet_forum", "encadreur", "Sujet de forum validé", 30, propose=True),
     Action("encadreur.discussion", "encadreur", "Discussion animée et attestée", 50, propose=True),
     Action("encadreur.reponse_utile", "encadreur", "Réponse utile validée à un élève", 10, propose=True),
@@ -88,6 +92,9 @@ EN_SERVICE: frozenset[str] = frozenset(
         COMMENTAIRE_ELEVE,
         COMMENTAIRE_ENCADREUR,
         QUIZ_ELEVE,
+        BADGE_ELEVE,
+        CERTIFICATION_ELEVE,
+        CERTIFICATION_ENCADREUR,
     }
 )
 

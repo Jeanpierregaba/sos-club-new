@@ -28,6 +28,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db import Base, Suivi
 
 PARCOURS_JEUX = "jeux"
+# Le parcours Génie Imhotep (spec 029) : 12 places, jouées dans l'ordre.
+PARCOURS_CERTIFICATION = "certification"
+PARCOURS = (PARCOURS_JEUX, PARCOURS_CERTIFICATION)
+PLACES = 12
 
 
 class EtatQuiz(StrEnum):
@@ -78,6 +82,13 @@ class Quiz(Suivi, Base):
             "etat <> 'publie' OR (validateur_nom IS NOT NULL AND validateur_qualite IS NOT NULL)",
             name="publie_avec_validateur",
         ),
+        CheckConstraint("parcours IN ('jeux', 'certification')", name="parcours_valide"),
+        # Un quiz de certification occupe une place de 1 à 12 ; un quiz de jeux n'en a pas, ni de fascicule.
+        CheckConstraint("(parcours = 'certification') = (place IS NOT NULL)", name="place_si_certification"),
+        CheckConstraint("place BETWEEN 1 AND 12", name="place_valide"),
+        CheckConstraint("parcours = 'certification' OR ressource_id IS NULL", name="fascicule_si_certification"),
+        # Une place n'a qu'un quiz publié : la base tranche entre deux approbations simultanées.
+        Index("uq_quiz_place_publiee", "place", unique=True, postgresql_where=text("etat = 'publie'")),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
@@ -85,6 +96,10 @@ class Quiz(Suivi, Base):
     description: Mapped[str] = mapped_column(String(300), server_default="")
     axe_code: Mapped[str] = mapped_column(ForeignKey("axe.code", ondelete="RESTRICT"), index=True)
     etat: Mapped[EtatQuiz] = mapped_column(_enum_texte(EtatQuiz, "etat"), default=EtatQuiz.brouillon, index=True)
+    parcours: Mapped[str] = mapped_column(String(20), server_default=PARCOURS_JEUX, default=PARCOURS_JEUX)
+    place: Mapped[int | None] = mapped_column(Integer)
+    # Le fascicule de la bibliothèque à lire avant de jouer (certification seulement).
+    ressource_id: Mapped[UUID | None] = mapped_column(ForeignKey("ressource.id", ondelete="RESTRICT"))
     # « Contenu de test » : chargé par seed_dev, jamais en prod (RULES).
     contenu_de_test: Mapped[bool] = mapped_column(server_default=text("false"))
     # Tous ceux qui l'ont créé, modifié ou soumis : aucun d'eux ne peut l'approuver (publication à deux).

@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 import app.admin.models
 import app.bibliotheque.models
+import app.certification.models
 import app.clubs.models
 import app.comptes.models
 import app.eleves.models
