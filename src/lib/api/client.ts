@@ -142,6 +142,13 @@ export type ListeBanque = Schemas["ListeBanque"];
 export type ParametresEntree = Schemas["ParametresEntree"];
 export type ParametresSortie = Schemas["ParametresSortie"];
 export type HistoriqueParametres = Schemas["HistoriqueParametres"];
+export type CategorieRessource = Schemas["CategorieRessource"];
+export type EtatRessource = Schemas["EtatRessource"];
+export type RessourcePublique = Schemas["RessourcePublique"];
+export type BibliothequePublique = Schemas["Bibliotheque"];
+export type RessourceGestion = Schemas["RessourceGestion"];
+export type RessourceEntree = Schemas["RessourceEntree"];
+export type ListeGestion = Schemas["ListeGestion"];
 
 export const MESSAGE_SAISIE = "Vérifie le formulaire : un champ est vide, trop long ou mal rempli.";
 
@@ -691,3 +698,84 @@ export const partieEssai: AppelsPartie = {
 export const chargerParametresQuiz = () => requeteApi<HistoriqueParametres>(`${BANQUE}/parametres`);
 export const changerParametresQuiz = (entree: ParametresEntree) =>
   envoyerJson<ParametresSortie>(`${BANQUE}/parametres`, entree, "PUT");
+
+// Bibliothèque (spec 028) --------------------------------------------------------------------------------
+// Publique : liste, PDF (lire ou télécharger) et couvertures, sans connexion. Gestion : espace admin.
+
+export const chargerBibliotheque = (filtres: { categorie?: CategorieRessource; axe?: string }) =>
+  requeteApi<BibliothequePublique>(avecParametres("/api/bibliotheque", filtres));
+export const urlRessource = (id: string, telecharger = false) =>
+  `/api/bibliotheque/${id}/fichier${telecharger ? "?telecharger=1" : ""}`;
+
+const GESTION_BIBLIOTHEQUE = "/api/admin/bibliotheque";
+export const chargerRessources = (etat?: EtatRessource) =>
+  requeteApi<ListeGestion>(avecParametres(GESTION_BIBLIOTHEQUE, { etat }));
+export const chargerRessource = (id: string) =>
+  requeteApi<RessourceGestion>(`${GESTION_BIBLIOTHEQUE}/${id}`);
+export const creerRessource = (entree: RessourceEntree) =>
+  envoyerJson<RessourceGestion>(GESTION_BIBLIOTHEQUE, entree);
+export const modifierRessource = (id: string, entree: RessourceEntree) =>
+  envoyerJson<RessourceGestion>(`${GESTION_BIBLIOTHEQUE}/${id}`, entree, "PUT");
+export const supprimerRessource = (id: string) =>
+  envoyerJson<void>(`${GESTION_BIBLIOTHEQUE}/${id}`, undefined, "DELETE");
+export const retirerCouvertureRessource = (id: string) =>
+  envoyerJson<RessourceGestion>(`${GESTION_BIBLIOTHEQUE}/${id}/couverture`, undefined, "DELETE");
+export const soumettreRessource = (id: string) =>
+  envoyerJson<RessourceGestion>(`${GESTION_BIBLIOTHEQUE}/${id}/soumettre`);
+export const reprendreRessource = (id: string) =>
+  envoyerJson<RessourceGestion>(`${GESTION_BIBLIOTHEQUE}/${id}/reprendre`);
+export const approuverRessource = (
+  id: string,
+  entree: { validateur_nom: string; validateur_qualite: string },
+) => envoyerJson<RessourceGestion>(`${GESTION_BIBLIOTHEQUE}/${id}/approuver`, entree);
+export const refuserRessource = (id: string, motif: string) =>
+  envoyerJson<RessourceGestion>(`${GESTION_BIBLIOTHEQUE}/${id}/refuser`, { motif });
+export const depublierRessource = (id: string, motif: string) =>
+  envoyerJson<RessourceGestion>(`${GESTION_BIBLIOTHEQUE}/${id}/depublier`, { motif });
+// Relecture par l'équipe, quel que soit l'état ; `v` change avec le fichier, pour ne pas revoir l'ancien.
+export const urlRelectureRessource = (id: string, version: string) =>
+  `${GESTION_BIBLIOTHEQUE}/${id}/fichier?v=${encodeURIComponent(version)}`;
+export const urlCouvertureGestion = (id: string, version: string) =>
+  `${GESTION_BIBLIOTHEQUE}/${id}/couverture/vignette?v=${encodeURIComponent(version)}`;
+
+export type FichierRessource = "fichier" | "couverture";
+
+// Envoi avec progression (un PDF peut peser 20 Mo sur une connexion lente).
+export function deposerFichierRessource(
+  id: string,
+  quoi: FichierRessource,
+  fichier: File,
+  progression: (fraction: number) => void,
+): Promise<RessourceGestion> {
+  const donnees = new FormData();
+  donnees.append("fichier", fichier);
+  return new Promise((resoudre, rejeter) => {
+    const requete = new XMLHttpRequest();
+    requete.open("PUT", `${GESTION_BIBLIOTHEQUE}/${id}/${quoi}`);
+    requete.timeout = 300_000;
+    requete.upload.onprogress = (e) => e.lengthComputable && progression(e.loaded / e.total);
+    requete.onload = () => {
+      let corps: unknown = null;
+      try {
+        corps = JSON.parse(requete.responseText);
+      } catch {
+        corps = null;
+      }
+      if (requete.status >= 200 && requete.status < 300) return resoudre(corps as RessourceGestion);
+      const detail = (corps as { detail?: unknown } | null)?.detail;
+      // Au-delà de la limite du proxy, il répond lui-même, sans message de l'API.
+      if (requete.status === 413 && typeof detail !== "string")
+        return rejeter(
+          new ErreurApi(
+            413,
+            quoi === "fichier"
+              ? "Ce PDF est trop lourd : 20 Mo au plus."
+              : "Cette image est trop lourde : 8 Mo au plus.",
+          ),
+        );
+      rejeter(new ErreurApi(requete.status, typeof detail === "string" ? detail : MESSAGE_SAISIE));
+    };
+    requete.onerror = requete.ontimeout = () => rejeter(new ErreurApi(0, MESSAGE_INDISPONIBLE));
+    requete.send(donnees);
+  });
+}

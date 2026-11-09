@@ -1,87 +1,72 @@
-import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  BookOpen,
-  CirclePlay,
-  Download,
-  GraduationCap,
-  Image as ImageIcon,
-  type LucideIcon,
-} from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ArrowRight, LibraryBig } from "lucide-react";
+
+import { ALaUne } from "@/components/bibliotheque/ALaUne";
+import { CarteRessource } from "@/components/bibliotheque/CarteRessource";
+import { DecorAnime } from "@/components/DecorAnime";
 import { EnTete } from "@/components/EnTete";
 import { FilAriane } from "@/components/FilAriane";
-import { SiteHeader } from "@/components/SiteHeader";
+import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 import { SiteMotion, retard } from "@/components/SiteMotion";
-import { DecorAnime } from "@/components/DecorAnime";
-import mascottesLivres from "@/assets/mascottes-livres.webp";
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
+import mascottesLivres from "@/assets/mascottes-livres.webp";
+import { chargerAxes, chargerBibliotheque, type CategorieRessource } from "@/lib/api/client";
+import { CATEGORIES, estCategorie, ORDRE_CATEGORIES } from "@/lib/bibliotheque";
+
+type Recherche = { categorie?: CategorieRessource; axe?: string };
 
 export const Route = createFileRoute("/bibliotheque")({
+  validateSearch: (search: Record<string, unknown>): Recherche => {
+    const categorie = search["categorie"];
+    const axe = typeof search["axe"] === "string" ? search["axe"] : undefined;
+    return {
+      ...(estCategorie(categorie) ? { categorie } : {}),
+      ...(axe ? { axe } : {}),
+    };
+  },
+  loaderDeps: ({ search }) => search,
+  loader: async ({ deps }) => {
+    const [bibliotheque, axes] = await Promise.all([
+      chargerBibliotheque(deps),
+      chargerAxes().catch(() => []),
+    ]);
+    return { bibliotheque, axes };
+  },
   head: () => ({
     meta: [
       { title: "Bibliothèque — Club Santé SOS Docteur TV" },
       {
         name: "description",
         content:
-          "Fascicules, guides d'action, affiches, modules et vidéos pour animer ton Club Santé SOS Docteur TV, en libre accès.",
+          "Magazines, guides d'action, fiches pratiques, affiches et fascicules validés par l'équipe nationale, à lire ou télécharger librement.",
       },
       { property: "og:title", content: "La bibliothèque des Clubs Santé" },
     ],
   }),
+  errorComponent: ServiceIndisponible,
   component: Bibliotheque,
 });
 
-type Genre = "guide" | "affiche" | "video" | "module";
+const nombre = (n: number) => n.toLocaleString("fr-FR");
 
-// `c` : la couleur de la couverture du document.
-const genres: Record<Genre, { t: string; un: string; i: LucideIcon; c: string }> = {
-  guide: { t: "Guides d’action", un: "Guide d’action", i: BookOpen, c: "bg-logo-blue" },
-  affiche: { t: "Affiches", un: "Affiche", i: ImageIcon, c: "bg-rose" },
-  video: { t: "Vidéos SOS", un: "Vidéo SOS", i: CirclePlay, c: "bg-grape" },
-  module: { t: "Modules", un: "Module", i: GraduationCap, c: "bg-primary" },
-};
-
-// Documents et compteurs repris de la bibliothèque du site de référence fourni par le porteur du projet (clubsante.ibdastudio.com).
-// Les fichiers ne sont pas encore en ligne : les liens de téléchargement pointent vers « # ».
-const documents: { genre: Genre; t: string; taille: string; telechargements: number }[] = [
-  {
-    genre: "guide",
-    t: "Guide méthodologique de gestion d’un Club Santé scolaire",
-    taille: "4,2 Mo",
-    telechargements: 145,
-  },
-  {
-    genre: "affiche",
-    t: "Affiche de sensibilisation : les 10 étapes du lavage des mains",
-    taille: "1,8 Mo",
-    telechargements: 320,
-  },
-  {
-    genre: "module",
-    t: "Module de formation animée : prévention du paludisme en milieu scolaire",
-    taille: "12,5 Mo",
-    telechargements: 98,
-  },
-  {
-    genre: "video",
-    t: "Vidéo : gestes de premiers secours face à un évanouissement",
-    taille: "24,1 Mo",
-    telechargements: 215,
-  },
-];
-
-const chiffres = [
-  { n: "4+", t: "Documents" },
-  { n: "1", t: "Fiche pratique" },
-  { n: "2", t: "Supports médias" },
-  { n: "778", t: "Téléchargements" },
-];
+// Un filtre vide disparaît de l'adresse.
+const filtres = (categorie?: CategorieRessource, axe?: string): Recherche => ({
+  ...(categorie ? { categorie } : {}),
+  ...(axe ? { axe } : {}),
+});
 
 function Bibliotheque() {
-  const [genre, setGenre] = useState<Genre | null>(null);
-  const affiches = documents.filter((d) => !genre || d.genre === genre);
+  const { bibliotheque, axes } = Route.useLoaderData();
+  const { categorie, axe } = Route.useSearch();
+  const naviguer = useNavigate({ from: Route.fullPath });
+  const { ressources, a_la_une, chiffres } = bibliotheque;
+  const filtre = Boolean(categorie || axe);
+  const chiffresAffiches = [
+    { n: nombre(chiffres.documents), t: chiffres.documents > 1 ? "Documents" : "Document" },
+    { n: nombre(chiffres.telechargements), t: "Téléchargements" },
+  ];
 
   return (
     <div className="min-h-screen overflow-x-clip bg-carnet text-ink">
@@ -112,11 +97,12 @@ function Bibliotheque() {
                 <span className="block text-primary">des Clubs Santé</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg font-medium text-ink/75">
-                Accède librement aux fascicules, outils, affiches et guides pratiques pour bien
-                animer ton Club Santé SOS Docteur TV.
+                Accède librement aux magazines, guides d’action, fiches pratiques, affiches et
+                fascicules pour bien animer ton Club Santé SOS Docteur TV. Chaque document est
+                validé avant sa mise en ligne.
               </p>
-              <dl className="mt-8 grid max-w-xl grid-cols-2 gap-3 sm:grid-cols-4">
-                {chiffres.map((c) => (
+              <dl className="mt-8 grid max-w-sm grid-cols-2 gap-3">
+                {chiffresAffiches.map((c) => (
                   <div
                     key={c.t}
                     className="flex flex-col-reverse rounded-2xl bg-white/80 p-4 shadow-sm backdrop-blur"
@@ -139,78 +125,81 @@ function Bibliotheque() {
         </div>
       </section>
 
-      {/* Rayonnages : un filtre par type, puis les documents en couvertures colorées. */}
+      <ALaUne magazines={a_la_une} />
+
+      {/* Rayonnages : un filtre par catégorie et par axe, puis les documents. */}
       <section className="mx-auto max-w-7xl px-5 py-20">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <EnTete sur="Ressources en libre accès" bleu="Tous les" vert="documents">
-            Guides, affiches, modules et vidéos validés par l’équipe nationale.
+            Validés par l’équipe nationale, à lire en ligne ou à télécharger.
           </EnTete>
-          <div data-reveal className="flex flex-wrap gap-2">
-            {([null, ...Object.keys(genres)] as (Genre | null)[]).map((g) => (
-              <button
-                key={g ?? "tous"}
-                type="button"
-                aria-pressed={genre === g}
-                onClick={() => setGenre(g)}
-                className={`rounded-full px-4 py-2 text-sm font-bold transition active:scale-95 ${
-                  genre === g
-                    ? "bg-logo-blue text-white shadow-card"
-                    : "bg-white text-ink ring-1 ring-border hover:ring-logo-blue/40"
-                }`}
+          {axes.length > 0 && (
+            <label data-reveal className="grid gap-1 text-sm font-bold text-ink">
+              Axe de santé
+              <select
+                value={axe ?? ""}
+                onChange={(e) =>
+                  void naviguer({
+                    search: (s) => filtres(s.categorie, e.target.value),
+                    resetScroll: false,
+                  })
+                }
+                className="h-11 rounded-full bg-white px-4 font-semibold ring-1 ring-border"
               >
-                {g ? genres[g].t : "Tous les documents"}
-              </button>
-            ))}
-          </div>
+                <option value="">Tous les axes</option>
+                {axes.map((a) => (
+                  <option key={a.code} value={a.code}>
+                    {a.libelle}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
         </div>
+        <nav aria-label="Catégories" data-reveal className="mt-8 flex flex-wrap gap-2">
+          {([undefined, ...ORDRE_CATEGORIES] as (CategorieRessource | undefined)[]).map((c) => (
+            <Link
+              key={c ?? "tous"}
+              from={Route.fullPath}
+              search={(s) => filtres(c, s.axe)}
+              resetScroll={false}
+              aria-current={categorie === c ? "page" : undefined}
+              className={`rounded-full px-4 py-2 text-sm font-bold transition active:scale-95 ${
+                categorie === c
+                  ? "bg-logo-blue text-white shadow-card"
+                  : "bg-white text-ink ring-1 ring-border hover:ring-logo-blue/40"
+              }`}
+            >
+              {c ? CATEGORIES[c].pluriel : "Tous les documents"}
+            </Link>
+          ))}
+        </nav>
 
-        <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {affiches.map((d, i) => {
-            const g = genres[d.genre];
-            return (
-              <li
-                key={d.t}
-                data-reveal
-                style={retard(i)}
-                className="card-fx group flex flex-col overflow-hidden rounded-[1.75rem] bg-white shadow-card"
+        {ressources.length > 0 ? (
+          <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {ressources.map((r, i) => (
+              <CarteRessource key={r.id} ressource={r} style={retard(i)} />
+            ))}
+          </ul>
+        ) : (
+          <div className="mt-10 flex flex-col items-center gap-4 rounded-[1.75rem] bg-white p-10 text-center shadow-card">
+            <LibraryBig aria-hidden className="size-12 text-logo-blue" />
+            <p className="max-w-md font-semibold">
+              {filtre
+                ? "Aucun document ne correspond à ce choix pour le moment."
+                : "La bibliothèque se remplit : les premiers documents arrivent bientôt."}
+            </p>
+            {filtre && (
+              <Link
+                to="/bibliotheque"
+                resetScroll={false}
+                className="font-bold text-logo-blue hover:underline"
               >
-                <div
-                  className={`relative isolate flex aspect-[4/3] items-center justify-center overflow-hidden ${g.c} text-white`}
-                >
-                  <span aria-hidden className="absolute inset-y-0 left-5 -z-10 w-3 bg-black/15" />
-                  <span
-                    aria-hidden
-                    className="absolute -bottom-10 -right-10 -z-10 size-40 rounded-full bg-white/10"
-                  />
-                  <g.i className="size-16 transition duration-300 group-hover:scale-110" />
-                  <span className="absolute right-4 top-4 rounded-full bg-white/20 px-3 py-1 text-xs font-extrabold">
-                    {d.taille}
-                  </span>
-                </div>
-                <div className="flex flex-1 flex-col p-6">
-                  <p className="text-xs font-extrabold uppercase tracking-wider text-logo-red">
-                    {g.un}
-                  </p>
-                  <h3 className="mt-2 flex-1 font-sans text-lg font-extrabold leading-snug">
-                    {d.t}
-                  </h3>
-                  <div className="mt-5 flex items-center justify-between gap-3">
-                    <span className="text-sm font-semibold text-muted-foreground">
-                      {d.telechargements} téléchargements
-                    </span>
-                    <a
-                      href="#"
-                      aria-label={`Télécharger : ${d.t}`}
-                      className="btn-fx inline-flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground"
-                    >
-                      <Download className="size-5" />
-                    </a>
-                  </div>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                Voir tous les documents
+              </Link>
+            )}
+          </div>
+        )}
       </section>
 
       {/* Passerelle vers la certification : les fascicules servent à réviser les 12 quiz. */}
