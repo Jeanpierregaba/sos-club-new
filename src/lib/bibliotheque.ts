@@ -7,7 +7,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import type { CategorieRessource } from "@/lib/api/client";
+import type { CategorieRessource, RessourceEntree } from "@/lib/api/client";
 
 // Libellés, icône et couleur de couverture de chaque catégorie (spec 028) : le visuel d'une ressource sans
 // image de couverture.
@@ -48,3 +48,12 @@ export function tailleLisible(octets: number): string {
 export function telechargements(nombre: number): string {
   return `${nombre.toLocaleString("fr-FR")} téléchargement${nombre > 1 ? "s" : ""}`;
 }
+
+// Une nouvelle ressource, avant saisie.
+export const entreeVide: RessourceEntree = {
+  titre: "",
+  description: "",
+  categorie: "guide",
+  axe_code: null,
+  parution: null,
+};

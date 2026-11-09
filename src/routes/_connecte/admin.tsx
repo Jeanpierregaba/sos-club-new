@@ -12,6 +12,7 @@ import {
   Download,
   ExternalLink,
   Flag,
+  LibraryBig,
   LayoutDashboard,
   LogOut,
   MapPinned,
@@ -101,6 +102,12 @@ function entrees(admin: AdminMoi): Entree[] {
       libelle: "Quiz",
       i: Brain,
       visible: peut(admin, "quiz", "consulter"),
+    },
+    {
+      to: "/admin/bibliotheque",
+      libelle: "Bibliothèque",
+      i: LibraryBig,
+      visible: peut(admin, "bibliotheque", "consulter"),
     },
     {
       to: "/admin/encadreurs",

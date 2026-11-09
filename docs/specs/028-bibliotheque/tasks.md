@@ -11,7 +11,7 @@
       fichier et couverture servis ou 404, en-têtes, compteur ; puis `public.py` et `router.py`.
 - [x] 5. `seed_dev` : ressources « Contenu de test » ; types de l'API régénérés.
 - [x] 6. Site, public : client, `/bibliotheque` sur les vraies données, carrousel, filtres, état vide.
-- [ ] 7. Site, admin : liste, fiche, dépôt des fichiers, décisions ; entrée « Bibliothèque » du menu.
+- [x] 7. Site, admin : liste, fiche, dépôt des fichiers, décisions ; entrée « Bibliothèque » du menu.
 - [ ] 8. Docs : ADR-0010, ARCHITECTURE, SECURITY, TASKS.
 - [ ] Vérifier tous les critères d'acceptation de spec.md
 - [ ] Relecture par le sous-agent reviewer
