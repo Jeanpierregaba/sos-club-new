@@ -11,7 +11,7 @@
 - [x] 5. Routes joueur : `GET /certification` (« Ma certification ») et `GET /certification/certificat.pdf`
       (reportlab ajouté, PDF vérifié par extraction de texte, réservé au titulaire).
 - [x] 6. Vérification publique `GET /certificats/{numero}` : tests de non-divulgation d'abord.
-- [ ] 7. Gestion : règles des badges (versions, 422), listes des certificats et des badges, révocation et
+- [x] 7. Gestion : règles des badges (versions, 422), listes des certificats et des badges, révocation et
       réémission (2FA, motif, annulation des points, audit, notifications). Tests d'abord, droits paramétrés.
 - [ ] 8. Seed : 12 quiz « [Test] » du parcours reliés au fascicule de test ; test du seed.
 - [ ] 9. Site : client et types, `lib/certification` (+ test), page « Ma certification », retour depuis la partie,
