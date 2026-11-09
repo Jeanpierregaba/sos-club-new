@@ -8,6 +8,7 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import {
+  Award,
   Brain,
   Download,
   ExternalLink,
@@ -101,6 +102,12 @@ function entrees(admin: AdminMoi): Entree[] {
       to: "/admin/quiz",
       libelle: "Quiz",
       i: Brain,
+      visible: peut(admin, "quiz", "consulter"),
+    },
+    {
+      to: "/admin/certification",
+      libelle: "Certification",
+      i: Award,
       visible: peut(admin, "quiz", "consulter"),
     },
     {

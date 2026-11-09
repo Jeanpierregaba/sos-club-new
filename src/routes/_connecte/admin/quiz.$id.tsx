@@ -16,6 +16,7 @@ import { useState, type ReactNode } from "react";
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { DialogueMotif } from "@/components/admin/DialogueMotif";
 import { BadgeEtatQuiz } from "@/components/quiz/BadgeEtatQuiz";
+import { ChampsParcours } from "@/components/quiz/ChampsParcours";
 import { EditeurQuestion } from "@/components/quiz/EditeurQuestion";
 import { PartieQuiz } from "@/components/quiz/PartieQuiz";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
@@ -43,22 +44,24 @@ import {
   type QuestionBanque,
 } from "@/lib/api/client";
 import { dateCourte } from "@/lib/dates";
+import { chargerFascicules, useParcours } from "@/lib/parcours";
 
 export const Route = createFileRoute("/_connecte/admin/quiz/$id")({
   gcTime: 0,
   loader: async ({ params }) => {
-    const [quiz, axes] = await Promise.all([
+    const [quiz, axes, fascicules] = await Promise.all([
       chargerQuizBanque(params.id),
       chargerAxes().catch((): AxePublic[] => []),
+      chargerFascicules(),
     ]);
-    return { quiz, axes };
+    return { quiz, axes, fascicules };
   },
   errorComponent: ServiceIndisponible,
   component: FicheQuiz,
 });
 
 function FicheQuiz() {
-  const { quiz, axes } = Route.useLoaderData();
+  const { quiz, axes, fascicules } = Route.useLoaderData();
   const { admin } = Route.useRouteContext();
   const router = useRouter();
   const [erreur, setErreur] = useState<string | null>(null);
@@ -71,6 +74,7 @@ function FicheQuiz() {
   const [titre, setTitre] = useState(quiz.titre);
   const [description, setDescription] = useState(quiz.description);
   const [axe, setAxe] = useState(quiz.axe_code);
+  const champsParcours = useParcours(quiz);
   const [validateurNom, setValidateurNom] = useState("");
   const [validateurQualite, setValidateurQualite] = useState("");
 
@@ -111,7 +115,7 @@ function FicheQuiz() {
         className="rounded-full font-bold"
         onClick={() => setDialogue("titre")}
       >
-        <Pencil className="size-4" /> Titre et axe
+        <Pencil className="size-4" /> Titre, axe et parcours
       </Button>,
     );
   actions.push(
@@ -198,9 +202,17 @@ function FicheQuiz() {
             </span>
           )}
           <span className="text-sm text-muted-foreground">{libelle(quiz.axe_code)}</span>
+          {quiz.place !== null && (
+            <span className="rounded-full bg-logo-blue/10 px-2.5 py-0.5 text-xs font-extrabold text-logo-blue">
+              Certification · quiz {quiz.place} sur 12
+            </span>
+          )}
         </div>
         <h2 className="font-display text-2xl text-ink">{quiz.titre}</h2>
         {quiz.description && <p className="text-muted-foreground">{quiz.description}</p>}
+        {quiz.ressource_titre && (
+          <p className="text-sm">Fascicule relié : {quiz.ressource_titre}</p>
+        )}
         <p className="text-sm font-semibold">
           {quiz.questions_actives} questions actives sur {quiz.questions_requises} requises
         </p>
@@ -317,10 +329,15 @@ function FicheQuiz() {
       <DialogueFormulaire
         ouvert={dialogue === "titre"}
         onOuvert={(o) => setDialogue(o ? "titre" : null)}
-        titre="Titre et axe du quiz"
+        titre="Titre, axe et parcours du quiz"
         bouton="Enregistrer"
         onEnvoie={async () => {
-          await modifierQuiz(quiz.id, { titre, description, axe_code: axe });
+          await modifierQuiz(quiz.id, {
+            titre,
+            description,
+            axe_code: axe,
+            ...champsParcours.entree,
+          });
           await rafraichir();
         }}
       >
@@ -349,6 +366,7 @@ function FicheQuiz() {
             ))}
           </select>
         </Champ>
+        <ChampsParcours etat={champsParcours} fascicules={fascicules} />
       </DialogueFormulaire>
 
       <DialogueFormulaire

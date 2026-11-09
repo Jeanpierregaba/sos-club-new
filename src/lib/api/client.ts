@@ -142,6 +142,18 @@ export type ListeBanque = Schemas["ListeBanque"];
 export type ParametresEntree = Schemas["ParametresEntree"];
 export type ParametresSortie = Schemas["ParametresSortie"];
 export type HistoriqueParametres = Schemas["HistoriqueParametres"];
+export type Parcours = QuizEntree["parcours"];
+export type MaCertification = Schemas["MaCertification"];
+export type PlaceParcours = Schemas["PlaceParcours"];
+export type BadgeParcours = Schemas["BadgeParcours"];
+export type EtatCertificat = Schemas["EtatCertificat"];
+export type VerificationCertificat = Schemas["Verification"];
+export type HistoriqueRegles = Schemas["HistoriqueRegles"];
+export type ReglesEntree = Schemas["ReglesEntree"];
+export type ReglesSortie = Schemas["ReglesSortie"];
+export type CertificatGestion = Schemas["CertificatGestion"];
+export type ListeCertificats = Schemas["ListeCertificats"];
+export type ListeBadges = Schemas["ListeBadges"];
 export type CategorieRessource = Schemas["CategorieRessource"];
 export type EtatRessource = Schemas["EtatRessource"];
 export type RessourcePublique = Schemas["RessourcePublique"];
@@ -667,8 +679,8 @@ export const partieJoueur: AppelsPartie = {
 };
 
 const BANQUE = "/api/admin/quiz";
-export const chargerBanque = (etat?: EtatQuiz) =>
-  requeteApi<ListeBanque>(avecParametres(BANQUE, { etat }));
+export const chargerBanque = (filtres: { etat?: EtatQuiz; parcours?: Parcours } = {}) =>
+  requeteApi<ListeBanque>(avecParametres(BANQUE, filtres));
 export const chargerQuizBanque = (id: string) => requeteApi<QuizDetail>(`${BANQUE}/${id}`);
 export const creerQuiz = (entree: QuizEntree) => envoyerJson<QuizDetail>(BANQUE, entree);
 export const modifierQuiz = (id: string, entree: QuizEntree) =>
@@ -695,9 +707,32 @@ export const partieEssai: AppelsPartie = {
   repondre: (id, rang, choix) =>
     envoyerJson<EtatPartie>(`${BANQUE}/essais/${id}/reponses`, { rang, choix }),
 };
-export const chargerParametresQuiz = () => requeteApi<HistoriqueParametres>(`${BANQUE}/parametres`);
-export const changerParametresQuiz = (entree: ParametresEntree) =>
-  envoyerJson<ParametresSortie>(`${BANQUE}/parametres`, entree, "PUT");
+export const chargerParametresQuiz = (parcours: Parcours = "jeux") =>
+  requeteApi<HistoriqueParametres>(`${BANQUE}/parametres?parcours=${parcours}`);
+export const changerParametresQuiz = (entree: ParametresEntree, parcours: Parcours = "jeux") =>
+  envoyerJson<ParametresSortie>(`${BANQUE}/parametres?parcours=${parcours}`, entree, "PUT");
+
+// Certification Génie Imhotep (spec 029) ------------------------------------------------------------------
+// Les parties du parcours passent par les routes des quiz ; le PDF du certificat n'est servi qu'à son titulaire.
+
+export const chargerMaCertification = () => requeteApi<MaCertification>("/api/certification");
+export const URL_CERTIFICAT_PDF = "/api/certification/certificat.pdf";
+export const verifierCertificat = (numero: string) =>
+  requeteApi<VerificationCertificat>(`/api/certificats/${encodeURIComponent(numero)}`);
+
+const GESTION_CERTIFICATION = "/api/admin/certification";
+export const chargerReglesBadges = () =>
+  requeteApi<HistoriqueRegles>(`${GESTION_CERTIFICATION}/regles`);
+export const changerReglesBadges = (entree: ReglesEntree) =>
+  envoyerJson<ReglesSortie>(`${GESTION_CERTIFICATION}/regles`, entree, "PUT");
+export const chargerCertificats = (etat?: EtatCertificat) =>
+  requeteApi<ListeCertificats>(avecParametres(`${GESTION_CERTIFICATION}/certificats`, { etat }));
+export const chargerBadgesDelivres = () =>
+  requeteApi<ListeBadges>(`${GESTION_CERTIFICATION}/badges`);
+export const revoquerCertificat = (id: string, motif: string) =>
+  envoyerJson<CertificatGestion>(`${GESTION_CERTIFICATION}/certificats/${id}/revoquer`, { motif });
+export const reemettreCertificat = (id: string) =>
+  envoyerJson<CertificatGestion>(`${GESTION_CERTIFICATION}/certificats/${id}/reemettre`);
 
 // Bibliothèque (spec 028) --------------------------------------------------------------------------------
 // Publique : liste, PDF (lire ou télécharger) et couvertures, sans connexion. Gestion : espace admin.

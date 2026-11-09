@@ -2846,6 +2846,143 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/certification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ma Certification */
+        get: operations["ma_certification_api_certification_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/certification/certificat.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Certificat */
+        get: operations["certificat_api_certification_certificat_pdf_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/certificats/{numero}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Verifier */
+        get: operations["verifier_api_certificats__numero__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/certification/regles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire Regles */
+        get: operations["lire_regles_api_admin_certification_regles_get"];
+        /** Changer Regles */
+        put: operations["changer_regles_api_admin_certification_regles_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/certification/certificats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister Certificats */
+        get: operations["lister_certificats_api_admin_certification_certificats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/certification/badges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister Badges */
+        get: operations["lister_badges_api_admin_certification_badges_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/certification/certificats/{certificat_id}/revoquer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoquer */
+        post: operations["revoquer_api_admin_certification_certificats__certificat_id__revoquer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/certification/certificats/{certificat_id}/reemettre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reemettre */
+        post: operations["reemettre_api_admin_certification_certificats__certificat_id__reemettre_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -3234,6 +3371,33 @@ export interface components {
             /** Description */
             description: string;
         };
+        /** BadgeGestion */
+        BadgeGestion: {
+            /** Titulaire */
+            titulaire: string;
+            /** Role */
+            role: string;
+            /** Nom */
+            nom: string;
+            /** Palier */
+            palier: number;
+            /**
+             * Obtenu Le
+             * Format: date-time
+             */
+            obtenu_le: string;
+        };
+        /** BadgeParcours */
+        BadgeParcours: {
+            /** Rang */
+            rang: number;
+            /** Nom */
+            nom: string;
+            /** Palier */
+            palier: number;
+            /** Obtenu Le */
+            obtenu_le: string | null;
+        };
         /**
          * Beneficiaire
          * @enum {string}
@@ -3319,6 +3483,50 @@ export interface components {
          * @enum {string}
          */
         CategorieRessource: "magazine" | "guide" | "fiche" | "affiche" | "fascicule";
+        /** CertificatGestion */
+        CertificatGestion: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Numero */
+            numero: string;
+            etat: components["schemas"]["EtatCertificat"];
+            /** Role */
+            role: string;
+            /** Titulaire */
+            titulaire: string;
+            /**
+             * Utilisateur Id
+             * Format: uuid
+             */
+            utilisateur_id: string;
+            /** Club */
+            club: string | null;
+            /**
+             * Delivre Le
+             * Format: date-time
+             */
+            delivre_le: string;
+            /** Motif */
+            motif: string | null;
+            /** Decide Le */
+            decide_le: string | null;
+            /** Remplace Numero */
+            remplace_numero: string | null;
+        };
+        /** CertificatJoueur */
+        CertificatJoueur: {
+            /** Numero */
+            numero: string;
+            etat: components["schemas"]["EtatCertificat"];
+            /**
+             * Delivre Le
+             * Format: date-time
+             */
+            delivre_le: string;
+        };
         /**
          * ChampsArticle
          * @description Les champs d'une version, stockés en JSONB (`version_contenu.donnees`).
@@ -4251,6 +4459,11 @@ export interface components {
             jeton: string;
         };
         /**
+         * EtatCertificat
+         * @enum {string}
+         */
+        EtatCertificat: "valide" | "revoque" | "remplace";
+        /**
          * EtatClub
          * @enum {string}
          */
@@ -4385,6 +4598,16 @@ export interface components {
              */
             cree_le: string;
         };
+        /** Fascicule */
+        Fascicule: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Titre */
+            titre: string;
+        };
         /**
          * FicheActuelle
          * @description La fiche publique du club au moment de la lecture : l'« avant » d'une proposition de fiche.
@@ -4468,6 +4691,12 @@ export interface components {
             en_cours: components["schemas"]["ParametresSortie"];
             /** Versions */
             versions: components["schemas"]["ParametresSortie"][];
+        };
+        /** HistoriqueRegles */
+        HistoriqueRegles: {
+            en_cours: components["schemas"]["ReglesSortie"];
+            /** Versions */
+            versions: components["schemas"]["ReglesSortie"][];
         };
         /** IesgAdmin */
         IesgAdmin: {
@@ -4754,12 +4983,22 @@ export interface components {
             /** Semestre */
             semestre: string | null;
         };
+        /** ListeBadges */
+        ListeBadges: {
+            /** Badges */
+            badges: components["schemas"]["BadgeGestion"][];
+        };
         /** ListeBanque */
         ListeBanque: {
             /** Questions Requises */
             questions_requises: number;
             /** Quiz */
             quiz: components["schemas"]["QuizBanque"][];
+        };
+        /** ListeCertificats */
+        ListeCertificats: {
+            /** Certificats */
+            certificats: components["schemas"]["CertificatGestion"][];
         };
         /** ListeGestion */
         ListeGestion: {
@@ -4786,6 +5025,20 @@ export interface components {
             elements: components["schemas"]["ElementLot"][];
             /** Motif */
             motif: string;
+        };
+        /** MaCertification */
+        MaCertification: {
+            /** Reussies */
+            reussies: number;
+            /** Places */
+            places: components["schemas"]["PlaceParcours"][];
+            /** Badges */
+            badges: components["schemas"]["BadgeParcours"][];
+            certificat: components["schemas"]["CertificatJoueur"] | null;
+            /** Nb Questions */
+            nb_questions: number;
+            /** Seuil */
+            seuil: number;
         };
         /**
          * MembreClub
@@ -5166,6 +5419,31 @@ export interface components {
             /** Hauteur */
             hauteur: number;
         };
+        /** PlaceParcours */
+        PlaceParcours: {
+            /** Place */
+            place: number;
+            /**
+             * Etat
+             * @enum {string}
+             */
+            etat: "verrouillee" | "ouverte" | "reussie" | "bientot";
+            /** Quiz Id */
+            quiz_id: string | null;
+            /** Titre */
+            titre: string | null;
+            /** Description */
+            description: string | null;
+            /** Contenu De Test */
+            contenu_de_test: boolean;
+            fascicule: components["schemas"]["Fascicule"] | null;
+            /** Meilleur Score */
+            meilleur_score: number | null;
+            /** Tentatives Restantes */
+            tentatives_restantes: number | null;
+            /** Tentative En Cours */
+            tentative_en_cours: string | null;
+        };
         /** ProfilEleveAdmin */
         ProfilEleveAdmin: {
             /** Pseudonyme */
@@ -5339,6 +5617,17 @@ export interface components {
             /** Axe Code */
             axe_code: string;
             etat: components["schemas"]["EtatQuiz"];
+            /**
+             * Parcours
+             * @enum {string}
+             */
+            parcours: "jeux" | "certification";
+            /** Place */
+            place: number | null;
+            /** Ressource Id */
+            ressource_id: string | null;
+            /** Ressource Titre */
+            ressource_titre: string | null;
             /** Contenu De Test */
             contenu_de_test: boolean;
             /** Questions Actives */
@@ -5377,6 +5666,17 @@ export interface components {
             /** Axe Code */
             axe_code: string;
             etat: components["schemas"]["EtatQuiz"];
+            /**
+             * Parcours
+             * @enum {string}
+             */
+            parcours: "jeux" | "certification";
+            /** Place */
+            place: number | null;
+            /** Ressource Id */
+            ressource_id: string | null;
+            /** Ressource Titre */
+            ressource_titre: string | null;
             /** Contenu De Test */
             contenu_de_test: boolean;
             /** Questions Actives */
@@ -5416,6 +5716,16 @@ export interface components {
             description: string;
             /** Axe Code */
             axe_code: string;
+            /**
+             * Parcours
+             * @default jeux
+             * @enum {string}
+             */
+            parcours: "jeux" | "certification";
+            /** Place */
+            place?: number | null;
+            /** Ressource Id */
+            ressource_id?: string | null;
         };
         /** QuizJoueur */
         QuizJoueur: {
@@ -5535,6 +5845,27 @@ export interface components {
             motif: string;
             /** Version */
             version?: number | null;
+        };
+        /** ReglesEntree */
+        ReglesEntree: {
+            /** Noms */
+            noms: string[];
+            /** Paliers */
+            paliers: number[];
+        };
+        /** ReglesSortie */
+        ReglesSortie: {
+            /** Version */
+            version: number;
+            /** Noms */
+            noms: string[];
+            /** Paliers */
+            paliers: number[];
+            /**
+             * Cree Le
+             * Format: date-time
+             */
+            cree_le: string;
         };
         /**
          * Remplacement
@@ -5931,6 +6262,33 @@ export interface components {
             /** Derniers Evenements */
             derniers_evenements: components["schemas"]["EvenementJournal"][] | null;
         };
+        /** TitulaireEleve */
+        TitulaireEleve: {
+            /**
+             * Type
+             * @default eleve
+             * @constant
+             */
+            type: "eleve";
+            /** Pseudonyme */
+            pseudonyme: string;
+            /** Club */
+            club: string | null;
+        };
+        /** TitulaireEncadreur */
+        TitulaireEncadreur: {
+            /**
+             * Type
+             * @default encadreur
+             * @constant
+             */
+            type: "encadreur";
+            /** Prenom */
+            prenom: string;
+            /** Initiale */
+            initiale: string;
+            fonction: components["schemas"]["Fonction"];
+        };
         /**
          * TypeDecision
          * @enum {string}
@@ -5958,6 +6316,21 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** Verification */
+        Verification: {
+            /** Numero */
+            numero: string;
+            etat: components["schemas"]["EtatCertificat"];
+            /**
+             * Delivre Le
+             * Format: date-time
+             */
+            delivre_le: string;
+            /** Titulaire */
+            titulaire: components["schemas"]["TitulaireEleve"] | components["schemas"]["TitulaireEncadreur"];
+            /** Remplace Par */
+            remplace_par: string | null;
         };
         /** VersionEntree */
         VersionEntree: {
@@ -10744,7 +11117,9 @@ export interface operations {
     };
     lire_parametres_api_admin_quiz_parametres_get: {
         parameters: {
-            query?: never;
+            query?: {
+                parcours?: "jeux" | "certification";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -10760,11 +11135,22 @@ export interface operations {
                     "application/json": components["schemas"]["HistoriqueParametres"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
     changer_parametres_api_admin_quiz_parametres_put: {
         parameters: {
-            query?: never;
+            query?: {
+                parcours?: "jeux" | "certification";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -10865,6 +11251,7 @@ export interface operations {
         parameters: {
             query?: {
                 etat?: components["schemas"]["EtatQuiz"] | null;
+                parcours?: ("jeux" | "certification") | null;
             };
             header?: never;
             path?: never;
@@ -11859,6 +12246,247 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ma_certification_api_certification_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MaCertification"];
+                };
+            };
+        };
+    };
+    certificat_api_certification_certificat_pdf_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
+                };
+            };
+        };
+    };
+    verifier_api_certificats__numero__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                numero: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Verification"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_regles_api_admin_certification_regles_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HistoriqueRegles"];
+                };
+            };
+        };
+    };
+    changer_regles_api_admin_certification_regles_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReglesEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReglesSortie"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lister_certificats_api_admin_certification_certificats_get: {
+        parameters: {
+            query?: {
+                etat?: components["schemas"]["EtatCertificat"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListeCertificats"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lister_badges_api_admin_certification_badges_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListeBadges"];
+                };
+            };
+        };
+    };
+    revoquer_api_admin_certification_certificats__certificat_id__revoquer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                certificat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Motif"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificatGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reemettre_api_admin_certification_certificats__certificat_id__reemettre_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                certificat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificatGestion"];
+                };
             };
             /** @description Validation Error */
             422: {

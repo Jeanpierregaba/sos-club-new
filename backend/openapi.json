@@ -7094,6 +7094,22 @@
         ],
         "summary": "Lire Parametres",
         "operationId": "lire_parametres_api_admin_quiz_parametres_get",
+        "parameters": [
+          {
+            "name": "parcours",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "jeux",
+                "certification"
+              ],
+              "type": "string",
+              "default": "jeux",
+              "title": "Parcours"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -7101,6 +7117,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HistoriqueParametres"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -7113,15 +7139,31 @@
         ],
         "summary": "Changer Parametres",
         "operationId": "changer_parametres_api_admin_quiz_parametres_put",
+        "parameters": [
+          {
+            "name": "parcours",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "jeux",
+                "certification"
+              ],
+              "type": "string",
+              "default": "jeux",
+              "title": "Parcours"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ParametresEntree"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -7265,6 +7307,26 @@
                 }
               ],
               "title": "Etat"
+            }
+          },
+          {
+            "name": "parcours",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "jeux",
+                    "certification"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Parcours"
             }
           }
         ],
@@ -8723,6 +8785,312 @@
         }
       }
     },
+    "/api/certification": {
+      "get": {
+        "tags": [
+          "certification"
+        ],
+        "summary": "Ma Certification",
+        "operationId": "ma_certification_api_certification_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaCertification"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/certification/certificat.pdf": {
+      "get": {
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certificat",
+        "operationId": "certificat_api_certification_certificat_pdf_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/pdf": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/certificats/{numero}": {
+      "get": {
+        "tags": [
+          "certification"
+        ],
+        "summary": "Verifier",
+        "operationId": "verifier_api_certificats__numero__get",
+        "parameters": [
+          {
+            "name": "numero",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Numero"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Verification"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/certification/regles": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lire Regles",
+        "operationId": "lire_regles_api_admin_certification_regles_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoriqueRegles"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Changer Regles",
+        "operationId": "changer_regles_api_admin_certification_regles_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReglesEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReglesSortie"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/certification/certificats": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister Certificats",
+        "operationId": "lister_certificats_api_admin_certification_certificats_get",
+        "parameters": [
+          {
+            "name": "etat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EtatCertificat"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Etat"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListeCertificats"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/certification/badges": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister Badges",
+        "operationId": "lister_badges_api_admin_certification_badges_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListeBadges"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/certification/certificats/{certificat_id}/revoquer": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Revoquer",
+        "operationId": "revoquer_api_admin_certification_certificats__certificat_id__revoquer_post",
+        "parameters": [
+          {
+            "name": "certificat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Certificat Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Motif"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificatGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/certification/certificats/{certificat_id}/reemettre": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Reemettre",
+        "operationId": "reemettre_api_admin_certification_certificats__certificat_id__reemettre_post",
+        "parameters": [
+          {
+            "name": "certificat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Certificat Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificatGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -9794,6 +10162,76 @@
         ],
         "title": "AxePublic"
       },
+      "BadgeGestion": {
+        "properties": {
+          "titulaire": {
+            "type": "string",
+            "title": "Titulaire"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "palier": {
+            "type": "integer",
+            "title": "Palier"
+          },
+          "obtenu_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Obtenu Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "titulaire",
+          "role",
+          "nom",
+          "palier",
+          "obtenu_le"
+        ],
+        "title": "BadgeGestion"
+      },
+      "BadgeParcours": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "palier": {
+            "type": "integer",
+            "title": "Palier"
+          },
+          "obtenu_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Obtenu Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rang",
+          "nom",
+          "palier",
+          "obtenu_le"
+        ],
+        "title": "BadgeParcours"
+      },
       "Beneficiaire": {
         "type": "string",
         "enum": [
@@ -10010,6 +10448,123 @@
           "fascicule"
         ],
         "title": "CategorieRessource"
+      },
+      "CertificatGestion": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "numero": {
+            "type": "string",
+            "title": "Numero"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatCertificat"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "titulaire": {
+            "type": "string",
+            "title": "Titulaire"
+          },
+          "utilisateur_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Utilisateur Id"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "delivre_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Delivre Le"
+          },
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          },
+          "decide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Le"
+          },
+          "remplace_numero": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remplace Numero"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "numero",
+          "etat",
+          "role",
+          "titulaire",
+          "utilisateur_id",
+          "club",
+          "delivre_le",
+          "motif",
+          "decide_le",
+          "remplace_numero"
+        ],
+        "title": "CertificatGestion"
+      },
+      "CertificatJoueur": {
+        "properties": {
+          "numero": {
+            "type": "string",
+            "title": "Numero"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatCertificat"
+          },
+          "delivre_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Delivre Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "numero",
+          "etat",
+          "delivre_le"
+        ],
+        "title": "CertificatJoueur"
       },
       "ChampsArticle": {
         "properties": {
@@ -12568,6 +13123,15 @@
         "title": "EtapeCode",
         "description": "Mot de passe juste, double authentification active : le code est demandé avant d'ouvrir la session."
       },
+      "EtatCertificat": {
+        "type": "string",
+        "enum": [
+          "valide",
+          "revoque",
+          "remplace"
+        ],
+        "title": "EtatCertificat"
+      },
       "EtatClub": {
         "type": "string",
         "enum": [
@@ -12942,6 +13506,25 @@
         ],
         "title": "ExportResume"
       },
+      "Fascicule": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "titre"
+        ],
+        "title": "Fascicule"
+      },
       "FicheActuelle": {
         "properties": {
           "description": {
@@ -13210,6 +13793,26 @@
           "versions"
         ],
         "title": "HistoriqueParametres"
+      },
+      "HistoriqueRegles": {
+        "properties": {
+          "en_cours": {
+            "$ref": "#/components/schemas/ReglesSortie"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/ReglesSortie"
+            },
+            "type": "array",
+            "title": "Versions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "en_cours",
+          "versions"
+        ],
+        "title": "HistoriqueRegles"
       },
       "IesgAdmin": {
         "properties": {
@@ -14132,6 +14735,22 @@
         ],
         "title": "LignePoints"
       },
+      "ListeBadges": {
+        "properties": {
+          "badges": {
+            "items": {
+              "$ref": "#/components/schemas/BadgeGestion"
+            },
+            "type": "array",
+            "title": "Badges"
+          }
+        },
+        "type": "object",
+        "required": [
+          "badges"
+        ],
+        "title": "ListeBadges"
+      },
       "ListeBanque": {
         "properties": {
           "questions_requises": {
@@ -14152,6 +14771,22 @@
           "quiz"
         ],
         "title": "ListeBanque"
+      },
+      "ListeCertificats": {
+        "properties": {
+          "certificats": {
+            "items": {
+              "$ref": "#/components/schemas/CertificatGestion"
+            },
+            "type": "array",
+            "title": "Certificats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "certificats"
+        ],
+        "title": "ListeCertificats"
       },
       "ListeGestion": {
         "properties": {
@@ -14238,6 +14873,56 @@
           "motif"
         ],
         "title": "LotRefusEntree"
+      },
+      "MaCertification": {
+        "properties": {
+          "reussies": {
+            "type": "integer",
+            "title": "Reussies"
+          },
+          "places": {
+            "items": {
+              "$ref": "#/components/schemas/PlaceParcours"
+            },
+            "type": "array",
+            "title": "Places"
+          },
+          "badges": {
+            "items": {
+              "$ref": "#/components/schemas/BadgeParcours"
+            },
+            "type": "array",
+            "title": "Badges"
+          },
+          "certificat": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CertificatJoueur"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "nb_questions": {
+            "type": "integer",
+            "title": "Nb Questions"
+          },
+          "seuil": {
+            "type": "integer",
+            "title": "Seuil"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reussies",
+          "places",
+          "badges",
+          "certificat",
+          "nb_questions",
+          "seuil"
+        ],
+        "title": "MaCertification"
       },
       "MembreClub": {
         "properties": {
@@ -15219,6 +15904,120 @@
         ],
         "title": "PhotoPublique"
       },
+      "PlaceParcours": {
+        "properties": {
+          "place": {
+            "type": "integer",
+            "title": "Place"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "verrouillee",
+              "ouverte",
+              "reussie",
+              "bientot"
+            ],
+            "title": "Etat"
+          },
+          "quiz_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quiz Id"
+          },
+          "titre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Titre"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "contenu_de_test": {
+            "type": "boolean",
+            "title": "Contenu De Test"
+          },
+          "fascicule": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Fascicule"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "meilleur_score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meilleur Score"
+          },
+          "tentatives_restantes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tentatives Restantes"
+          },
+          "tentative_en_cours": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tentative En Cours"
+          }
+        },
+        "type": "object",
+        "required": [
+          "place",
+          "etat",
+          "quiz_id",
+          "titre",
+          "description",
+          "contenu_de_test",
+          "fascicule",
+          "meilleur_score",
+          "tentatives_restantes",
+          "tentative_en_cours"
+        ],
+        "title": "PlaceParcours"
+      },
       "ProfilEleveAdmin": {
         "properties": {
           "pseudonyme": {
@@ -15795,6 +16594,48 @@
           "etat": {
             "$ref": "#/components/schemas/EtatQuiz"
           },
+          "parcours": {
+            "type": "string",
+            "enum": [
+              "jeux",
+              "certification"
+            ],
+            "title": "Parcours"
+          },
+          "place": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Place"
+          },
+          "ressource_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ressource Id"
+          },
+          "ressource_titre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ressource Titre"
+          },
           "contenu_de_test": {
             "type": "boolean",
             "title": "Contenu De Test"
@@ -15889,6 +16730,10 @@
           "description",
           "axe_code",
           "etat",
+          "parcours",
+          "place",
+          "ressource_id",
+          "ressource_titre",
           "contenu_de_test",
           "questions_actives",
           "soumis_le",
@@ -15923,6 +16768,48 @@
           },
           "etat": {
             "$ref": "#/components/schemas/EtatQuiz"
+          },
+          "parcours": {
+            "type": "string",
+            "enum": [
+              "jeux",
+              "certification"
+            ],
+            "title": "Parcours"
+          },
+          "place": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Place"
+          },
+          "ressource_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ressource Id"
+          },
+          "ressource_titre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ressource Titre"
           },
           "contenu_de_test": {
             "type": "boolean",
@@ -16029,6 +16916,10 @@
           "description",
           "axe_code",
           "etat",
+          "parcours",
+          "place",
+          "ressource_id",
+          "ressource_titre",
           "contenu_de_test",
           "questions_actives",
           "soumis_le",
@@ -16062,6 +16953,40 @@
             "type": "string",
             "maxLength": 40,
             "title": "Axe Code"
+          },
+          "parcours": {
+            "type": "string",
+            "enum": [
+              "jeux",
+              "certification"
+            ],
+            "title": "Parcours",
+            "default": "jeux"
+          },
+          "place": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 12.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Place"
+          },
+          "ressource_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ressource Id"
           }
         },
         "additionalProperties": false,
@@ -16366,6 +17291,74 @@
           "motif"
         ],
         "title": "RefusEntree"
+      },
+      "ReglesEntree": {
+        "properties": {
+          "noms": {
+            "items": {
+              "type": "string",
+              "maxLength": 40,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 5,
+            "minItems": 5,
+            "title": "Noms"
+          },
+          "paliers": {
+            "items": {
+              "type": "integer",
+              "maximum": 12.0,
+              "minimum": 1.0
+            },
+            "type": "array",
+            "maxItems": 5,
+            "minItems": 5,
+            "title": "Paliers"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "noms",
+          "paliers"
+        ],
+        "title": "ReglesEntree"
+      },
+      "ReglesSortie": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "noms": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Noms"
+          },
+          "paliers": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Paliers"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "noms",
+          "paliers",
+          "cree_le"
+        ],
+        "title": "ReglesSortie"
       },
       "Remplacement": {
         "properties": {
@@ -17511,6 +18504,65 @@
         ],
         "title": "TableauDeBord"
       },
+      "TitulaireEleve": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "eleve",
+            "title": "Type",
+            "default": "eleve"
+          },
+          "pseudonyme": {
+            "type": "string",
+            "title": "Pseudonyme"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pseudonyme",
+          "club"
+        ],
+        "title": "TitulaireEleve"
+      },
+      "TitulaireEncadreur": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "encadreur",
+            "title": "Type",
+            "default": "encadreur"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "initiale": {
+            "type": "string",
+            "title": "Initiale"
+          },
+          "fonction": {
+            "$ref": "#/components/schemas/Fonction"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prenom",
+          "initiale",
+          "fonction"
+        ],
+        "title": "TitulaireEncadreur"
+      },
       "TypeDecision": {
         "type": "string",
         "enum": [
@@ -17578,6 +18630,53 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "Verification": {
+        "properties": {
+          "numero": {
+            "type": "string",
+            "title": "Numero"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatCertificat"
+          },
+          "delivre_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Delivre Le"
+          },
+          "titulaire": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TitulaireEleve"
+              },
+              {
+                "$ref": "#/components/schemas/TitulaireEncadreur"
+              }
+            ],
+            "title": "Titulaire"
+          },
+          "remplace_par": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remplace Par"
+          }
+        },
+        "type": "object",
+        "required": [
+          "numero",
+          "etat",
+          "delivre_le",
+          "titulaire",
+          "remplace_par"
+        ],
+        "title": "Verification"
       },
       "VersionEntree": {
         "properties": {

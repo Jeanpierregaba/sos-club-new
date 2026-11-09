@@ -14,10 +14,10 @@
 - [x] 7. Gestion : règles des badges (versions, 422), listes des certificats et des badges, révocation et
       réémission (2FA, motif, annulation des points, audit, notifications). Tests d'abord, droits paramétrés.
 - [x] 8. Seed : 12 quiz « [Test] » du parcours reliés au fascicule de test ; test du seed.
-- [ ] 9. Site : client et types, `lib/certification` (+ test), page « Ma certification », retour depuis la partie,
+- [x] 9. Site : client et types, `lib/certification` (+ test), page « Ma certification », retour depuis la partie,
       bouton sur `/certification`.
-- [ ] 10. Site : page publique `/certificats/$numero` (+ test), vérifiée dans le navigateur à 375 px.
-- [ ] 11. Site admin : parcours, place et fascicule dans la banque ; page « Certification » (paramètres, badges,
+- [x] 10. Site : page publique `/certificats/$numero` (+ test), vérifiée dans le navigateur à 375 px.
+- [x] 11. Site admin : parcours, place et fascicule dans la banque ; page « Certification » (paramètres, badges,
       certificats avec révocation et réémission).
 - [ ] 12. Docs : ARCHITECTURE, SECURITY, PRD (Q24), TASKS.md, SESSION-LOG.
 - [ ] Vérifier tous les critères d'acceptation de spec.md

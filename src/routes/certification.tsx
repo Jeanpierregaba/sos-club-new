@@ -422,8 +422,9 @@ function Certification() {
                 ))}
               </ul>
               <div className="mt-8 flex flex-wrap gap-3">
+                {/* Connecté, le parcours s'ouvre ; sinon la connexion le demande d'abord. */}
                 <a
-                  href="#parcours"
+                  href="/certification/parcours"
                   className="btn-fx inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground shadow-card"
                 >
                   Lancer ma certification <ArrowRight className="size-4" />

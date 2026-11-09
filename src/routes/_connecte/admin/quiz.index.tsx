@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { BadgeEtatQuiz, ETATS_QUIZ } from "@/components/quiz/BadgeEtatQuiz";
+import { ChampsParcours } from "@/components/quiz/ChampsParcours";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Button } from "@/components/ui/button";
 import { peut } from "@/lib/admin";
@@ -13,31 +14,43 @@ import {
   creerQuiz,
   type AxePublic,
   type EtatQuiz,
+  type Parcours,
 } from "@/lib/api/client";
 import { dateCourte } from "@/lib/dates";
+import { chargerFascicules, useParcours } from "@/lib/parcours";
 
-type Recherche = { etat?: EtatQuiz | undefined };
+type Recherche = { etat?: EtatQuiz; parcours?: Parcours };
 const ETATS = Object.keys(ETATS_QUIZ) as EtatQuiz[];
+const PARCOURS: { valeur: Parcours; libelle: string }[] = [
+  { valeur: "jeux", libelle: "Jeux" },
+  { valeur: "certification", libelle: "Certification" },
+];
 
 export const Route = createFileRoute("/_connecte/admin/quiz/")({
   gcTime: 0,
-  validateSearch: (search: Record<string, unknown>): Recherche =>
-    ETATS.includes(search["etat"] as EtatQuiz) ? { etat: search["etat"] as EtatQuiz } : {},
+  validateSearch: (search: Record<string, unknown>): Recherche => ({
+    ...(ETATS.includes(search["etat"] as EtatQuiz) ? { etat: search["etat"] as EtatQuiz } : {}),
+    ...(search["parcours"] === "jeux" || search["parcours"] === "certification"
+      ? { parcours: search["parcours"] }
+      : {}),
+  }),
   loaderDeps: ({ search }) => search,
   loader: async ({ deps }) => {
-    const [banque, axes] = await Promise.all([
-      chargerBanque(deps.etat),
+    const [banque, axes, fascicules] = await Promise.all([
+      chargerBanque(deps),
       chargerAxes().catch((): AxePublic[] => []),
+      chargerFascicules(),
     ]);
-    return { banque, axes };
+    return { banque, axes, fascicules };
   },
   errorComponent: ServiceIndisponible,
   component: Banque,
 });
 
 function Banque() {
-  const { banque, axes } = Route.useLoaderData();
-  const { etat } = Route.useSearch();
+  const { banque, axes, fascicules } = Route.useLoaderData();
+  const { etat, parcours } = Route.useSearch();
+  const champsParcours = useParcours();
   const { admin } = Route.useRouteContext();
   const naviguer = useNavigate();
   const [ouvert, setOuvert] = useState(false);
@@ -49,12 +62,34 @@ function Banque() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <nav aria-label="Filtrer par état" className="flex flex-wrap gap-2">
-          <Filtre libelle="Tous" actif={!etat} />
-          {ETATS.map((e) => (
-            <Filtre key={e} etat={e} libelle={ETATS_QUIZ[e].libelle} actif={etat === e} />
-          ))}
-        </nav>
+        <div className="space-y-2">
+          <nav aria-label="Filtrer par parcours" className="flex flex-wrap gap-2">
+            <Filtre
+              recherche={etat ? { etat } : {}}
+              libelle="Tous les parcours"
+              actif={!parcours}
+            />
+            {PARCOURS.map((p) => (
+              <Filtre
+                key={p.valeur}
+                recherche={{ ...(etat ? { etat } : {}), parcours: p.valeur }}
+                libelle={p.libelle}
+                actif={parcours === p.valeur}
+              />
+            ))}
+          </nav>
+          <nav aria-label="Filtrer par état" className="flex flex-wrap gap-2">
+            <Filtre recherche={parcours ? { parcours } : {}} libelle="Tous" actif={!etat} />
+            {ETATS.map((e) => (
+              <Filtre
+                key={e}
+                recherche={{ ...(parcours ? { parcours } : {}), etat: e }}
+                libelle={ETATS_QUIZ[e].libelle}
+                actif={etat === e}
+              />
+            ))}
+          </nav>
+        </div>
         {peut(admin, "quiz", "creer") && (
           <Button className="rounded-full font-bold" onClick={() => setOuvert(true)}>
             <Plus className="size-4" /> Nouveau quiz
@@ -86,6 +121,11 @@ function Banque() {
                   </span>
                 </span>
                 <span className="flex flex-wrap gap-2">
+                  {q.place !== null && (
+                    <span className="rounded-full bg-logo-blue/10 px-2.5 py-0.5 text-xs font-extrabold text-logo-blue">
+                      Certification · quiz {q.place}
+                    </span>
+                  )}
                   {q.contenu_de_test && (
                     <span className="rounded-full bg-sun/30 px-2.5 py-0.5 text-xs font-extrabold">
                       Contenu de test
@@ -106,7 +146,12 @@ function Banque() {
         description="Il reste en brouillon tant que tu ne le soumets pas."
         bouton="Créer le quiz"
         onEnvoie={async () => {
-          const quiz = await creerQuiz({ titre, description, axe_code: axe });
+          const quiz = await creerQuiz({
+            titre,
+            description,
+            axe_code: axe,
+            ...champsParcours.entree,
+          });
           await naviguer({ to: "/admin/quiz/$id", params: { id: quiz.id } });
         }}
       >
@@ -135,16 +180,25 @@ function Banque() {
             ))}
           </select>
         </Champ>
+        <ChampsParcours etat={champsParcours} fascicules={fascicules} />
       </DialogueFormulaire>
     </div>
   );
 }
 
-function Filtre({ etat, libelle, actif }: { etat?: EtatQuiz; libelle: string; actif: boolean }) {
+function Filtre({
+  recherche,
+  libelle,
+  actif,
+}: {
+  recherche: Recherche;
+  libelle: string;
+  actif: boolean;
+}) {
   return (
     <Link
       to="/admin/quiz"
-      search={etat ? { etat } : {}}
+      search={recherche}
       aria-current={actif ? "page" : undefined}
       className={`rounded-full px-3 py-1.5 text-sm font-semibold ring-1 transition ${
         actif ? "bg-night text-white ring-night" : "bg-white ring-border"

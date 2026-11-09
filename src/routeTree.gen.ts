@@ -30,11 +30,13 @@ import { Route as ConnecteMonEspaceRouteImport } from './routes/_connecte/mon-es
 import { Route as ConnecteNotificationsRouteImport } from './routes/_connecte/notifications'
 import { Route as ArticlesIndexRouteImport } from './routes/articles.index'
 import { Route as ArticlesAdresseRouteImport } from './routes/articles.$adresse'
+import { Route as CertificatsNumeroRouteImport } from './routes/certificats.$numero'
 import { Route as ClubsIdRouteImport } from './routes/clubs.$id'
 import { Route as GenieImhotepDescriptionRouteImport } from './routes/genie-imhotep/description'
 import { Route as GenieImhotepInscriptionRouteImport } from './routes/genie-imhotep/inscription'
 import { Route as ConnecteAdminIndexRouteImport } from './routes/_connecte/admin/index'
 import { Route as ConnecteAdminBibliothequeRouteImport } from './routes/_connecte/admin/bibliotheque'
+import { Route as ConnecteAdminCertificationRouteImport } from './routes/_connecte/admin/certification'
 import { Route as ConnecteAdminClubsRouteImport } from './routes/_connecte/admin/clubs'
 import { Route as ConnecteAdminDoubleAuthentificationRouteImport } from './routes/_connecte/admin/double-authentification'
 import { Route as ConnecteAdminEncadreursRouteImport } from './routes/_connecte/admin/encadreurs'
@@ -56,6 +58,9 @@ import { Route as GenieImhotepPalmaresIndexRouteImport } from './routes/genie-im
 import { Route as GenieImhotepPalmaresEditionRouteImport } from './routes/genie-imhotep/palmares/$edition'
 import { Route as ConnecteAdminBibliothequeIndexRouteImport } from './routes/_connecte/admin/bibliotheque.index'
 import { Route as ConnecteAdminBibliothequeIdRouteImport } from './routes/_connecte/admin/bibliotheque.$id'
+import { Route as ConnecteAdminCertificationIndexRouteImport } from './routes/_connecte/admin/certification.index'
+import { Route as ConnecteAdminCertificationBadgesRouteImport } from './routes/_connecte/admin/certification.badges'
+import { Route as ConnecteAdminCertificationParametresRouteImport } from './routes/_connecte/admin/certification.parametres'
 import { Route as ConnecteAdminCollaborateursIndexRouteImport } from './routes/_connecte/admin/collaborateurs.index'
 import { Route as ConnecteAdminCollaborateursIdRouteImport } from './routes/_connecte/admin/collaborateurs.$id'
 import { Route as ConnecteAdminInscritsIndexRouteImport } from './routes/_connecte/admin/inscrits.index'
@@ -68,6 +73,8 @@ import { Route as ConnecteAdminQuizParametresRouteImport } from './routes/_conne
 import { Route as ConnecteAdminReferentielIndexRouteImport } from './routes/_connecte/admin/referentiel.index'
 import { Route as ConnecteAdminReferentielAxesRouteImport } from './routes/_connecte/admin/referentiel.axes'
 import { Route as ConnecteAdminReferentielEtablissementsRouteImport } from './routes/_connecte/admin/referentiel.etablissements'
+import { Route as ConnecteCertificationParcoursIndexRouteImport } from './routes/_connecte/certification.parcours.index'
+import { Route as ConnecteCertificationParcoursPlaceRouteImport } from './routes/_connecte/certification.parcours.$place'
 import { Route as ConnecteMonClubActualitesIdRouteImport } from './routes/_connecte/mon-club.actualites.$id'
 import { Route as ConnecteMonClubActualitesNouveauRouteImport } from './routes/_connecte/mon-club.actualites.nouveau'
 
@@ -175,6 +182,11 @@ const ArticlesAdresseRoute = ArticlesAdresseRouteImport.update({
   path: '/articles/$adresse',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CertificatsNumeroRoute = CertificatsNumeroRouteImport.update({
+  id: '/certificats/$numero',
+  path: '/certificats/$numero',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClubsIdRoute = ClubsIdRouteImport.update({
   id: '/clubs/$id',
   path: '/clubs/$id',
@@ -199,6 +211,12 @@ const ConnecteAdminBibliothequeRoute =
   ConnecteAdminBibliothequeRouteImport.update({
     id: '/bibliotheque',
     path: '/bibliotheque',
+    getParentRoute: () => ConnecteAdminRoute,
+  } as any)
+const ConnecteAdminCertificationRoute =
+  ConnecteAdminCertificationRouteImport.update({
+    id: '/certification',
+    path: '/certification',
     getParentRoute: () => ConnecteAdminRoute,
   } as any)
 const ConnecteAdminClubsRoute = ConnecteAdminClubsRouteImport.update({
@@ -316,6 +334,24 @@ const ConnecteAdminBibliothequeIdRoute =
     path: '/$id',
     getParentRoute: () => ConnecteAdminBibliothequeRoute,
   } as any)
+const ConnecteAdminCertificationIndexRoute =
+  ConnecteAdminCertificationIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ConnecteAdminCertificationRoute,
+  } as any)
+const ConnecteAdminCertificationBadgesRoute =
+  ConnecteAdminCertificationBadgesRouteImport.update({
+    id: '/badges',
+    path: '/badges',
+    getParentRoute: () => ConnecteAdminCertificationRoute,
+  } as any)
+const ConnecteAdminCertificationParametresRoute =
+  ConnecteAdminCertificationParametresRouteImport.update({
+    id: '/parametres',
+    path: '/parametres',
+    getParentRoute: () => ConnecteAdminCertificationRoute,
+  } as any)
 const ConnecteAdminCollaborateursIndexRoute =
   ConnecteAdminCollaborateursIndexRouteImport.update({
     id: '/collaborateurs/',
@@ -385,6 +421,18 @@ const ConnecteAdminReferentielEtablissementsRoute =
     path: '/etablissements',
     getParentRoute: () => ConnecteAdminReferentielRoute,
   } as any)
+const ConnecteCertificationParcoursIndexRoute =
+  ConnecteCertificationParcoursIndexRouteImport.update({
+    id: '/certification/parcours/',
+    path: '/certification/parcours/',
+    getParentRoute: () => ConnecteRoute,
+  } as any)
+const ConnecteCertificationParcoursPlaceRoute =
+  ConnecteCertificationParcoursPlaceRouteImport.update({
+    id: '/certification/parcours/$place',
+    path: '/certification/parcours/$place',
+    getParentRoute: () => ConnecteRoute,
+  } as any)
 const ConnecteMonClubActualitesIdRoute =
   ConnecteMonClubActualitesIdRouteImport.update({
     id: '/mon-club/actualites/$id',
@@ -418,11 +466,13 @@ export interface FileRoutesByFullPath {
   '/mon-espace': typeof ConnecteMonEspaceRoute
   '/notifications': typeof ConnecteNotificationsRoute
   '/articles/$adresse': typeof ArticlesAdresseRoute
+  '/certificats/$numero': typeof CertificatsNumeroRoute
   '/clubs/$id': typeof ClubsIdRoute
   '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
   '/articles/': typeof ArticlesIndexRoute
   '/admin/bibliotheque': typeof ConnecteAdminBibliothequeRouteWithChildren
+  '/admin/certification': typeof ConnecteAdminCertificationRouteWithChildren
   '/admin/clubs': typeof ConnecteAdminClubsRoute
   '/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
   '/admin/encadreurs': typeof ConnecteAdminEncadreursRoute
@@ -444,6 +494,8 @@ export interface FileRoutesByFullPath {
   '/genie-imhotep/hall-of-fame/': typeof GenieImhotepHallOfFameIndexRoute
   '/genie-imhotep/palmares/': typeof GenieImhotepPalmaresIndexRoute
   '/admin/bibliotheque/$id': typeof ConnecteAdminBibliothequeIdRoute
+  '/admin/certification/badges': typeof ConnecteAdminCertificationBadgesRoute
+  '/admin/certification/parametres': typeof ConnecteAdminCertificationParametresRoute
   '/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
   '/admin/points/bareme': typeof ConnecteAdminPointsBaremeRoute
@@ -451,14 +503,17 @@ export interface FileRoutesByFullPath {
   '/admin/quiz/parametres': typeof ConnecteAdminQuizParametresRoute
   '/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
   '/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
+  '/certification/parcours/$place': typeof ConnecteCertificationParcoursPlaceRoute
   '/mon-club/actualites/$id': typeof ConnecteMonClubActualitesIdRoute
   '/mon-club/actualites/nouveau': typeof ConnecteMonClubActualitesNouveauRoute
   '/admin/bibliotheque/': typeof ConnecteAdminBibliothequeIndexRoute
+  '/admin/certification/': typeof ConnecteAdminCertificationIndexRoute
   '/admin/collaborateurs/': typeof ConnecteAdminCollaborateursIndexRoute
   '/admin/inscrits/': typeof ConnecteAdminInscritsIndexRoute
   '/admin/points/': typeof ConnecteAdminPointsIndexRoute
   '/admin/quiz/': typeof ConnecteAdminQuizIndexRoute
   '/admin/referentiel/': typeof ConnecteAdminReferentielIndexRoute
+  '/certification/parcours/': typeof ConnecteCertificationParcoursIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -479,6 +534,7 @@ export interface FileRoutesByTo {
   '/mon-espace': typeof ConnecteMonEspaceRoute
   '/notifications': typeof ConnecteNotificationsRoute
   '/articles/$adresse': typeof ArticlesAdresseRoute
+  '/certificats/$numero': typeof CertificatsNumeroRoute
   '/clubs/$id': typeof ClubsIdRoute
   '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
@@ -501,6 +557,8 @@ export interface FileRoutesByTo {
   '/genie-imhotep/hall-of-fame': typeof GenieImhotepHallOfFameIndexRoute
   '/genie-imhotep/palmares': typeof GenieImhotepPalmaresIndexRoute
   '/admin/bibliotheque/$id': typeof ConnecteAdminBibliothequeIdRoute
+  '/admin/certification/badges': typeof ConnecteAdminCertificationBadgesRoute
+  '/admin/certification/parametres': typeof ConnecteAdminCertificationParametresRoute
   '/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
   '/admin/points/bareme': typeof ConnecteAdminPointsBaremeRoute
@@ -508,14 +566,17 @@ export interface FileRoutesByTo {
   '/admin/quiz/parametres': typeof ConnecteAdminQuizParametresRoute
   '/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
   '/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
+  '/certification/parcours/$place': typeof ConnecteCertificationParcoursPlaceRoute
   '/mon-club/actualites/$id': typeof ConnecteMonClubActualitesIdRoute
   '/mon-club/actualites/nouveau': typeof ConnecteMonClubActualitesNouveauRoute
   '/admin/bibliotheque': typeof ConnecteAdminBibliothequeIndexRoute
+  '/admin/certification': typeof ConnecteAdminCertificationIndexRoute
   '/admin/collaborateurs': typeof ConnecteAdminCollaborateursIndexRoute
   '/admin/inscrits': typeof ConnecteAdminInscritsIndexRoute
   '/admin/points': typeof ConnecteAdminPointsIndexRoute
   '/admin/quiz': typeof ConnecteAdminQuizIndexRoute
   '/admin/referentiel': typeof ConnecteAdminReferentielIndexRoute
+  '/certification/parcours': typeof ConnecteCertificationParcoursIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -539,11 +600,13 @@ export interface FileRoutesById {
   '/_connecte/mon-espace': typeof ConnecteMonEspaceRoute
   '/_connecte/notifications': typeof ConnecteNotificationsRoute
   '/articles/$adresse': typeof ArticlesAdresseRoute
+  '/certificats/$numero': typeof CertificatsNumeroRoute
   '/clubs/$id': typeof ClubsIdRoute
   '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
   '/articles/': typeof ArticlesIndexRoute
   '/_connecte/admin/bibliotheque': typeof ConnecteAdminBibliothequeRouteWithChildren
+  '/_connecte/admin/certification': typeof ConnecteAdminCertificationRouteWithChildren
   '/_connecte/admin/clubs': typeof ConnecteAdminClubsRoute
   '/_connecte/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
   '/_connecte/admin/encadreurs': typeof ConnecteAdminEncadreursRoute
@@ -565,6 +628,8 @@ export interface FileRoutesById {
   '/genie-imhotep/hall-of-fame/': typeof GenieImhotepHallOfFameIndexRoute
   '/genie-imhotep/palmares/': typeof GenieImhotepPalmaresIndexRoute
   '/_connecte/admin/bibliotheque/$id': typeof ConnecteAdminBibliothequeIdRoute
+  '/_connecte/admin/certification/badges': typeof ConnecteAdminCertificationBadgesRoute
+  '/_connecte/admin/certification/parametres': typeof ConnecteAdminCertificationParametresRoute
   '/_connecte/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/_connecte/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
   '/_connecte/admin/points/bareme': typeof ConnecteAdminPointsBaremeRoute
@@ -572,14 +637,17 @@ export interface FileRoutesById {
   '/_connecte/admin/quiz/parametres': typeof ConnecteAdminQuizParametresRoute
   '/_connecte/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
   '/_connecte/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
+  '/_connecte/certification/parcours/$place': typeof ConnecteCertificationParcoursPlaceRoute
   '/_connecte/mon-club/actualites/$id': typeof ConnecteMonClubActualitesIdRoute
   '/_connecte/mon-club/actualites/nouveau': typeof ConnecteMonClubActualitesNouveauRoute
   '/_connecte/admin/bibliotheque/': typeof ConnecteAdminBibliothequeIndexRoute
+  '/_connecte/admin/certification/': typeof ConnecteAdminCertificationIndexRoute
   '/_connecte/admin/collaborateurs/': typeof ConnecteAdminCollaborateursIndexRoute
   '/_connecte/admin/inscrits/': typeof ConnecteAdminInscritsIndexRoute
   '/_connecte/admin/points/': typeof ConnecteAdminPointsIndexRoute
   '/_connecte/admin/quiz/': typeof ConnecteAdminQuizIndexRoute
   '/_connecte/admin/referentiel/': typeof ConnecteAdminReferentielIndexRoute
+  '/_connecte/certification/parcours/': typeof ConnecteCertificationParcoursIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -603,11 +671,13 @@ export interface FileRouteTypes {
     | '/mon-espace'
     | '/notifications'
     | '/articles/$adresse'
+    | '/certificats/$numero'
     | '/clubs/$id'
     | '/genie-imhotep/description'
     | '/genie-imhotep/inscription'
     | '/articles/'
     | '/admin/bibliotheque'
+    | '/admin/certification'
     | '/admin/clubs'
     | '/admin/double-authentification'
     | '/admin/encadreurs'
@@ -629,6 +699,8 @@ export interface FileRouteTypes {
     | '/genie-imhotep/hall-of-fame/'
     | '/genie-imhotep/palmares/'
     | '/admin/bibliotheque/$id'
+    | '/admin/certification/badges'
+    | '/admin/certification/parametres'
     | '/admin/collaborateurs/$id'
     | '/admin/inscrits/$id'
     | '/admin/points/bareme'
@@ -636,14 +708,17 @@ export interface FileRouteTypes {
     | '/admin/quiz/parametres'
     | '/admin/referentiel/axes'
     | '/admin/referentiel/etablissements'
+    | '/certification/parcours/$place'
     | '/mon-club/actualites/$id'
     | '/mon-club/actualites/nouveau'
     | '/admin/bibliotheque/'
+    | '/admin/certification/'
     | '/admin/collaborateurs/'
     | '/admin/inscrits/'
     | '/admin/points/'
     | '/admin/quiz/'
     | '/admin/referentiel/'
+    | '/certification/parcours/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -664,6 +739,7 @@ export interface FileRouteTypes {
     | '/mon-espace'
     | '/notifications'
     | '/articles/$adresse'
+    | '/certificats/$numero'
     | '/clubs/$id'
     | '/genie-imhotep/description'
     | '/genie-imhotep/inscription'
@@ -686,6 +762,8 @@ export interface FileRouteTypes {
     | '/genie-imhotep/hall-of-fame'
     | '/genie-imhotep/palmares'
     | '/admin/bibliotheque/$id'
+    | '/admin/certification/badges'
+    | '/admin/certification/parametres'
     | '/admin/collaborateurs/$id'
     | '/admin/inscrits/$id'
     | '/admin/points/bareme'
@@ -693,14 +771,17 @@ export interface FileRouteTypes {
     | '/admin/quiz/parametres'
     | '/admin/referentiel/axes'
     | '/admin/referentiel/etablissements'
+    | '/certification/parcours/$place'
     | '/mon-club/actualites/$id'
     | '/mon-club/actualites/nouveau'
     | '/admin/bibliotheque'
+    | '/admin/certification'
     | '/admin/collaborateurs'
     | '/admin/inscrits'
     | '/admin/points'
     | '/admin/quiz'
     | '/admin/referentiel'
+    | '/certification/parcours'
   id:
     | '__root__'
     | '/'
@@ -723,11 +804,13 @@ export interface FileRouteTypes {
     | '/_connecte/mon-espace'
     | '/_connecte/notifications'
     | '/articles/$adresse'
+    | '/certificats/$numero'
     | '/clubs/$id'
     | '/genie-imhotep/description'
     | '/genie-imhotep/inscription'
     | '/articles/'
     | '/_connecte/admin/bibliotheque'
+    | '/_connecte/admin/certification'
     | '/_connecte/admin/clubs'
     | '/_connecte/admin/double-authentification'
     | '/_connecte/admin/encadreurs'
@@ -749,6 +832,8 @@ export interface FileRouteTypes {
     | '/genie-imhotep/hall-of-fame/'
     | '/genie-imhotep/palmares/'
     | '/_connecte/admin/bibliotheque/$id'
+    | '/_connecte/admin/certification/badges'
+    | '/_connecte/admin/certification/parametres'
     | '/_connecte/admin/collaborateurs/$id'
     | '/_connecte/admin/inscrits/$id'
     | '/_connecte/admin/points/bareme'
@@ -756,14 +841,17 @@ export interface FileRouteTypes {
     | '/_connecte/admin/quiz/parametres'
     | '/_connecte/admin/referentiel/axes'
     | '/_connecte/admin/referentiel/etablissements'
+    | '/_connecte/certification/parcours/$place'
     | '/_connecte/mon-club/actualites/$id'
     | '/_connecte/mon-club/actualites/nouveau'
     | '/_connecte/admin/bibliotheque/'
+    | '/_connecte/admin/certification/'
     | '/_connecte/admin/collaborateurs/'
     | '/_connecte/admin/inscrits/'
     | '/_connecte/admin/points/'
     | '/_connecte/admin/quiz/'
     | '/_connecte/admin/referentiel/'
+    | '/_connecte/certification/parcours/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -783,6 +871,7 @@ export interface RootRouteChildren {
   Les7AxesRoute: typeof Les7AxesRoute
   MagazineRoute: typeof MagazineRoute
   ArticlesAdresseRoute: typeof ArticlesAdresseRoute
+  CertificatsNumeroRoute: typeof CertificatsNumeroRoute
   ClubsIdRoute: typeof ClubsIdRoute
   GenieImhotepDescriptionRoute: typeof GenieImhotepDescriptionRoute
   GenieImhotepInscriptionRoute: typeof GenieImhotepInscriptionRoute
@@ -942,6 +1031,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArticlesAdresseRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/certificats/$numero': {
+      id: '/certificats/$numero'
+      path: '/certificats/$numero'
+      fullPath: '/certificats/$numero'
+      preLoaderRoute: typeof CertificatsNumeroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/clubs/$id': {
       id: '/clubs/$id'
       path: '/clubs/$id'
@@ -975,6 +1071,13 @@ declare module '@tanstack/react-router' {
       path: '/bibliotheque'
       fullPath: '/admin/bibliotheque'
       preLoaderRoute: typeof ConnecteAdminBibliothequeRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
+    '/_connecte/admin/certification': {
+      id: '/_connecte/admin/certification'
+      path: '/certification'
+      fullPath: '/admin/certification'
+      preLoaderRoute: typeof ConnecteAdminCertificationRouteImport
       parentRoute: typeof ConnecteAdminRoute
     }
     '/_connecte/admin/clubs': {
@@ -1124,6 +1227,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteAdminBibliothequeIdRouteImport
       parentRoute: typeof ConnecteAdminBibliothequeRoute
     }
+    '/_connecte/admin/certification/': {
+      id: '/_connecte/admin/certification/'
+      path: '/'
+      fullPath: '/admin/certification/'
+      preLoaderRoute: typeof ConnecteAdminCertificationIndexRouteImport
+      parentRoute: typeof ConnecteAdminCertificationRoute
+    }
+    '/_connecte/admin/certification/badges': {
+      id: '/_connecte/admin/certification/badges'
+      path: '/badges'
+      fullPath: '/admin/certification/badges'
+      preLoaderRoute: typeof ConnecteAdminCertificationBadgesRouteImport
+      parentRoute: typeof ConnecteAdminCertificationRoute
+    }
+    '/_connecte/admin/certification/parametres': {
+      id: '/_connecte/admin/certification/parametres'
+      path: '/parametres'
+      fullPath: '/admin/certification/parametres'
+      preLoaderRoute: typeof ConnecteAdminCertificationParametresRouteImport
+      parentRoute: typeof ConnecteAdminCertificationRoute
+    }
     '/_connecte/admin/collaborateurs/': {
       id: '/_connecte/admin/collaborateurs/'
       path: '/collaborateurs'
@@ -1208,6 +1332,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteAdminReferentielEtablissementsRouteImport
       parentRoute: typeof ConnecteAdminReferentielRoute
     }
+    '/_connecte/certification/parcours/': {
+      id: '/_connecte/certification/parcours/'
+      path: '/certification/parcours'
+      fullPath: '/certification/parcours/'
+      preLoaderRoute: typeof ConnecteCertificationParcoursIndexRouteImport
+      parentRoute: typeof ConnecteRoute
+    }
+    '/_connecte/certification/parcours/$place': {
+      id: '/_connecte/certification/parcours/$place'
+      path: '/certification/parcours/$place'
+      fullPath: '/certification/parcours/$place'
+      preLoaderRoute: typeof ConnecteCertificationParcoursPlaceRouteImport
+      parentRoute: typeof ConnecteRoute
+    }
     '/_connecte/mon-club/actualites/$id': {
       id: '/_connecte/mon-club/actualites/$id'
       path: '/mon-club/actualites/$id'
@@ -1239,6 +1377,26 @@ const ConnecteAdminBibliothequeRouteChildren: ConnecteAdminBibliothequeRouteChil
 const ConnecteAdminBibliothequeRouteWithChildren =
   ConnecteAdminBibliothequeRoute._addFileChildren(
     ConnecteAdminBibliothequeRouteChildren,
+  )
+
+interface ConnecteAdminCertificationRouteChildren {
+  ConnecteAdminCertificationBadgesRoute: typeof ConnecteAdminCertificationBadgesRoute
+  ConnecteAdminCertificationParametresRoute: typeof ConnecteAdminCertificationParametresRoute
+  ConnecteAdminCertificationIndexRoute: typeof ConnecteAdminCertificationIndexRoute
+}
+
+const ConnecteAdminCertificationRouteChildren: ConnecteAdminCertificationRouteChildren =
+  {
+    ConnecteAdminCertificationBadgesRoute:
+      ConnecteAdminCertificationBadgesRoute,
+    ConnecteAdminCertificationParametresRoute:
+      ConnecteAdminCertificationParametresRoute,
+    ConnecteAdminCertificationIndexRoute: ConnecteAdminCertificationIndexRoute,
+  }
+
+const ConnecteAdminCertificationRouteWithChildren =
+  ConnecteAdminCertificationRoute._addFileChildren(
+    ConnecteAdminCertificationRouteChildren,
   )
 
 interface ConnecteAdminPointsRouteChildren {
@@ -1290,6 +1448,7 @@ const ConnecteAdminReferentielRouteWithChildren =
 
 interface ConnecteAdminRouteChildren {
   ConnecteAdminBibliothequeRoute: typeof ConnecteAdminBibliothequeRouteWithChildren
+  ConnecteAdminCertificationRoute: typeof ConnecteAdminCertificationRouteWithChildren
   ConnecteAdminClubsRoute: typeof ConnecteAdminClubsRoute
   ConnecteAdminDoubleAuthentificationRoute: typeof ConnecteAdminDoubleAuthentificationRoute
   ConnecteAdminEncadreursRoute: typeof ConnecteAdminEncadreursRoute
@@ -1308,6 +1467,7 @@ interface ConnecteAdminRouteChildren {
 
 const ConnecteAdminRouteChildren: ConnecteAdminRouteChildren = {
   ConnecteAdminBibliothequeRoute: ConnecteAdminBibliothequeRouteWithChildren,
+  ConnecteAdminCertificationRoute: ConnecteAdminCertificationRouteWithChildren,
   ConnecteAdminClubsRoute: ConnecteAdminClubsRoute,
   ConnecteAdminDoubleAuthentificationRoute:
     ConnecteAdminDoubleAuthentificationRoute,
@@ -1340,8 +1500,10 @@ interface ConnecteRouteChildren {
   ConnecteMesArticlesIndexRoute: typeof ConnecteMesArticlesIndexRoute
   ConnecteMonClubIndexRoute: typeof ConnecteMonClubIndexRoute
   ConnecteQuizIndexRoute: typeof ConnecteQuizIndexRoute
+  ConnecteCertificationParcoursPlaceRoute: typeof ConnecteCertificationParcoursPlaceRoute
   ConnecteMonClubActualitesIdRoute: typeof ConnecteMonClubActualitesIdRoute
   ConnecteMonClubActualitesNouveauRoute: typeof ConnecteMonClubActualitesNouveauRoute
+  ConnecteCertificationParcoursIndexRoute: typeof ConnecteCertificationParcoursIndexRoute
 }
 
 const ConnecteRouteChildren: ConnecteRouteChildren = {
@@ -1355,8 +1517,12 @@ const ConnecteRouteChildren: ConnecteRouteChildren = {
   ConnecteMesArticlesIndexRoute: ConnecteMesArticlesIndexRoute,
   ConnecteMonClubIndexRoute: ConnecteMonClubIndexRoute,
   ConnecteQuizIndexRoute: ConnecteQuizIndexRoute,
+  ConnecteCertificationParcoursPlaceRoute:
+    ConnecteCertificationParcoursPlaceRoute,
   ConnecteMonClubActualitesIdRoute: ConnecteMonClubActualitesIdRoute,
   ConnecteMonClubActualitesNouveauRoute: ConnecteMonClubActualitesNouveauRoute,
+  ConnecteCertificationParcoursIndexRoute:
+    ConnecteCertificationParcoursIndexRoute,
 }
 
 const ConnecteRouteWithChildren = ConnecteRoute._addFileChildren(
@@ -1380,6 +1546,7 @@ const rootRouteChildren: RootRouteChildren = {
   Les7AxesRoute: Les7AxesRoute,
   MagazineRoute: MagazineRoute,
   ArticlesAdresseRoute: ArticlesAdresseRoute,
+  CertificatsNumeroRoute: CertificatsNumeroRoute,
   ClubsIdRoute: ClubsIdRoute,
   GenieImhotepDescriptionRoute: GenieImhotepDescriptionRoute,
   GenieImhotepInscriptionRoute: GenieImhotepInscriptionRoute,
