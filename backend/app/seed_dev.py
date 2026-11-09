@@ -11,17 +11,21 @@ Refusé en production : aucune base réelle ne doit recevoir ces comptes (docs/R
 import asyncio
 import io
 import sys
-from datetime import UTC, datetime
+import unicodedata
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from uuid import UUID, uuid7
 
 from PIL import Image
+from pypdf import PdfWriter
+from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.catalogue import LIBELLES_ROLES, RoleDepart
 from app.admin.journal import journaliser
 from app.admin.models import DoubleAuth
+from app.bibliotheque.models import CategorieRessource, EtatRessource, Ressource
 from app.clubs.adhesions import adhesion_president
 from app.clubs.models import Adhesion, Club, ClubAxe, EtatAdhesion, EtatClub
 from app.comptes.models import Role, Utilisateur
@@ -390,6 +394,79 @@ async def _preparer_quiz(db: AsyncSession) -> None:
             db.add(question)
 
 
+def _pdf_de_test(titre: str) -> bytes:
+    """Un PDF d'une page qui ne dit qu'une chose : c'est un document de test (texte ASCII, police standard)."""
+    writer = PdfWriter()
+    page = writer.add_blank_page(width=595, height=842)
+    police = DictionaryObject(
+        {
+            NameObject("/Type"): NameObject("/Font"),
+            NameObject("/Subtype"): NameObject("/Type1"),
+            NameObject("/BaseFont"): NameObject("/Helvetica"),
+        }
+    )
+    page[NameObject("/Resources")] = DictionaryObject(
+        {NameObject("/Font"): DictionaryObject({NameObject("/F1"): writer._add_object(police)})}
+    )
+    texte = unicodedata.normalize("NFKD", titre).encode("ascii", "ignore").decode().replace("(", "").replace(")", "")
+    contenu = DecodedStreamObject()
+    contenu.set_data(
+        f"BT /F1 22 Tf 60 760 Td ({texte}) Tj 0 -40 Td /F1 14 Tf "
+        "(Document de demonstration - contenu de test, non valide.) Tj ET".encode()
+    )
+    page[NameObject("/Contents")] = writer._add_object(contenu)
+    sortie = io.BytesIO()
+    writer.write(sortie)
+    return sortie.getvalue()
+
+
+async def _preparer_bibliotheque(db: AsyncSession) -> None:
+    """Quatre ressources de démonstration (spec 028), une fois : deux magazines et un guide publiés, une fiche soumise
+    par le gestionnaire pédagogique (à publier par un autre compte). Marquées « Contenu de test » : des PDF d'une
+    page qui le disent, aucun contenu de santé inventé (docs/RULES.md)."""
+    if await db.scalar(select(Ressource.id)):
+        return
+    pedagogie = await db.scalar(select(Utilisateur.id).where(Utilisateur.identifiant == "dev.pedagogie"))
+    if pedagogie is None:
+        return
+    maintenant = datetime.now(UTC)
+    disque = stockage()
+    ressources = (
+        ("[Test] Magazine de démonstration n° 2", CategorieRessource.magazine, EtatRessource.publie, (46, 140, 90)),
+        ("[Test] Magazine de démonstration n° 1", CategorieRessource.magazine, EtatRessource.publie, (40, 90, 170)),
+        ("[Test] Guide d'action de démonstration", CategorieRessource.guide, EtatRessource.publie, None),
+        ("[Test] Fiche pratique à publier", CategorieRessource.fiche, EtatRessource.soumis, None),
+    )
+    for rang, (titre, categorie, etat, couleur) in enumerate(ressources):
+        identifiant = uuid7()
+        octets = _pdf_de_test(titre)
+        cle = f"ressources/{identifiant}-document.pdf"
+        await disque.enregistrer(cle, octets)
+        grande = vignette = None
+        if couleur is not None:
+            sortie = io.BytesIO()
+            Image.new("RGB", (900, 1200), couleur).save(sortie, "JPEG")
+            preparees = await images.preparer(sortie.getvalue())
+            grande, vignette = f"ressources/{identifiant}-grande.webp", f"ressources/{identifiant}-vignette.webp"
+            await disque.enregistrer(grande, preparees.grande.octets)
+            await disque.enregistrer(vignette, preparees.vignette.octets)
+        publiee = etat is EtatRessource.publie
+        db.add(
+            Ressource(
+                id=identifiant, titre=titre, description="Ressource de démonstration pour essayer la plateforme.",
+                categorie=categorie, axe_code="sante-environnement" if categorie is CategorieRessource.guide else None,
+                parution=f"N° {2 - rang}" if categorie is CategorieRessource.magazine else None, etat=etat,
+                contenu_de_test=True, contributeurs=[pedagogie], fichier_cle=cle, fichier_octets=len(octets), pages=1,
+                couverture_grande=grande, couverture_vignette=vignette, soumis_par=pedagogie, soumis_le=maintenant,
+                validateur_nom="Compte de test" if publiee else None,
+                validateur_qualite="Contenu de démonstration" if publiee else None,
+                # Le premier magazine est le plus récent.
+                publie_le=maintenant.replace(microsecond=0) - timedelta(days=rang) if publiee else None,
+                deja_publiee=publiee,
+            )
+        )  # fmt: skip
+
+
 async def semer(db: AsyncSession) -> list[dict[str, str]]:
     """Prépare tous les comptes `dev.*` et renvoie leurs accès. Valide la transaction."""
     if settings.production:
@@ -435,6 +512,7 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
     await _preparer_commentaires(db)
     await _preparer_contenus_du_club(db)
     await _preparer_quiz(db)
+    await _preparer_bibliotheque(db)
     journaliser(db, "comptes_de_developpement_prepares", details={"comptes": [c[0] for c in COMPTES]})
     await db.commit()
     return acces

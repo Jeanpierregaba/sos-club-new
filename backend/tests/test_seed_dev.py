@@ -176,3 +176,21 @@ def test_le_seed_prepare_trois_quiz_de_test_une_seule_fois(en_base: Callable[...
     lignes = en_base(lambda db: db.execute(select(Quiz.etat, Quiz.contenu_de_test, Quiz.titre)))
     assert sorted(e.value for e, _, _ in lignes) == ["brouillon", "publie", "soumis"]
     assert all(test and titre.startswith("[Test]") for _, test, titre in lignes)
+
+
+def test_le_seed_prepare_quatre_ressources_de_test_une_seule_fois(
+    en_base: Callable[..., Any], dossier_fichiers: Path
+) -> None:
+    from app.bibliotheque.models import Ressource
+    from app.fichiers import pdf
+
+    en_base(semer)
+    en_base(semer)
+
+    ressources = en_base(lambda db: db.scalars(select(Ressource))).all()
+    assert sorted(r.etat.value for r in ressources) == ["publie", "publie", "publie", "soumis"]
+    assert all(r.contenu_de_test and r.titre.startswith("[Test]") for r in ressources)
+    # Les PDF générés passent le contrôle des dépôts, et les magazines ont leur couverture.
+    for r in ressources:
+        assert pdf.verifier((dossier_fichiers / r.fichier_cle).read_bytes()).pages == 1
+    assert all(r.couverture_grande for r in ressources if r.categorie.value == "magazine")

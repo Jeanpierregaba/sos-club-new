@@ -9,7 +9,7 @@
       `router_gestion.py`.
 - [x] 4. Tests de la bibliothèque publique (`test_bibliotheque_public.py`) : liste, filtres, « À la Une »,
       fichier et couverture servis ou 404, en-têtes, compteur ; puis `public.py` et `router.py`.
-- [ ] 5. `seed_dev` : ressources « Contenu de test » ; types de l'API régénérés.
+- [x] 5. `seed_dev` : ressources « Contenu de test » ; types de l'API régénérés.
 - [ ] 6. Site, public : client, `/bibliotheque` sur les vraies données, carrousel, filtres, état vide.
 - [ ] 7. Site, admin : liste, fiche, dépôt des fichiers, décisions ; entrée « Bibliothèque » du menu.
 - [ ] 8. Docs : ADR-0010, ARCHITECTURE, SECURITY, TASKS.
