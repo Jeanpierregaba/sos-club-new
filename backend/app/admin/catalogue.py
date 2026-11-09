@@ -52,6 +52,8 @@ MODULES: dict[str, tuple[str, bool, tuple[Action, ...]]] = {
     "agenda": ("Agenda et campagnes", False, (C, CR, M, S, A, D)),
     "rapports": ("Rapports d'activités", False, (C, A)),
     "quiz": ("Quiz et certification", True, (C, CR, M, S, A, D)),
+    # Bibliothèque (spec 028) : publiée à deux personnes, comme les quiz.
+    "bibliotheque": ("Bibliothèque", True, (C, CR, M, S, A, D)),
     "points": ("Points et classements", True, (C, M)),
     # Vérification des encadreurs (spec 018) : un collaborateur de DRE ne voit que les demandes de sa DRE.
     "encadreurs": ("Encadreurs à vérifier", True, (C, A)),
@@ -75,6 +77,8 @@ SENSIBLES: frozenset[tuple[str, Action]] = frozenset(
         ("inscrits", E),
         ("quiz", A),
         ("quiz", D),
+        ("bibliotheque", A),
+        ("bibliotheque", D),
         ("points", M),
         # La file montre l'e-mail et le téléphone ; un encadreur actif accédera aux données de ses élèves.
         ("encadreurs", C),
@@ -116,13 +120,19 @@ LIBELLES_ROLES: dict[RoleDepart, str] = {
 }
 
 _TABLEAU = {("tableau_de_bord", C)}
+# Préparer une ressource ; la publier reste à un autre collaborateur.
+_PREPARER_BIBLIOTHEQUE = {("bibliotheque", C), ("bibliotheque", CR), ("bibliotheque", M), ("bibliotheque", S)}
 
 # Préréglages : le super-administrateur ajuste ensuite la grille.
 DROITS_DES_ROLES: dict[RoleDepart, set[tuple[str, Action]]] = {
     RoleDepart.admin_national: tous_les_droits(),
     RoleDepart.moderateur: _TABLEAU | {("moderation", C), ("moderation", A), ("moderation", D), ("contenus", C)},
-    RoleDepart.gestionnaire_contenus: _TABLEAU | {("contenus", C), ("contenus", CR), ("contenus", M), ("contenus", S)},
-    RoleDepart.gestionnaire_pedagogique: _TABLEAU | {("quiz", C), ("quiz", CR), ("quiz", M), ("quiz", S)},
+    RoleDepart.gestionnaire_contenus: _TABLEAU
+    | {("contenus", C), ("contenus", CR), ("contenus", M), ("contenus", S)}
+    | _PREPARER_BIBLIOTHEQUE,
+    RoleDepart.gestionnaire_pedagogique: _TABLEAU
+    | {("quiz", C), ("quiz", CR), ("quiz", M), ("quiz", S)}
+    | _PREPARER_BIBLIOTHEQUE,
     RoleDepart.gestionnaire_clubs: _TABLEAU
     | {
         ("clubs", C),
