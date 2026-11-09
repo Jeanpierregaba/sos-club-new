@@ -35,7 +35,8 @@ function Parametres() {
   const { en_cours, versions } = Route.useLoaderData();
   const { admin } = Route.useRouteContext();
   const router = useRouter();
-  const modifiable = peut(admin, "quiz", "modifier");
+  // Les règles de toutes les parties : réservé à qui publie (l'API exige aussi la double authentification).
+  const modifiable = peut(admin, "quiz", "approuver");
   const [valeurs, setValeurs] = useState<Record<keyof ParametresEntree, string>>({
     nb_questions: String(en_cours.nb_questions),
     temps_ms: String(en_cours.temps_ms / 1000),

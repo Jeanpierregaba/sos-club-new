@@ -55,6 +55,8 @@ class QuizJoueur(BaseModel):
     reussi: bool
     meilleur_score: int | None
     tentatives_restantes: int
+    # La partie en cours du joueur sur ce quiz, à reprendre (la liste clôt d'abord les parties abandonnées).
+    tentative_en_cours: UUID | None = None
 
 
 class ListeQuiz(BaseModel):

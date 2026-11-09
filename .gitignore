@@ -52,3 +52,6 @@ __pycache__/
 
 # Fichiers envoyés en local (spec 024)
 backend/var/
+
+# Captures du serveur MCP Playwright
+.playwright-mcp/

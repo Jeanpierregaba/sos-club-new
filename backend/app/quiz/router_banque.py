@@ -63,8 +63,9 @@ async def lire_parametres(db: Db, _: Lecteur) -> HistoriqueParametres:
     return resultat
 
 
+# Les règles de toutes les parties : réservé à qui publie (droit sensible, double authentification).
 @router_banque.put("/parametres")
-async def changer_parametres(entree: ParametresEntree, request: Request, db: Db, acces: Redacteur) -> ParametresSortie:
+async def changer_parametres(entree: ParametresEntree, request: Request, db: Db, acces: Decideur) -> ParametresSortie:
     try:
         resultat = await banque.changer_parametres(db, acces, entree, adresse_ip(request))
     except ERREURS_BANQUE as e:

@@ -12,6 +12,6 @@
 - [x] 5. Le mode test (essais) et ses tests ; quiz « Contenu de test » dans `seed_dev`.
 - [x] 6. Site, joueur : client, `PartieQuiz`, `/quiz` et `/quiz/$id`, liens depuis « Mon espace » et `/jeux`.
 - [x] 7. Site, admin : banque, éditeur de questions, décisions, essai, paramètres ; entrée « Quiz » du menu.
-- [ ] 8. Docs : ADR-0004, ARCHITECTURE, SECURITY, TASKS.
-- [ ] Vérifier tous les critères d'acceptation de spec.md
-- [ ] Relecture par le sous-agent reviewer
+- [x] 8. Docs : ADR-0004, ARCHITECTURE, SECURITY, TASKS.
+- [x] Vérifier tous les critères d'acceptation de spec.md
+- [x] Relecture par le sous-agent reviewer

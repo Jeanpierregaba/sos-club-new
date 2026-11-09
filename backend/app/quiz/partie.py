@@ -12,7 +12,7 @@ import random
 from datetime import datetime, timedelta
 from uuid import UUID
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.comptes.models import Role, StatutCompte, Utilisateur
@@ -33,6 +33,8 @@ from app.quiz.schemas import EtatPartie, ListeQuiz, QuestionJoueur, QuizJoueur, 
 
 # Une tentative sans activité pendant ce temps est close avec le score acquis.
 INACTIVITE = timedelta(minutes=10)
+# Un essai de l'équipe abandonné en cours de route est effacé au lancement d'un essai suivant, au bout d'un jour.
+ESSAI_OUBLIE = timedelta(days=1)
 _hasard = random.SystemRandom()
 
 
@@ -70,16 +72,31 @@ def cle_points(quiz_id: UUID, joueur_id: UUID) -> str:
 async def lancer(db: AsyncSession, joueur: Utilisateur, quiz_id: UUID, *, essai: bool = False) -> EtatPartie:
     """Tire les questions et envoie la première. Un essai (mode test d'un collaborateur) accepte un quiz non
     publié, n'entre pas dans le plafond et remplace l'essai précédent du collaborateur."""
-    quiz = await db.get(Quiz, quiz_id)
+    # FOR SHARE : la réserve ne change pas pendant le tirage (une modification de question attend), et une
+    # dépublication en cours est vue.
+    quiz = await db.scalar(
+        select(Quiz).where(Quiz.id == quiz_id).with_for_update(read=True).execution_options(populate_existing=True)
+    )
     if quiz is None or (not essai and quiz.etat is not EtatQuiz.publie):
         raise Introuvable
     # Sérialise les lancements d'un même joueur : le plafond et la tentative en cours restent exacts.
-    await db.execute(select(Utilisateur.id).where(Utilisateur.id == joueur.id).with_for_update())
+    await _verrouiller_joueur(db, joueur)
     maintenant = horloge.maintenant()
     p = await parametres.en_cours(db)
 
     if essai:
-        await db.execute(delete(TentativeQuiz).where(TentativeQuiz.joueur_id == joueur.id, TentativeQuiz.essai))
+        # L'essai précédent du collaborateur, puis les essais abandonnés depuis plus d'un jour par d'autres : ceux
+        # qu'un autre lancement est en train d'effacer sont sautés (SKIP LOCKED), sans attente ni interblocage.
+        await db.execute(delete(TentativeQuiz).where(TentativeQuiz.essai, TentativeQuiz.joueur_id == joueur.id))
+        oublies = (
+            await db.scalars(
+                select(TentativeQuiz.id)
+                .where(TentativeQuiz.essai, TentativeQuiz.commencee_le < maintenant - ESSAI_OUBLIE)
+                .with_for_update(skip_locked=True)
+            )
+        ).all()
+        if oublies:
+            await db.execute(delete(TentativeQuiz).where(TentativeQuiz.id.in_(oublies)))
     else:
         precedente = await db.scalar(
             select(TentativeQuiz)
@@ -195,6 +212,7 @@ async def repondre(
 
 
 async def liste(db: AsyncSession, joueur: Utilisateur, axe: str | None = None) -> ListeQuiz:
+    await _clore_abandonnees(db, joueur)
     p = await parametres.en_cours(db)
     requete = select(Quiz).where(Quiz.etat == EtatQuiz.publie)
     if axe:
@@ -219,6 +237,15 @@ async def liste(db: AsyncSession, joueur: Utilisateur, axe: str | None = None) -
             )
         ).all()
     )
+    en_cours = dict(
+        (
+            await db.execute(
+                select(TentativeQuiz.quiz_id, TentativeQuiz.id).where(
+                    *les_siennes, TentativeQuiz.etat == EtatTentative.en_cours
+                )
+            )
+        ).all()
+    )
     return ListeQuiz(
         nb_questions=p.nb_questions,
         seuil=p.seuil,
@@ -233,6 +260,7 @@ async def liste(db: AsyncSession, joueur: Utilisateur, axe: str | None = None) -
                 reussi=resultats.get(q.id, (False, None))[0],
                 meilleur_score=resultats.get(q.id, (False, None))[1],
                 tentatives_restantes=max(0, p.tentatives_par_jour - du_jour.get(q.id, 0)),
+                tentative_en_cours=en_cours.get(q.id),
             )
             for q in tous
         ],
@@ -240,6 +268,32 @@ async def liste(db: AsyncSession, joueur: Utilisateur, axe: str | None = None) -
 
 
 # Interne ----------------------------------------------------------------------------------------------------------
+
+
+async def _verrouiller_joueur(db: AsyncSession, joueur: Utilisateur) -> None:
+    """Sérialise les opérations d'un joueur sur ses tentatives (lancement, clôture des abandons), toujours dans
+    le même ordre : le compte d'abord, puis les tentatives. FOR NO KEY UPDATE ne bloque pas les écritures qui
+    référencent le compte (crédit de points d'une autre partie), d'où aucun interblocage."""
+    await db.execute(select(Utilisateur.id).where(Utilisateur.id == joueur.id).with_for_update(key_share=True))
+
+
+async def _clore_abandonnees(db: AsyncSession, joueur: Utilisateur) -> None:
+    """Une partie quittée sans y revenir est close avec son score dès que le joueur revoit la liste : une
+    réussite acquise rapporte ses points sans qu'il ait à relancer le quiz."""
+    maintenant = horloge.maintenant()
+    abandon = TentativeQuiz.derniere_activite < maintenant - INACTIVITE
+    filtre = (
+        TentativeQuiz.joueur_id == joueur.id,
+        TentativeQuiz.essai.is_(False),
+        TentativeQuiz.etat == EtatTentative.en_cours,
+        abandon,
+    )
+    if not await db.scalar(select(exists().where(*filtre))):
+        return
+    await _verrouiller_joueur(db, joueur)
+    for tentative in (await db.scalars(select(TentativeQuiz).where(*filtre).with_for_update())).all():
+        quiz, p, _ = await _contexte(db, tentative)
+        await _terminer(db, tentative, joueur, quiz, p, maintenant)
 
 
 async def _charger(db: AsyncSession, joueur: Utilisateur, tentative_id: UUID | str, essai: bool) -> TentativeQuiz:

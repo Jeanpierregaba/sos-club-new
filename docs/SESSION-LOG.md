@@ -14,6 +14,24 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-08 — Quiz chronométrés et banque de quiz (spec 027)
+
+- Fait : spec 027 livrée (R9). Partie arbitrée par le serveur (ADR-0004) : questions tirées au lancement dans
+  une réserve, envoyées une à une avec leur heure d'envoi, réponse comptée dans 5 s + 2 s de tolérance, score seul
+  à la fin, +50 à la première réussite d'un élève actif, plafond de 10 parties par quiz et par jour, clôture
+  après 10 minutes d'inactivité. Banque de l'espace admin : brouillon, soumission, publication par un autre
+  collaborateur qui nomme le validateur médical, refus, dépublication, paramètres versionnés, mode test effacé
+  à sa fin. Site : `/quiz`, `/quiz/$id` (reprise d'une partie), banque, éditeur, paramètres.
+  Relecture `reviewer` corrigée : question tirée remplacée par une copie au lieu d'être réécrite, reprise de
+  partie et clôture des parties abandonnées à la lecture de la liste, verrou du joueur en FOR NO KEY UPDATE
+  (interblocage avec le crédit de points), paramètres réservés à qui publie (2FA), verrou des quiz pendant un
+  changement de paramètres, purge des essais oubliés, accessibilité et double clic de la partie.
+- Pièges rencontrés : une fixture importée d'un module d'aide déclenche F811 : en faire une fonction et définir
+  la fixture dans chaque fichier. `Result.tuples()` est déprécié (avertissement traité en erreur).
+- Décisions : spec 027 (publication à deux personnes, joueurs connectés seulement, tirage dans une réserve, score
+  seul à la fin).
+- Prochaine étape : pousser develop (migration `quiz`), puis R10 (ressources et fascicules).
+
 ### 2026-11-08 — Photos (spec 024), commentaires (spec 025) et espace du président (spec 026)
 
 - Fait : spec 024 livrée (photos stockées sur le disque du VPS derrière l'interface `Stockage` de l'ADR-0010,

@@ -175,6 +175,66 @@ def test_retirer_une_question_deja_jouee_la_desactive(
     assert reponse.json()["questions_actives"] == 14
 
 
+def test_modifier_une_question_deja_jouee_la_remplace_sans_toucher_la_partie(
+    client: TestClient, gestionnaire: Utilisateur, en_base: Callable[..., Any], heure: Horloge
+) -> None:
+    corps = quiz_pret(client, en_base)
+    essai = client.post(f"{BANQUE}/{corps['id']}/essais").json()
+    # La question envoyée en premier à l'essai : c'est elle qu'on modifie.
+    [jouee] = [q for q in corps["questions"] if q["enonce"] == essai["question"]["enonce"]]
+
+    reponse = client.put(f"{BANQUE}/{corps['id']}/questions/{jouee['id']}", json=question(99))
+
+    assert reponse.status_code == 200
+    questions = reponse.json()["questions"]
+    [ancienne] = [q for q in questions if q["id"] == jouee["id"]]
+    [nouvelle] = [q for q in questions if q["enonce"] == question(99)["enonce"]]
+    assert ancienne["active"] is False and ancienne["enonce"] == jouee["enonce"]
+    assert nouvelle["active"] is True and nouvelle["id"] != jouee["id"]
+    assert reponse.json()["questions_actives"] == 15
+    # La partie en cours garde la question telle qu'elle a été envoyée, jugée sur sa bonne réponse d'origine.
+    etat = client.get(f"{BANQUE}/essais/{essai['tentative_id']}").json()
+    assert etat["question"] == essai["question"] | {"restant_ms": etat["question"]["restant_ms"]}
+    while etat["question"] is not None:
+        etat = client.post(
+            f"{BANQUE}/essais/{essai['tentative_id']}/reponses",
+            json={"rang": etat["question"]["rang"], "choix": bon_choix(etat["question"])},
+        ).json()
+    assert etat["resultat"]["score"] == 15
+
+
+def test_une_question_deja_remplacee_ne_se_modifie_plus(
+    client: TestClient, gestionnaire: Utilisateur, en_base: Callable[..., Any], heure: Horloge
+) -> None:
+    corps = quiz_pret(client, en_base)
+    client.post(f"{BANQUE}/{corps['id']}/essais")
+    ancienne = corps["questions"][0]["id"]
+    client.put(f"{BANQUE}/{corps['id']}/questions/{ancienne}", json=question(98))
+
+    reponse = client.put(f"{BANQUE}/{corps['id']}/questions/{ancienne}", json=question(99))
+
+    assert reponse.status_code == 409
+    detail = client.get(f"{BANQUE}/{corps['id']}").json()
+    assert detail["questions_actives"] == 15
+    # À la même place, la remplaçante active vient avant l'ancienne désactivée.
+    premiere, deuxieme = detail["questions"][:2]
+    assert premiere["active"] is True and premiere["enonce"] == question(98)["enonce"]
+    assert deuxieme["id"] == ancienne and deuxieme["active"] is False
+
+
+def test_modifier_une_question_jamais_jouee_la_reecrit(
+    client: TestClient, gestionnaire: Utilisateur, en_base: Callable[..., Any]
+) -> None:
+    corps = quiz_pret(client, en_base, questions=2)
+    premiere = corps["questions"][0]["id"]
+
+    reponse = client.put(f"{BANQUE}/{corps['id']}/questions/{premiere}", json=question(99))
+
+    [ligne] = [q for q in reponse.json()["questions"] if q["id"] == premiere]
+    assert ligne["enonce"] == question(99)["enonce"]
+    assert len(reponse.json()["questions"]) == 2
+
+
 def test_retirer_une_question_jamais_jouee_lefface(
     client: TestClient, gestionnaire: Utilisateur, en_base: Callable[..., Any]
 ) -> None:
@@ -434,16 +494,14 @@ def test_publier_exige_la_double_authentification(
 # Paramètres ---------------------------------------------------------------------------------------------------------
 
 
-def test_changer_les_parametres_ajoute_une_version(
-    client: TestClient, gestionnaire: Utilisateur, en_base: Callable[..., Any]
-) -> None:
+def test_changer_les_parametres_ajoute_une_version(publieur: Navigateur, en_base: Callable[..., Any]) -> None:
     entree = {"nb_questions": 10, "temps_ms": 8000, "tolerance_ms": 2000, "seuil": 8, "tentatives_par_jour": 5}
 
-    reponse = client.put(f"{BANQUE}/parametres", json=entree)
+    reponse = publieur.put(f"{BANQUE}/parametres", json=entree)
 
     assert reponse.status_code == 200, reponse.text
     assert reponse.json()["version"] == 2
-    historique = client.get(f"{BANQUE}/parametres").json()
+    historique = publieur.get(f"{BANQUE}/parametres").json()
     assert historique["en_cours"]["nb_questions"] == 10
     assert [v["version"] for v in historique["versions"]] == [2, 1]
     assert journal(en_base)[-1] == "quiz_parametres_modifies"
@@ -458,27 +516,54 @@ def test_changer_les_parametres_ajoute_une_version(
         {"nb_questions": 0, "temps_ms": 5000, "tolerance_ms": 2000, "seuil": 0, "tentatives_par_jour": 5},
     ],
 )
-def test_des_parametres_incoherents_sont_refuses(
-    client: TestClient, gestionnaire: Utilisateur, entree: dict[str, int]
-) -> None:
-    assert client.put(f"{BANQUE}/parametres", json=entree).status_code == 422
+def test_des_parametres_incoherents_sont_refuses(publieur: Navigateur, entree: dict[str, int]) -> None:
+    assert publieur.put(f"{BANQUE}/parametres", json=entree).status_code == 422
 
 
 def test_relever_le_nombre_de_questions_au_dessus_dune_reserve_publiee_est_refuse(
-    client: TestClient, gestionnaire: Utilisateur, en_base: Callable[..., Any]
+    publieur: Navigateur, en_base: Callable[..., Any]
 ) -> None:
     creer_quiz(en_base, questions=15, titre="Court")
     creer_quiz(en_base, questions=20, titre="Long")
     entree = {"nb_questions": 18, "temps_ms": 5000, "tolerance_ms": 2000, "seuil": 14, "tentatives_par_jour": 5}
 
-    reponse = client.put(f"{BANQUE}/parametres", json=entree)
+    reponse = publieur.put(f"{BANQUE}/parametres", json=entree)
 
     assert reponse.status_code == 422
     assert "Court" in reponse.json()["detail"]
     assert "Long" not in reponse.json()["detail"]
 
 
+def test_preparer_des_quiz_ne_suffit_pas_pour_changer_les_parametres(
+    client: TestClient, gestionnaire: Utilisateur
+) -> None:
+    entree = {"nb_questions": 10, "temps_ms": 8000, "tolerance_ms": 2000, "seuil": 8, "tentatives_par_jour": 5}
+
+    assert client.put(f"{BANQUE}/parametres", json=entree).status_code == 403
+    assert client.get(f"{BANQUE}/parametres").status_code == 200
+
+
 # Mode test ----------------------------------------------------------------------------------------------------------
+
+
+def test_un_essai_abandonne_depuis_un_jour_est_efface_au_prochain_essai(
+    client: TestClient,
+    gestionnaire: Utilisateur,
+    publieur: Navigateur,
+    en_base: Callable[..., Any],
+    heure: Horloge,
+) -> None:
+    corps = quiz_pret(client, en_base)
+    oublie = client.post(f"{BANQUE}/{corps['id']}/essais").json()
+    heure.avancer(23 * 3600)
+    recent = publieur.post(f"{BANQUE}/{corps['id']}/essais").json()
+    assert {str(t.id) for t in tentatives(en_base)} == {oublie["tentative_id"], recent["tentative_id"]}
+    heure.avancer(2 * 3600)
+
+    dernier = publieur.post(f"{BANQUE}/{corps['id']}/essais").json()
+
+    # L'essai oublié du gestionnaire est effacé ; celui du publieur est remplacé par le nouveau.
+    assert {str(t.id) for t in tentatives(en_base)} == {dernier["tentative_id"]}
 
 
 def test_un_essai_ne_laisse_ni_tentative_ni_plafond_ni_points(

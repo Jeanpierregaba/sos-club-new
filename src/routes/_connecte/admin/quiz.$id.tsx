@@ -162,7 +162,6 @@ function FicheQuiz() {
         key="refuser"
         variant="outline"
         className="rounded-full font-bold"
-        disabled={quiz.contributeur}
         onClick={() => setDialogue("refuser")}
       >
         <X className="size-4" /> Refuser
@@ -241,7 +240,12 @@ function FicheQuiz() {
           <p className="text-sm text-muted-foreground">
             Dans les conditions réelles, sans rien enregistrer ni créditer.
           </p>
-          <PartieQuiz depart={essai} appels={partieEssai} avecPoints={false} onRejouer={tester} />
+          <PartieQuiz
+            depart={essai}
+            appels={partieEssai}
+            avecPoints={false}
+            onRejouer={async () => setEssai(await lancerEssai(quiz.id))}
+          />
         </section>
       )}
 
@@ -268,7 +272,9 @@ function FicheQuiz() {
                   numero={i + 1}
                   question={q}
                   actions={
-                    redaction && (
+                    // Une question désactivée (remplacée ou retirée après avoir été jouée) ne se modifie plus.
+                    redaction &&
+                    q.active && (
                       <div className="flex gap-1">
                         <Button
                           variant="ghost"

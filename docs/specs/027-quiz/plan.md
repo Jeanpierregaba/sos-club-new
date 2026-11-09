@@ -38,11 +38,12 @@ effacée à sa fin (ou à l'essai suivant).
 - `app/quiz/partie.py` : lancer une tentative, état courant, répondre, clore, créditer, résultats du joueur.
 - `app/quiz/schemas.py` : deux familles de schémas, sans champ commun pour les réponses : `QuestionJoueur`
   (énoncé et choix mélangés, jamais `bonne_reponse` ni `explication`) et `QuestionBanque` (complète, admin).
-- `app/quiz/router.py` : `router` (`/quiz`, joueurs) et `router_admin` (`/admin/quiz`) ; inclus dans `main.py`.
+- `app/quiz/router.py` (`/quiz`, joueurs) et `app/quiz/router_banque.py` (`/admin/quiz`, banque et essais) ;
+  inclus dans `main.py`.
 - `app/quiz/dependances.py` : `joueur_actif` (élève ou encadreur au compte actif ; 401 sans session, 403 sinon).
 - `app/admin/catalogue.py` : module `quiz` disponible.
 - `app/points/bareme.py` : `eleve.quiz` dans `EN_SERVICE` ; `encadreur.quiz` reste à 0.
-- `app/seed_dev.py` : deux quiz « Contenu de test » publiés (18 et 15 questions), un brouillon ; jamais en prod
+- `app/seed_dev.py` : trois quiz « Contenu de test » (un publié de 18 questions, un soumis de 15, un brouillon) ; jamais en prod
   (`seed_preprod` n'en charge pas).
 - Migration `quiz` : les cinq tables, la première version des paramètres du parcours `jeux`, `eleve.quiz` en
   service.
@@ -75,7 +76,7 @@ parametres_quiz   id, parcours ('jeux'), version, nb_questions, temps_ms, tolera
                   nb_questions BETWEEN 1 AND 50, temps_ms > 0, tolerance_ms >= 0, tentatives_par_jour >= 1
 
 quiz              id, titre (120), description (300), axe_code → axe, etat
-                  (brouillon | soumis | publie | depublie), essai_contenu (bool : « Contenu de test »),
+                  (brouillon | soumis | publie | depublie), contenu_de_test (bool : « Contenu de test »),
                   contributeurs uuid[] (créé, modifié ou soumis par), soumis_par, soumis_le,
                   decide_par, decide_le, motif, validateur_nom (120), validateur_qualite (120), publie_le,
                   + Suivi (cree_le, modifie_le, version optimiste)
@@ -119,18 +120,18 @@ traduit par `ordre_choix`. Le résultat : `score`, `total`, `seuil`, `reussie`, 
 
 **Banque** (`exiger_permission("quiz", …)`, journal d'audit à chaque écriture) :
 
-| Route                                                                        | Droit                                      |
-| ---------------------------------------------------------------------------- | ------------------------------------------ |
-| `GET /admin/quiz?etat=`, `GET /admin/quiz/{id}`                              | consulter                                  |
-| `POST /admin/quiz`                                                           | créer                                      |
-| `PATCH /admin/quiz/{id}`, questions (POST, PATCH, DELETE)                    | modifier (brouillon seul, sinon 409)       |
-| `POST /admin/quiz/{id}/soumettre`                                            | soumettre                                  |
-| `POST /admin/quiz/{id}/reprendre`                                            | soumettre (soumis ou dépublié → brouillon) |
-| `POST /admin/quiz/{id}/approuver`                                            | approuver (403 si contributeur)            |
-| `POST /admin/quiz/{id}/refuser`                                              | approuver                                  |
-| `POST /admin/quiz/{id}/depublier`                                            | dépublier                                  |
-| `POST /admin/quiz/{id}/essais` + routes de partie `/admin/quiz/essais/{id}…` | consulter                                  |
-| `GET /admin/quiz/parametres`, `PUT …`                                        | consulter, modifier                        |
+| Route                                                                        | Droit                                          |
+| ---------------------------------------------------------------------------- | ---------------------------------------------- |
+| `GET /admin/quiz?etat=`, `GET /admin/quiz/{id}`                              | consulter                                      |
+| `POST /admin/quiz`                                                           | créer                                          |
+| `PUT /admin/quiz/{id}`, questions (POST, PUT, DELETE)                        | modifier (brouillon seul, sinon 409)           |
+| `POST /admin/quiz/{id}/soumettre`                                            | soumettre                                      |
+| `POST /admin/quiz/{id}/reprendre`                                            | soumettre (soumis ou dépublié → brouillon)     |
+| `POST /admin/quiz/{id}/approuver`                                            | approuver (403 si contributeur)                |
+| `POST /admin/quiz/{id}/refuser`                                              | approuver                                      |
+| `POST /admin/quiz/{id}/depublier`                                            | dépublier                                      |
+| `POST /admin/quiz/{id}/essais` + routes de partie `/admin/quiz/essais/{id}…` | consulter                                      |
+| `GET /admin/quiz/parametres`, `PUT …`                                        | consulter, approuver (double authentification) |
 
 Approuver et dépublier sont des droits sensibles (double authentification, déjà au catalogue). Chaque transition
 verrouille la ligne du quiz (`with_for_update`) et vérifie l'état attendu : la seconde de deux décisions
@@ -172,20 +173,20 @@ API (écrits avant le code pour la partie, `docs/TESTING.md`) :
   validation des questions ; soumission sous le nombre requis ; modification d'un soumis (409) ; contributeur qui
   approuve (403) ; validateur manquant (422) ; décisions concurrentes (409) ; paramètres incohérents et nombre
   relevé au-dessus d'une réserve publiée (422) ; journal et notifications.
-- `test_quiz_essai.py` : un essai ne laisse ni tentative, ni plafond consommé, ni points.
+- Essais (dans `test_quiz_banque.py`) : un essai ne laisse ni tentative, ni plafond consommé, ni points.
 
 Site : `PartieQuiz.test.tsx` (déroulé, temps écoulé, résultat), éditeur de questions.
 
 ## Stress-test (2026-11-08)
 
-| Gravité   | Point                                                                                   | Traitement                                                                                       |
-| --------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Important | Effacer une question d'un quiz repris en brouillon casserait l'historique des tentatives | Question désactivée, jamais effacée une fois tirée (ci-dessus)                                  |
-| Important | Relever les réponses par reprises : le score seul suffit à sonder, question par question | Accepté : tirage dans la réserve, plafond de 10 par jour, tentatives conservées pour l'analyse   |
-| Important | Une petite équipe où une seule personne a les deux droits ne peut rien publier           | Accepté (choix « deux personnes ») ; le super-administrateur ajuste les droits                   |
-| Mineur    | Deux changements de paramètres simultanés                                                | La contrainte unique (parcours, version) tranche : 409                                           |
-| Mineur    | Essais abandonnés par un collaborateur                                                   | Effacés au lancement de l'essai suivant et après un jour                                         |
-| Mineur    | ROADMAP (R9) annonce encore +25 / +10 et +25 encadreur                                  | Corrigée selon le barème harmonisé (spec 022) : +50 élève, +25 club en R13, 0 encadreur          |
+| Gravité   | Point                                                                                    | Traitement                                                                                     |
+| --------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Important | Effacer une question d'un quiz repris en brouillon casserait l'historique des tentatives | Question désactivée, jamais effacée une fois tirée (ci-dessus)                                 |
+| Important | Relever les réponses par reprises : le score seul suffit à sonder, question par question | Accepté : tirage dans la réserve, plafond de 10 par jour, tentatives conservées pour l'analyse |
+| Important | Une petite équipe où une seule personne a les deux droits ne peut rien publier           | Accepté (choix « deux personnes ») ; le super-administrateur ajuste les droits                 |
+| Mineur    | Deux changements de paramètres simultanés                                                | La contrainte unique (parcours, version) tranche : 409                                         |
+| Mineur    | Essais abandonnés par un collaborateur                                                   | Effacés au lancement de l'essai suivant et après un jour                                       |
+| Mineur    | ROADMAP (R9) annonce encore +25 / +10 et +25 encadreur                                   | Corrigée selon le barème harmonisé (spec 022) : +50 élève, +25 club en R13, 0 encadreur        |
 
 Sur-engineering écarté : pas de détection d'anomalies, pas de planification ni d'import, pas de pôles.
 

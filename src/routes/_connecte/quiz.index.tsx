@@ -48,7 +48,8 @@ function PageQuiz() {
   const { liste, axes, refus } = Route.useLoaderData();
   const { axe } = Route.useSearch();
   const libelle = (code: string) => axes.find((a) => a.code === code)?.libelle ?? code;
-  const joues = liste?.quiz.filter((q) => q.meilleur_score !== null) ?? [];
+  // Sur la liste complète seulement : un filtre par axe fausserait le décompte.
+  const joues = axe ? [] : (liste?.quiz.filter((q) => q.meilleur_score !== null) ?? []);
 
   return (
     <main className="min-h-screen bg-carnet px-4 py-10 sm:px-6">
@@ -99,7 +100,7 @@ function PageQuiz() {
                   <p className="mt-1 text-sm text-muted-foreground">
                     {joues.filter((q) => q.reussi).length} réussi
                     {joues.filter((q) => q.reussi).length > 1 ? "s" : ""} sur {joues.length} joué
-                    {joues.length > 1 ? "s" : ""}
+                    {joues.length > 1 ? "s" : ""}, parmi les quiz en ligne
                   </p>
                 </section>
               )}

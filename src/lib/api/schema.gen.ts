@@ -5174,6 +5174,8 @@ export interface components {
             meilleur_score: number | null;
             /** Tentatives Restantes */
             tentatives_restantes: number;
+            /** Tentative En Cours */
+            tentative_en_cours?: string | null;
         };
         /**
          * RattachementAValider

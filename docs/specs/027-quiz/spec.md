@@ -21,7 +21,8 @@ certificat) suit en R11 et réutilisera ce moteur.
 
 **Paramètres du parcours**
 
-1. Le parcours « jeux libres » a des paramètres réglables dans l'espace admin : nombre de questions par
+1. Le parcours « jeux libres » a des paramètres réglables dans l'espace admin, par un collaborateur qui a le droit
+   de publier (ils changent la difficulté, donc les points) : nombre de questions par
    tentative (15 par défaut), temps affiché par question (5 s), tolérance réseau (2 s), seuil de réussite
    (12 bonnes réponses) et plafond de tentatives par joueur et par quiz sur une journée (10).
 2. Modifier un paramètre crée une nouvelle version ; l'ancienne reste lisible. Une tentative garde la version
@@ -68,38 +69,38 @@ certificat) suit en R11 et réutilisera ce moteur.
 
 ## Critères d'acceptation
 
-- [ ] Étant donné un élève, un encadreur ou un président, quand il appelle une route de la banque de quiz
+- [x] Étant donné un élève, un encadreur ou un président, quand il appelle une route de la banque de quiz
       (création, modification, soumission, approbation, paramètres), alors l'API répond 403, et rien ne change.
-- [ ] Étant donné un collaborateur sans le droit `quiz` voulu, quand il appelle la route correspondante, alors
+- [x] Étant donné un collaborateur sans le droit `quiz` voulu, quand il appelle la route correspondante, alors
       l'API répond 403 ; l'approbation et la dépublication exigent la double authentification.
-- [ ] Étant donné un quiz dont la réserve compte 14 questions et un paramètre à 15, quand le gestionnaire le
+- [x] Étant donné un quiz dont la réserve compte 14 questions et un paramètre à 15, quand le gestionnaire le
       soumet, alors l'API refuse (422).
-- [ ] Étant donné une question avec 1 ou 5 choix, ou sans bonne réponse unique, alors l'API la refuse (422).
-- [ ] Étant donné un quiz soumis, quand on tente de modifier une question, alors l'API refuse (409).
-- [ ] Étant donné un collaborateur qui a créé, modifié ou soumis un quiz, quand il l'approuve, alors l'API
+- [x] Étant donné une question avec 1 ou 5 choix, ou sans bonne réponse unique, alors l'API la refuse (422).
+- [x] Étant donné un quiz soumis, quand on tente de modifier une question, alors l'API refuse (409).
+- [x] Étant donné un collaborateur qui a créé, modifié ou soumis un quiz, quand il l'approuve, alors l'API
       refuse (403), même s'il a le droit d'approuver.
-- [ ] Étant donné une approbation sans nom ou sans qualité du validateur médical, alors l'API refuse (422).
-- [ ] Étant donné un quiz approuvé, alors il apparaît dans `/quiz` ; un brouillon, un quiz soumis ou dépublié
+- [x] Étant donné une approbation sans nom ou sans qualité du validateur médical, alors l'API refuse (422).
+- [x] Étant donné un quiz approuvé, alors il apparaît dans `/quiz` ; un brouillon, un quiz soumis ou dépublié
       n'y apparaît pas et ne se lance pas (404).
-- [ ] Étant donné une tentative, aucune réponse de l'API au joueur ne contient la bonne réponse ni l'explication
+- [x] Étant donné une tentative, aucune réponse de l'API au joueur ne contient la bonne réponse ni l'explication
       d'une question, à aucune étape, ni dans la liste des quiz, ni dans le résultat final.
-- [ ] Étant donné une question envoyée, quand la réponse arrive 6,9 s plus tard, alors elle compte ; à 7,1 s,
+- [x] Étant donné une question envoyée, quand la réponse arrive 6,9 s plus tard, alors elle compte ; à 7,1 s,
       elle compte comme ratée, quel que soit le choix.
-- [ ] Étant donné 11 bonnes réponses sur 15, alors la tentative est ratée ; avec 12, elle est réussie.
-- [ ] Étant donné la même réponse envoyée deux fois, ou deux réponses simultanées à la même question, alors une
+- [x] Étant donné 11 bonnes réponses sur 15, alors la tentative est ratée ; avec 12, elle est réussie.
+- [x] Étant donné la même réponse envoyée deux fois, ou deux réponses simultanées à la même question, alors une
       seule est comptée.
-- [ ] Étant donné un élève actif qui réussit un quiz pour la première fois, alors une seule ligne de +50 est
+- [x] Étant donné un élève actif qui réussit un quiz pour la première fois, alors une seule ligne de +50 est
       écrite au registre ; une deuxième réussite, ou deux fins de tentative simultanées, n'en ajoutent pas.
-- [ ] Étant donné un encadreur qui réussit un quiz, alors aucune ligne de points n'est écrite.
-- [ ] Étant donné un joueur qui a atteint le plafond de tentatives du jour sur un quiz, quand il en lance une
+- [x] Étant donné un encadreur qui réussit un quiz, alors aucune ligne de points n'est écrite.
+- [x] Étant donné un joueur qui a atteint le plafond de tentatives du jour sur un quiz, quand il en lance une
       autre, alors l'API répond 429.
-- [ ] Étant donné une tentative commencée avec la version 1 des paramètres, quand l'admin passe à la version 2,
+- [x] Étant donné une tentative commencée avec la version 1 des paramètres, quand l'admin passe à la version 2,
       alors la tentative se termine avec les règles de la version 1.
-- [ ] Étant donné un visiteur, un compte en attente ou retiré, ou un collaborateur, quand il lance une tentative
+- [x] Étant donné un visiteur, un compte en attente ou retiré, ou un collaborateur, quand il lance une tentative
       hors du mode test, alors l'API répond 401 ou 403.
-- [ ] Étant donné un test lancé par le gestionnaire, alors il n'entre ni dans les résultats, ni dans le plafond, ni au
+- [x] Étant donné un test lancé par le gestionnaire, alors il n'entre ni dans les résultats, ni dans le plafond, ni au
       registre des points ; la partie de test est effacée à sa fin.
-- [ ] Étant donné un quiz dépublié, alors les tentatives et les points déjà acquis restent intacts.
+- [x] Étant donné un quiz dépublié, alors les tentatives et les points déjà acquis restent intacts.
 
 ## Cas limites et erreurs
 
@@ -110,10 +111,18 @@ certificat) suit en R11 et réutilisera ce moteur.
   acquis), pour ne pas cumuler les essais en parallèle.
 - **Réponse à une question qui n'est pas la question en cours**, ou à une tentative d'un autre joueur : 404.
   Un choix hors limites : 422.
-- **Compte retiré ou affiliation perdue pendant une tentative** : la tentative se termine ; les points ne sont
-  crédités qu'à un élève actif au moment du crédit.
+- **Compte suspendu pendant une tentative** : le joueur n'a plus accès aux quiz ; la tentative reste en cours et
+  se clôt s'il revient. Les points ne sont crédités qu'à un élève actif au moment du crédit.
+- **Partie abandonnée** : le joueur la retrouve sur la page du quiz (« Reprendre ma partie ») ; sans activité
+  depuis 10 minutes, elle est close à la prochaine lecture de la liste des quiz, et une réussite y est créditée.
 - **Quiz dépublié pendant une tentative** : la tentative peut se terminer, sans points.
 - **Paramètres incohérents** (seuil supérieur au nombre de questions, temps nul, plafond nul) : 422.
+- **Question modifiée après avoir été tirée** (essai ou partie d'un quiz repris en brouillon) : elle n'est pas
+  réécrite ; elle est désactivée et remplacée par une copie modifiée, à la même place. Les parties en cours et
+  l'historique gardent la question jouée.
+- **Essai abandonné** : effacé au prochain essai de son auteur, ou au premier essai de quiconque après un jour.
+- **Changement de paramètres pendant une publication** : les deux opérations se suivent ; la publication vérifie
+  la réserve contre le nombre de questions en vigueur.
 - **Réserve réduite après la publication** : impossible, un quiz publié ne se modifie pas ; il faut le
   dépublier.
 - **Nombre de questions relevé au-dessus de la réserve d'un quiz publié** : le changement de paramètres est

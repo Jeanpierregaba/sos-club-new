@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.encadreurs.models import EtatVerification
 from app.quiz import partie
-from app.quiz.models import EtatQuiz, Quiz, ReponseQuiz
+from app.quiz.models import EtatQuiz, EtatTentative, Quiz, ReponseQuiz
 from tests.conftest import MOT_DE_PASSE, Navigateur, connecter_admin, moteur_test
 from tests.quiz import (
     QUIZ,
@@ -186,6 +186,36 @@ def test_une_tentative_inactive_10_minutes_est_close_avec_le_score_acquis(
     assert len(gains(en_base, eleve.id)) == 1
 
 
+def test_la_liste_propose_de_reprendre_la_partie_en_cours(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
+) -> None:
+    assert client.get(QUIZ).json()["quiz"][0]["tentative_en_cours"] is None
+    etat = lancer(client, quiz)
+    heure.avancer(5 * 60)
+
+    [ligne] = client.get(QUIZ).json()["quiz"]
+
+    assert ligne["tentative_en_cours"] == etat["tentative_id"]
+
+
+def test_une_reussite_abandonnee_est_creditee_quand_le_joueur_revoit_la_liste(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge, en_base: Callable[..., Any]
+) -> None:
+    etat = lancer(client, quiz)
+    for _ in range(12):
+        etat = repondre(client, etat, bon_choix(etat["question"]))
+    heure.avancer(11 * 60)
+
+    [ligne] = client.get(QUIZ).json()["quiz"]
+
+    assert ligne["tentative_en_cours"] is None
+    assert ligne["reussi"] is True
+    assert ligne["meilleur_score"] == 12
+    assert len(gains(en_base, eleve.id)) == 1
+    [tentative] = tentatives(en_base)
+    assert tentative.etat is EtatTentative.terminee
+
+
 # Le résultat ------------------------------------------------------------------------------------------------
 
 
@@ -305,6 +335,35 @@ def test_deux_fins_simultanees_ne_creditent_quune_fois(
     # Les deux voient la même tentative terminée, et le même crédit.
     assert [f["resultat"]["points"] for f in fins] == [50, 50]
     assert len(gains(en_base, eleve.id)) == 1
+
+
+def test_relancer_pendant_la_derniere_reponse_ne_bloque_pas_et_credite_une_fois(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge, en_base: Callable[..., Any]
+) -> None:
+    # La dernière réponse clôt et crédite (verrou de la tentative, puis écriture au registre) pendant qu'un
+    # lancement tient le joueur et attend la même tentative : aucun interblocage, un seul crédit.
+    etat = _tentative_avec_derniere_question(client, quiz)
+    joueur = en_base(lambda db: db.get(Utilisateur, eleve.id))
+
+    async def repondre_a_la_derniere() -> None:
+        async with AsyncSession(moteur_test, expire_on_commit=False) as db:
+            await partie.repondre(db, joueur, etat["tentative_id"], 15, bon_choix(etat["question"]))
+            await asyncio.sleep(0.2)
+            await db.commit()
+
+    async def relancer() -> None:
+        async with AsyncSession(moteur_test, expire_on_commit=False) as db:
+            await asyncio.sleep(0.05)
+            await partie.lancer(db, joueur, quiz.id)
+            await db.commit()
+
+    async def scenario() -> None:
+        await asyncio.wait_for(asyncio.gather(repondre_a_la_derniere(), relancer()), timeout=10)
+
+    asyncio.run(scenario())
+
+    assert len(gains(en_base, eleve.id)) == 1
+    assert sorted(t.etat.value for t in tentatives(en_base)) == ["en_cours", "terminee"]
 
 
 def test_deux_reponses_simultanees_a_la_meme_question_ne_comptent_quune_fois(

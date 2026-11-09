@@ -104,7 +104,11 @@ async def detail(db: AsyncSession, acces: Acces, quiz_id: UUID) -> QuizDetail:
     if quiz is None:
         raise Introuvable
     questions = (
-        await db.scalars(select(QuestionQuiz).where(QuestionQuiz.quiz_id == quiz.id).order_by(QuestionQuiz.ordre))
+        await db.scalars(
+            select(QuestionQuiz)
+            .where(QuestionQuiz.quiz_id == quiz.id)
+            .order_by(QuestionQuiz.ordre, QuestionQuiz.active.desc(), QuestionQuiz.id)
+        )
     ).all()
     p = await parametres.en_cours(db)
     return QuizDetail.model_validate(
@@ -207,16 +211,30 @@ async def _question(db: AsyncSession, quiz: Quiz, question_id: UUID) -> Question
 
 async def modifier_question(
     db: AsyncSession, acces: Acces, quiz_id: UUID, question_id: UUID, entree: QuestionEntree, ip: str
-) -> None:
+) -> UUID:
+    """Une question déjà tirée dans une partie n'est jamais réécrite : une partie en cours et l'historique gardent
+    l'énoncé et les choix joués. Elle est désactivée et remplacée par une copie modifiée, à la même place."""
     quiz = await _verrouiller(db, quiz_id)
     _brouillon(quiz)
     question = await _question(db, quiz, question_id)
-    for champ, valeur in entree.model_dump().items():
-        setattr(question, champ, valeur)
-    question.active = True
+    tiree = await db.scalar(select(exists().where(ReponseQuiz.question_id == question.id)))
+    if tiree and not question.active:
+        # Déjà remplacée ou retirée : la modifier créerait une seconde copie active dans la réserve.
+        raise EtatInvalide("Cette question a été remplacée ou retirée : modifie la question active.")
+    if tiree:
+        question.active = False
+        question = QuestionQuiz(quiz_id=quiz.id, ordre=question.ordre, **entree.model_dump())
+        db.add(question)
+        await db.flush()
+    else:
+        for champ, valeur in entree.model_dump().items():
+            setattr(question, champ, valeur)
+        question.active = True
     _contribue(quiz, acces)
     quiz.modifie_le = horloge.maintenant()
-    _journal(db, "question_modifiee", acces, quiz, ip, question=str(question.id))
+    remplacement = {"remplace": str(question_id)} if tiree else {}
+    _journal(db, "question_modifiee", acces, quiz, ip, question=str(question.id), **remplacement)
+    return question.id
 
 
 async def retirer_question(db: AsyncSession, acces: Acces, quiz_id: UUID, question_id: UUID, ip: str) -> None:
@@ -339,8 +357,20 @@ async def historique(db: AsyncSession) -> HistoriqueParametres:
 
 async def changer_parametres(db: AsyncSession, acces: Acces, entree: ParametresEntree, ip: str) -> ParametresSortie:
     """Ajoute une version. Refusé si un quiz publié n'a pas assez de questions actives pour le nouveau nombre."""
+    # Verrouille les quiz soumis ou publiés : une publication simultanée attend ce changement, puis vérifie sa
+    # réserve contre le nouveau nombre de questions ; une publication déjà faite est vue ici.
+    candidats = (
+        await db.scalars(
+            select(Quiz)
+            .where(Quiz.etat.in_((EtatQuiz.soumis, EtatQuiz.publie)))
+            .order_by(Quiz.id)
+            # FOR NO KEY UPDATE : les parties continuent de se lancer pendant le changement.
+            .with_for_update(key_share=True)
+            .execution_options(populate_existing=True)
+        )
+    ).all()
     actuels = await parametres.en_cours(db)
-    publies = (await db.scalars(select(Quiz).where(Quiz.etat == EtatQuiz.publie))).all()
+    publies = [q for q in candidats if q.etat is EtatQuiz.publie]
     actives = await _actives(db, [q.id for q in publies])
     trop_courts = sorted(q.titre for q in publies if actives.get(q.id, 0) < entree.nb_questions)
     if trop_courts:

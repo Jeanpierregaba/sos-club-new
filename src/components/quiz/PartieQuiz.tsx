@@ -37,6 +37,7 @@ export function PartieQuiz({
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const occupe = useRef(false);
+  const titre = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => setEtat(depart), [depart]);
 
@@ -83,6 +84,27 @@ export function PartieQuiz({
     };
   }, [etat, appels, appeler]);
 
+  // Chaque nouvelle question prend le focus : le lecteur d'écran la lit, et le clavier repart du bon endroit.
+  const rang = etat.question?.rang;
+  useEffect(() => {
+    if (rang !== undefined) titre.current?.focus();
+  }, [etat.tentative_id, rang]);
+
+  async function rejouer() {
+    if (!onRejouer || occupe.current) return;
+    occupe.current = true;
+    setEnCours(true);
+    setErreur(null);
+    try {
+      await onRejouer();
+    } catch (e) {
+      setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
+    } finally {
+      occupe.current = false;
+      setEnCours(false);
+    }
+  }
+
   if (!question && etat.resultat) {
     const r = etat.resultat;
     return (
@@ -116,13 +138,18 @@ export function PartieQuiz({
             <Button
               className="h-11 rounded-full px-6 font-bold"
               disabled={enCours}
-              onClick={() => void onRejouer()}
+              onClick={() => void rejouer()}
             >
               <RotateCcw className="size-4" /> Rejouer
             </Button>
           )}
           {actions}
         </div>
+        {erreur && (
+          <Alert variant="destructive" className="text-left">
+            <AlertDescription>{erreur}</AlertDescription>
+          </Alert>
+        )}
       </div>
     );
   }
@@ -137,8 +164,9 @@ export function PartieQuiz({
         <span>
           Question {question.rang} / {etat.total}
         </span>
-        <span className="inline-flex items-center gap-1" aria-label={`${secondes} secondes`}>
-          <Timer aria-hidden className="size-4" /> {secondes} s
+        <span className="inline-flex items-center gap-1">
+          <Timer aria-hidden className="size-4" /> <span aria-hidden>{secondes} s</span>
+          <span className="sr-only">{secondes} secondes restantes</span>
         </span>
       </div>
       <div
@@ -151,7 +179,16 @@ export function PartieQuiz({
           style={{ width: `${Math.round(part * 100)}%` }}
         />
       </div>
-      <h2 className="font-display text-2xl leading-snug text-ink">{question.enonce}</h2>
+      <h2
+        ref={titre}
+        tabIndex={-1}
+        className="font-display text-2xl leading-snug text-ink outline-none"
+      >
+        <span className="sr-only">
+          Question {question.rang} sur {etat.total} :{" "}
+        </span>
+        {question.enonce}
+      </h2>
       <div className="grid gap-3">
         {question.choix.map((texte, i) => (
           <button

@@ -116,8 +116,15 @@ Champs structurants :
   `dre_code`, `club_id` facultatif.
 - `video` : `titre`, `youtube_id`, `axe_id`. `document` : `titre`, `type` (magazine, guide, fiche),
   `fichier`, `couverture`, `publie_le`.
-- `tentative` : `quiz_id`, `eleve_id`, `commencee_le`, `terminee_le`, `score`, `reussie`.
-  `reponse` : `question_id`, `choix_id`, `envoyee_le`, `repondue_le`.
+- `quiz` (spec 027) : `titre`, `description`, `axe_code`, `etat` (brouillon, soumis, publie, depublie),
+  `contenu_de_test`, `contributeurs` (créé, modifié ou soumis par : aucun ne peut publier), `validateur_nom` et
+  `validateur_qualite` (validation médicale nommée, Q11). `question_quiz` : `enonce`, `choix` (2 à 4),
+  `bonne_reponse`, `explication` (équipe seulement), `active` (une question déjà tirée se désactive, ne
+  s'efface pas). `parametres_quiz` : versions des paramètres du parcours « jeux ».
+- `tentative_quiz` (spec 027) : `quiz_id`, `joueur_id`, `parametres_id`, `essai` (mode test, effacé à la fin),
+  `etat`, `jour`, `score`, `reussie`, `mouvement_id` ; une seule en cours par joueur et par quiz.
+  `reponse_quiz` : `rang`, `question_id`, `ordre_choix` (permutation), `envoyee_le`, `repondue_le`, `choix`,
+  `correcte`.
 - `eleve` (spec 017) : le profil d'un compte élève, lié un à un à `utilisateur`. `pseudonyme` (seule
   identité publique, Q20) et `pseudonyme_normalise` unique (sans accents, majuscules, espaces ni
   ponctuation), `classe`, `etablissement_id`, `charte_version`. Le prénom et le nom restent dans
@@ -187,25 +194,28 @@ flowchart LR
 Sessions en base et cookie sécurisé (ADR-0003). Les droits sont contrôlés dans l'API, sur chaque route,
 pour la ressource demandée.
 
-| Action                                                                    | Visiteur | Élève                     | Encadreur                 | Admin                                         |
-| ------------------------------------------------------------------------- | -------- | ------------------------- | ------------------------- | --------------------------------------------- |
-| Lire les contenus publiés                                                 | Oui      | Oui                       | Oui                       | Oui                                           |
-| Passer un quiz avec points                                                | Non      | Oui                       | Non                       | Non                                           |
-| Voir son Passeport                                                        | Non      | Le sien                   | Non                       | Oui                                           |
-| Soumettre un témoignage                                                   | Non      | Oui                       | Non                       | Non                                           |
-| Soumettre une activité, ajouter à l'agenda                                | Non      | Non                       | Pour son club             | Oui                                           |
-| Voir la console d'un club                                                 | Non      | Non                       | Son club                  | Oui                                           |
-| Retirer un élève, réinitialiser son accès                                 | Non      | Non                       | Élèves de son club        | Oui                                           |
-| Commenter                                                                 | Non      | Non                       | Oui                       | Oui                                           |
-| Demander à rejoindre un club (spec 020)                                   | Non      | Club de son établissement | N'importe quel club actif | Non                                           |
-| Confirmer ou refuser une demande, retirer un membre (spec 020)            | Non      | Président de ce club      | Non                       | Non                                           |
-| Voir la liste des membres d'un club (spec 020)                            | Non      | Membre ou président       | Clubs où il est rattaché  | Sa DRE                                        |
-| Valider une affiliation ou un rattachement (spec 020)                     | Non      | Non                       | Non                       | Sa DRE (national pour un club supplémentaire) |
-| Confirmer le nouveau président d'un club (Q19, spec 020)                  | Non      | Non                       | Clubs où il est rattaché  | Non                                           |
-| Jouer à « Quel axe est fait pour toi ? » (spec 021)                       | Non      | Élève actif               | Non                       | Non                                           |
-| Répondre au défi du jour, voir le podium des clubs (spec 021)             | Oui      | Oui                       | Oui                       | Oui                                           |
-| Gagner des points au défi du jour (spec 022)                              | Non      | Élève actif, 1 fois/jour  | Non                       | Non                                           |
-| Modérer, publier vidéos et documents, valider un club, attribuer un badge | Non      | Non                       | Non                       | Oui                                           |
+| Action                                                                    | Visiteur | Élève                     | Encadreur                 | Admin                                                       |
+| ------------------------------------------------------------------------- | -------- | ------------------------- | ------------------------- | ----------------------------------------------------------- |
+| Lire les contenus publiés                                                 | Oui      | Oui                       | Oui                       | Oui                                                         |
+| Passer un quiz avec points                                                | Non      | Élève actif               | Non (joue sans points)    | Non                                                         |
+| Voir son Passeport                                                        | Non      | Le sien                   | Non                       | Oui                                                         |
+| Soumettre un témoignage                                                   | Non      | Oui                       | Non                       | Non                                                         |
+| Soumettre une activité, ajouter à l'agenda                                | Non      | Non                       | Pour son club             | Oui                                                         |
+| Voir la console d'un club                                                 | Non      | Non                       | Son club                  | Oui                                                         |
+| Retirer un élève, réinitialiser son accès                                 | Non      | Non                       | Élèves de son club        | Oui                                                         |
+| Commenter                                                                 | Non      | Non                       | Oui                       | Oui                                                         |
+| Demander à rejoindre un club (spec 020)                                   | Non      | Club de son établissement | N'importe quel club actif | Non                                                         |
+| Confirmer ou refuser une demande, retirer un membre (spec 020)            | Non      | Président de ce club      | Non                       | Non                                                         |
+| Voir la liste des membres d'un club (spec 020)                            | Non      | Membre ou président       | Clubs où il est rattaché  | Sa DRE                                                      |
+| Valider une affiliation ou un rattachement (spec 020)                     | Non      | Non                       | Non                       | Sa DRE (national pour un club supplémentaire)               |
+| Confirmer le nouveau président d'un club (Q19, spec 020)                  | Non      | Non                       | Clubs où il est rattaché  | Non                                                         |
+| Jouer à « Quel axe est fait pour toi ? » (spec 021)                       | Non      | Élève actif               | Non                       | Non                                                         |
+| Jouer à un quiz (spec 027 ; points pour l'élève seulement)                | Non      | Élève actif               | Encadreur vérifié         | Mode test seulement                                         |
+| Préparer, soumettre un quiz (spec 027)                                    | Non      | Non                       | Non                       | Droits `quiz` créer, modifier, soumettre                    |
+| Publier, refuser, dépublier un quiz (spec 027)                            | Non      | Non                       | Non                       | Droits `quiz` approuver, dépublier ; jamais son propre quiz |
+| Répondre au défi du jour, voir le podium des clubs (spec 021)             | Oui      | Oui                       | Oui                       | Oui                                                         |
+| Gagner des points au défi du jour (spec 022)                              | Non      | Élève actif, 1 fois/jour  | Non                       | Non                                                         |
+| Modérer, publier vidéos et documents, valider un club, attribuer un badge | Non      | Non                       | Non                       | Oui                                                         |
 
 Un élève ne peut ni voir les coordonnées d'un autre utilisateur, ni être contacté par un autre
 utilisateur. Sur les pages publiques, un élève apparaît par son pseudonyme et le nom de son club.

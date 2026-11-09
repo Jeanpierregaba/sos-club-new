@@ -54,17 +54,18 @@ function JouerQuiz() {
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
 
-  async function commencer() {
+  async function demarrer(action: () => Promise<EtatPartie>) {
     setErreur(null);
     setEnCours(true);
     try {
-      setPartie(await lancerQuiz(quiz.id));
+      setPartie(await action());
     } catch (e) {
       setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
     } finally {
       setEnCours(false);
     }
   }
+  const enCoursId = quiz.tentative_en_cours;
 
   return (
     <main className="min-h-screen bg-carnet px-4 py-10 sm:px-6">
@@ -94,7 +95,8 @@ function JouerQuiz() {
               depart={partie}
               appels={partieJoueur}
               avecPoints={moi.role === "eleve"}
-              onRejouer={commencer}
+              // L'erreur (plafond du jour, réseau) remonte à la partie, qui l'affiche sous le résultat.
+              onRejouer={async () => setPartie(await lancerQuiz(quiz.id))}
               actions={
                 <Link
                   to="/quiz"
@@ -111,25 +113,46 @@ function JouerQuiz() {
                 <li>{nbQuestions} questions, une à la fois, avec un compte à rebours.</li>
                 <li>Sans réponse à temps, la question compte comme ratée.</li>
                 <li>Il faut {seuil} bonnes réponses pour réussir.</li>
-                <li>Si tu quittes la page, la question en cours est perdue.</li>
+                <li>
+                  Si tu quittes la page, la question en cours est perdue ; tu reprends ensuite à la
+                  suivante.
+                </li>
               </ul>
+              {enCoursId && (
+                <p className="rounded-2xl bg-sun/20 p-3 text-sm font-semibold text-ink">
+                  Tu as une partie en cours sur ce quiz : reprends-la, ou recommence (la partie en
+                  cours sera close avec ton score actuel).
+                </p>
+              )}
               {erreur && (
                 <Alert variant="destructive">
                   <AlertDescription>{erreur}</AlertDescription>
                 </Alert>
               )}
-              <Button
-                className="h-12 rounded-full px-6 font-bold"
-                disabled={enCours}
-                onClick={() => void commencer()}
-              >
-                {enCours ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : (
-                  <Play className="size-4" />
+              <div className="flex flex-wrap gap-3">
+                {enCoursId && (
+                  <Button
+                    className="h-12 rounded-full px-6 font-bold"
+                    disabled={enCours}
+                    onClick={() => void demarrer(() => partieJoueur.reprendre(enCoursId))}
+                  >
+                    <Play className="size-4" /> Reprendre ma partie
+                  </Button>
                 )}
-                Commencer
-              </Button>
+                <Button
+                  variant={enCoursId ? "outline" : "default"}
+                  className="h-12 rounded-full px-6 font-bold"
+                  disabled={enCours}
+                  onClick={() => void demarrer(() => lancerQuiz(quiz.id))}
+                >
+                  {enCours ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Play className="size-4" />
+                  )}
+                  {enCoursId ? "Recommencer" : "Commencer"}
+                </Button>
+              </div>
             </div>
           )}
         </section>
