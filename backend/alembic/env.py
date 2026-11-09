@@ -17,7 +17,8 @@ import app.moderation.models
 import app.notifications.models
 import app.points.models
 import app.quiz.models
-import app.referentiel.models  # noqa: F401
+import app.referentiel.models
+import app.visiteurs.models  # noqa: F401
 from alembic import context
 from app.config import settings
 from app.db import Base

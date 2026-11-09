@@ -12,7 +12,7 @@ authentification, code de confirmation) commencent par leurs tests.
 
 ## Données
 
-- [ ] 2. Migration : `fiche_eleve`, `fiche_eleve_axe`, `fiche_eleve_parcours`, `encadreur.discipline`, rôle
+- [x] 2. Migration : `fiche_eleve`, `fiche_eleve_axe`, `fiche_eleve_parcours`, `encadreur.discipline`, rôle
       `visiteur`, `utilisateur.email_confirme_le`, `visiteur`, `code_confirmation` ; module de droit
       `fiches_eleves`. Test : `alembic upgrade head` puis `downgrade -1` puis `upgrade` sur la base de test.
 

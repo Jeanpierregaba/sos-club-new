@@ -48,6 +48,8 @@ class Encadreur(Suivi, Base):
     etablissement_id: Mapped[UUID] = mapped_column(ForeignKey("etablissement.id", ondelete="RESTRICT"), index=True)
     fonction: Mapped[Fonction] = mapped_column(_enum_texte(Fonction, "fonction"))
     fonction_precision: Mapped[str | None] = mapped_column(String(100))
+    # Discipline ou spécialité (spec 030), facultative.
+    discipline: Mapped[str | None] = mapped_column(String(100))
     etat: Mapped[EtatVerification] = mapped_column(
         _enum_texte(EtatVerification, "etat_verification"), default=EtatVerification.en_attente
     )

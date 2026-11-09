@@ -12,6 +12,8 @@ class Role(StrEnum):
     eleve = "eleve"
     encadreur = "encadreur"
     admin = "admin"
+    # Compte léger du grand public (spec 030) : quiz « jeux » sans points, ni club ni certification.
+    visiteur = "visiteur"
 
 
 class StatutCompte(StrEnum):
@@ -19,6 +21,11 @@ class StatutCompte(StrEnum):
     suspendu = "suspendu"
     # Collaborateur retiré définitivement (spec 015) : ne se réactive pas.
     revoque = "revoque"
+
+
+class Sexe(StrEnum):
+    feminin = "feminin"
+    masculin = "masculin"
 
 
 def _enum_texte(enum: type[StrEnum], nom: str) -> Enum:
@@ -44,6 +51,8 @@ class Utilisateur(Base):
     mot_de_passe_hash: Mapped[str] = mapped_column(Text)
     statut: Mapped[StatutCompte] = mapped_column(_enum_texte(StatutCompte, "statut"), default=StatutCompte.actif)
     consentement_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Adresse confirmée par un code (spec 030) : exigée des seuls visiteurs, nulle pour les autres profils.
+    email_confirme_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cree_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 

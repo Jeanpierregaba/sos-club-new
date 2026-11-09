@@ -43,6 +43,8 @@ MODULES: dict[str, tuple[str, bool, tuple[Action, ...]]] = {
     "tableau_de_bord": ("Tableau de bord", True, (C,)),
     "inscrits": ("Inscrits", True, (C, M, E)),
     "statistiques": ("Statistiques", True, (C, E)),
+    # Fiche d'adhésion de l'élève (spec 030) : données personnelles d'un mineur, lecture seule et journalisée.
+    "fiches_eleves": ("Fiches d'adhésion des élèves", True, (C,)),
     "journal": ("Journal d'audit", True, (C,)),
     # File de modération (spec 023) : un collaborateur de DRE ne voit que les contenus des auteurs de sa DRE.
     "moderation": ("Modération", True, (C, A, D)),
@@ -75,6 +77,7 @@ SENSIBLES: frozenset[tuple[str, Action]] = frozenset(
         ("agenda", D),
         ("inscrits", M),
         ("inscrits", E),
+        ("fiches_eleves", C),
         ("quiz", A),
         ("quiz", D),
         ("bibliotheque", A),
