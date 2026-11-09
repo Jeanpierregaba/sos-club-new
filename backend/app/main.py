@@ -35,6 +35,7 @@ from app.eleves.router import router as router_eleves
 from app.encadreurs.router import router as router_encadreurs
 from app.encadreurs.router import router_admin as router_encadreurs_admin
 from app.jeux.router import router as router_jeux
+from app.jeux.router_quiz import router as router_jeux_quiz
 from app.moderation.photos import purger_regulierement as purger_photos_regulierement
 from app.moderation.router import router_admin as router_moderation_admin
 from app.notifications.router import router as router_notifications
@@ -87,6 +88,7 @@ api.include_router(router_actualites)
 api.include_router(router_clubs)
 api.include_router(router_clubs_admin)
 api.include_router(router_jeux)
+api.include_router(router_jeux_quiz)
 api.include_router(router_notifications)
 api.include_router(router_articles_auteur)
 api.include_router(router_articles)

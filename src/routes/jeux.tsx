@@ -1,12 +1,22 @@
 import { useState, type CSSProperties } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, Clock, Crown, Gamepad2, GraduationCap, Medal, UserPlus } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  ArrowRight,
+  Clock,
+  Crown,
+  Gamepad2,
+  GraduationCap,
+  Medal,
+  Play,
+  UserPlus,
+} from "lucide-react";
 import { EnTete } from "@/components/EnTete";
 import { FilAriane } from "@/components/FilAriane";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion, retard } from "@/components/SiteMotion";
 import { DecorAnime } from "@/components/DecorAnime";
+import { chargerCatalogueJeux, type CatalogueQuiz } from "@/lib/api/client";
 import { BAREME, points } from "@/lib/bareme";
 import { niveauDe, poles, type Niveau } from "@/lib/quiz";
 import mascottesVs from "@/assets/mascottes-vs.webp";
@@ -24,6 +34,8 @@ export const Route = createFileRoute("/jeux")({
       { property: "og:title", content: "Joue, apprends & deviens champion de la santé" },
     ],
   }),
+  // Les quiz jouables (spec 031). API en panne : la page reste lisible, sans la section « Joue maintenant ».
+  loader: () => chargerCatalogueJeux().catch(() => null),
   component: Jeux,
 });
 
@@ -76,7 +88,81 @@ const niveaux: { n: Niveau; c: string }[] = [
   { n: "Championnat", c: "bg-grape/15 text-grape" },
 ];
 
+// Les quiz chargés depuis le document officiel portent leur lot au début de la description : « Lot 3 — … ».
+function parLot(catalogue: CatalogueQuiz) {
+  const lots = new Map<string, CatalogueQuiz["quiz"]>();
+  for (const q of catalogue.quiz) {
+    const lot = /^(Lot \d+ — [^·]+)/.exec(q.description)?.[1]?.trim() ?? "Autres quiz";
+    lots.set(lot, [...(lots.get(lot) ?? []), q]);
+  }
+  // Les lots dans l'ordre du document ; « Autres quiz » (sans lot) à la fin.
+  const rang = (lot: string) => Number(/^Lot (\d+)/.exec(lot)?.[1] ?? 99);
+  return [...lots.entries()].sort(([a], [b]) => rang(a) - rang(b));
+}
+
+function JoueMaintenant({ catalogue }: { catalogue: CatalogueQuiz }) {
+  const [ouvert, setOuvert] = useState(0);
+  const lots = parLot(catalogue);
+  const [, quizDuLot] = lots[ouvert] ?? lots[0] ?? ["", []];
+  return (
+    <section id="jouer" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-20">
+      <EnTete sur="Jeu Quiz Santé" bleu="Joue" vert="maintenant">
+        {catalogue.quiz.length} quiz tirés des 922 QCM officiels : {catalogue.nb_questions}{" "}
+        questions au hasard par partie, {catalogue.seuil} bonnes réponses pour réussir.
+      </EnTete>
+      {catalogue.restants !== null && (
+        <p className="mx-auto mt-6 flex max-w-2xl flex-wrap items-center justify-center gap-x-3 gap-y-2 rounded-2xl bg-sun/25 px-5 py-3 text-center font-semibold text-ink">
+          Sans compte, tu peux jouer à {catalogue.limite} quiz : il t'en reste{" "}
+          <strong>{catalogue.restants}</strong>.
+          <Link
+            to="/inscription"
+            search={{ profil: "visiteur" }}
+            className="font-bold text-logo-blue underline underline-offset-4"
+          >
+            Crée ton compte visiteur pour jouer sans limite
+          </Link>
+        </p>
+      )}
+      <div role="group" aria-label="Thèmes" className="mt-10 flex flex-wrap justify-center gap-2">
+        {lots.map(([lot], i) => (
+          <button
+            key={lot}
+            type="button"
+            aria-pressed={i === ouvert}
+            onClick={() => setOuvert(i)}
+            className={`rounded-full px-4 py-2 text-sm font-bold transition ${
+              i === ouvert
+                ? "bg-primary text-primary-foreground"
+                : "bg-white ring-1 ring-border hover:bg-mist"
+            }`}
+          >
+            {lot.replace(/^Lot \d+ — /, "")}
+          </button>
+        ))}
+      </div>
+      <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {quizDuLot.map((q) => (
+          <li key={q.id} className="flex flex-col rounded-[1.5rem] border bg-white p-5 shadow-sm">
+            <p className="flex-1 font-extrabold leading-snug">{q.titre}</p>
+            <p className="mt-2 text-xs font-semibold text-muted-foreground">
+              {q.nb_questions_reserve} questions en réserve · {catalogue.nb_questions} par partie
+            </p>
+            <Link
+              to={catalogue.connecte ? "/quiz/$id" : "/jeux/quiz/$id"}
+              params={{ id: q.id }}
+              className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition hover:brightness-105"
+            >
+              <Play className="size-3.5" /> Jouer
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function Jeux() {
+  const catalogue = Route.useLoaderData();
   const [pole, setPole] = useState(2);
   const [niveau, setNiveau] = useState<Niveau | null>(null);
   const p = poles[pole] ?? poles[0]!;
@@ -178,6 +264,8 @@ function Jeux() {
           ))}
         </ol>
       </section>
+
+      {catalogue && catalogue.quiz.length > 0 && <JoueMaintenant catalogue={catalogue} />}
 
       {/* Catalogue : les 6 pôles en tuiles, puis les quiz du pôle choisi. */}
       <section id="quiz" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-20">
@@ -322,7 +410,7 @@ function Jeux() {
                         </span>
                       </span>
                       <a
-                        href="/quiz"
+                        href="#jouer"
                         className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition group-hover:brightness-105"
                       >
                         Relever le défi <ArrowRight className="size-3.5" />

@@ -166,4 +166,8 @@ async def purger_regulierement() -> None:
                 nombre = await purger_non_confirmes(db)
                 if nombre:
                     logger.info("%s compte(s) visiteur non confirmé(s) effacé(s).", nombre)
+                # Les joueurs sans compte de plus de 7 jours (spec 031).
+                from app.jeux.invites import purger as purger_invites
+
+                await purger_invites(db)
         await asyncio.sleep(3600)

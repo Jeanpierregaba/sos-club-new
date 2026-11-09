@@ -701,6 +701,17 @@ export const chargerQuiz = (axe?: string) =>
   requeteApi<ListeQuiz>(avecParametres("/api/quiz", { axe }));
 export const lancerQuiz = (quizId: string) =>
   envoyerJson<EtatPartie>(`/api/quiz/${quizId}/tentatives`);
+// Quiz ouverts depuis la page des jeux (spec 031) : un joueur sans compte joue deux quiz au plus.
+export type CatalogueQuiz = Schemas["CatalogueQuiz"];
+export type QuizOuvert = Schemas["QuizOuvert"];
+export const chargerCatalogueJeux = () => requeteApi<CatalogueQuiz>("/api/jeux/quiz");
+export const lancerQuizOuvert = (quizId: string) =>
+  envoyerJson<EtatPartie>(`/api/jeux/quiz/${quizId}/tentatives`);
+export const partieSansCompte: AppelsPartie = {
+  reprendre: (id) => requeteApi<EtatPartie>(`/api/jeux/quiz/tentatives/${id}`),
+  repondre: (id, rang, choix) =>
+    envoyerJson<EtatPartie>(`/api/jeux/quiz/tentatives/${id}/reponses`, { rang, choix }),
+};
 export const partieJoueur: AppelsPartie = {
   reprendre: (id) => requeteApi<EtatPartie>(`/api/quiz/tentatives/${id}`),
   repondre: (id, rang, choix) =>

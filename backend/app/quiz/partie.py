@@ -90,7 +90,7 @@ async def lancer(db: AsyncSession, joueur: Utilisateur, quiz_id: UUID, *, essai:
     )
     if quiz is None or (not essai and quiz.etat is not EtatQuiz.publie):
         raise Introuvable
-    if quiz.parcours == PARCOURS_CERTIFICATION and joueur.role is Role.visiteur:
+    if quiz.parcours == PARCOURS_CERTIFICATION and joueur.role in (Role.visiteur, Role.invite):
         # Le parcours de certification est réservé aux élèves et aux encadreurs (spec 030).
         raise ReserveCertification
     # Sérialise les lancements d'un même joueur : le plafond et la tentative en cours restent exacts.

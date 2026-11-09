@@ -14,6 +14,9 @@ class Role(StrEnum):
     admin = "admin"
     # Compte léger du grand public (spec 030) : quiz « jeux » sans points, ni club ni certification.
     visiteur = "visiteur"
+    # Joueur sans compte (spec 031) : créé à sa première partie depuis la page des jeux, sans e-mail ni mot de
+    # passe, reconnu par un cookie à part ; deux quiz au plus, puis il crée un compte visiteur. Effacé après 7 jours.
+    invite = "invite"
 
 
 class StatutCompte(StrEnum):
@@ -38,7 +41,7 @@ class Utilisateur(Base):
     __table_args__ = (
         CheckConstraint("identifiant ~ '^[a-z0-9._-]{3,30}$'", name="identifiant_format"),
         CheckConstraint("email = lower(email)", name="email_minuscules"),
-        CheckConstraint("email IS NOT NULL OR role = 'eleve'", name="email_obligatoire_sauf_eleve"),
+        CheckConstraint("email IS NOT NULL OR role IN ('eleve', 'invite')", name="email_obligatoire_sauf_eleve"),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)

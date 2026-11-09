@@ -24,7 +24,8 @@ async def verifier_origine(request: Request) -> None:
 async def utilisateur_courant(request: Request, db: Annotated[AsyncSession, Depends(get_session)]) -> Utilisateur:
     jeton = request.cookies.get(settings.cookie_session)
     utilisateur = await utilisateur_de_la_session(db, jeton) if jeton else None
-    if utilisateur is None:
+    # Le jeton d'un joueur sans compte (spec 031) ne vaut que pour /jeux/quiz, jamais comme session.
+    if utilisateur is None or utilisateur.role is Role.invite:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Connecte-toi pour continuer.")
     return utilisateur
 
@@ -43,4 +44,5 @@ async def utilisateur_facultatif(
 ) -> Utilisateur | None:
     """L'utilisateur connecté, ou None pour un visiteur : pour une route publique qui en fait plus pour un compte."""
     jeton = request.cookies.get(settings.cookie_session)
-    return await utilisateur_de_la_session(db, jeton) if jeton else None
+    utilisateur = await utilisateur_de_la_session(db, jeton) if jeton else None
+    return None if utilisateur is None or utilisateur.role is Role.invite else utilisateur

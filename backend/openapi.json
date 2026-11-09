@@ -5757,6 +5757,166 @@
         }
       }
     },
+    "/api/jeux/quiz": {
+      "get": {
+        "tags": [
+          "jeux"
+        ],
+        "summary": "Catalogue",
+        "operationId": "catalogue_api_jeux_quiz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogueQuiz"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jeux/quiz/{quiz_id}/tentatives": {
+      "post": {
+        "tags": [
+          "jeux"
+        ],
+        "summary": "Lancer",
+        "operationId": "lancer_api_jeux_quiz__quiz_id__tentatives_post",
+        "parameters": [
+          {
+            "name": "quiz_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Quiz Id"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatPartie"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jeux/quiz/tentatives/{tentative_id}": {
+      "get": {
+        "tags": [
+          "jeux"
+        ],
+        "summary": "Reprendre",
+        "operationId": "reprendre_api_jeux_quiz_tentatives__tentative_id__get",
+        "parameters": [
+          {
+            "name": "tentative_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tentative Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatPartie"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jeux/quiz/tentatives/{tentative_id}/reponses": {
+      "post": {
+        "tags": [
+          "jeux"
+        ],
+        "summary": "Repondre",
+        "operationId": "repondre_api_jeux_quiz_tentatives__tentative_id__reponses_post",
+        "parameters": [
+          {
+            "name": "tentative_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tentative Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReponseJoueur"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatPartie"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/notifications": {
       "get": {
         "tags": [
@@ -10738,6 +10898,59 @@
           "dre_actives"
         ],
         "title": "Catalogue"
+      },
+      "CatalogueQuiz": {
+        "properties": {
+          "nb_questions": {
+            "type": "integer",
+            "title": "Nb Questions"
+          },
+          "seuil": {
+            "type": "integer",
+            "title": "Seuil"
+          },
+          "temps_ms": {
+            "type": "integer",
+            "title": "Temps Ms"
+          },
+          "limite": {
+            "type": "integer",
+            "title": "Limite"
+          },
+          "restants": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Restants"
+          },
+          "connecte": {
+            "type": "boolean",
+            "title": "Connecte"
+          },
+          "quiz": {
+            "items": {
+              "$ref": "#/components/schemas/QuizOuvert"
+            },
+            "type": "array",
+            "title": "Quiz"
+          }
+        },
+        "type": "object",
+        "required": [
+          "nb_questions",
+          "seuil",
+          "temps_ms",
+          "limite",
+          "restants",
+          "connecte",
+          "quiz"
+        ],
+        "title": "CatalogueQuiz"
       },
       "CategorieRessource": {
         "type": "string",
@@ -18348,6 +18561,40 @@
         ],
         "title": "QuizJoueur"
       },
+      "QuizOuvert": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "axe_code": {
+            "type": "string",
+            "title": "Axe Code"
+          },
+          "nb_questions_reserve": {
+            "type": "integer",
+            "title": "Nb Questions Reserve"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "titre",
+          "description",
+          "axe_code",
+          "nb_questions_reserve"
+        ],
+        "title": "QuizOuvert"
+      },
       "RattachementAValider": {
         "properties": {
           "id": {
@@ -19448,7 +19695,8 @@
           "eleve",
           "encadreur",
           "admin",
-          "visiteur"
+          "visiteur",
+          "invite"
         ],
         "title": "Role"
       },

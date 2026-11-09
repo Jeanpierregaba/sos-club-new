@@ -50,6 +50,7 @@ const LIBELLES_ROLE = {
   encadreur: "Encadreur",
   admin: "Admin",
   visiteur: "Visiteur",
+  invite: "Joueur sans compte",
 } as const;
 
 export const Route = createFileRoute("/_connecte/mon-espace")({

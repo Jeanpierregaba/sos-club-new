@@ -43,6 +43,7 @@ export const PROFILS = {
   encadreur: "Encadreur",
   admin: "Collaborateur",
   visiteur: "Visiteur",
+  invite: "Joueur sans compte",
 } as const;
 
 // Libellés des actions du journal d'audit.

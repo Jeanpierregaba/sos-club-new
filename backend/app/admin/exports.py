@@ -39,7 +39,13 @@ COLONNES: dict[str, str] = {
     "date_inscription": "Date d'inscription",
     "consentement": "Consentement",
 }
-LIBELLES_PROFILS = {"eleve": "Élève", "encadreur": "Encadreur", "admin": "Collaborateur"}
+LIBELLES_PROFILS = {
+    "eleve": "Élève",
+    "encadreur": "Encadreur",
+    "admin": "Collaborateur",
+    "visiteur": "Visiteur",
+    "invite": "Joueur sans compte",
+}
 LIBELLES_STATUTS = {"actif": "Actif", "suspendu": "Suspendu", "revoque": "Révoqué"}
 DEBUTS_DE_FORMULE = ("=", "+", "-", "@", "\t", "\r")
 TYPES_MIME = {

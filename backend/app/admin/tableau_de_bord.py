@@ -30,18 +30,20 @@ A_VENIR = [
 async def calculer(db: AsyncSession, acces: Acces) -> TableauDeBord:
     maintenant = datetime.now(UTC)
 
-    par_profil = {role: 0 for role in Role} | dict(
-        (await db.execute(select(Utilisateur.role, func.count()).group_by(Utilisateur.role))).all()
+    # Les joueurs sans compte (spec 031) ne sont pas des comptes.
+    comptes = Utilisateur.role != Role.invite
+    par_profil = {role: 0 for role in Role if role is not Role.invite} | dict(
+        (await db.execute(select(Utilisateur.role, func.count()).where(comptes).group_by(Utilisateur.role))).all()
     )
     par_statut = {statut: 0 for statut in StatutCompte} | dict(
-        (await db.execute(select(Utilisateur.statut, func.count()).group_by(Utilisateur.statut))).all()
+        (await db.execute(select(Utilisateur.statut, func.count()).where(comptes).group_by(Utilisateur.statut))).all()
     )
 
     debut = (maintenant - timedelta(days=29)).date()
     jour = func.date(func.timezone("UTC", Utilisateur.cree_le))
     lignes = await db.execute(
         select(jour, func.count())
-        .where(Utilisateur.cree_le >= datetime.combine(debut, datetime.min.time(), UTC))
+        .where(Utilisateur.cree_le >= datetime.combine(debut, datetime.min.time(), UTC), comptes)
         .group_by(jour)
     )
     par_jour: dict[date, int] = dict(lignes.all())

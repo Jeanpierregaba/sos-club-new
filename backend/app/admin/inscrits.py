@@ -70,7 +70,12 @@ class Refus(Exception):
 
 
 def requete_filtree(filtres: FiltresInscrits) -> Select[tuple[Utilisateur]]:
-    requete = select(Utilisateur).outerjoin(Eleve, Eleve.utilisateur_id == Utilisateur.id)
+    # Les joueurs sans compte (spec 031) ne sont pas des inscrits.
+    requete = (
+        select(Utilisateur)
+        .outerjoin(Eleve, Eleve.utilisateur_id == Utilisateur.id)
+        .where(Utilisateur.role != Role.invite)
+    )
     if filtres.recherche and filtres.recherche.strip():
         # Les caractères spéciaux de LIKE sont échappés : « 100% » cherche bien « 100% ».
         texte = filtres.recherche.strip().lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
