@@ -67,6 +67,8 @@ class EtablissementTrouve(EtablissementPublic):
     iesg: str
     dre_code: str
     dre: str
+    # La ville (spec 030) : l'encadreur voit la région et la ville de l'établissement choisi.
+    localite: str | None = None
 
 
 class EtablissementRattache(BaseModel):

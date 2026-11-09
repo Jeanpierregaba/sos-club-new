@@ -25,6 +25,7 @@ import { Route as JeuxRouteImport } from './routes/jeux'
 import { Route as Les7AxesRouteImport } from './routes/les-7-axes'
 import { Route as MagazineRouteImport } from './routes/magazine'
 import { Route as ConnecteAdminRouteImport } from './routes/_connecte/admin'
+import { Route as ConnecteMaFicheRouteImport } from './routes/_connecte/ma-fiche'
 import { Route as ConnecteMesCommentairesRouteImport } from './routes/_connecte/mes-commentaires'
 import { Route as ConnecteMonEspaceRouteImport } from './routes/_connecte/mon-espace'
 import { Route as ConnecteNotificationsRouteImport } from './routes/_connecte/notifications'
@@ -155,6 +156,11 @@ const MagazineRoute = MagazineRouteImport.update({
 const ConnecteAdminRoute = ConnecteAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => ConnecteRoute,
+} as any)
+const ConnecteMaFicheRoute = ConnecteMaFicheRouteImport.update({
+  id: '/ma-fiche',
+  path: '/ma-fiche',
   getParentRoute: () => ConnecteRoute,
 } as any)
 const ConnecteMesCommentairesRoute = ConnecteMesCommentairesRouteImport.update({
@@ -462,6 +468,7 @@ export interface FileRoutesByFullPath {
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
   '/admin': typeof ConnecteAdminRouteWithChildren
+  '/ma-fiche': typeof ConnecteMaFicheRoute
   '/mes-commentaires': typeof ConnecteMesCommentairesRoute
   '/mon-espace': typeof ConnecteMonEspaceRoute
   '/notifications': typeof ConnecteNotificationsRoute
@@ -530,6 +537,7 @@ export interface FileRoutesByTo {
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
+  '/ma-fiche': typeof ConnecteMaFicheRoute
   '/mes-commentaires': typeof ConnecteMesCommentairesRoute
   '/mon-espace': typeof ConnecteMonEspaceRoute
   '/notifications': typeof ConnecteNotificationsRoute
@@ -596,6 +604,7 @@ export interface FileRoutesById {
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
   '/_connecte/admin': typeof ConnecteAdminRouteWithChildren
+  '/_connecte/ma-fiche': typeof ConnecteMaFicheRoute
   '/_connecte/mes-commentaires': typeof ConnecteMesCommentairesRoute
   '/_connecte/mon-espace': typeof ConnecteMonEspaceRoute
   '/_connecte/notifications': typeof ConnecteNotificationsRoute
@@ -667,6 +676,7 @@ export interface FileRouteTypes {
     | '/les-7-axes'
     | '/magazine'
     | '/admin'
+    | '/ma-fiche'
     | '/mes-commentaires'
     | '/mon-espace'
     | '/notifications'
@@ -735,6 +745,7 @@ export interface FileRouteTypes {
     | '/jeux'
     | '/les-7-axes'
     | '/magazine'
+    | '/ma-fiche'
     | '/mes-commentaires'
     | '/mon-espace'
     | '/notifications'
@@ -800,6 +811,7 @@ export interface FileRouteTypes {
     | '/les-7-axes'
     | '/magazine'
     | '/_connecte/admin'
+    | '/_connecte/ma-fiche'
     | '/_connecte/mes-commentaires'
     | '/_connecte/mon-espace'
     | '/_connecte/notifications'
@@ -994,6 +1006,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof ConnecteAdminRouteImport
+      parentRoute: typeof ConnecteRoute
+    }
+    '/_connecte/ma-fiche': {
+      id: '/_connecte/ma-fiche'
+      path: '/ma-fiche'
+      fullPath: '/ma-fiche'
+      preLoaderRoute: typeof ConnecteMaFicheRouteImport
       parentRoute: typeof ConnecteRoute
     }
     '/_connecte/mes-commentaires': {
@@ -1491,6 +1510,7 @@ const ConnecteAdminRouteWithChildren = ConnecteAdminRoute._addFileChildren(
 
 interface ConnecteRouteChildren {
   ConnecteAdminRoute: typeof ConnecteAdminRouteWithChildren
+  ConnecteMaFicheRoute: typeof ConnecteMaFicheRoute
   ConnecteMesCommentairesRoute: typeof ConnecteMesCommentairesRoute
   ConnecteMonEspaceRoute: typeof ConnecteMonEspaceRoute
   ConnecteNotificationsRoute: typeof ConnecteNotificationsRoute
@@ -1508,6 +1528,7 @@ interface ConnecteRouteChildren {
 
 const ConnecteRouteChildren: ConnecteRouteChildren = {
   ConnecteAdminRoute: ConnecteAdminRouteWithChildren,
+  ConnecteMaFicheRoute: ConnecteMaFicheRoute,
   ConnecteMesCommentairesRoute: ConnecteMesCommentairesRoute,
   ConnecteMonEspaceRoute: ConnecteMonEspaceRoute,
   ConnecteNotificationsRoute: ConnecteNotificationsRoute,

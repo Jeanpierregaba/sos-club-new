@@ -38,7 +38,12 @@ export const STATUTS_COMPTE = {
   revoque: STATUTS_COLLABORATEUR.revoque,
 } as const;
 
-export const PROFILS = { eleve: "Élève", encadreur: "Encadreur", admin: "Collaborateur" } as const;
+export const PROFILS = {
+  eleve: "Élève",
+  encadreur: "Encadreur",
+  admin: "Collaborateur",
+  visiteur: "Visiteur",
+} as const;
 
 // Libellés des actions du journal d'audit.
 export const ACTIONS_JOURNAL: Record<string, string> = {
@@ -66,6 +71,10 @@ export const ACTIONS_JOURNAL: Record<string, string> = {
   inscrit_suspendu: "Inscrit suspendu",
   inscrit_reactive: "Inscrit réactivé",
   inscription_eleve: "Inscription d'un élève",
+  inscription_visiteur: "Inscription d'un visiteur",
+  email_confirme: "Adresse e-mail confirmée",
+  fiche_eleve_modifiee: "Fiche d'adhésion modifiée par l'élève",
+  fiche_eleve_consultee: "Fiche d'adhésion consultée",
   profil_eleve_modifie: "Profil d'élève modifié",
   pseudonyme_impose: "Pseudonyme imposé",
   mot_de_passe_change: "Mot de passe changé",

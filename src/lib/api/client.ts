@@ -6,6 +6,7 @@ import type { components } from "./schema.gen";
 type Schemas = components["schemas"];
 export type Moi = Schemas["Moi"];
 export type EtapeCode = Schemas["EtapeCode"];
+export type EtapeConfirmation = Schemas["EtapeConfirmation"];
 export type AdminMoi = Schemas["AdminMoi"];
 export type Catalogue = Schemas["Catalogue"];
 export type Droit = Schemas["Droit"];
@@ -49,6 +50,15 @@ export type EtatInscription = Schemas["EtatInscription"];
 export type InscriptionEntree = Schemas["InscriptionEntree"];
 export type Classe = Schemas["Classe"];
 export type EspaceEleve = Schemas["EspaceEleve"];
+export type FicheEntree = Schemas["FicheEntree"];
+export type FicheSortie = Schemas["FicheSortie"];
+export type FicheModification = Schemas["FicheModification"];
+export type Sexe = Schemas["Sexe"];
+export type Reseau = Schemas["Reseau"];
+export type InscriptionVisiteur = Schemas["InscriptionVisiteur"];
+export type CodeEnvoye = Schemas["CodeEnvoye"];
+export type EspaceVisiteur = Schemas["EspaceVisiteur"];
+export type Region = Schemas["Region"];
 export type ProfilModification = Schemas["ProfilModification"];
 export type ResumePoints = Schemas["ResumePoints"];
 export type ProfilEleveAdmin = Schemas["ProfilEleveAdmin"];
@@ -250,8 +260,12 @@ function avecParametres(
 }
 
 // Si la double authentification est active, la réponse est une étape « code » et aucune session n'est ouverte.
-export function connecter(identifiant: string, motDePasse: string): Promise<Moi | EtapeCode> {
-  return envoyerJson<Moi | EtapeCode>("/api/comptes/connexion", {
+// Un visiteur dont l'adresse n'est pas confirmée reçoit l'étape « confirmation » et un nouveau code (spec 030).
+export function connecter(
+  identifiant: string,
+  motDePasse: string,
+): Promise<Moi | EtapeCode | EtapeConfirmation> {
+  return envoyerJson<Moi | EtapeCode | EtapeConfirmation>("/api/comptes/connexion", {
     identifiant,
     mot_de_passe: motDePasse,
   });
@@ -308,6 +322,8 @@ export const voirInvitation = (jeton: string) =>
 export const activerInvitation = (jeton: string, identifiant: string, motDePasse: string) =>
   envoyerJson<Moi>("/api/activation", { jeton, identifiant, mot_de_passe: motDePasse });
 
+export const adminVoirFicheEleve = (id: string) =>
+  requeteApi<FicheSortie>(`/api/admin/inscrits/${id}/fiche`);
 export const listerInscrits = (filtres: Record<string, string | number | undefined>) =>
   requeteApi<PageInscrits>(avecParametres("/api/admin/inscrits", filtres));
 export const chargerInscrit = (id: string) =>
@@ -375,6 +391,9 @@ export const inscrireEleve = (entree: InscriptionEntree) =>
 export const chargerEspaceEleve = () => requeteApi<EspaceEleve>("/api/eleves/moi");
 export const modifierProfilEleve = (entree: ProfilModification) =>
   envoyerJson<EspaceEleve>("/api/eleves/moi", entree, "PATCH");
+export const chargerMaFiche = () => requeteApi<FicheSortie | null>("/api/eleves/moi/fiche");
+export const enregistrerMaFiche = (entree: FicheModification) =>
+  envoyerJson<FicheSortie>("/api/eleves/moi/fiche", entree, "PUT");
 export const changerMotDePasse = (actuel: string, nouveau: string) =>
   envoyerJson<void>("/api/comptes/mot-de-passe", { actuel, nouveau });
 
@@ -397,6 +416,16 @@ export const modifierProfilEncadreur = (entree: ProfilEncadreurModification) =>
   envoyerJson<EspaceEncadreur>("/api/encadreurs/moi", entree, "PATCH");
 export const renvoyerDemandeEncadreur = () =>
   envoyerJson<EspaceEncadreur>("/api/encadreurs/moi/renvoyer");
+
+// Compte visiteur (spec 030) -----------------------------------------------------------------------------
+
+export const inscrireVisiteur = (entree: InscriptionVisiteur) =>
+  envoyerJson<CodeEnvoye>("/api/visiteurs/inscription", entree);
+export const confirmerEmail = (email: string, code: string) =>
+  envoyerJson<Moi>("/api/visiteurs/confirmation", { email, code });
+export const renvoyerCode = (email: string) =>
+  envoyerJson<{ code_de_test?: string | null }>("/api/visiteurs/confirmation/renvoi", { email });
+export const chargerEspaceVisiteur = () => requeteApi<EspaceVisiteur>("/api/visiteurs/moi");
 
 const ENCADREURS = "/api/admin/encadreurs";
 export const adminFileEncadreurs = (etat: EtatVerification) =>

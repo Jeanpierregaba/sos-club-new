@@ -59,6 +59,17 @@ export function EspaceEncadreur({
           {espace.etat === "refuse" && <Refuse espace={espace} />}
         </EnTeteEspace>
 
+        {!espace.telephone && (
+          <div className="mt-6 flex flex-col gap-4 rounded-3xl bg-sun/25 p-5 ring-1 ring-sun sm:flex-row sm:items-center">
+            <p className="flex-1 font-semibold text-ink">
+              Ajoute ton téléphone ou ton WhatsApp : l'équipe en a besoin pour te joindre.
+            </p>
+            <Button onClick={() => setProfil(true)} className="btn-fx rounded-full font-bold">
+              Ajouter mon téléphone
+            </Button>
+          </div>
+        )}
+
         {espace.etat === "actif" && espace.points && <CartesPoints points={espace.points} />}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
@@ -107,6 +118,9 @@ export function EspaceEncadreur({
                 terme="Établissement"
                 valeur={<EtablissementAffiche etablissement={espace.etablissement} />}
               />
+              <Info terme="Région (DRE)" valeur={espace.etablissement.dre} />
+              <Info terme="Ville du lycée" valeur={espace.etablissement.localite ?? "—"} />
+              <Info terme="Discipline" valeur={espace.discipline ?? "—"} />
               <Info terme="Email" valeur={espace.email ?? "Aucun"} />
               <Info terme="Téléphone" valeur={espace.telephone ?? "Aucun"} />
             </dl>
@@ -216,6 +230,7 @@ function DialogueProfil({
   const [precision, setPrecision] = useState(espace.fonction_precision ?? "");
   const [etablissement, setEtablissement] = useState<EtablissementChoisi | null>(actuel);
   const [telephone, setTelephone] = useState(espace.telephone ?? "");
+  const [discipline, setDiscipline] = useState(espace.discipline ?? "");
 
   return (
     <DialogueFormulaire
@@ -226,6 +241,7 @@ function DialogueProfil({
           setPrecision(espace.fonction_precision ?? "");
           setEtablissement(actuel);
           setTelephone(espace.telephone ?? "");
+          setDiscipline(espace.discipline ?? "");
         }
         onOuvert(o);
       }}
@@ -235,6 +251,8 @@ function DialogueProfil({
         if (!etablissement) throw new ErreurApi(422, "Choisis ton établissement dans la liste.");
         if (fonction === "autre" && !precision.trim())
           throw new ErreurApi(422, "Précise ta fonction.");
+        if (!normaliserTelephone(telephone))
+          throw new ErreurApi(422, "Indique ton téléphone ou ton WhatsApp.");
         if (!telephoneValide(telephone))
           throw new ErreurApi(422, "Ce téléphone n'est pas valide : de 8 à 15 chiffres.");
         await modifierProfilEncadreur({
@@ -243,6 +261,7 @@ function DialogueProfil({
           fonction_precision: fonction === "autre" ? precision.trim() : null,
           etablissement_id: etablissement.id,
           telephone: normaliserTelephone(telephone),
+          discipline: discipline.trim() || null,
         });
         await router.invalidate();
       }}
@@ -274,7 +293,15 @@ function DialogueProfil({
         Établissement
         <ChoixEtablissement valeur={etablissement} onChoix={setEtablissement} />
       </div>
-      <Champ libelle="Téléphone (facultatif)">
+      <Champ libelle="Discipline, matière ou spécialité (facultatif)">
+        <input
+          value={discipline}
+          onChange={(e) => setDiscipline(e.target.value)}
+          maxLength={100}
+          className={CHAMP_ADMIN}
+        />
+      </Champ>
+      <Champ libelle="Téléphone / WhatsApp">
         <input
           type="tel"
           value={telephone}

@@ -211,6 +211,7 @@ class ProfilEleveAdmin(BaseModel):
 class ProfilEncadreurAdmin(BaseModel):
     fonction: Fonction
     fonction_precision: str | None
+    discipline: str | None = None
     charte_version: str
     etablissement: EtablissementRattache
     etat: EtatVerification

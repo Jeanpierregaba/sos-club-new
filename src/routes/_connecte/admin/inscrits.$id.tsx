@@ -1,5 +1,14 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { ArrowLeft, Copy, KeyRound, Pause, Play, UserPen } from "lucide-react";
+import {
+  ArrowLeft,
+  ClipboardList,
+  Copy,
+  KeyRound,
+  Loader2,
+  Pause,
+  Play,
+  UserPen,
+} from "lucide-react";
 import { useState } from "react";
 
 import { BadgeStatut } from "@/components/admin/BadgeStatut";
@@ -17,7 +26,11 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ACTIONS_JOURNAL, PROFILS, dateCourte, dateHeure, peut } from "@/lib/admin";
 import {
+  adminVoirFicheEleve,
   chargerInscrit,
+  ErreurApi,
+  MESSAGE_INDISPONIBLE,
+  type FicheSortie,
   changerStatutInscrit,
   imposerPseudonyme,
   reinitialiserMotDePasse,
@@ -99,6 +112,9 @@ function FicheInscrit() {
       </section>
 
       {inscrit.eleve && <SectionEleve inscrit={inscrit} eleve={inscrit.eleve} gerable={gerable} />}
+      {inscrit.eleve && peut(admin, "fiches_eleves", "consulter") && (
+        <SectionFiche id={inscrit.id} />
+      )}
       {inscrit.encadreur && <SectionEncadreur encadreur={inscrit.encadreur} />}
 
       <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-border">
@@ -342,6 +358,8 @@ function SectionEncadreur({ encadreur }: { encadreur: ProfilEncadreurAdmin }) {
   const champs: [string, React.ReactNode][] = [
     ["Vérification", LIBELLES_VERIFICATION[encadreur.etat]],
     ["Fonction", libelleFonction(encadreur.fonction, encadreur.fonction_precision)],
+    ["Discipline", encadreur.discipline ?? "—"],
+    ["Ville", encadreur.etablissement.localite ?? "—"],
     [
       "Établissement",
       <>
@@ -397,6 +415,113 @@ function SectionEncadreur({ encadreur }: { encadreur: ProfilEncadreurAdmin }) {
         ))}
       </dl>
       <RegistrePoints points={encadreur.points} />
+    </section>
+  );
+}
+
+const SEXES_FICHE = { feminin: "Féminin", masculin: "Masculin" } as const;
+const RESEAUX_FICHE = {
+  facebook: "Facebook",
+  tiktok: "TikTok",
+  instagram: "Instagram",
+  autre: "Autre",
+} as const;
+
+// La fiche d'adhésion (spec 030) : données personnelles d'un mineur. Elle n'est chargée qu'à la demande,
+// car chaque lecture est inscrite au journal d'audit.
+function SectionFiche({ id }: { id: string }) {
+  const [fiche, setFiche] = useState<FicheSortie | null>(null);
+  const [erreur, setErreur] = useState<string | null>(null);
+  const [enCours, setEnCours] = useState(false);
+
+  const afficher = async () => {
+    setErreur(null);
+    setEnCours(true);
+    try {
+      setFiche(await adminVoirFicheEleve(id));
+    } catch (e) {
+      setErreur(
+        e instanceof ErreurApi && e.statut === 404
+          ? "Cet élève n'a pas encore rempli sa fiche."
+          : e instanceof ErreurApi
+            ? e.message
+            : MESSAGE_INDISPONIBLE,
+      );
+    } finally {
+      setEnCours(false);
+    }
+  };
+
+  const parent = (p: FicheSortie["pere"]) =>
+    p ? [p.nom, p.profession, p.telephone].filter(Boolean).join(" · ") : "—";
+  const champs: [string, string][] = fiche
+    ? [
+        ["Année scolaire", fiche.annee_scolaire],
+        ["N° d'adhésion", fiche.numero_adhesion ?? "—"],
+        [
+          "Préfecture · commune · canton",
+          [fiche.prefecture, fiche.commune, fiche.canton].filter(Boolean).join(" · ") || "—",
+        ],
+        ["Sexe", fiche.sexe ? SEXES_FICHE[fiche.sexe] : "—"],
+        [
+          "Naissance",
+          `${fiche.date_naissance ? dateCourte(fiche.date_naissance) : "—"} à ${fiche.lieu_naissance ?? "—"}`,
+        ],
+        ["Contact de l'élève", fiche.telephone ?? "—"],
+        ["Père", parent(fiche.pere)],
+        ["Mère", parent(fiche.mere)],
+        [
+          "Parent ou tuteur responsable",
+          fiche.responsable ? `${fiche.responsable.nom} · ${fiche.responsable.telephone}` : "—",
+        ],
+        ["Axes choisis", fiche.axes.join(", ") || "—"],
+        [
+          "Années antérieures",
+          fiche.parcours
+            .map((p) => `${p.annee} : ${p.etablissement}${p.iesg ? ` (${p.iesg})` : ""}`)
+            .join(" ; ") || "—",
+        ],
+        [
+          "Réseaux sociaux",
+          fiche.reseaux
+            .map((r) => (r === "autre" ? (fiche.reseau_autre ?? "Autre") : RESEAUX_FICHE[r]))
+            .join(", ") || "—",
+        ],
+        ["Engagement", fiche.engagement_le ? dateCourte(fiche.engagement_le) : "—"],
+      ]
+    : [];
+
+  return (
+    <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-border md:p-8">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <h2 className="text-xl text-logo-blue">Fiche d'adhésion</h2>
+        {!fiche && (
+          <Button variant="outline" onClick={() => void afficher()} disabled={enCours}>
+            {enCours ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <ClipboardList className="size-4" />
+            )}
+            Afficher la fiche
+          </Button>
+        )}
+      </div>
+      <p className="mt-2 text-sm font-medium text-muted-foreground">
+        Données personnelles d'un élève : chaque consultation est inscrite au journal d'audit.
+      </p>
+      {erreur && <p className="mt-4 text-sm font-semibold text-destructive">{erreur}</p>}
+      {fiche && (
+        <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {champs.map(([libelle, valeur]) => (
+            <div key={libelle} className="flex flex-col-reverse">
+              <dd className="mt-0.5 break-words font-semibold">{valeur}</dd>
+              <dt className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">
+                {libelle}
+              </dt>
+            </div>
+          ))}
+        </dl>
+      )}
     </section>
   );
 }

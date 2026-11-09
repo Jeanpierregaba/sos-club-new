@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ChampCode } from "@/components/admin/ChampCode";
+import { ConfirmationEmail } from "@/components/inscription/ConfirmationEmail";
 import {
   connecter,
   connecterAvecCode,
@@ -39,6 +40,10 @@ const schema = z.object({
 export function FormulaireConnexion({ onConnecte }: { onConnecte: (moi: Moi) => void }) {
   // Jeton de l'étape « code » : le mot de passe était juste, la double authentification est active.
   const [etape, setEtape] = useState<string | null>(null);
+  // Visiteur au bon mot de passe, adresse non confirmée (spec 030) : un code vient de partir.
+  const [confirmation, setConfirmation] = useState<{ email: string; test: string | null } | null>(
+    null,
+  );
   const [erreur, setErreur] = useState<string | null>(null);
   const [afficher, setAfficher] = useState(false);
   const form = useForm<z.infer<typeof schema>>({
@@ -50,13 +55,28 @@ export function FormulaireConnexion({ onConnecte }: { onConnecte: (moi: Moi) => 
     setErreur(null);
     try {
       const reponse = await connecter(identifiant, motDePasse);
-      if ("etape" in reponse) setEtape(reponse.jeton);
-      else onConnecte(reponse);
+      if (!("etape" in reponse)) onConnecte(reponse);
+      else if (reponse.etape === "code") setEtape(reponse.jeton);
+      else setConfirmation({ email: reponse.email, test: reponse.code_de_test ?? null });
     } catch (e) {
       setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
     }
   });
   const enCours = form.formState.isSubmitting;
+
+  if (confirmation) {
+    return (
+      <ConfirmationEmail
+        email={confirmation.email}
+        codeDeTest={confirmation.test}
+        onConfirme={onConnecte}
+        onRetour={() => {
+          setConfirmation(null);
+          form.resetField("motDePasse");
+        }}
+      />
+    );
+  }
 
   if (etape) {
     return (

@@ -51,7 +51,9 @@ const schema = z
     telephone: z
       .string()
       .max(30, "Ce numéro est trop long.")
+      .refine((v) => normaliserTelephone(v) !== "", "Indique ton téléphone ou ton WhatsApp.")
       .refine(telephoneValide, "De 8 à 15 chiffres, avec « + » au début si besoin."),
+    discipline: z.string().trim().max(100, "Cette discipline est trop longue."),
     fonction: z.string().min(1, "Choisis ta fonction."),
     precision: z.string().trim().max(100, "Cette précision est trop longue."),
     identifiant: z
@@ -104,6 +106,7 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
       telephone: "",
       fonction: "",
       precision: "",
+      discipline: "",
       identifiant: "",
       motDePasse: "",
       charte: false,
@@ -123,11 +126,12 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
           prenom: v.prenom,
           nom: v.nom,
           email: v.email,
-          telephone: normaliserTelephone(v.telephone) || null,
+          telephone: normaliserTelephone(v.telephone),
           identifiant: v.identifiant,
           mot_de_passe: v.motDePasse,
           fonction: v.fonction as Fonction,
           fonction_precision: v.fonction === "autre" ? v.precision : null,
+          discipline: v.discipline || null,
           charte: true,
           consentement: true,
           ...corpsEtablissement(etablissement),
@@ -226,6 +230,27 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
               )}
             />
           )}
+          <FormField
+            control={form.control}
+            name="discipline"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Discipline, matière ou spécialité{" "}
+                  <span className="font-medium text-muted-foreground">(facultatif)</span>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    maxLength={100}
+                    placeholder="ex. : SVT (Sciences de la Vie et de la Terre)"
+                    className={CHAMP}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </fieldset>
 
         <ChampEtablissement
@@ -237,6 +262,18 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
           }}
           erreur={erreurEtablissement}
         />
+        {etablissement.choix?.dre && (
+          <dl className="-mt-2 grid grid-cols-2 gap-3 rounded-2xl bg-mist-soft p-4 text-sm">
+            <div>
+              <dt className="font-semibold text-muted-foreground">Région (DRE)</dt>
+              <dd className="font-bold text-ink">{etablissement.choix.dre}</dd>
+            </div>
+            <div>
+              <dt className="font-semibold text-muted-foreground">Ville du lycée</dt>
+              <dd className="font-bold text-ink">{etablissement.choix.localite ?? "—"}</dd>
+            </div>
+          </dl>
+        )}
 
         <fieldset className="space-y-5">
           <legend className="mb-4 text-lg font-bold text-logo-blue">Pour te joindre</legend>
@@ -265,9 +302,7 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
             name="telephone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Téléphone <span className="font-medium text-muted-foreground">(facultatif)</span>
-                </FormLabel>
+                <FormLabel>Téléphone / WhatsApp</FormLabel>
                 <FormControl>
                   <Input {...field} type="tel" autoComplete="tel" className={CHAMP} />
                 </FormControl>

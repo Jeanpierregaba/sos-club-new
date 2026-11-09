@@ -1,5 +1,5 @@
 import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
-import { KeyRound, LogOut, PartyPopper, Pencil } from "lucide-react";
+import { Brain, ClipboardList, KeyRound, LogOut, PartyPopper, Pencil } from "lucide-react";
 import { useState } from "react";
 
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
@@ -28,6 +28,7 @@ import {
   chargerMesClubs,
   chargerEspaceEleve,
   chargerEspaceEncadreur,
+  chargerEspaceVisiteur,
   chargerMonClub,
   ErreurApi,
   modifierProfilEleve,
@@ -37,12 +38,19 @@ import {
   type DemandeAdhesion,
   type DemandeRattachement,
   type EspaceEleve,
+  type EspaceVisiteur,
   type MembresDuClub,
   type MonClub,
 } from "@/lib/api/client";
 import { CLASSES, libelleClasse } from "@/lib/classes";
+import { libelleRegion } from "@/lib/visiteurs";
 
-const LIBELLES_ROLE = { eleve: "Élève", encadreur: "Encadreur", admin: "Admin" } as const;
+const LIBELLES_ROLE = {
+  eleve: "Élève",
+  encadreur: "Encadreur",
+  admin: "Admin",
+  visiteur: "Visiteur",
+} as const;
 
 export const Route = createFileRoute("/_connecte/mon-espace")({
   validateSearch: (search: Record<string, unknown>): { bienvenue?: boolean } =>
@@ -118,6 +126,16 @@ export const Route = createFileRoute("/_connecte/mon-espace")({
           membresEncadres,
         };
       }
+      if (context.moi.role === "visiteur") {
+        return {
+          eleve: null,
+          club: null,
+          axes: [],
+          clubEtablissement: null,
+          encadreur: null,
+          visiteur: await chargerEspaceVisiteur(),
+        };
+      }
     } catch (e) {
       // Un compte créé avant les specs 017 et 018 n'a pas de profil : il garde l'espace simple.
       if (e instanceof ErreurApi && (e.statut === 403 || e.statut === 404))
@@ -168,7 +186,57 @@ function MonEspace() {
         membres={"membresEncadres" in donnees ? donnees.membresEncadres : {}}
       />
     );
+  if ("visiteur" in donnees && donnees.visiteur)
+    return <EspaceDuVisiteur espace={donnees.visiteur} />;
   return <EspaceSimple message={"message" in donnees ? donnees.message : undefined} />;
+}
+
+// L'espace minimal d'un visiteur (spec 030) : son profil et les quiz, sans points ni certification.
+function EspaceDuVisiteur({ espace }: { espace: EspaceVisiteur }) {
+  const { bienvenue } = Route.useSearch();
+  return (
+    <main className="min-h-screen bg-carnet px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-3xl">
+        <EnTeteEspace nom={espace.prenom}>{null}</EnTeteEspace>
+        {bienvenue && (
+          <div className="mt-6 flex items-start gap-3 rounded-3xl bg-primary/10 p-5 ring-1 ring-primary/30">
+            <PartyPopper aria-hidden className="mt-0.5 size-6 shrink-0 text-primary" />
+            <p className="font-semibold text-ink">
+              Ton adresse est confirmée : bienvenue sur la plateforme des Clubs Santé !
+            </p>
+          </div>
+        )}
+        <section className="mt-6 rounded-3xl bg-white p-6 shadow-card ring-1 ring-border">
+          <h2 className="text-2xl">
+            <span className="text-logo-blue">Teste tes</span>{" "}
+            <span className="text-primary">connaissances</span>
+          </h2>
+          <p className="mt-2 font-medium text-muted-foreground">
+            Joue aux quiz santé, à ton rythme. Les points, les classements et la certification Génie
+            Imhotep sont réservés aux élèves et aux encadreurs des Clubs Santé.
+          </p>
+          <Button asChild className="btn-fx mt-5 rounded-full font-bold">
+            <Link to="/quiz">
+              <Brain className="size-4" /> Jouer aux quiz
+            </Link>
+          </Button>
+        </section>
+        <section className="mt-6 rounded-3xl bg-white p-6 shadow-card ring-1 ring-border">
+          <h2 className="text-2xl">
+            <span className="text-logo-blue">Mon</span> <span className="text-primary">profil</span>
+          </h2>
+          <dl className="mt-4 grid gap-3 text-sm">
+            <Info terme="Nom" valeur={`${espace.prenom} ${espace.nom}`} />
+            <Info terme="Email" valeur={espace.email} />
+            <Info terme="Téléphone" valeur={espace.telephone ?? "Aucun"} />
+            <Info terme="Ville" valeur={espace.ville} />
+            <Info terme="Région" valeur={libelleRegion(espace.region)} />
+            {espace.statut && <Info terme="Statut" valeur={espace.statut} />}
+          </dl>
+        </section>
+      </div>
+    </main>
+  );
 }
 
 function EspaceSimple({ message }: { message?: string | undefined }) {
@@ -268,6 +336,19 @@ function EspaceDeLEleve({
           </div>
         )}
 
+        {!espace.fiche_complete && (
+          <div className="mt-6 flex flex-col gap-4 rounded-3xl bg-sun/25 p-5 ring-1 ring-sun sm:flex-row sm:items-center">
+            <ClipboardList aria-hidden className="size-7 shrink-0 text-tangerine" />
+            <p className="flex-1 font-semibold text-ink">
+              Complète ta fiche d'adhésion au Club Santé : elle aide l'équipe à soutenir les membres
+              actifs.
+            </p>
+            <Button asChild className="btn-fx rounded-full font-bold">
+              <Link to="/ma-fiche">Compléter ma fiche</Link>
+            </Button>
+          </div>
+        )}
+
         <CartesPoints points={points} />
 
         <BlocClub
@@ -321,6 +402,11 @@ function EspaceDeLEleve({
                 className="rounded-full font-bold"
               >
                 <KeyRound className="size-4" /> Mot de passe
+              </Button>
+              <Button asChild variant="outline" className="rounded-full font-bold">
+                <Link to="/ma-fiche">
+                  <ClipboardList className="size-4" /> Ma fiche d'adhésion
+                </Link>
               </Button>
             </div>
             <p className="mt-4 text-xs font-medium text-muted-foreground">

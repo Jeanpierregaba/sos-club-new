@@ -10,12 +10,12 @@ import { listerInscrits } from "@/lib/api/client";
 
 type Recherche = {
   recherche?: string | undefined;
-  profil?: "eleve" | "encadreur" | "admin" | undefined;
+  profil?: "eleve" | "encadreur" | "admin" | "visiteur" | undefined;
   statut?: "actif" | "suspendu" | "revoque" | undefined;
   page?: number | undefined;
 };
 
-const PROFILS_VALIDES = ["eleve", "encadreur", "admin"] as const;
+const PROFILS_VALIDES = ["eleve", "encadreur", "visiteur", "admin"] as const;
 const STATUTS_VALIDES = ["actif", "suspendu", "revoque"] as const;
 
 export const Route = createFileRoute("/_connecte/admin/inscrits/")({

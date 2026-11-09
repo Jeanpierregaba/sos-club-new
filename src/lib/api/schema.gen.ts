@@ -89,6 +89,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/visiteurs/inscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Inscription */
+        post: operations["inscription_api_visiteurs_inscription_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/visiteurs/confirmation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirmation */
+        post: operations["confirmation_api_visiteurs_confirmation_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/visiteurs/confirmation/renvoi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Renvoi */
+        post: operations["renvoi_api_visiteurs_confirmation_renvoi_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/visiteurs/moi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mon Espace */
+        get: operations["mon_espace_api_visiteurs_moi_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/moi": {
         parameters: {
             query?: never;
@@ -461,6 +529,26 @@ export interface paths {
         put?: never;
         /** Reinitialiser Mot De Passe */
         post: operations["reinitialiser_mot_de_passe_api_admin_inscrits__utilisateur_id__mot_de_passe_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/inscrits/{utilisateur_id}/fiche": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Voir Fiche Eleve
+         * @description La fiche d'adhésion d'un élève (spec 030) : droit sensible, périmètre DRE, chaque lecture journalisée.
+         */
+        get: operations["voir_fiche_eleve_api_admin_inscrits__utilisateur_id__fiche_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -903,6 +991,27 @@ export interface paths {
         head?: never;
         /** Modifier Mon Profil */
         patch: operations["modifier_mon_profil_api_eleves_moi_patch"];
+        trace?: never;
+    };
+    "/api/eleves/moi/fiche": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ma Fiche
+         * @description La fiche d'adhésion de l'élève (spec 030) ; null s'il ne l'a pas encore remplie.
+         */
+        get: operations["ma_fiche_api_eleves_moi_fiche_get"];
+        /** Corriger Ma Fiche */
+        put: operations["corriger_ma_fiche_api_eleves_moi_fiche_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/encadreurs/inscription": {
@@ -3720,6 +3829,16 @@ export interface components {
             /** Code */
             code: string;
         };
+        /**
+         * CodeEnvoye
+         * @description Le compte attend son code. `code_de_test` : seulement hors production, sans SMTP configuré.
+         */
+        CodeEnvoye: {
+            /** Email */
+            email: string;
+            /** Code De Test */
+            code_de_test?: string | null;
+        };
         /** CodeSaisi */
         CodeSaisi: {
             /** Code */
@@ -3879,6 +3998,13 @@ export interface components {
         CompteNotifications: {
             /** Non Lues */
             non_lues: number;
+        };
+        /** ConfirmationEntree */
+        ConfirmationEntree: {
+            /** Email */
+            email: string;
+            /** Code */
+            code: string;
         };
         /** ConnexionEntree */
         ConnexionEntree: {
@@ -4046,6 +4172,8 @@ export interface components {
             fonction: components["schemas"]["Fonction"];
             /** Fonction Precision */
             fonction_precision: string | null;
+            /** Discipline */
+            discipline: string | null;
             etablissement: components["schemas"]["EtablissementRattache"];
             etat: components["schemas"]["EtatVerification"];
             /**
@@ -4323,6 +4451,11 @@ export interface components {
             points: components["schemas"]["ResumePoints"];
             club?: components["schemas"]["ClubResume"] | null;
             adhesion?: components["schemas"]["AdhesionResume"] | null;
+            /**
+             * Fiche Complete
+             * @default false
+             */
+            fiche_complete: boolean;
         };
         /** EspaceEncadreur */
         EspaceEncadreur: {
@@ -4339,6 +4472,8 @@ export interface components {
             fonction: components["schemas"]["Fonction"];
             /** Fonction Precision */
             fonction_precision: string | null;
+            /** Discipline */
+            discipline: string | null;
             /** Email */
             email: string | null;
             /** Telephone */
@@ -4347,6 +4482,23 @@ export interface components {
             /** Version */
             version: number;
             points: components["schemas"]["ResumePoints"] | null;
+        };
+        /** EspaceVisiteur */
+        EspaceVisiteur: {
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            /** Email */
+            email: string;
+            /** Telephone */
+            telephone: string | null;
+            /** Ville */
+            ville: string;
+            region: components["schemas"]["Region"] | null;
+            sexe: components["schemas"]["Sexe"] | null;
+            /** Statut */
+            statut: string | null;
         };
         /** EtablissementAdmin */
         EtablissementAdmin: {
@@ -4444,6 +4596,8 @@ export interface components {
             dre_code: string;
             /** Dre */
             dre: string;
+            /** Localite */
+            localite?: string | null;
         };
         /**
          * EtablissementTrouve
@@ -4469,6 +4623,8 @@ export interface components {
             dre_code: string;
             /** Dre */
             dre: string;
+            /** Localite */
+            localite?: string | null;
         };
         /**
          * EtapeCode
@@ -4483,6 +4639,22 @@ export interface components {
             etape: "code";
             /** Jeton */
             jeton: string;
+        };
+        /**
+         * EtapeConfirmation
+         * @description Visiteur au bon mot de passe dont l'adresse n'est pas confirmée (spec 030) : un code lui est renvoyé.
+         */
+        EtapeConfirmation: {
+            /**
+             * Etape
+             * @default confirmation
+             * @constant
+             */
+            etape: "confirmation";
+            /** Email */
+            email: string;
+            /** Code De Test */
+            code_de_test?: string | null;
         };
         /**
          * EtatCertificat
@@ -4643,6 +4815,127 @@ export interface components {
             description: string | null;
             /** Axes */
             axes: string[];
+        };
+        /**
+         * FicheEntree
+         * @description Une fiche complète : à l'inscription comme à la correction depuis l'espace.
+         */
+        FicheEntree: {
+            /** Numero Adhesion */
+            numero_adhesion?: string | null;
+            /** Prefecture */
+            prefecture?: string | null;
+            /** Commune */
+            commune?: string | null;
+            /** Canton */
+            canton?: string | null;
+            sexe: components["schemas"]["Sexe"];
+            /**
+             * Date Naissance
+             * Format: date
+             */
+            date_naissance: string;
+            /** Lieu Naissance */
+            lieu_naissance: string;
+            /** Telephone */
+            telephone?: string | null;
+            pere?: components["schemas"]["Parent"] | null;
+            mere?: components["schemas"]["Parent"] | null;
+            responsable: components["schemas"]["Responsable"];
+            /** Axes */
+            axes: string[];
+            /** Parcours */
+            parcours?: components["schemas"]["ParcoursAnterieur"][];
+            /** Reseaux */
+            reseaux?: components["schemas"]["Reseau"][];
+            /** Reseau Autre */
+            reseau_autre?: string | null;
+            /**
+             * Engagement
+             * @constant
+             */
+            engagement: true;
+        };
+        /** FicheModification */
+        FicheModification: {
+            /** Numero Adhesion */
+            numero_adhesion?: string | null;
+            /** Prefecture */
+            prefecture?: string | null;
+            /** Commune */
+            commune?: string | null;
+            /** Canton */
+            canton?: string | null;
+            sexe: components["schemas"]["Sexe"];
+            /**
+             * Date Naissance
+             * Format: date
+             */
+            date_naissance: string;
+            /** Lieu Naissance */
+            lieu_naissance: string;
+            /** Telephone */
+            telephone?: string | null;
+            pere?: components["schemas"]["Parent"] | null;
+            mere?: components["schemas"]["Parent"] | null;
+            responsable: components["schemas"]["Responsable"];
+            /** Axes */
+            axes: string[];
+            /** Parcours */
+            parcours?: components["schemas"]["ParcoursAnterieur"][];
+            /** Reseaux */
+            reseaux?: components["schemas"]["Reseau"][];
+            /** Reseau Autre */
+            reseau_autre?: string | null;
+            /**
+             * Engagement
+             * @constant
+             */
+            engagement: true;
+            /** Version */
+            version: number | null;
+        };
+        /** FicheSortie */
+        FicheSortie: {
+            /** Annee Scolaire */
+            annee_scolaire: string;
+            /** Numero Adhesion */
+            numero_adhesion: string | null;
+            /** Prefecture */
+            prefecture: string | null;
+            /** Commune */
+            commune: string | null;
+            /** Canton */
+            canton: string | null;
+            sexe: components["schemas"]["Sexe"] | null;
+            /** Date Naissance */
+            date_naissance: string | null;
+            /** Lieu Naissance */
+            lieu_naissance: string | null;
+            /** Telephone */
+            telephone: string | null;
+            pere: components["schemas"]["Parent"] | null;
+            mere: components["schemas"]["Parent"] | null;
+            responsable: components["schemas"]["Responsable"] | null;
+            /** Axes */
+            axes: string[];
+            /** Parcours */
+            parcours: components["schemas"]["ParcoursAnterieur"][];
+            /** Reseaux */
+            reseaux: components["schemas"]["Reseau"][];
+            /** Reseau Autre */
+            reseau_autre: string | null;
+            /** Engagement Le */
+            engagement_le: string | null;
+            /** Complete Le */
+            complete_le: string | null;
+            /**
+             * Cree Le
+             * Format: date-time
+             */
+            cree_le: string;
+            /** Version */
+            version: number;
         };
         /** FileAffiliations */
         FileAffiliations: {
@@ -4827,7 +5120,7 @@ export interface components {
             /** Email */
             email: string;
             /** Telephone */
-            telephone?: string | null;
+            telephone: string;
             /** Identifiant */
             identifiant: string;
             /** Mot De Passe */
@@ -4835,6 +5128,8 @@ export interface components {
             fonction: components["schemas"]["Fonction"];
             /** Fonction Precision */
             fonction_precision?: string | null;
+            /** Discipline */
+            discipline?: string | null;
             /**
              * Charte
              * @constant
@@ -4877,6 +5172,36 @@ export interface components {
             /** Etablissement Id */
             etablissement_id?: string | null;
             proposition?: components["schemas"]["Proposition"] | null;
+            fiche: components["schemas"]["FicheEntree"];
+        };
+        /** InscriptionVisiteur */
+        InscriptionVisiteur: {
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            /** Telephone */
+            telephone: string;
+            /** Ville */
+            ville: string;
+            /** Email */
+            email: string;
+            region?: components["schemas"]["Region"] | null;
+            sexe?: components["schemas"]["Sexe"] | null;
+            /** Statut */
+            statut?: string | null;
+            /** Mot De Passe */
+            mot_de_passe: string;
+            /**
+             * Charte
+             * @constant
+             */
+            charte: true;
+            /**
+             * Majeur Ou Accord
+             * @constant
+             */
+            majeur_ou_accord: true;
         };
         /** Inscrit */
         Inscrit: {
@@ -5269,6 +5594,24 @@ export interface components {
              */
             cree_le: string;
         };
+        /** ParcoursAnterieur */
+        ParcoursAnterieur: {
+            /** Annee */
+            annee: string;
+            /** Etablissement */
+            etablissement: string;
+            /** Iesg */
+            iesg?: string | null;
+        };
+        /** Parent */
+        Parent: {
+            /** Nom */
+            nom?: string | null;
+            /** Profession */
+            profession?: string | null;
+            /** Telephone */
+            telephone?: string | null;
+        };
         /**
          * ParentContenu
          * @description L'article d'un commentaire (spec 025) : le modérateur juge le commentaire dans son contexte.
@@ -5486,6 +5829,8 @@ export interface components {
             fonction: components["schemas"]["Fonction"];
             /** Fonction Precision */
             fonction_precision: string | null;
+            /** Discipline */
+            discipline?: string | null;
             /** Charte Version */
             charte_version: string;
             etablissement: components["schemas"]["EtablissementRattache"];
@@ -5514,6 +5859,8 @@ export interface components {
             fonction?: components["schemas"]["Fonction"] | null;
             /** Fonction Precision */
             fonction_precision?: string | null;
+            /** Discipline */
+            discipline?: string | null;
         };
         /** ProfilModification */
         ProfilModification: {
@@ -5872,6 +6219,11 @@ export interface components {
             /** Version */
             version?: number | null;
         };
+        /**
+         * Region
+         * @enum {string}
+         */
+        Region: "maritime" | "plateaux" | "centrale" | "kara" | "savanes" | "hors_togo";
         /** ReglesEntree */
         ReglesEntree: {
             /** Noms */
@@ -5906,6 +6258,19 @@ export interface components {
              */
             cible_id: string;
         };
+        /** RenvoiEntree */
+        RenvoiEntree: {
+            /** Email */
+            email: string;
+        };
+        /**
+         * RenvoiSortie
+         * @description Même réponse que l'adresse existe ou non.
+         */
+        RenvoiSortie: {
+            /** Code De Test */
+            code_de_test?: string | null;
+        };
         /** ReponseDefi */
         ReponseDefi: {
             /** Choix */
@@ -5932,6 +6297,21 @@ export interface components {
         ReponsesQuelAxe: {
             /** Reponses */
             reponses: ("A" | "B" | "C" | "D")[];
+        };
+        /**
+         * Reseau
+         * @enum {string}
+         */
+        Reseau: "facebook" | "tiktok" | "instagram" | "autre";
+        /**
+         * Responsable
+         * @description Le parent ou tuteur responsable : il remplace la signature de la fiche papier.
+         */
+        Responsable: {
+            /** Nom */
+            nom: string;
+            /** Telephone */
+            telephone: string;
         };
         /** RessourceEntree */
         RessourceEntree: {
@@ -6136,7 +6516,7 @@ export interface components {
          * Role
          * @enum {string}
          */
-        Role: "eleve" | "encadreur" | "admin";
+        Role: "eleve" | "encadreur" | "admin" | "visiteur";
         /** RoleCatalogue */
         RoleCatalogue: {
             id: components["schemas"]["RoleDepart"];
@@ -6218,6 +6598,11 @@ export interface components {
              */
             fin: string;
         };
+        /**
+         * Sexe
+         * @enum {string}
+         */
+        Sexe: "feminin" | "masculin";
         /**
          * Signature
          * @description Jamais de nom complet : un élève par son pseudonyme (et son club s'il l'a choisi), un encadreur par son
@@ -6410,7 +6795,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Moi"] | components["schemas"]["EtapeCode"];
+                    "application/json": components["schemas"]["Moi"] | components["schemas"]["EtapeCode"] | components["schemas"]["EtapeConfirmation"];
                 };
             };
             /** @description Validation Error */
@@ -6522,6 +6907,125 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    inscription_api_visiteurs_inscription_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InscriptionVisiteur"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CodeEnvoye"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirmation_api_visiteurs_confirmation_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmationEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Moi"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    renvoi_api_visiteurs_confirmation_renvoi_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenvoiEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RenvoiSortie"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mon_espace_api_visiteurs_moi_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EspaceVisiteur"];
                 };
             };
         };
@@ -7237,6 +7741,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MotDePasseProvisoire"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    voir_fiche_eleve_api_admin_inscrits__utilisateur_id__fiche_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FicheSortie"];
                 };
             };
             /** @description Validation Error */
@@ -8184,6 +8719,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EspaceEleve"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ma_fiche_api_eleves_moi_fiche_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FicheSortie"] | null;
+                };
+            };
+        };
+    };
+    corriger_ma_fiche_api_eleves_moi_fiche_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FicheModification"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FicheSortie"];
                 };
             };
             /** @description Validation Error */

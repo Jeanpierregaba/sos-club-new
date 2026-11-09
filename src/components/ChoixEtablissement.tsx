@@ -4,12 +4,21 @@ import { useEffect, useId, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { chercherEtablissements, type EtablissementTrouve } from "@/lib/api/client";
 
-export type EtablissementChoisi = { id: string; nom: string; detail: string };
+export type EtablissementChoisi = {
+  id: string;
+  nom: string;
+  detail: string;
+  // La DRE et la ville (spec 030) : l'encadreur voit la région et la ville de son établissement.
+  dre?: string;
+  localite?: string | null;
+};
 
 const choixDe = (e: EtablissementTrouve): EtablissementChoisi => ({
   id: e.id,
   nom: e.nom,
   detail: `${e.iesg} · ${e.dre}`,
+  dre: e.dre,
+  localite: e.localite ?? null,
 });
 
 // Recherche d'un établissement actif du référentiel (spec 016), mot à mot, à partir de 2 lettres.

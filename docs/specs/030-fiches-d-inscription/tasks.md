@@ -46,13 +46,13 @@ authentification, code de confirmation) commencent par leurs tests.
 
 ## Site
 
-- [ ] 11. Types de l'API régénérés ; `client.ts`. Formulaire élève en étapes avec la fiche, composants
+- [x] 11. Types de l'API régénérés ; `client.ts`. Formulaire élève en étapes avec la fiche, composants
       `ChoixAxes`, `ChoixReseaux`, `ChampTelephone` ; tests Vitest des étapes et de la validation.
-- [ ] 12. Espace élève : bannière et page « Ma fiche d'adhésion » ; espace encadreur : téléphone, discipline,
+- [x] 12. Espace élève : bannière et page « Ma fiche d'adhésion » ; espace encadreur : téléphone, discipline,
       région et ville ; formulaire encadreur mis à jour.
-- [ ] 13. Visiteur : formulaire, saisie du code (renvoi avec compte à rebours), étape `confirmation` sur
+- [x] 13. Visiteur : formulaire, saisie du code (renvoi avec compte à rebours), étape `confirmation` sur
       `/connexion`, espace visiteur minimal, menus sans certification, textes au tutoiement.
-- [ ] 14. Admin : onglet « Fiche d'adhésion » sur la fiche d'un inscrit (si droit), filtre « Visiteurs » ;
+- [x] 14. Admin : onglet « Fiche d'adhésion » sur la fiche d'un inscrit (si droit), filtre « Visiteurs » ;
       libellé du droit dans la grille des collaborateurs.
 
 ## Clôture

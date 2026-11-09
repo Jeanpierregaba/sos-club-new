@@ -34,6 +34,9 @@
                     },
                     {
                       "$ref": "#/components/schemas/EtapeCode"
+                    },
+                    {
+                      "$ref": "#/components/schemas/EtapeConfirmation"
                     }
                   ],
                   "title": "Response Connexion Api Comptes Connexion Post"
@@ -157,6 +160,150 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/visiteurs/inscription": {
+      "post": {
+        "tags": [
+          "visiteurs"
+        ],
+        "summary": "Inscription",
+        "operationId": "inscription_api_visiteurs_inscription_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InscriptionVisiteur"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeEnvoye"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/visiteurs/confirmation": {
+      "post": {
+        "tags": [
+          "visiteurs"
+        ],
+        "summary": "Confirmation",
+        "operationId": "confirmation_api_visiteurs_confirmation_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmationEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Moi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/visiteurs/confirmation/renvoi": {
+      "post": {
+        "tags": [
+          "visiteurs"
+        ],
+        "summary": "Renvoi",
+        "operationId": "renvoi_api_visiteurs_confirmation_renvoi_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenvoiEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RenvoiSortie"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/visiteurs/moi": {
+      "get": {
+        "tags": [
+          "visiteurs"
+        ],
+        "summary": "Mon Espace",
+        "operationId": "mon_espace_api_visiteurs_moi_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EspaceVisiteur"
                 }
               }
             }
@@ -1296,6 +1443,50 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MotDePasseProvisoire"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/inscrits/{utilisateur_id}/fiche": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Voir Fiche Eleve",
+        "description": "La fiche d'adhésion d'un élève (spec 030) : droit sensible, périmètre DRE, chaque lecture journalisée.",
+        "operationId": "voir_fiche_eleve_api_admin_inscrits__utilisateur_id__fiche_get",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FicheSortie"
                 }
               }
             }
@@ -2748,6 +2939,75 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/EspaceEleve"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/eleves/moi/fiche": {
+      "get": {
+        "tags": [
+          "eleves"
+        ],
+        "summary": "Ma Fiche",
+        "description": "La fiche d'adhésion de l'élève (spec 030) ; null s'il ne l'a pas encore remplie.",
+        "operationId": "ma_fiche_api_eleves_moi_fiche_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/FicheSortie"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Ma Fiche Api Eleves Moi Fiche Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "eleves"
+        ],
+        "summary": "Corriger Ma Fiche",
+        "operationId": "corriger_ma_fiche_api_eleves_moi_fiche_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FicheModification"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FicheSortie"
                 }
               }
             }
@@ -11065,6 +11325,31 @@
         ],
         "title": "CodeEntree"
       },
+      "CodeEnvoye": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "code_de_test": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code De Test"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "CodeEnvoye",
+        "description": "Le compte attend son code. `code_de_test` : seulement hors production, sans SMTP configuré."
+      },
       "CodeSaisi": {
         "properties": {
           "code": {
@@ -11526,6 +11811,28 @@
         ],
         "title": "CompteNotifications"
       },
+      "ConfirmationEntree": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "title": "Email"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "email",
+          "code"
+        ],
+        "title": "ConfirmationEntree"
+      },
       "ConnexionEntree": {
         "properties": {
           "identifiant": {
@@ -11944,6 +12251,17 @@
             ],
             "title": "Fonction Precision"
           },
+          "discipline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discipline"
+          },
           "etablissement": {
             "$ref": "#/components/schemas/EtablissementRattache"
           },
@@ -11993,6 +12311,7 @@
           "telephone",
           "fonction",
           "fonction_precision",
+          "discipline",
           "etablissement",
           "etat",
           "demande_le",
@@ -12758,6 +13077,11 @@
                 "type": "null"
               }
             ]
+          },
+          "fiche_complete": {
+            "type": "boolean",
+            "title": "Fiche Complete",
+            "default": false
           }
         },
         "type": "object",
@@ -12818,6 +13142,17 @@
             ],
             "title": "Fonction Precision"
           },
+          "discipline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discipline"
+          },
           "email": {
             "anyOf": [
               {
@@ -12866,6 +13201,7 @@
           "motif_refus",
           "fonction",
           "fonction_precision",
+          "discipline",
           "email",
           "telephone",
           "etablissement",
@@ -12873,6 +13209,80 @@
           "points"
         ],
         "title": "EspaceEncadreur"
+      },
+      "EspaceVisiteur": {
+        "properties": {
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "telephone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telephone"
+          },
+          "ville": {
+            "type": "string",
+            "title": "Ville"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Region"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sexe": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Sexe"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "statut": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prenom",
+          "nom",
+          "email",
+          "telephone",
+          "ville",
+          "region",
+          "sexe",
+          "statut"
+        ],
+        "title": "EspaceVisiteur"
       },
       "EtablissementAdmin": {
         "properties": {
@@ -13116,6 +13526,17 @@
           "dre": {
             "type": "string",
             "title": "Dre"
+          },
+          "localite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Localite"
           }
         },
         "type": "object",
@@ -13160,6 +13581,17 @@
           "dre": {
             "type": "string",
             "title": "Dre"
+          },
+          "localite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Localite"
           }
         },
         "type": "object",
@@ -13194,6 +13626,37 @@
         ],
         "title": "EtapeCode",
         "description": "Mot de passe juste, double authentification active : le code est demandé avant d'ouvrir la session."
+      },
+      "EtapeConfirmation": {
+        "properties": {
+          "etape": {
+            "type": "string",
+            "const": "confirmation",
+            "title": "Etape",
+            "default": "confirmation"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "code_de_test": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code De Test"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "EtapeConfirmation",
+        "description": "Visiteur au bon mot de passe dont l'adresse n'est pas confirmée (spec 030) : un code lui est renvoyé."
       },
       "EtatCertificat": {
         "type": "string",
@@ -13625,6 +14088,543 @@
         ],
         "title": "FicheActuelle",
         "description": "La fiche publique du club au moment de la lecture : l'« avant » d'une proposition de fiche."
+      },
+      "FicheEntree": {
+        "properties": {
+          "numero_adhesion": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero Adhesion"
+          },
+          "prefecture": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefecture"
+          },
+          "commune": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commune"
+          },
+          "canton": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canton"
+          },
+          "sexe": {
+            "$ref": "#/components/schemas/Sexe"
+          },
+          "date_naissance": {
+            "type": "string",
+            "format": "date",
+            "title": "Date Naissance"
+          },
+          "lieu_naissance": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Lieu Naissance"
+          },
+          "telephone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telephone"
+          },
+          "pere": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Parent"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mere": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Parent"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "responsable": {
+            "$ref": "#/components/schemas/Responsable"
+          },
+          "axes": {
+            "items": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Axes"
+          },
+          "parcours": {
+            "items": {
+              "$ref": "#/components/schemas/ParcoursAnterieur"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "title": "Parcours"
+          },
+          "reseaux": {
+            "items": {
+              "$ref": "#/components/schemas/Reseau"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "title": "Reseaux"
+          },
+          "reseau_autre": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reseau Autre"
+          },
+          "engagement": {
+            "type": "boolean",
+            "const": true,
+            "title": "Engagement"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sexe",
+          "date_naissance",
+          "lieu_naissance",
+          "responsable",
+          "axes",
+          "engagement"
+        ],
+        "title": "FicheEntree",
+        "description": "Une fiche complète : à l'inscription comme à la correction depuis l'espace."
+      },
+      "FicheModification": {
+        "properties": {
+          "numero_adhesion": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero Adhesion"
+          },
+          "prefecture": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefecture"
+          },
+          "commune": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commune"
+          },
+          "canton": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canton"
+          },
+          "sexe": {
+            "$ref": "#/components/schemas/Sexe"
+          },
+          "date_naissance": {
+            "type": "string",
+            "format": "date",
+            "title": "Date Naissance"
+          },
+          "lieu_naissance": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Lieu Naissance"
+          },
+          "telephone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telephone"
+          },
+          "pere": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Parent"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mere": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Parent"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "responsable": {
+            "$ref": "#/components/schemas/Responsable"
+          },
+          "axes": {
+            "items": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Axes"
+          },
+          "parcours": {
+            "items": {
+              "$ref": "#/components/schemas/ParcoursAnterieur"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "title": "Parcours"
+          },
+          "reseaux": {
+            "items": {
+              "$ref": "#/components/schemas/Reseau"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "title": "Reseaux"
+          },
+          "reseau_autre": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reseau Autre"
+          },
+          "engagement": {
+            "type": "boolean",
+            "const": true,
+            "title": "Engagement"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sexe",
+          "date_naissance",
+          "lieu_naissance",
+          "responsable",
+          "axes",
+          "engagement",
+          "version"
+        ],
+        "title": "FicheModification"
+      },
+      "FicheSortie": {
+        "properties": {
+          "annee_scolaire": {
+            "type": "string",
+            "title": "Annee Scolaire"
+          },
+          "numero_adhesion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero Adhesion"
+          },
+          "prefecture": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefecture"
+          },
+          "commune": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commune"
+          },
+          "canton": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canton"
+          },
+          "sexe": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Sexe"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "date_naissance": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Naissance"
+          },
+          "lieu_naissance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lieu Naissance"
+          },
+          "telephone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telephone"
+          },
+          "pere": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Parent"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mere": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Parent"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "responsable": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Responsable"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "axes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Axes"
+          },
+          "parcours": {
+            "items": {
+              "$ref": "#/components/schemas/ParcoursAnterieur"
+            },
+            "type": "array",
+            "title": "Parcours"
+          },
+          "reseaux": {
+            "items": {
+              "$ref": "#/components/schemas/Reseau"
+            },
+            "type": "array",
+            "title": "Reseaux"
+          },
+          "reseau_autre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reseau Autre"
+          },
+          "engagement_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engagement Le"
+          },
+          "complete_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Complete Le"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "annee_scolaire",
+          "numero_adhesion",
+          "prefecture",
+          "commune",
+          "canton",
+          "sexe",
+          "date_naissance",
+          "lieu_naissance",
+          "telephone",
+          "pere",
+          "mere",
+          "responsable",
+          "axes",
+          "parcours",
+          "reseaux",
+          "reseau_autre",
+          "engagement_le",
+          "complete_le",
+          "cree_le",
+          "version"
+        ],
+        "title": "FicheSortie"
       },
       "FileAffiliations": {
         "properties": {
@@ -14206,15 +15206,8 @@
             "title": "Email"
           },
           "telephone": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 30
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "type": "string",
+            "maxLength": 30,
             "title": "Telephone"
           },
           "identifiant": {
@@ -14241,6 +15234,18 @@
               }
             ],
             "title": "Fonction Precision"
+          },
+          "discipline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discipline"
           },
           "charte": {
             "type": "boolean",
@@ -14281,6 +15286,7 @@
           "prenom",
           "nom",
           "email",
+          "telephone",
           "identifiant",
           "mot_de_passe",
           "fonction",
@@ -14362,6 +15368,9 @@
                 "type": "null"
               }
             ]
+          },
+          "fiche": {
+            "$ref": "#/components/schemas/FicheEntree"
           }
         },
         "additionalProperties": false,
@@ -14374,9 +15383,99 @@
           "mot_de_passe",
           "classe",
           "charte",
-          "consentement_parent"
+          "consentement_parent",
+          "fiche"
         ],
         "title": "InscriptionEntree"
+      },
+      "InscriptionVisiteur": {
+        "properties": {
+          "prenom": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Nom"
+          },
+          "telephone": {
+            "type": "string",
+            "maxLength": 30,
+            "title": "Telephone"
+          },
+          "ville": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Ville"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "title": "Email"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Region"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sexe": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Sexe"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "statut": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statut"
+          },
+          "mot_de_passe": {
+            "type": "string",
+            "maxLength": 256,
+            "title": "Mot De Passe"
+          },
+          "charte": {
+            "type": "boolean",
+            "const": true,
+            "title": "Charte"
+          },
+          "majeur_ou_accord": {
+            "type": "boolean",
+            "const": true,
+            "title": "Majeur Ou Accord"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "prenom",
+          "nom",
+          "telephone",
+          "ville",
+          "email",
+          "mot_de_passe",
+          "charte",
+          "majeur_ou_accord"
+        ],
+        "title": "InscriptionVisiteur"
       },
       "Inscrit": {
         "properties": {
@@ -15531,6 +16630,82 @@
         ],
         "title": "ParametresSortie"
       },
+      "ParcoursAnterieur": {
+        "properties": {
+          "annee": {
+            "type": "string",
+            "maxLength": 9,
+            "title": "Annee"
+          },
+          "etablissement": {
+            "type": "string",
+            "maxLength": 150,
+            "title": "Etablissement"
+          },
+          "iesg": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 150
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iesg"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "annee",
+          "etablissement"
+        ],
+        "title": "ParcoursAnterieur"
+      },
+      "Parent": {
+        "properties": {
+          "nom": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 150
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nom"
+          },
+          "profession": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profession"
+          },
+          "telephone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telephone"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Parent"
+      },
       "ParentContenu": {
         "properties": {
           "adresse": {
@@ -16146,6 +17321,17 @@
             ],
             "title": "Fonction Precision"
           },
+          "discipline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discipline"
+          },
           "charte_version": {
             "type": "string",
             "title": "Charte Version"
@@ -16266,6 +17452,18 @@
               }
             ],
             "title": "Fonction Precision"
+          },
+          "discipline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discipline"
           }
         },
         "additionalProperties": false,
@@ -17364,6 +18562,18 @@
         ],
         "title": "RefusEntree"
       },
+      "Region": {
+        "type": "string",
+        "enum": [
+          "maritime",
+          "plateaux",
+          "centrale",
+          "kara",
+          "savanes",
+          "hors_togo"
+        ],
+        "title": "Region"
+      },
       "ReglesEntree": {
         "properties": {
           "noms": {
@@ -17454,6 +18664,39 @@
         "title": "Remplacement",
         "description": "Remplace un établissement proposé par un établissement existant : ses élèves y sont rattachés (spec 017)."
       },
+      "RenvoiEntree": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "title": "Email"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "RenvoiEntree"
+      },
+      "RenvoiSortie": {
+        "properties": {
+          "code_de_test": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code De Test"
+          }
+        },
+        "type": "object",
+        "title": "RenvoiSortie",
+        "description": "Même réponse que l'adresse existe ou non."
+      },
       "ReponseDefi": {
         "properties": {
           "choix": {
@@ -17539,6 +18782,38 @@
           "reponses"
         ],
         "title": "ReponsesQuelAxe"
+      },
+      "Reseau": {
+        "type": "string",
+        "enum": [
+          "facebook",
+          "tiktok",
+          "instagram",
+          "autre"
+        ],
+        "title": "Reseau"
+      },
+      "Responsable": {
+        "properties": {
+          "nom": {
+            "type": "string",
+            "maxLength": 150,
+            "title": "Nom"
+          },
+          "telephone": {
+            "type": "string",
+            "maxLength": 30,
+            "title": "Telephone"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nom",
+          "telephone"
+        ],
+        "title": "Responsable",
+        "description": "Le parent ou tuteur responsable : il remplace la signature de la fiche papier."
       },
       "RessourceEntree": {
         "properties": {
@@ -18172,7 +19447,8 @@
         "enum": [
           "eleve",
           "encadreur",
-          "admin"
+          "admin",
+          "visiteur"
         ],
         "title": "Role"
       },
@@ -18360,6 +19636,14 @@
           "fin"
         ],
         "title": "SemestreResume"
+      },
+      "Sexe": {
+        "type": "string",
+        "enum": [
+          "feminin",
+          "masculin"
+        ],
+        "title": "Sexe"
       },
       "Signature": {
         "properties": {

@@ -12,6 +12,8 @@ export const Route = createFileRoute("/_connecte/certification/parcours/")({
   gcTime: 0,
   beforeLoad: ({ context }) => {
     if (context.moi.role === "admin") throw redirect({ to: "/admin/certification" });
+    // La certification est réservée aux élèves et aux encadreurs (spec 030) : un visiteur joue aux quiz.
+    if (context.moi.role === "visiteur") throw redirect({ to: "/quiz" });
   },
   loader: async () => {
     try {

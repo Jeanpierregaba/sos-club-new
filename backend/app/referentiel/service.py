@@ -108,6 +108,7 @@ def _trouve(etablissement: Etablissement, iesg: Iesg, dre: Dre) -> Etablissement
         iesg=iesg.nom,
         dre_code=dre.code,
         dre=dre.nom,
+        localite=etablissement.localite,
     )
 
 
