@@ -1,6 +1,6 @@
 # 028 — Tâches
 
-- [ ] 1. Tests du contrôle des PDF (`test_pdf.py`, PDF construits dans les tests : sain, JavaScript, action de
+- [x] 1. Tests du contrôle des PDF (`test_pdf.py`, PDF construits dans les tests : sain, JavaScript, action de
       lancement, fichier joint, chiffré, tronqué, pas un PDF), puis `pypdf`, `fichiers/pdf.py`, clés `.pdf` et
       lecture en flux du stockage, limites de taille, Caddy à 25MB.
 - [ ] 2. Modèle `Ressource`, migration `bibliotheque`, module `bibliotheque` au catalogue.

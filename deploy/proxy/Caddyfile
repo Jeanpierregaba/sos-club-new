@@ -16,8 +16,9 @@
 # L'API est servie sur le domaine du site (ADR-0006). /health et /docs restent inaccessibles depuis l'extérieur.
 (application) {
 	handle /api/* {
+		# Un PDF de la bibliothèque (20 Mo, spec 028) plus l'enveloppe du formulaire.
 		request_body {
-			max_size 20MB
+			max_size 25MB
 		}
 		reverse_proxy {args[0]}-api:8000
 	}

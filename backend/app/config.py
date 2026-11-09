@@ -44,6 +44,8 @@ class Settings(BaseSettings):
     # Fichiers (spec 024, ADR-0010) : sur le disque du VPS, dans un volume Docker. Hors du dépôt en local.
     dossier_fichiers: Path = RACINE_PROJET / "backend" / "var" / "fichiers"
     photo_octets_max: int = 8 * 1024 * 1024
+    # Un PDF de la bibliothèque (spec 028) ; le proxy laisse passer 25 Mo pour l'enveloppe du formulaire.
+    ressource_octets_max: int = 20 * 1024 * 1024
 
     # Inscription des élèves (spec 017). None : ouvertes en local, fermées dès que le site est en HTTPS, car aucune
     # vraie donnée d'élève ne doit entrer avant le récépissé de l'IPDCP (docs/RULES.md). La préproduction les ouvre.
