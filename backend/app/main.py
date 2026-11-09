@@ -18,6 +18,7 @@ from app.admin.router import router as router_admin
 from app.admin.router import router_activation
 from app.articles.router import router_auteur as router_articles_auteur
 from app.articles.router import router_public as router_articles
+from app.bibliotheque.router_gestion import router_gestion as router_bibliotheque_gestion
 from app.clubs.router import router as router_clubs
 from app.clubs.router import router_actualites
 from app.clubs.router import router_admin as router_clubs_admin
@@ -82,6 +83,7 @@ api.include_router(router_commentaires_auteur)
 api.include_router(router_moderation_admin)
 api.include_router(router_quiz)
 api.include_router(router_quiz_banque)
+api.include_router(router_bibliotheque_gestion)
 app.include_router(api)
 
 

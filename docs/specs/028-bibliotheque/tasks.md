@@ -4,7 +4,7 @@
       lancement, fichier joint, chiffré, tronqué, pas un PDF), puis `pypdf`, `fichiers/pdf.py`, clés `.pdf` et
       lecture en flux du stockage, limites de taille, Caddy à 25MB.
 - [x] 2. Modèle `Ressource`, migration `bibliotheque`, module `bibliotheque` au catalogue.
-- [ ] 3. Tests de la gestion (`test_bibliotheque_gestion.py`) : droits, 2FA, deux personnes, validateur, états,
+- [x] 3. Tests de la gestion (`test_bibliotheque_gestion.py`) : droits, 2FA, deux personnes, validateur, états,
       dépôt et remplacement des fichiers, suppression, journal, notifications, courses ; puis `gestion.py` et
       `router_gestion.py`.
 - [ ] 4. Tests de la bibliothèque publique (`test_bibliotheque_public.py`) : liste, filtres, « À la Une »,
