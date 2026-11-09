@@ -33,15 +33,15 @@ authentification, code de confirmation) commencent par leurs tests.
 
 ## Visiteur
 
-- [ ] 7. Tests d'abord : inscription visiteur (compte non confirmé, code envoyé ou `code_de_test`, 503 en
+- [x] 7. Tests d'abord : inscription visiteur (compte non confirmé, code envoyé ou `code_de_test`, 503 en
       production sans SMTP, inscriptions fermées, limite par adresse, doublon d'e-mail).
-- [ ] 8. Domaine `app/visiteurs/` : inscription, code (Argon2, 15 min, 5 essais, renvoi 1/min et 5/h,
+- [x] 8. Domaine `app/visiteurs/` : inscription, code (Argon2, 15 min, 5 essais, renvoi 1/min et 5/h,
       réponse 204 neutre), confirmation qui ouvre la session, étape `confirmation` à la connexion, `GET
     /visiteurs/moi`.
-- [ ] 9. Droits de jeu : `peut_jouer` accepte le visiteur confirmé, `peut_certifier` protège la certification,
+- [x] 9. Droits de jeu : `peut_jouer` accepte le visiteur confirmé, `peut_certifier` protège la certification,
       lancement d'une place de certification refusé (403), aucune ligne de points, pas d'affiliation à un club.
       Tests.
-- [ ] 10. Purge horaire des visiteurs non confirmés de plus de 7 jours (`lifespan`) ; filtre « visiteur » dans
+- [x] 10. Purge horaire des visiteurs non confirmés de plus de 7 jours (`lifespan`) ; filtre « visiteur » dans
       les inscrits. Tests.
 
 ## Site

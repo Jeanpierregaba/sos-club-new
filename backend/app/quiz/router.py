@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
 from app.quiz import partie
-from app.quiz.dependances import Joueur
+from app.quiz.dependances import MESSAGE_CERTIFICATION, Joueur
 from app.quiz.schemas import EtatPartie, ListeQuiz, ReponseJoueur
 
 router = APIRouter(prefix="/quiz", tags=["quiz"])
@@ -26,6 +26,8 @@ def erreur_de_partie(erreur: Exception) -> HTTPException:
         )
     if isinstance(erreur, partie.ChoixInvalide):
         return HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Ce choix n'existe pas pour cette question.")
+    if isinstance(erreur, partie.ReserveCertification):
+        return HTTPException(status.HTTP_403_FORBIDDEN, MESSAGE_CERTIFICATION)
     if isinstance(erreur, partie.PlaceVerrouillee):
         return HTTPException(status.HTTP_403_FORBIDDEN, "Réussis d'abord la place précédente du parcours.")
     if isinstance(erreur, partie.QuizIncomplet):
@@ -39,6 +41,7 @@ ERREURS = (
     partie.ChoixInvalide,
     partie.QuizIncomplet,
     partie.PlaceVerrouillee,
+    partie.ReserveCertification,
 )
 
 

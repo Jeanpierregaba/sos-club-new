@@ -132,6 +132,12 @@ async def _purger_vieux_essais(db: AsyncSession) -> None:
     await db.execute(delete(TentativeConnexion).where(TentativeConnexion.cree_le < limite))
 
 
+class EmailNonConfirme(Exception):
+    def __init__(self, utilisateur: Utilisateur) -> None:
+        super().__init__("Adresse non confirmée")
+        self.utilisateur = utilisateur
+
+
 async def connecter(
     db: AsyncSession, saisie: str, mot_de_passe: str, adresse_ip: str, jeton_precedent: str | None
 ) -> Connexion:
@@ -171,6 +177,12 @@ async def connecter(
         await _supprimer_essai(db, essai)
         await db.commit()
         raise AccesTermine
+
+    if utilisateur.role is Role.visiteur and utilisateur.email_confirme_le is None:
+        # Bon mot de passe, adresse non confirmée (spec 030) : pas de session, l'appelant renvoie un code.
+        await db.execute(delete(TentativeConnexion).where(TentativeConnexion.cle_hash == cle))
+        await db.commit()
+        raise EmailNonConfirme(utilisateur)
 
     if doit_rehacher(utilisateur.mot_de_passe_hash):
         utilisateur.mot_de_passe_hash = await hacher(mot_de_passe)

@@ -43,6 +43,8 @@ from app.quiz.router import router as router_quiz
 from app.quiz.router_banque import router_banque as router_quiz_banque
 from app.referentiel.router import router_admin as router_referentiel_admin
 from app.referentiel.router import router_public as router_referentiel
+from app.visiteurs.router import router as router_visiteurs
+from app.visiteurs.service import purger_regulierement as purger_visiteurs_regulierement
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +55,12 @@ PHOTOS_PUBLIQUES = re.compile(r"^/api/articles/[^/]+/photos/[^/]+/[a-z]+$")
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     # Efface les fichiers d'export expirés au démarrage, puis toutes les heures (spec 015), et les photos refusées
     # depuis plus de 90 jours, une fois par jour (spec 024).
-    purges = [asyncio.create_task(purger_regulierement()), asyncio.create_task(purger_photos_regulierement())]
+    # Les comptes visiteurs jamais confirmés depuis 7 jours, toutes les heures (spec 030).
+    purges = [
+        asyncio.create_task(purger_regulierement()),
+        asyncio.create_task(purger_photos_regulierement()),
+        asyncio.create_task(purger_visiteurs_regulierement()),
+    ]
     yield
     for purge in purges:
         purge.cancel()
@@ -67,6 +74,7 @@ app = FastAPI(title="API Club Santé SOS Docteur TV", lifespan=lifespan)
 # Toutes les routes sous /api sont servies sur le domaine du site (ADR-0006).
 api = APIRouter(prefix="/api", dependencies=[Depends(verifier_origine)])
 api.include_router(router_comptes)
+api.include_router(router_visiteurs)
 api.include_router(router_admin)
 api.include_router(router_activation)
 api.include_router(router_referentiel)

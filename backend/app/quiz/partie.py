@@ -49,6 +49,10 @@ class PlafondAtteint(Exception):
     pass
 
 
+class ReserveCertification(Exception):
+    pass
+
+
 class PlaceVerrouillee(Exception):
     """Certification (spec 029) : la place précédente n'est pas encore réussie."""
 
@@ -86,6 +90,9 @@ async def lancer(db: AsyncSession, joueur: Utilisateur, quiz_id: UUID, *, essai:
     )
     if quiz is None or (not essai and quiz.etat is not EtatQuiz.publie):
         raise Introuvable
+    if quiz.parcours == PARCOURS_CERTIFICATION and joueur.role is Role.visiteur:
+        # Le parcours de certification est réservé aux élèves et aux encadreurs (spec 030).
+        raise ReserveCertification
     # Sérialise les lancements d'un même joueur : le plafond et la tentative en cours restent exacts.
     await _verrouiller_joueur(db, joueur)
     maintenant = horloge.maintenant()

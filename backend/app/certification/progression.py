@@ -25,7 +25,7 @@ from app.notifications.service import notifier
 from app.points import service as points
 from app.points.bareme import BADGE_ELEVE, CERTIFICATION_ELEVE, CERTIFICATION_ENCADREUR
 from app.quiz import horloge
-from app.quiz.dependances import peut_jouer
+from app.quiz.dependances import peut_certifier
 from app.quiz.models import PLACES, Quiz, TentativeQuiz
 
 # Base 32 de Crockford : ni I, ni L, ni O, ni U, pour un numéro qui se recopie sans erreur.
@@ -89,7 +89,7 @@ async def enregistrer_reussite(db: AsyncSession, joueur: Utilisateur, quiz: Quiz
 async def mettre_a_jour(db: AsyncSession, joueur: Utilisateur) -> None:
     """Délivre les badges dont le palier est atteint et, les 12 places réussies, le certificat. Rien pour un compte
     qui ne peut pas jouer (suspendu, encadreur non vérifié) : il sera rattrapé à son retour."""
-    if not await peut_jouer(db, joueur):
+    if not await peut_certifier(db, joueur):
         return
     reussies = len(await places_reussies(db, joueur.id))
     if reussies == 0:

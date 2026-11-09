@@ -6,12 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.double_auth import verifier_code
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.models import Utilisateur
-from app.comptes.schemas import CodeEntree, ConnexionEntree, EtapeCode, Moi, MotDePasseEntree
+from app.comptes.schemas import CodeEntree, ConnexionEntree, EtapeCode, EtapeConfirmation, Moi, MotDePasseEntree
 from app.comptes.service import (
     AccesTermine,
     CodeIncorrect,
     CompteInvalide,
     CompteSuspendu,
+    EmailNonConfirme,
     EtapeInvalide,
     IdentifiantsIncorrects,
     MotDePasseIncorrect,
@@ -46,7 +47,9 @@ def _poser_cookie(response: Response, utilisateur: Utilisateur, jeton: str) -> N
 
 
 @router.post("/connexion")
-async def connexion(entree: ConnexionEntree, request: Request, response: Response, db: Base) -> Moi | EtapeCode:
+async def connexion(
+    entree: ConnexionEntree, request: Request, response: Response, db: Base
+) -> Moi | EtapeCode | EtapeConfirmation:
     adresse_ip = cle_adresse(request.client.host if request.client else None)
     try:
         resultat = await connecter(
@@ -62,6 +65,12 @@ async def connexion(entree: ConnexionEntree, request: Request, response: Respons
         ) from None
     except AccesTermine:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Ton accès à l'espace admin a pris fin.") from None
+    except EmailNonConfirme as attente:
+        from app.visiteurs.service import code_a_la_connexion
+
+        visiteur = attente.utilisateur
+        assert visiteur.email
+        return EtapeConfirmation(email=visiteur.email, code_de_test=await code_a_la_connexion(db, visiteur))
 
     if resultat.jeton_etape:
         return EtapeCode(jeton=resultat.jeton_etape)

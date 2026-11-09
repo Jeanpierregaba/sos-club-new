@@ -59,7 +59,7 @@ badges ni certificat (le PRD reste vrai) ; code à 6 chiffres par e-mail ; régi
 13. Le bon code confirme l'adresse et ouvre la session. Un visiteur qui se connecte (e-mail + mot de passe) sans
     avoir confirmé est renvoyé vers la saisie du code, avec un nouveau code envoyé.
 14. Un visiteur confirmé joue aux quiz du parcours « jeux » sans gagner de points, comme le prévoit le PRD : ni
-    points, ni classement, ni badge, ni certificat, ni club. Il voit un espace minimal (son profil, ses parties).
+    points, ni classement, ni badge, ni certificat, ni club. Il voit un espace minimal : son profil et les quiz.
 15. Un compte visiteur jamais confirmé est effacé au bout de 7 jours, ce qui libère l'adresse.
 16. L'équipe voit les visiteurs dans « Inscrits » (filtre par profil), sans droit nouveau.
 17. Les textes de la page visiteur tutoient et ne promettent plus ni badges ni certification.

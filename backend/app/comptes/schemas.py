@@ -29,6 +29,15 @@ class EtapeCode(BaseModel):
     jeton: str
 
 
+class EtapeConfirmation(BaseModel):
+    """Visiteur au bon mot de passe dont l'adresse n'est pas confirmée (spec 030) : un code lui est renvoyé."""
+
+    etape: Literal["confirmation"] = "confirmation"
+    email: str
+    # Seulement hors production, sans SMTP configuré.
+    code_de_test: str | None = None
+
+
 class CodeEntree(BaseModel):
     jeton: str = Field(min_length=1, max_length=100)
     # 6 chiffres, ou un code de secours de 16 caractères, avec ses tirets et espaces éventuels.

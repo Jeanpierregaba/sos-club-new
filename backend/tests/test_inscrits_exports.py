@@ -224,7 +224,7 @@ def test_tableau_de_bord_sur_les_vraies_donnees(
 ) -> None:
     corps = client.get("/api/admin/tableau-de-bord").json()
 
-    assert corps["comptes_par_profil"] == {"eleve": 2, "encadreur": 1, "admin": 1}
+    assert corps["comptes_par_profil"] == {"eleve": 2, "encadreur": 1, "admin": 1, "visiteur": 0}
     assert len(corps["inscriptions_30_jours"]) == 30
     assert sum(n for _, n in corps["inscriptions_30_jours"]) == 4
     indicateurs = {i["id"]: i for i in corps["indicateurs"]}

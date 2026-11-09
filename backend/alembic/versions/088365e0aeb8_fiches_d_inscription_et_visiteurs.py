@@ -32,6 +32,9 @@ def upgrade() -> None:
         sa.Column("expire_le", sa.DateTime(timezone=True), nullable=False),
         sa.Column("essais", sa.SmallInteger(), nullable=False),
         sa.Column("envoye_le", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("envois", sa.SmallInteger(), nullable=False),
+        sa.Column("fenetre_le", sa.DateTime(timezone=True), nullable=False),
+        sa.CheckConstraint("envois >= 0", name=op.f("ck_code_confirmation_envois")),
         sa.CheckConstraint("essais BETWEEN 0 AND 5", name=op.f("ck_code_confirmation_essais")),
         sa.ForeignKeyConstraint(
             ["utilisateur_id"],

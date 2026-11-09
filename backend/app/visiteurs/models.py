@@ -38,13 +38,19 @@ class Visiteur(Base):
 
 
 class CodeConfirmation(Base):
-    """Le code en cours d'un compte : un renvoi remplace le précédent. Seule son empreinte Argon2 est gardée."""
+    """Le code en cours d'un compte : un renvoi remplace le précédent. Seule son empreinte Argon2 est gardée.
+    `envois` compte les codes envoyés depuis `fenetre_le` : au plus 5 par heure."""
 
     __tablename__ = "code_confirmation"
-    __table_args__ = (CheckConstraint("essais BETWEEN 0 AND 5", name="essais"),)
+    __table_args__ = (
+        CheckConstraint("essais BETWEEN 0 AND 5", name="essais"),
+        CheckConstraint("envois >= 0", name="envois"),
+    )
 
     utilisateur_id: Mapped[UUID] = mapped_column(ForeignKey("utilisateur.id", ondelete="CASCADE"), primary_key=True)
     code_hash: Mapped[str] = mapped_column(Text)
     expire_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     essais: Mapped[int] = mapped_column(SmallInteger, default=0)
     envoye_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    envois: Mapped[int] = mapped_column(SmallInteger, default=0)
+    fenetre_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))

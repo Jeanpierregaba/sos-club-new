@@ -11,7 +11,7 @@ from app.certification.schemas import CertificatJoueur, ChoixClub, MaCertificati
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.models import Utilisateur
 from app.db import get_session
-from app.quiz.dependances import Joueur
+from app.quiz.dependances import Candidat
 
 router = APIRouter(prefix="/certification", tags=["certification"])
 router_public = APIRouter(prefix="/certificats", tags=["certification"])
@@ -22,7 +22,7 @@ SANS_CACHE = {"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"}
 
 
 @router.get("")
-async def ma_certification(db: Db, utilisateur: Joueur) -> MaCertification:
+async def ma_certification(db: Db, utilisateur: Candidat) -> MaCertification:
     resultat = await joueur.ma_certification(db, utilisateur)
     await db.commit()
     return resultat
@@ -30,7 +30,7 @@ async def ma_certification(db: Db, utilisateur: Joueur) -> MaCertification:
 
 # RULES : un élève choisit de montrer son club à la vérification publique (caché par défaut).
 @router.put("/club")
-async def choisir_club(entree: ChoixClub, db: Db, utilisateur: Joueur) -> CertificatJoueur:
+async def choisir_club(entree: ChoixClub, db: Db, utilisateur: Candidat) -> CertificatJoueur:
     resultat = await joueur.choisir_club(db, utilisateur, entree.afficher)
     if resultat is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Tu n'as pas de certificat valide.")
