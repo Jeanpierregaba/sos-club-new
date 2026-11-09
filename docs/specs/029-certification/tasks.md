@@ -8,9 +8,9 @@
       points, certificat unique, fins simultanées, rattrapage, révoqué rejoué.
 - [x] 4. Progression : `partie.py` (paramètres du parcours, `PlaceVerrouillee`, fin de partie, liste des jeux
       seulement), `certification/progression.py`, `regles.py` ; les tests de la tâche 3 passent.
-- [ ] 5. Routes joueur : `GET /certification` (« Ma certification ») et `GET /certification/certificat.pdf`
+- [x] 5. Routes joueur : `GET /certification` (« Ma certification ») et `GET /certification/certificat.pdf`
       (reportlab ajouté, PDF vérifié par extraction de texte, réservé au titulaire).
-- [ ] 6. Vérification publique `GET /certificats/{numero}` : tests de non-divulgation d'abord.
+- [x] 6. Vérification publique `GET /certificats/{numero}` : tests de non-divulgation d'abord.
 - [ ] 7. Gestion : règles des badges (versions, 422), listes des certificats et des badges, révocation et
       réémission (2FA, motif, annulation des points, audit, notifications). Tests d'abord, droits paramétrés.
 - [ ] 8. Seed : 12 quiz « [Test] » du parcours reliés au fascicule de test ; test du seed.

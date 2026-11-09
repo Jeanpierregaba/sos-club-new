@@ -20,6 +20,8 @@ from app.articles.router import router_auteur as router_articles_auteur
 from app.articles.router import router_public as router_articles
 from app.bibliotheque.router import router as router_bibliotheque
 from app.bibliotheque.router_gestion import router_gestion as router_bibliotheque_gestion
+from app.certification.router import router as router_certification
+from app.certification.router import router_public as router_certificats
 from app.clubs.router import router as router_clubs
 from app.clubs.router import router_actualites
 from app.clubs.router import router_admin as router_clubs_admin
@@ -86,6 +88,8 @@ api.include_router(router_quiz)
 api.include_router(router_quiz_banque)
 api.include_router(router_bibliotheque_gestion)
 api.include_router(router_bibliotheque)
+api.include_router(router_certification)
+api.include_router(router_certificats)
 app.include_router(api)
 
 

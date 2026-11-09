@@ -221,7 +221,7 @@ async def repondre(
 
 
 async def liste(db: AsyncSession, joueur: Utilisateur, axe: str | None = None) -> ListeQuiz:
-    await _clore_abandonnees(db, joueur)
+    await clore_abandonnees(db, joueur)
     p = await parametres.en_cours(db)
     requete = select(Quiz).where(Quiz.etat == EtatQuiz.publie, Quiz.parcours == PARCOURS_JEUX)
     if axe:
@@ -286,7 +286,7 @@ async def _verrouiller_joueur(db: AsyncSession, joueur: Utilisateur) -> None:
     await db.execute(select(Utilisateur.id).where(Utilisateur.id == joueur.id).with_for_update(key_share=True))
 
 
-async def _clore_abandonnees(db: AsyncSession, joueur: Utilisateur) -> None:
+async def clore_abandonnees(db: AsyncSession, joueur: Utilisateur) -> None:
     """Une partie quittée sans y revenir est close avec son score dès que le joueur revoit la liste : une
     réussite acquise rapporte ses points sans qu'il ait à relancer le quiz."""
     maintenant = horloge.maintenant()
