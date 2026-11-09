@@ -7880,6 +7880,849 @@
         }
       }
     },
+    "/api/admin/bibliotheque": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister",
+        "operationId": "lister_api_admin_bibliotheque_get",
+        "parameters": [
+          {
+            "name": "etat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EtatRessource"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Etat"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListeGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Creer",
+        "operationId": "creer_api_admin_bibliotheque_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RessourceEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RessourceGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/bibliotheque/{ressource_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lire",
+        "operationId": "lire_api_admin_bibliotheque__ressource_id__get",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RessourceGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Modifier",
+        "operationId": "modifier_api_admin_bibliotheque__ressource_id__put",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RessourceEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RessourceGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Supprimer",
+        "operationId": "supprimer_api_admin_bibliotheque__ressource_id__delete",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/bibliotheque/{ressource_id}/fichier": {
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Deposer Fichier",
+        "operationId": "deposer_fichier_api_admin_bibliotheque__ressource_id__fichier_put",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_deposer_fichier_api_admin_bibliotheque__ressource_id__fichier_put"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RessourceGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Relire Fichier",
+        "operationId": "relire_fichier_api_admin_bibliotheque__ressource_id__fichier_get",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/bibliotheque/{ressource_id}/couverture": {
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Deposer Couverture",
+        "operationId": "deposer_couverture_api_admin_bibliotheque__ressource_id__couverture_put",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_deposer_couverture_api_admin_bibliotheque__ressource_id__couverture_put"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RessourceGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Retirer Couverture",
+        "operationId": "retirer_couverture_api_admin_bibliotheque__ressource_id__couverture_delete",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RessourceGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/bibliotheque/{ressource_id}/couverture/{taille}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Relire Couverture",
+        "operationId": "relire_couverture_api_admin_bibliotheque__ressource_id__couverture__taille__get",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          },
+          {
+            "name": "taille",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Taille"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/bibliotheque/{ressource_id}/soumettre": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Soumettre",
+        "operationId": "soumettre_api_admin_bibliotheque__ressource_id__soumettre_post",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RessourceGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/bibliotheque/{ressource_id}/reprendre": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Reprendre",
+        "operationId": "reprendre_api_admin_bibliotheque__ressource_id__reprendre_post",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RessourceGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/bibliotheque/{ressource_id}/approuver": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Approuver",
+        "operationId": "approuver_api_admin_bibliotheque__ressource_id__approuver_post",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Approbation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RessourceGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/bibliotheque/{ressource_id}/refuser": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Refuser",
+        "operationId": "refuser_api_admin_bibliotheque__ressource_id__refuser_post",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Motif"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RessourceGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/bibliotheque/{ressource_id}/depublier": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Depublier",
+        "operationId": "depublier_api_admin_bibliotheque__ressource_id__depublier_post",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Motif"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RessourceGestion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bibliotheque": {
+      "get": {
+        "tags": [
+          "bibliotheque"
+        ],
+        "summary": "Bibliotheque",
+        "operationId": "bibliotheque_api_bibliotheque_get",
+        "parameters": [
+          {
+            "name": "categorie",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/CategorieRessource"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Categorie"
+            }
+          },
+          {
+            "name": "axe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Axe"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bibliotheque"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bibliotheque/{ressource_id}/fichier": {
+      "get": {
+        "tags": [
+          "bibliotheque"
+        ],
+        "summary": "Fichier",
+        "operationId": "fichier_api_bibliotheque__ressource_id__fichier_get",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          },
+          {
+            "name": "telecharger",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Telecharger"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bibliotheque/{ressource_id}/couverture/{taille}": {
+      "get": {
+        "tags": [
+          "bibliotheque"
+        ],
+        "summary": "Couverture",
+        "operationId": "couverture_api_bibliotheque__ressource_id__couverture__taille__get",
+        "parameters": [
+          {
+            "name": "ressource_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ressource Id"
+            }
+          },
+          {
+            "name": "taille",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Taille"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -8960,6 +9803,34 @@
         ],
         "title": "Beneficiaire"
       },
+      "Bibliotheque": {
+        "properties": {
+          "a_la_une": {
+            "items": {
+              "$ref": "#/components/schemas/RessourcePublique"
+            },
+            "type": "array",
+            "title": "A La Une"
+          },
+          "ressources": {
+            "items": {
+              "$ref": "#/components/schemas/RessourcePublique"
+            },
+            "type": "array",
+            "title": "Ressources"
+          },
+          "chiffres": {
+            "$ref": "#/components/schemas/Chiffres"
+          }
+        },
+        "type": "object",
+        "required": [
+          "a_la_une",
+          "ressources",
+          "chiffres"
+        ],
+        "title": "Bibliotheque"
+      },
       "Body_ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post": {
         "properties": {
           "fichier": {
@@ -9042,6 +9913,34 @@
         ],
         "title": "Body_ajouter_photo_api_mes_articles__contenu_id__photos_post"
       },
+      "Body_deposer_couverture_api_admin_bibliotheque__ressource_id__couverture_put": {
+        "properties": {
+          "fichier": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Fichier"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fichier"
+        ],
+        "title": "Body_deposer_couverture_api_admin_bibliotheque__ressource_id__couverture_put"
+      },
+      "Body_deposer_fichier_api_admin_bibliotheque__ressource_id__fichier_put": {
+        "properties": {
+          "fichier": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Fichier"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fichier"
+        ],
+        "title": "Body_deposer_fichier_api_admin_bibliotheque__ressource_id__fichier_put"
+      },
       "Catalogue": {
         "properties": {
           "modules": {
@@ -9101,6 +10000,17 @@
         ],
         "title": "Catalogue"
       },
+      "CategorieRessource": {
+        "type": "string",
+        "enum": [
+          "magazine",
+          "guide",
+          "fiche",
+          "affiche",
+          "fascicule"
+        ],
+        "title": "CategorieRessource"
+      },
       "ChampsArticle": {
         "properties": {
           "titre": {
@@ -9141,6 +10051,24 @@
         ],
         "title": "ChampsArticle",
         "description": "Les champs d'une version, stockés en JSONB (`version_contenu.donnees`)."
+      },
+      "Chiffres": {
+        "properties": {
+          "documents": {
+            "type": "integer",
+            "title": "Documents"
+          },
+          "telechargements": {
+            "type": "integer",
+            "title": "Telechargements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "documents",
+          "telechargements"
+        ],
+        "title": "Chiffres"
       },
       "Classe": {
         "type": "string",
@@ -11742,6 +12670,16 @@
         ],
         "title": "EtatQuiz"
       },
+      "EtatRessource": {
+        "type": "string",
+        "enum": [
+          "brouillon",
+          "soumis",
+          "publie",
+          "depublie"
+        ],
+        "title": "EtatRessource"
+      },
       "EtatVerification": {
         "type": "string",
         "enum": [
@@ -13214,6 +14152,22 @@
           "quiz"
         ],
         "title": "ListeBanque"
+      },
+      "ListeGestion": {
+        "properties": {
+          "ressources": {
+            "items": {
+              "$ref": "#/components/schemas/RessourceGestion"
+            },
+            "type": "array",
+            "title": "Ressources"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ressources"
+        ],
+        "title": "ListeGestion"
       },
       "ListeQuiz": {
         "properties": {
@@ -15520,6 +16474,348 @@
           "reponses"
         ],
         "title": "ReponsesQuelAxe"
+      },
+      "RessourceEntree": {
+        "properties": {
+          "titre": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 1,
+            "title": "Titre"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Description",
+            "default": ""
+          },
+          "categorie": {
+            "$ref": "#/components/schemas/CategorieRessource"
+          },
+          "axe_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Axe Code"
+          },
+          "parution": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parution"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "titre",
+          "categorie"
+        ],
+        "title": "RessourceEntree"
+      },
+      "RessourceGestion": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "categorie": {
+            "$ref": "#/components/schemas/CategorieRessource"
+          },
+          "axe_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Axe Code"
+          },
+          "parution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parution"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatRessource"
+          },
+          "contenu_de_test": {
+            "type": "boolean",
+            "title": "Contenu De Test"
+          },
+          "fichier_octets": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fichier Octets"
+          },
+          "pages": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages"
+          },
+          "a_couverture": {
+            "type": "boolean",
+            "title": "A Couverture"
+          },
+          "telechargements": {
+            "type": "integer",
+            "title": "Telechargements"
+          },
+          "soumis_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soumis Le"
+          },
+          "decide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Le"
+          },
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          },
+          "validateur_nom": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validateur Nom"
+          },
+          "validateur_qualite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validateur Qualite"
+          },
+          "publie_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publie Le"
+          },
+          "deja_publiee": {
+            "type": "boolean",
+            "title": "Deja Publiee"
+          },
+          "modifie_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Modifie Le"
+          },
+          "contributeur": {
+            "type": "boolean",
+            "title": "Contributeur"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "titre",
+          "description",
+          "categorie",
+          "axe_code",
+          "parution",
+          "etat",
+          "contenu_de_test",
+          "fichier_octets",
+          "pages",
+          "a_couverture",
+          "telechargements",
+          "soumis_le",
+          "decide_le",
+          "motif",
+          "validateur_nom",
+          "validateur_qualite",
+          "publie_le",
+          "deja_publiee",
+          "modifie_le",
+          "contributeur"
+        ],
+        "title": "RessourceGestion"
+      },
+      "RessourcePublique": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "categorie": {
+            "$ref": "#/components/schemas/CategorieRessource"
+          },
+          "axe_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Axe Code"
+          },
+          "parution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parution"
+          },
+          "fichier_octets": {
+            "type": "integer",
+            "title": "Fichier Octets"
+          },
+          "pages": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages"
+          },
+          "telechargements": {
+            "type": "integer",
+            "title": "Telechargements"
+          },
+          "publie_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Publie Le"
+          },
+          "validateur_nom": {
+            "type": "string",
+            "title": "Validateur Nom"
+          },
+          "validateur_qualite": {
+            "type": "string",
+            "title": "Validateur Qualite"
+          },
+          "contenu_de_test": {
+            "type": "boolean",
+            "title": "Contenu De Test"
+          },
+          "couverture": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Couverture"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "titre",
+          "description",
+          "categorie",
+          "axe_code",
+          "parution",
+          "fichier_octets",
+          "pages",
+          "telechargements",
+          "publie_le",
+          "validateur_nom",
+          "validateur_qualite",
+          "contenu_de_test",
+          "couverture"
+        ],
+        "title": "RessourcePublique"
       },
       "ResultatLot": {
         "properties": {

@@ -2620,6 +2620,232 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/bibliotheque": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister */
+        get: operations["lister_api_admin_bibliotheque_get"];
+        put?: never;
+        /** Creer */
+        post: operations["creer_api_admin_bibliotheque_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/bibliotheque/{ressource_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire */
+        get: operations["lire_api_admin_bibliotheque__ressource_id__get"];
+        /** Modifier */
+        put: operations["modifier_api_admin_bibliotheque__ressource_id__put"];
+        post?: never;
+        /** Supprimer */
+        delete: operations["supprimer_api_admin_bibliotheque__ressource_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/bibliotheque/{ressource_id}/fichier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Relire Fichier */
+        get: operations["relire_fichier_api_admin_bibliotheque__ressource_id__fichier_get"];
+        /** Deposer Fichier */
+        put: operations["deposer_fichier_api_admin_bibliotheque__ressource_id__fichier_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/bibliotheque/{ressource_id}/couverture": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Deposer Couverture */
+        put: operations["deposer_couverture_api_admin_bibliotheque__ressource_id__couverture_put"];
+        post?: never;
+        /** Retirer Couverture */
+        delete: operations["retirer_couverture_api_admin_bibliotheque__ressource_id__couverture_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/bibliotheque/{ressource_id}/couverture/{taille}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Relire Couverture */
+        get: operations["relire_couverture_api_admin_bibliotheque__ressource_id__couverture__taille__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/bibliotheque/{ressource_id}/soumettre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Soumettre */
+        post: operations["soumettre_api_admin_bibliotheque__ressource_id__soumettre_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/bibliotheque/{ressource_id}/reprendre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reprendre */
+        post: operations["reprendre_api_admin_bibliotheque__ressource_id__reprendre_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/bibliotheque/{ressource_id}/approuver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approuver */
+        post: operations["approuver_api_admin_bibliotheque__ressource_id__approuver_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/bibliotheque/{ressource_id}/refuser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refuser */
+        post: operations["refuser_api_admin_bibliotheque__ressource_id__refuser_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/bibliotheque/{ressource_id}/depublier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Depublier */
+        post: operations["depublier_api_admin_bibliotheque__ressource_id__depublier_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/bibliotheque": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Bibliotheque */
+        get: operations["bibliotheque_api_bibliotheque_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/bibliotheque/{ressource_id}/fichier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fichier */
+        get: operations["fichier_api_bibliotheque__ressource_id__fichier_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/bibliotheque/{ressource_id}/couverture/{taille}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Couverture */
+        get: operations["couverture_api_bibliotheque__ressource_id__couverture__taille__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -3013,6 +3239,14 @@ export interface components {
          * @enum {string}
          */
         Beneficiaire: "eleve" | "encadreur" | "club";
+        /** Bibliotheque */
+        Bibliotheque: {
+            /** A La Une */
+            a_la_une: components["schemas"]["RessourcePublique"][];
+            /** Ressources */
+            ressources: components["schemas"]["RessourcePublique"][];
+            chiffres: components["schemas"]["Chiffres"];
+        };
         /** Body_ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post */
         Body_ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post: {
             /** Fichier */
@@ -3051,6 +3285,16 @@ export interface components {
              */
             couverture: boolean;
         };
+        /** Body_deposer_couverture_api_admin_bibliotheque__ressource_id__couverture_put */
+        Body_deposer_couverture_api_admin_bibliotheque__ressource_id__couverture_put: {
+            /** Fichier */
+            fichier: string;
+        };
+        /** Body_deposer_fichier_api_admin_bibliotheque__ressource_id__fichier_put */
+        Body_deposer_fichier_api_admin_bibliotheque__ressource_id__fichier_put: {
+            /** Fichier */
+            fichier: string;
+        };
         /** Catalogue */
         Catalogue: {
             /** Modules */
@@ -3071,6 +3315,11 @@ export interface components {
             dre_actives: string[];
         };
         /**
+         * CategorieRessource
+         * @enum {string}
+         */
+        CategorieRessource: "magazine" | "guide" | "fiche" | "affiche" | "fascicule";
+        /**
          * ChampsArticle
          * @description Les champs d'une version, stockés en JSONB (`version_contenu.donnees`).
          */
@@ -3088,6 +3337,13 @@ export interface components {
              * @default true
              */
             afficher_club: boolean;
+        };
+        /** Chiffres */
+        Chiffres: {
+            /** Documents */
+            documents: number;
+            /** Telechargements */
+            telechargements: number;
         };
         /**
          * Classe
@@ -4036,6 +4292,11 @@ export interface components {
          */
         EtatQuiz: "brouillon" | "soumis" | "publie" | "depublie";
         /**
+         * EtatRessource
+         * @enum {string}
+         */
+        EtatRessource: "brouillon" | "soumis" | "publie" | "depublie";
+        /**
          * EtatVerification
          * @enum {string}
          */
@@ -4499,6 +4760,11 @@ export interface components {
             questions_requises: number;
             /** Quiz */
             quiz: components["schemas"]["QuizBanque"][];
+        };
+        /** ListeGestion */
+        ListeGestion: {
+            /** Ressources */
+            ressources: components["schemas"]["RessourceGestion"][];
         };
         /** ListeQuiz */
         ListeQuiz: {
@@ -5309,6 +5575,106 @@ export interface components {
         ReponsesQuelAxe: {
             /** Reponses */
             reponses: ("A" | "B" | "C" | "D")[];
+        };
+        /** RessourceEntree */
+        RessourceEntree: {
+            /** Titre */
+            titre: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            categorie: components["schemas"]["CategorieRessource"];
+            /** Axe Code */
+            axe_code?: string | null;
+            /** Parution */
+            parution?: string | null;
+        };
+        /** RessourceGestion */
+        RessourceGestion: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Titre */
+            titre: string;
+            /** Description */
+            description: string;
+            categorie: components["schemas"]["CategorieRessource"];
+            /** Axe Code */
+            axe_code: string | null;
+            /** Parution */
+            parution: string | null;
+            etat: components["schemas"]["EtatRessource"];
+            /** Contenu De Test */
+            contenu_de_test: boolean;
+            /** Fichier Octets */
+            fichier_octets: number | null;
+            /** Pages */
+            pages: number | null;
+            /** A Couverture */
+            a_couverture: boolean;
+            /** Telechargements */
+            telechargements: number;
+            /** Soumis Le */
+            soumis_le: string | null;
+            /** Decide Le */
+            decide_le: string | null;
+            /** Motif */
+            motif: string | null;
+            /** Validateur Nom */
+            validateur_nom: string | null;
+            /** Validateur Qualite */
+            validateur_qualite: string | null;
+            /** Publie Le */
+            publie_le: string | null;
+            /** Deja Publiee */
+            deja_publiee: boolean;
+            /**
+             * Modifie Le
+             * Format: date-time
+             */
+            modifie_le: string;
+            /** Contributeur */
+            contributeur: boolean;
+        };
+        /** RessourcePublique */
+        RessourcePublique: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Titre */
+            titre: string;
+            /** Description */
+            description: string;
+            categorie: components["schemas"]["CategorieRessource"];
+            /** Axe Code */
+            axe_code: string | null;
+            /** Parution */
+            parution: string | null;
+            /** Fichier Octets */
+            fichier_octets: number;
+            /** Pages */
+            pages: number | null;
+            /** Telechargements */
+            telechargements: number;
+            /**
+             * Publie Le
+             * Format: date-time
+             */
+            publie_le: string;
+            /** Validateur Nom */
+            validateur_nom: string;
+            /** Validateur Qualite */
+            validateur_qualite: string;
+            /** Contenu De Test */
+            contenu_de_test: boolean;
+            /** Couverture */
+            couverture: string | null;
         };
         /**
          * ResultatLot
@@ -10914,6 +11280,585 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["EtatPartie"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lister_api_admin_bibliotheque_get: {
+        parameters: {
+            query?: {
+                etat?: components["schemas"]["EtatRessource"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListeGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    creer_api_admin_bibliotheque_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RessourceEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RessourceGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_api_admin_bibliotheque__ressource_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RessourceGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modifier_api_admin_bibliotheque__ressource_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RessourceEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RessourceGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    supprimer_api_admin_bibliotheque__ressource_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    relire_fichier_api_admin_bibliotheque__ressource_id__fichier_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deposer_fichier_api_admin_bibliotheque__ressource_id__fichier_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_deposer_fichier_api_admin_bibliotheque__ressource_id__fichier_put"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RessourceGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deposer_couverture_api_admin_bibliotheque__ressource_id__couverture_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_deposer_couverture_api_admin_bibliotheque__ressource_id__couverture_put"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RessourceGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retirer_couverture_api_admin_bibliotheque__ressource_id__couverture_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RessourceGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    relire_couverture_api_admin_bibliotheque__ressource_id__couverture__taille__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+                taille: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    soumettre_api_admin_bibliotheque__ressource_id__soumettre_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RessourceGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reprendre_api_admin_bibliotheque__ressource_id__reprendre_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RessourceGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approuver_api_admin_bibliotheque__ressource_id__approuver_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Approbation"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RessourceGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refuser_api_admin_bibliotheque__ressource_id__refuser_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Motif"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RessourceGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    depublier_api_admin_bibliotheque__ressource_id__depublier_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Motif"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RessourceGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    bibliotheque_api_bibliotheque_get: {
+        parameters: {
+            query?: {
+                categorie?: components["schemas"]["CategorieRessource"] | null;
+                axe?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Bibliotheque"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    fichier_api_bibliotheque__ressource_id__fichier_get: {
+        parameters: {
+            query?: {
+                telecharger?: boolean;
+            };
+            header?: never;
+            path: {
+                ressource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    couverture_api_bibliotheque__ressource_id__couverture__taille__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ressource_id: string;
+                taille: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

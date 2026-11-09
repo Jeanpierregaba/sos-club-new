@@ -7,7 +7,7 @@
 - [x] 3. Tests de la gestion (`test_bibliotheque_gestion.py`) : droits, 2FA, deux personnes, validateur, états,
       dépôt et remplacement des fichiers, suppression, journal, notifications, courses ; puis `gestion.py` et
       `router_gestion.py`.
-- [ ] 4. Tests de la bibliothèque publique (`test_bibliotheque_public.py`) : liste, filtres, « À la Une »,
+- [x] 4. Tests de la bibliothèque publique (`test_bibliotheque_public.py`) : liste, filtres, « À la Une »,
       fichier et couverture servis ou 404, en-têtes, compteur ; puis `public.py` et `router.py`.
 - [ ] 5. `seed_dev` : ressources « Contenu de test » ; types de l'API régénérés.
 - [ ] 6. Site, public : client, `/bibliotheque` sur les vraies données, carrousel, filtres, état vide.
