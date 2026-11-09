@@ -221,3 +221,22 @@ def test_le_seed_prepare_le_parcours_de_certification_une_seule_fois(
         )
     )
     assert questions == 15
+
+
+def test_le_seed_prepare_la_fiche_et_le_visiteur(client: TestClient, en_base: Callable[..., Any]) -> None:
+    en_base(semer)
+    acces = en_base(semer)
+    eleve = acces_de(acces, "dev.eleve1")
+    client.post("/api/comptes/connexion", json={"identifiant": "dev.eleve1", "mot_de_passe": eleve["mot_de_passe"]})
+
+    assert client.get("/api/eleves/moi").json()["fiche_complete"] is True
+    assert client.get("/api/eleves/moi/fiche").json()["responsable"]["nom"] == "Parent de test"
+    client.cookies.clear()
+
+    visiteur = acces_de(acces, "dev.visiteur")
+    assert visiteur["profil"] == "Visiteur (adresse confirmée)"
+    reponse = client.post(
+        "/api/comptes/connexion", json={"identifiant": visiteur["email"], "mot_de_passe": visiteur["mot_de_passe"]}
+    )
+    assert reponse.json()["role"] == "visiteur"
+    assert client.get("/api/visiteurs/moi").json()["ville"] == "Lomé"

@@ -12,7 +12,7 @@ import asyncio
 import io
 import sys
 import unicodedata
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID, uuid7
 
@@ -28,11 +28,13 @@ from app.admin.models import DoubleAuth
 from app.bibliotheque.models import CategorieRessource, EtatRessource, Ressource
 from app.clubs.adhesions import adhesion_president
 from app.clubs.models import Adhesion, Club, ClubAxe, EtatAdhesion, EtatClub
-from app.comptes.models import Role, Utilisateur
+from app.comptes.models import Role, Sexe, Utilisateur
 from app.config import RACINE_PROJET, settings
 from app.db import SessionLocal, engine
-from app.eleves.models import Classe, Eleve
-from app.encadreurs.models import EtatVerification, Fonction
+from app.eleves import fiche as fiche_eleve
+from app.eleves.models import Classe, Eleve, FicheEleve, Reseau
+from app.eleves.schemas_fiche import FicheEntree, Responsable
+from app.encadreurs.models import Encadreur, EtatVerification, Fonction
 from app.fichiers import images
 from app.fichiers.stockage import stockage
 from app.jeux import banque_initiale
@@ -63,6 +65,7 @@ from app.seed_commun import (
 from app.seed_commun import (
     ecrire_fichier as ecrire_acces,
 )
+from app.visiteurs.models import Region, Visiteur
 
 FICHIER_ACCES = RACINE_PROJET / ".comptes-dev.local"
 DOMAINE = "exemple.tg"
@@ -81,6 +84,7 @@ COMPTES: list[tuple[str, str, str, Role, RoleDepart | None | str, str | None]] =
     ("dev.encadreur.attente", "Yao", "Attente", Role.encadreur, "", None),
     ("dev.eleve1", "Ama", "Eleve", Role.eleve, "", None),
     ("dev.eleve2", "Kofi", "Eleve", Role.eleve, "", None),
+    ("dev.visiteur", "Edem", "Visiteur", Role.visiteur, "", None),
 ]
 
 # Profils des élèves (spec 017) : pseudonyme, classe, établissement.
@@ -513,6 +517,39 @@ async def _preparer_certification(db: AsyncSession) -> None:
             )  # fmt: skip
 
 
+async def _preparer_fiche(db: AsyncSession, utilisateur: Utilisateur) -> None:
+    """Fiche d'adhésion de démonstration (spec 030) : valeurs fictives, signalées comme contenu de test."""
+    if await db.get(FicheEleve, utilisateur.id) is not None:
+        return
+    entree = FicheEntree(
+        numero_adhesion="TEST-001",
+        prefecture="Golfe",
+        commune="Golfe 1",
+        canton="Contenu de test",
+        sexe=Sexe.feminin,
+        date_naissance=date(datetime.now(UTC).year - 16, 3, 14),
+        lieu_naissance="Lomé (Contenu de test)",
+        responsable=Responsable(nom="Parent de test", telephone="+22800000002"),
+        axes=["genie-imhotep", "sante-environnement"],
+        reseaux=[Reseau.facebook],
+        engagement=True,
+    )
+    await fiche_eleve.enregistrer_a_linscription(db, utilisateur.id, entree)
+
+
+async def _preparer_visiteur(db: AsyncSession, utilisateur: Utilisateur) -> None:
+    """Visiteur à l'adresse confirmée (spec 030) : il se connecte sans code."""
+    utilisateur.telephone = "+22800000003"
+    utilisateur.email_confirme_le = utilisateur.email_confirme_le or datetime.now(UTC)
+    utilisateur.consentement_le = utilisateur.consentement_le or datetime.now(UTC)
+    if await db.get(Visiteur, utilisateur.id) is None:
+        db.add(
+            Visiteur(utilisateur_id=utilisateur.id, ville="Lomé", region=Region.maritime,
+                     statut="Contenu de test", charte_version=settings.version_charte)
+        )  # fmt: skip
+    await db.flush()
+
+
 async def semer(db: AsyncSession) -> list[dict[str, str]]:
     """Prépare tous les comptes `dev.*` et renvoie leurs accès. Valide la transaction."""
     if settings.production:
@@ -538,6 +575,9 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
                 ligne["codes_secours"] = ", ".join(codes)
             else:
                 await db.execute(delete(DoubleAuth).where(DoubleAuth.utilisateur_id == utilisateur.id))
+        elif role is Role.visiteur:
+            await _preparer_visiteur(db, utilisateur)
+            ligne["profil"] = "Visiteur (adresse confirmée)"
         else:
             ligne["profil"] = "Encadreur" if role is Role.encadreur else "Élève"
             if role is Role.eleve:
@@ -545,11 +585,20 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
                 etablissement_id = await _etablissement_eleve(db, nom_etablissement)
                 if etablissement_id is not None:
                     await preparer_eleve(db, utilisateur, affiche, classe, etablissement_id)
+                    # dev.eleve2 reste sans fiche : son espace montre l'invitation à la compléter.
+                    if identifiant == "dev.eleve1":
+                        await _preparer_fiche(db, utilisateur)
             else:
                 fonction, dre_etablissement, etat = PROFILS_ENCADREURS[identifiant]
                 etablissement_id = await _etablissement_dre(db, dre_etablissement)
                 if etablissement_id is not None:
                     await preparer_encadreur(db, utilisateur, fonction, etablissement_id, etat)
+                # Spec 030 : téléphone (fictif) et discipline ; « dev.encadreur.attente » reste sans téléphone.
+                if identifiant == "dev.encadreur":
+                    utilisateur.telephone = "+22800000001"
+                    encadreur = await db.get(Encadreur, utilisateur.id)
+                    if encadreur is not None:
+                        encadreur.discipline = "SVT (Contenu de test)"
                 ligne["profil"] += " (actif)" if etat is EtatVerification.actif else " (en attente)"
         acces.append(ligne)
     await _preparer_clubs(db)
