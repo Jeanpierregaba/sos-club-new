@@ -41,8 +41,11 @@ def creer_quiz(
     etat: EtatQuiz = EtatQuiz.publie,
     titre: str = "Quiz de test",
     axe: str | None = None,
+    place: int | None = None,
+    ressource_id: UUID | None = None,
 ) -> Quiz:
-    """Un quiz dont chaque bonne réponse commence par « Juste » : le test la retrouve dans l'ordre mélangé."""
+    """Un quiz dont chaque bonne réponse commence par « Juste » : le test la retrouve dans l'ordre mélangé. Avec une
+    place, c'est un quiz du parcours de certification (spec 029)."""
 
     async def inserer(db: AsyncSession) -> Quiz:
         code = axe or await db.scalar(select(Axe.code).order_by(Axe.code).limit(1))
@@ -56,6 +59,9 @@ def creer_quiz(
             validateur_nom="Dr Test" if publie else None,
             validateur_qualite="Médecin" if publie else None,
             publie_le=DEBUT if publie else None,
+            parcours="jeux" if place is None else "certification",
+            place=place,
+            ressource_id=ressource_id,
         )
         db.add(quiz)
         await db.flush()
@@ -75,12 +81,12 @@ def creer_quiz(
     return en_base(inserer)
 
 
-def regler(en_base: Callable[..., Any], **valeurs: int) -> None:
-    """Ajoute une version des paramètres du parcours « jeux », à partir de la dernière."""
+def regler(en_base: Callable[..., Any], parcours: str = "jeux", **valeurs: int) -> None:
+    """Ajoute une version des paramètres d'un parcours, à partir de la dernière."""
     from app.quiz import parametres
 
     async def ajouter(db: AsyncSession) -> None:
-        actuels = await parametres.en_cours(db)
+        actuels = await parametres.en_cours(db, parcours)
         champs = {
             "nb_questions": actuels.nb_questions,
             "temps_ms": actuels.temps_ms,
@@ -88,7 +94,7 @@ def regler(en_base: Callable[..., Any], **valeurs: int) -> None:
             "seuil": actuels.seuil,
             "tentatives_par_jour": actuels.tentatives_par_jour,
         } | valeurs
-        db.add(ParametresQuiz(parcours="jeux", version=actuels.version + 1, **champs))
+        db.add(ParametresQuiz(parcours=parcours, version=actuels.version + 1, **champs))
 
     en_base(ajouter)
 

@@ -14,9 +14,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
+from app.bibliotheque.models import CategorieRessource, EtatRessource, Ressource
 from app.notifications.service import notifier
 from app.quiz import horloge, parametres
-from app.quiz.models import PARCOURS_JEUX, EtatQuiz, ParametresQuiz, QuestionQuiz, Quiz, ReponseQuiz
+from app.quiz.models import PARCOURS_JEUX, EtatQuiz, ParametresQuiz, QuestionQuiz, Quiz, ReponseQuiz, TentativeQuiz
 from app.quiz.schemas_banque import (
     Approbation,
     HistoriqueParametres,
@@ -66,13 +67,24 @@ async def _actives(db: AsyncSession, quiz_ids: list[UUID]) -> dict[UUID, int]:
     return dict(lignes.all())
 
 
-def _resume(quiz: Quiz, actives: int, acces: Acces) -> dict[str, object]:
+async def _titres_ressources(db: AsyncSession, quiz: list[Quiz]) -> dict[UUID, str]:
+    ids = {q.ressource_id for q in quiz if q.ressource_id}
+    if not ids:
+        return {}
+    return dict((await db.execute(select(Ressource.id, Ressource.titre).where(Ressource.id.in_(ids)))).all())
+
+
+def _resume(quiz: Quiz, actives: int, acces: Acces, titres: dict[UUID, str]) -> dict[str, object]:
     return {
         "id": quiz.id,
         "titre": quiz.titre,
         "description": quiz.description,
         "axe_code": quiz.axe_code,
         "etat": quiz.etat,
+        "parcours": quiz.parcours,
+        "place": quiz.place,
+        "ressource_id": quiz.ressource_id,
+        "ressource_titre": titres.get(quiz.ressource_id) if quiz.ressource_id else None,
         "contenu_de_test": quiz.contenu_de_test,
         "questions_actives": actives,
         "soumis_le": quiz.soumis_le,
@@ -86,16 +98,21 @@ def _resume(quiz: Quiz, actives: int, acces: Acces) -> dict[str, object]:
     }
 
 
-async def lister(db: AsyncSession, acces: Acces, etat: EtatQuiz | None = None) -> ListeBanque:
+async def lister(
+    db: AsyncSession, acces: Acces, etat: EtatQuiz | None = None, parcours: str | None = None
+) -> ListeBanque:
     requete = select(Quiz)
     if etat is not None:
         requete = requete.where(Quiz.etat == etat)
-    tous = (await db.scalars(requete.order_by(Quiz.modifie_le.desc()))).all()
+    if parcours is not None:
+        requete = requete.where(Quiz.parcours == parcours)
+    tous = list((await db.scalars(requete.order_by(Quiz.place.nulls_last(), Quiz.modifie_le.desc()))).all())
     actives = await _actives(db, [q.id for q in tous])
-    p = await parametres.en_cours(db)
+    titres = await _titres_ressources(db, tous)
+    p = await parametres.en_cours(db, parcours or PARCOURS_JEUX)
     return ListeBanque(
         questions_requises=p.nb_questions,
-        quiz=[QuizBanque.model_validate(_resume(q, actives.get(q.id, 0), acces)) for q in tous],
+        quiz=[QuizBanque.model_validate(_resume(q, actives.get(q.id, 0), acces, titres)) for q in tous],
     )
 
 
@@ -110,9 +127,9 @@ async def detail(db: AsyncSession, acces: Acces, quiz_id: UUID) -> QuizDetail:
             .order_by(QuestionQuiz.ordre, QuestionQuiz.active.desc(), QuestionQuiz.id)
         )
     ).all()
-    p = await parametres.en_cours(db)
+    p = await parametres.en_cours(db, quiz.parcours)
     return QuizDetail.model_validate(
-        _resume(quiz, sum(1 for q in questions if q.active), acces)
+        _resume(quiz, sum(1 for q in questions if q.active), acces, await _titres_ressources(db, [quiz]))
         | {
             "questions": [
                 QuestionBanque(
@@ -165,18 +182,41 @@ async def _axe_existe(db: AsyncSession, code: str) -> None:
         raise Invalide("Cet axe n'existe pas.")
 
 
+async def _fascicule_publie(db: AsyncSession, ressource_id: UUID | None) -> None:
+    if ressource_id is None:
+        return
+    ressource = await db.get(Ressource, ressource_id)
+    if (
+        ressource is None
+        or ressource.categorie is not CategorieRessource.fascicule
+        or ressource.etat is not EtatRessource.publie
+    ):
+        raise Invalide("Choisis un fascicule publié dans la bibliothèque.")
+
+
+def _parcours(entree: QuizEntree) -> dict[str, object]:
+    """Ce que l'audit retient du parcours d'un quiz."""
+    if entree.parcours == PARCOURS_JEUX:
+        return {}
+    return {"parcours": entree.parcours, "place": entree.place, "ressource_id": str(entree.ressource_id or "")}
+
+
 async def creer(db: AsyncSession, acces: Acces, entree: QuizEntree, ip: str) -> Quiz:
     await _axe_existe(db, entree.axe_code)
+    await _fascicule_publie(db, entree.ressource_id)
     quiz = Quiz(
         titre=entree.titre,
         description=entree.description,
         axe_code=entree.axe_code,
+        parcours=entree.parcours,
+        place=entree.place,
+        ressource_id=entree.ressource_id,
         etat=EtatQuiz.brouillon,
         contributeurs=[acces.utilisateur.id],
     )
     db.add(quiz)
     await db.flush()
-    _journal(db, "cree", acces, quiz, ip)
+    _journal(db, "cree", acces, quiz, ip, **_parcours(entree))
     return quiz
 
 
@@ -184,9 +224,17 @@ async def modifier(db: AsyncSession, acces: Acces, quiz_id: UUID, entree: QuizEn
     quiz = await _verrouiller(db, quiz_id)
     _brouillon(quiz)
     await _axe_existe(db, entree.axe_code)
+    if entree.ressource_id != quiz.ressource_id:
+        await _fascicule_publie(db, entree.ressource_id)
+    if entree.parcours != quiz.parcours:
+        # Les réussites, les points et la progression d'un quiz joué dépendent de son parcours.
+        joue = await db.scalar(select(exists().where(TentativeQuiz.quiz_id == quiz.id, TentativeQuiz.essai.is_(False))))
+        if joue:
+            raise Invalide("Ce quiz a déjà été joué : son parcours ne change plus.")
     quiz.titre, quiz.description, quiz.axe_code = entree.titre, entree.description, entree.axe_code
+    quiz.parcours, quiz.place, quiz.ressource_id = entree.parcours, entree.place, entree.ressource_id
     _contribue(quiz, acces)
-    _journal(db, "modifie", acces, quiz, ip)
+    _journal(db, "modifie", acces, quiz, ip, **_parcours(entree))
 
 
 async def ajouter_question(db: AsyncSession, acces: Acces, quiz_id: UUID, entree: QuestionEntree, ip: str) -> UUID:
@@ -253,7 +301,7 @@ async def retirer_question(db: AsyncSession, acces: Acces, quiz_id: UUID, questi
 
 
 async def _reserve_suffisante(db: AsyncSession, quiz: Quiz) -> None:
-    requises = (await parametres.en_cours(db)).nb_questions
+    requises = (await parametres.en_cours(db, quiz.parcours)).nb_questions
     actives = (await _actives(db, [quiz.id])).get(quiz.id, 0)
     if actives < requises:
         raise Invalide(f"Il faut au moins {requises} questions actives ; ce quiz en compte {actives}.")
@@ -294,12 +342,24 @@ async def approuver(db: AsyncSession, acces: Acces, quiz_id: UUID, entree: Appro
     if quiz.etat is not EtatQuiz.soumis:
         raise EtatInvalide("Ce quiz n'est plus en attente de publication.")
     await _reserve_suffisante(db, quiz)
+    occupee = f"La place {quiz.place} a déjà un quiz publié : dépublie-le d'abord."
+    if quiz.place is not None and await db.scalar(
+        select(exists().where(Quiz.place == quiz.place, Quiz.etat == EtatQuiz.publie, Quiz.id != quiz.id))
+    ):
+        raise EtatInvalide(occupee)
     maintenant = horloge.maintenant()
     quiz.etat = EtatQuiz.publie
     quiz.decide_par, quiz.decide_le = acces.utilisateur.id, maintenant
     quiz.validateur_nom, quiz.validateur_qualite = entree.validateur_nom, entree.validateur_qualite
     quiz.publie_le = maintenant
     quiz.motif = None
+    if quiz.place is not None:
+        # Deux approbations simultanées sur une même place : l'index unique de la base tranche.
+        try:
+            async with db.begin_nested():
+                await db.flush()
+        except IntegrityError:
+            raise EtatInvalide(occupee) from None
     _prevenir(db, quiz, f"Ton quiz « {quiz.titre} » est publié", None)
     _journal(
         db, "approuve", acces, quiz, ip,
@@ -343,33 +403,33 @@ def _sortie(p: ParametresQuiz) -> ParametresSortie:
     )
 
 
-async def historique(db: AsyncSession) -> HistoriqueParametres:
-    en_cours = await parametres.en_cours(db)
+async def historique(db: AsyncSession, parcours: str = PARCOURS_JEUX) -> HistoriqueParametres:
+    en_cours = await parametres.en_cours(db, parcours)
     versions = (
         await db.scalars(
-            select(ParametresQuiz)
-            .where(ParametresQuiz.parcours == PARCOURS_JEUX)
-            .order_by(ParametresQuiz.version.desc())
+            select(ParametresQuiz).where(ParametresQuiz.parcours == parcours).order_by(ParametresQuiz.version.desc())
         )
     ).all()
     return HistoriqueParametres(en_cours=_sortie(en_cours), versions=[_sortie(p) for p in versions])
 
 
-async def changer_parametres(db: AsyncSession, acces: Acces, entree: ParametresEntree, ip: str) -> ParametresSortie:
+async def changer_parametres(
+    db: AsyncSession, acces: Acces, entree: ParametresEntree, ip: str, parcours: str = PARCOURS_JEUX
+) -> ParametresSortie:
     """Ajoute une version. Refusé si un quiz publié n'a pas assez de questions actives pour le nouveau nombre."""
     # Verrouille les quiz soumis ou publiés : une publication simultanée attend ce changement, puis vérifie sa
     # réserve contre le nouveau nombre de questions ; une publication déjà faite est vue ici.
     candidats = (
         await db.scalars(
             select(Quiz)
-            .where(Quiz.etat.in_((EtatQuiz.soumis, EtatQuiz.publie)))
+            .where(Quiz.parcours == parcours, Quiz.etat.in_((EtatQuiz.soumis, EtatQuiz.publie)))
             .order_by(Quiz.id)
             # FOR NO KEY UPDATE : les parties continuent de se lancer pendant le changement.
             .with_for_update(key_share=True)
             .execution_options(populate_existing=True)
         )
     ).all()
-    actuels = await parametres.en_cours(db)
+    actuels = await parametres.en_cours(db, parcours)
     publies = [q for q in candidats if q.etat is EtatQuiz.publie]
     actives = await _actives(db, [q.id for q in publies])
     trop_courts = sorted(q.titre for q in publies if actives.get(q.id, 0) < entree.nb_questions)
@@ -378,7 +438,7 @@ async def changer_parametres(db: AsyncSession, acces: Acces, entree: ParametresE
             f"Ces quiz publiés ont moins de {entree.nb_questions} questions actives : " + ", ".join(trop_courts) + "."
         )
     nouvelle = ParametresQuiz(
-        parcours=PARCOURS_JEUX, version=actuels.version + 1, cree_par=acces.utilisateur.id, **entree.model_dump()
+        parcours=parcours, version=actuels.version + 1, cree_par=acces.utilisateur.id, **entree.model_dump()
     )
     db.add(nouvelle)
     try:
@@ -388,7 +448,7 @@ async def changer_parametres(db: AsyncSession, acces: Acces, entree: ParametresE
         raise EtatInvalide("Les paramètres viennent d'être changés par quelqu'un d'autre : recharge la page.") from None
     journaliser(
         db, "quiz_parametres_modifies", acces.utilisateur, cible_type="parametres_quiz", cible_id=nouvelle.id,
-        perimetre="national", details={"version": nouvelle.version, **entree.model_dump()}, adresse_ip=ip,
+        perimetre="national", details={"parcours": parcours, "version": nouvelle.version, **entree.model_dump()}, adresse_ip=ip,
     )  # fmt: skip
     await db.refresh(nouvelle)
     return _sortie(nouvelle)

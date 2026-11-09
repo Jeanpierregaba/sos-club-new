@@ -1,7 +1,7 @@
 """Schémas de la banque de quiz (spec 027), réservés à l'espace admin : eux seuls portent la bonne réponse."""
 
 from datetime import datetime
-from typing import Annotated, Self
+from typing import Annotated, Literal, Self
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
@@ -40,12 +40,27 @@ class QuestionBanque(BaseModel):
     active: bool
 
 
+Parcours = Literal["jeux", "certification"]
+
+
 class QuizEntree(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     titre: Annotated[Texte, StringConstraints(min_length=3, max_length=120)]
     description: Annotated[str, StringConstraints(strip_whitespace=True, max_length=300)] = ""
     axe_code: Annotated[str, StringConstraints(max_length=40)]
+    parcours: Parcours = "jeux"
+    # Certification seulement (spec 029) : la place de 1 à 12 et le fascicule à lire avant de jouer.
+    place: Annotated[int | None, Field(ge=1, le=12)] = None
+    ressource_id: UUID | None = None
+
+    @model_validator(mode="after")
+    def coherente(self) -> Self:
+        if self.parcours == "jeux":
+            self.place = self.ressource_id = None
+        elif self.place is None:
+            raise ValueError("Un quiz de certification occupe une place de 1 à 12.")
+        return self
 
 
 class QuizBanque(BaseModel):
@@ -54,6 +69,10 @@ class QuizBanque(BaseModel):
     description: str
     axe_code: str
     etat: EtatQuiz
+    parcours: Parcours
+    place: int | None
+    ressource_id: UUID | None
+    ressource_titre: str | None
     contenu_de_test: bool
     questions_actives: int
     soumis_le: datetime | None

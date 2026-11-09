@@ -2,7 +2,7 @@
 
 - [x] 1. Données : migration (`quiz.parcours`, `place`, `ressource_id`, place publiée unique ; `regles_badges`,
       `place_reussie`, `badge_obtenu`, `certificat` ; barème en service), modèles, `points.annuler` et son test.
-- [ ] 2. Banque : parcours, place et fascicule à la création et à la modification, filtre par parcours, place
+- [x] 2. Banque : parcours, place et fascicule à la création et à la modification, filtre par parcours, place
       unique à l'approbation (409, course comprise), paramètres par parcours. Tests d'abord.
 - [ ] 3. Tests de la progression (TDD) : ordre des places, pas de +50, badges et leurs points, encadreur sans
       points, certificat unique, fins simultanées, rattrapage, révoqué rejoué.

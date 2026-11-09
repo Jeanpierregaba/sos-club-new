@@ -22,6 +22,7 @@ from app.quiz.schemas_banque import (
     Motif,
     ParametresEntree,
     ParametresSortie,
+    Parcours,
     QuestionEntree,
     QuizDetail,
     QuizEntree,
@@ -57,17 +58,19 @@ ERREURS_BANQUE = (banque.Introuvable, banque.Refuse, banque.Invalide, banque.Eta
 
 
 @router_banque.get("/parametres")
-async def lire_parametres(db: Db, _: Lecteur) -> HistoriqueParametres:
-    resultat = await banque.historique(db)
+async def lire_parametres(db: Db, _: Lecteur, parcours: Parcours = "jeux") -> HistoriqueParametres:
+    resultat = await banque.historique(db, parcours)
     await db.commit()
     return resultat
 
 
 # Les règles de toutes les parties : réservé à qui publie (droit sensible, double authentification).
 @router_banque.put("/parametres")
-async def changer_parametres(entree: ParametresEntree, request: Request, db: Db, acces: Decideur) -> ParametresSortie:
+async def changer_parametres(
+    entree: ParametresEntree, request: Request, db: Db, acces: Decideur, parcours: Parcours = "jeux"
+) -> ParametresSortie:
     try:
-        resultat = await banque.changer_parametres(db, acces, entree, adresse_ip(request))
+        resultat = await banque.changer_parametres(db, acces, entree, adresse_ip(request), parcours)
     except ERREURS_BANQUE as e:
         raise _erreur(e) from None
     await db.commit()
@@ -101,8 +104,8 @@ async def repondre_essai(tentative_id: UUID, entree: ReponseJoueur, db: Db, acce
 
 
 @router_banque.get("")
-async def lister(db: Db, acces: Lecteur, etat: EtatQuiz | None = None) -> ListeBanque:
-    resultat = await banque.lister(db, acces, etat)
+async def lister(db: Db, acces: Lecteur, etat: EtatQuiz | None = None, parcours: Parcours | None = None) -> ListeBanque:
+    resultat = await banque.lister(db, acces, etat, parcours)
     await db.commit()
     return resultat
 
