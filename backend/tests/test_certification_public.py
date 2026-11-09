@@ -20,7 +20,7 @@ def certifier(en_base: Callable[..., Any], joueur: Utilisateur) -> Certificat:
     return certificats(en_base, joueur.id)[0]
 
 
-def test_un_certificat_deleve_montre_son_pseudonyme_et_son_club(
+def test_un_certificat_deleve_montre_son_pseudonyme_et_son_club_sil_le_souhaite(
     client: TestClient,
     creer_eleve: Callable[..., Utilisateur],
     creer_club: Callable[..., Any],
@@ -29,6 +29,9 @@ def test_un_certificat_deleve_montre_son_pseudonyme_et_son_club(
     eleve = creer_eleve("ama", affiche="Ama du Golfe")
     creer_club(eleve, nom="Club Santé du Lycée de Tokoin")
     certificat = certifier(en_base, eleve)
+    # RULES : le club est caché tant que l'élève ne choisit pas de le montrer.
+    assert client.get(f"{PUBLIC}/{certificat.numero}").json()["titulaire"]["club"] is None
+    en_base(lambda db: db.execute(update(Certificat).values(afficher_club=True)))
 
     reponse = client.get(f"{PUBLIC}/{certificat.numero}")
 

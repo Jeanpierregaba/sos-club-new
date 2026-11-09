@@ -19,6 +19,6 @@
 - [x] 10. Site : page publique `/certificats/$numero` (+ test), vérifiée dans le navigateur à 375 px.
 - [x] 11. Site admin : parcours, place et fascicule dans la banque ; page « Certification » (paramètres, badges,
       certificats avec révocation et réémission).
-- [ ] 12. Docs : ARCHITECTURE, SECURITY, PRD (Q24), TASKS.md, SESSION-LOG.
-- [ ] Vérifier tous les critères d'acceptation de spec.md
-- [ ] Relecture par le sous-agent reviewer
+- [x] 12. Docs : ARCHITECTURE, SECURITY, PRD (Q24), TASKS.md, SESSION-LOG.
+- [x] Vérifier tous les critères d'acceptation de spec.md
+- [x] Relecture par le sous-agent reviewer (3 constats importants et 3 mineurs corrigés)

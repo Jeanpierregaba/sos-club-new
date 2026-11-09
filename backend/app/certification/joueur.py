@@ -16,6 +16,7 @@ from app.certification.schemas import (
     MaCertification,
     PlaceParcours,
 )
+from app.clubs.models import Club
 from app.comptes.models import Utilisateur
 from app.quiz import horloge, parametres, partie
 from app.quiz.models import PARCOURS_CERTIFICATION, PLACES, EtatQuiz, EtatTentative, Quiz, TentativeQuiz
@@ -150,4 +151,21 @@ async def _certificat(db: AsyncSession, joueur_id: UUID) -> CertificatJoueur | N
     )
     if certificat is None:
         return None
-    return CertificatJoueur(numero=certificat.numero, etat=certificat.etat, delivre_le=certificat.delivre_le)
+    club = await db.get(Club, certificat.club_id) if certificat.club_id else None
+    return CertificatJoueur(
+        numero=certificat.numero,
+        etat=certificat.etat,
+        delivre_le=certificat.delivre_le,
+        club=club.nom if club else None,
+        afficher_club=certificat.afficher_club,
+    )
+
+
+async def choisir_club(db: AsyncSession, joueur: Utilisateur, afficher: bool) -> CertificatJoueur | None:
+    """Le titulaire choisit de montrer, ou non, son club à la vérification publique. None sans certificat valide."""
+    certificat = await certificat_valide(db, joueur.id)
+    if certificat is None:
+        return None
+    certificat.afficher_club = afficher
+    await db.flush()
+    return await _certificat(db, joueur.id)

@@ -717,6 +717,9 @@ export const changerParametresQuiz = (entree: ParametresEntree, parcours: Parcou
 
 export const chargerMaCertification = () => requeteApi<MaCertification>("/api/certification");
 export const URL_CERTIFICAT_PDF = "/api/certification/certificat.pdf";
+// RULES : le club de l'élève n'apparaît à la vérification publique que s'il le souhaite.
+export const choisirClubCertificat = (afficher: boolean) =>
+  envoyerJson<MaCertification["certificat"]>("/api/certification/club", { afficher }, "PUT");
 export const verifierCertificat = (numero: string) =>
   requeteApi<VerificationCertificat>(`/api/certificats/${encodeURIComponent(numero)}`);
 

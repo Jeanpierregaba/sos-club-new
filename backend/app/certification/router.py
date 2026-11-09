@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.certification import certificat_pdf, joueur, verification
-from app.certification.schemas import MaCertification, Verification
+from app.certification.schemas import CertificatJoueur, ChoixClub, MaCertification, Verification
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.models import Utilisateur
 from app.db import get_session
@@ -24,6 +24,16 @@ SANS_CACHE = {"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"}
 @router.get("")
 async def ma_certification(db: Db, utilisateur: Joueur) -> MaCertification:
     resultat = await joueur.ma_certification(db, utilisateur)
+    await db.commit()
+    return resultat
+
+
+# RULES : un élève choisit de montrer son club à la vérification publique (caché par défaut).
+@router.put("/club")
+async def choisir_club(entree: ChoixClub, db: Db, utilisateur: Joueur) -> CertificatJoueur:
+    resultat = await joueur.choisir_club(db, utilisateur, entree.afficher)
+    if resultat is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Tu n'as pas de certificat valide.")
     await db.commit()
     return resultat
 

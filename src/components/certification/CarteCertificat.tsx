@@ -1,7 +1,14 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import { Award, Download, ShieldCheck } from "lucide-react";
+import { useState } from "react";
 
-import { URL_CERTIFICAT_PDF, type MaCertification } from "@/lib/api/client";
+import {
+  choisirClubCertificat,
+  ErreurApi,
+  MESSAGE_INDISPONIBLE,
+  URL_CERTIFICAT_PDF,
+  type MaCertification,
+} from "@/lib/api/client";
 import { dateCourte } from "@/lib/dates";
 
 // Le certificat du joueur (spec 029) : à télécharger s'il est valide, avec le lien de sa page de vérification.
@@ -24,7 +31,7 @@ export function CarteCertificat({
     );
   }
   return (
-    <section className="flex flex-col gap-5 rounded-3xl bg-gradient-to-br from-sun/40 via-white to-primary/10 p-6 shadow-card ring-1 ring-sun sm:flex-row sm:items-center">
+    <section className="flex flex-col flex-wrap gap-5 rounded-3xl bg-gradient-to-br from-sun/40 via-white to-primary/10 p-6 shadow-card ring-1 ring-sun sm:flex-row sm:items-center">
       <span className="grid size-16 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground shadow-card">
         <Award aria-hidden className="size-8" />
       </span>
@@ -53,6 +60,52 @@ export function CarteCertificat({
           <ShieldCheck aria-hidden className="size-4" /> Page de vérification
         </Link>
       </div>
+      {certificat.club && <ChoixClub club={certificat.club} affiche={certificat.afficher_club} />}
     </section>
+  );
+}
+
+// Le titulaire élève choisit de montrer son club sur la page de vérification (caché par défaut).
+function ChoixClub({ club, affiche }: { club: string; affiche: boolean }) {
+  const router = useRouter();
+  const [enCours, setEnCours] = useState(false);
+  const [erreur, setErreur] = useState<string | null>(null);
+
+  async function changer(afficher: boolean) {
+    setErreur(null);
+    setEnCours(true);
+    try {
+      await choisirClubCertificat(afficher);
+      await router.invalidate();
+    } catch (e) {
+      setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
+    } finally {
+      setEnCours(false);
+    }
+  }
+
+  return (
+    <div className="basis-full border-t border-sun/60 pt-4 text-sm">
+      <label className="flex items-start gap-3 font-semibold text-ink">
+        <input
+          type="checkbox"
+          className="mt-0.5 size-5 accent-[var(--primary)]"
+          checked={affiche}
+          disabled={enCours}
+          onChange={(e) => void changer(e.target.checked)}
+        />
+        <span>
+          Montrer mon club ({club}) sur la page de vérification
+          <span className="block font-normal text-muted-foreground">
+            Sinon, seul ton pseudonyme y apparaît. Ton nom n'y figure jamais.
+          </span>
+        </span>
+      </label>
+      {erreur && (
+        <p role="alert" className="mt-2 text-logo-red">
+          {erreur}
+        </p>
+      )}
+    </div>
   );
 }

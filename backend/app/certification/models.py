@@ -107,6 +107,8 @@ class Certificat(Base):
     )
     delivre_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     club_id: Mapped[UUID | None] = mapped_column(ForeignKey("club.id", ondelete="SET NULL"))
+    # RULES : un élève n'apparaît publiquement avec son club que s'il le souhaite. Caché par défaut.
+    afficher_club: Mapped[bool] = mapped_column(server_default=text("false"), default=False)
     mouvement_id: Mapped[UUID | None] = mapped_column(ForeignKey("mouvement_points.id", ondelete="RESTRICT"))
     # Le certificat que celui-ci remplace (réémission).
     remplace_id: Mapped[UUID | None] = mapped_column(ForeignKey("certificat.id", ondelete="RESTRICT"), unique=True)

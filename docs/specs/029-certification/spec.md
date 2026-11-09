@@ -57,7 +57,8 @@ Règles des badges (Q24) : en attendant l'équipe pédagogique, les paliers affi
 **Vérifier (tout le monde)**
 
 12. `/certificats/<numero>` (ou le QR code) indique : certificat valide, révoqué ou introuvable ; pour un élève son
-    pseudonyme et son club, pour un encadreur son prénom, l'initiale de son nom et sa fonction ; la date. Jamais
+    pseudonyme, et son club s'il a choisi de le montrer depuis « Ma certification » (RULES ; caché par défaut,
+    tranché le 2026-11-09 après relecture), pour un encadreur son prénom, l'initiale de son nom et sa fonction ; la date. Jamais
     le nom complet d'un élève, ni son établissement s'il n'a pas de club.
 
 **Gérer les certificats (équipe)**

@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] 029 — Certification Génie Imhotep : parcours de 12 quiz, badges, certificat vérifiable (R11, Q24) → [`docs/specs/029-certification/`](docs/specs/029-certification/)
+Rien en cours.
 
 ## À faire
 
@@ -36,7 +36,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 - [x] R9 — Quiz chronométrés et banque de quiz (Q11, Q12, Q24) : [spec 027](docs/specs/027-quiz/spec.md)
 - [x] R10 — Ressources et fascicules (Q11) : [spec 028](docs/specs/028-bibliotheque/spec.md)
-- [ ] R11 — Certification Génie Imhotep : 12 quiz, 5 badges, certificat (Q24, Q25)
+- [x] R11 — Certification Génie Imhotep : 12 quiz, 5 badges, certificat (Q24, Q25) : [spec 029](docs/specs/029-certification/spec.md)
 
 **Phase 4 — Rapports (P0)**
 
@@ -73,6 +73,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] [029 — Certification Génie Imhotep](docs/specs/029-certification/spec.md) (R11 : quiz de certification sur 12 places jouées dans l'ordre, sans les +50 ; 5 badges aux paliers réglables et versionnés (+500 pour l'élève) ; certificat unique (+1 000 élève ou encadreur) au numéro non devinable, PDF au seul titulaire avec QR code, vérification publique sans nom complet, club au choix de l'élève ; révocation motivée qui retire les points, réémission ; club bénéficiaire enregistré pour R13)
 - [x] [028 — Bibliothèque : ressources et fascicules](docs/specs/028-bibliotheque/spec.md) (R10 : magazines, guides, fiches, affiches et fascicules en PDF, publiés à deux personnes avec validateur nommé ; PDF contrôlé et réécrit par pypdf, servi en flux ; « À la Une », filtres, compteur de téléchargements sans donnée personnelle ; bibliothèque publique)
 - [x] [027 — Quiz chronométrés et banque de quiz](docs/specs/027-quiz/spec.md) (R9 : partie arbitrée par le serveur, envoi question par question, 5 s + 2 s de tolérance, tirage de 15 questions dans une réserve, score seul à la fin ; +50 à la première réussite d'un élève ; banque publiée à deux personnes avec validateur médical ; paramètres versionnés ; mode test sans trace)
 - [x] [026 — Espace du président](docs/specs/026-espace-du-president/spec.md) (R8 : « Mon club » pour le président, lecture pour les membres et encadreurs ; propositions de fiche et actualités du club modérées, signées du club, sans point ; passation qui transmet les contenus)

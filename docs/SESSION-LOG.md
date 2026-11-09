@@ -14,6 +14,26 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-09 — Certification Génie Imhotep (spec 029)
+
+- Fait : spec 029 livrée (R11). Un quiz porte un parcours (jeux ou certification) ; la certification a 12 places
+  jouées dans l'ordre (403 sinon), une place publiée unique (index partiel), des paramètres et des règles de badges
+  versionnés. Domaine `certification` : places réussies matérialisées, badges et certificat délivrés par insertions
+  idempotentes (+500 par badge pour l'élève, +1 000 au certificat, `encadreur.certification` mis en service), club
+  bénéficiaire enregistré pour R13, notifications. Certificat : numéro `GI-XXXX-XXXX-XXXX` (60 bits), PDF reportlab
+  5.1 avec Noto Sans et QR code au seul titulaire, vérification publique `/certificats/<numéro>` sans nom complet,
+  club au choix de l'élève. Équipe : `/admin/certification` (règles, certificats, révocation qui retire les points
+  par `points.annuler`, réémission). Site : « Ma certification », partie d'une place, page publique, admin. Seed :
+  12 quiz « [Test] » et un fascicule. API 1272 tests avant la relecture (suite complète), 168 ciblés après ; site 140.
+  Relecture `reviewer` corrigée : place sautée en déplaçant un quiz pendant une partie, lettres éwé et kabiyè
+  absentes d'Helvetica, club montré sans consentement (RULES), liste non bornée, fascicule dépublié invisible.
+- Pièges rencontrés : `/admin/quiz/{quiz_id}` captait les chemins de gestion : préfixe `/admin/certification`.
+  Un verrou du compte dans la progression pouvait s'interbloquer avec un lancement : remplacé par des insertions
+  `ON CONFLICT DO NOTHING` dans un ordre fixe.
+- Décisions : paliers du site réglables (Q24 provisoire), parcours dans l'ordre, élèves et encadreurs, nom réel dans
+  le seul PDF, club public au choix de l'élève, police Noto Sans embarquée.
+- Prochaine étape : pousser develop (migrations `19d3fa3f1a3d` et `d6ac6782bcd5`), puis R12.
+
 ### 2026-11-09 — Bibliothèque (spec 028)
 
 - Fait : spec 027 commitée après la relecture (API 1024 tests). Spec 028 livrée (R10) : domaine

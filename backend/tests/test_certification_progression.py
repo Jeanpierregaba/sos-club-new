@@ -27,7 +27,19 @@ from tests.certification import (
     regles,
 )
 from tests.conftest import moteur_test
-from tests.quiz import QUIZ, Horloge, connecter, creer_quiz, figer_horloge, gains, jouer, regler
+from tests.quiz import (
+    QUIZ,
+    Horloge,
+    bon_choix,
+    connecter,
+    creer_quiz,
+    figer_horloge,
+    gains,
+    jouer,
+    lancer,
+    regler,
+    repondre,
+)
 
 
 @pytest.fixture
@@ -107,6 +119,21 @@ def test_une_place_reussie_reste_acquise_quand_son_quiz_est_remplace(
     creer_quiz(en_base, titre="Place 1, version revue", place=1)
 
     assert client.post(f"{QUIZ}/{quiz[2].id}/tentatives").status_code == 201
+
+
+def test_un_quiz_deplace_pendant_une_partie_ne_fait_pas_sauter_de_place(
+    client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
+) -> None:
+    quiz = creer_parcours(en_base, places=[1, 2])
+    acquerir(en_base, eleve, quiz, [1])
+    etat = lancer(client, quiz[2])
+    # L'équipe déplace le quiz à la place 5 pendant la partie (la base le permet, la banque le refuse ensuite).
+    en_base(lambda db: db.execute(update(Quiz).where(Quiz.id == quiz[2].id).values(place=5)))
+    while etat["question"] is not None:
+        etat = repondre(client, etat, bon_choix(etat["question"]))
+
+    assert etat["resultat"]["reussie"] is True
+    assert places(en_base, eleve.id) == [1]
 
 
 def test_un_echec_ne_reussit_pas_la_place(

@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.dependances import Acces
@@ -146,6 +146,11 @@ def test_le_parcours_dun_quiz_deja_joue_ne_change_plus(
 
     assert reponse.status_code == 422
     assert "parcours" in reponse.json()["detail"]
+    # Ni sa place.
+    en_base(lambda db: db.execute(update(Quiz).where(Quiz.id == corps["id"]).values(parcours="certification", place=1)))
+    deplace = client.put(f"{BANQUE}/{corps['id']}", json=entree | {"place": 2})
+    assert deplace.status_code == 422
+    assert "place" in deplace.json()["detail"]
 
 
 def test_la_liste_se_filtre_par_parcours(

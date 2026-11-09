@@ -2863,6 +2863,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/certification/club": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Choisir Club */
+        put: operations["choisir_club_api_certification_club_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/certification/certificat.pdf": {
         parameters: {
             query?: never;
@@ -3526,6 +3543,10 @@ export interface components {
              * Format: date-time
              */
             delivre_le: string;
+            /** Club */
+            club: string | null;
+            /** Afficher Club */
+            afficher_club: boolean;
         };
         /**
          * ChampsArticle
@@ -3552,6 +3573,11 @@ export interface components {
             documents: number;
             /** Telechargements */
             telechargements: number;
+        };
+        /** ChoixClub */
+        ChoixClub: {
+            /** Afficher */
+            afficher: boolean;
         };
         /**
          * Classe
@@ -12274,6 +12300,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MaCertification"];
+                };
+            };
+        };
+    };
+    choisir_club_api_certification_club_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChoixClub"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificatJoueur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

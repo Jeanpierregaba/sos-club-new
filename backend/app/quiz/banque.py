@@ -226,11 +226,11 @@ async def modifier(db: AsyncSession, acces: Acces, quiz_id: UUID, entree: QuizEn
     await _axe_existe(db, entree.axe_code)
     if entree.ressource_id != quiz.ressource_id:
         await _fascicule_publie(db, entree.ressource_id)
-    if entree.parcours != quiz.parcours:
-        # Les réussites, les points et la progression d'un quiz joué dépendent de son parcours.
+    if entree.parcours != quiz.parcours or entree.place != quiz.place:
+        # Les réussites, les points et la progression d'un quiz joué dépendent de son parcours et de sa place.
         joue = await db.scalar(select(exists().where(TentativeQuiz.quiz_id == quiz.id, TentativeQuiz.essai.is_(False))))
         if joue:
-            raise Invalide("Ce quiz a déjà été joué : son parcours ne change plus.")
+            raise Invalide("Ce quiz a déjà été joué : son parcours et sa place ne changent plus.")
     quiz.titre, quiz.description, quiz.axe_code = entree.titre, entree.description, entree.axe_code
     quiz.parcours, quiz.place, quiz.ressource_id = entree.parcours, entree.place, entree.ressource_id
     _contribue(quiz, acces)

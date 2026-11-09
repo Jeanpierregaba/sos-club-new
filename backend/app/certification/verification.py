@@ -32,7 +32,8 @@ async def verifier(db: AsyncSession, numero: str) -> Verification | None:
     titulaire: TitulaireEleve | TitulaireEncadreur
     if certificat.role == "eleve":
         eleve = await db.get(Eleve, certificat.utilisateur_id)
-        club = await db.get(Club, certificat.club_id) if certificat.club_id else None
+        # Le club seulement si l'élève a choisi de le montrer (RULES).
+        club = await db.get(Club, certificat.club_id) if certificat.club_id and certificat.afficher_club else None
         titulaire = TitulaireEleve(pseudonyme=eleve.pseudonyme if eleve else "Élève", club=club.nom if club else None)
     else:
         encadreur = await db.get(Encadreur, certificat.utilisateur_id)

@@ -182,6 +182,47 @@ def test_le_titulaire_telecharge_son_certificat(
     assert f"/certificats/{certificat.numero}" in texte
 
 
+def test_le_pdf_ecrit_les_lettres_ewe_et_kabiye(
+    client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any]
+) -> None:
+    en_base(
+        lambda db: db.execute(
+            update(Utilisateur).where(Utilisateur.id == eleve.id).values(prenom="Kɔfi", nom="Agbɛnyo Ŋutsu-Ɖoʋi")
+        )
+    )
+    certifier(en_base, eleve)
+
+    texte = PdfReader(io.BytesIO(client.get(PDF).content)).pages[0].extract_text()
+
+    assert "Kɔfi Agbɛnyo Ŋutsu-Ɖoʋi" in texte
+
+
+def test_le_titulaire_choisit_de_montrer_son_club(
+    client: TestClient, eleve: Utilisateur, creer_club: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    creer_club(eleve, nom="Club Santé de Tokoin")
+    certificat = certifier(en_base, eleve)
+    assert client.get(CERTIFICATION).json()["certificat"] | {"delivre_le": None} == {
+        "numero": certificat.numero,
+        "etat": "valide",
+        "delivre_le": None,
+        "club": "Club Santé de Tokoin",
+        "afficher_club": False,
+    }
+
+    reponse = client.put(f"{CERTIFICATION}/club", json={"afficher": True})
+
+    assert reponse.status_code == 200
+    assert reponse.json()["afficher_club"] is True
+    assert client.get(f"/api/certificats/{certificat.numero}").json()["titulaire"]["club"] == "Club Santé de Tokoin"
+    client.put(f"{CERTIFICATION}/club", json={"afficher": False})
+    assert client.get(f"/api/certificats/{certificat.numero}").json()["titulaire"]["club"] is None
+
+
+def test_choisir_son_club_sans_certificat_repond_404(client: TestClient, eleve: Utilisateur) -> None:
+    assert client.put(f"{CERTIFICATION}/club", json={"afficher": True}).status_code == 404
+
+
 def test_sans_certificat_le_pdf_repond_404(client: TestClient, eleve: Utilisateur) -> None:
     assert client.get(PDF).status_code == 404
 

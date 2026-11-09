@@ -48,6 +48,11 @@ export function ChampsParcours({
               onChange={(e) => etat.setRessource(e.target.value)}
             >
               <option value="">Aucun</option>
+              {etat.ressource && !fascicules.some((f) => f.id === etat.ressource) && (
+                <option value={etat.ressource}>
+                  {etat.ressourceTitre ?? "Fascicule relié"} (plus en ligne)
+                </option>
+              )}
               {fascicules.map((f) => (
                 <option key={f.id} value={f.id}>
                   {f.titre}

@@ -8806,6 +8806,47 @@
         }
       }
     },
+    "/api/certification/club": {
+      "put": {
+        "tags": [
+          "certification"
+        ],
+        "summary": "Choisir Club",
+        "operationId": "choisir_club_api_certification_club_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChoixClub"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificatJoueur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/certification/certificat.pdf": {
       "get": {
         "tags": [
@@ -10556,13 +10597,30 @@
             "type": "string",
             "format": "date-time",
             "title": "Delivre Le"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "afficher_club": {
+            "type": "boolean",
+            "title": "Afficher Club"
           }
         },
         "type": "object",
         "required": [
           "numero",
           "etat",
-          "delivre_le"
+          "delivre_le",
+          "club",
+          "afficher_club"
         ],
         "title": "CertificatJoueur"
       },
@@ -10624,6 +10682,20 @@
           "telechargements"
         ],
         "title": "Chiffres"
+      },
+      "ChoixClub": {
+        "properties": {
+          "afficher": {
+            "type": "boolean",
+            "title": "Afficher"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "afficher"
+        ],
+        "title": "ChoixClub"
       },
       "Classe": {
         "type": "string",

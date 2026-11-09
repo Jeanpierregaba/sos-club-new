@@ -6,17 +6,30 @@ code mène à la page publique de vérification, qui ne montre pas le nom comple
 
 import io
 from datetime import datetime
+from pathlib import Path
 
 from reportlab.graphics import renderPDF
 from reportlab.graphics.barcode.qr import QrCodeWidget
 from reportlab.graphics.shapes import Drawing
 from reportlab.lib.colors import HexColor
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.pdfbase.pdfmetrics import stringWidth
+from reportlab.pdfbase.pdfmetrics import registerFont, stringWidth
+from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
 from app.certification.models import Certificat
 from app.config import settings
+
+# Noto Sans (licence OFL, dans `polices/`) : elle couvre les lettres éwé et kabiyè (ɔ, ɛ, ŋ, ɖ, ʋ…) des noms,
+# qu'Helvetica ne sait pas écrire. Embarquée dans le PDF, sous-ensemble des seuls caractères utilisés.
+POLICES = Path(__file__).parent / "polices"
+NORMALE, GRASSE, ITALIQUE = "NotoSans", "NotoSans-Bold", "NotoSans-Italic"
+for _nom, _fichier in (
+    (NORMALE, "NotoSans-Regular.ttf"),
+    (GRASSE, "NotoSans-Bold.ttf"),
+    (ITALIQUE, "NotoSans-Italic.ttf"),
+):
+    registerFont(TTFont(_nom, POLICES / _fichier))
 
 BLEU = HexColor("#1e3a6e")
 VERT = HexColor("#1f8a4c")
@@ -59,25 +72,25 @@ def generer(certificat: Certificat) -> bytes:
     c.rect(34, 34, largeur - 68, hauteur - 68)
 
     nom = f"{certificat.titulaire_prenom} {certificat.titulaire_nom}"
-    _centrer(c, "CLUBS SANTÉ SCOLAIRES DU TOGO", hauteur - 95, "Helvetica-Bold", 13, ROUGE)
-    _centrer(c, "Certificat Génie Imhotep", hauteur - 150, "Helvetica-Bold", 40, BLEU)
-    _centrer(c, "décerné à", hauteur - 205, "Helvetica-Oblique", 16, GRIS)
+    _centrer(c, "CLUBS SANTÉ SCOLAIRES DU TOGO", hauteur - 95, GRASSE, 13, ROUGE)
+    _centrer(c, "Certificat Génie Imhotep", hauteur - 150, GRASSE, 40, BLEU)
+    _centrer(c, "décerné à", hauteur - 205, ITALIQUE, 16, GRIS)
     # Un nom long est réduit pour tenir dans le cadre.
     taille = 32.0
-    while taille > 12 and stringWidth(nom, "Helvetica-Bold", taille) > largeur - 140:
+    while taille > 12 and stringWidth(nom, GRASSE, taille) > largeur - 140:
         taille -= 1
-    _centrer(c, nom, hauteur - 255, "Helvetica-Bold", taille, VERT)
+    _centrer(c, nom, hauteur - 255, GRASSE, taille, VERT)
     _centrer(
         c, "pour avoir réussi les 12 quiz du parcours officiel de certification Génie Imhotep,",
-        hauteur - 305, "Helvetica", 15, GRIS,
+        hauteur - 305, NORMALE, 15, GRIS,
     )  # fmt: skip
     _centrer(
-        c, "dont chaque quiz est validé par un professionnel de santé.", hauteur - 326, "Helvetica", 15, GRIS
+        c, "dont chaque quiz est validé par un professionnel de santé.", hauteur - 326, NORMALE, 15, GRIS
     )  # fmt: skip
-    _centrer(c, f"Délivré le {date_longue(certificat.delivre_le)}", hauteur - 380, "Helvetica-Bold", 14, BLEU)
+    _centrer(c, f"Délivré le {date_longue(certificat.delivre_le)}", hauteur - 380, GRASSE, 14, BLEU)
 
     # Numéro et vérification, en bas.
-    c.setFont("Helvetica", 11)
+    c.setFont(NORMALE, 11)
     c.setFillColor(GRIS)
     c.drawString(70, 90, f"Numéro : {certificat.numero}")
     c.drawString(70, 72, "Vérifie ce certificat en scannant le QR code ou sur :")

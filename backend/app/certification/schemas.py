@@ -46,6 +46,15 @@ class CertificatJoueur(BaseModel):
     numero: str
     etat: EtatCertificat
     delivre_le: datetime
+    # Le club enregistré à la délivrance (élève affilié), et le choix de le montrer à la vérification publique.
+    club: str | None
+    afficher_club: bool
+
+
+class ChoixClub(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    afficher: bool
 
 
 class MaCertification(BaseModel):

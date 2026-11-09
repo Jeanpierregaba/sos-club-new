@@ -68,6 +68,10 @@ async def enregistrer_reussite(db: AsyncSession, joueur: Utilisateur, quiz: Quiz
     """Une partie réussie sur un quiz publié du parcours : la place est acquise (une fois), puis ce qui est dû est
     délivré."""
     assert quiz.place is not None
+    # L'ordre est vérifié au lancement, et de nouveau ici : un quiz déplacé pendant une partie ne fait pas sauter
+    # de place.
+    if not await place_ouverte(db, joueur.id, quiz.place):
+        return
     await db.execute(
         insert(PlaceReussie)
         .values(

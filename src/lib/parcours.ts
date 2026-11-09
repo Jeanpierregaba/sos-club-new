@@ -15,6 +15,7 @@ export function useParcours(depart?: {
   parcours: Parcours;
   place: number | null;
   ressource_id: string | null;
+  ressource_titre?: string | null;
 }) {
   const [parcours, setParcours] = useState<Parcours>(depart?.parcours ?? "jeux");
   const [place, setPlace] = useState(depart?.place ?? 1);
@@ -23,5 +24,15 @@ export function useParcours(depart?: {
     parcours === "certification"
       ? { parcours, place, ressource_id: ressource || null }
       : { parcours, place: null, ressource_id: null };
-  return { parcours, setParcours, place, setPlace, ressource, setRessource, entree };
+  const ressourceTitre = depart?.ressource_titre ?? null;
+  return {
+    parcours,
+    setParcours,
+    place,
+    setPlace,
+    ressource,
+    setRessource,
+    ressourceTitre,
+    entree,
+  };
 }

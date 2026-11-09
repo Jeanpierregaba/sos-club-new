@@ -32,12 +32,14 @@ données figées à la délivrance : il n'est jamais stocké.
   numéro de certificat, club bénéficiaire, crédits et notifications.
 - `backend/app/certification/certificat_pdf.py` : `generer(certificat) -> bytes` (reportlab, A4 paysage, QR code).
 - `backend/app/certification/verification.py` : lecture publique d'un numéro, sans nom complet.
+- `backend/app/certification/joueur.py` : « Ma certification » (mise en œuvre : séparé de `progression.py`, que
+  `partie.py` importe).
 - `backend/app/certification/gestion.py` : liste des certificats et des badges, révocation, réémission.
 - `backend/app/certification/schemas.py`, `router.py` (joueur et public), `router_gestion.py` (équipe).
 - Migration `xxxx_certification.py`.
 - Tests : `tests/certification.py` (fabriques), `test_certification_parcours.py`,
   `test_certification_progression.py`, `test_certification_public.py`, `test_certification_gestion.py`,
-  `test_certificat_pdf.py`.
+  le PDF étant testé dans `test_certification_parcours.py`.
 
 **API — modifiés**
 
@@ -55,11 +57,12 @@ données figées à la délivrance : il n'est jamais stocké.
 
 **Site — créés**
 
-- `src/routes/_connecte/certification.parcours.tsx` : « Ma certification ».
+- `src/routes/_connecte/certification.parcours.index.tsx` : « Ma certification » ; `certification.parcours.$place.tsx` :
+  la partie d'une place (le jeu des quiz ne liste que les jeux).
 - `src/routes/certificats.$numero.tsx` : vérification publique.
-- `src/routes/_connecte/admin/certification.tsx` (+ `.index.tsx`, `.badges.tsx`, `.certificats.tsx`) : paramètres
+- `src/routes/_connecte/admin/certification.tsx` (+ `.index.tsx`, `.badges.tsx`, `.parametres.tsx`) : paramètres
   du parcours, règles des badges, certificats.
-- `src/components/certification/` : `PlaceParcours`, `BadgesParcours`, `CarteCertificat` ; `src/lib/certification.ts`
+- `src/components/certification/` : `CartePlace`, `BadgesParcours`, `CarteCertificat` ; `src/lib/certification.ts`
   (+ test) : état d'une place, libellés, paliers.
 
 **Site — modifiés**
@@ -133,15 +136,15 @@ bientot`, quiz id et titre, meilleur score, fascicule publié éventuel avec ses
 {type: "encadreur", prenom, initiale, fonction}, remplace_par?}` ; 404 si inconnu ou mal formé. Rien d'autre
   (ni identifiant, ni établissement, ni nom complet). `Cache-Control: no-store`.
 
-**Équipe** (préfixe `/admin/quiz`, droits `quiz`)
+**Équipe** (droits `quiz`). Mise en œuvre : préfixe `/admin/certification` plutôt que `/admin/quiz`, où
+`/{quiz_id}` aurait capté ces chemins ; les paramètres restent sous `/admin/quiz`.
 
-- `GET /parametres?parcours=certification` et `PUT /parametres?parcours=certification` : comme les jeux
-  (approuver, 2FA).
-- `GET /badges` (consulter) → historique des règles ; `PUT /badges` (approuver, 2FA) → nouvelle version ;
+- `GET /admin/quiz/parametres?parcours=certification` et `PUT` : comme les jeux (approuver, 2FA).
+- `GET /regles` (consulter) → historique des règles ; `PUT /regles` (approuver, 2FA) → nouvelle version ;
   validation : 5 noms non vides de 40 caractères au plus, paliers entiers strictement croissants entre 1 et 12,
   dernier = 12 (422 sinon).
 - `GET /certificats?etat=` (consulter) → numéro, titulaire (prénom et nom : vue interne), rôle, club, date, état.
-- `GET /badges-obtenus` (consulter) → derniers badges délivrés (titulaire, badge, date), paginés.
+- `GET /badges` (consulter) → les 200 derniers badges délivrés (titulaire, badge, date).
 - `POST /certificats/{id}/revoquer` (dépublier, 2FA) `{motif}` : valide → révoqué ; annule la ligne de points
   (`points.annuler`) ; audit ; notification. 409 si pas valide.
 - `POST /certificats/{id}/reemettre` (dépublier, 2FA) : valide ou révoqué → l'ancien passe « remplacé », un
@@ -155,8 +158,10 @@ bientot`, quiz id et titre, meilleur score, fascicule publié éventuel avec ses
 
 - `progression.enregistrer_reussite(db, joueur, quiz, tentative)` : insère `place_reussie` (ON CONFLICT DO
   NOTHING), puis `mettre_a_jour`.
-- `progression.mettre_a_jour(db, joueur)` : verrou du compte (`FOR NO KEY UPDATE`, même ordre que `partie`),
-  compte les places réussies, délivre les badges manquants dont le palier est atteint (règles en cours), puis le
+- `progression.mettre_a_jour(db, joueur)` : sans verrou (mise en œuvre : un verrou du compte pris après celui
+  de la tentative pouvait s'interbloquer avec un lancement) ; chaque délivrance est une insertion `ON CONFLICT DO
+NOTHING` suivie du crédit seulement si la ligne est neuve, dans un ordre fixe (badges par rang, puis
+  certificat). Elle compte les places réussies, délivre les badges manquants dont le palier est atteint (règles en cours), puis le
   certificat si les 12 places sont réussies et qu'aucun certificat d'origine n'existe. Crédits : `eleve.badge`
   clé `badge:<rang>:<compte>`, `eleve.certification` clé `certification:<compte>`, `encadreur.certification`
   même clé ; seulement pour un élève actif ou un encadreur vérifié. Notification par badge et pour le
@@ -171,7 +176,9 @@ bientot`, quiz id et titre, meilleur score, fascicule publié éventuel avec ses
   (4.5 → 5.1 en 2026), Python `>=3.9,<4`. Doc consultée par Context7 (`canvas.Canvas(flux, pagesize=...)`).
   Alternative écartée : dessiner une image avec Pillow et l'enregistrer en PDF (pas de nouvelle dépendance, mais
   texte non sélectionnable et fichier plus lourd). `segno`, déjà présent, reste une solution de repli pour le QR.
-- Polices : Helvetica de base (encodage WinAnsi, accents français et « œ » compris) : aucun fichier de police.
+- Polices : ~~Helvetica de base~~. Mise en œuvre : Helvetica n'écrit pas les lettres éwé et kabiyè (ɔ, ɛ, ŋ, ɖ, ʋ)
+  des noms togolais ; Noto Sans (licence OFL, `app/certification/polices/`, avec `OFL.txt`) est embarquée,
+  téléchargée depuis github.com/notofonts avec l'accord de l'utilisateur (2026-11-09).
 
 ## Sécurité
 
@@ -214,6 +221,17 @@ En TDD (parties critiques de `docs/TESTING.md` : points, quiz arbitrés, droits)
   vérification (Vitest) ; vérification dans le navigateur de `/certificats/<numero>` à 375 px.
 
 ## Risques
+
+**Relecture (2026-11-09)** : corrigés — une place n'est acquise que si elle est ouverte à la fin de la partie (un
+quiz déplacé pendant une partie ne fait plus sauter de place) et la place d'un quiz joué ne change plus ; police
+Noto Sans ; club de l'élève montré à la vérification publique seulement s'il le choisit (`afficher_club`, migration
+`d6ac6782bcd5`, `PUT /certification/club`) ; liste des certificats limitée à 500 ; fascicule dépublié encore
+visible dans le formulaire de la banque. Restent :
+
+- **Page publique `/certification`** : ses paliers (Bronze 3 … Diamant 12) sont écrits dans la page ; une nouvelle
+  version des règles des badges ne s'y reflète pas. À relier à l'API si l'équipe change les règles.
+- **Deux fins simultanées sur deux places différentes** peuvent ne pas voir le palier atteint ; le badge est
+  rattrapé à la prochaine ouverture de « Ma certification ».
 
 - **Réémission d'un certificat révoqué** : le certificat est rétabli **sans** rendre les points retirés (la spec
   interdit tout point de plus à la réémission). Une révocation faite par erreur coûte donc les +1 000 ; accepté

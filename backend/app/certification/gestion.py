@@ -30,6 +30,7 @@ from app.points.models import MouvementPoints
 from app.quiz import horloge
 
 LIMITE_BADGES = 200
+LIMITE_CERTIFICATS = 500
 
 
 class Introuvable(Exception):
@@ -90,6 +91,7 @@ async def lister_certificats(
         requete = requete.where(Certificat.etat == etat)
     if certificat_id is not None:
         requete = requete.where(Certificat.id == certificat_id)
+    requete = requete.limit(LIMITE_CERTIFICATS)
     return ListeCertificats(
         certificats=[
             CertificatGestion(
@@ -194,6 +196,7 @@ async def reemettre(db: AsyncSession, acces: Acces, certificat_id: UUID, ip: str
         etat=EtatCertificat.valide,
         delivre_le=maintenant,
         club_id=ancien.club_id,
+        afficher_club=ancien.afficher_club,
         mouvement_id=ancien.mouvement_id,
         remplace_id=ancien.id,
     )
