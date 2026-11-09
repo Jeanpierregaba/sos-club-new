@@ -62,32 +62,32 @@ ses quiz.
 
 ## Critères d'acceptation
 
-- [ ] Étant donné un élève, un encadreur, un président ou un visiteur, quand il appelle une route de gestion de
+- [x] Étant donné un élève, un encadreur, un président ou un visiteur, quand il appelle une route de gestion de
       la bibliothèque, alors l'API répond 401 ou 403, et rien ne change.
-- [ ] Étant donné un collaborateur sans le droit `bibliotheque` voulu, quand il appelle la route
+- [x] Étant donné un collaborateur sans le droit `bibliotheque` voulu, quand il appelle la route
       correspondante, alors l'API répond 403 ; l'approbation et la dépublication exigent la double
       authentification.
-- [ ] Étant donné un fichier qui n'est pas un PDF (même renommé en `.pdf`), ou un PDF de plus de 20 Mo, alors
+- [x] Étant donné un fichier qui n'est pas un PDF (même renommé en `.pdf`), ou un PDF de plus de 20 Mo, alors
       l'API le refuse (422 ou 413).
-- [ ] Étant donné un PDF qui contient du JavaScript, une action de lancement ou un fichier joint, alors l'API le
+- [x] Étant donné un PDF qui contient du JavaScript, une action de lancement ou un fichier joint, alors l'API le
       refuse (422).
-- [ ] Étant donné une ressource sans fichier, ou un magazine sans couverture, quand on la soumet, alors l'API
+- [x] Étant donné une ressource sans fichier, ou un magazine sans couverture, quand on la soumet, alors l'API
       refuse (422).
-- [ ] Étant donné une ressource soumise ou publiée, quand on tente d'en changer le fichier ou les informations,
+- [x] Étant donné une ressource soumise ou publiée, quand on tente d'en changer le fichier ou les informations,
       alors l'API refuse (409).
-- [ ] Étant donné un collaborateur qui a créé, modifié ou soumis une ressource, quand il l'approuve, alors l'API
+- [x] Étant donné un collaborateur qui a créé, modifié ou soumis une ressource, quand il l'approuve, alors l'API
       refuse (403), même s'il a le droit d'approuver.
-- [ ] Étant donné une approbation sans nom ou sans qualité du validateur, alors l'API refuse (422).
-- [ ] Étant donné une ressource publiée, alors un visiteur la voit dans la liste et en télécharge le fichier ;
+- [x] Étant donné une approbation sans nom ou sans qualité du validateur, alors l'API refuse (422).
+- [x] Étant donné une ressource publiée, alors un visiteur la voit dans la liste et en télécharge le fichier ;
       un brouillon, une ressource soumise ou dépubliée n'apparaît pas, et son fichier répond 404 au public.
-- [ ] Étant donné un collaborateur qui a le droit de consulter la bibliothèque, alors il ouvre le fichier d'une
+- [x] Étant donné un collaborateur qui a le droit de consulter la bibliothèque, alors il ouvre le fichier d'une
       ressource soumise pour la relire.
-- [ ] Étant donné 4 magazines publiés, alors « À la Une » montre les 3 plus récents.
-- [ ] Étant donné un téléchargement, alors le compteur de la ressource augmente de 1 ; aucune donnée sur la
+- [x] Étant donné 4 magazines publiés, alors « À la Une » montre les 3 plus récents.
+- [x] Étant donné un téléchargement, alors le compteur de la ressource augmente de 1 ; aucune donnée sur la
       personne n'est enregistrée.
-- [ ] Étant donné une ressource jamais publiée, quand on la supprime, alors ses fichiers sont effacés du
+- [x] Étant donné une ressource jamais publiée, quand on la supprime, alors ses fichiers sont effacés du
       stockage ; une ressource déjà publiée ne se supprime pas (409).
-- [ ] Étant donné le fichier PDF servi, alors la réponse porte le bon type, un nom de fichier tiré du titre, et
+- [x] Étant donné le fichier PDF servi, alors la réponse porte le bon type, un nom de fichier tiré du titre, et
       des en-têtes qui empêchent son exécution comme page du site.
 
 ## Cas limites et erreurs

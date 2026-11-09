@@ -119,7 +119,7 @@ async def deposer_fichier(
     except pdf.PdfRefuse as refus:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, refus.message) from None
     try:
-        await gestion.deposer_fichier(db, acces, ressource_id, octets, infos, adresse_ip(request))
+        await gestion.deposer_fichier(db, acces, ressource_id, infos, adresse_ip(request))
     except ERREURS as e:
         raise _erreur(e) from None
     return await gestion.detail(db, acces, ressource_id)

@@ -15,6 +15,10 @@ mise en commun : deux usages ne justifient pas encore une abstraction (à recons
   objet atteignable depuis le catalogue porte `/JavaScript`, `/JS`, `/Launch`, `/EmbeddedFile(s)`,
   `/RichMedia`, `/XFA`, `/SubmitForm` ou `/ImportData`. Parcours depuis le trailer avec un ensemble de visités
   (pas de boucle), plafonné en nombre d'objets.
+- **Réécriture** (après la relecture `reviewer`) : le PDF vérifié est réécrit par pypdf (`clone_from`, objets
+  non référencés retirés) puis vérifié de nouveau ; c'est cette version qui est stockée. Refus ajoutés : fichier
+  joint par annotation (`/EF`, `/FileAttachment`), `/GoToR`, `/GoToE`, `/Rendition`, `/Movie`, `/Sound`, et
+  tout `/URI` hors `http:`, `https:` et `mailto:`.
 - **Service des PDF** : en flux, par morceaux de 256 Ko (`StreamingResponse`, `Content-Length`), pour ne pas
   charger 20 Mo en mémoire par lecture sur un petit VPS. `Stockage` gagne `lire_par_morceaux(cle)`. Pas de
   `Accept-Ranges`. En-têtes : `application/pdf`, `X-Content-Type-Options: nosniff`, `Content-Disposition`
@@ -66,24 +70,24 @@ Docs : ADR-0010 (les PDF et la lecture en flux), `ARCHITECTURE.md`, `SECURITY.md
 
 `ressource` :
 
-| Colonne                                    | Type                                   | Note                                          |
-| ------------------------------------------ | -------------------------------------- | --------------------------------------------- |
-| `id`                                       | uuid                                   | uuid7                                         |
-| `titre`, `description`                     | text (150, 500)                        |                                               |
-| `categorie`                                | enum                                   | magazine, guide, fiche, affiche, fascicule    |
-| `axe_code`                                 | FK `axe`, nullable                     |                                               |
-| `parution`                                 | text (60), nullable                    | numéro ou date, magazine seulement            |
-| `etat`                                     | enum                                   | brouillon, soumis, publie, depublie           |
-| `contributeurs`                            | uuid[]                                 | créé, modifié, déposé, soumis                 |
-| `fichier_cle`, `fichier_octets`, `pages`   | text, int, int (nullable)              |                                               |
-| `couverture_grande`, `couverture_vignette` | text, nullable                         |                                               |
-| `telechargements`                          | int, défaut 0                          |                                               |
-| `soumis_par/le`, `publie_par/le`           | uuid, timestamptz                      | `publie_le` garde la première publication     |
-| `validateur_nom`, `validateur_qualite`     | text                                   | contrainte : obligatoires si `publie`         |
-| `depublie_le`, `motif`                     | timestamptz, text                      |                                               |
-| `deja_publiee`                             | bool                                   | interdit la suppression                       |
-| `contenu_de_test`                          | bool                                   | « Contenu de test » (seed seulement)          |
-| `cree_le`, `modifie_le`                    | timestamptz                            |                                               |
+| Colonne                                    | Type                      | Note                                       |
+| ------------------------------------------ | ------------------------- | ------------------------------------------ |
+| `id`                                       | uuid                      | uuid7                                      |
+| `titre`, `description`                     | text (150, 500)           |                                            |
+| `categorie`                                | enum                      | magazine, guide, fiche, affiche, fascicule |
+| `axe_code`                                 | FK `axe`, nullable        |                                            |
+| `parution`                                 | text (60), nullable       | numéro ou date, magazine seulement         |
+| `etat`                                     | enum                      | brouillon, soumis, publie, depublie        |
+| `contributeurs`                            | uuid[]                    | créé, modifié, déposé, soumis              |
+| `fichier_cle`, `fichier_octets`, `pages`   | text, int, int (nullable) |                                            |
+| `couverture_grande`, `couverture_vignette` | text, nullable            |                                            |
+| `telechargements`                          | int, défaut 0             |                                            |
+| `soumis_par/le`, `publie_par/le`           | uuid, timestamptz         | `publie_le` : la dernière publication      |
+| `validateur_nom`, `validateur_qualite`     | text                      | contrainte : obligatoires si `publie`      |
+| `depublie_le`, `motif`                     | timestamptz, text         |                                            |
+| `deja_publiee`                             | bool                      | interdit la suppression                    |
+| `contenu_de_test`                          | bool                      | « Contenu de test » (seed seulement)       |
+| `cree_le`, `modifie_le`                    | timestamptz               |                                            |
 
 Index : `(etat, publie_le desc)` ; `(categorie, etat, publie_le desc)` pour « À la Une ».
 

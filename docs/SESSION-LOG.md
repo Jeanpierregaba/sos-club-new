@@ -14,6 +14,26 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-09 — Bibliothèque (spec 028)
+
+- Fait : spec 027 commitée après la relecture (API 1024 tests). Spec 028 livrée (R10) : domaine
+  `bibliotheque`, droits `bibliotheque` (approuver et dépublier sous 2FA, préparation préréglée pour les
+  gestionnaires pédagogique et de contenus), publication à deux personnes avec validateur nommé, PDF de 20 Mo au
+  plus contrôlé par pypdf 6.21 puis réécrit, couverture en WebP, lecture en flux par morceaux de 256 Ko,
+  `no-store`, compteur agrégé, « À la Une » des 3 derniers magazines, page `/bibliotheque` sur les vraies
+  données, espace admin (liste, fiche, dépôt avec progression). Proxy à 25MB. API 1160 tests avant la relecture,
+  site 128.
+  Relecture `reviewer` corrigée : fichier joint par annotation, actions GoToR/GoToE/multimédia, liens hors
+  http(s)/mailto, PDF stocké = PDF réécrit et revérifié, focus du dépôt, `Object.hasOwn` pour les catégories,
+  pluriels, carrousel sans arrêt de tabulation, flux refermé si le comptage échoue, tests de course.
+- Pièges rencontrés : Docker s'arrête au redémarrage de la machine (1022 erreurs d'une suite sans base) :
+  `open -a Docker` puis `docker compose up -d --wait`. pypdf 7.0.0 sortait juste (3 jours) : borné à `<7`.
+  `exactOptionalPropertyTypes` : construire les paramètres d'URL sans clé `undefined`.
+- Décisions : spec 028 (bibliothèque publique, publication à deux, PDF et couverture, compteur agrégé) ;
+  `publie_le` suit la dernière publication.
+- Prochaine étape : pousser develop (migrations `quiz` et `bibliotheque`, Caddy à 25MB), puis R11 (certification
+  Génie Imhotep).
+
 ### 2026-11-08 — Quiz chronométrés et banque de quiz (spec 027)
 
 - Fait : spec 027 livrée (R9). Partie arbitrée par le serveur (ADR-0004) : questions tirées au lancement dans

@@ -29,7 +29,12 @@ async def fichier(ressource_id: UUID, db: Db, telecharger: bool = False) -> Stre
         raise HTTPException(status.HTTP_404_NOT_FOUND, lecture.INTROUVABLE)
     # Le fichier s'ouvre d'abord : un stockage indisponible ne compte rien.
     reponse = await lecture.pdf(ressource, telecharger=telecharger)
-    await public.compter(db, ressource.id)
+    try:
+        await public.compter(db, ressource.id)
+    except BaseException:
+        # Le fichier est déjà ouvert : le refermer plutôt que d'attendre le ramasse-miettes.
+        await reponse.body_iterator.aclose()  # type: ignore[attr-defined]
+        raise
     return reponse
 
 

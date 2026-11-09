@@ -7,7 +7,7 @@ from uuid import uuid4
 
 import pytest
 from pypdf import PdfWriter
-from pypdf.generic import ArrayObject, DictionaryObject, NameObject, TextStringObject
+from pypdf.generic import ArrayObject, DecodedStreamObject, DictionaryObject, NameObject, TextStringObject
 
 from app.fichiers import pdf
 from app.fichiers.stockage import CleInvalide, Disque
@@ -92,6 +92,85 @@ def test_un_fichier_joint_est_refuse() -> None:
 
     with pytest.raises(pdf.PdfRefuse, match="joint"):
         pdf.verifier(ecrire(writer))
+
+
+def test_un_fichier_joint_par_une_annotation_est_refuse() -> None:
+    writer = document()
+    flux = DecodedStreamObject()
+    flux.set_data(b"MZ\x90\x00")
+    annotation = DictionaryObject(
+        {
+            NameObject("/Type"): NameObject("/Annot"),
+            NameObject("/Subtype"): NameObject("/FileAttachment"),
+            NameObject("/Rect"): ArrayObject([]),
+            NameObject("/FS"): DictionaryObject(
+                {
+                    NameObject("/F"): TextStringObject("joint.exe"),
+                    NameObject("/EF"): DictionaryObject({NameObject("/F"): writer._add_object(flux)}),
+                }
+            ),
+        }
+    )
+    writer.pages[0][NameObject("/Annots")] = ArrayObject([writer._add_object(annotation)])
+
+    with pytest.raises(pdf.PdfRefuse, match="joint"):
+        pdf.verifier(ecrire(writer))
+
+
+@pytest.mark.parametrize("action", ["/GoToR", "/GoToE", "/Rendition", "/Movie", "/Sound"])
+def test_une_action_vers_un_autre_fichier_ou_un_media_est_refusee(action: str) -> None:
+    writer = document()
+    writer._root_object[NameObject("/OpenAction")] = DictionaryObject(
+        {NameObject("/S"): NameObject(action), NameObject("/F"): TextStringObject("\\\\hote\\partage\\x.pdf")}
+    )
+
+    with pytest.raises(pdf.PdfRefuse):
+        pdf.verifier(ecrire(writer))
+
+
+def lien(adresse: str) -> bytes:
+    writer = document()
+    annotation = DictionaryObject(
+        {
+            NameObject("/Type"): NameObject("/Annot"),
+            NameObject("/Subtype"): NameObject("/Link"),
+            NameObject("/Rect"): ArrayObject([]),
+            NameObject("/A"): DictionaryObject(
+                {NameObject("/S"): NameObject("/URI"), NameObject("/URI"): TextStringObject(adresse)}
+            ),
+        }
+    )
+    writer.pages[0][NameObject("/Annots")] = ArrayObject([writer._add_object(annotation)])
+    return ecrire(writer)
+
+
+@pytest.mark.parametrize("adresse", ["javascript:alert(1)", "file:///C:/Windows", "  JavaScript:x", "data:text/html,x"])
+def test_un_lien_hors_web_et_e_mail_est_refuse(adresse: str) -> None:
+    with pytest.raises(pdf.PdfRefuse, match="lien"):
+        pdf.verifier(lien(adresse))
+
+
+@pytest.mark.parametrize("adresse", ["https://sosdocteur.tv", "http://exemple.tg", "mailto:contact@exemple.tg"])
+def test_un_lien_web_ou_e_mail_est_permis(adresse: str) -> None:
+    assert pdf.verifier(lien(adresse)).pages == 1
+
+
+def test_le_pdf_garde_est_reecrit_sans_objet_cache() -> None:
+    writer = document(2)
+    # Un objet que rien ne référence : pypdf ne le parcourt pas, mais un autre lecteur pourrait le lire.
+    cache = DictionaryObject(
+        {NameObject("/S"): NameObject("/JavaScript"), NameObject("/JS"): TextStringObject("app.alert(1);")}
+    )
+    writer._add_object(cache)
+    octets = ecrire(writer)
+    assert b"/JavaScript" in octets
+
+    infos = pdf.verifier(octets)
+
+    assert b"/JavaScript" not in infos.octets
+    assert infos.pages == 2
+    # Le PDF réécrit passe lui-même le contrôle.
+    assert pdf.verifier(infos.octets).pages == 2
 
 
 def test_un_pdf_chiffre_est_refuse() -> None:

@@ -41,7 +41,7 @@ import {
   type AxePublic,
   type RessourceEntree,
 } from "@/lib/api/client";
-import { CATEGORIES, tailleLisible } from "@/lib/bibliotheque";
+import { CATEGORIES, pages, tailleLisible, telechargements } from "@/lib/bibliotheque";
 import { dateCourte } from "@/lib/dates";
 
 export const Route = createFileRoute("/_connecte/admin/bibliotheque/$id")({
@@ -215,7 +215,7 @@ function FicheRessource() {
             <CheckCircle2 className="size-4 text-primary" /> Validé par {ressource.validateur_nom} (
             {ressource.validateur_qualite})
             {ressource.publie_le && `, en ligne depuis le ${dateCourte(ressource.publie_le)}`} ·{" "}
-            {ressource.telechargements} téléchargements
+            {telechargements(ressource.telechargements)}
           </p>
         )}
         {ressource.motif && ressource.etat !== "publie" && (
@@ -252,7 +252,7 @@ function FicheRessource() {
             <p className="flex flex-wrap items-center gap-3 text-sm">
               <span>
                 {tailleLisible(ressource.fichier_octets)}
-                {ressource.pages ? ` · ${ressource.pages} pages` : ""}
+                {ressource.pages ? ` · ${pages(ressource.pages)}` : ""}
               </span>
               <a
                 href={urlRelectureRessource(ressource.id, ressource.modifie_le)}

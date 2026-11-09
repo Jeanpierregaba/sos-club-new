@@ -42,7 +42,7 @@ export function DepotFichier({
     <div className="grid gap-2">
       <label
         htmlFor={id}
-        className={`inline-flex w-fit cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-bold ring-1 ring-border transition hover:bg-mist ${
+        className={`inline-flex w-fit cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-bold ring-1 ring-border transition hover:bg-mist has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-logo-blue ${
           desactive || enCours ? "pointer-events-none opacity-60" : ""
         }`}
       >

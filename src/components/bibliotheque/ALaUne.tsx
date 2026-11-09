@@ -13,10 +13,10 @@ export function ALaUne({ magazines }: { magazines: RessourcePublique[] }) {
       <EnTete sur="À la Une" bleu="Les derniers" vert="magazines">
         Les magazines SOS Docteur TV, à lire en ligne ou à télécharger.
       </EnTete>
+      {/* Pas d'arrêt de tabulation sur la rangée : chaque carte a déjà ses liens, qui la font défiler au clavier. */}
       <ul
-        tabIndex={0}
         aria-label="Derniers magazines"
-        className="-mx-5 mt-10 flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 pb-4 outline-none focus-visible:ring-2 focus-visible:ring-logo-blue lg:grid lg:grid-cols-3 lg:overflow-visible"
+        className="-mx-5 mt-10 flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 pb-4 lg:grid lg:grid-cols-3 lg:overflow-visible"
       >
         {magazines.map((m) => (
           <li

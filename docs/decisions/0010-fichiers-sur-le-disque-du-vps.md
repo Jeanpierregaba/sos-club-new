@@ -35,3 +35,12 @@ Les fichiers vont sur le disque du VPS, dans un volume Docker, derrière une int
   chaque lecture. Les photos publiques portent un en-tête de cache long, car leur adresse change avec leur
   contenu.
 - Les clés de fichier sont des UUID tirés par l'API : aucun nom choisi par l'utilisateur n'arrive sur le disque.
+
+## Mise en œuvre (spec 028)
+
+- Les PDF de la bibliothèque suivent le même chemin (`ressources/<uuid>-document.pdf`) ; `Stockage` gagne
+  `lire_par_morceaux`, et l'API sert un PDF en flux par morceaux de 256 Ko, avec sa taille, sans jamais le
+  charger en entier. Un passage à S3 devra fournir la même lecture en flux.
+- Contrairement aux photos publiques, les fichiers de la bibliothèque ne se gardent dans aucun cache
+  (`no-store`) : une ressource dépubliée cesse aussitôt d'être servie.
+- La limite du proxy passe à 25 Mo, pour un PDF de 20 Mo et l'enveloppe du formulaire.

@@ -20,5 +20,8 @@ describe("bibliothèque", () => {
     expect(estCategorie("magazine")).toBe(true);
     expect(estCategorie("video")).toBe(false);
     expect(estCategorie(undefined)).toBe(false);
+    // Les noms hérités d'un objet ne sont pas des catégories.
+    expect(estCategorie("constructor")).toBe(false);
+    expect(estCategorie("toString")).toBe(false);
   });
 });

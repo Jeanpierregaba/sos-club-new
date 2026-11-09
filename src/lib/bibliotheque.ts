@@ -35,7 +35,7 @@ export const CATEGORIES: Record<
 export const ORDRE_CATEGORIES = Object.keys(CATEGORIES) as CategorieRessource[];
 
 export const estCategorie = (valeur: unknown): valeur is CategorieRessource =>
-  typeof valeur === "string" && valeur in CATEGORIES;
+  typeof valeur === "string" && Object.hasOwn(CATEGORIES, valeur);
 
 // 4 404 019 octets → « 4,2 Mo » ; 512 000 → « 500 Ko ».
 export function tailleLisible(octets: number): string {
@@ -43,6 +43,9 @@ export function tailleLisible(octets: number): string {
   const mo = octets / (1024 * 1024);
   return `${mo.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} Mo`;
 }
+
+// 1 → « 1 page » ; 12 → « 12 pages ».
+export const pages = (nombre: number) => `${nombre} page${nombre > 1 ? "s" : ""}`;
 
 // 1 → « 1 téléchargement » ; 1234 → « 1 234 téléchargements ».
 export function telechargements(nombre: number): string {

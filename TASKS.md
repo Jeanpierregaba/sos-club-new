@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] [028 — Bibliothèque : ressources et fascicules](docs/specs/028-bibliotheque/spec.md) (R10 ; tâches dans `tasks.md`)
+Rien en cours.
 
 ## À faire
 
@@ -35,7 +35,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 **Phase 3 — Quiz et certification (P0)**
 
 - [x] R9 — Quiz chronométrés et banque de quiz (Q11, Q12, Q24) : [spec 027](docs/specs/027-quiz/spec.md)
-- [ ] R10 — Ressources et fascicules (Q11)
+- [x] R10 — Ressources et fascicules (Q11) : [spec 028](docs/specs/028-bibliotheque/spec.md)
 - [ ] R11 — Certification Génie Imhotep : 12 quiz, 5 badges, certificat (Q24, Q25)
 
 **Phase 4 — Rapports (P0)**
@@ -73,6 +73,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] [028 — Bibliothèque : ressources et fascicules](docs/specs/028-bibliotheque/spec.md) (R10 : magazines, guides, fiches, affiches et fascicules en PDF, publiés à deux personnes avec validateur nommé ; PDF contrôlé et réécrit par pypdf, servi en flux ; « À la Une », filtres, compteur de téléchargements sans donnée personnelle ; bibliothèque publique)
 - [x] [027 — Quiz chronométrés et banque de quiz](docs/specs/027-quiz/spec.md) (R9 : partie arbitrée par le serveur, envoi question par question, 5 s + 2 s de tolérance, tirage de 15 questions dans une réserve, score seul à la fin ; +50 à la première réussite d'un élève ; banque publiée à deux personnes avec validateur médical ; paramètres versionnés ; mode test sans trace)
 - [x] [026 — Espace du président](docs/specs/026-espace-du-president/spec.md) (R8 : « Mon club » pour le président, lecture pour les membres et encadreurs ; propositions de fiche et actualités du club modérées, signées du club, sans point ; passation qui transmet les contenus)
 - [x] [025 — Commentaires prémodérés](docs/specs/025-commentaires/spec.md) (R7 : type `commentaire` du moteur ADR-0009, rattaché à l'article ; élèves et encadreurs actifs, liste à plat, +5 dans la limite de 5 par jour, 20 envois par jour au plus ; auteur de l'article notifié ; retrait par l'auteur)

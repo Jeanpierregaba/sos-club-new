@@ -18,7 +18,7 @@ import {
   type AxePublic,
   type EtatRessource,
 } from "@/lib/api/client";
-import { CATEGORIES, entreeVide, tailleLisible } from "@/lib/bibliotheque";
+import { CATEGORIES, entreeVide, tailleLisible, telechargements } from "@/lib/bibliotheque";
 import { dateCourte } from "@/lib/dates";
 
 type Recherche = { etat?: EtatRessource | undefined };
@@ -90,7 +90,7 @@ function Ressources() {
                   <span className="text-sm text-muted-foreground">
                     {CATEGORIES[r.categorie].un}
                     {r.fichier_octets ? ` · ${tailleLisible(r.fichier_octets)}` : " · sans PDF"}
-                    {r.etat === "publie" ? ` · ${r.telechargements} téléchargements` : ""} ·
+                    {r.etat === "publie" ? ` · ${telechargements(r.telechargements)}` : ""} ·
                     modifiée le {dateCourte(r.modifie_le)}
                   </span>
                 </span>

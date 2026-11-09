@@ -12,6 +12,6 @@
 - [x] 5. `seed_dev` : ressources « Contenu de test » ; types de l'API régénérés.
 - [x] 6. Site, public : client, `/bibliotheque` sur les vraies données, carrousel, filtres, état vide.
 - [x] 7. Site, admin : liste, fiche, dépôt des fichiers, décisions ; entrée « Bibliothèque » du menu.
-- [ ] 8. Docs : ADR-0010, ARCHITECTURE, SECURITY, TASKS.
-- [ ] Vérifier tous les critères d'acceptation de spec.md
-- [ ] Relecture par le sous-agent reviewer
+- [x] 8. Docs : ADR-0010, ARCHITECTURE, SECURITY, TASKS.
+- [x] Vérifier tous les critères d'acceptation de spec.md
+- [x] Relecture par le sous-agent reviewer

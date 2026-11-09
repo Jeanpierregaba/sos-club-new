@@ -38,6 +38,7 @@ erDiagram
   axe ||--o{ article : classe
   axe ||--o{ video : classe
   axe ||--o{ quiz : classe
+  axe ||--o{ ressource : classe
   club ||--o{ article : publie
   utilisateur ||--o{ article : redige
   article ||--o{ commentaire : recoit
@@ -114,8 +115,12 @@ Champs structurants :
   `motif_rejet`, `modere_par`, `publie_le`.
 - `evenement` : `titre`, `type` (sensibilisation, nettoyage, depistage, defi), `debut`, `fin`, `lieu`,
   `dre_code`, `club_id` facultatif.
-- `video` : `titre`, `youtube_id`, `axe_id`. `document` : `titre`, `type` (magazine, guide, fiche),
-  `fichier`, `couverture`, `publie_le`.
+- `video` : `titre`, `youtube_id`, `axe_id`.
+- `ressource` (spec 028) : la bibliothèque. `titre`, `description`, `categorie` (magazine, guide, fiche,
+  affiche, fascicule), `axe_code` facultatif, `parution` (magazine), `etat` (brouillon, soumis, publie,
+  depublie), `contributeurs`, `validateur_nom` et `validateur_qualite`, `fichier_cle`, `fichier_octets`, `pages`,
+  `couverture_grande` et `couverture_vignette` (clés du stockage, ADR-0010), `telechargements` (simple
+  compteur, sans donnée sur la personne), `deja_publiee` (interdit la suppression).
 - `quiz` (spec 027) : `titre`, `description`, `axe_code`, `etat` (brouillon, soumis, publie, depublie),
   `contenu_de_test`, `contributeurs` (créé, modifié ou soumis par : aucun ne peut publier), `validateur_nom` et
   `validateur_qualite` (validation médicale nommée, Q11). `question_quiz` : `enonce`, `choix` (2 à 4),
@@ -184,7 +189,7 @@ flowchart LR
 - **Site** : rendu serveur pour les pages publiques (référencement, affichage rapide sur réseau lent).
   Il n'a aucune logique métier et n'accède jamais à la base (ADR-0002).
 - **API** : seule détentrice des données et des règles. Chaque domaine vit dans son dossier sous
-  `backend/app/` (`comptes/`, `admin/`, `referentiel/`, `eleves/`, `encadreurs/`, `points/`, `clubs/`, `moderation/`, `articles/`, `commentaires/`, `notifications/`, `fichiers/`, `agenda/`, `mediatheque/`, `quiz/`),
+  `backend/app/` (`comptes/`, `admin/`, `referentiel/`, `eleves/`, `encadreurs/`, `points/`, `clubs/`, `moderation/`, `articles/`, `commentaires/`, `notifications/`, `fichiers/`, `agenda/`, `mediatheque/`, `quiz/`, `bibliotheque/`),
   avec `router.py` (HTTP), `schemas.py` (Pydantic), `models.py` (SQLAlchemy) et `service.py` (règles).
 - **Types partagés** : `backend/openapi.json` est versionné, et `npm run api:types` en génère les types
   TypeScript avec `openapi-typescript`. La CI vérifie que les deux restent à jour.
@@ -213,6 +218,9 @@ pour la ressource demandée.
 | Jouer à un quiz (spec 027 ; points pour l'élève seulement)                | Non      | Élève actif               | Encadreur vérifié         | Mode test seulement                                         |
 | Préparer, soumettre un quiz (spec 027)                                    | Non      | Non                       | Non                       | Droits `quiz` créer, modifier, soumettre                    |
 | Publier, refuser, dépublier un quiz (spec 027)                            | Non      | Non                       | Non                       | Droits `quiz` approuver, dépublier ; jamais son propre quiz |
+| Lire et télécharger une ressource publiée (spec 028)                      | Oui      | Oui                       | Oui                       | Oui (et relire avant publication)                           |
+| Préparer, soumettre une ressource (spec 028)                              | Non      | Non                       | Non                       | Droits `bibliotheque` créer, modifier, soumettre            |
+| Publier, refuser, dépublier une ressource (spec 028)                      | Non      | Non                       | Non                       | Droits `bibliotheque` approuver, dépublier ; pas la sienne  |
 | Répondre au défi du jour, voir le podium des clubs (spec 021)             | Oui      | Oui                       | Oui                       | Oui                                                         |
 | Gagner des points au défi du jour (spec 022)                              | Non      | Élève actif, 1 fois/jour  | Non                       | Non                                                         |
 | Modérer, publier vidéos et documents, valider un club, attribuer un badge | Non      | Non                       | Non                       | Oui                                                         |
@@ -269,7 +277,7 @@ restent à surveiller.
 
 - **Données de mineurs** : aucune donnée réelle avant le récépissé de l'IPDCP et l'avis d'un juriste
   sur le consentement (Q8, Q9). L'analyse de la loi ici n'est pas un avis juridique.
-- **Contenus de santé** : pas de quiz publié sans validation médicale nommée (Q11). Sans contenus, les
+- **Contenus de santé** : pas de quiz ni de ressource publiés sans validation nommée (Q11). Sans contenus, les
   specs 009 à 011 seront techniquement prêtes, mais inutilisables.
 - **Écarts Q1 et Q2** : ils touchent tout le classement et le classement des contenus. À trancher avant
   les specs 003 et 006, même si les tables de référence limitent le coût d'un changement.

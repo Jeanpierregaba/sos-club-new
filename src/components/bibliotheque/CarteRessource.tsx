@@ -2,7 +2,7 @@ import { BadgeCheck, BookOpenText, Download } from "lucide-react";
 import type { CSSProperties } from "react";
 
 import { urlRessource, type RessourcePublique } from "@/lib/api/client";
-import { CATEGORIES, tailleLisible, telechargements } from "@/lib/bibliotheque";
+import { CATEGORIES, pages, tailleLisible, telechargements } from "@/lib/bibliotheque";
 import { dateCourte } from "@/lib/dates";
 
 // Une ressource publiée (spec 028) : sa couverture ou le visuel de sa catégorie, son validateur, et les deux
@@ -72,9 +72,8 @@ export function CarteRessource({
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
           {dateCourte(ressource.publie_le)}
-          {ressource.pages
-            ? ` · ${ressource.pages} page${ressource.pages > 1 ? "s" : ""}`
-            : ""} · {telechargements(ressource.telechargements)}
+          {ressource.pages ? ` · ${pages(ressource.pages)}` : ""} ·{" "}
+          {telechargements(ressource.telechargements)}
         </p>
         <div className="mt-auto flex flex-wrap gap-2 pt-5">
           <a

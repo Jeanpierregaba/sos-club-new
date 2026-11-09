@@ -201,9 +201,9 @@ async def _effacer(cles: Iterable[str]) -> None:
             logger.exception("Fichier %s non effacé : à reprendre par le balayage des orphelins", cle)
 
 
-async def deposer_fichier(
-    db: AsyncSession, acces: Acces, ressource_id: UUID, octets: bytes, infos: InfosPdf, ip: str
-) -> None:
+async def deposer_fichier(db: AsyncSession, acces: Acces, ressource_id: UUID, infos: InfosPdf, ip: str) -> None:
+    """Stocke le PDF réécrit par le contrôle (`infos.octets`), jamais le fichier reçu tel quel."""
+    octets = infos.octets
     cle = f"ressources/{uuid7()}-document.pdf"
 
     def appliquer(ressource: Ressource) -> list[str]:
@@ -292,10 +292,10 @@ def _prevenir(db: AsyncSession, ressource: Ressource, titre: str, message: str |
 
 async def approuver(db: AsyncSession, acces: Acces, ressource_id: UUID, entree: Approbation, ip: str) -> None:
     ressource = await _verrouiller(db, ressource_id)
-    if acces.utilisateur.id in (ressource.contributeurs or []):
-        raise Refuse
     if ressource.etat is not EtatRessource.soumis:
         raise EtatInvalide("Cette ressource n'est plus en attente de publication.")
+    if acces.utilisateur.id in (ressource.contributeurs or []):
+        raise Refuse
     maintenant = datetime.now(UTC)
     ressource.etat = EtatRessource.publie
     ressource.decide_par, ressource.decide_le = acces.utilisateur.id, maintenant

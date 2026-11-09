@@ -105,8 +105,9 @@ def test_le_gestionnaire_cree_depose_et_soumet_une_ressource(
     corps = client.put(f"{GESTION}/{corps['id']}/fichier", **envoi_pdf(pdf(3))).json()
 
     assert corps["pages"] == 3
-    assert corps["fichier_octets"] == len(pdf(3))
-    assert len(fichiers(dossier_fichiers)) == 1
+    # Le PDF gardé est celui que le contrôle a réécrit ; sa taille est celle du fichier stocké.
+    [stocke] = fichiers(dossier_fichiers)
+    assert corps["fichier_octets"] == (dossier_fichiers / "ressources" / stocke).stat().st_size
 
     reponse = client.post(f"{GESTION}/{corps['id']}/soumettre")
 
@@ -375,6 +376,82 @@ def test_deux_approbations_simultanees_une_seule_passe(
         return await asyncio.gather(decider(premier), decider(second))
 
     assert sorted(asyncio.run(scenario())) == ["conflit", "ok"]
+
+
+def test_une_ressource_publiee_ne_se_modifie_pas(
+    client: TestClient, gestionnaire: Utilisateur, en_base: Callable[..., Any]
+) -> None:
+    ressource = creer_ressource(en_base, etat=EtatRessource.publie, couverture=True)
+    rid = ressource.id
+
+    assert client.put(f"{GESTION}/{rid}", json={**INFOS, "titre": "Autre"}).status_code == 409
+    assert client.put(f"{GESTION}/{rid}/fichier", **envoi_pdf()).status_code == 409
+    assert client.put(f"{GESTION}/{rid}/couverture", **envoi_image()).status_code == 409
+    assert client.delete(f"{GESTION}/{rid}/couverture").status_code == 409
+    assert client.delete(f"{GESTION}/{rid}").status_code == 409
+
+
+def acces_de(qui: Utilisateur) -> Any:
+    async def construire(db: AsyncSession) -> Acces:
+        from app.admin.models import Collaborateur
+
+        collaborateur = await db.scalar(select(Collaborateur).where(Collaborateur.utilisateur_id == qui.id))
+        return Acces(utilisateur=qui, collaborateur=collaborateur)  # type: ignore[arg-type]
+
+    return construire
+
+
+def test_une_approbation_pendant_une_reprise_en_brouillon_recoit_409(
+    client: TestClient, gestionnaire: Utilisateur, creer_collaborateur: Callable[..., Utilisateur]
+) -> None:
+    corps = soumise(client)
+    publieur = creer_collaborateur("pub1", droits=PUBLICATION, double_auth=True)
+
+    async def reprendre() -> str:
+        async with AsyncSession(moteur_test, expire_on_commit=False) as db:
+            await gestion.reprendre(db, await acces_de(gestionnaire)(db), corps["id"], "test")
+            await asyncio.sleep(0.2)
+            await db.commit()
+            return "reprise"
+
+    async def approuver() -> str:
+        await asyncio.sleep(0.05)
+        async with AsyncSession(moteur_test, expire_on_commit=False) as db:
+            try:
+                await gestion.approuver(db, await acces_de(publieur)(db), corps["id"], Approbation(**APPROBATION), "t")
+            except gestion.EtatInvalide:
+                return "conflit"
+            await db.commit()
+            return "approuvee"
+
+    async def scenario() -> list[str]:
+        return await asyncio.gather(reprendre(), approuver())
+
+    assert asyncio.run(scenario()) == ["reprise", "conflit"]
+    assert client.get(f"{GESTION}/{corps['id']}").json()["etat"] == "brouillon"
+
+
+def test_deux_depots_simultanes_ne_gardent_quun_fichier(
+    client: TestClient, gestionnaire: Utilisateur, en_base: Callable[..., Any], dossier_fichiers: Path
+) -> None:
+    from app.fichiers import pdf as controle
+
+    corps = brouillon(client)
+
+    async def deposer(pages: int) -> None:
+        infos = await controle.examiner(pdf(pages))
+        async with AsyncSession(moteur_test, expire_on_commit=False) as db:
+            await gestion.deposer_fichier(db, await acces_de(gestionnaire)(db), corps["id"], infos, "test")
+
+    async def scenario() -> None:
+        await asyncio.gather(deposer(2), deposer(4))
+
+    asyncio.run(scenario())
+
+    ressource = en_base(lambda db: db.get(Ressource, corps["id"]))
+    # Le dernier validé l'emporte ; le fichier de l'autre a été libéré et effacé.
+    assert fichiers(dossier_fichiers) == {ressource.fichier_cle.split("/")[1]}
+    assert ressource.pages in (2, 4)
 
 
 # Relire et supprimer ------------------------------------------------------------------------------------------------

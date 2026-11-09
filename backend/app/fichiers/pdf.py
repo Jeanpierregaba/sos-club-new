@@ -13,7 +13,7 @@ import asyncio
 import io
 from dataclasses import dataclass
 
-from pypdf import PdfReader
+from pypdf import PdfReader, PdfWriter
 from pypdf.errors import PyPdfError
 from pypdf.generic import ArrayObject, DictionaryObject, IndirectObject, NameObject, PdfObject
 
@@ -33,7 +33,19 @@ INTERDITS: dict[str, str] = {
     "/XFA": "Ce PDF contient un formulaire XFA.",
     "/SubmitForm": "Ce PDF contient un formulaire qui envoie des données.",
     "/ImportData": "Ce PDF contient une action qui importe des données.",
+    # Fichier joint par une annotation (le type /EmbeddedFile du flux est facultatif dans la norme).
+    "/EF": "Ce PDF contient un fichier joint.",
+    "/FileAttachment": "Ce PDF contient un fichier joint.",
+    # Ouvrent un autre fichier ou un contenu externe (un partage réseau peut faire fuiter un identifiant Windows).
+    "/GoToR": "Ce PDF contient un lien vers un autre fichier.",
+    "/GoToE": "Ce PDF contient un lien vers un fichier joint.",
+    "/Rendition": "Ce PDF contient un contenu multimédia intégré.",
+    "/Movie": "Ce PDF contient un contenu multimédia intégré.",
+    "/Sound": "Ce PDF contient un contenu multimédia intégré.",
 }
+# Un lien ne mène qu'à un site ou à une adresse e-mail.
+SCHEMAS_PERMIS = ("http:", "https:", "mailto:")
+LIEN_REFUSE = "Ce PDF contient un lien qui n'est ni une adresse web ni une adresse e-mail."
 CONSEIL = " Exporte-le de nouveau en PDF simple (« Enregistrer sous » ou « Imprimer en PDF »)."
 ILLISIBLE = "Ce fichier n'est pas un PDF lisible."
 CHIFFRE = "Ce PDF est protégé par un mot de passe : dépose une version sans protection."
@@ -52,11 +64,20 @@ class PdfRefuse(ValueError):
 @dataclass(frozen=True)
 class InfosPdf:
     pages: int
+    # Le PDF réécrit à partir de ce qui a été vérifié : c'est lui qu'on stocke et qu'on sert.
+    octets: bytes
 
 
 def _interdit(nom: str) -> None:
     if nom in INTERDITS:
         raise PdfRefuse(INTERDITS[nom] + CONSEIL)
+
+
+def _lien_permis(valeur: PdfObject) -> None:
+    adresse = valeur.get_object() if isinstance(valeur, IndirectObject) else valeur
+    texte = adresse.decode("latin-1", "replace") if isinstance(adresse, bytes) else str(adresse)
+    if not texte.strip().lower().startswith(SCHEMAS_PERMIS):
+        raise PdfRefuse(LIEN_REFUSE + CONSEIL)
 
 
 def _parcourir(racine: PdfObject) -> None:
@@ -78,6 +99,8 @@ def _parcourir(racine: PdfObject) -> None:
         if isinstance(objet, DictionaryObject):
             for cle, valeur in objet.items():
                 _interdit(str(cle))
+                if cle == "/URI":
+                    _lien_permis(valeur)
                 pile.append(valeur)
         elif isinstance(objet, ArrayObject):
             pile.extend(objet)
@@ -85,23 +108,37 @@ def _parcourir(racine: PdfObject) -> None:
             _interdit(str(objet))
 
 
+def _lire(octets: bytes) -> PdfReader:
+    """Ouvre le PDF et vérifie tout ce qui est atteignable ; renvoie le lecteur."""
+    lecteur = PdfReader(io.BytesIO(octets), strict=False)
+    if lecteur.is_encrypted:
+        raise PdfRefuse(CHIFFRE)
+    if len(lecteur.pages) == 0:
+        raise PdfRefuse(SANS_PAGE)
+    _parcourir(lecteur.trailer)
+    return lecteur
+
+
 def verifier(octets: bytes) -> InfosPdf:
+    """Vérifie le PDF, puis le réécrit : seuls les objets atteignables et vérifiés sont gardés, avec une table des
+    références neuve. Un objet caché ou une mise à jour incrémentale que pypdf ignore, mais qu'un autre lecteur
+    lirait, disparaît ainsi. Le résultat est vérifié à son tour."""
     # La norme tolère quelques octets avant l'en-tête ; au-delà, ce n'est pas un PDF.
     if b"%PDF-" not in octets[:1024]:
         raise PdfRefuse(ILLISIBLE)
     try:
-        lecteur = PdfReader(io.BytesIO(octets), strict=False)
-        if lecteur.is_encrypted:
-            raise PdfRefuse(CHIFFRE)
-        pages = len(lecteur.pages)
-        if pages == 0:
-            raise PdfRefuse(SANS_PAGE)
-        _parcourir(lecteur.trailer)
+        lecteur = _lire(octets)
+        ecrivain = PdfWriter(clone_from=lecteur)
+        ecrivain.compress_identical_objects(remove_duplicates=True, remove_unreferenced=True)
+        sortie = io.BytesIO()
+        ecrivain.write(sortie)
+        propre = sortie.getvalue()
+        pages = len(_lire(propre).pages)
     except PdfRefuse:
         raise
     except LECTURE_IMPOSSIBLE:
         raise PdfRefuse(ILLISIBLE) from None
-    return InfosPdf(pages=pages)
+    return InfosPdf(pages=pages, octets=propre)
 
 
 async def examiner(octets: bytes) -> InfosPdf:
