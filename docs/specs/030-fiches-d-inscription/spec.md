@@ -106,8 +106,8 @@ badges ni certificat (le PRD reste vrai) ; code à 6 chiffres par e-mail ; régi
   d'empreinte, jamais en clair.
 - **Échec d'envoi SMTP** : le compte n'est pas créé (production) ou le visiteur peut redemander un code.
 - **Caractères** : noms éwé et kabiyè acceptés (ɔ, ɛ, ŋ, ɖ, ʋ…), espaces normalisés.
-- **Fiche partielle d'un ancien élève** : enregistrable champ par champ ; les champs obligatoires ne le deviennent
-  qu'à la première validation complète.
+- **Ancien élève sans fiche** : il la remplit en une fois depuis son espace, avec les mêmes champs obligatoires ;
+  aucune fiche partielle n'est enregistrée.
 - **Changement d'établissement** : la préfecture, la commune et le canton restent ceux saisis ; l'élève les corrige.
 - **Rafales** : la limite d'inscriptions par adresse IP s'applique aussi aux visiteurs.
 - **Concurrence** : deux confirmations simultanées du même code n'ouvrent qu'une confirmation.

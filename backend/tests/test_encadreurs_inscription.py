@@ -9,12 +9,13 @@ from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 
 from app.admin.models import JournalAudit
+from app.comptes.champs import normaliser_telephone
 from app.comptes.models import Role, Utilisateur
 from app.config import settings
 from app.encadreurs.models import Encadreur, EtatVerification, Fonction
-from app.encadreurs.schemas import normaliser_telephone
 from app.points.models import MouvementPoints
 from app.referentiel.models import Etablissement, Iesg, StatutEtablissement
+from tests.fiche import fiche
 
 INSCRIPTION = "/api/encadreurs/inscription"
 
@@ -241,7 +242,7 @@ def test_la_limite_par_adresse_est_partagee_avec_les_eleves(
     eleve = {
         "prenom": "Aya", "nom": "Mensah", "pseudonyme": "Aya la Curieuse", "identifiant": "aya.mensah",
         "mot_de_passe": "un-mot-de-passe", "classe": "2nde", "charte": True, "consentement_parent": True,
-        "etablissement_id": etablissement_id(en_base),
+        "etablissement_id": etablissement_id(en_base), "fiche": fiche(),
     }  # fmt: skip
     assert client.post("/api/eleves/inscription", json=eleve).status_code == 201
     client.cookies.clear()

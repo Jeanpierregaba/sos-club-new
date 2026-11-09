@@ -12,6 +12,7 @@ from app.admin.models import JournalAudit
 from app.config import settings
 from app.referentiel.models import Etablissement, Iesg
 from tests.conftest import MOT_DE_PASSE, Navigateur, connecter_admin
+from tests.fiche import fiche
 
 INSCRITS = "/api/admin/inscrits"
 ETABLISSEMENTS = "/api/admin/referentiel/etablissements"
@@ -34,7 +35,7 @@ def inscrire(navigateur: Any, en_base: Callable[..., Any], numero: int, **champs
     corps = {
         "prenom": "Aya", "nom": "Mensah", "pseudonyme": f"Pseudo {numero}", "identifiant": f"eleve{numero}",
         "mot_de_passe": MOT_DE_PASSE, "classe": "3e", "charte": True, "consentement_parent": True,
-        "etablissement_id": id_de(en_base, Etablissement, "Lycée de Tokoin I"),
+        "etablissement_id": id_de(en_base, Etablissement, "Lycée de Tokoin I"), "fiche": fiche(),
     } | champs  # fmt: skip
     reponse = navigateur.post("/api/eleves/inscription", json=corps)
     assert reponse.status_code == 201, reponse.text

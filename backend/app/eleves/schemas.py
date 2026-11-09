@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from app.clubs.schemas import AdhesionResume, ClubResume
 from app.comptes.service import LONGUEUR_MAX_MOT_DE_PASSE
 from app.eleves.models import Classe
+from app.eleves.schemas_fiche import FicheEntree
 from app.points.schemas import ResumePoints
 from app.referentiel.schemas import EtablissementRattache, Proposition
 
@@ -30,6 +31,8 @@ class InscriptionEntree(BaseModel):
     consentement_parent: Literal[True]
     etablissement_id: UUID | None = None
     proposition: Proposition | None = None
+    # La fiche d'adhésion (spec 030), complète.
+    fiche: FicheEntree
 
     @model_validator(mode="after")
     def un_seul_etablissement(self) -> InscriptionEntree:
@@ -49,6 +52,8 @@ class EspaceEleve(BaseModel):
     club: ClubResume | None = None
     # Son affiliation à un club (spec 020) : en cours, sinon la dernière, pour lire un motif de refus.
     adhesion: AdhesionResume | None = None
+    # Fiche d'adhésion remplie (spec 030) : sinon, l'espace invite à la compléter.
+    fiche_complete: bool = False
 
 
 class ProfilModification(BaseModel):

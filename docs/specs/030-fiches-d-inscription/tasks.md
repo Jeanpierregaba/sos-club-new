@@ -18,11 +18,11 @@ authentification, code de confirmation) commencent par leurs tests.
 
 ## Fiche élève
 
-- [ ] 3. Tests d'abord : inscription élève avec fiche (champs obligatoires, dates, axes 1 à 3 et actifs,
+- [x] 3. Tests d'abord : inscription élève avec fiche (champs obligatoires, dates, axes 1 à 3 et actifs,
       téléphones normalisés, année scolaire posée par le serveur, transaction unique).
-- [ ] 4. Schéma `FicheEleveEntree` + service : inscription étendue ; `GET/PUT /eleves/moi/fiche` (fiche partielle
+- [x] 4. Schéma `FicheEleveEntree` + service : inscription étendue ; `GET/PUT /eleves/moi/fiche` (fiche partielle
       d'un ancien élève, `complete_le`, verrou de version) ; `fiche_complete` dans `/eleves/moi`.
-- [ ] 5. Tests d'abord puis route `GET /admin/inscrits/{id}/fiche` : droit sensible, périmètre DRE, double
+- [x] 5. Tests d'abord puis route `GET /admin/inscrits/{id}/fiche` : droit sensible, périmètre DRE, double
       authentification, journal ; refus pour élève, encadreur, visiteur, autre DRE ; aucun champ de la fiche dans
       les exports ni les routes publiques.
 

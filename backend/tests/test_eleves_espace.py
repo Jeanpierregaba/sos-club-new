@@ -16,6 +16,7 @@ from app.points.models import Semestre
 from app.points.service import aujourd_hui
 from app.referentiel.models import Etablissement, StatutEtablissement
 from tests.conftest import MOT_DE_PASSE, Navigateur
+from tests.fiche import fiche
 
 MOI = "/api/eleves/moi"
 MOT_DE_PASSE_URL = "/api/comptes/mot-de-passe"
@@ -38,7 +39,7 @@ def inscrire(client: TestClient, en_base: Callable[..., Any], identifiant: str =
         json={
             "prenom": "Aya", "nom": "Mensah", "pseudonyme": pseudo, "identifiant": identifiant,
             "mot_de_passe": MOT_DE_PASSE, "classe": "3e", "charte": True, "consentement_parent": True,
-            "etablissement_id": id_etablissement(en_base, "Lycée de Tokoin I"),
+            "etablissement_id": id_etablissement(en_base, "Lycée de Tokoin I"), "fiche": fiche(),
         },
     )  # fmt: skip
     assert reponse.status_code == 201, reponse.text
@@ -102,7 +103,7 @@ def test_chaque_eleve_ne_voit_que_ses_donnees(client: TestClient, en_base: Calla
         json={
             "prenom": "Kofi", "nom": "Agbo", "pseudonyme": "Kofi A", "identifiant": "kofi",
             "mot_de_passe": MOT_DE_PASSE, "classe": "tle", "charte": True, "consentement_parent": True,
-            "etablissement_id": id_etablissement(en_base, "Lycée de Tokoin I"),
+            "etablissement_id": id_etablissement(en_base, "Lycée de Tokoin I"), "fiche": fiche(),
         },
     )  # fmt: skip
     assert reponse.status_code == 201

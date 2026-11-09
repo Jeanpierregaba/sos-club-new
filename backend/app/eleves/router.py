@@ -15,8 +15,9 @@ from app.comptes.schemas import Moi
 from app.comptes.service import cle_adresse, ouvrir_session, utilisateur_de_la_session
 from app.config import settings
 from app.db import get_session
-from app.eleves import service
+from app.eleves import fiche, service
 from app.eleves.schemas import EspaceEleve, EtatInscription, InscriptionEntree, ProfilModification
+from app.eleves.schemas_fiche import FicheModification, FicheSortie
 
 Base = Annotated[AsyncSession, Depends(get_session)]
 Connecte = Annotated[Utilisateur, Depends(utilisateur_courant)]
@@ -74,3 +75,18 @@ async def modifier_mon_profil(
 ) -> EspaceEleve:
     with _traduire_refus():
         return await service.modifier_profil(db, utilisateur, entree, _adresse(request))
+
+
+@router.get("/moi/fiche")
+async def ma_fiche(utilisateur: Connecte, db: Base) -> FicheSortie | None:
+    """La fiche d'adhésion de l'élève (spec 030) ; null s'il ne l'a pas encore remplie."""
+    with _traduire_refus():
+        return await fiche.ma_fiche(db, utilisateur)
+
+
+@router.put("/moi/fiche")
+async def corriger_ma_fiche(
+    entree: FicheModification, request: Request, utilisateur: Connecte, db: Base
+) -> FicheSortie:
+    with _traduire_refus():
+        return await fiche.corriger(db, utilisateur, entree, _adresse(request))

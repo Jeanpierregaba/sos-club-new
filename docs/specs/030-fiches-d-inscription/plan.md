@@ -31,8 +31,8 @@ relève de la déclaration IPDCP.
 - `fiche_eleve_axe` (`utilisateur_id`, `axe_code` FK `axe` RESTRICT), PK composite, 1 à 3 lignes.
 - `fiche_eleve_parcours` (`id`, `utilisateur_id`, `rang` 1–2, `annee` `String(9)`, `etablissement` texte, `iesg`
   texte) : texte libre, un ancien établissement n'est pas forcément dans le référentiel.
-- Les colonnes sont nulles pour accepter la fiche partielle d'un ancien élève ; « complète » est vérifiée par le
-  service (`complete_le`) et, pour une **nouvelle** inscription, par le schéma d'entrée.
+- Les colonnes sont nulles (une fiche partielle pourra venir plus tard) ; aujourd'hui toute fiche est enregistrée
+  complète, à l'inscription comme depuis l'espace (`complete_le`).
 
 ### `encadreur`
 

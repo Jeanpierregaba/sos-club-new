@@ -32,7 +32,7 @@ from app.comptes.service import (
 )
 from app.comptes.service import normaliser as normaliser_identifiant
 from app.config import settings
-from app.eleves import pseudonyme
+from app.eleves import fiche, pseudonyme
 from app.eleves.models import Eleve
 from app.eleves.schemas import EspaceEleve, InscriptionEntree, ProfilModification
 from app.points import service as points
@@ -92,6 +92,7 @@ async def inscrire(db: AsyncSession, entree: InscriptionEntree, adresse_ip: str)
         )
     )
     await flush(db)
+    await fiche.enregistrer_a_linscription(db, utilisateur.id, entree.fiche)
     await points.crediter(db, BIENVENUE_ELEVE, utilisateur.id, f"bienvenue:{utilisateur.id}")
     journaliser(
         db, "inscription_eleve", utilisateur, cible_type="utilisateur", cible_id=utilisateur.id,
@@ -128,6 +129,7 @@ async def espace(db: AsyncSession, utilisateur: Utilisateur) -> EspaceEleve:
         points=await points.resume(db, utilisateur.id, 20),
         club=await club_lie(db, utilisateur),
         adhesion=await mon_adhesion(db, utilisateur),
+        fiche_complete=await fiche.est_complete(db, utilisateur.id),
     )
 
 

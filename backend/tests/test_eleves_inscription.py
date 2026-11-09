@@ -17,6 +17,7 @@ from app.eleves.models import Eleve
 from app.points.models import MouvementPoints, Semestre
 from app.points.service import aujourd_hui
 from app.referentiel.models import Etablissement, Iesg, StatutEtablissement
+from tests.fiche import fiche
 
 INSCRIPTION = "/api/eleves/inscription"
 
@@ -42,6 +43,7 @@ def formulaire(en_base: Callable[..., Any], **champs: Any) -> dict[str, Any]:
         "charte": True,
         "consentement_parent": True,
         "etablissement_id": etablissement_id(en_base),
+        "fiche": fiche(),
     }
     return valeurs | champs
 

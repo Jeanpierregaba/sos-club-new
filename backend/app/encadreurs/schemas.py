@@ -1,29 +1,14 @@
-import re
 from datetime import datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field, model_validator
 
+from app.comptes.champs import Telephone
 from app.comptes.service import LONGUEUR_MAX_MOT_DE_PASSE
 from app.encadreurs.models import EtatVerification, Fonction
 from app.points.schemas import ResumePoints
 from app.referentiel.schemas import EtablissementRattache, Proposition
-
-SEPARATEURS = re.compile(r"[\s().-]")
-FORMAT_TELEPHONE = re.compile(r"\+?[0-9]{8,15}")
-
-
-def normaliser_telephone(valeur: str | None) -> str | None:
-    """« +228 90 12-34-56 » devient « +22890123456 ». Un champ vide redevient nul."""
-    if valeur is None:
-        return None
-    propre = SEPARATEURS.sub("", valeur)
-    if not propre:
-        return None
-    if not FORMAT_TELEPHONE.fullmatch(propre):
-        raise ValueError("Ce téléphone n'est pas valide : de 8 à 15 chiffres, avec « + » au début si besoin")
-    return propre
 
 
 def _precision(valeur: str | None) -> str | None:
@@ -40,7 +25,6 @@ def _motif(valeur: str) -> str:
 
 
 Motif = Annotated[str, Field(max_length=500), AfterValidator(_motif)]
-Telephone = Annotated[str | None, Field(max_length=30), AfterValidator(normaliser_telephone)]
 Precision = Annotated[str | None, Field(max_length=100), AfterValidator(_precision)]
 
 

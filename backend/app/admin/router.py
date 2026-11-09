@@ -65,6 +65,8 @@ from app.comptes.service import (
 from app.config import settings
 from app.db import get_session
 from app.eleves import administration as administration_eleves
+from app.eleves import fiche as fiche_eleve
+from app.eleves.schemas_fiche import FicheSortie
 from app.encadreurs.verification import compter_en_attente as compter_encadreurs_en_attente
 from app.moderation.decisions import compter_en_attente as compter_contenus_en_attente
 from app.referentiel.models import Dre
@@ -469,6 +471,18 @@ async def reinitialiser_mot_de_passe(
     except administration_eleves.Introuvable:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Élève introuvable.") from None
     return MotDePasseProvisoire(mot_de_passe=provisoire)
+
+
+LecteurFiches = Annotated[Acces, Depends(exiger_permission("fiches_eleves", Action.consulter))]
+
+
+@router.get("/inscrits/{utilisateur_id}/fiche")
+async def voir_fiche_eleve(utilisateur_id: UUID, acces: LecteurFiches, db: Base, request: Request) -> FicheSortie:
+    """La fiche d'adhésion d'un élève (spec 030) : droit sensible, périmètre DRE, chaque lecture journalisée."""
+    try:
+        return await fiche_eleve.lire_pour_equipe(db, acces, utilisateur_id, adresse_ip(request))
+    except fiche_eleve.Introuvable:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Fiche introuvable.") from None
 
 
 # Exports ----------------------------------------------------------------------------------------------------
