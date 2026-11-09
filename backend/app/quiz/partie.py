@@ -15,12 +15,15 @@ from uuid import UUID
 from sqlalchemy import delete, exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.certification import progression
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.points import service as points
 from app.points.bareme import QUIZ_ELEVE
 from app.points.models import MouvementPoints
 from app.quiz import horloge, parametres
 from app.quiz.models import (
+    PARCOURS_CERTIFICATION,
+    PARCOURS_JEUX,
     EtatQuiz,
     EtatTentative,
     ParametresQuiz,
@@ -44,6 +47,10 @@ class Introuvable(Exception):
 
 class PlafondAtteint(Exception):
     pass
+
+
+class PlaceVerrouillee(Exception):
+    """Certification (spec 029) : la place précédente n'est pas encore réussie."""
 
 
 class ChoixInvalide(Exception):
@@ -82,7 +89,9 @@ async def lancer(db: AsyncSession, joueur: Utilisateur, quiz_id: UUID, *, essai:
     # Sérialise les lancements d'un même joueur : le plafond et la tentative en cours restent exacts.
     await _verrouiller_joueur(db, joueur)
     maintenant = horloge.maintenant()
-    p = await parametres.en_cours(db)
+    p = await parametres.en_cours(db, quiz.parcours)
+    if not essai and quiz.place is not None and not await progression.place_ouverte(db, joueur.id, quiz.place):
+        raise PlaceVerrouillee
 
     if essai:
         # L'essai précédent du collaborateur, puis les essais abandonnés depuis plus d'un jour par d'autres : ceux
@@ -214,7 +223,7 @@ async def repondre(
 async def liste(db: AsyncSession, joueur: Utilisateur, axe: str | None = None) -> ListeQuiz:
     await _clore_abandonnees(db, joueur)
     p = await parametres.en_cours(db)
-    requete = select(Quiz).where(Quiz.etat == EtatQuiz.publie)
+    requete = select(Quiz).where(Quiz.etat == EtatQuiz.publie, Quiz.parcours == PARCOURS_JEUX)
     if axe:
         requete = requete.where(Quiz.axe_code == axe)
     tous = (await db.scalars(requete.order_by(Quiz.publie_le.desc(), Quiz.titre))).all()
@@ -367,7 +376,8 @@ async def _terminer(
     db: AsyncSession, tentative: TentativeQuiz, joueur: Utilisateur, quiz: Quiz, p: ParametresQuiz, maintenant: datetime
 ) -> None:
     """Les questions non tranchées sont ratées ; la réussite se calcule sur le seuil de la version de la tentative.
-    Seule la première réussite d'un élève actif, sur un quiz toujours publié, rapporte des points."""
+    Seule la première réussite d'un élève actif, sur un quiz de jeux toujours publié, rapporte des points ; une
+    réussite sur un quiz de certification fait avancer le parcours (spec 029)."""
     lignes = await _lignes(db, tentative)
     for ligne in lignes:
         if ligne.correcte is None:
@@ -377,6 +387,13 @@ async def _terminer(
     tentative.etat = EtatTentative.terminee
     tentative.terminee_le = maintenant
     if (
+        not tentative.essai
+        and tentative.reussie
+        and quiz.etat is EtatQuiz.publie
+        and quiz.parcours == PARCOURS_CERTIFICATION
+    ):
+        await progression.enregistrer_reussite(db, joueur, quiz, tentative)
+    elif (
         not tentative.essai
         and tentative.reussie
         and quiz.etat is EtatQuiz.publie

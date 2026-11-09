@@ -4,9 +4,9 @@
       `place_reussie`, `badge_obtenu`, `certificat` ; barème en service), modèles, `points.annuler` et son test.
 - [x] 2. Banque : parcours, place et fascicule à la création et à la modification, filtre par parcours, place
       unique à l'approbation (409, course comprise), paramètres par parcours. Tests d'abord.
-- [ ] 3. Tests de la progression (TDD) : ordre des places, pas de +50, badges et leurs points, encadreur sans
+- [x] 3. Tests de la progression (TDD) : ordre des places, pas de +50, badges et leurs points, encadreur sans
       points, certificat unique, fins simultanées, rattrapage, révoqué rejoué.
-- [ ] 4. Progression : `partie.py` (paramètres du parcours, `PlaceVerrouillee`, fin de partie, liste des jeux
+- [x] 4. Progression : `partie.py` (paramètres du parcours, `PlaceVerrouillee`, fin de partie, liste des jeux
       seulement), `certification/progression.py`, `regles.py` ; les tests de la tâche 3 passent.
 - [ ] 5. Routes joueur : `GET /certification` (« Ma certification ») et `GET /certification/certificat.pdf`
       (reportlab ajouté, PDF vérifié par extraction de texte, réservé au titulaire).

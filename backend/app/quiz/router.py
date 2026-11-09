@@ -26,12 +26,20 @@ def erreur_de_partie(erreur: Exception) -> HTTPException:
         )
     if isinstance(erreur, partie.ChoixInvalide):
         return HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Ce choix n'existe pas pour cette question.")
+    if isinstance(erreur, partie.PlaceVerrouillee):
+        return HTTPException(status.HTTP_403_FORBIDDEN, "Réussis d'abord la place précédente du parcours.")
     if isinstance(erreur, partie.QuizIncomplet):
         return HTTPException(status.HTTP_409_CONFLICT, "Ce quiz n'a pas assez de questions pour une partie.")
     return HTTPException(status.HTTP_404_NOT_FOUND, INTROUVABLE)
 
 
-ERREURS = (partie.Introuvable, partie.PlafondAtteint, partie.ChoixInvalide, partie.QuizIncomplet)
+ERREURS = (
+    partie.Introuvable,
+    partie.PlafondAtteint,
+    partie.ChoixInvalide,
+    partie.QuizIncomplet,
+    partie.PlaceVerrouillee,
+)
 
 
 @router.get("")
