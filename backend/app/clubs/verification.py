@@ -55,6 +55,7 @@ def _etablissement(etablissement: Etablissement, iesg: Iesg, dre: Dre) -> Etabli
         iesg=iesg.nom,
         dre_code=dre.code,
         dre=dre.nom,
+        localite=etablissement.localite,
     )
 
 

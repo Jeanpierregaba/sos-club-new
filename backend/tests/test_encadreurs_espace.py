@@ -127,30 +127,44 @@ def test_modifier_son_profil(client: TestClient, en_base: Callable[..., Any], en
 
     reponse = client.patch(
         ESPACE,
-        json={"version": version, "telephone": "", "etablissement_id": autre, "fonction": "autre",
-              "fonction_precision": "Bibliothécaire"},
+        json={"version": version, "telephone": "91 00 00 00", "etablissement_id": autre, "fonction": "autre",
+              "fonction_precision": "Bibliothécaire", "discipline": "Physique-chimie"},
     )  # fmt: skip
 
     assert reponse.status_code == 200, reponse.text
     espace = reponse.json()
-    assert espace["telephone"] is None
+    assert (espace["telephone"], espace["discipline"]) == ("91000000", "Physique-chimie")
     assert espace["etablissement"]["nom"] == "Lycée de Tokoin II"
     assert (espace["fonction"], espace["fonction_precision"]) == ("autre", "Bibliothécaire")
     assert espace["version"] == version + 1
     (entree,) = en_base(
         lambda db: db.scalars(select(JournalAudit).where(JournalAudit.action == "profil_encadreur_modifie"))
     ).all()
-    assert entree.details["apres"]["telephone"] is None
-    assert "90123456" not in str(entree.details)
+    assert entree.details["apres"]["telephone"] == "nouveau"
+    assert "90123456" not in str(entree.details) and "91000000" not in str(entree.details)
+
+
+def test_le_telephone_ne_sefface_plus(client: TestClient, encadreur: dict[str, Any]) -> None:
+    version = client.get(ESPACE).json()["version"]
+
+    reponse = client.patch(ESPACE, json={"version": version, "telephone": ""})
+
+    assert reponse.status_code == 422
+    assert client.get(ESPACE).json()["telephone"] == "90123456"
 
 
 def test_ajouter_un_telephone_est_journalise_sans_ancien_numero(
     client: TestClient, en_base: Callable[..., Any], encadreur: dict[str, Any]
 ) -> None:
+    # Un encadreur inscrit avant la spec 030 peut n'avoir aucun téléphone.
+    en_base(
+        lambda db: db.execute(
+            update(Utilisateur).where(Utilisateur.identifiant == "kossi.agbeko").values(telephone=None)
+        )
+    )
     version = client.get(ESPACE).json()["version"]
-    client.patch(ESPACE, json={"version": version, "telephone": ""})
 
-    client.patch(ESPACE, json={"version": version + 1, "telephone": "91 00 00 00"})
+    client.patch(ESPACE, json={"version": version, "telephone": "91 00 00 00"})
 
     dernier = en_base(
         lambda db: db.scalars(

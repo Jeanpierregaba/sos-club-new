@@ -66,6 +66,7 @@ def _demande(
         telephone=utilisateur.telephone,
         fonction=encadreur.fonction,
         fonction_precision=encadreur.fonction_precision,
+        discipline=encadreur.discipline,
         etablissement=EtablissementRattache(
             id=etablissement.id,
             nom=etablissement.nom,
@@ -73,6 +74,7 @@ def _demande(
             iesg=iesg.nom,
             dre_code=dre.code,
             dre=dre.nom,
+            localite=etablissement.localite,
         ),
         etat=encadreur.etat,
         demande_le=encadreur.demande_le,

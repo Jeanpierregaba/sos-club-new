@@ -78,6 +78,8 @@ class EtablissementRattache(BaseModel):
     iesg: str
     dre_code: str
     dre: str
+    # La ville de l'établissement (spec 030) : avec la DRE, elle donne la région et la ville d'un encadreur.
+    localite: str | None = None
 
 
 class Proposition(BaseModel):

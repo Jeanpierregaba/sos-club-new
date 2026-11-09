@@ -28,7 +28,7 @@ authentification, code de confirmation) commencent par leurs tests.
 
 ## Encadreur
 
-- [ ] 6. Téléphone requis à l'inscription, `discipline` (inscription, espace, modification, file de vérification),
+- [x] 6. Téléphone requis à l'inscription, `discipline` (inscription, espace, modification, file de vérification),
       `region` et `ville` déduites dans l'espace. Tests.
 
 ## Visiteur

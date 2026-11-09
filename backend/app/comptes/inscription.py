@@ -140,5 +140,5 @@ async def etablissement_rattache(db: AsyncSession, etablissement_id: UUID) -> Et
     ).one()
     return EtablissementRattache(
         id=etablissement.id, nom=etablissement.nom, statut=etablissement.statut, iesg=iesg.nom, dre_code=dre.code,
-        dre=dre.nom,
+        dre=dre.nom, localite=etablissement.localite,
     )  # fmt: skip

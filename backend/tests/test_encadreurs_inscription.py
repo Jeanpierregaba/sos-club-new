@@ -194,11 +194,36 @@ def test_un_telephone_invalide_est_refuse(client: TestClient, en_base: Callable[
     assert client.post(INSCRIPTION, json=formulaire(en_base, telephone=telephone)).status_code == 422
 
 
-def test_le_telephone_est_facultatif(client: TestClient, en_base: Callable[..., Any]) -> None:
+@pytest.mark.parametrize("telephone", [None, "", "  "])
+def test_le_telephone_est_obligatoire(client: TestClient, en_base: Callable[..., Any], telephone: str | None) -> None:
     corps = formulaire(en_base)
     del corps["telephone"]
+    assert client.post(INSCRIPTION, json=corps).status_code == 422
 
-    assert client.post(INSCRIPTION, json=corps).status_code == 201
+    assert client.post(INSCRIPTION, json=formulaire(en_base, telephone=telephone)).status_code == 422
+    assert compter(en_base, Encadreur) == 0
+
+
+def test_la_discipline_est_enregistree(client: TestClient, en_base: Callable[..., Any]) -> None:
+    reponse = client.post(
+        INSCRIPTION, json=formulaire(en_base, discipline="  SVT (Sciences de la Vie  et de la Terre) ")
+    )
+
+    assert reponse.status_code == 201
+    encadreur = en_base(lambda db: db.scalar(select(Encadreur)))
+    assert encadreur.discipline == "SVT (Sciences de la Vie et de la Terre)"
+    assert client.get("/api/encadreurs/moi").json()["discipline"] == "SVT (Sciences de la Vie et de la Terre)"
+
+
+def test_lespace_montre_la_region_et_la_ville_de_letablissement(
+    client: TestClient, en_base: Callable[..., Any]
+) -> None:
+    client.post(INSCRIPTION, json=formulaire(en_base))
+
+    etablissement = client.get("/api/encadreurs/moi").json()["etablissement"]
+
+    lieu = en_base(lambda db: db.scalar(select(Etablissement.localite).where(Etablissement.nom == "Lycée de Tokoin I")))
+    assert (etablissement["dre"], etablissement["localite"]) == ("Grand Lomé", lieu)
 
 
 # Établissement ---------------------------------------------------------------------------------------------------

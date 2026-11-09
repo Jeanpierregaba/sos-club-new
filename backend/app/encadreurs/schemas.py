@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field, model_validator
 
-from app.comptes.champs import Telephone
+from app.comptes.champs import Telephone, TelephoneObligatoire, Texte100
 from app.comptes.service import LONGUEUR_MAX_MOT_DE_PASSE
 from app.encadreurs.models import EtatVerification, Fonction
 from app.points.schemas import ResumePoints
@@ -37,11 +37,13 @@ class InscriptionEncadreur(BaseModel):
     prenom: str = Field(max_length=100)
     nom: str = Field(max_length=100)
     email: str = Field(max_length=254)
-    telephone: Telephone = None
+    # Obligatoire depuis la spec 030 : l'équipe joint l'encadreur pour la vérification.
+    telephone: TelephoneObligatoire
     identifiant: str = Field(max_length=60)
     mot_de_passe: str = Field(max_length=LONGUEUR_MAX_MOT_DE_PASSE)
     fonction: Fonction
     fonction_precision: Precision = None
+    discipline: Texte100 = None
     # Les deux cases du formulaire : vérifiées ici, pas seulement par le site.
     charte: Literal[True]
     consentement: Literal[True]
@@ -66,6 +68,7 @@ class EspaceEncadreur(BaseModel):
     motif_refus: str | None
     fonction: Fonction
     fonction_precision: str | None
+    discipline: str | None
     email: str | None
     telephone: str | None
     etablissement: EtablissementRattache
@@ -78,11 +81,13 @@ class ProfilEncadreurModification(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     version: Annotated[int, Field(ge=1)]
-    # Une chaîne vide efface le téléphone.
+    # Le téléphone se change mais ne s'efface plus (spec 030).
     telephone: Telephone = None
     etablissement_id: UUID | None = None
     fonction: Fonction | None = None
     fonction_precision: Precision = None
+    # Une chaîne vide efface la discipline.
+    discipline: Texte100 = None
 
 
 # Vérification par l'espace admin -------------------------------------------------------------------------------
@@ -99,6 +104,7 @@ class DemandeEncadreur(BaseModel):
     telephone: str | None
     fonction: Fonction
     fonction_precision: str | None
+    discipline: str | None
     etablissement: EtablissementRattache
     etat: EtatVerification
     demande_le: datetime

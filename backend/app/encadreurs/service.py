@@ -80,6 +80,7 @@ async def inscrire(db: AsyncSession, entree: InscriptionEncadreur, adresse_ip: s
             etablissement_id=etablissement.id,
             fonction=entree.fonction,
             fonction_precision=entree.fonction_precision,
+            discipline=entree.discipline,
             etat=EtatVerification.en_attente,
             demande_le=datetime.now(UTC),
             charte_version=settings.version_charte,
@@ -118,6 +119,7 @@ async def espace(db: AsyncSession, utilisateur: Utilisateur) -> EspaceEncadreur:
         motif_refus=encadreur.motif_refus,
         fonction=encadreur.fonction,
         fonction_precision=encadreur.fonction_precision,
+        discipline=encadreur.discipline,
         email=utilisateur.email,
         telephone=utilisateur.telephone,
         etablissement=await etablissement_rattache(db, encadreur.etablissement_id),
@@ -142,6 +144,8 @@ async def modifier_profil(
         raise Refus(MESSAGE_VERSION, 409)
     avant: dict[str, str | None] = {}
     apres: dict[str, str | None] = {}
+    if "telephone" in entree.model_fields_set and entree.telephone is None and utilisateur.telephone:
+        raise Refus("Ton téléphone est obligatoire : remplace-le plutôt que de l'effacer.")
     if "telephone" in entree.model_fields_set and entree.telephone != utilisateur.telephone:
         # Le numéro lui-même n'entre pas au journal.
         avant["telephone"] = "ancien" if utilisateur.telephone else None
@@ -168,6 +172,9 @@ async def modifier_profil(
         avant["fonction"], apres["fonction"] = encadreur.fonction.value, fonction.value
         avant["fonction_precision"], apres["fonction_precision"] = encadreur.fonction_precision, precision
         encadreur.fonction, encadreur.fonction_precision = fonction, precision
+    if "discipline" in entree.model_fields_set and entree.discipline != encadreur.discipline:
+        avant["discipline"], apres["discipline"] = encadreur.discipline, entree.discipline
+        encadreur.discipline = entree.discipline
     if apres:
         # Le verrou optimiste ne voit que les colonnes du profil : le téléphone seul doit aussi faire monter la version.
         encadreur.modifie_le = datetime.now(UTC)
