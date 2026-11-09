@@ -90,15 +90,15 @@ const CHAMPS_NOMMES: [string, keyof Valeurs][] = [
 // Les étapes, pour rester lisible sur un téléphone : chaque « Suivant » ne valide que les champs affichés.
 const ETAPES = [
   {
-    titre: "Ton compte",
+    titre: "Compte",
     champs: ["prenom", "nom", "pseudonyme", "classe", "identifiant", "motDePasse", "email"],
   },
   {
     titre: "Toi",
     champs: [...CHAMPS_ETAPES.lieu, ...CHAMPS_ETAPES.toi].map((c) => `fiche.${c}`),
   },
-  { titre: "Ta famille", champs: CHAMPS_ETAPES.famille.map((c) => `fiche.${c}`) },
-  { titre: "Ton club", champs: [] },
+  { titre: "Famille", champs: CHAMPS_ETAPES.famille.map((c) => `fiche.${c}`) },
+  { titre: "Club", champs: [] },
 ] as const;
 
 // Le formulaire d'inscription d'un élève (spec 017), avec sa fiche d'adhésion (spec 030).
@@ -141,7 +141,11 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
       setErreurEtablissement(manque);
       if (manque) return;
     }
-    if (valide) allerA(etape + 1);
+    if (valide) {
+      // Les champs des étapes suivantes n'ont pas encore été remplis : pas d'erreur avant d'y arriver.
+      form.clearErrors();
+      allerA(etape + 1);
+    }
   };
 
   const envoyer = form.handleSubmit(

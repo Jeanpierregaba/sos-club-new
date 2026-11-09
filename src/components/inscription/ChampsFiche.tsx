@@ -145,16 +145,16 @@ export function SectionToi() {
   );
 }
 
-function Parent({ qui, libelle }: { qui: "pere" | "mere"; libelle: string }) {
+function Parent({ qui, libelle, de }: { qui: "pere" | "mere"; libelle: string; de: string }) {
   return (
     <div className="space-y-4 rounded-2xl bg-mist-soft p-4">
       <p className="font-bold text-ink">
         {libelle} {facultatif}
       </p>
-      <Texte name={`fiche.${qui}.nom`} libelle="Nom et prénoms" />
+      <Texte name={`fiche.${qui}.nom`} libelle={`Nom et prénoms ${de}`} />
       <div className="grid gap-4 sm:grid-cols-2">
-        <Texte name={`fiche.${qui}.profession`} libelle="Profession" />
-        <Texte name={`fiche.${qui}.telephone`} libelle="Contact" type="tel" />
+        <Texte name={`fiche.${qui}.profession`} libelle={`Profession ${de}`} />
+        <Texte name={`fiche.${qui}.telephone`} libelle={`Contact ${de}`} type="tel" />
       </div>
     </div>
   );
@@ -164,15 +164,15 @@ export function SectionFamille() {
   return (
     <fieldset className="space-y-5">
       <Titre>Ta famille</Titre>
-      <Parent qui="pere" libelle="Père" />
-      <Parent qui="mere" libelle="Mère" />
+      <Parent qui="pere" libelle="Père" de="du père" />
+      <Parent qui="mere" libelle="Mère" de="de la mère" />
       <div className="space-y-4 rounded-2xl border-2 border-primary/30 p-4">
         <p className="font-bold text-ink">Ton parent ou tuteur responsable</p>
         <p className="-mt-2 text-sm font-medium text-muted-foreground">
           Il remplace la signature de la fiche papier : l'équipe peut le joindre si besoin.
         </p>
-        <Texte name="fiche.responsableNom" libelle="Nom et prénoms" />
-        <Texte name="fiche.responsableTelephone" libelle="Contact" type="tel" />
+        <Texte name="fiche.responsableNom" libelle="Nom et prénoms du responsable" />
+        <Texte name="fiche.responsableTelephone" libelle="Contact du responsable" type="tel" />
       </div>
     </fieldset>
   );
