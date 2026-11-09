@@ -251,7 +251,8 @@ function DialogueProfil({
         if (!etablissement) throw new ErreurApi(422, "Choisis ton établissement dans la liste.");
         if (fonction === "autre" && !precision.trim())
           throw new ErreurApi(422, "Précise ta fonction.");
-        if (!normaliserTelephone(telephone))
+        // Un ancien compte sans téléphone n'est pas bloqué ; un téléphone enregistré ne s'efface plus.
+        if (espace.telephone && !normaliserTelephone(telephone))
           throw new ErreurApi(422, "Indique ton téléphone ou ton WhatsApp.");
         if (!telephoneValide(telephone))
           throw new ErreurApi(422, "Ce téléphone n'est pas valide : de 8 à 15 chiffres.");
@@ -260,7 +261,7 @@ function DialogueProfil({
           fonction,
           fonction_precision: fonction === "autre" ? precision.trim() : null,
           etablissement_id: etablissement.id,
-          telephone: normaliserTelephone(telephone),
+          telephone: normaliserTelephone(telephone) || null,
           discipline: discipline.trim() || null,
         });
         await router.invalidate();

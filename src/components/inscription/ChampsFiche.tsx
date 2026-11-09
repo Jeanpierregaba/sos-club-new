@@ -195,7 +195,13 @@ function ChoixAxes({ axes }: { axes: AxePublic[] }) {
             <FormLabel>Axe(s) choisi(s)</FormLabel>
             <FormDescription>De 1 à {AXES_MAX} axes du Club Santé.</FormDescription>
             <div className="grid gap-2 sm:grid-cols-2">
-              {axes.map((axe) => {
+              {[
+                ...axes,
+                // Un axe désactivé depuis le choix de l'élève reste affiché : il peut le décocher.
+                ...choisis
+                  .filter((code) => !axes.some((a) => a.code === code))
+                  .map((code) => ({ code, libelle: `${code} (n'est plus proposé)` })),
+              ].map((axe) => {
                 const coche = choisis.includes(axe.code);
                 const bloque = !coche && choisis.length >= AXES_MAX;
                 return (

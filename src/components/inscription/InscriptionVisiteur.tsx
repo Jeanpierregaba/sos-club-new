@@ -136,6 +136,12 @@ export function InscriptionVisiteur() {
           email={attente.email}
           codeDeTest={attente.test}
           onConfirme={(moi) => void confirme(moi)}
+          retour="Ce n'est pas mon adresse"
+          onRetour={() => {
+            // Une adresse mal tapée : on revient au formulaire pour s'inscrire avec la bonne.
+            setAttente(null);
+            form.resetField("motDePasse");
+          }}
         />
       </div>
     );

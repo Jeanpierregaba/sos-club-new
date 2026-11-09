@@ -442,7 +442,7 @@ function SectionFiche({ id }: { id: string }) {
     } catch (e) {
       setErreur(
         e instanceof ErreurApi && e.statut === 404
-          ? "Cet élève n'a pas encore rempli sa fiche."
+          ? "Fiche introuvable : pas encore remplie, ou hors de ton périmètre."
           : e instanceof ErreurApi
             ? e.message
             : MESSAGE_INDISPONIBLE,
@@ -509,7 +509,11 @@ function SectionFiche({ id }: { id: string }) {
       <p className="mt-2 text-sm font-medium text-muted-foreground">
         Données personnelles d'un élève : chaque consultation est inscrite au journal d'audit.
       </p>
-      {erreur && <p className="mt-4 text-sm font-semibold text-destructive">{erreur}</p>}
+      {erreur && (
+        <p role="alert" className="mt-4 text-sm font-semibold text-destructive">
+          {erreur}
+        </p>
+      )}
       {fiche && (
         <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {champs.map(([libelle, valeur]) => (

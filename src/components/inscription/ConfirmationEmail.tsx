@@ -22,11 +22,13 @@ export function ConfirmationEmail({
   codeDeTest,
   onConfirme,
   onRetour,
+  retour = "Retour",
 }: {
   email: string;
   codeDeTest?: string | null | undefined;
   onConfirme: (moi: Moi) => void;
   onRetour?: () => void;
+  retour?: string;
 }) {
   const [code, setCode] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
@@ -124,7 +126,7 @@ export function ConfirmationEmail({
             onClick={onRetour}
             className="inline-flex items-center gap-1 text-muted-foreground hover:text-ink"
           >
-            <ArrowLeft className="size-4" /> Retour
+            <ArrowLeft className="size-4" /> {retour}
           </button>
         ) : (
           <span />
