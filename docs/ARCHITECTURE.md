@@ -67,9 +67,9 @@ erDiagram
 
 Champs structurants :
 
-- `utilisateur` : `role` (eleve, encadreur, admin), `identifiant` unique, `email` unique facultatif
-  pour l'élève et obligatoire pour les autres, `telephone`, `prenom`, `nom`, `mot_de_passe_hash`,
-  `statut`, `consentement_le`.
+- `utilisateur` : `role` (eleve, encadreur, admin, visiteur), `identifiant` unique, `email` unique
+  facultatif pour l'élève et obligatoire pour les autres, `telephone`, `prenom`, `nom`,
+  `mot_de_passe_hash`, `statut`, `consentement_le`, `email_confirme_le` (visiteur, spec 030).
 - `dre`, `iesg`, `etablissement` (spec 016) : le découpage scolaire. Une DRE a un `code` stable (clé
   primaire, aussi utilisée par `collaborateur.perimetre_dre`) ; IESG et établissements ont un UUID.
   La DRE d'un établissement se déduit de son IESG. Chaque table a un `nom_normalise` (sans accents ni
@@ -168,6 +168,13 @@ Champs structurants :
 - `semestre` (spec 017) : `libelle`, `debut`, `fin` (dates de Lomé, UTC+0). Une contrainte d'exclusion
   interdit deux semestres qui se chevauchent ; un semestre commencé ne se modifie plus, sauf pour
   prolonger un semestre en cours.
+- `fiche_eleve` (spec 030) : la fiche d'adhésion de l'élève, un pour un avec `eleve` — année scolaire
+  posée par le serveur, n° d'adhésion, préfecture, commune, canton, sexe, date et lieu de naissance,
+  contact, père et mère, parent ou tuteur responsable, réseaux sociaux, `engagement_le`, `complete_le`.
+  Avec `fiche_eleve_axe` (1 à 3 axes) et `fiche_eleve_parcours` (2 années antérieures au plus, texte
+  libre). Données personnelles d'un mineur : droit sensible `fiches_eleves:consulter`, lecture journalisée.
+- `visiteur` (spec 030) : ville, région, sexe, statut ; `code_confirmation` garde l'empreinte Argon2 du
+  code en cours, ses essais et ses envois de l'heure. `encadreur.discipline` s'ajoute (spec 030).
 
 Le référentiel (`dre`, `iesg`, `etablissement`, `axe`) est chargé par la migration `referentiel` depuis
 `backend/alembic/donnees/annuaire.json`, puis géré depuis `/admin/referentiel`. Le site lit ses listes
@@ -199,46 +206,47 @@ flowchart LR
 Sessions en base et cookie sécurisé (ADR-0003). Les droits sont contrôlés dans l'API, sur chaque route,
 pour la ressource demandée.
 
-| Action                                                                    | Visiteur | Élève                     | Encadreur                 | Admin                                                       |
-| ------------------------------------------------------------------------- | -------- | ------------------------- | ------------------------- | ----------------------------------------------------------- |
-| Lire les contenus publiés                                                 | Oui      | Oui                       | Oui                       | Oui                                                         |
-| Passer un quiz avec points                                                | Non      | Élève actif               | Non (joue sans points)    | Non                                                         |
-| Voir son Passeport                                                        | Non      | Le sien                   | Non                       | Oui                                                         |
-| Soumettre un témoignage                                                   | Non      | Oui                       | Non                       | Non                                                         |
-| Soumettre une activité, ajouter à l'agenda                                | Non      | Non                       | Pour son club             | Oui                                                         |
-| Voir la console d'un club                                                 | Non      | Non                       | Son club                  | Oui                                                         |
-| Retirer un élève, réinitialiser son accès                                 | Non      | Non                       | Élèves de son club        | Oui                                                         |
-| Commenter                                                                 | Non      | Non                       | Oui                       | Oui                                                         |
-| Demander à rejoindre un club (spec 020)                                   | Non      | Club de son établissement | N'importe quel club actif | Non                                                         |
-| Confirmer ou refuser une demande, retirer un membre (spec 020)            | Non      | Président de ce club      | Non                       | Non                                                         |
-| Voir la liste des membres d'un club (spec 020)                            | Non      | Membre ou président       | Clubs où il est rattaché  | Sa DRE                                                      |
-| Valider une affiliation ou un rattachement (spec 020)                     | Non      | Non                       | Non                       | Sa DRE (national pour un club supplémentaire)               |
-| Confirmer le nouveau président d'un club (Q19, spec 020)                  | Non      | Non                       | Clubs où il est rattaché  | Non                                                         |
-| Jouer à « Quel axe est fait pour toi ? » (spec 021)                       | Non      | Élève actif               | Non                       | Non                                                         |
-| Jouer à un quiz (spec 027 ; points pour l'élève seulement)                | Non      | Élève actif               | Encadreur vérifié         | Mode test seulement                                         |
-| Préparer, soumettre un quiz (spec 027)                                    | Non      | Non                       | Non                       | Droits `quiz` créer, modifier, soumettre                    |
-| Publier, refuser, dépublier un quiz (spec 027)                            | Non      | Non                       | Non                       | Droits `quiz` approuver, dépublier ; jamais son propre quiz |
-| Suivre le parcours Génie Imhotep, badges et certificat (spec 029)         | Non      | Élève actif (points)      | Encadreur vérifié         | Non                                                         |
-| Télécharger le PDF d'un certificat (spec 029)                             | Non      | Son certificat seulement  | Son certificat seulement  | Non                                                         |
-| Vérifier un certificat par son numéro (spec 029)                          | Oui      | Oui                       | Oui                       | Oui                                                         |
-| Régler les badges, révoquer ou réémettre un certificat (spec 029)         | Non      | Non                       | Non                       | Droits `quiz` approuver (règles), dépublier (certificats)   |
-| Lire et télécharger une ressource publiée (spec 028)                      | Oui      | Oui                       | Oui                       | Oui (et relire avant publication)                           |
-| Préparer, soumettre une ressource (spec 028)                              | Non      | Non                       | Non                       | Droits `bibliotheque` créer, modifier, soumettre            |
-| Publier, refuser, dépublier une ressource (spec 028)                      | Non      | Non                       | Non                       | Droits `bibliotheque` approuver, dépublier ; pas la sienne  |
-| Répondre au défi du jour, voir le podium des clubs (spec 021)             | Oui      | Oui                       | Oui                       | Oui                                                         |
-| Gagner des points au défi du jour (spec 022)                              | Non      | Élève actif, 1 fois/jour  | Non                       | Non                                                         |
-| Modérer, publier vidéos et documents, valider un club, attribuer un badge | Non      | Non                       | Non                       | Oui                                                         |
+| Action                                                                    | Visiteur                                  | Élève                     | Encadreur                 | Admin                                                       |
+| ------------------------------------------------------------------------- | ----------------------------------------- | ------------------------- | ------------------------- | ----------------------------------------------------------- |
+| Lire les contenus publiés                                                 | Oui                                       | Oui                       | Oui                       | Oui                                                         |
+| Passer un quiz avec points                                                | Non                                       | Élève actif               | Non (joue sans points)    | Non                                                         |
+| Voir son Passeport                                                        | Non                                       | Le sien                   | Non                       | Oui                                                         |
+| Soumettre un témoignage                                                   | Non                                       | Oui                       | Non                       | Non                                                         |
+| Soumettre une activité, ajouter à l'agenda                                | Non                                       | Non                       | Pour son club             | Oui                                                         |
+| Voir la console d'un club                                                 | Non                                       | Non                       | Son club                  | Oui                                                         |
+| Retirer un élève, réinitialiser son accès                                 | Non                                       | Non                       | Élèves de son club        | Oui                                                         |
+| Commenter                                                                 | Non                                       | Non                       | Oui                       | Oui                                                         |
+| Demander à rejoindre un club (spec 020)                                   | Non                                       | Club de son établissement | N'importe quel club actif | Non                                                         |
+| Confirmer ou refuser une demande, retirer un membre (spec 020)            | Non                                       | Président de ce club      | Non                       | Non                                                         |
+| Voir la liste des membres d'un club (spec 020)                            | Non                                       | Membre ou président       | Clubs où il est rattaché  | Sa DRE                                                      |
+| Valider une affiliation ou un rattachement (spec 020)                     | Non                                       | Non                       | Non                       | Sa DRE (national pour un club supplémentaire)               |
+| Confirmer le nouveau président d'un club (Q19, spec 020)                  | Non                                       | Non                       | Clubs où il est rattaché  | Non                                                         |
+| Jouer à « Quel axe est fait pour toi ? » (spec 021)                       | Non                                       | Élève actif               | Non                       | Non                                                         |
+| Jouer à un quiz (spec 027 ; points pour l'élève seulement)                | Visiteur confirmé (spec 030), sans points | Élève actif               | Encadreur vérifié         | Mode test seulement                                         |
+| Préparer, soumettre un quiz (spec 027)                                    | Non                                       | Non                       | Non                       | Droits `quiz` créer, modifier, soumettre                    |
+| Publier, refuser, dépublier un quiz (spec 027)                            | Non                                       | Non                       | Non                       | Droits `quiz` approuver, dépublier ; jamais son propre quiz |
+| Suivre le parcours Génie Imhotep, badges et certificat (spec 029)         | Non                                       | Élève actif (points)      | Encadreur vérifié         | Non                                                         |
+| Lire la fiche d'adhésion d'un élève (spec 030)                            | Non                                       | La sienne                 | Non                       | Droit `fiches_eleves` consulter, sa DRE, double auth        |
+| Télécharger le PDF d'un certificat (spec 029)                             | Non                                       | Son certificat seulement  | Son certificat seulement  | Non                                                         |
+| Vérifier un certificat par son numéro (spec 029)                          | Oui                                       | Oui                       | Oui                       | Oui                                                         |
+| Régler les badges, révoquer ou réémettre un certificat (spec 029)         | Non                                       | Non                       | Non                       | Droits `quiz` approuver (règles), dépublier (certificats)   |
+| Lire et télécharger une ressource publiée (spec 028)                      | Oui                                       | Oui                       | Oui                       | Oui (et relire avant publication)                           |
+| Préparer, soumettre une ressource (spec 028)                              | Non                                       | Non                       | Non                       | Droits `bibliotheque` créer, modifier, soumettre            |
+| Publier, refuser, dépublier une ressource (spec 028)                      | Non                                       | Non                       | Non                       | Droits `bibliotheque` approuver, dépublier ; pas la sienne  |
+| Répondre au défi du jour, voir le podium des clubs (spec 021)             | Oui                                       | Oui                       | Oui                       | Oui                                                         |
+| Gagner des points au défi du jour (spec 022)                              | Non                                       | Élève actif, 1 fois/jour  | Non                       | Non                                                         |
+| Modérer, publier vidéos et documents, valider un club, attribuer un badge | Non                                       | Non                       | Non                       | Oui                                                         |
 
 Un élève ne peut ni voir les coordonnées d'un autre utilisateur, ni être contacté par un autre
 utilisateur. Sur les pages publiques, un élève apparaît par son pseudonyme et le nom de son club.
 
 ## Intégrations externes
 
-| Service        | Usage                                   | Clé    | Coût et limite                               | État                             |
-| -------------- | --------------------------------------- | ------ | -------------------------------------------- | -------------------------------- |
-| YouTube        | Lecture des capsules (mode sans cookie) | Aucune | Gratuit ; dépend de la chaîne SOS DOCTEUR TV | Q11                              |
-| Envoi d'emails | Invitations d'encadreurs, mots de passe | Oui    | Quota gratuit à vérifier                     | Fournisseur à choisir (spec 003) |
-| Stockage S3    | Photos et PDF (ADR-0005)                | Oui    | Au volume                                    | Fournisseur à choisir (Q10)      |
+| Service        | Usage                                   | Clé    | Coût et limite                                | État                                     |
+| -------------- | --------------------------------------- | ------ | --------------------------------------------- | ---------------------------------------- |
+| YouTube        | Lecture des capsules (mode sans cookie) | Aucune | Gratuit ; dépend de la chaîne SOS DOCTEUR TV  | Q11                                      |
+| Envoi d'emails | Invitations, avis, codes des visiteurs  | Oui    | Brevo gratuit : ~300 e-mails/jour, à vérifier | SMTP, gabarit `app/courriel/` (spec 030) |
+| Stockage S3    | Photos et PDF (ADR-0005)                | Oui    | Au volume                                     | Fournisseur à choisir (Q10)              |
 
 ## Environnements et déploiement
 

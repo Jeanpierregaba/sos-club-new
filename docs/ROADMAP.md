@@ -105,7 +105,7 @@ article approuvé d'un élève affilié (spec 023), `club.article_eleve` au club
 | R16  | Agenda et invitations  | Le président et l'encadreur proposent un événement, l'admin le valide ; agenda public filtrable ; invitations des membres et réponses (+30 encadreur) | M      | Q22       |
 | R17  | Partages               | « Partager mon classement » (visuel sans donnée sensible) ; republication et partage d'articles avec preuve vérifiée (+10, +50 par réseau)            | M      | Q23       |
 | R18  | Forums et co-animation | Sujets et réponses prémodérés, co-animation entre encadreurs d'un même club, invitations des élèves, points des forums                                | L      | Q26       |
-| R19  | Comptes visiteurs      | Inscription légère par lien ou code, quiz sans points, commentaires modérés                                                                           | S      | Q27       |
+| R19  | Comptes visiteurs      | Avancé et livré par la spec 030 : inscription confirmée par un code e-mail, quiz sans points. Reste : commentaires modérés                            | S      | Q27       |
 
 R15 peut remonter juste après R5 si le porteur du projet veut la carte membre dès la démo : elle ne
 dépend que du compte et de l'affiliation. R18 exige d'abord un ADR sur les échanges entre élèves

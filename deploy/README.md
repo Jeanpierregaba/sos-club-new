@@ -146,6 +146,24 @@ test a déjà un autre club actif, ou si une passation du club de test est en at
 
 Il reste à copier `/opt/sosclub/prod/sauvegardes/` hors du VPS, de façon chiffrée. Le service reste à choisir.
 
+**9. Brancher l'envoi des e-mails** (spec 030). Sans SMTP, la production refuse l'inscription des visiteurs (leur
+code de confirmation ne pourrait pas partir) et n'envoie ni invitation ni avis aux encadreurs. Fournisseur proposé :
+[Brevo](https://www.brevo.com/), offre gratuite (environ 300 e-mails par jour : vérifie sur sa page tarifs).
+
+1. Crée le compte Brevo de l'association, puis ajoute et **authentifie le domaine d'envoi** : Brevo donne les
+   enregistrements DNS (SPF, DKIM et DMARC) à créer chez ton registraire. Sans eux, les codes arrivent en
+   courriers indésirables.
+2. Dans Brevo, « SMTP & API » : génère une **clé SMTP** (pas une clé d'API). Note l'hôte, le port et l'identifiant
+   affichés.
+3. Dans le fichier d'environnement de la préproduction, puis dans celui de la production (étape 4), renseigne
+   `SMTP_HOTE`, `SMTP_PORT` (587), `SMTP_SECURITE` (`starttls`), `SMTP_UTILISATEUR`, `SMTP_MOT_DE_PASSE` (la clé
+   SMTP) et `SMTP_EXPEDITEUR`, par exemple `Clubs Santé SOS Docteur TV <no-reply@ton-domaine.tg>`, sur le domaine
+   authentifié.
+4. Relance l'API (`docker compose up -d`), puis inscris un visiteur de test en préproduction : le code doit arriver
+   en boîte de réception. Le logo des e-mails est servi par le site (`/logo-email.png`).
+
+Ces accès ne vont jamais dans le dépôt.
+
 ## Au quotidien
 
 **Revenir à une version précédente** : dans l'onglet Actions de GitHub, lance « Déploiement » à la main, avec
