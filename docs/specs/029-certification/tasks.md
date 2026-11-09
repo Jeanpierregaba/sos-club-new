@@ -13,7 +13,7 @@
 - [x] 6. Vérification publique `GET /certificats/{numero}` : tests de non-divulgation d'abord.
 - [x] 7. Gestion : règles des badges (versions, 422), listes des certificats et des badges, révocation et
       réémission (2FA, motif, annulation des points, audit, notifications). Tests d'abord, droits paramétrés.
-- [ ] 8. Seed : 12 quiz « [Test] » du parcours reliés au fascicule de test ; test du seed.
+- [x] 8. Seed : 12 quiz « [Test] » du parcours reliés au fascicule de test ; test du seed.
 - [ ] 9. Site : client et types, `lib/certification` (+ test), page « Ma certification », retour depuis la partie,
       bouton sur `/certification`.
 - [ ] 10. Site : page publique `/certificats/$numero` (+ test), vérifiée dans le navigateur à 375 px.

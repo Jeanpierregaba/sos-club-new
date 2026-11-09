@@ -49,7 +49,7 @@ from app.moderation.models import (
 from app.moderation.photos import ATTESTATION
 from app.points import service as points
 from app.points.bareme import ARTICLE_ELEVE
-from app.quiz.models import EtatQuiz, QuestionQuiz, Quiz
+from app.quiz.models import PARCOURS_CERTIFICATION, PLACES, EtatQuiz, QuestionQuiz, Quiz
 from app.referentiel.models import Etablissement, Iesg, StatutEtablissement
 from app.seed_commun import (
     activer_double_auth,
@@ -467,6 +467,52 @@ async def _preparer_bibliotheque(db: AsyncSession) -> None:
         )  # fmt: skip
 
 
+async def _preparer_certification(db: AsyncSession) -> None:
+    """Le parcours Génie Imhotep de démonstration (spec 029), une fois : un fascicule publié et 12 quiz publiés, un
+    par place, reliés à ce fascicule. Marqués « Contenu de test » : des calculs et un PDF qui le dit, aucun contenu
+    de santé inventé (docs/RULES.md)."""
+    if await db.scalar(select(Quiz.id).where(Quiz.parcours == PARCOURS_CERTIFICATION)):
+        return
+    pedagogie = await db.scalar(select(Utilisateur.id).where(Utilisateur.identifiant == "dev.pedagogie"))
+    if pedagogie is None:
+        return
+    maintenant = datetime.now(UTC)
+    titre = "[Test] Fascicule de démonstration du parcours Génie Imhotep"
+    identifiant = uuid7()
+    octets = _pdf_de_test(titre)
+    cle = f"ressources/{identifiant}-document.pdf"
+    await stockage().enregistrer(cle, octets)
+    db.add(
+        Ressource(
+            id=identifiant, titre=titre, description="Fascicule de démonstration pour essayer le parcours.",
+            categorie=CategorieRessource.fascicule, etat=EtatRessource.publie, contenu_de_test=True,
+            contributeurs=[pedagogie], fichier_cle=cle, fichier_octets=len(octets), pages=1, soumis_par=pedagogie,
+            soumis_le=maintenant, validateur_nom="Compte de test", validateur_qualite="Contenu de démonstration",
+            publie_le=maintenant.replace(microsecond=0), deja_publiee=True,
+        )
+    )  # fmt: skip
+    await db.flush()
+    for place in range(1, PLACES + 1):
+        quiz = Quiz(
+            id=uuid7(), titre=f"[Test] Génie Imhotep — quiz {place}",
+            description="Quiz de démonstration du parcours de certification, non validé.",
+            axe_code="sante-environnement", etat=EtatQuiz.publie, contenu_de_test=True, contributeurs=[pedagogie],
+            parcours=PARCOURS_CERTIFICATION, place=place, ressource_id=identifiant, soumis_par=pedagogie,
+            soumis_le=maintenant, validateur_nom="Compte de test", validateur_qualite="Contenu de démonstration",
+            publie_le=maintenant,
+        )  # fmt: skip
+        db.add(quiz)
+        await db.flush()
+        for i in range(1, 16):
+            somme = i + place
+            db.add(
+                QuestionQuiz(
+                    quiz_id=quiz.id, enonce=f"Question de test {i} : combien font {i} + {place} ?",
+                    choix=[str(somme), str(somme + 1), str(somme - 1)], bonne_reponse=0, ordre=i,
+                )
+            )  # fmt: skip
+
+
 async def semer(db: AsyncSession) -> list[dict[str, str]]:
     """Prépare tous les comptes `dev.*` et renvoie leurs accès. Valide la transaction."""
     if settings.production:
@@ -513,6 +559,7 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
     await _preparer_contenus_du_club(db)
     await _preparer_quiz(db)
     await _preparer_bibliotheque(db)
+    await _preparer_certification(db)
     journaliser(db, "comptes_de_developpement_prepares", details={"comptes": [c[0] for c in COMPTES]})
     await db.commit()
     return acces

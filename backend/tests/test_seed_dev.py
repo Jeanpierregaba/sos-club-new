@@ -173,7 +173,9 @@ def test_le_seed_prepare_trois_quiz_de_test_une_seule_fois(en_base: Callable[...
     en_base(semer)
     en_base(semer)
 
-    lignes = en_base(lambda db: db.execute(select(Quiz.etat, Quiz.contenu_de_test, Quiz.titre)))
+    lignes = en_base(
+        lambda db: db.execute(select(Quiz.etat, Quiz.contenu_de_test, Quiz.titre).where(Quiz.parcours == "jeux"))
+    )
     assert sorted(e.value for e, _, _ in lignes) == ["brouillon", "publie", "soumis"]
     assert all(test and titre.startswith("[Test]") for _, test, titre in lignes)
 
@@ -188,9 +190,34 @@ def test_le_seed_prepare_quatre_ressources_de_test_une_seule_fois(
     en_base(semer)
 
     ressources = en_base(lambda db: db.scalars(select(Ressource))).all()
-    assert sorted(r.etat.value for r in ressources) == ["publie", "publie", "publie", "soumis"]
+    # Les quatre de la bibliothèque, et le fascicule du parcours de certification (spec 029).
+    assert sorted(r.etat.value for r in ressources) == ["publie", "publie", "publie", "publie", "soumis"]
     assert all(r.contenu_de_test and r.titre.startswith("[Test]") for r in ressources)
     # Les PDF générés passent le contrôle des dépôts, et les magazines ont leur couverture.
     for r in ressources:
         assert pdf.verifier((dossier_fichiers / r.fichier_cle).read_bytes()).pages == 1
     assert all(r.couverture_grande for r in ressources if r.categorie.value == "magazine")
+
+
+def test_le_seed_prepare_le_parcours_de_certification_une_seule_fois(
+    en_base: Callable[..., Any], dossier_fichiers: Path
+) -> None:
+    from app.bibliotheque.models import Ressource
+    from app.quiz.models import QuestionQuiz, Quiz
+
+    en_base(semer)
+    en_base(semer)
+
+    parcours = en_base(
+        lambda db: db.scalars(select(Quiz).where(Quiz.parcours == "certification").order_by(Quiz.place))
+    ).all()
+    assert [q.place for q in parcours] == list(range(1, 13))
+    assert all(q.etat.value == "publie" and q.contenu_de_test and q.titre.startswith("[Test]") for q in parcours)
+    [fascicule] = en_base(lambda db: db.scalars(select(Ressource).where(Ressource.categorie == "fascicule"))).all()
+    assert {q.ressource_id for q in parcours} == {fascicule.id}
+    questions = en_base(
+        lambda db: db.scalar(
+            select(func.count()).select_from(QuestionQuiz).where(QuestionQuiz.quiz_id == parcours[0].id)
+        )
+    )
+    assert questions == 15
