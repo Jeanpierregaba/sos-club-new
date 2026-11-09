@@ -9,11 +9,11 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 
-from app.admin import courriel
 from app.admin.exports import neutraliser
 from app.admin.models import Collaborateur
 from app.comptes.models import StatutCompte, Utilisateur
 from app.config import settings
+from app.courriel import envoi as courriel
 from tests.conftest import Navigateur, code_totp, connecter_admin
 
 MODERATEUR_KARA = {
@@ -40,7 +40,7 @@ def en_parallele(*appels: Callable[[], Any]) -> list[Any]:
 def courriels(monkeypatch: pytest.MonkeyPatch) -> list[str]:
     boite: list[str] = []
 
-    async def envoyer(_: str, __: str, texte: str) -> None:
+    async def envoyer(_: str, __: str, texte: str, html: str | None = None) -> None:
         boite.append(texte)
 
     monkeypatch.setattr(courriel, "envoyer", envoyer)

@@ -1,5 +1,8 @@
-"""Envoi des e-mails par SMTP, avec la bibliothèque standard. Hors production et sans SMTP configuré, le lien
-d'invitation est renvoyé par l'API (lien_de_test) pour pouvoir tester : aucune adresse ni contenu n'est journalisé."""
+"""Envoi des e-mails par SMTP, avec la bibliothèque standard (spec 015, puis 030 pour le HTML).
+
+Hors production et sans SMTP configuré, rien ne part : l'API renvoie alors le lien ou le code de test
+(`lien_de_test`, `code_de_test`). Aucune adresse ni aucun contenu n'est journalisé.
+"""
 
 import asyncio
 import logging
@@ -36,32 +39,28 @@ def _envoyer(message: EmailMessage) -> None:
         serveur.send_message(message)
 
 
-async def envoyer(destinataire: str, sujet: str, texte: str) -> None:
-    """Lève EnvoiImpossible si le message n'a pas pu partir. Le contenu n'est jamais écrit dans les journaux."""
-    if not smtp_configure():
-        if settings.production:
-            raise EnvoiImpossible("SMTP non configuré")
-        # Ni le destinataire ni le contenu ne partent dans les journaux : le lien part par la réponse de l'API (lien_de_test) en local.
-        logger.warning("SMTP non configuré : e-mail non envoyé.")
-        return
+def composer(destinataire: str, sujet: str, texte: str, html: str | None = None) -> EmailMessage:
+    """Texte brut toujours ; HTML en alternative quand il est fourni (multipart/alternative)."""
     message = EmailMessage()
     message["From"] = settings.smtp_expediteur
     message["To"] = destinataire
     message["Subject"] = sujet
     message.set_content(texte)
+    if html is not None:
+        message.add_alternative(html, subtype="html")
+    return message
+
+
+async def envoyer(destinataire: str, sujet: str, texte: str, html: str | None = None) -> None:
+    """Lève EnvoiImpossible si le message n'a pas pu partir. Le contenu n'est jamais écrit dans les journaux."""
+    if not smtp_configure():
+        if settings.production:
+            raise EnvoiImpossible("SMTP non configuré")
+        logger.warning("SMTP non configuré : e-mail non envoyé.")
+        return
+    message = composer(destinataire, sujet, texte, html)
     try:
         await asyncio.to_thread(_envoyer, message)
     except (smtplib.SMTPException, OSError) as erreur:
         logger.error("Échec d'envoi d'e-mail (%s)", type(erreur).__name__)
         raise EnvoiImpossible from erreur
-
-
-def texte_invitation(prenom: str, lien: str, heures: int, invite_par: str) -> str:
-    return (
-        f"Bonjour {prenom},\n\n"
-        f"{invite_par} t'invite à rejoindre l'espace d'administration des Clubs Santé SOS Docteur TV.\n\n"
-        f"Pour activer ton compte, ouvre ce lien et choisis ton identifiant et ton mot de passe :\n{lien}\n\n"
-        f"Ce lien ne sert qu'une fois et expire dans {heures} heures. Aucun mot de passe ne t'est envoyé par e-mail.\n"
-        "Si tu n'attendais pas cette invitation, ignore ce message.\n\n"
-        "L'équipe nationale AIMES-AFRIQUE / SOS Docteur TV\n"
-    )

@@ -12,12 +12,12 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.admin import courriel
 from app.admin.catalogue import Action
 from app.admin.dependances import Acces
 from app.admin.models import Collaborateur, JournalAudit
 from app.comptes.inscription import Refus
 from app.comptes.models import Role, StatutCompte, Utilisateur
+from app.courriel import envoi as courriel
 from app.encadreurs import verification
 from app.encadreurs.models import Encadreur, EtatVerification, Fonction
 from app.points.models import LigneBareme, MouvementPoints, Semestre
@@ -356,7 +356,7 @@ def test_lactivation_envoie_un_email_sans_dependre_de_son_envoi(
 ) -> None:
     envoyes: list[str] = []
 
-    async def envoyer(destinataire: str, sujet: str, texte: str) -> None:
+    async def envoyer(destinataire: str, sujet: str, texte: str, html: str | None = None) -> None:
         envoyes.append(destinataire)
         raise courriel.EnvoiImpossible
 

@@ -9,9 +9,9 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import select, update
 
-from app.admin import courriel
 from app.admin.models import Collaborateur, Invitation, JournalAudit
 from app.comptes.models import Role, Utilisateur
+from app.courriel import envoi as courriel
 from tests.conftest import Navigateur, connecter_admin
 
 COLLABORATEURS = "/api/admin/collaborateurs"
@@ -28,7 +28,7 @@ def courriels(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, str, str]]:
     """Boîte factice : capture les e-mails au lieu de les envoyer."""
     boite: list[tuple[str, str, str]] = []
 
-    async def envoyer(destinataire: str, sujet: str, texte: str) -> None:
+    async def envoyer(destinataire: str, sujet: str, texte: str, html: str | None = None) -> None:
         boite.append((destinataire, sujet, texte))
 
     monkeypatch.setattr(courriel, "envoyer", envoyer)
@@ -177,7 +177,7 @@ def test_dre_inconnue_refusee(client: TestClient, chef: Utilisateur, courriels: 
 def test_envoi_impossible_marque_l_invitation(
     client: TestClient, chef: Utilisateur, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    async def panne(*_: Any) -> None:
+    async def panne(*_: Any, **__: Any) -> None:
         raise courriel.EnvoiImpossible
 
     monkeypatch.setattr(courriel, "envoyer", panne)

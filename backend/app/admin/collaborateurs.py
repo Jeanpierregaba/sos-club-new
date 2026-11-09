@@ -10,7 +10,6 @@ from sqlalchemy import delete, func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.admin import courriel
 from app.admin.catalogue import SENSIBLES, Action, droit_existe
 from app.admin.dependances import Acces
 from app.admin.double_auth import double_auth_active, reinitialiser
@@ -36,6 +35,8 @@ from app.comptes.service import (
     normaliser,
 )
 from app.config import settings
+from app.courriel import envoi as courriel
+from app.courriel import messages
 from app.referentiel.models import Dre
 
 
@@ -188,11 +189,8 @@ async def _nouvelle_invitation(
         envoi=EnvoiInvitation.envoye,
     )
     try:
-        await courriel.envoyer(
-            collaborateur.email,
-            "Ton accès à l'espace admin des Clubs Santé",
-            courriel.texte_invitation(collaborateur.prenom, lien, settings.duree_invitation_heures, libelle(auteur)),
-        )
+        message = messages.invitation(collaborateur.prenom, lien, settings.duree_invitation_heures, libelle(auteur))
+        await courriel.envoyer(collaborateur.email, message.sujet, message.texte, html=message.html)
     except courriel.EnvoiImpossible:
         invitation.envoi = EnvoiInvitation.echec
     db.add(invitation)

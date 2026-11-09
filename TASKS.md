@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-Rien en cours.
+- [ ] Fiches d'inscription : élève, encadreur et visiteur, e-mails (R19 avancé) — [spec 030](docs/specs/030-fiches-d-inscription/spec.md)
 
 ## À faire
 

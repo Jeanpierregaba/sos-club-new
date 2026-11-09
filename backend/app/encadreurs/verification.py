@@ -12,12 +12,13 @@ from uuid import UUID
 from sqlalchemy import Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.admin import courriel
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
 from app.comptes.inscription import Refus
 from app.comptes.models import Role, StatutCompte, Utilisateur
-from app.config import settings
+from app.courriel import envoi as courriel
+from app.courriel import messages
+from app.courriel.gabarit import Courriel
 from app.encadreurs.models import Encadreur, EtatVerification
 from app.encadreurs.schemas import DemandeEncadreur, FileEncadreurs
 from app.points import service as points
@@ -128,12 +129,12 @@ async def _a_decider(db: AsyncSession, acces: Acces, utilisateur_id: UUID, versi
     return tuple(ligne)
 
 
-async def _prevenir(utilisateur: Utilisateur, sujet: str, texte: str) -> None:
+async def _prevenir(utilisateur: Utilisateur, message: Courriel) -> None:
     """Après la validation : un e-mail qui ne part pas ne défait pas la décision."""
     if not utilisateur.email:
         return
     try:
-        await courriel.envoyer(utilisateur.email, sujet, texte)
+        await courriel.envoyer(utilisateur.email, message.sujet, message.texte, html=message.html)
     except courriel.EnvoiImpossible:
         logger.warning("Avis de vérification non envoyé à l'encadreur %s", utilisateur.id)
     except Exception:
@@ -161,14 +162,7 @@ async def activer(
         perimetre=dre.code, adresse_ip=ip,
     )  # fmt: skip
     await db.commit()
-    await _prevenir(
-        utilisateur,
-        "Ton compte encadreur est activé",
-        f"Bonjour {utilisateur.prenom},\n\n"
-        "L'équipe des Clubs Santé a vérifié ton inscription : ton compte encadreur est maintenant actif.\n"
-        f"Connecte-toi pour retrouver ton espace : {settings.site_origine}/connexion\n\n"
-        "L'équipe nationale AIMES-AFRIQUE / SOS Docteur TV\n",
-    )
+    await _prevenir(utilisateur, messages.encadreur_active(utilisateur.prenom))
     return _demande(*ligne)
 
 
@@ -186,13 +180,5 @@ async def refuser(
         perimetre=dre.code, details={"motif": motif}, adresse_ip=ip,
     )  # fmt: skip
     await db.commit()
-    await _prevenir(
-        utilisateur,
-        "Ton inscription d'encadreur",
-        f"Bonjour {utilisateur.prenom},\n\n"
-        "L'équipe des Clubs Santé n'a pas pu valider ton inscription d'encadreur, pour ce motif :\n"
-        f"{motif}\n\n"
-        f"Tu peux corriger ton profil et renvoyer ta demande depuis ton espace : {settings.site_origine}/mon-espace\n\n"
-        "L'équipe nationale AIMES-AFRIQUE / SOS Docteur TV\n",
-    )
+    await _prevenir(utilisateur, messages.encadreur_refuse(utilisateur.prenom, motif))
     return _demande(*ligne)
