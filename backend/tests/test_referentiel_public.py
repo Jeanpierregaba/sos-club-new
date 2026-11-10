@@ -51,7 +51,7 @@ def test_aucun_champ_d_administration_dans_les_listes(client: TestClient) -> Non
     assert set(dre) == {"code", "nom", "nom_complet", "nb_etablissements", "iesg"}
     assert set(dre["iesg"][0]) == {"id", "nom", "zone", "nb_etablissements"}
     trouve = chercher(client, recherche="tokoin").json()[0]
-    assert set(trouve) == {"id", "nom", "type", "iesg_id", "iesg", "dre_code", "dre"}
+    assert set(trouve) == {"id", "nom", "type", "iesg_id", "iesg", "dre_code", "dre", "localite"}
     axe = client.get("/api/referentiel/axes").json()[0]
     assert set(axe) == {"code", "libelle", "description"}
 
