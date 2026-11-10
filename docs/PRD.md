@@ -208,7 +208,7 @@ d'établissement ne transfère pas les points déjà acquis.
 | Mobilisation vérifiée de 10 participants          | —              | +50 (proposé)    | —                    |
 
 Le barème est le même pour tous les quiz : jamais de montant variable selon le niveau. « Quel axe est fait pour
-toi ? » ne rapporte rien. Restent à valider : les noms et jalons des 5 badges, le seuil de réussite d'un quiz,
+toi ? » ne rapporte rien : 7 questions, 3 participations par élève sur la vie du compte (spec 032). Restent à valider : les noms et jalons des 5 badges, le seuil de réussite d'un quiz,
 les plafonds et la preuve des partages.
 
 Ne rapportent aucun point : la carte membre, une invitation, le partage d'un classement, un contenu en

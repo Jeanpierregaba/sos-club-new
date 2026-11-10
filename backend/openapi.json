@@ -5625,15 +5625,16 @@
         "tags": [
           "jeux"
         ],
-        "summary": "Questionnaire Quel Axe",
-        "operationId": "questionnaire_quel_axe_api_jeux_quel_axe_get",
+        "summary": "Etat Quel Axe",
+        "description": "Le questionnaire (sans les axes associés aux réponses), le compteur et les parties de l'élève (spec 032).",
+        "operationId": "etat_quel_axe_api_jeux_quel_axe_get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/QuestionnaireQuelAxe"
+                  "$ref": "#/components/schemas/EtatQuelAxe"
                 }
               }
             }
@@ -5641,22 +5642,121 @@
         }
       }
     },
-    "/api/jeux/quel-axe/resultat": {
+    "/api/jeux/quel-axe/parties": {
       "post": {
         "tags": [
           "jeux"
         ],
-        "summary": "Resultat Quel Axe",
-        "operationId": "resultat_quel_axe_api_jeux_quel_axe_resultat_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReponsesQuelAxe"
+        "summary": "Commencer Quel Axe",
+        "description": "Reprend la partie en cours, ou en crée une s'il reste une participation (201). Jamais plus de 3.",
+        "operationId": "commencer_quel_axe_api_jeux_quel_axe_parties_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartieQuelAxe"
+                }
               }
             }
           },
-          "required": true
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartieQuelAxe"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jeux/quel-axe/parties/{partie_id}": {
+      "get": {
+        "tags": [
+          "jeux"
+        ],
+        "summary": "Partie Quel Axe",
+        "operationId": "partie_quel_axe_api_jeux_quel_axe_parties__partie_id__get",
+        "parameters": [
+          {
+            "name": "partie_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Partie Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartieQuelAxe"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jeux/quel-axe/parties/{partie_id}/reponses/{numero}": {
+      "put": {
+        "tags": [
+          "jeux"
+        ],
+        "summary": "Repondre Quel Axe",
+        "description": "Enregistre la réponse à une question ; elle peut être changée tant que la partie n'est pas terminée.",
+        "operationId": "repondre_quel_axe_api_jeux_quel_axe_parties__partie_id__reponses__numero__put",
+        "parameters": [
+          {
+            "name": "partie_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Partie Id"
+            }
+          },
+          {
+            "name": "numero",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "maximum": 7,
+              "minimum": 1,
+              "title": "Numero"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChoixQuelAxe"
+              }
+            }
+          }
         },
         "responses": {
           "200": {
@@ -5664,7 +5764,51 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ResultatQuelAxe"
+                  "$ref": "#/components/schemas/PartieQuelAxe"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jeux/quel-axe/parties/{partie_id}/fin": {
+      "post": {
+        "tags": [
+          "jeux"
+        ],
+        "summary": "Terminer Quel Axe",
+        "description": "Calcule le résultat d'une partie aux 7 réponses. Aucun point, badge ni certificat.",
+        "operationId": "terminer_quel_axe_api_jeux_quel_axe_parties__partie_id__fin_post",
+        "parameters": [
+          {
+            "name": "partie_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Partie Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartieQuelAxe"
                 }
               }
             }
@@ -11170,6 +11314,26 @@
         ],
         "title": "ChoixClub"
       },
+      "ChoixQuelAxe": {
+        "properties": {
+          "lettre": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ],
+            "title": "Lettre"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "lettre"
+        ],
+        "title": "ChoixQuelAxe"
+      },
       "Classe": {
         "type": "string",
         "enum": [
@@ -13971,6 +14135,57 @@
           "resultat"
         ],
         "title": "EtatPartie"
+      },
+      "EtatQuelAxe": {
+        "properties": {
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionQuelAxe"
+            },
+            "type": "array",
+            "title": "Questions"
+          },
+          "limite": {
+            "type": "integer",
+            "title": "Limite"
+          },
+          "utilisees": {
+            "type": "integer",
+            "title": "Utilisees"
+          },
+          "restantes": {
+            "type": "integer",
+            "title": "Restantes"
+          },
+          "en_cours": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PartieQuelAxe"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "historique": {
+            "items": {
+              "$ref": "#/components/schemas/PartieQuelAxe"
+            },
+            "type": "array",
+            "title": "Historique"
+          }
+        },
+        "type": "object",
+        "required": [
+          "questions",
+          "limite",
+          "utilisees",
+          "restantes",
+          "en_cours",
+          "historique"
+        ],
+        "title": "EtatQuelAxe",
+        "description": "Le jeu vu par l'élève : les questions, le compteur (source de vérité : l'API) et ses parties."
       },
       "EtatQuiz": {
         "type": "string",
@@ -16945,6 +17160,77 @@
         "title": "ParentContenu",
         "description": "L'article d'un commentaire (spec 025) : le modérateur juge le commentaire dans son contexte."
       },
+      "PartieQuelAxe": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "numero": {
+            "type": "integer",
+            "title": "Numero"
+          },
+          "reponses": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "A",
+                    "B",
+                    "C",
+                    "D"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Reponses"
+          },
+          "commencee_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Commencee Le"
+          },
+          "terminee_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Terminee Le"
+          },
+          "resultat": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResultatQuelAxe"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "numero",
+          "reponses",
+          "commencee_le",
+          "terminee_le",
+          "resultat"
+        ],
+        "title": "PartieQuelAxe",
+        "description": "Une partie de l'élève (spec 032) : ses réponses enregistrées, et son résultat une fois terminée."
+      },
       "Passation": {
         "properties": {
           "id": {
@@ -18039,22 +18325,6 @@
         ],
         "title": "QuestionQuelAxe"
       },
-      "QuestionnaireQuelAxe": {
-        "properties": {
-          "questions": {
-            "items": {
-              "$ref": "#/components/schemas/QuestionQuelAxe"
-            },
-            "type": "array",
-            "title": "Questions"
-          }
-        },
-        "type": "object",
-        "required": [
-          "questions"
-        ],
-        "title": "QuestionnaireQuelAxe"
-      },
       "QuizBanque": {
         "properties": {
           "id": {
@@ -19005,31 +19275,6 @@
         ],
         "title": "ReponseQuelAxe"
       },
-      "ReponsesQuelAxe": {
-        "properties": {
-          "reponses": {
-            "items": {
-              "type": "string",
-              "enum": [
-                "A",
-                "B",
-                "C",
-                "D"
-              ]
-            },
-            "type": "array",
-            "maxItems": 5,
-            "minItems": 5,
-            "title": "Reponses"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "reponses"
-        ],
-        "title": "ReponsesQuelAxe"
-      },
       "Reseau": {
         "type": "string",
         "enum": [
@@ -19493,31 +19738,12 @@
             },
             "type": "array",
             "title": "Autres"
-          },
-          "scores": {
-            "additionalProperties": {
-              "type": "integer"
-            },
-            "propertyNames": {
-              "enum": [
-                "GI",
-                "EVSS",
-                "TV",
-                "SS",
-                "GB",
-                "LM",
-                "SE"
-              ]
-            },
-            "type": "object",
-            "title": "Scores"
           }
         },
         "type": "object",
         "required": [
           "principal",
-          "autres",
-          "scores"
+          "autres"
         ],
         "title": "ResultatQuelAxe"
       },

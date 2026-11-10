@@ -39,6 +39,8 @@ function Connexion() {
   const router = useRouter();
 
   const allerAuCompte = (moi: Moi) => {
+    // Un autre compte a pu laisser des données en cache dans cet onglet.
+    queryClient.clear();
     queryClient.setQueryData(CLE_MOI, moi);
     void router.navigate({ href: cheminSur(redirection), replace: true });
   };

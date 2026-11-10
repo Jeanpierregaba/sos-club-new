@@ -1,8 +1,9 @@
-"""« Quel axe est fait pour toi ? » (spec 021) : le jeu de découverte des 7 axes, réservé aux élèves.
+"""« Quel axe est fait pour toi ? » (specs 021 et 032) : le jeu de découverte des 7 axes, réservé aux élèves.
 
-Questions et table de correspondance du document fonctionnel « Jeu de découverte des 7 axes ». Chaque réponse
-donne +3 à son axe principal et +1 à son axe secondaire. Rien n'est enregistré, aucun point n'est gagné : le
-résultat oriente, il ne classe pas l'élève.
+Sept questions et la table de correspondance du cahier des charges « Quel axe — 7 questions / 3 parties ».
+Chaque réponse donne +3 à son axe principal et +1 à son axe secondaire ; chaque axe est axe principal 4 fois sur
+les 28 réponses. Aucun point n'est gagné : le résultat oriente, il ne classe pas l'élève. Les parties sont
+gardées par `parties_quel_axe`.
 """
 
 from collections import Counter
@@ -80,7 +81,31 @@ QUESTIONS: tuple[Question, ...] = (
             Reponse("D", "Un grand challenge interclasses avec des jeux, des défis et des récompenses.", "GB", "GI"),
         ),
     ),
+    Question(
+        "Un camarade te propose de contribuer à une initiative utile au lycée. Tu choisis de…",
+        (
+            Reponse(
+                "A", "Créer un espace d'écoute et de sensibilisation au bien-être et à l'environnement.", "SE", "GI"
+            ),
+            Reponse("B", "Transformer l'initiative en challenge amusant pour mobiliser les participants.", "GB", "TV"),
+            Reponse("C", "Préparer des messages sur le respect et les comportements responsables.", "EVSS", "LM"),
+            Reponse("D", "Animer un atelier pratique de sport et de premiers secours.", "SS", "SE"),
+        ),
+    ),
+    Question(
+        "Pour terminer, quel projet aimerais-tu voir se développer dans ton établissement ?",
+        (
+            Reponse("A", "Un laboratoire de découverte et de quiz pour apprendre la santé autrement.", "GI", "GB"),
+            Reponse("B", "Une équipe de jeunes reporters qui valorise les initiatives du club.", "TV", "EVSS"),
+            Reponse("C", "Un comité qui accompagne les élèves pour réaliser leurs idées ensemble.", "LM", "SS"),
+            Reponse("D", "Un jardin scolaire et des activités pour prendre soin de soi et de la planète.", "SE", "TV"),
+        ),
+    ),
 )
+
+# Les versions du questionnaire : une partie se termine avec la table de la version où elle a commencé (spec 032).
+VERSION = 1
+QUESTIONNAIRES: dict[int, tuple[Question, ...]] = {1: QUESTIONS}
 
 
 @dataclass(frozen=True)
@@ -90,16 +115,17 @@ class Resultat:
     scores: dict[CodeAxe, int]
 
 
-def calculer(lettres: list[Lettre]) -> Resultat:
-    """Le classement des axes pour ces 5 réponses, identique pour tous à réponses identiques.
+def calculer(lettres: list[Lettre], version: int = VERSION) -> Resultat:
+    """Le classement des axes pour ces 7 réponses, identique pour tous à réponses identiques.
 
     Départage : total décroissant, puis nombre de fois en axe principal, puis l'axe principal de la question 1
     s'il est parmi les ex æquo, puis l'ordre GI, EVSS, TV, SS, GB, LM, SE."""
-    if len(lettres) != len(QUESTIONS):
+    questions = QUESTIONNAIRES[version]
+    if len(lettres) != len(questions):
         raise ValueError("Il faut une réponse à chaque question.")
     choisies = [
         next(r for r in question.reponses if r.lettre == lettre)
-        for question, lettre in zip(QUESTIONS, lettres, strict=True)
+        for question, lettre in zip(questions, lettres, strict=True)
     ]
     scores: Counter[CodeAxe] = Counter()
     principaux: Counter[CodeAxe] = Counter()

@@ -1959,8 +1959,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Questionnaire Quel Axe */
-        get: operations["questionnaire_quel_axe_api_jeux_quel_axe_get"];
+        /**
+         * Etat Quel Axe
+         * @description Le questionnaire (sans les axes associés aux réponses), le compteur et les parties de l'élève (spec 032).
+         */
+        get: operations["etat_quel_axe_api_jeux_quel_axe_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1969,7 +1972,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/jeux/quel-axe/resultat": {
+    "/api/jeux/quel-axe/parties": {
         parameters: {
             query?: never;
             header?: never;
@@ -1978,8 +1981,68 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Resultat Quel Axe */
-        post: operations["resultat_quel_axe_api_jeux_quel_axe_resultat_post"];
+        /**
+         * Commencer Quel Axe
+         * @description Reprend la partie en cours, ou en crée une s'il reste une participation (201). Jamais plus de 3.
+         */
+        post: operations["commencer_quel_axe_api_jeux_quel_axe_parties_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/jeux/quel-axe/parties/{partie_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Partie Quel Axe */
+        get: operations["partie_quel_axe_api_jeux_quel_axe_parties__partie_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/jeux/quel-axe/parties/{partie_id}/reponses/{numero}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Repondre Quel Axe
+         * @description Enregistre la réponse à une question ; elle peut être changée tant que la partie n'est pas terminée.
+         */
+        put: operations["repondre_quel_axe_api_jeux_quel_axe_parties__partie_id__reponses__numero__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/jeux/quel-axe/parties/{partie_id}/fin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Terminer Quel Axe
+         * @description Calcule le résultat d'une partie aux 7 réponses. Aucun point, badge ni certificat.
+         */
+        post: operations["terminer_quel_axe_api_jeux_quel_axe_parties__partie_id__fin_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3773,6 +3836,14 @@ export interface components {
             /** Afficher */
             afficher: boolean;
         };
+        /** ChoixQuelAxe */
+        ChoixQuelAxe: {
+            /**
+             * Lettre
+             * @enum {string}
+             */
+            lettre: "A" | "B" | "C" | "D";
+        };
         /**
          * Classe
          * @enum {string}
@@ -4783,6 +4854,23 @@ export interface components {
             resultat: components["schemas"]["ResultatPartie"] | null;
         };
         /**
+         * EtatQuelAxe
+         * @description Le jeu vu par l'élève : les questions, le compteur (source de vérité : l'API) et ses parties.
+         */
+        EtatQuelAxe: {
+            /** Questions */
+            questions: components["schemas"]["QuestionQuelAxe"][];
+            /** Limite */
+            limite: number;
+            /** Utilisees */
+            utilisees: number;
+            /** Restantes */
+            restantes: number;
+            en_cours: components["schemas"]["PartieQuelAxe"] | null;
+            /** Historique */
+            historique: components["schemas"]["PartieQuelAxe"][];
+        };
+        /**
          * EtatQuiz
          * @enum {string}
          */
@@ -5707,6 +5795,29 @@ export interface components {
             /** Titre */
             titre: string;
         };
+        /**
+         * PartieQuelAxe
+         * @description Une partie de l'élève (spec 032) : ses réponses enregistrées, et son résultat une fois terminée.
+         */
+        PartieQuelAxe: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Numero */
+            numero: number;
+            /** Reponses */
+            reponses: (("A" | "B" | "C" | "D") | null)[];
+            /**
+             * Commencee Le
+             * Format: date-time
+             */
+            commencee_le: string;
+            /** Terminee Le */
+            terminee_le: string | null;
+            resultat: components["schemas"]["ResultatQuelAxe"] | null;
+        };
         /** Passation */
         Passation: {
             /**
@@ -6056,11 +6167,6 @@ export interface components {
             /** Reponses */
             reponses: components["schemas"]["ReponseQuelAxe"][];
         };
-        /** QuestionnaireQuelAxe */
-        QuestionnaireQuelAxe: {
-            /** Questions */
-            questions: components["schemas"]["QuestionQuelAxe"][];
-        };
         /** QuizBanque */
         QuizBanque: {
             /**
@@ -6394,11 +6500,6 @@ export interface components {
             /** Libelle */
             libelle: string;
         };
-        /** ReponsesQuelAxe */
-        ReponsesQuelAxe: {
-            /** Reponses */
-            reponses: ("A" | "B" | "C" | "D")[];
-        };
         /**
          * Reseau
          * @enum {string}
@@ -6546,10 +6647,6 @@ export interface components {
             principal: "GI" | "EVSS" | "TV" | "SS" | "GB" | "LM" | "SE";
             /** Autres */
             autres: ("GI" | "EVSS" | "TV" | "SS" | "GB" | "LM" | "SE")[];
-            /** Scores */
-            scores: {
-                [key: string]: number;
-            };
         };
         /** ResumeArticle */
         ResumeArticle: {
@@ -10687,7 +10784,7 @@ export interface operations {
             };
         };
     };
-    questionnaire_quel_axe_api_jeux_quel_axe_get: {
+    etat_quel_axe_api_jeux_quel_axe_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -10702,21 +10799,84 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["QuestionnaireQuelAxe"];
+                    "application/json": components["schemas"]["EtatQuelAxe"];
                 };
             };
         };
     };
-    resultat_quel_axe_api_jeux_quel_axe_resultat_post: {
+    commencer_quel_axe_api_jeux_quel_axe_parties_post: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartieQuelAxe"];
+                };
+            };
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartieQuelAxe"];
+                };
+            };
+        };
+    };
+    partie_quel_axe_api_jeux_quel_axe_parties__partie_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                partie_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartieQuelAxe"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    repondre_quel_axe_api_jeux_quel_axe_parties__partie_id__reponses__numero__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                partie_id: string;
+                numero: number;
+            };
+            cookie?: never;
+        };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ReponsesQuelAxe"];
+                "application/json": components["schemas"]["ChoixQuelAxe"];
             };
         };
         responses: {
@@ -10726,7 +10886,38 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ResultatQuelAxe"];
+                    "application/json": components["schemas"]["PartieQuelAxe"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    terminer_quel_axe_api_jeux_quel_axe_parties__partie_id__fin_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                partie_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartieQuelAxe"];
                 };
             };
             /** @description Validation Error */

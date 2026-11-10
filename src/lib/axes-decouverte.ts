@@ -72,3 +72,21 @@ export function axeDecouverte(code: CodeAxe) {
 }
 
 export type AxeDecouverte = ReturnType<typeof axeDecouverte>;
+
+// Partage d'un résultat : le nom de l'axe et un lien vers le jeu, jamais de nom, pseudonyme ni contact. Renvoie
+// un message à afficher quand le texte a été copié faute de partage natif.
+export async function partagerAxe(nom: string): Promise<string | null> {
+  const texte = `Mon axe Clubs Santé SOS Docteur TV : ${nom} ! Et toi, quel axe est fait pour toi ?`;
+  const url = `${window.location.origin}/#quel-axe`;
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: "Quel axe est fait pour toi ?", text: texte, url });
+      return null;
+    }
+    await navigator.clipboard.writeText(`${texte} ${url}`);
+    return "Texte copié : colle-le où tu veux le partager.";
+  } catch {
+    // Partage annulé : rien à signaler.
+    return null;
+  }
+}

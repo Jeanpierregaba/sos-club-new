@@ -17,6 +17,7 @@ import {
 import { EspaceEncadreur } from "@/components/espace/EspaceEncadreur";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { MonAxe } from "@/components/MonAxe";
 import { Button } from "@/components/ui/button";
 import { useDeconnexion } from "@/hooks/use-deconnexion";
 import {
@@ -366,6 +367,8 @@ function EspaceDeLEleve({
             await router.invalidate();
           }}
         />
+
+        <MonAxe />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
           <DernieresLignes points={points} />

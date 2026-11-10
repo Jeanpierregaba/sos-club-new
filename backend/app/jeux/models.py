@@ -4,7 +4,19 @@ tous ; seule la première réponse du jour d'un élève compte, et rapporte des 
 from datetime import date, datetime
 from uuid import UUID, uuid7
 
-from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, Integer, String, UniqueConstraint, func, text
+from sqlalchemy import (
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    SmallInteger,
+    String,
+    UniqueConstraint,
+    func,
+    text,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -50,3 +62,31 @@ class DefiReponse(Base):
     # La ligne du registre créditée pour une bonne réponse ; nulle sinon (ou si le barème est à 0).
     mouvement_id: Mapped[UUID | None] = mapped_column(ForeignKey("mouvement_points.id", ondelete="RESTRICT"))
     repondu_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class PartieQuelAxe(Base):
+    """Une partie de « Quel axe est fait pour toi ? » (spec 032) : au plus 3 par élève, sur toute la vie du compte,
+    et une seule en cours. Effacée avec le compte. Ne rapporte jamais de point."""
+
+    __tablename__ = "partie_quel_axe"
+    __table_args__ = (
+        UniqueConstraint("eleve_id", "numero"),
+        CheckConstraint("numero BETWEEN 1 AND 3", name="numero_1_a_3"),
+        CheckConstraint(
+            "(terminee_le IS NULL AND principal IS NULL AND autres IS NULL) "
+            "OR (terminee_le IS NOT NULL AND principal IS NOT NULL AND autres IS NOT NULL)",
+            name="resultat_a_la_fin",
+        ),
+        Index("uq_partie_quel_axe_en_cours", "eleve_id", unique=True, postgresql_where=text("terminee_le IS NULL")),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    eleve_id: Mapped[UUID] = mapped_column(ForeignKey("utilisateur.id", ondelete="CASCADE"))
+    numero: Mapped[int] = mapped_column(SmallInteger)
+    version_questionnaire: Mapped[int] = mapped_column(SmallInteger)
+    # Une lettre (A à D) ou null par question, dans l'ordre du questionnaire.
+    reponses: Mapped[list[str | None]] = mapped_column(JSONB)
+    principal: Mapped[str | None] = mapped_column(String(4))
+    autres: Mapped[list[str] | None] = mapped_column(JSONB)
+    commencee_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    terminee_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

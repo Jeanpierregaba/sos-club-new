@@ -16,6 +16,8 @@ export function useDeconnexion() {
     setEnCours(true);
     try {
       await deconnecter();
+      // Rien du compte précédent ne doit rester en cache (appareil partagé, données de mineurs).
+      queryClient.clear();
       queryClient.setQueryData(CLE_MOI, null);
       await router.navigate({ to: "/", replace: true });
     } catch (e) {

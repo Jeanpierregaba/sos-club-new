@@ -165,7 +165,9 @@ export function QuelAxe() {
         </div>
 
         <div data-reveal className="text-center md:text-left">
-          <p className="font-hand text-2xl text-logo-red">Fais le test&#8239;!</p>
+          <p className="font-hand text-2xl text-logo-red">
+            7 axes. Des talents à révéler. Et toi, où vas-tu briller&#8239;?
+          </p>
           <h2 className="mt-1 font-display text-4xl leading-tight text-ink md:text-5xl xl:text-6xl">
             Quel{" "}
             <span className="relative inline-block text-grape">
@@ -190,8 +192,8 @@ export function QuelAxe() {
             est fait pour toi&#8239;?
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-lg font-semibold text-ink/75 md:mx-0">
-            Réponds à cinq questions et découvre l’axe des Clubs Santé qui correspond le mieux à ta
-            personnalité&#8239;!
+            Tu aimes créer, apprendre, aider, diriger ou relever des défis&#8239;? Réponds à sept
+            questions et découvre l’axe des Clubs Santé qui correspond le mieux à tes envies&#8239;!
           </p>
           <div className="relative mt-8 inline-flex">
             <span
@@ -203,12 +205,12 @@ export function QuelAxe() {
               onClick={() => setOuvert(true)}
               className="btn-fx group relative inline-flex items-center gap-2 rounded-full bg-grape px-8 py-4 text-base font-bold text-white shadow-lg shadow-grape/30"
             >
-              Commencer le test{" "}
+              Commencer le jeu{" "}
               <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
           <p className="mt-3 text-sm font-medium text-muted-foreground">
-            Réservé aux élèves inscrits · aucun point en jeu
+            Réservé aux élèves inscrits · 3 participations maximum
           </p>
         </div>
 
@@ -255,7 +257,7 @@ export function QuelAxe() {
         <DialogContent className="max-h-[100dvh] w-full max-w-2xl overflow-y-auto rounded-none p-0 sm:max-h-[92dvh] sm:rounded-[2rem]">
           <DialogTitle className="sr-only">Quel axe est fait pour toi ?</DialogTitle>
           <DialogDescription className="sr-only">
-            Cinq questions pour découvrir l’axe des Clubs Santé qui te ressemble.
+            Sept questions pour découvrir l’axe des Clubs Santé qui te ressemble.
           </DialogDescription>
           {ouvert && <QuelAxeTest />}
         </DialogContent>

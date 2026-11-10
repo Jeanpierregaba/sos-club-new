@@ -1,5 +1,8 @@
 # 021 — Accueil : « Quel axe est fait pour toi ? », défi du jour et podium des clubs
 
+> **Dépassée pour « Quel axe » (2026-11-10)** : le jeu a désormais 7 questions et 3 participations par élève,
+> gardées par l'API. Voir la [spec 032](../032-quel-axe-7-questions/spec.md).
+
 ## Objectif
 
 Rendre l'accueil plus vivant avec trois blocs de gamification légère, qui ne rapportaient aucun point. Depuis la

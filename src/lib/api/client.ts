@@ -105,7 +105,8 @@ export type FileAffiliations = Schemas["FileAffiliations"];
 export type FileRattachements = Schemas["FileRattachements"];
 export type ResultatLot = Schemas["ResultatLot"];
 export type ElementLot = Schemas["ElementLot"];
-export type QuestionnaireQuelAxe = Schemas["QuestionnaireQuelAxe"];
+export type EtatQuelAxe = Schemas["EtatQuelAxe"];
+export type PartieQuelAxe = Schemas["PartieQuelAxe"];
 export type QuestionQuelAxe = Schemas["QuestionQuelAxe"];
 export type ResultatQuelAxe = Schemas["ResultatQuelAxe"];
 export type CodeAxe = ResultatQuelAxe["principal"];
@@ -536,9 +537,14 @@ export const adminDeciderRattachements = (
   );
 
 // Jeux de l'accueil (spec 021). « Quel axe » est réservé aux élèves actifs : l'API répond 401 ou 403 sinon.
-export const chargerQuelAxe = () => requeteApi<QuestionnaireQuelAxe>("/api/jeux/quel-axe");
-export const calculerQuelAxe = (reponses: string[]) =>
-  envoyerJson<ResultatQuelAxe>("/api/jeux/quel-axe/resultat", { reponses });
+// Ses parties sont gardées par l'API, 3 au plus par élève (spec 032).
+const QUEL_AXE = "/api/jeux/quel-axe";
+export const etatQuelAxe = () => requeteApi<EtatQuelAxe>(QUEL_AXE);
+export const commencerQuelAxe = () => envoyerJson<PartieQuelAxe>(`${QUEL_AXE}/parties`);
+export const repondreQuelAxe = (partie: string, numero: number, lettre: string) =>
+  envoyerJson<PartieQuelAxe>(`${QUEL_AXE}/parties/${partie}/reponses/${numero}`, { lettre }, "PUT");
+export const terminerQuelAxe = (partie: string) =>
+  envoyerJson<PartieQuelAxe>(`${QUEL_AXE}/parties/${partie}/fin`);
 export const chargerDefiDuJour = () => requeteApi<DefiDuJour>("/api/jeux/defi-du-jour");
 export const corrigerDefi = (id: string, choix: number) =>
   envoyerJson<CorrectionDefi>(`/api/jeux/defis/${id}/reponse`, { choix });

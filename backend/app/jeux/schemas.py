@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
@@ -18,20 +19,39 @@ class QuestionQuelAxe(BaseModel):
     reponses: list[ReponseQuelAxe]
 
 
-class QuestionnaireQuelAxe(BaseModel):
-    questions: list[QuestionQuelAxe]
-
-
-class ReponsesQuelAxe(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    reponses: Annotated[list[Lettre], Field(min_length=5, max_length=5)]
-
-
 class ResultatQuelAxe(BaseModel):
     principal: CodeAxe
     autres: list[CodeAxe]
-    scores: dict[CodeAxe, int]
+
+
+class PartieQuelAxe(BaseModel):
+    """Une partie de l'élève (spec 032) : ses réponses enregistrées, et son résultat une fois terminée."""
+
+    id: UUID
+    numero: int
+    # Une lettre ou null par question, dans l'ordre du questionnaire.
+    reponses: list[Lettre | None]
+    commencee_le: datetime
+    terminee_le: datetime | None
+    resultat: ResultatQuelAxe | None
+
+
+class EtatQuelAxe(BaseModel):
+    """Le jeu vu par l'élève : les questions, le compteur (source de vérité : l'API) et ses parties."""
+
+    questions: list[QuestionQuelAxe]
+    limite: int
+    utilisees: int
+    restantes: int
+    en_cours: PartieQuelAxe | None
+    # Les parties terminées, de la plus récente à la plus ancienne.
+    historique: list[PartieQuelAxe]
+
+
+class ChoixQuelAxe(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    lettre: Lettre
 
 
 class CorrectionDefi(BaseModel):
