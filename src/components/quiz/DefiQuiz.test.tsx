@@ -36,8 +36,8 @@ const catalogue = (connecte: boolean): CatalogueQuiz => ({
   nb_questions: 15,
   seuil: 12,
   temps_ms: 20000,
-  limite: 2,
-  restants: connecte ? null : 2,
+  limite: 3,
+  restants: connecte ? null : 3,
   connecte,
   quiz: [quiz],
 });
@@ -123,7 +123,9 @@ describe("DefiQuiz", () => {
 
   it("annonce la fin de la période d'essai et invite à créer un compte", async () => {
     api.chargerMoi.mockRejectedValue(new ErreurApi(401, "Non connecté"));
-    api.lancerQuizOuvert.mockRejectedValue(new ErreurApi(403, "Tu as joué tes 2 quiz gratuits."));
+    api.lancerQuizOuvert.mockRejectedValue(
+      new ErreurApi(403, "Tu as joué tes 3 quiz gratuits.", "fin-essai"),
+    );
     await afficher(false);
 
     await act(async () => fireEvent.click(screen.getByRole("button", { name: /Commencer/ })));
@@ -146,6 +148,19 @@ describe("DefiQuiz", () => {
 
     expect(screen.getByText(/Trop de parties sans compte/)).toBeTruthy();
     expect(screen.queryByText("Ta période d'essai est terminée")).toBeNull();
+  });
+
+  it("un autre refus 403 n'est pas une fin d'essai (bug du 2026-11-10)", async () => {
+    api.chargerMoi.mockRejectedValue(new ErreurApi(401, "Non connecté"));
+    api.lancerQuizOuvert.mockRejectedValue(
+      new ErreurApi(403, "Cette action ne peut venir que du site."),
+    );
+    await afficher(false);
+
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /Commencer/ })));
+
+    expect(screen.queryByText("Ta période d'essai est terminée")).toBeNull();
+    expect(screen.getByText(/ne peut venir que du site/)).toBeInTheDocument();
   });
 
   it("affiche une erreur réseau au lancement sans quitter l'écran d'accueil", async () => {

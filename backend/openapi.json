@@ -12270,6 +12270,42 @@
         ],
         "title": "CorrectionDefi"
       },
+      "CorrectionReponse": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "juste": {
+            "type": "boolean",
+            "title": "Juste"
+          },
+          "choix_joueur": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Choix Joueur"
+          },
+          "choix_attendu": {
+            "type": "integer",
+            "title": "Choix Attendu"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rang",
+          "juste",
+          "choix_joueur",
+          "choix_attendu"
+        ],
+        "title": "CorrectionReponse",
+        "description": "La correction de la question à laquelle le joueur vient de répondre (quiz des jeux, 2026-11-10). Elle n'arrive\nqu'après sa réponse : la question en cours ne porte jamais la sienne (ADR-0004)."
+      },
       "DecisionEntree": {
         "properties": {
           "version": {
@@ -13344,6 +13380,54 @@
         ],
         "title": "Enrolement"
       },
+      "ErreurPartie": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "enonce": {
+            "type": "string",
+            "title": "Enonce"
+          },
+          "ta_reponse": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ta Reponse"
+          },
+          "reponse_attendue": {
+            "type": "string",
+            "title": "Reponse Attendue"
+          },
+          "explication": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explication"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rang",
+          "enonce",
+          "ta_reponse",
+          "reponse_attendue",
+          "explication"
+        ],
+        "title": "ErreurPartie",
+        "description": "Une question ratée, dans le récapitulatif de fin de partie des quiz des jeux."
+      },
       "EspaceClub": {
         "properties": {
           "club": {
@@ -14118,6 +14202,16 @@
             "anyOf": [
               {
                 "$ref": "#/components/schemas/ResultatPartie"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "correction": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CorrectionReponse"
               },
               {
                 "type": "null"
@@ -19696,6 +19790,20 @@
           "points": {
             "type": "integer",
             "title": "Points"
+          },
+          "erreurs": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ErreurPartie"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Erreurs"
           }
         },
         "type": "object",

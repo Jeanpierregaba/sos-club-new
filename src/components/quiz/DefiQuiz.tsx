@@ -22,9 +22,9 @@ import {
 
 export type Defi = { titre: string; numero: number; quiz: QuizOuvert };
 
-// Le joueur sans compte a épuisé ses quiz d'essai : seul le 403 le dit. Un 429 (trop de joueurs sur le même
-// réseau, plafond du jour) garde le message de l'API.
-const estFinDEssai = (e: unknown) => e instanceof ErreurApi && e.statut === 403;
+// Le joueur sans compte a épuisé ses quiz d'essai : l'API le marque (X-Raison: fin-essai). Tout autre refus, même un
+// 403 (contrôle d'origine, certification) ou un 429, garde le message de l'API : c'était le bug du 2026-11-10.
+const estFinDEssai = (e: unknown) => e instanceof ErreurApi && e.raison === "fin-essai";
 
 // Un compte connecté que l'API refuse de faire jouer (403) : équipe, compte à activer ou à vérifier.
 const MESSAGE_EQUIPE = "Les membres de l'équipe jouent en mode test, depuis l'espace admin.";

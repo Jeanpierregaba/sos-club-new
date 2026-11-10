@@ -83,7 +83,8 @@ certificat) suit en R11 et réutilisera ce moteur.
 - [x] Étant donné un quiz approuvé, alors il apparaît dans `/quiz` ; un brouillon, un quiz soumis ou dépublié
       n'y apparaît pas et ne se lance pas (404).
 - [x] Étant donné une tentative, aucune réponse de l'API au joueur ne contient la bonne réponse ni l'explication
-      d'une question, à aucune étape, ni dans la liste des quiz, ni dans le résultat final.
+      d'une question avant qu'elle soit tranchée, ni dans la liste des quiz. Depuis le 2026-11-10, un quiz des
+      jeux corrige chaque question tranchée et récapitule les erreurs à la fin (amendement de l'ADR-0004).
 - [x] Étant donné une question envoyée, quand la réponse arrive 6,9 s plus tard, alors elle compte ; à 7,1 s,
       elle compte comme ratée, quel que soit le choix.
 - [x] Étant donné 11 bonnes réponses sur 15, alors la tentative est ratée ; avec 12, elle est réussie.
@@ -137,7 +138,7 @@ certificat) suit en R11 et réutilisera ce moteur.
 - Le parcours Génie Imhotep, les 5 badges et le certificat (R11), les fascicules (R10).
 - Les points du club pour un quiz réussi (`club.quiz_eleve`, R13) et les classements.
 - Les quiz des visiteurs, avec ou sans compte léger (R19).
-- La correction détaillée des questions pour le joueur.
+- La correction détaillée des questions pour le joueur (ajoutée le 2026-11-10 pour les quiz des jeux : ADR-0004).
 - L'import de quiz depuis un fichier, la planification d'une publication, les images dans les questions.
 - La détection automatique des anomalies (réponses automatisées, comptes multiples) : les tentatives et
   leurs horaires sont conservés pour la permettre plus tard.

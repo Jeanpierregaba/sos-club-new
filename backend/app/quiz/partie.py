@@ -2,8 +2,9 @@
 
 Le serveur tire les questions au lancement, puis envoie une question à la fois : une question n'est « envoyée »
 (heure enregistrée) qu'au moment où elle part vers le joueur, et son délai court à partir de là. Une réponse
-compte si elle arrive dans le temps affiché plus la tolérance ; sinon la question est ratée. Rien dans ce module
-n'envoie la bonne réponse : il ne la lit que pour trancher une réponse reçue.
+compte si elle arrive dans le temps affiché plus la tolérance ; sinon la question est ratée. Rien n'envoie la bonne
+réponse d'avance : pour un quiz des jeux seulement (ADR-0004, amendement du 2026-11-10), une question est corrigée
+une fois tranchée, et le résultat récapitule les erreurs ; la certification ne montre que le score.
 
 Chaque opération verrouille la tentative : deux réponses simultanées, ou deux fins, ne comptent qu'une fois.
 """
@@ -32,12 +33,23 @@ from app.quiz.models import (
     ReponseQuiz,
     TentativeQuiz,
 )
-from app.quiz.schemas import EtatPartie, ListeQuiz, QuestionJoueur, QuizJoueur, ResultatPartie
+from app.quiz.schemas import (
+    CorrectionReponse,
+    ErreurPartie,
+    EtatPartie,
+    ListeQuiz,
+    QuestionJoueur,
+    QuizJoueur,
+    ResultatPartie,
+)
 
 # Une tentative sans activité pendant ce temps est close avec le score acquis.
 INACTIVITE = timedelta(minutes=10)
 # Un essai de l'équipe abandonné en cours de route est effacé au lancement d'un essai suivant, au bout d'un jour.
 ESSAI_OUBLIE = timedelta(days=1)
+# Quiz des jeux : le site montre la correction pendant cette pause (DUREE_RETOUR_MS de PartieQuiz.tsx), puis la
+# question suivante, dont le chrono ne démarre qu'à la fin de la pause.
+PAUSE_CORRECTION = timedelta(milliseconds=1200)
 _hasard = random.SystemRandom()
 
 
@@ -187,8 +199,8 @@ async def etat(db: AsyncSession, joueur: Utilisateur, tentative_id: UUID | str, 
     d'envoi d'origine ; expirée, elle est ratée et la suivante part."""
     tentative = await _charger(db, joueur, tentative_id, essai)
     quiz, p, maintenant = await _contexte(db, tentative)
-    await _avancer(db, tentative, joueur, quiz, p, maintenant)
-    return await _finir_reponse(db, tentative, quiz, p, maintenant)
+    expiree = await _avancer(db, tentative, joueur, quiz, p, maintenant)
+    return await _finir_reponse(db, tentative, quiz, p, maintenant, corrigee=expiree)
 
 
 async def repondre(
@@ -207,7 +219,7 @@ async def repondre(
     if ligne.correcte is not None or tentative.etat is EtatTentative.terminee:
         # Double envoi, ou réponse arrivée après la fin : rien ne change, le joueur reçoit l'état courant.
         await _avancer(db, tentative, joueur, quiz, p, maintenant)
-        return await _finir_reponse(db, tentative, quiz, p, maintenant)
+        return await _finir_reponse(db, tentative, quiz, p, maintenant, corrigee=ligne)
     if choix >= len(ligne.ordre_choix):
         raise ChoixInvalide
 
@@ -221,7 +233,7 @@ async def repondre(
         ligne.correcte = False
     tentative.derniere_activite = maintenant
     await _envoyer_suivante(db, tentative, joueur, quiz, p, maintenant)
-    return await _finir_reponse(db, tentative, quiz, p, maintenant)
+    return await _finir_reponse(db, tentative, quiz, p, maintenant, corrigee=ligne)
 
 
 # Liste des quiz ---------------------------------------------------------------------------------------------------
@@ -355,18 +367,21 @@ async def _courante(db: AsyncSession, tentative: TentativeQuiz) -> ReponseQuiz |
 
 async def _avancer(
     db: AsyncSession, tentative: TentativeQuiz, joueur: Utilisateur, quiz: Quiz, p: ParametresQuiz, maintenant: datetime
-) -> None:
-    """Applique le temps écoulé : clôture après une longue inactivité, question expirée comptée ratée."""
+) -> ReponseQuiz | None:
+    """Applique le temps écoulé : clôture après une longue inactivité, question expirée comptée ratée. Renvoie la
+    question qui vient d'expirer, pour que le joueur en voie la correction."""
     if tentative.etat is EtatTentative.terminee:
-        return
+        return None
     if maintenant - tentative.derniere_activite > INACTIVITE:
         await _terminer(db, tentative, joueur, quiz, p, maintenant)
-        return
+        return None
     courante = await _courante(db, tentative)
     if courante is not None and courante.envoyee_le is not None and maintenant > courante.envoyee_le + _delai(p):
         courante.correcte = False
         tentative.derniere_activite = maintenant
         await _envoyer_suivante(db, tentative, joueur, quiz, p, maintenant)
+        return courante
+    return None
 
 
 async def _envoyer_suivante(
@@ -376,7 +391,8 @@ async def _envoyer_suivante(
     if suivante is None:
         await _terminer(db, tentative, joueur, quiz, p, maintenant)
     elif suivante.envoyee_le is None:
-        suivante.envoyee_le = maintenant
+        # La pause de correction des jeux ne mange pas le temps de la question suivante.
+        suivante.envoyee_le = maintenant + (PAUSE_CORRECTION if quiz.parcours == PARCOURS_JEUX else timedelta(0))
 
 
 async def _terminer(
@@ -427,6 +443,7 @@ async def _etat(
             seuil=p.seuil,
             reussie=bool(tentative.reussie),
             points=gain.montant if gain else 0,
+            erreurs=await _erreurs(db, tentative) if quiz.parcours == PARCOURS_JEUX else None,
         )
     else:
         courante = await _courante(db, tentative)
@@ -439,7 +456,8 @@ async def _etat(
             enonce=source.enonce,
             choix=[source.choix[i] for i in courante.ordre_choix],
             temps_ms=p.temps_ms,
-            restant_ms=max(0, _ms(restant)),
+            # Pendant la pause de correction, le chrono n'a pas encore démarré : le temps reste plein.
+            restant_ms=min(p.temps_ms, max(0, _ms(restant))),
         )
     return EtatPartie(
         tentative_id=tentative.id,
@@ -451,11 +469,55 @@ async def _etat(
     )
 
 
+async def _correction(db: AsyncSession, ligne: ReponseQuiz) -> CorrectionReponse:
+    """La correction d'une question tranchée, dans l'ordre des choix affiché au joueur."""
+    question = await db.get(QuestionQuiz, ligne.question_id)
+    assert question is not None and ligne.correcte is not None
+    return CorrectionReponse(
+        rang=ligne.rang,
+        juste=ligne.correcte,
+        choix_joueur=ligne.ordre_choix.index(ligne.choix) if ligne.choix is not None else None,
+        choix_attendu=ligne.ordre_choix.index(question.bonne_reponse),
+    )
+
+
+async def _erreurs(db: AsyncSession, tentative: TentativeQuiz) -> list[ErreurPartie]:
+    """Le récapitulatif de fin de partie : chaque question ratée, la réponse du joueur et la bonne."""
+    ratees = [ligne for ligne in await _lignes(db, tentative) if not ligne.correcte]
+    if not ratees:
+        return []
+    questions = {
+        q.id: q
+        for q in await db.scalars(select(QuestionQuiz).where(QuestionQuiz.id.in_([lg.question_id for lg in ratees])))
+    }
+    erreurs = []
+    for ligne in ratees:
+        question = questions[ligne.question_id]
+        erreurs.append(
+            ErreurPartie(
+                rang=ligne.rang,
+                enonce=question.enonce,
+                ta_reponse=question.choix[ligne.choix] if ligne.choix is not None else None,
+                reponse_attendue=question.choix[question.bonne_reponse],
+                explication=question.explication,
+            )
+        )
+    return erreurs
+
+
 async def _finir_reponse(
-    db: AsyncSession, tentative: TentativeQuiz, quiz: Quiz, p: ParametresQuiz, maintenant: datetime
+    db: AsyncSession,
+    tentative: TentativeQuiz,
+    quiz: Quiz,
+    p: ParametresQuiz,
+    maintenant: datetime,
+    corrigee: ReponseQuiz | None = None,
 ) -> EtatPartie:
-    """Construit l'état renvoyé ; un essai terminé est effacé aussitôt (il ne laisse aucune trace)."""
+    """Construit l'état renvoyé ; un essai terminé est effacé aussitôt (il ne laisse aucune trace). Pour un quiz des
+    jeux, la question à laquelle le joueur vient de répondre est corrigée."""
     resultat = await _etat(db, tentative, quiz, p, maintenant)
+    if corrigee is not None and corrigee.correcte is not None and quiz.parcours == PARCOURS_JEUX:
+        resultat.correction = await _correction(db, corrigee)
     if tentative.essai and tentative.etat is EtatTentative.terminee:
         await db.execute(delete(TentativeQuiz).where(TentativeQuiz.id == tentative.id))
     return resultat

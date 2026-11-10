@@ -153,6 +153,8 @@
   --animate-marquee: marquee 40s linear infinite;
   --animate-float: float 5s ease-in-out infinite;
   --animate-shake: shake 0.45s ease-in-out;
+  /* Le choix corrigé d'un quiz des jeux clignote trois fois (PartieQuiz, 2026-11-10). */
+  --animate-clignote: clignote 0.4s ease-in-out 3;
 
   @keyframes marquee {
     to {
@@ -162,6 +164,11 @@
   @keyframes float {
     50% {
       transform: translateY(-10px);
+    }
+  }
+  @keyframes clignote {
+    50% {
+      opacity: 0.45;
     }
   }
   @keyframes shake {

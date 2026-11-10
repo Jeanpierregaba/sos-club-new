@@ -1,4 +1,5 @@
-"""Quiz ouverts depuis la page des jeux (spec 031) : un joueur sans compte joue deux quiz au plus, sans points."""
+"""Quiz ouverts depuis la page des jeux (spec 031) : un joueur sans compte joue trois quiz au plus, sans points
+(limite portée de 2 à 3 le 2026-11-10)."""
 
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
@@ -49,7 +50,7 @@ def test_le_catalogue_est_public(client: TestClient, en_base: Callable[..., Any]
     corps = client.get(QUIZ).json()
 
     assert [q["titre"] for q in corps["quiz"]] == ["Hygiène"]
-    assert (corps["limite"], corps["restants"], corps["connecte"]) == (2, 2, False)
+    assert (corps["limite"], corps["restants"], corps["connecte"]) == (3, 3, False)
 
 
 def test_un_joueur_sans_compte_joue_sans_points(
@@ -66,20 +67,22 @@ def test_un_joueur_sans_compte_joue_sans_points(
     (invite,) = invites_en_base(en_base)
     assert (invite.email, invite.mot_de_passe_hash) == (None, "")
     assert en_base(lambda db: db.scalar(select(func.count()).select_from(MouvementPoints))) == 0
-    assert client.get(QUIZ).json()["restants"] == 1
+    assert client.get(QUIZ).json()["restants"] == 2
 
 
-def test_au_troisieme_quiz_il_faut_un_compte(client: TestClient, en_base: Callable[..., Any], heure: Horloge) -> None:
-    quiz = [creer_quiz(en_base, titre=f"Quiz {i}") for i in range(3)]
-    assert lancer(client, quiz[0]).status_code == 201
-    assert lancer(client, quiz[1]).status_code == 201
+def test_au_quatrieme_quiz_il_faut_un_compte(client: TestClient, en_base: Callable[..., Any], heure: Horloge) -> None:
+    quiz = [creer_quiz(en_base, titre=f"Quiz {i}") for i in range(4)]
+    for un in quiz[:3]:
+        assert lancer(client, un).status_code == 201
 
-    refus = lancer(client, quiz[2])
+    refus = lancer(client, quiz[3])
 
     assert refus.status_code == 403
-    assert "compte visiteur" in refus.json()["detail"]
+    assert "3 quiz gratuits" in refus.json()["detail"]
+    # Le site reconnaît la fin de l'essai à ce marqueur, pas au seul code 403.
+    assert refus.headers["x-raison"] == "fin-essai"
     assert client.get(QUIZ).json()["restants"] == 0
-    # Rejouer un des deux quiz déjà commencés reste possible.
+    # Rejouer un des quiz déjà commencés reste possible.
     assert lancer(client, quiz[0]).status_code == 201
     assert len(invites_en_base(en_base)) == 1
 
@@ -168,3 +171,14 @@ def test_les_quiz_des_jeux_laissent_20_secondes_et_la_certification_5(
         return (await parametres.en_cours(db, "certification")).temps_ms
 
     assert en_base(certification) == 5000
+
+
+def test_un_refus_d_origine_n_est_pas_une_fin_d_essai(client: TestClient, en_base: Callable[..., Any]) -> None:
+    """Le bug du 2026-11-10 : un 403 sans rapport (ici le contrôle d'origine) passait pour la fin de l'essai."""
+    quiz = creer_quiz(en_base)
+
+    refus = client.post(f"{QUIZ}/{quiz.id}/tentatives", headers={"Origin": "https://autre-site.example"})
+
+    assert refus.status_code == 403
+    assert "x-raison" not in refus.headers
+    assert client.get(QUIZ).json()["restants"] == 3

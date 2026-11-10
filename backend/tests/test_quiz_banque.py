@@ -579,7 +579,7 @@ def test_un_essai_ne_laisse_ni_tentative_ni_plafond_ni_points(
                 f"{BANQUE}/essais/{etat['tentative_id']}/reponses",
                 json={"rang": etat["question"]["rang"], "choix": bon_choix(etat["question"])},
             ).json()
-        assert etat["resultat"] == {"score": 15, "total": 15, "seuil": 12, "reussie": True, "points": 0}
+        assert etat["resultat"] == {"score": 15, "total": 15, "seuil": 12, "reussie": True, "points": 0, "erreurs": []}
 
     assert tentatives(en_base) == []
     assert gains(en_base, gestionnaire.id) == []

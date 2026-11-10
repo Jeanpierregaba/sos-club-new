@@ -2,7 +2,7 @@
 
 À sa première partie, le joueur reçoit un compte « invite » sans e-mail ni mot de passe, reconnu par un cookie à
 part du cookie de session : il ne se connecte à rien d'autre. Le serveur arbitre ses parties comme les autres
-(ADR-0004), sans points. Deux quiz au plus ; au-delà, il crée un compte visiteur. Effacé au bout de 7 jours.
+(ADR-0004), sans points. Trois quiz au plus (2026-11-10) ; au-delà, il crée un compte visiteur. Effacé au bout de 7 jours.
 """
 
 import secrets
@@ -16,7 +16,7 @@ from app.comptes.service import _purger_vieux_essais, empreinte, utilisateur_de_
 from app.quiz.models import ReponseQuiz, TentativeQuiz
 
 COOKIE = "sosclub_invite"
-LIMITE_QUIZ = 2
+LIMITE_QUIZ = 3
 DUREE = timedelta(days=7)
 # Une salle informatique partage une adresse : la limite freine seulement qui efface ses cookies en boucle.
 CLE_LIMITE = "invite"
@@ -24,6 +24,11 @@ INVITES_PAR_HEURE = 30
 MESSAGE_LIMITE = (
     f"Tu as joué tes {LIMITE_QUIZ} quiz gratuits. Crée ton compte visiteur pour continuer à jouer : c'est gratuit."
 )
+
+
+# Le site reconnaît la fin de l'essai à cet en-tête, jamais au seul code 403 : d'autres refus (origine, certification)
+# n'ont rien à voir avec l'essai.
+EN_TETE_FIN_ESSAI = {"X-Raison": "fin-essai"}
 
 
 class LimiteAtteinte(Exception):

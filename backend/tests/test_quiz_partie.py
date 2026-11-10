@@ -4,6 +4,7 @@ temps et calcule seul le résultat. Écrits avant le code (docs/TESTING.md)."""
 import asyncio
 from collections.abc import Callable
 from typing import Any
+from unittest.mock import ANY
 
 import pytest
 from fastapi.testclient import TestClient
@@ -70,21 +71,140 @@ def textes(valeur: Any) -> list[str]:
 # Réponses jamais exposées -------------------------------------------------------------------------------------
 
 
-def test_aucune_reponse_au_joueur_ne_contient_la_bonne_reponse(
+def test_la_question_en_cours_ne_contient_jamais_sa_reponse(
     client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
 ) -> None:
-    corps = [client.get(QUIZ).json()]
+    """ADR-0004 : rien n'est envoyé d'avance. La correction (2026-11-10) n'arrive qu'après la réponse du joueur, et ne
+    porte que sur la question à laquelle il vient de répondre."""
+    listes = [client.get(QUIZ).json()]
     etat = lancer(client, quiz)
-    corps.append(etat)
+    etats = [etat]
     while etat["question"] is not None:
-        corps.append(client.get(f"{QUIZ}/tentatives/{etat['tentative_id']}").json())
+        etats.append(client.get(f"{QUIZ}/tentatives/{etat['tentative_id']}").json())
+        rang = etat["question"]["rang"]
         etat = repondre(client, etat, bon_choix(etat["question"]))
-        corps.append(etat)
-    corps.append(client.get(QUIZ).json())
+        assert etat["correction"]["rang"] == rang
+        etats.append(etat)
+    listes.append(client.get(QUIZ).json())
 
-    for c in corps:
+    for c in listes + [e["question"] for e in etats if e["question"]]:
         assert not cles(c) & CLES_INTERDITES
         assert not any("Explication secrète" in t for t in textes(c))
+    # Un état lu sans répondre (reprise) ne corrige rien.
+    assert all(e.get("correction") is None for e in etats[1::2])
+
+
+def test_apres_chaque_reponse_le_joueur_sait_si_elle_etait_juste(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
+) -> None:
+    etat = lancer(client, quiz)
+    bon = bon_choix(etat["question"])
+    juste = repondre(client, etat, bon)
+    faux_choix = mauvais_choix(juste["question"])
+    bon_suivant = bon_choix(juste["question"])
+    faux = repondre(client, juste, faux_choix)
+
+    assert juste["correction"] == {"rang": 1, "juste": True, "choix_joueur": bon, "choix_attendu": bon}
+    assert faux["correction"] == {
+        "rang": 2, "juste": False, "choix_joueur": faux_choix, "choix_attendu": bon_suivant,
+    }  # fmt: skip
+    assert juste["resultat"] is None and faux["resultat"] is None
+
+
+def test_une_question_expiree_est_corrigee_sans_choix(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
+) -> None:
+    etat = lancer(client, quiz)
+    bon = bon_choix(etat["question"])
+    heure.avancer(23)
+
+    corrige = repondre(client, etat, bon)
+
+    assert corrige["correction"] == {"rang": 1, "juste": False, "choix_joueur": None, "choix_attendu": bon}
+
+
+def test_une_question_expiree_pendant_une_coupure_est_corrigee_a_la_reprise(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
+) -> None:
+    etat = lancer(client, quiz)
+    bon = bon_choix(etat["question"])
+    heure.avancer(23)
+
+    reprise = client.get(f"{QUIZ}/tentatives/{etat['tentative_id']}").json()
+
+    assert reprise["correction"] == {"rang": 1, "juste": False, "choix_joueur": None, "choix_attendu": bon}
+    assert reprise["question"]["rang"] == 2
+    while reprise["question"] is not None:
+        reprise = repondre(client, reprise, bon_choix(reprise["question"]))
+    ratee = reprise["resultat"]["erreurs"]
+    assert [(e["rang"], e["ta_reponse"]) for e in ratee] == [(1, None)]
+    assert ratee[0]["reponse_attendue"].startswith("Juste")
+
+
+def test_la_pause_de_correction_ne_prend_pas_sur_le_temps_de_la_question_suivante(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
+) -> None:
+    etat = lancer(client, quiz)
+    etat = repondre(client, etat, bon_choix(etat["question"]))
+    assert etat["question"]["restant_ms"] == 20000
+
+    heure.avancer(1.2 + 19)
+    reprise = client.get(f"{QUIZ}/tentatives/{etat['tentative_id']}").json()
+    assert reprise["question"]["rang"] == 2
+    assert reprise["question"]["restant_ms"] == 1000
+
+    heure.avancer(2.9)  # 20 s affichées + 2 s de tolérance, comptées après la pause
+    suite = repondre(client, reprise, bon_choix(reprise["question"]))
+    assert suite["correction"]["juste"] is True
+
+
+def test_la_certification_n_a_pas_de_pause_de_correction(
+    client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
+) -> None:
+    certification = creer_quiz(en_base, titre="Place 1", place=1)
+    etat = lancer(client, certification)
+    etat = repondre(client, etat, bon_choix(etat["question"]))
+    heure.avancer(etat["question"]["temps_ms"] / 1000 - 1)
+
+    reprise = client.get(f"{QUIZ}/tentatives/{etat['tentative_id']}").json()
+
+    # Sans pause, le temps se décompte dès la réponse : il reste 1 s.
+    assert reprise["question"]["restant_ms"] == 1000
+    assert reprise["correction"] is None
+
+
+def test_le_recapitulatif_liste_les_erreurs_avec_la_bonne_reponse(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
+) -> None:
+    resultat = jouer(client, quiz, justes=13)["resultat"]
+
+    assert resultat["score"] == 13
+    erreurs = resultat["erreurs"]
+    assert [e["rang"] for e in erreurs] == [14, 15]
+    for e in erreurs:
+        assert e["reponse_attendue"].startswith("Juste")
+        assert e["ta_reponse"].startswith("Faux")
+        assert e["explication"].startswith("Explication secrète")
+        assert e["enonce"].endswith("?")
+
+
+def test_un_sans_faute_a_un_recapitulatif_vide(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
+) -> None:
+    assert jouer(client, quiz, justes=15)["resultat"]["erreurs"] == []
+
+
+def test_la_certification_ne_corrige_ni_pendant_ni_apres(
+    client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
+) -> None:
+    """Les quiz de la certification Génie Imhotep gardent le score seul à la fin (spec 029)."""
+    certification = creer_quiz(en_base, titre="Place 1", place=1)
+    etat = lancer(client, certification)
+    etat = repondre(client, etat, mauvais_choix(etat["question"]))
+    assert etat["correction"] is None
+    while etat["question"] is not None:
+        etat = repondre(client, etat, bon_choix(etat["question"]))
+    assert etat["resultat"]["erreurs"] is None
 
 
 def test_une_question_arrive_seule_avec_ses_choix_melanges(
@@ -97,17 +217,6 @@ def test_une_question_arrive_seule_avec_ses_choix_melanges(
     assert etat["question"]["temps_ms"] == 20000
     assert etat["resultat"] is None
     assert sorted(t.split(" ")[0] for t in etat["question"]["choix"]) == ["Faux", "Faux", "Juste"]
-
-
-def test_la_reponse_suivante_ne_dit_pas_si_la_precedente_etait_juste(
-    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
-) -> None:
-    etat = lancer(client, quiz)
-    juste = repondre(client, etat, bon_choix(etat["question"]))
-    faux = repondre(client, juste, mauvais_choix(juste["question"]))
-
-    assert set(juste) == set(faux)
-    assert juste["resultat"] is None and faux["resultat"] is None
 
 
 # Le temps ----------------------------------------------------------------------------------------------------
@@ -182,7 +291,7 @@ def test_une_tentative_inactive_10_minutes_est_close_avec_le_score_acquis(
     fin = client.get(f"{QUIZ}/tentatives/{etat['tentative_id']}").json()
 
     assert fin["question"] is None
-    assert fin["resultat"] == {"score": 12, "total": 15, "seuil": 12, "reussie": True, "points": 50}
+    assert fin["resultat"] == {"score": 12, "total": 15, "seuil": 12, "reussie": True, "points": 50, "erreurs": ANY}
     assert len(gains(en_base, eleve.id)) == 1
 
 
@@ -224,7 +333,7 @@ def test_onze_bonnes_reponses_sur_quinze_ne_suffisent_pas(
 ) -> None:
     resultat = jouer(client, quiz, 11)["resultat"]
 
-    assert resultat == {"score": 11, "total": 15, "seuil": 12, "reussie": False, "points": 0}
+    assert resultat == {"score": 11, "total": 15, "seuil": 12, "reussie": False, "points": 0, "erreurs": ANY}
     assert gains(en_base, eleve.id) == []
 
 
@@ -233,7 +342,7 @@ def test_douze_bonnes_reponses_reussissent_et_rapportent_50_points(
 ) -> None:
     resultat = jouer(client, quiz, 12)["resultat"]
 
-    assert resultat == {"score": 12, "total": 15, "seuil": 12, "reussie": True, "points": 50}
+    assert resultat == {"score": 12, "total": 15, "seuil": 12, "reussie": True, "points": 50, "erreurs": ANY}
     [ligne] = gains(en_base, eleve.id)
     assert (ligne.action, ligne.montant, ligne.cle) == ("eleve.quiz", 50, f"quiz:{quiz.id}:{eleve.id}")
 

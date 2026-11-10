@@ -1,6 +1,6 @@
 """Quiz « jeux » ouverts à tous depuis la page des jeux (spec 031), sous /jeux/quiz.
 
-Un joueur sans compte joue au plus deux quiz, sans points ; ses parties sont arbitrées par le serveur comme les
+Un joueur sans compte joue au plus trois quiz, sans points ; ses parties sont arbitrées par le serveur comme les
 autres (ADR-0004). Un compte connecté joue depuis /quiz, avec ses règles.
 """
 
@@ -126,7 +126,9 @@ async def lancer(quiz_id: UUID, request: Request, response: Response, db: Db, mo
         await invites.verifier_limite(db, invite, quiz_id)
         resultat = await partie.lancer(db, invite, quiz_id)
     except invites.LimiteAtteinte:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, invites.MESSAGE_LIMITE) from None
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, invites.MESSAGE_LIMITE, headers=invites.EN_TETE_FIN_ESSAI
+        ) from None
     except ERREURS as e:
         raise erreur_de_partie(e) from None
     await db.commit()

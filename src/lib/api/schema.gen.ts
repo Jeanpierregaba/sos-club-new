@@ -4190,6 +4190,21 @@ export interface components {
              */
             deja_repondu: boolean;
         };
+        /**
+         * CorrectionReponse
+         * @description La correction de la question à laquelle le joueur vient de répondre (quiz des jeux, 2026-11-10). Elle n'arrive
+         *     qu'après sa réponse : la question en cours ne porte jamais la sienne (ADR-0004).
+         */
+        CorrectionReponse: {
+            /** Rang */
+            rang: number;
+            /** Juste */
+            juste: boolean;
+            /** Choix Joueur */
+            choix_joueur: number | null;
+            /** Choix Attendu */
+            choix_attendu: number;
+        };
         /** DecisionEntree */
         DecisionEntree: {
             /** Version */
@@ -4576,6 +4591,22 @@ export interface components {
             qr_svg: string;
         };
         /**
+         * ErreurPartie
+         * @description Une question ratée, dans le récapitulatif de fin de partie des quiz des jeux.
+         */
+        ErreurPartie: {
+            /** Rang */
+            rang: number;
+            /** Enonce */
+            enonce: string;
+            /** Ta Reponse */
+            ta_reponse: string | null;
+            /** Reponse Attendue */
+            reponse_attendue: string;
+            /** Explication */
+            explication: string | null;
+        };
+        /**
          * EspaceClub
          * @description La vue « Mon club » : la gestion (demandes, suivi) pour le président seul ; la lecture pour les membres et
          *     les encadreurs rattachés.
@@ -4852,6 +4883,7 @@ export interface components {
             total: number;
             question: components["schemas"]["QuestionJoueur"] | null;
             resultat: components["schemas"]["ResultatPartie"] | null;
+            correction?: components["schemas"]["CorrectionReponse"] | null;
         };
         /**
          * EtatQuelAxe
@@ -6637,6 +6669,8 @@ export interface components {
             reussie: boolean;
             /** Points */
             points: number;
+            /** Erreurs */
+            erreurs?: components["schemas"]["ErreurPartie"][] | null;
         };
         /** ResultatQuelAxe */
         ResultatQuelAxe: {

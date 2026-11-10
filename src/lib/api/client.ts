@@ -139,6 +139,8 @@ export type MesCommentaires = Schemas["MesCommentaires"];
 export type CommentairePublic = Schemas["CommentairePublic"];
 export type CommentairesPublics = Schemas["CommentairesPublics"];
 export type EtatPartie = Schemas["EtatPartie"];
+export type CorrectionReponse = Schemas["CorrectionReponse"];
+export type ErreurPartie = Schemas["ErreurPartie"];
 export type QuestionJoueur = Schemas["QuestionJoueur"];
 export type ResultatPartie = Schemas["ResultatPartie"];
 export type ListeQuiz = Schemas["ListeQuiz"];
@@ -182,6 +184,9 @@ export class ErreurApi extends Error {
   constructor(
     readonly statut: number,
     message: string,
+    // Le motif précis d'un refus, quand l'API le donne (en-tête X-Raison) : « fin-essai » pour la limite d'essai
+    // des joueurs sans compte. Un code 403 seul ne suffit pas à le savoir.
+    readonly raison: string | null = null,
   ) {
     super(message);
     this.name = "ErreurApi";
@@ -223,7 +228,7 @@ async function requeteApi<T>(chemin: string, init: RequestInit = {}): Promise<T>
         : reponse.status === 422
           ? MESSAGE_SAISIE
           : MESSAGE_INDISPONIBLE;
-    throw new ErreurApi(reponse.status, message);
+    throw new ErreurApi(reponse.status, message, reponse.headers.get("x-raison"));
   }
   return corps as T;
 }
@@ -707,7 +712,7 @@ export const chargerQuiz = (axe?: string) =>
   requeteApi<ListeQuiz>(avecParametres("/api/quiz", { axe }));
 export const lancerQuiz = (quizId: string) =>
   envoyerJson<EtatPartie>(`/api/quiz/${quizId}/tentatives`);
-// Quiz ouverts depuis la page des jeux (spec 031) : un joueur sans compte joue deux quiz au plus.
+// Quiz ouverts depuis la page des jeux (spec 031) : un joueur sans compte joue trois quiz au plus.
 export type CatalogueQuiz = Schemas["CatalogueQuiz"];
 export type QuizOuvert = Schemas["QuizOuvert"];
 export const chargerCatalogueJeux = () => requeteApi<CatalogueQuiz>("/api/jeux/quiz");
