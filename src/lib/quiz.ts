@@ -22,12 +22,15 @@ export type Pole = {
   d: string;
   themes: string[];
   couleur: string;
+  // Le lot du Jeu Quiz Santé (document officiel des 922 QCM) dont les défis du pôle tirent leurs questions.
+  lot: number;
   quiz: [titre: string, cotation: number][];
 };
 
 export const poles: Pole[] = [
   {
     id: "aimes-afrique",
+    lot: 1,
     nom: "AIMES-AFRIQUE & SOS Docteur TV",
     sur: "Histoire & média santé",
     d: "La genèse humanitaire et la 1re chaîne 100 % santé d’Afrique.",
@@ -46,6 +49,7 @@ export const poles: Pole[] = [
   },
   {
     id: "genie-imhotep",
+    lot: 2,
     nom: "Championnat national Génie Imhotep",
     sur: "Compétition & citoyenneté",
     d: "Épreuves au buzzer, questions de rapidité, culture médicale et esprit d’équipe : les règles du jeu, les valeurs civiques et l’excellence scolaire.",
@@ -69,6 +73,7 @@ export const poles: Pole[] = [
   },
   {
     id: "hygiene",
+    lot: 5,
     nom: "Santé, hygiène & nutrition locale",
     sur: "Gestes du quotidien & hygiène",
     d: "20 quiz pour ancrer les réflexes de prévention : hygiène bucco-dentaire, eau potable, nutrition locale équilibrée et sommeil réparateur.",
@@ -104,6 +109,7 @@ export const poles: Pole[] = [
   },
   {
     id: "evss",
+    lot: 4,
     nom: "Santé sexuelle & reproductive (EVSS)",
     sur: "Droits, genre & bien-être",
     d: "30 quiz sans tabou pour comprendre son corps, prévenir les grossesses précoces en milieu scolaire, dire NON aux violences et développer l’estime de soi.",
@@ -144,6 +150,7 @@ export const poles: Pole[] = [
   },
   {
     id: "journees-mondiales",
+    lot: 3,
     nom: "Journées mondiales & environnement",
     sur: "Maladies & calendrier de santé",
     d: "20 quiz consacrés aux dates phares de la santé mondiale, à la drépanocytose, au paludisme, au don de sang bénévole et à l’éco-jogging scolaire.",
@@ -179,6 +186,7 @@ export const poles: Pole[] = [
   },
   {
     id: "secourisme",
+    lot: 6,
     nom: "Secourisme & santé publique pratique",
     sur: "Réflexes d’urgence & vaccination",
     d: "14 quiz pratiques sur les gestes vitaux face aux malaises, blessures et accidents, et sur le calendrier vaccinal togolais.",

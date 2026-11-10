@@ -600,7 +600,7 @@ def test_un_essai_respecte_le_chrono(
 ) -> None:
     corps = quiz_pret(client, en_base)
     etat = client.post(f"{BANQUE}/{corps['id']}/essais").json()
-    heure.avancer(8)
+    heure.avancer(23)
 
     suite = client.get(f"{BANQUE}/essais/{etat['tentative_id']}").json()
 

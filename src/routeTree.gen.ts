@@ -57,7 +57,6 @@ import { Route as GenieImhotepHallOfFameIndexRouteImport } from './routes/genie-
 import { Route as GenieImhotepHallOfFameEditionRouteImport } from './routes/genie-imhotep/hall-of-fame/$edition'
 import { Route as GenieImhotepPalmaresIndexRouteImport } from './routes/genie-imhotep/palmares/index'
 import { Route as GenieImhotepPalmaresEditionRouteImport } from './routes/genie-imhotep/palmares/$edition'
-import { Route as JeuxQuizIdRouteImport } from './routes/jeux_.quiz.$id'
 import { Route as ConnecteAdminBibliothequeIndexRouteImport } from './routes/_connecte/admin/bibliotheque.index'
 import { Route as ConnecteAdminBibliothequeIdRouteImport } from './routes/_connecte/admin/bibliotheque.$id'
 import { Route as ConnecteAdminCertificationIndexRouteImport } from './routes/_connecte/admin/certification.index'
@@ -329,11 +328,6 @@ const GenieImhotepPalmaresEditionRoute =
     path: '/genie-imhotep/palmares/$edition',
     getParentRoute: () => rootRouteImport,
   } as any)
-const JeuxQuizIdRoute = JeuxQuizIdRouteImport.update({
-  id: '/jeux_/quiz/$id',
-  path: '/jeux/quiz/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ConnecteAdminBibliothequeIndexRoute =
   ConnecteAdminBibliothequeIndexRouteImport.update({
     id: '/',
@@ -500,7 +494,6 @@ export interface FileRoutesByFullPath {
   '/quiz/$id': typeof ConnecteQuizIdRoute
   '/genie-imhotep/hall-of-fame/$edition': typeof GenieImhotepHallOfFameEditionRoute
   '/genie-imhotep/palmares/$edition': typeof GenieImhotepPalmaresEditionRoute
-  '/jeux/quiz/$id': typeof JeuxQuizIdRoute
   '/admin/': typeof ConnecteAdminIndexRoute
   '/mes-articles/': typeof ConnecteMesArticlesIndexRoute
   '/mon-club/': typeof ConnecteMonClubIndexRoute
@@ -565,7 +558,6 @@ export interface FileRoutesByTo {
   '/quiz/$id': typeof ConnecteQuizIdRoute
   '/genie-imhotep/hall-of-fame/$edition': typeof GenieImhotepHallOfFameEditionRoute
   '/genie-imhotep/palmares/$edition': typeof GenieImhotepPalmaresEditionRoute
-  '/jeux/quiz/$id': typeof JeuxQuizIdRoute
   '/admin': typeof ConnecteAdminIndexRoute
   '/mes-articles': typeof ConnecteMesArticlesIndexRoute
   '/mon-club': typeof ConnecteMonClubIndexRoute
@@ -638,7 +630,6 @@ export interface FileRoutesById {
   '/_connecte/quiz/$id': typeof ConnecteQuizIdRoute
   '/genie-imhotep/hall-of-fame/$edition': typeof GenieImhotepHallOfFameEditionRoute
   '/genie-imhotep/palmares/$edition': typeof GenieImhotepPalmaresEditionRoute
-  '/jeux_/quiz/$id': typeof JeuxQuizIdRoute
   '/_connecte/admin/': typeof ConnecteAdminIndexRoute
   '/_connecte/mes-articles/': typeof ConnecteMesArticlesIndexRoute
   '/_connecte/mon-club/': typeof ConnecteMonClubIndexRoute
@@ -711,7 +702,6 @@ export interface FileRouteTypes {
     | '/quiz/$id'
     | '/genie-imhotep/hall-of-fame/$edition'
     | '/genie-imhotep/palmares/$edition'
-    | '/jeux/quiz/$id'
     | '/admin/'
     | '/mes-articles/'
     | '/mon-club/'
@@ -776,7 +766,6 @@ export interface FileRouteTypes {
     | '/quiz/$id'
     | '/genie-imhotep/hall-of-fame/$edition'
     | '/genie-imhotep/palmares/$edition'
-    | '/jeux/quiz/$id'
     | '/admin'
     | '/mes-articles'
     | '/mon-club'
@@ -848,7 +837,6 @@ export interface FileRouteTypes {
     | '/_connecte/quiz/$id'
     | '/genie-imhotep/hall-of-fame/$edition'
     | '/genie-imhotep/palmares/$edition'
-    | '/jeux_/quiz/$id'
     | '/_connecte/admin/'
     | '/_connecte/mes-articles/'
     | '/_connecte/mon-club/'
@@ -902,7 +890,6 @@ export interface RootRouteChildren {
   ArticlesIndexRoute: typeof ArticlesIndexRoute
   GenieImhotepHallOfFameEditionRoute: typeof GenieImhotepHallOfFameEditionRoute
   GenieImhotepPalmaresEditionRoute: typeof GenieImhotepPalmaresEditionRoute
-  JeuxQuizIdRoute: typeof JeuxQuizIdRoute
   GenieImhotepHallOfFameIndexRoute: typeof GenieImhotepHallOfFameIndexRoute
   GenieImhotepPalmaresIndexRoute: typeof GenieImhotepPalmaresIndexRoute
 }
@@ -1243,13 +1230,6 @@ declare module '@tanstack/react-router' {
       path: '/genie-imhotep/palmares/$edition'
       fullPath: '/genie-imhotep/palmares/$edition'
       preLoaderRoute: typeof GenieImhotepPalmaresEditionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/jeux_/quiz/$id': {
-      id: '/jeux_/quiz/$id'
-      path: '/jeux/quiz/$id'
-      fullPath: '/jeux/quiz/$id'
-      preLoaderRoute: typeof JeuxQuizIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_connecte/admin/bibliotheque/': {
@@ -1594,7 +1574,6 @@ const rootRouteChildren: RootRouteChildren = {
   ArticlesIndexRoute: ArticlesIndexRoute,
   GenieImhotepHallOfFameEditionRoute: GenieImhotepHallOfFameEditionRoute,
   GenieImhotepPalmaresEditionRoute: GenieImhotepPalmaresEditionRoute,
-  JeuxQuizIdRoute: JeuxQuizIdRoute,
   GenieImhotepHallOfFameIndexRoute: GenieImhotepHallOfFameIndexRoute,
   GenieImhotepPalmaresIndexRoute: GenieImhotepPalmaresIndexRoute,
 }

@@ -23,7 +23,7 @@ certificat) suit en R11 et réutilisera ce moteur.
 
 1. Le parcours « jeux libres » a des paramètres réglables dans l'espace admin, par un collaborateur qui a le droit
    de publier (ils changent la difficulté, donc les points) : nombre de questions par
-   tentative (15 par défaut), temps affiché par question (5 s), tolérance réseau (2 s), seuil de réussite
+   tentative (15 par défaut), temps affiché par question (5 s ; 20 s pour les jeux depuis le 2026-11-10), tolérance réseau (2 s), seuil de réussite
    (12 bonnes réponses) et plafond de tentatives par joueur et par quiz sur une journée (10).
 2. Modifier un paramètre crée une nouvelle version ; l'ancienne reste lisible. Une tentative garde la version
    avec laquelle elle a commencé. Le seuil ne peut dépasser le nombre de questions.

@@ -7,7 +7,7 @@
 
 Les points font les classements publics, donc la fierté des clubs. Ils doivent pouvoir être expliqués
 ligne par ligne, annulés en cas de fraude, et jamais attribués deux fois (double clic, nouvel essai
-après une coupure). Le quiz limite le temps à 5 secondes par question, ce qu'un navigateur seul ne peut
+après une coupure). Le quiz limite le temps par question (5 secondes au départ, 20 pour les jeux depuis le 2026-11-10), ce qu'un navigateur seul ne peut
 pas garantir.
 
 ## Options envisagées
@@ -21,8 +21,8 @@ pas garantir.
 
 Tout gain passe par une seule fonction du domaine `points`, qui écrit dans `mouvement_points` avec une
 clé d'idempotence unique (ex. `quiz:<quiz>:<eleve>`) ; un score est la somme de ces lignes. Pour le
-quiz, le serveur envoie une question à la fois sans sa réponse, note l'heure d'envoi, compte 5 secondes
-plus 2 secondes de tolérance réseau, et calcule seul le résultat.
+quiz, le serveur envoie une question à la fois sans sa réponse, note l'heure d'envoi, compte le temps du parcours
+(jeux 20 s, certification 5 s) plus 2 secondes de tolérance réseau, et calcule seul le résultat.
 
 ## Conséquences
 

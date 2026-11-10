@@ -64,7 +64,7 @@ Les routes publiques sont rendues côté serveur ; le menu masque ce qui ne conc
 ## Accessibilité
 
 WCAG 2.2 AA : navigation au clavier, contrastes, textes alternatifs, respect de
-`prefers-reduced-motion`. Le chrono de 5 secondes fait partie de l'épreuve ; il reste visible, annoncé
+`prefers-reduced-motion`. Le chrono (20 secondes pour les jeux, 5 pour la certification) fait partie de l'épreuve ; il reste visible, annoncé
 aux lecteurs d'écran, et n'est jamais indiqué par la seule couleur. Le MVP ne propose pas de quiz sans
 chrono : à revoir si des élèves en sont exclus.
 

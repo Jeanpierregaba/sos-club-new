@@ -7,8 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.quiz.models import PARCOURS_JEUX, ParametresQuiz
 
-# Q12 : 15 questions, 5 secondes affichées plus 2 de tolérance, réussite à 12 ; plafond de 10 tentatives par jour.
+# Q12 : 15 questions, 5 secondes affichées (certification) plus 2 de tolérance, réussite à 12 ; plafond de 10 tentatives par jour.
 PAR_DEFAUT = {"nb_questions": 15, "temps_ms": 5000, "tolerance_ms": 2000, "seuil": 12, "tentatives_par_jour": 10}
+# Les quiz de la page des jeux passent à 20 secondes par question (2026-11-10) ; la certification garde 5 secondes.
+PAR_DEFAUT_PARCOURS = {PARCOURS_JEUX: PAR_DEFAUT | {"temps_ms": 20000}}
 
 
 async def en_cours(db: AsyncSession, parcours: str = PARCOURS_JEUX) -> ParametresQuiz:
@@ -18,7 +20,7 @@ async def en_cours(db: AsyncSession, parcours: str = PARCOURS_JEUX) -> Parametre
     if parametres is None:
         await db.execute(
             insert(ParametresQuiz)
-            .values(parcours=parcours, version=1, **PAR_DEFAUT)
+            .values(parcours=parcours, version=1, **PAR_DEFAUT_PARCOURS.get(parcours, PAR_DEFAUT))
             .on_conflict_do_nothing(index_elements=["parcours", "version"])
         )
         parametres = await db.scalar(requete.limit(1))
