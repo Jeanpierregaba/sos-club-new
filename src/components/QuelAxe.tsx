@@ -251,39 +251,6 @@ export function QuelAxe() {
         </ul>
       </div>
 
-      {/* Les 7 axes défilent en pied de section. */}
-      <div className="group/axes relative border-t border-white/70 bg-white/45 py-4 backdrop-blur-sm">
-        <div className="flex w-max motion-safe:animate-marquee group-hover/axes:[animation-play-state:paused]">
-          {[0, 1].map((copie) => (
-            <ul
-              key={copie}
-              aria-label={copie === 0 ? "Les 7 axes des Clubs Santé" : undefined}
-              aria-hidden={copie === 1 || undefined}
-              className="flex shrink-0 gap-3 pr-3"
-            >
-              {[...axes, ...axes].map((a, j) => (
-                <li
-                  key={`${a.n}-${j}`}
-                  aria-hidden={j >= axes.length || undefined}
-                  className={`flex items-center gap-2 rounded-full py-1 pl-1 pr-4 text-sm font-bold shadow-sm ${a.encre}`}
-                  style={{ background: a.couleur }}
-                >
-                  <img
-                    src={a.img}
-                    alt=""
-                    width={1414}
-                    height={2000}
-                    loading="lazy"
-                    className="size-8 rounded-full bg-white/90 object-cover object-top"
-                  />
-                  {a.nom}
-                </li>
-              ))}
-            </ul>
-          ))}
-        </div>
-      </div>
-
       <Dialog open={ouvert} onOpenChange={setOuvert}>
         <DialogContent className="max-h-[100dvh] w-full max-w-2xl overflow-y-auto rounded-none p-0 sm:max-h-[92dvh] sm:rounded-[2rem]">
           <DialogTitle className="sr-only">Quel axe est fait pour toi ?</DialogTitle>
@@ -294,5 +261,42 @@ export function QuelAxe() {
         </DialogContent>
       </Dialog>
     </section>
+  );
+}
+
+// Les 7 axes qui défilent, en bande pleine largeur (placée après « Et si ton lycée devenait N°1 du Togo ? »).
+export function BandeAxes() {
+  return (
+    <div className="group/axes relative w-full overflow-hidden border-y border-white/70 bg-linear-to-r from-lilac via-[oklch(0.97_0.02_300)] to-mist py-4">
+      <div className="flex w-max motion-safe:animate-marquee group-hover/axes:[animation-play-state:paused]">
+        {[0, 1].map((copie) => (
+          <ul
+            key={copie}
+            aria-label={copie === 0 ? "Les 7 axes des Clubs Santé" : undefined}
+            aria-hidden={copie === 1 || undefined}
+            className="flex shrink-0 gap-3 pr-3"
+          >
+            {[...axes, ...axes].map((a, j) => (
+              <li
+                key={`${a.n}-${j}`}
+                aria-hidden={j >= axes.length || undefined}
+                className={`flex items-center gap-2 rounded-full py-1 pl-1 pr-4 text-sm font-bold shadow-sm ${a.encre}`}
+                style={{ background: a.couleur }}
+              >
+                <img
+                  src={a.img}
+                  alt=""
+                  width={1414}
+                  height={2000}
+                  loading="lazy"
+                  className="size-8 rounded-full bg-white/90 object-cover object-top"
+                />
+                {a.nom}
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
+    </div>
   );
 }

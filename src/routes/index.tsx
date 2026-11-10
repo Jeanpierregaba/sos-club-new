@@ -34,7 +34,7 @@ import { SiteMotion, retard } from "@/components/SiteMotion";
 import { DecorAnime } from "@/components/DecorAnime";
 import { BulleDefi } from "@/components/BulleDefi";
 import { PodiumClubs } from "@/components/PodiumClubs";
-import { QuelAxe } from "@/components/QuelAxe";
+import { BandeAxes, QuelAxe } from "@/components/QuelAxe";
 import hero from "@/assets/hero.jpg";
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
 import mascotteValeurs from "@/assets/mascotte-valeurs.webp";
@@ -122,7 +122,7 @@ const univers = [
   },
 ];
 
-// Socle et valeurs du programme. `c` : fond de l'icône et filet du bas ; `tc` : couleur du mot clé.
+// Piliers et valeurs du programme. `c` : fond de l'icône et filet du bas ; `tc` : couleur du mot clé.
 const valeurs = [
   {
     i: Sparkles,
@@ -436,7 +436,7 @@ function ObjectifProgramme() {
         className="mt-12 flex items-center gap-3 font-sans text-sm font-extrabold uppercase tracking-widest text-logo-blue"
       >
         <span className="h-1 w-8 rounded-full bg-primary" />
-        Socle & valeurs du programme
+        Piliers & valeurs du programme
       </h3>
       <div className="mt-6 grid gap-6 md:grid-cols-3">
         {valeurs.map((v, i) => (
@@ -889,6 +889,7 @@ function Index() {
       <QuelAxe />
       <ClubsSection liste={dre} />
       <PodiumClubs />
+      <BandeAxes />
       <ActualitesSection />
       <CampagnesSection />
       <GalerieSection />
