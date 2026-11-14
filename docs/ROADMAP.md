@@ -74,11 +74,11 @@ pièces jointes (suite de l'ADR-0005).
 
 ## Phase 3 — Quiz et certification (P0)
 
-| Code | Spec                        | Côté utilisateurs                                                                                                                                     | Côté admin                                                                                                       | Taille | Questions     |
-| ---- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------ | ------------- |
+| Code | Spec                        | Côté utilisateurs                                                                                                                                              | Côté admin                                                                                                       | Taille | Questions     |
+| ---- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------ | ------------- |
 | R9   | Quiz                        | Quiz chronométrés arbitrés par le serveur (ADR-0004) ; points à la première réussite seulement (montant selon le niveau du quiz, la moitié au club : spec 034) | Banque de quiz : créer, tester, publier, paramètres versionnés ; aucun droit pour les encadreurs, même par l'API | L      | Q11, Q12, Q24 |
-| R10  | Ressources et fascicules    | Bibliothèque : fascicules, magazines, guides PDF                                                                                                      | Gestion des ressources                                                                                           | S      | Q11           |
-| R11  | Certification Génie Imhotep | Parcours des 12 quiz obligatoires, 5 badges, certificat vérifiable, +1 000 (élève et encadreur) et +100 au club                                       | Seuils et règles des badges, réémission et révocation des certificats                                            | M      | Q24, Q25      |
+| R10  | Ressources et fascicules    | Bibliothèque : fascicules, magazines, guides PDF                                                                                                               | Gestion des ressources                                                                                           | S      | Q11           |
+| R11  | Certification Génie Imhotep | Parcours des 12 quiz obligatoires, 5 badges, certificat vérifiable, +1 000 (élève et encadreur) et +100 au club                                                | Seuils et règles des badges, réémission et révocation des certificats                                            | M      | Q24, Q25      |
 
 ## Phase 4 — Rapports d'activités (P0)
 
@@ -88,14 +88,14 @@ pièces jointes (suite de l'ADR-0005).
 
 ## Phase 5 — Classements (P0)
 
-| Code | Spec                            | Côté utilisateurs                                                                                                                                                                             | Côté admin                                                                                           | Taille | Questions |
-| ---- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------ | --------- |
-| R13  | Classements et tableaux de bord | Classements séparés des élèves et des encadreurs (club, DRE, national) et des clubs (DRE, national), semestre et historique ; tableaux de bord complets ; Hall of Fame sur les vraies données | Module « Points » : registre consultable, correction manuelle motivée et journalisée                 | L      | Q21       |
-| R14  | Clôture de semestre et Top 3    | Palmarès archivé, Grand Champion, Vice-Champion, Jeune Talent                                                                                                                                 | Gel, contrôle antifraude, ex æquo, validation, publication ; distinctions des encadreurs si retenues | M      | Q21, Q25  |
+| Code | Spec                            | Côté utilisateurs                                                                                                                                                                                                          | Côté admin                                                                                              | Taille | Questions |
+| ---- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------ | --------- |
+| R13  | Classements et tableaux de bord | Classements publics des élèves et des encadreurs (DRE, national) et des clubs (DRE, national), semestre et historique ; classement interne du club privé ; tableaux de bord complets ; Hall of Fame sur les vraies données | Module « Points » : registre consultable, correction manuelle motivée et journalisée, classements admin | L      | Q21       |
+| R14  | Clôture de semestre et Top 3    | Palmarès archivé, Grand Champion, Vice-Champion, Jeune Talent                                                                                                                                                              | Gel, contrôle antifraude, ex æquo, validation, publication ; distinctions des encadreurs si retenues    | M      | Q21, Q25  |
 
-R13 crédite aussi les points des clubs laissés en attente par les specs précédentes : par exemple, pour chaque
-article approuvé d'un élève affilié (spec 023), `club.article_eleve` au club enregistré dans
-`contenu.club_beneficiaire_id`, avec la clé `club_article:<contenu>`.
+La part du club est déjà livrée par la spec 034 : chaque gain d'un élève crédite son club de la moitié, en
+demi-points (ADR-0012). R13 ne crédite plus de lignes `club.*` ; il branche les classements sur le registre et sur
+cette part, et ajoute le registre consultable et les corrections motivées (spec 036).
 
 ## Phase 6 — Vie du réseau (P1)
 

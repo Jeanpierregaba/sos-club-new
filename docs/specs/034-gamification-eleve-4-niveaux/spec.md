@@ -97,7 +97,9 @@ pas encore écrites par le code (spec à venir) : leurs montants sont réglés, 
 - L'espace « Mon Club Santé » de l'encadreur montre le total annuel du club, par parcours.
 - Un élève qui quitte le système scolaire peut passer **ancien élève** : il garde l'accès à ses archives et ne
   gagne plus de récompenses d'élève.
-- Les classements publics ne montrent que pseudonymes, clubs, points et rangs.
+- Les classements publics ne montrent que pseudonymes, clubs, points et rangs. Les classements courants (DRE,
+  national et interne au club) sont livrés par R13, spec 036 ; la spec 034 ne fournit que le classement annuel figé
+  à la clôture.
 
 ## Critères d'acceptation
 

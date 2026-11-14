@@ -118,11 +118,13 @@ groupe deviendra une ou plusieurs specs dans `docs/specs/`.
 
 **Classements**
 
-- [ ] Élèves et encadreurs ont des classements séparés au niveau du club, de la DRE et national ; les
-      clubs ont un classement DRE et national ; chacun montre le semestre en cours et le total historique.
+- [x] Élèves et encadreurs ont des classements séparés au niveau du club (privé), de la DRE et national ;
+      les clubs ont un classement DRE et national ; chacun montre le semestre en cours et le total historique
+      (R13, spec 036 : les classements DRE et national sont publics, celui du club reste réservé à ses membres).
 - [ ] En fin de semestre, l'admin gèle le classement, le contrôle, tranche les ex æquo et publie le Top 3
-      des élèves ; le semestre suivant repart de zéro.
-- [ ] L'admin corrige un score par une ligne motivée et journalisée, jamais en modifiant l'historique.
+      des élèves ; le semestre suivant repart de zéro (R14).
+- [x] L'admin corrige un score par une ligne motivée et journalisée, jamais en modifiant l'historique
+      (R13, spec 036 : registre national, correction à double authentification, annulation liée à la ligne d'origine).
 
 ## Après l'ouverture (P1 et P2 du CDC admin)
 

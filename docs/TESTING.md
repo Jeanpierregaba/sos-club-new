@@ -44,7 +44,11 @@ Le sous-agent `test-writer` écrit d'abord le test, on vérifie qu'il échoue, p
 - **Enregistrement d'un club** : exactement 3 encadreurs, emails et téléphones distincts, encadreur déjà pris.
 - **Modération** : rien de public avant approbation ; un article modifié après publication repasse en modération.
 - **Données d'élèves** : aucune réponse publique de l'API ne contient de coordonnées ni de nom complet.
-- **Classements** : Top 3 par région, égalités, clubs suspendus et comptes retirés exclus.
+- **Classements** : DRE et national, semestre et historique, égalités et ordre stable, clubs suspendus, anciens
+  élèves, encadreurs non vérifiés et comptes retirés exclus, scores décimaux, pagination, absence de semestre,
+  aucune coordonnée ni identifiant utilisateur dans une charge publique, classement interne refusé hors du club.
+- **Corrections de points** : motif et bornes, rôles refusés, aucune part de club, semestre et année, journal,
+  idempotence, total négatif, annulation avec part de club et semestre d'origine, double annulation refusée.
 
 ## Checklist manuelle avant un commit important
 

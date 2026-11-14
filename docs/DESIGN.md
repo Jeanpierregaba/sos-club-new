@@ -33,22 +33,27 @@ Navigation : Accueil, Club Santé, Vie du Club (S'informer, Hall of Fame, Agenda
 Actualités, Bibliothèque, Rejoindre le Club. Elle remplacera le menu actuel de l'accueil, qui pointe
 encore vers des pages absentes.
 
-| Écran           | Route visée                | But et contenu                                          | Actions                            |
-| --------------- | -------------------------- | ------------------------------------------------------- | ---------------------------------- |
-| Accueil         | `/`                        | Existant, à brancher sur les vraies données             | Aller aux quiz, carte, inscription |
-| Club Santé      | `/club-sante`              | Vision, mission, slogans, mot du promoteur, partenaires | Lire                               |
-| Carte des clubs | `/clubs`                   | Carte par région et palmarès                            | Filtrer, ouvrir un club            |
-| Page d'un club  | `/clubs/:id`               | Score, articles, événements, sans liste d'élèves        | Lire                               |
-| S'informer      | `/videos`                  | Capsules par axe                                        | Filtrer, lire                      |
-| Hall of Fame    | `/hall-of-fame`            | Top 3 par région : clubs, élèves, encadreurs            | Changer de région et de catégorie  |
-| Agenda          | `/agenda`                  | Calendrier et liste                                     | Filtrer par région, club, type     |
-| Gamification    | `/quiz`, `/quiz/:id`       | Meilleurs scores, quiz par thème, partie chronométrée   | Jouer, reprendre                   |
-| Actualités      | `/actualites`              | Magazine et Paroles aux Élèves                          | Lire, commenter (encadreur)        |
-| Bibliothèque    | `/bibliotheque`            | Les 3 derniers magazines à la une, guides               | Lire, télécharger                  |
-| Rejoindre       | `/rejoindre`, `/connexion` | Choix du profil et formulaires                          | S'inscrire, se connecter           |
-| Passeport Santé | `/passeport`               | Points, badges, quiz réussis                            | Soumettre un témoignage            |
-| Console du club | `/console`                 | Score, élèves, articles et état de modération, agenda   | Publier, retirer un élève          |
-| Console admin   | `/admin`                   | Modération, suivi des clubs, contenus, badges, chiffres | Approuver, rejeter, publier        |
+| Écran           | Route visée                | But et contenu                                                                                                                | Actions                                              |
+| --------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Accueil         | `/`                        | Existant, à brancher sur les vraies données                                                                                   | Aller aux quiz, carte, inscription                   |
+| Club Santé      | `/club-sante`              | Vision, mission, slogans, mot du promoteur, partenaires                                                                       | Lire                                                 |
+| Carte des clubs | `/clubs`                   | Carte par région et palmarès                                                                                                  | Filtrer, ouvrir un club                              |
+| Page d'un club  | `/clubs/:id`               | Score, articles, événements, sans liste d'élèves                                                                              | Lire                                                 |
+| S'informer      | `/videos`                  | Capsules par axe                                                                                                              | Filtrer, lire                                        |
+| Hall of Fame    | `/hall-of-fame`            | Classements DRE et national : élèves, encadreurs, clubs ; semestre ou historique ; lien vers le Hall of Fame du Génie Imhotep | Changer de DRE, de catégorie et de période ; paginer |
+| Agenda          | `/agenda`                  | Calendrier et liste                                                                                                           | Filtrer par région, club, type                       |
+| Gamification    | `/quiz`, `/quiz/:id`       | Meilleurs scores, quiz par thème, partie chronométrée                                                                         | Jouer, reprendre                                     |
+| Actualités      | `/actualites`              | Magazine et Paroles aux Élèves                                                                                                | Lire, commenter (encadreur)                          |
+| Bibliothèque    | `/bibliotheque`            | Les 3 derniers magazines à la une, guides                                                                                     | Lire, télécharger                                    |
+| Rejoindre       | `/rejoindre`, `/connexion` | Choix du profil et formulaires                                                                                                | S'inscrire, se connecter                             |
+| Passeport Santé | `/passeport`               | Points, badges, quiz réussis                                                                                                  | Soumettre un témoignage                              |
+| Console du club | `/console`                 | Score, élèves, articles et état de modération, agenda                                                                         | Publier, retirer un élève                            |
+| Console admin   | `/admin`                   | Modération, suivi des clubs, contenus, badges, chiffres                                                                       | Approuver, rejeter, publier                          |
+
+Le **classement interne d'un club** n'a pas de page publique : il s'affiche dans « Mon espace » (élève), « Mon Club
+Santé » (encadreur) et l'espace du président, avec deux onglets Élèves et Encadreurs et la ligne du lecteur mise en
+évidence. L'admin le consulte depuis `/admin/points/classements`, avec le registre dans
+`/admin/points/registre` (lecture seule, correction et annulation motivées).
 
 Les routes publiques sont rendues côté serveur ; le menu masque ce qui ne concerne pas le rôle.
 
