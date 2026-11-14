@@ -33,6 +33,8 @@ class Beneficiaire(StrEnum):
     eleve = "eleve"
     encadreur = "encadreur"
     club = "club"
+    # Ligne technique de correction manuelle (spec 036) : jamais créditée par le code ordinaire.
+    admin = "admin"
 
 
 class Parcours(StrEnum):
@@ -143,9 +145,18 @@ class LigneBareme(Suivi, Base):
 class MouvementPoints(Base):
     __tablename__ = "mouvement_points"
     __table_args__ = (
-        # Un gain est positif ; seule une annulation est négative.
+        # Un gain est positif, sauf une correction négative motivée (spec 036) ; une annulation peut être positive
+        # (celle d'une correction négative) ou négative, mais jamais nulle.
         CheckConstraint(
-            "(annule_id IS NULL AND montant > 0) OR (annule_id IS NOT NULL AND montant < 0)", name="montant_signe"
+            "(annule_id IS NULL AND (montant > 0 OR (action = 'admin.correction' AND motif IS NOT NULL)))"
+            " OR (annule_id IS NOT NULL AND montant <> 0)",
+            name="montant_signe",
+        ),
+        # Un motif est obligatoire sur une correction et permis sur une annulation ; jamais sur un gain ordinaire.
+        CheckConstraint(
+            "(action <> 'admin.correction' OR motif IS NOT NULL)"
+            " AND (motif IS NULL OR action = 'admin.correction' OR annule_id IS NOT NULL)",
+            name="motif_correction",
         ),
         Index("ix_mouvement_points_utilisateur_id_semestre_id", "utilisateur_id", "semestre_id"),
         # La part du club (spec 034, ADR-0012) : toujours la moitié du gain de l'élève, en demi-points entiers.
@@ -153,6 +164,15 @@ class MouvementPoints(Base):
         CheckConstraint("demi_points_club IS NULL OR demi_points_club = montant", name="part_du_club_moitie"),
         Index("ix_mouvement_points_club_id", "club_id", postgresql_where=text("club_id IS NOT NULL")),
         Index("ix_mouvement_points_annee_id_utilisateur_id", "annee_id", "utilisateur_id"),
+        # Les classements lisent par semestre et par club ; le registre trie par date (spec 036).
+        Index("ix_mouvement_points_semestre_id_utilisateur_id", "semestre_id", "utilisateur_id"),
+        Index(
+            "ix_mouvement_points_semestre_id_club_id",
+            "semestre_id",
+            "club_id",
+            postgresql_where=text("club_id IS NOT NULL"),
+        ),
+        Index("ix_mouvement_points_cree_le", "cree_le"),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
@@ -168,6 +188,8 @@ class MouvementPoints(Base):
     cle: Mapped[str] = mapped_column(String(200), unique=True)
     valide_par: Mapped[UUID | None] = mapped_column(ForeignKey("utilisateur.id", ondelete="RESTRICT"))
     annule_id: Mapped[UUID | None] = mapped_column(ForeignKey("mouvement_points.id", ondelete="RESTRICT"), unique=True)
+    # Motif d'une correction ou d'une annulation admin (spec 036) ; nul sur un gain ordinaire.
+    motif: Mapped[str | None] = mapped_column(String(500))
     # Le club de l'élève au moment du gain, s'il était affilié à un club en service ; il garde sa part ensuite.
     club_id: Mapped[UUID | None] = mapped_column(ForeignKey("club.id", ondelete="RESTRICT"))
     # La part du club en demi-points : 5 ici valent 2,5 points de club.

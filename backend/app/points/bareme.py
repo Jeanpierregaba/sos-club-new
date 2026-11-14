@@ -11,7 +11,7 @@ from sqlalchemy.dialects.postgresql import insert
 
 from app.points.models import LigneBareme, Parcours, SousCompte
 
-Beneficiaire = Literal["eleve", "encadreur", "club"]
+Beneficiaire = Literal["eleve", "encadreur", "club", "admin"]
 
 
 class Action(NamedTuple):
@@ -49,6 +49,8 @@ QUIZ_CERTIFICATION_ELEVE = "eleve.quiz_certification"
 BADGE_ELEVE = "eleve.badge"
 CERTIFICATION_ELEVE = "eleve.certification"
 CERTIFICATION_ENCADREUR = "encadreur.certification"
+# Ligne technique de la correction manuelle (spec 036) : jamais un gain automatique, masquée du barème.
+ACTION_CORRECTION = "admin.correction"
 
 C, J, V = Parcours.certification, Parcours.jeux, Parcours.vie
 Q, E = SousCompte.quiz, SousCompte.etoiles
@@ -113,6 +115,8 @@ GRILLE: tuple[Action, ...] = (
     # Le compte collectif du club : un référentiel distinct, hors de la règle des 50 % (spec 034).
     Action("club.rapport_activite", "club", "Rapport d'activité validé", 50, propose=True),
     Action("club.bilan_semestriel", "club", "Bilan semestriel validé", 100, propose=True),
+    # Spec 036 : une correction manuelle, toujours motivée et écrite par l'admin, jamais un gain automatique.
+    Action(ACTION_CORRECTION, "admin", "Correction manuelle du score", 0, actif=False),
 )  # fmt: skip
 
 
@@ -133,6 +137,8 @@ EN_SERVICE: frozenset[str] = frozenset(
         BADGE_ELEVE,
         CERTIFICATION_ELEVE,
         CERTIFICATION_ENCADREUR,
+        # Spec 036 : la correction manuelle, utilisée par le registre admin.
+        ACTION_CORRECTION,
     }
 )
 

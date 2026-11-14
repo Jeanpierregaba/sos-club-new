@@ -3,9 +3,9 @@
 Ordonnées. Chaque tâche est petite, testable et committable seule. Les parties critiques (classements, correction,
 privacy) sont écrites en TDD : les tests précèdent le code.
 
-- [ ] 1. ADR-0013 (classements publics et correction des points) ; mettre à jour `docs/PRD.md`, `docs/ROADMAP.md`,
+- [x] 1. ADR-0013 (classements publics et correction des points) ; mettre à jour `docs/PRD.md`, `docs/ROADMAP.md`,
       `docs/DESIGN.md`, `docs/SECURITY.md` et `docs/TESTING.md` ; lier la spec 034 et la spec 036.
-- [ ] 2. Migration non destructive et modèles : `mouvement_points.motif`, contraintes `montant_signe` et
+- [x] 2. Migration non destructive et modèles : `mouvement_points.motif`, contraintes `montant_signe` et
       `motif_correction`, valeur `admin` du barème, ligne technique `admin.correction`, index de classement et de
       registre ; test d'aller-retour et des lignes existantes.
 - [ ] 3. Tests puis code des requêtes de classement dans `points/classements.py` : élèves, encadreurs et clubs ;

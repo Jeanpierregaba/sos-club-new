@@ -199,13 +199,21 @@ def test_prolonger_ne_peut_pas_chevaucher_le_suivant(gestionnaire: TestClient, e
 # Barème -------------------------------------------------------------------------------------------------------
 
 
-def test_le_bareme_affiche_toute_la_grille(lecteur: TestClient) -> None:
+def test_le_bareme_affiche_toute_la_grille_sans_la_correction_manuelle(lecteur: TestClient) -> None:
     grille = lecteur.get(BAREME).json()
 
     assert len(grille) == 46
+    assert all(element["code"] != "admin.correction" for element in grille)
     bienvenue = ligne(lecteur, "eleve.bienvenue")
     assert (bienvenue["montant"], bienvenue["en_service"], bienvenue["propose"]) == (100, True, False)
     assert ligne(lecteur, "encadreur.sujet_forum")["propose"] is True
+
+
+def test_la_correction_manuelle_ne_se_modifie_pas(gestionnaire: TestClient) -> None:
+    reponse = gestionnaire.patch(f"{BAREME}/admin.correction", json={"version": 1, "montant": 100, "propose": False})
+
+    assert reponse.status_code == 422
+    assert "technique" in reponse.json()["detail"]
 
 
 def test_modifier_un_montant_est_journalise(gestionnaire: TestClient, en_base: Callable[..., Any]) -> None:

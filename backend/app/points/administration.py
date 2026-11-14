@@ -17,6 +17,7 @@ from sqlalchemy.orm.exc import StaleDataError
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
 from app.comptes.service import VIOLATION_UNICITE
+from app.points.bareme import ACTION_CORRECTION
 from app.points.models import LigneBareme, Semestre
 from app.points.schemas import (
     LigneBaremeAdmin,
@@ -157,13 +158,18 @@ async def modifier_semestre(
 
 
 async def lister_bareme(db: AsyncSession) -> list[LigneBaremeAdmin]:
-    lignes = await db.scalars(select(LigneBareme).order_by(LigneBareme.ordre))
+    # La correction manuelle est une ligne technique du registre (spec 036), pas un gain réglable.
+    lignes = await db.scalars(
+        select(LigneBareme).where(LigneBareme.code != ACTION_CORRECTION).order_by(LigneBareme.ordre)
+    )
     return [LigneBaremeAdmin.model_validate(ligne) for ligne in lignes]
 
 
 async def modifier_bareme(
     db: AsyncSession, acces: Acces, code: str, entree: LigneBaremeModification, ip: str
 ) -> LigneBaremeAdmin:
+    if code == ACTION_CORRECTION:
+        raise Refus("Cette ligne est technique et ne se modifie pas.", 422)
     ligne = await db.get(LigneBareme, code, with_for_update=True)
     if ligne is None:
         raise Introuvable

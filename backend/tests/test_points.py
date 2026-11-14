@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.comptes.models import Utilisateur
 from app.points import service
 from app.points.bareme import (
+    ACTION_CORRECTION,
     ARTICLE_ELEVE,
     ARTICLE_ENCADREUR,
     BIENVENUE_ELEVE,
@@ -179,6 +180,82 @@ def test_la_base_refuse_un_montant_negatif_sans_annulation(eleve: Utilisateur, e
         en_base(inserer)
 
 
+def test_une_correction_exige_un_motif(eleve: Utilisateur, en_base: Callable[..., Any]) -> None:
+    async def inserer(db: AsyncSession) -> None:
+        db.add(MouvementPoints(utilisateur_id=eleve.id, action=ACTION_CORRECTION, montant=-25, cle="correction"))
+
+    with pytest.raises(IntegrityError):
+        en_base(inserer)
+
+
+def test_un_gain_ordinaire_ne_porte_pas_de_motif(eleve: Utilisateur, en_base: Callable[..., Any]) -> None:
+    async def inserer(db: AsyncSession) -> None:
+        db.add(
+            MouvementPoints(
+                utilisateur_id=eleve.id, action="eleve.quiz", montant=25, cle="gain-motive", motif="interdit"
+            )
+        )
+
+    with pytest.raises(IntegrityError):
+        en_base(inserer)
+
+
+def test_une_correction_negative_est_acceptee_avec_son_motif(eleve: Utilisateur, en_base: Callable[..., Any]) -> None:
+    async def inserer(db: AsyncSession) -> MouvementPoints:
+        ligne = MouvementPoints(
+            utilisateur_id=eleve.id,
+            action=ACTION_CORRECTION,
+            montant=-25,
+            cle="correction",
+            motif="Doublon signalé par le club.",
+        )
+        db.add(ligne)
+        return ligne
+
+    ligne = en_base(inserer)
+
+    assert (ligne.montant, ligne.motif, ligne.club_id, ligne.demi_points_club) == (
+        -25,
+        "Doublon signalé par le club.",
+        None,
+        None,
+    )
+
+
+def test_une_correction_negative_peut_etre_annulee_par_un_montant_positif(
+    eleve: Utilisateur, en_base: Callable[..., Any]
+) -> None:
+    async def corriger(db: AsyncSession) -> MouvementPoints:
+        ligne = MouvementPoints(
+            utilisateur_id=eleve.id,
+            action=ACTION_CORRECTION,
+            montant=-25,
+            cle="correction",
+            motif="Erreur de saisie.",
+        )
+        db.add(ligne)
+        return ligne
+
+    correction = en_base(corriger)
+
+    async def annuler(db: AsyncSession) -> MouvementPoints:
+        ligne = MouvementPoints(
+            utilisateur_id=eleve.id,
+            action=ACTION_CORRECTION,
+            montant=25,
+            cle="annulation:correction",
+            annule_id=correction.id,
+            motif="Correction annulée.",
+        )
+        db.add(ligne)
+        return ligne
+
+    annulation = en_base(annuler)
+
+    assert (annulation.montant, annulation.annule_id) == (25, correction.id)
+    assert en_base(lambda db: service.totaux(db, eleve.id)).total == 0
+
+
 def test_une_annulation_est_une_ligne_negative_unique(
     eleve: Utilisateur, semestre: Semestre, en_base: Callable[..., Any]
 ) -> None:
@@ -247,11 +324,13 @@ def test_le_bareme_initial_contient_toute_la_grille(en_base: Callable[..., Any])
         return nombre, en_service
 
     # Les actions écrites par une spec livrée : la bienvenue élève (017), encadreur (018), la question du jour (022),
-    # les articles (023), les commentaires (025), la certification (029), puis la spec 034 : quiz par niveau,
-    # étoiles et quiz de certification ; les anciennes parts fixes du club restent, désactivées.
+    # les articles (023), les commentaires (025), la certification (029), la spec 034 : quiz par niveau, étoiles et
+    # quiz de certification, puis la correction manuelle (036) ; les anciennes parts fixes du club restent,
+    # désactivées.
     assert en_base(lire) == (
-        46,
+        47,
         [
+            ACTION_CORRECTION,
             ARTICLE_ELEVE,
             "eleve.badge",
             BIENVENUE_ELEVE,
