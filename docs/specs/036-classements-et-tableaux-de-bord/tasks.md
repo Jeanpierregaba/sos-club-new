@@ -8,7 +8,7 @@ privacy) sont écrites en TDD : les tests précèdent le code.
 - [x] 2. Migration non destructive et modèles : `mouvement_points.motif`, contraintes `montant_signe` et
       `motif_correction`, valeur `admin` du barème, ligne technique `admin.correction`, index de classement et de
       registre ; test d'aller-retour et des lignes existantes.
-- [ ] 3. Tests puis code des requêtes de classement dans `points/classements.py` : élèves, encadreurs et clubs ;
+- [x] 3. Tests puis code des requêtes de classement dans `points/classements.py` : élèves, encadreurs et clubs ;
       national et DRE ; semestre et historique ; égalités ; exclusions (suspendus, anciens, encadreurs non
       vérifiés, clubs hors service) ; score décimal ; pagination ; absence de semestre.
 - [ ] 4. Tests puis code des routes publiques et personnelles : `GET /classements`, `/classements/moi`,
