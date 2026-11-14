@@ -13,6 +13,8 @@ export const Route = createFileRoute("/_connecte/admin/points")({
 const ONGLETS = [
   { to: "/admin/points", libelle: "Semestres", exact: true },
   { to: "/admin/points/bareme", libelle: "Barème", exact: false },
+  { to: "/admin/points/annees", libelle: "Années académiques", exact: false },
+  { to: "/admin/points/gold", libelle: "Élèves Gold", exact: false },
 ] as const;
 
 function Points() {

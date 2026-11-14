@@ -1,11 +1,13 @@
 import { Champ, CHAMP_ADMIN } from "@/components/admin/DialogueFormulaire";
 import type { Parcours } from "@/lib/api/client";
+import { NIVEAUX_JEUX, type NiveauJeux } from "@/lib/bareme";
 import type { FasciculeChoix, useParcours } from "@/lib/parcours";
 
-const PLACES = Array.from({ length: 12 }, (_, i) => i + 1);
+// Spec 034 : 20 places, en 5 thématiques de 4.
+const PLACES = Array.from({ length: 20 }, (_, i) => i + 1);
 
-// Le parcours d'un quiz dans la banque (spec 029) : jeux, ou une place du parcours de certification et son
-// fascicule.
+// Le parcours d'un quiz dans la banque (spec 029) : jeux avec son niveau (spec 034), ou une place du parcours de
+// certification et son fascicule.
 
 export function ChampsParcours({
   etat,
@@ -26,6 +28,21 @@ export function ChampsParcours({
           <option value="certification">Certification Génie Imhotep</option>
         </select>
       </Champ>
+      {etat.parcours === "jeux" && (
+        <Champ libelle="Niveau">
+          <select
+            className={CHAMP_ADMIN}
+            value={etat.niveau}
+            onChange={(e) => etat.setNiveau(e.target.value as NiveauJeux)}
+          >
+            {NIVEAUX_JEUX.map((n) => (
+              <option key={n.code} value={n.code}>
+                {n.nom} ({n.eleve} points par quiz réussi)
+              </option>
+            ))}
+          </select>
+        </Champ>
+      )}
       {etat.parcours === "certification" && (
         <>
           <Champ libelle="Place dans le parcours">
@@ -36,7 +53,7 @@ export function ChampsParcours({
             >
               {PLACES.map((p) => (
                 <option key={p} value={p}>
-                  Quiz {p} sur 12
+                  Quiz {p} sur 20 · thématique {Math.ceil(p / 4)}
                 </option>
               ))}
             </select>

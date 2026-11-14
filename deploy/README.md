@@ -146,6 +146,15 @@ test a déjà un autre club actif, ou si une passation du club de test est en at
 
 Il reste à copier `/opt/sosclub/prod/sauvegardes/` hors du VPS, de façon chiffrée. Le service reste à choisir.
 
+**8 bis. Programmer les échéances des clubs** (spec 033), dans le même `crontab -e`, chaque matin à 6 h : un club
+passé sous le seuil de 3 encadreurs et 21 élèves est suspendu au bout de 15 jours, et ses encadreurs reçoivent un
+rappel à J+7 et J+14. Sans cette ligne, l'affichage reste juste, mais les rappels ne partent pas.
+
+```cron
+0 6 * * * cd /opt/sosclub/prod && docker compose exec -T api python -m app.clubs.echeances >> /opt/sosclub/prod/echeances.log 2>&1
+5 6 * * * cd /opt/sosclub/preprod && docker compose exec -T api python -m app.clubs.echeances >> /opt/sosclub/preprod/echeances.log 2>&1
+```
+
 **9. Brancher l'envoi des e-mails** (spec 030). Sans SMTP, la production refuse l'inscription des visiteurs (leur
 code de confirmation ne pourrait pas partir) et n'envoie ni invitation ni avis aux encadreurs. Fournisseur proposé :
 [Brevo](https://www.brevo.com/), offre gratuite (environ 300 e-mails par jour : vérifie sur sa page tarifs).

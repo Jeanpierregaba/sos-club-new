@@ -15,13 +15,15 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.engine import Connection
 
 from app.referentiel.normalisation import normaliser
+from app.referentiel.regions import REGION_PAR_DRE
 
 FICHIER = Path(__file__).resolve().parents[2] / "alembic" / "donnees" / "annuaire.json"
 
 _meta = MetaData()
 _dre = Table(
     "dre", _meta, Column("code", String), Column("nom", String), Column("nom_normalise", String),
-    Column("nom_complet", String), Column("ordre", Integer), Column("actif", Boolean), Column("version", Integer),
+    Column("nom_complet", String), Column("region", String), Column("ordre", Integer), Column("actif", Boolean),
+    Column("version", Integer),
 )  # fmt: skip
 _iesg = Table(
     "iesg", _meta, Column("id", Uuid), Column("dre_code", String), Column("nom", String),
@@ -48,7 +50,18 @@ def charger(connexion: Connection, *, etablissements: bool = True) -> None:
 
     connexion.execute(
         insert(_dre)
-        .values([d | {"nom_normalise": normaliser(d["nom"]), "actif": True, "version": 1} for d in annuaire["dre"]])
+        .values(
+            [
+                d
+                | {
+                    "nom_normalise": normaliser(d["nom"]),
+                    "region": REGION_PAR_DRE[d["code"]].value,
+                    "actif": True,
+                    "version": 1,
+                }
+                for d in annuaire["dre"]
+            ]
+        )
         .on_conflict_do_nothing()
     )
     connexion.execute(

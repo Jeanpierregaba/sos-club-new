@@ -7,7 +7,8 @@ from uuid import UUID
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field, StringConstraints, field_validator
 
 from app.articles.schemas import ResumeArticle, ResumeArticleAuteur
-from app.clubs.models import EtatClub
+from app.eleves.models import Classe
+from app.encadreurs.models import Fonction
 from app.moderation.models import EtatContenu
 from app.referentiel.schemas import EtablissementRattache
 
@@ -20,52 +21,6 @@ def _motif(valeur: str) -> str:
 
 
 Motif = Annotated[str, Field(max_length=500), AfterValidator(_motif)]
-
-
-class EncadreurAssocie(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    nom: str = Field(min_length=1, max_length=100)
-    email: str | None = Field(default=None, max_length=254)
-    telephone: str | None = Field(default=None, max_length=30)
-
-
-class DemandeClubEntree(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    nom: str = Field(min_length=3, max_length=150)
-    description: str | None = Field(default=None, max_length=300)
-    axes: list[str] = Field(default_factory=list, max_length=3)
-    encadreurs_associes: list[EncadreurAssocie] = Field(default_factory=list, max_length=10)
-    # La case « je suis désigné président », vérifiée ici, pas seulement par le site.
-    confirmation: Literal[True]
-
-    @field_validator("nom")
-    @classmethod
-    def nom_non_vide(cls, valeur: str) -> str:
-        return " ".join(valeur.split())
-
-
-class DemandeClub(BaseModel):
-    """Copie d'une demande dans la file d'un collaborateur."""
-
-    id: UUID
-    nom: str
-    description: str | None
-    axes: list[str]
-    demandeur_pseudonyme: str
-    etablissement: EtablissementRattache
-    encadreurs_associes: list[EncadreurAssocie]
-    etat: EtatClub
-    demande_le: datetime
-    decide_le: datetime | None
-    motif_refus: str | None
-    version: int
-
-
-class FileClubs(BaseModel):
-    total: int
-    demandes: list[DemandeClub]
 
 
 # Vues côté élève -------------------------------------------------------------------------------------------
@@ -84,15 +39,22 @@ class PassationApercu(BaseModel):
     version: int
 
 
+# Statut d'un club tel qu'on le montre (spec 033) : l'échéance passée d'une régularisation se lit « suspendu ».
+StatutClub = Literal["en_constitution", "actif", "en_regularisation", "suspendu"]
+
+
 class ClubResume(BaseModel):
+    """Le club de l'établissement de l'élève, vu par lui (spec 033)."""
+
     id: UUID
     nom: str
     description: str | None
     etablissement: EtablissementRattache
     axes: list[str]
-    etat: str
+    statut: StatutClub
+    actif_le: datetime | None
+    regularisation_jusquau: datetime | None
     president: bool
-    motif_refus: str | None = None
     version: int
 
 
@@ -101,6 +63,7 @@ class ClubPublic(BaseModel):
     nom: str
     etablissement: EtablissementRattache
     axes: list[str]
+    statut: StatutClub
     actif_le: datetime | None
 
 
@@ -110,6 +73,7 @@ class ClubFiche(BaseModel):
     description: str | None
     etablissement: EtablissementRattache
     axes: list[str]
+    statut: StatutClub
     actif_le: datetime | None
     # Les dernières actualités publiées du club (spec 026).
     actualites: list[ResumeArticle] = []
@@ -127,6 +91,8 @@ class PassationEntree(BaseModel):
 
 class MonClub(BaseModel):
     club: ClubResume | None
+    # L'affiliation en cours de l'élève, sinon la dernière terminée (motif lisible).
+    affiliation: AdhesionResume | None = None
     # La proposition de passation en attente, visible par le président sortant.
     passation: PassationApercu | None = None
 
@@ -179,16 +145,6 @@ class AdhesionResume(BaseModel):
     version: int
 
 
-class DemandeAdhesion(BaseModel):
-    """Une demande d'affiliation, vue par le président : le pseudonyme du demandeur, jamais son nom."""
-
-    id: UUID
-    pseudonyme: str
-    classe: str
-    demande_le: datetime
-    version: int
-
-
 class DecisionEntree(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -200,42 +156,6 @@ class RefusDemandeEntree(BaseModel):
 
     motif: Motif
     version: int = Field(ge=1)
-
-
-class RetraitEntree(BaseModel):
-    """Le retrait d'un membre par le président : le motif est facultatif."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    motif: Annotated[str, Field(max_length=500)] | None = None
-    version: int = Field(ge=1)
-
-
-class RattachementResume(BaseModel):
-    """Un rattachement, vu par l'encadreur concerné."""
-
-    id: UUID
-    club_id: UUID
-    club_nom: str
-    etat: Literal["en_attente_president", "en_attente_validation", "actif", "refuse", "retire"]
-    # Au-delà du premier club, seule l'équipe nationale peut valider (Q16).
-    supplementaire: bool
-    demande_le: datetime
-    motif_refus: str | None = None
-    motif_retrait: str | None = None
-    version: int
-
-
-class DemandeRattachement(BaseModel):
-    """Une demande de rattachement, vue par le président : un encadreur est un adulte identifié par son nom."""
-
-    id: UUID
-    prenom: str
-    nom: str
-    fonction: str
-    etablissement: str
-    demande_le: datetime
-    version: int
 
 
 class PassationAConfirmer(BaseModel):
@@ -250,16 +170,8 @@ class PassationAConfirmer(BaseModel):
     version: int
 
 
-class MesClubs(BaseModel):
-    """L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés, et les
-    passations de ses clubs qu'il doit confirmer (Q19)."""
-
-    rattachements: list[RattachementResume]
-    passations: list[PassationAConfirmer] = []
-
-
 class AffiliationAValider(BaseModel):
-    """Une affiliation confirmée par le président, dans la file d'un collaborateur."""
+    """Une affiliation à confirmer, dans la file d'un collaborateur (à la place d'un encadreur du club)."""
 
     id: UUID
     pseudonyme: str
@@ -273,34 +185,9 @@ class AffiliationAValider(BaseModel):
     version: int
 
 
-class RattachementAValider(BaseModel):
-    """Un rattachement confirmé par le président, dans la file d'un collaborateur."""
-
-    id: UUID
-    prenom: str
-    nom: str
-    fonction: str
-    etablissement_encadreur: str
-    club_id: UUID
-    club_nom: str
-    club_etablissement: str
-    dre: str
-    supplementaire: bool
-    # Faux pour un collaborateur de DRE devant un club supplémentaire : seule l'équipe nationale décide (Q16).
-    decidable: bool
-    demande_le: datetime
-    confirme_le: datetime | None
-    version: int
-
-
 class FileAffiliations(BaseModel):
     total: int
     demandes: list[AffiliationAValider]
-
-
-class FileRattachements(BaseModel):
-    total: int
-    demandes: list[RattachementAValider]
 
 
 class ElementLot(BaseModel):
@@ -369,7 +256,8 @@ class ClubPodium(BaseModel):
     nom: str
     etablissement: str
     dre: str
-    points: int
+    # Demi-points possibles : la moitié de chaque gain d'un élève (spec 034).
+    points: float
 
 
 # Espace du président (spec 026) -----------------------------------------------------------------------------
@@ -417,13 +305,6 @@ class IndicateursClub(BaseModel):
     membres: int
     encadreurs: int
     actualites: int
-    # Pour le président seulement.
-    demandes: int | None
-
-
-class DemandesClub(BaseModel):
-    adhesions: list[DemandeAdhesion]
-    rattachements: list[DemandeRattachement]
 
 
 class SuiviClub(BaseModel):
@@ -432,13 +313,259 @@ class SuiviClub(BaseModel):
 
 
 class EspaceClub(BaseModel):
-    """La vue « Mon club » : la gestion (demandes, suivi) pour le président seul ; la lecture pour les membres et
-    les encadreurs rattachés."""
+    """La vue « Mon club » : le suivi pour le président seul ; la lecture pour les membres et les encadreurs
+    rattachés."""
 
     club: ClubEspace
+    statut: StatutClub
     role: Literal["president", "membre", "encadreur"]
     indicateurs: IndicateursClub
     actualites: list[ResumeArticle]
     membres: MembresDuClub
-    demandes: DemandesClub | None
     suivi: SuiviClub | None
+
+
+# « Mon Club Santé » de l'encadreur (spec 033) ----------------------------------------------------------------
+
+
+class Seuils(BaseModel):
+    encadreurs: int
+    eleves: int
+    delai_jours: int
+
+
+class MembreEquipe(BaseModel):
+    """Un encadreur du club, vu par les autres encadreurs : un adulte identifié par son nom."""
+
+    utilisateur_id: UUID
+    prenom: str
+    nom: str
+    fonction: Fonction
+    moi: bool
+    # Un signalement de désistement attend l'équipe pour lui.
+    signalement_en_attente: bool
+
+
+class SignalementResume(BaseModel):
+    id: UUID
+    encadreur_prenom: str
+    encadreur_nom: str
+    motif: str
+    etat: Literal["en_attente", "confirme", "rejete"]
+    signale_le: datetime
+    decide_le: datetime | None
+    motif_decision: str | None
+
+
+class MonClubSante(BaseModel):
+    id: UUID
+    nom: str
+    etablissement: EtablissementRattache
+    statut: StatutClub
+    actif_le: datetime | None
+    regularisation_jusquau: datetime | None
+    declare_terrain: bool
+    seuils: Seuils
+    nb_encadreurs: int
+    nb_eleves: int
+    a_confirmer: int
+    equipe: list[MembreEquipe]
+    president_pseudonyme: str | None
+    # La proposition de président (ou passation) en attente de l'équipe, s'il y en a une.
+    president_propose: str | None
+    passations_a_confirmer: list[PassationAConfirmer]
+    mes_signalements: list[SignalementResume]
+
+
+class AffiliationDuClub(BaseModel):
+    """Un élève du club, vu par ses encadreurs : pseudonyme et classe seulement (décision 4 de la spec 033)."""
+
+    id: UUID
+    pseudonyme: str
+    classe: Classe
+    etat: Literal["en_attente_validation", "active"]
+    demande_le: datetime
+    depuis: datetime | None
+    president: bool
+    version: int
+
+
+class AffiliationsDuClub(BaseModel):
+    a_confirmer: list[AffiliationDuClub]
+    confirmees: list[AffiliationDuClub]
+
+
+class DesistementEntree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    encadreur_id: UUID
+    motif: Motif
+
+
+class PresidentEntree(BaseModel):
+    """L'élève proposé comme président, désigné par son affiliation confirmée."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    affiliation_id: UUID
+
+
+# Suivi des clubs par l'équipe (spec 033) ---------------------------------------------------------------------
+
+
+class ClubSuivi(BaseModel):
+    id: UUID
+    nom: str
+    etablissement: str
+    iesg: str
+    dre: str
+    region: str
+    statut: StatutClub
+    nb_encadreurs: int
+    nb_eleves: int
+    a_confirmer: int
+    actif_le: datetime | None
+    regularisation_jusquau: datetime | None
+    declare_terrain: bool
+
+
+class PageSuivi(BaseModel):
+    total: int
+    page: int
+    par_page: int
+    clubs: list[ClubSuivi]
+
+
+class LigneJournalClub(BaseModel):
+    ancien: str | None
+    nouveau: str
+    cause: str
+    nb_encadreurs: int
+    nb_eleves: int
+    cree_le: datetime
+
+
+class EleveDuClub(BaseModel):
+    pseudonyme: str
+    classe: str
+
+
+class EncadreurSuivi(BaseModel):
+    utilisateur_id: UUID
+    prenom: str
+    nom: str
+    fonction: str
+
+
+class SignalementAdmin(BaseModel):
+    id: UUID
+    club_id: UUID
+    club_nom: str
+    dre: str
+    encadreur_prenom: str
+    encadreur_nom: str
+    signale_par: str | None
+    motif: str
+    etat: Literal["en_attente", "confirme", "rejete"]
+    signale_le: datetime
+    decide_le: datetime | None
+    motif_decision: str | None
+    version: int
+
+
+class FicheSuivi(BaseModel):
+    club: ClubSuivi
+    declare_note: str | None
+    declare_le: datetime | None
+    president_pseudonyme: str | None
+    encadreurs: list[EncadreurSuivi]
+    eleves: list[EleveDuClub]
+    journal: list[LigneJournalClub]
+    signalements: list[SignalementAdmin]
+    version: int
+
+
+class FileDesistements(BaseModel):
+    total: int
+    signalements: list[SignalementAdmin]
+
+
+class TerrainEntree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    declare: bool
+    note: Annotated[str, StringConstraints(strip_whitespace=True, max_length=300)] | None = None
+    version: int = Field(ge=1)
+
+
+class DecisionSignalementEntree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    version: int = Field(ge=1)
+
+
+class RejetSignalementEntree(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    motif: Motif
+    version: int = Field(ge=1)
+
+
+# Carte nationale publique (spec 033) : aucun contact, aucun nom, aucun effectif nominatif ----------------------
+
+# Statut public d'un établissement : sans club (ou club sans membre confirmé) « reference » ; une régularisation se
+# montre « actif » (le club fonctionne encore).
+StatutCarte = Literal["reference", "en_constitution", "actif", "suspendu"]
+
+
+class CarteEtablissement(BaseModel):
+    id: UUID
+    nom: str
+    localite: str | None
+    statut: StatutCarte
+    declare_terrain: bool
+    club_id: UUID | None
+
+
+class CarteIesg(BaseModel):
+    id: UUID
+    nom: str
+    zone: str | None
+    nb_etablissements: int
+    nb_clubs: int
+    nb_actifs: int
+    etablissements: list[CarteEtablissement]
+
+
+class CarteDre(BaseModel):
+    code: str
+    nom: str
+    nom_complet: str
+    nb_etablissements: int
+    nb_clubs: int
+    nb_actifs: int
+    iesg: list[CarteIesg]
+
+
+class CarteRegion(BaseModel):
+    code: str
+    nom: str
+    nb_etablissements: int
+    nb_clubs: int
+    nb_actifs: int
+    dres: list[CarteDre]
+
+
+class ChiffresCarte(BaseModel):
+    # Établissements du référentiel officiel.
+    etablissements: int
+    # Clubs existants : déclarés sur le terrain, ou ayant atteint une fois le seuil (actifs, en régularisation,
+    # suspendus), chacun compté une fois.
+    clubs: int
+    # Clubs actifs sur la plateforme (actifs ou en régularisation).
+    clubs_actifs: int
+
+
+class Carte(BaseModel):
+    chiffres: ChiffresCarte
+    regions: list[CarteRegion]

@@ -247,17 +247,26 @@ def test_le_bareme_initial_contient_toute_la_grille(en_base: Callable[..., Any])
         return nombre, en_service
 
     # Les actions écrites par une spec livrée : la bienvenue élève (017), encadreur (018), la question du jour (022),
-    # les articles (023), les commentaires (025), les quiz (027), la certification (029).
+    # les articles (023), les commentaires (025), la certification (029), puis la spec 034 : quiz par niveau,
+    # étoiles et quiz de certification ; les anciennes parts fixes du club restent, désactivées.
     assert en_base(lire) == (
-        37,
+        46,
         [
             ARTICLE_ELEVE,
             "eleve.badge",
             BIENVENUE_ELEVE,
             "eleve.certification",
             "eleve.commentaire",
+            "eleve.etoile_avance",
+            "eleve.etoile_debutant",
+            "eleve.etoile_expert",
+            "eleve.etoile_intermediaire",
             QUESTION_JOUR_ELEVE,
-            "eleve.quiz",
+            "eleve.quiz_avance",
+            "eleve.quiz_certification",
+            "eleve.quiz_debutant",
+            "eleve.quiz_expert",
+            "eleve.quiz_intermediaire",
             ARTICLE_ENCADREUR,
             BIENVENUE_ENCADREUR,
             "encadreur.certification",

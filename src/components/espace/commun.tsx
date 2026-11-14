@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import {
   Brain,
+  HeartPulse,
   CalendarRange,
   LogOut,
   MessageCircle,
@@ -24,11 +25,14 @@ export function EnTeteEspace({
   nom,
   articles = false,
   monClub = false,
+  monClubSante = false,
   children,
 }: {
   nom: string;
-  // Le lien « Mon club » (spec 026) : un élève président ou membre actif d'un club. Un encadreur ouvre l'espace
-  // de chacun de ses clubs depuis « Mes clubs ».
+  // « Mon Club Santé » (spec 033) : l'encadreur vérifié rattaché au club de son établissement.
+  monClubSante?: boolean;
+  // Le lien « Mon club » (spec 026) : l'espace public interne du club, pour son président, ses membres confirmés
+  // et ses encadreurs.
   monClub?: boolean;
   // Les liens « Mes articles », « Mes commentaires » et « Quiz » : élève, ou encadreur vérifié (specs 023, 025
   // et 027).
@@ -62,6 +66,14 @@ export function EnTeteEspace({
               className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
             >
               <PenLine className="size-4" /> Mes articles
+            </Link>
+          )}
+          {monClubSante && (
+            <Link
+              to="/mon-club-sante"
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
+            >
+              <HeartPulse className="size-4" /> Mon Club Santé
             </Link>
           )}
           {monClub && (

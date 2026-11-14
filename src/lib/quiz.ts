@@ -1,19 +1,10 @@
+import { NIVEAUX_JEUX, type NiveauJeux } from "@/lib/bareme";
+
 // Catalogue des 100 quiz de gamification, repris du parcours officiel publié par la coordination nationale.
 // Chaque quiz compte 10 questions tirées du référentiel des 922 QCM. Le nombre qui suit chaque titre est la
-// cotation du parcours officiel : il ne sert plus qu'à classer le niveau. Tout quiz réussi rapporte le même
-// barème (spec 022, `src/lib/bareme.ts`).
+// cotation du parcours officiel : elle classe les niveaux (spec 034) : les 40 moins cotés en Débutant, puis 30
+// Intermédiaire, 20 Avancé et 10 Expert. L'API garde le niveau appliqué, que l'équipe peut changer.
 // Les questions elles-mêmes restent côté API : le serveur seul arbitre les quiz (ADR-0004).
-
-export type Niveau = "Débutant" | "Intermédiaire" | "Avancé" | "Championnat";
-
-export const niveauDe = (cotation: number): Niveau =>
-  cotation <= 50
-    ? "Débutant"
-    : cotation <= 65
-      ? "Intermédiaire"
-      : cotation <= 75
-        ? "Avancé"
-        : "Championnat";
 
 export type Pole = {
   id: string;
@@ -215,3 +206,21 @@ export const poles: Pole[] = [
     ],
   },
 ];
+
+// Le niveau de chaque défi par son numéro (1 à 100), comme la migration de l'API l'a fixé : la page reste lisible
+// quand l'API ne répond pas.
+export const niveauParNumero: Map<number, NiveauJeux> = (() => {
+  let numero = 0;
+  const defis = poles.flatMap((p) =>
+    p.quiz.map(([, cotation]) => ({ numero: ++numero, cotation })),
+  );
+  const ordre = [...defis].sort((a, b) => a.cotation - b.cotation || a.numero - b.numero);
+  const carte = new Map<number, NiveauJeux>();
+  let i = 0;
+  for (const niveau of NIVEAUX_JEUX)
+    for (let k = 0; k < niveau.quiz; k++) {
+      const defi = ordre[i++];
+      if (defi) carte.set(defi.numero, niveau.code);
+    }
+  return carte;
+})();

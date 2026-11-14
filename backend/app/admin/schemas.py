@@ -206,6 +206,8 @@ class ProfilEleveAdmin(BaseModel):
     points: ResumePoints
     # Sa demande ou son club (spec 019), priorité à l'actif puis à l'attente.
     club: ClubInscrit | None = None
+    # Spec 034 : la date de son passage en ancien élève (archives seulement, plus de récompense).
+    ancien_eleve_le: datetime | None = None
 
 
 class ProfilEncadreurAdmin(BaseModel):

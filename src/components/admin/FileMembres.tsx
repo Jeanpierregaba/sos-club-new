@@ -6,24 +6,18 @@ import { DialogueMotif } from "@/components/admin/DialogueMotif";
 import { Button } from "@/components/ui/button";
 import {
   adminDeciderAffiliations,
-  adminDeciderRattachements,
   type AffiliationAValider,
   type Classe,
-  type Fonction,
-  type RattachementAValider,
   type ResultatLot,
 } from "@/lib/api/client";
 import { libelleClasse } from "@/lib/classes";
 import { dateCourte } from "@/lib/dates";
-import { libelleFonction } from "@/lib/fonctions";
 
-type Props =
-  | { type: "affiliations"; demandes: AffiliationAValider[] }
-  | { type: "rattachements"; demandes: RattachementAValider[] };
+type Props = { demandes: AffiliationAValider[] };
 
-// La file des affiliations ou des rattachements confirmés par un président (spec 020). Le collaborateur coche
-// les demandes et décide en lot ; chaque demande est traitée à part et le résultat s'affiche ligne par ligne.
-// Un rattachement supplémentaire n'est décidable que par l'équipe nationale.
+// La file des affiliations à confirmer (spec 033) : un encadreur du club les confirme d'habitude ; l'équipe peut le
+// faire à sa place (décision 2). Le collaborateur coche les élèves et décide en lot ; chaque affiliation est traitée
+// à part et le résultat s'affiche ligne par ligne.
 export function FileMembres({
   decideur,
   onRafraichir,
@@ -33,9 +27,9 @@ export function FileMembres({
   const [validation, setValidation] = useState(false);
   const [refus, setRefus] = useState(false);
   const [resultat, setResultat] = useState<ResultatLot | null>(null);
-  const decidables = props.demandes.filter((d) => !("decidable" in d) || d.decidable);
+  const decidables = props.demandes;
   const echecs = new Map(resultat?.echecs.map((e) => [e.id, e.message]));
-  const nom = props.type === "affiliations" ? "affiliation" : "rattachement";
+  const nom = "affiliation";
 
   const basculer = (id: string) =>
     setSelection((s) => {
@@ -50,10 +44,7 @@ export function FileMembres({
       .map((d) => ({ id: d.id, version: d.version }));
   const decider = async (decision: "valider" | "refuser", motif?: string) => {
     const lot = elements();
-    const reponse =
-      props.type === "affiliations"
-        ? await adminDeciderAffiliations(decision, lot, motif)
-        : await adminDeciderRattachements(decision, lot, motif);
+    const reponse = await adminDeciderAffiliations(decision, lot, motif);
     setResultat(reponse);
     setSelection(new Set());
     await onRafraichir();
@@ -63,7 +54,7 @@ export function FileMembres({
     return (
       <div className="rounded-3xl bg-white p-8 text-center font-medium text-muted-foreground shadow-card ring-1 ring-border">
         {resultat && <Bilan resultat={resultat} nom={nom} />}
-        Aucune demande confirmée par un président n'attend ta décision.
+        Aucune affiliation n'attend de confirmation dans ton périmètre.
       </div>
     );
 
@@ -102,51 +93,26 @@ export function FileMembres({
       )}
 
       <ul className="divide-y rounded-3xl bg-white shadow-card ring-1 ring-border">
-        {props.type === "affiliations"
-          ? props.demandes.map((d) => (
-              <Ligne
-                key={d.id}
-                id={d.id}
-                decideur={decideur}
-                coche={selection.has(d.id)}
-                onCocher={basculer}
-                echec={echecs.get(d.id)}
-                titre={d.pseudonyme}
-                detail={`Élève de ${libelleClasse(d.classe as Classe)} · ${d.club_nom} · ${d.etablissement} · DRE ${d.dre}`}
-                confirme={d.confirme_le}
-              />
-            ))
-          : props.demandes.map((d) => (
-              <Ligne
-                key={d.id}
-                id={d.id}
-                decideur={decideur && d.decidable}
-                coche={selection.has(d.id)}
-                onCocher={basculer}
-                echec={echecs.get(d.id)}
-                titre={`${d.prenom} ${d.nom}`}
-                detail={`${libelleFonction(d.fonction as Fonction)} à ${d.etablissement_encadreur} → ${d.club_nom} (${d.club_etablissement}) · DRE ${d.dre}`}
-                confirme={d.confirme_le}
-                mention={
-                  d.supplementaire
-                    ? d.decidable
-                      ? "Club supplémentaire : cet encadreur en a déjà un"
-                      : "Club supplémentaire : autorisation nationale requise"
-                    : undefined
-                }
-              />
-            ))}
+        {props.demandes.map((d) => (
+          <Ligne
+            key={d.id}
+            id={d.id}
+            decideur={decideur}
+            coche={selection.has(d.id)}
+            onCocher={basculer}
+            echec={echecs.get(d.id)}
+            titre={d.pseudonyme}
+            detail={`Élève de ${libelleClasse(d.classe as Classe)} · ${d.club_nom} · ${d.etablissement} · DRE ${d.dre}`}
+            demande={d.demande_le}
+          />
+        ))}
       </ul>
 
       <DialogueFormulaire
         ouvert={validation}
         onOuvert={setValidation}
         titre={`Valider ${selection.size} ${nom}${selection.size > 1 ? "s" : ""} ?`}
-        description={
-          props.type === "affiliations"
-            ? "Chaque élève sélectionné devient membre de son club."
-            : "Chaque encadreur sélectionné est rattaché au club demandé."
-        }
+        description="Chaque élève sélectionné devient membre confirmé de son club, qui est recalculé."
         bouton="Valider"
         onEnvoie={() => decider("valider")}
       />
@@ -154,7 +120,7 @@ export function FileMembres({
         ouvert={refus}
         onOuvert={setRefus}
         titre={`Refuser ${selection.size} demande${selection.size > 1 ? "s" : ""} ?`}
-        description="Le même motif est envoyé à chaque demandeur, qui pourra redemander."
+        description="Le même motif est lu par chaque élève dans son espace."
         bouton="Refuser"
         danger
         onConfirme={(motif) => decider("refuser", motif)}
@@ -171,8 +137,7 @@ function Ligne({
   echec,
   titre,
   detail,
-  confirme,
-  mention,
+  demande,
 }: {
   id: string;
   decideur: boolean;
@@ -181,8 +146,7 @@ function Ligne({
   echec: string | undefined;
   titre: string;
   detail: string;
-  confirme: string | null | undefined;
-  mention?: string | undefined;
+  demande: string;
 }) {
   return (
     <li className="flex items-start gap-3 px-5 py-4">
@@ -197,16 +161,9 @@ function Ligne({
       <div className="min-w-0 flex-1">
         <p className="font-bold text-ink">{titre}</p>
         <p className="text-sm font-medium text-muted-foreground">{detail}</p>
-        {confirme && (
-          <p className="text-xs font-semibold text-muted-foreground">
-            Confirmée par le président le {dateCourte(confirme)}
-          </p>
-        )}
-        {mention && (
-          <p className="mt-1 inline-flex rounded-full bg-sun/30 px-2.5 py-0.5 text-xs font-extrabold text-ink">
-            {mention}
-          </p>
-        )}
+        <p className="text-xs font-semibold text-muted-foreground">
+          Inscrit le {dateCourte(demande)}
+        </p>
         {echec && (
           <p
             role="alert"

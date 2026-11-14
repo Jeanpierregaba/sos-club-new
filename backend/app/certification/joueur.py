@@ -1,4 +1,4 @@
-"""« Ma certification » (spec 029) : les 12 places, les badges et le certificat du joueur connecté."""
+"""« Ma certification » (spec 029) : les 20 places, les badges et le certificat du joueur connecté."""
 
 from uuid import UUID
 
@@ -19,7 +19,15 @@ from app.certification.schemas import (
 from app.clubs.models import Club
 from app.comptes.models import Utilisateur
 from app.quiz import horloge, parametres, partie
-from app.quiz.models import PARCOURS_CERTIFICATION, PLACES, EtatQuiz, EtatTentative, Quiz, TentativeQuiz
+from app.quiz.models import (
+    PARCOURS_CERTIFICATION,
+    PLACES,
+    PLACES_PAR_THEMATIQUE,
+    EtatQuiz,
+    EtatTentative,
+    Quiz,
+    TentativeQuiz,
+)
 
 
 async def ma_certification(db: AsyncSession, joueur: Utilisateur) -> MaCertification:
@@ -70,6 +78,7 @@ async def ma_certification(db: AsyncSession, joueur: Utilisateur) -> MaCertifica
         ).all()
     )
 
+    noms_badges = (await regles.en_cours(db)).noms
     places: list[PlaceParcours] = []
     ouverte = True
     for numero in range(1, PLACES + 1):
@@ -86,6 +95,8 @@ async def ma_certification(db: AsyncSession, joueur: Utilisateur) -> MaCertifica
         places.append(
             PlaceParcours(
                 place=numero,
+                thematique=(numero - 1) // PLACES_PAR_THEMATIQUE + 1,
+                thematique_nom=noms_badges[min((numero - 1) // PLACES_PAR_THEMATIQUE, len(noms_badges) - 1)],
                 etat=etat,
                 quiz_id=quiz.id if quiz else None,
                 titre=quiz.titre if quiz else None,
@@ -93,7 +104,11 @@ async def ma_certification(db: AsyncSession, joueur: Utilisateur) -> MaCertifica
                 contenu_de_test=quiz.contenu_de_test if quiz else False,
                 fascicule=fascicules.get(quiz.ressource_id) if quiz and quiz.ressource_id else None,
                 meilleur_score=meilleurs.get(quiz.id) if quiz else None,
-                tentatives_restantes=max(0, p.tentatives_par_jour - du_jour.get(quiz.id, 0)) if quiz else None,
+                tentatives_restantes=(
+                    max(0, p.tentatives_par_jour - du_jour.get(quiz.id, 0))
+                    if quiz and p.tentatives_par_jour is not None
+                    else None
+                ),
                 tentative_en_cours=en_cours.get(quiz.id) if quiz else None,
             )
         )

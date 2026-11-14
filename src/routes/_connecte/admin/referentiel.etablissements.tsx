@@ -21,6 +21,7 @@ import {
   ErreurApi,
   type DreAdmin,
   type EtablissementAdmin,
+  type OrdreEnseignement,
   type StatutEtablissement,
   type TypeEtablissement,
 } from "@/lib/api/client";
@@ -30,6 +31,58 @@ const TYPES: Record<TypeEtablissement, string> = {
   college: "Collège",
   complexe: "Complexe scolaire",
   autre: "Autre",
+};
+// Les 39 préfectures de la liste nationale, dans leur graphie officielle (backend/app/referentiel/import_secondaire.py).
+const PREFECTURES = [
+  "Agoè-Nyivé",
+  "Agou",
+  "Akébou",
+  "Amou",
+  "Anié",
+  "Assoli",
+  "Avé",
+  "Bas-Mono",
+  "Bassar",
+  "Binah",
+  "Blitta",
+  "Cinkassé",
+  "Dankpen",
+  "Danyi",
+  "Doufelgou",
+  "Est-Mono",
+  "Golfe",
+  "Haho",
+  "Kéran",
+  "Kloto",
+  "Kozah",
+  "Kpélé",
+  "Kpendjal",
+  "Kpendjal-Ouest",
+  "Lacs",
+  "Mô",
+  "Moyen-Mono",
+  "Ogou",
+  "Oti",
+  "Oti-Sud",
+  "Sotouboua",
+  "Tandjouaré",
+  "Tchamba",
+  "Tchaoudjo",
+  "Tône",
+  "Vo",
+  "Wawa",
+  "Yoto",
+  "Zio",
+];
+
+// L'ordre d'enseignement de la liste nationale (spec 035).
+const ORDRES: Record<OrdreEnseignement, string> = {
+  public: "Public",
+  prive_laic: "Privé laïc",
+  prive_catholique: "Privé catholique",
+  prive_protestant: "Privé protestant",
+  prive_islamique: "Privé islamique",
+  communautaire: "Communautaire",
 };
 const STATUTS: Record<StatutEtablissement, string> = {
   actif: "Actif",
@@ -43,6 +96,9 @@ type Recherche = {
   iesg?: string | undefined;
   type?: TypeEtablissement | undefined;
   statut?: StatutEtablissement | undefined;
+  ordre?: OrdreEnseignement | undefined;
+  prefecture?: string | undefined;
+  importes?: boolean | undefined;
   page?: number | undefined;
 };
 
@@ -60,11 +116,19 @@ export const Route = createFileRoute("/_connecte/admin/referentiel/etablissement
     ...(typeof s["statut"] === "string" && s["statut"] in STATUTS
       ? { statut: s["statut"] as StatutEtablissement }
       : {}),
+    ...(typeof s["ordre"] === "string" && s["ordre"] in ORDRES
+      ? { ordre: s["ordre"] as OrdreEnseignement }
+      : {}),
+    ...texte(s, "prefecture"),
+    ...(s["importes"] === true || s["importes"] === "true" ? { importes: true } : {}),
     ...(Number(s["page"]) > 1 ? { page: Number(s["page"]) } : {}),
   }),
   loaderDeps: ({ search }) => search,
   loader: async ({ deps }) => {
-    const [page, dres] = await Promise.all([adminListerEtablissements(deps), adminListerDre()]);
+    const [page, dres] = await Promise.all([
+      adminListerEtablissements({ ...deps, importes: deps.importes ? "true" : undefined }),
+      adminListerDre(),
+    ]);
     return { page, dres };
   },
   gcTime: 0,
@@ -171,6 +235,43 @@ function Etablissements() {
             </option>
           ))}
         </select>
+        <select
+          aria-label="Ordre d'enseignement"
+          value={filtres.ordre ?? ""}
+          onChange={(e) =>
+            filtrer({ ordre: (e.target.value || undefined) as OrdreEnseignement | undefined })
+          }
+          className={`${CHAMP_ADMIN} max-w-44`}
+        >
+          <option value="">Tous les ordres</option>
+          {Object.entries(ORDRES).map(([id, libelle]) => (
+            <option key={id} value={id}>
+              {libelle}
+            </option>
+          ))}
+        </select>
+        <select
+          aria-label="Préfecture"
+          value={filtres.prefecture ?? ""}
+          onChange={(e) => filtrer({ prefecture: e.target.value || undefined })}
+          className={`${CHAMP_ADMIN} max-w-44`}
+        >
+          <option value="">Toutes les préfectures</option>
+          {PREFECTURES.map((p) => (
+            <option key={p} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+        <label className="inline-flex h-11 items-center gap-2 rounded-full px-3 text-sm font-semibold ring-1 ring-border">
+          <input
+            type="checkbox"
+            checked={filtres.importes ?? false}
+            onChange={(e) => filtrer({ importes: e.target.checked || undefined })}
+            className="size-4 accent-primary"
+          />
+          Importés de la liste nationale
+        </label>
         {peut(admin, "clubs", "creer") && (
           <Button
             onClick={() => setEdition("nouveau")}
@@ -199,7 +300,7 @@ function Etablissements() {
                 IESG · DRE
               </th>
               <th scope="col" className="px-4 py-3">
-                Localité
+                Préfecture · ordre
               </th>
               <th scope="col" className="px-4 py-3 text-right">
                 Élèves
@@ -228,7 +329,10 @@ function Etablissements() {
                   {e.iesg}
                   <span className="block text-xs text-muted-foreground">DRE {e.dre}</span>
                 </td>
-                <td className="px-4 py-3 text-muted-foreground">{e.localite ?? "—"}</td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {e.prefecture ?? "—"}
+                  {e.ordre && <span className="block text-xs">{ORDRES[e.ordre]}</span>}
+                </td>
                 <td className="px-4 py-3 text-right font-bold tabular-nums">{e.nb_eleves}</td>
                 <td className="px-4 py-3 text-right font-bold tabular-nums">{e.nb_encadreurs}</td>
                 <td className="px-4 py-3 text-right">
@@ -346,6 +450,8 @@ function FormulaireEtablissement({
   const [iesg, setIesg] = useState(etablissement?.iesg_id ?? iesgParDefaut ?? "");
   const [localite, setLocalite] = useState(etablissement?.localite ?? "");
   const [statut, setStatut] = useState(etablissement?.statut ?? "actif");
+  const [prefecture, setPrefecture] = useState(etablissement?.prefecture ?? "");
+  const [ordre, setOrdre] = useState<OrdreEnseignement | "">(etablissement?.ordre ?? "");
 
   return (
     <DialogueFormulaire
@@ -359,7 +465,14 @@ function FormulaireEtablissement({
       }
       bouton="Enregistrer"
       onEnvoie={async () => {
-        const champs = { nom, type, iesg_id: iesg, localite: localite || null };
+        const champs = {
+          nom,
+          type,
+          iesg_id: iesg,
+          localite: localite || null,
+          prefecture: prefecture || null,
+          ordre: ordre || null,
+        };
         if (etablissement)
           await adminModifierEtablissement(etablissement.id, {
             version: etablissement.version,
@@ -422,6 +535,38 @@ function FormulaireEtablissement({
           maxLength={150}
           className={CHAMP_ADMIN}
         />
+      </Champ>
+      <Champ libelle="Préfecture (facultatif)">
+        <select
+          value={prefecture}
+          onChange={(e) => setPrefecture(e.target.value)}
+          className={CHAMP_ADMIN}
+        >
+          <option value="">Non renseignée</option>
+          {/* Une graphie hors liste, saisie avant la spec 035, reste affichée. */}
+          {prefecture && !PREFECTURES.includes(prefecture) && (
+            <option value={prefecture}>{prefecture}</option>
+          )}
+          {PREFECTURES.map((p) => (
+            <option key={p} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+      </Champ>
+      <Champ libelle="Ordre d'enseignement (facultatif)">
+        <select
+          value={ordre}
+          onChange={(e) => setOrdre(e.target.value as OrdreEnseignement | "")}
+          className={CHAMP_ADMIN}
+        >
+          <option value="">Non renseigné</option>
+          {Object.entries(ORDRES).map(([id, libelle]) => (
+            <option key={id} value={id}>
+              {libelle}
+            </option>
+          ))}
+        </select>
       </Champ>
       {etablissement && statut !== "propose" && (
         <Champ libelle="Statut">

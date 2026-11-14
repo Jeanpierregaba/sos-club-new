@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.clubs.models import Adhesion, EtatAdhesion, EtatRattachement, Rattachement
+from app.clubs.models import Adhesion, Club, EtatAdhesion, EtatRattachement, Rattachement
 from app.comptes.models import Utilisateur
 from app.eleves.models import Eleve
 from tests.conftest import MOT_DE_PASSE, VERIFICATION_CLUBS, connecter_admin, etablissement_de
@@ -130,13 +130,27 @@ def changer_detablissement(client: TestClient, chemin: str, etablissement_id: An
 def test_un_membre_qui_change_detablissement_quitte_le_club(
     client: TestClient, avec_membres: Any, en_base: Callable[..., Any]
 ) -> None:
+    """Spec 033 : l'ancienne affiliation prend fin, une nouvelle s'ouvre « à confirmer » dans le club du nouvel
+    établissement."""
     connecter(client, "ama")
+    savanes = etablissement_de(en_base, "savanes")
 
-    reponse = changer_detablissement(client, "/api/eleves/moi", etablissement_de(en_base, "savanes"))
+    reponse = changer_detablissement(client, "/api/eleves/moi", savanes)
 
     assert reponse.status_code == 200, reponse.text
-    assert reponse.json()["adhesion"]["etat"] == "retiree"
-    assert reponse.json()["adhesion"]["motif_retrait"] == "Changement d'établissement."
+    lignes = en_base(
+        lambda db: db.execute(
+            select(Adhesion.club_id, Adhesion.etat, Adhesion.motif_retrait)
+            .join(Utilisateur, Utilisateur.id == Adhesion.eleve_id)
+            .where(Utilisateur.identifiant == "ama")
+        )
+    ).all()
+    anciennes = [ligne for ligne in lignes if ligne.club_id == avec_membres.id]
+    nouvelles = [ligne for ligne in lignes if ligne.club_id != avec_membres.id]
+    assert [(a.etat, a.motif_retrait) for a in anciennes] == [(EtatAdhesion.retiree, "Changement d'établissement.")]
+    assert [a.etat for a in nouvelles] == [EtatAdhesion.en_attente_validation]
+    nouveau_club = en_base(lambda db: db.get(Club, nouvelles[0].club_id))
+    assert nouveau_club.etablissement_id == savanes
 
 
 def test_un_president_ne_change_pas_detablissement_avant_une_passation(
@@ -152,24 +166,29 @@ def test_un_president_ne_change_pas_detablissement_avant_une_passation(
     assert president.etablissement_id == club.etablissement_id
 
 
-def test_un_encadreur_qui_change_detablissement_quitte_le_club_de_lancien(
+def test_un_encadreur_qui_change_detablissement_suit_son_etablissement(
     client: TestClient,
     club: Any,
-    creer_eleve: Callable[..., Utilisateur],
-    creer_club: Callable[..., Any],
     creer_encadreur: Callable[..., Utilisateur],
     en_base: Callable[..., Any],
 ) -> None:
-    autre = creer_club(creer_eleve("president.kara", "Présidente de Kara", dre="kara"), nom="Club de Kara")
+    """Spec 033 : un seul club par encadreur ; son rattachement suit l'établissement de son profil."""
     prof = creer_encadreur("prof", etablissement_id=club.etablissement_id)
     local = rattacher(en_base, prof, club)
-    supplementaire = rattacher(en_base, prof, autre)
+    savanes = etablissement_de(en_base, "savanes")
     connecter(client, "prof")
 
-    reponse = changer_detablissement(client, "/api/encadreurs/moi", etablissement_de(en_base, "savanes"))
+    reponse = changer_detablissement(client, "/api/encadreurs/moi", savanes)
 
     assert reponse.status_code == 200, reponse.text
-    etats = en_base(
-        lambda db: db.execute(select(Rattachement.id, Rattachement.etat).where(Rattachement.encadreur_id == prof.id))
+    lignes = en_base(
+        lambda db: db.execute(
+            select(Rattachement.id, Rattachement.etat, Club.etablissement_id)
+            .join(Club, Club.id == Rattachement.club_id)
+            .where(Rattachement.encadreur_id == prof.id)
+        )
     ).all()
-    assert dict(etats) == {local.id: EtatRattachement.retire, supplementaire.id: EtatRattachement.actif}
+    assert {(ligne.id == local.id, ligne.etat, ligne.etablissement_id) for ligne in lignes} == {
+        (True, EtatRattachement.retire, club.etablissement_id),
+        (False, EtatRattachement.actif, savanes),
+    }

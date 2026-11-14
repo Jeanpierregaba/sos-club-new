@@ -11,6 +11,7 @@ from sqlalchemy import CheckConstraint, Enum, ForeignKey, Integer, String, Uniqu
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base, Suivi
+from app.referentiel.regions import RegionScolaire
 
 FORMAT_CODE = "^[a-z0-9-]+$"
 
@@ -20,6 +21,17 @@ class TypeEtablissement(StrEnum):
     college = "college"
     complexe = "complexe"
     autre = "autre"
+
+
+class OrdreEnseignement(StrEnum):
+    """L'ordre d'enseignement de la liste nationale (spec 035)."""
+
+    public = "public"
+    prive_laic = "prive_laic"
+    prive_catholique = "prive_catholique"
+    prive_protestant = "prive_protestant"
+    prive_islamique = "prive_islamique"
+    communautaire = "communautaire"
 
 
 class StatutEtablissement(StrEnum):
@@ -42,6 +54,8 @@ class Dre(Suivi, Base):
     nom: Mapped[str] = mapped_column(String(150))
     nom_normalise: Mapped[str] = mapped_column(String(150), unique=True)
     nom_complet: Mapped[str] = mapped_column(String(200))
+    # La région de la DRE (spec 033) : Grand Lomé et Maritime sont dans la région Maritime.
+    region: Mapped[RegionScolaire] = mapped_column(_enum_texte(RegionScolaire, "region"))
     ordre: Mapped[int] = mapped_column(Integer)
     actif: Mapped[bool] = mapped_column(server_default=text("true"))
 
@@ -79,6 +93,11 @@ class Etablissement(Suivi, Base):
     statut: Mapped[StatutEtablissement] = mapped_column(
         _enum_texte(StatutEtablissement, "statut_etablissement"), server_default=StatutEtablissement.actif.value
     )
+    # Spec 035 : la préfecture et l'ordre de la liste nationale ; `import_source` marque les établissements créés
+    # par un import (le retour arrière de la migration ne retire qu'eux, l'équipe les filtre).
+    prefecture: Mapped[str | None] = mapped_column(String(100), index=True)
+    ordre: Mapped[OrdreEnseignement | None] = mapped_column(_enum_texte(OrdreEnseignement, "ordre_enseignement"))
+    import_source: Mapped[str | None] = mapped_column(String(40), index=True)
 
     __mapper_args__ = {"version_id_col": Suivi.version}  # noqa: RUF012
 

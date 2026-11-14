@@ -1,5 +1,7 @@
-"""Clubs (spec 019) : demande et espace de l'élève sous /clubs, lecture publique, vérification sous /admin/clubs.
-Affiliations et rattachements (spec 020) : demandes, décisions du président, files des collaborateurs."""
+"""Clubs : espace de l'élève et du président sous /clubs, lecture publique, suivi sous /admin/clubs.
+
+Depuis la spec 033, un club naît et s'active seul (ADR-0011) : plus de demande de création ni de rattachement manuel ;
+l'affiliation d'un élève est confirmée par un encadreur du club ou par l'équipe."""
 
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -12,46 +14,52 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.catalogue import Action
 from app.admin.dependances import Acces, adresse_ip, exiger_permission
 from app.articles.router import routes_de_redaction
-from app.clubs import adhesions, espace, membres_admin, rattachements, service, verification
-from app.clubs.models import EtatClub
+from app.clubs import adhesions, espace, membres_admin, rattachements, service, suivi, verification
+from app.clubs import affiliations as affiliations_
+from app.clubs import carte as carte_
+from app.clubs import mon_club_sante as mon_club_sante_
 from app.clubs.schemas import (
     ActivationEntree,
-    AdhesionResume,
+    AffiliationsDuClub,
+    Carte,
     ClubFiche,
     ClubPodium,
     ClubPublic,
-    ClubResume,
     DecisionEntree,
-    DemandeAdhesion,
-    DemandeClub,
-    DemandeClubEntree,
-    DemandeRattachement,
+    DecisionSignalementEntree,
+    DesistementEntree,
     EspaceClub,
+    FicheSuivi,
     FileAffiliations,
-    FileClubs,
+    FileDesistements,
     FilePassations,
-    FileRattachements,
     LotEntree,
     LotRefusEntree,
     MembresDuClub,
     MonClub,
+    MonClubSante,
+    PageSuivi,
     Passation,
     PassationAConfirmer,
     PassationApercu,
     PassationEntree,
+    PresidentEntree,
     PropositionFiche,
     PropositionFicheEntree,
-    RattachementResume,
     RefusDemandeEntree,
     RefusEntree,
+    RejetSignalementEntree,
     ResultatLot,
-    RetraitEntree,
+    Seuils,
+    SignalementResume,
+    TerrainEntree,
 )
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.inscription import Refus
 from app.comptes.models import Utilisateur
 from app.comptes.service import cle_adresse
 from app.db import get_session
+from app.referentiel.regions import RegionScolaire
 
 Base = Annotated[AsyncSession, Depends(get_session)]
 Connecte = Annotated[Utilisateur, Depends(utilisateur_courant)]
@@ -82,21 +90,17 @@ def _adresse(request: Request) -> str:
 # Élève ------------------------------------------------------------------------------------------------------
 
 
-@router.post("/demande", status_code=status.HTTP_201_CREATED)
-async def demander(entree: DemandeClubEntree, request: Request, utilisateur: Connecte, db: Base) -> ClubResume:
-    with _traduire_refus():
-        return await service.demarrer(db, utilisateur, entree, _adresse(request))
-
-
-@router.post("/demande/renvoyer")
-async def renvoyer_ma_demande(request: Request, utilisateur: Connecte, db: Base) -> ClubResume:
-    with _traduire_refus():
-        return await service.renvoyer(db, utilisateur, _adresse(request))
-
-
 @router.get("/moi")
 async def mon_club(utilisateur: Connecte, db: Base) -> MonClub:
     with _traduire_refus():
+        return await service.mon_club(db, utilisateur)
+
+
+@router.post("/moi/affiliation", status_code=status.HTTP_201_CREATED)
+async def redemander_affiliation(request: Request, utilisateur: Connecte, db: Base) -> MonClub:
+    """Après un refus ou un retrait, l'élève redemande son affiliation : elle repart « à confirmer » (spec 033)."""
+    with _traduire_refus():
+        await affiliations_.redemander(db, utilisateur, _adresse(request))
         return await service.mon_club(db, utilisateur)
 
 
@@ -114,54 +118,65 @@ async def annuler_passation(request: Request, utilisateur: Connecte, db: Base) -
         return await service.annuler_passation(db, utilisateur, _adresse(request))
 
 
-# Affiliations (spec 020) : l'élève demande ou se retire, le président confirme, refuse ou retire ---------------
+# « Mon Club Santé » de l'encadreur (spec 033) : déclaré avant les routes /{club_id}/…
 
 
-@router.post("/{club_id}/adhesions", status_code=status.HTTP_201_CREATED)
-async def demander_adhesion(club_id: UUID, request: Request, utilisateur: Connecte, db: Base) -> AdhesionResume:
+@router.get("/mon-club-sante")
+async def mon_club_sante(utilisateur: Connecte, db: Base) -> MonClubSante:
     with _traduire_refus():
-        return await adhesions.demander(db, utilisateur, club_id, _adresse(request))
+        return await mon_club_sante_.fiche(db, utilisateur)
 
 
-@router.delete("/{club_id}/adhesions/moi")
-async def quitter_le_club(club_id: UUID, request: Request, utilisateur: Connecte, db: Base) -> AdhesionResume:
-    """Annule la demande en cours, ou quitte le club."""
+@router.get("/mon-club-sante/affiliations")
+async def affiliations_du_club(utilisateur: Connecte, db: Base) -> AffiliationsDuClub:
     with _traduire_refus():
-        return await adhesions.se_retirer(db, utilisateur, club_id, _adresse(request))
+        return await mon_club_sante_.affiliations(db, utilisateur)
 
 
-@router.get("/{club_id}/adhesions/demandes")
-async def demandes_adhesion(club_id: UUID, utilisateur: Connecte, db: Base) -> list[DemandeAdhesion]:
+@router.post("/mon-club-sante/affiliations/{affiliation_id}/confirmer")
+async def confirmer_affiliation(
+    affiliation_id: UUID, entree: DecisionEntree, request: Request, utilisateur: Connecte, db: Base
+) -> AffiliationsDuClub:
     with _traduire_refus():
-        return await adhesions.demandes_a_confirmer(db, utilisateur, club_id)
+        return await mon_club_sante_.confirmer(db, utilisateur, affiliation_id, entree.version, _adresse(request))
 
 
-@router.post("/{club_id}/adhesions/{adhesion_id}/confirmer")
-async def confirmer_adhesion(
-    club_id: UUID, adhesion_id: UUID, entree: DecisionEntree, request: Request, utilisateur: Connecte, db: Base
-) -> AdhesionResume:
+@router.post("/mon-club-sante/affiliations/{affiliation_id}/refuser")
+async def refuser_affiliation(
+    affiliation_id: UUID, entree: RefusDemandeEntree, request: Request, utilisateur: Connecte, db: Base
+) -> AffiliationsDuClub:
     with _traduire_refus():
-        return await adhesions.confirmer(db, utilisateur, club_id, adhesion_id, entree.version, _adresse(request))
-
-
-@router.post("/{club_id}/adhesions/{adhesion_id}/refuser")
-async def refuser_adhesion(
-    club_id: UUID, adhesion_id: UUID, entree: RefusDemandeEntree, request: Request, utilisateur: Connecte, db: Base
-) -> AdhesionResume:
-    with _traduire_refus():
-        return await adhesions.refuser(
-            db, utilisateur, club_id, adhesion_id, entree.motif, entree.version, _adresse(request)
+        return await mon_club_sante_.refuser(
+            db, utilisateur, affiliation_id, entree.motif, entree.version, _adresse(request)
         )
 
 
-@router.post("/{club_id}/adhesions/{adhesion_id}/retirer")
-async def retirer_membre(
-    club_id: UUID, adhesion_id: UUID, entree: RetraitEntree, request: Request, utilisateur: Connecte, db: Base
-) -> AdhesionResume:
+@router.post("/mon-club-sante/affiliations/{affiliation_id}/retirer")
+async def retirer_affiliation(
+    affiliation_id: UUID, entree: RefusDemandeEntree, request: Request, utilisateur: Connecte, db: Base
+) -> AffiliationsDuClub:
     with _traduire_refus():
-        return await adhesions.retirer(
-            db, utilisateur, club_id, adhesion_id, entree.motif, entree.version, _adresse(request)
+        return await mon_club_sante_.retirer(
+            db, utilisateur, affiliation_id, entree.motif, entree.version, _adresse(request)
         )
+
+
+@router.post("/mon-club-sante/desistements", status_code=status.HTTP_201_CREATED)
+async def signaler_desistement(
+    entree: DesistementEntree, request: Request, utilisateur: Connecte, db: Base
+) -> SignalementResume:
+    with _traduire_refus():
+        return await mon_club_sante_.signaler_desistement(
+            db, utilisateur, entree.encadreur_id, entree.motif, _adresse(request)
+        )
+
+
+@router.post("/mon-club-sante/president")
+async def proposer_president(
+    entree: PresidentEntree, request: Request, utilisateur: Connecte, db: Base
+) -> MonClubSante:
+    with _traduire_refus():
+        return await mon_club_sante_.proposer_president(db, utilisateur, entree.affiliation_id, _adresse(request))
 
 
 # Espace du président (spec 026) : « Mon club », propositions de fiche ; les actualités sont dans `router_actualites`.
@@ -195,65 +210,6 @@ async def membres(club_id: UUID, utilisateur: Connecte, db: Base) -> MembresDuCl
         return await adhesions.membres_du_club(db, utilisateur, club_id)
 
 
-# Rattachements (spec 020) : l'encadreur demande ou se retire, le président confirme, refuse ou retire -------
-
-
-@router.post("/{club_id}/rattachements", status_code=status.HTTP_201_CREATED)
-async def demander_rattachement(club_id: UUID, request: Request, utilisateur: Connecte, db: Base) -> RattachementResume:
-    with _traduire_refus():
-        return await rattachements.demander(db, utilisateur, club_id, _adresse(request))
-
-
-@router.delete("/{club_id}/rattachements/moi")
-async def quitter_le_club_encadre(
-    club_id: UUID, request: Request, utilisateur: Connecte, db: Base
-) -> RattachementResume:
-    """Annule la demande en cours, ou met fin au rattachement."""
-    with _traduire_refus():
-        return await rattachements.se_retirer(db, utilisateur, club_id, _adresse(request))
-
-
-@router.get("/{club_id}/rattachements/demandes")
-async def demandes_rattachement(club_id: UUID, utilisateur: Connecte, db: Base) -> list[DemandeRattachement]:
-    with _traduire_refus():
-        return await rattachements.demandes_a_confirmer(db, utilisateur, club_id)
-
-
-@router.post("/{club_id}/rattachements/{rattachement_id}/confirmer")
-async def confirmer_rattachement(
-    club_id: UUID, rattachement_id: UUID, entree: DecisionEntree, request: Request, utilisateur: Connecte, db: Base
-) -> RattachementResume:
-    with _traduire_refus():
-        return await rattachements.confirmer(
-            db, utilisateur, club_id, rattachement_id, entree.version, _adresse(request)
-        )
-
-
-@router.post("/{club_id}/rattachements/{rattachement_id}/refuser")
-async def refuser_rattachement(
-    club_id: UUID,
-    rattachement_id: UUID,
-    entree: RefusDemandeEntree,
-    request: Request,
-    utilisateur: Connecte,
-    db: Base,
-) -> RattachementResume:
-    with _traduire_refus():
-        return await rattachements.refuser(
-            db, utilisateur, club_id, rattachement_id, entree.motif, entree.version, _adresse(request)
-        )
-
-
-@router.post("/{club_id}/rattachements/{rattachement_id}/retirer")
-async def retirer_encadreur(
-    club_id: UUID, rattachement_id: UUID, entree: RetraitEntree, request: Request, utilisateur: Connecte, db: Base
-) -> RattachementResume:
-    with _traduire_refus():
-        return await rattachements.retirer(
-            db, utilisateur, club_id, rattachement_id, entree.motif, entree.version, _adresse(request)
-        )
-
-
 # Passation confirmée par un encadreur rattaché (Q19, spec 020) ------------------------------------------------
 
 
@@ -283,6 +239,12 @@ async def lister_clubs(db: Base) -> list[ClubPublic]:
     return await service.clubs_publics(db)
 
 
+@router.get("/carte")
+async def carte_des_clubs(db: Base) -> Carte:
+    """La carte nationale : trois chiffres réels et l'arbre région → DRE → inspection → établissement (spec 033)."""
+    return await carte_.carte(db)
+
+
 @router.get("/podium")
 async def podium_des_clubs(db: Base) -> list[ClubPodium]:
     """Les trois clubs qui ont le plus de points, pour l'accueil (spec 021)."""
@@ -308,15 +270,52 @@ async def fiche_club(club_id: UUID, db: Base) -> ClubFiche:
 # Vérification par l'espace admin -----------------------------------------------------------------------------
 
 
-@router_admin.get("")
-async def file_attente(
+@router_admin.get("/suivi")
+async def suivi_des_clubs(
     acces: Lecteur,
     db: Base,
-    etat: Literal["en_attente", "refuse"] = "en_attente",
+    statut: Literal["en_constitution", "actif", "en_regularisation", "suspendu"] | None = None,
+    region: RegionScolaire | None = None,
+    dre: Annotated[str | None, Query(max_length=30)] = None,
+    iesg: UUID | None = None,
+    recherche: Annotated[str | None, Query(max_length=100)] = None,
+    terrain: bool | None = None,
     page: Annotated[int, Query(ge=1)] = 1,
     par_page: Annotated[int, Query(ge=1, le=100)] = 50,
-) -> FileClubs:
-    return await verification.file_attente(db, acces, EtatClub(etat), page, par_page)
+) -> PageSuivi:
+    return await suivi.lister(
+        db, acces, statut=statut, region=region, dre=dre, iesg=iesg, recherche=recherche, terrain=terrain,
+        page=page, par_page=par_page,
+    )  # fmt: skip
+
+
+@router_admin.get("/seuils")
+async def seuils_des_clubs(_: Lecteur) -> Seuils:
+    """Les seuils d'activation, fixés dans le code (spec 033) : en lecture seule."""
+    return suivi.seuils()
+
+
+@router_admin.get("/desistements")
+async def file_desistements(acces: Lecteur, db: Base) -> FileDesistements:
+    return await suivi.file_desistements(db, acces)
+
+
+@router_admin.post("/desistements/{signalement_id}/confirmer")
+async def confirmer_desistement(
+    signalement_id: UUID, entree: DecisionSignalementEntree, request: Request, acces: Decideur, db: Base
+) -> FileDesistements:
+    with _traduire_refus():
+        return await suivi.confirmer_desistement(db, acces, signalement_id, entree.version, adresse_ip(request))
+
+
+@router_admin.post("/desistements/{signalement_id}/rejeter")
+async def rejeter_desistement(
+    signalement_id: UUID, entree: RejetSignalementEntree, request: Request, acces: Decideur, db: Base
+) -> FileDesistements:
+    with _traduire_refus():
+        return await suivi.rejeter_desistement(
+            db, acces, signalement_id, entree.motif, entree.version, adresse_ip(request)
+        )
 
 
 @router_admin.get("/passations")
@@ -342,25 +341,26 @@ async def refuser_affiliations(entree: LotRefusEntree, request: Request, acces: 
     return await membres_admin.refuser_affiliations(db, acces, entree.elements, entree.motif, adresse_ip(request))
 
 
+@router_admin.get("/{club_id}/suivi")
+async def fiche_de_suivi(club_id: UUID, acces: Lecteur, db: Base) -> FicheSuivi:
+    with _traduire_refus():
+        return await suivi.fiche(db, acces, club_id)
+
+
+@router_admin.post("/{club_id}/terrain")
+async def declarer_terrain(
+    club_id: UUID, entree: TerrainEntree, request: Request, acces: Decideur, db: Base
+) -> FicheSuivi:
+    with _traduire_refus():
+        return await suivi.marquer_terrain(
+            db, acces, club_id, entree.declare, entree.note, entree.version, adresse_ip(request)
+        )
+
+
 @router_admin.get("/{club_id}/membres")
 async def membres_admin_du_club(club_id: UUID, acces: Lecteur, db: Base) -> MembresDuClub:
     with _traduire_refus():
         return await membres_admin.membres_du_club(db, acces, club_id)
-
-
-@router_admin.get("/rattachements")
-async def file_rattachements(acces: Lecteur, db: Base) -> FileRattachements:
-    return await membres_admin.file_rattachements(db, acces)
-
-
-@router_admin.post("/rattachements/valider")
-async def valider_rattachements(entree: LotEntree, request: Request, acces: Decideur, db: Base) -> ResultatLot:
-    return await membres_admin.valider_rattachements(db, acces, entree.elements, adresse_ip(request))
-
-
-@router_admin.post("/rattachements/refuser")
-async def refuser_rattachements(entree: LotRefusEntree, request: Request, acces: Decideur, db: Base) -> ResultatLot:
-    return await membres_admin.refuser_rattachements(db, acces, entree.elements, entree.motif, adresse_ip(request))
 
 
 @router_admin.post("/passations/{passation_id}/valider")
@@ -381,20 +381,6 @@ async def refuser_passation(
         return await verification.refuser_passation(
             db, acces, passation_id, entree.motif, adresse_ip(request), entree.version
         )
-
-
-@router_admin.post("/{club_id}/activer")
-async def activer(
-    club_id: UUID, request: Request, acces: Decideur, db: Base, entree: ActivationEntree | None = None
-) -> DemandeClub:
-    with _traduire_refus():
-        return await verification.activer(db, acces, club_id, adresse_ip(request), entree.version if entree else None)
-
-
-@router_admin.post("/{club_id}/refuser")
-async def refuser(club_id: UUID, entree: RefusEntree, request: Request, acces: Decideur, db: Base) -> DemandeClub:
-    with _traduire_refus():
-        return await verification.refuser(db, acces, club_id, entree.motif, adresse_ip(request), entree.version)
 
 
 # Actualités du club (spec 026) : les routes de rédaction des articles, pour le président en place.

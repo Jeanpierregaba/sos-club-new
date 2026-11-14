@@ -4,14 +4,17 @@ publique d'un numéro."""
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.certification import certificat_pdf, joueur, verification
+from app.certification.models import PlaceReussie
 from app.certification.schemas import CertificatJoueur, ChoixClub, MaCertification, Verification
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.models import Utilisateur
 from app.db import get_session
 from app.quiz.dependances import Candidat
+from app.quiz.models import PLACES
 
 router = APIRouter(prefix="/certification", tags=["certification"])
 router_public = APIRouter(prefix="/certificats", tags=["certification"])
@@ -45,8 +48,14 @@ async def certificat(db: Db, utilisateur: Connecte) -> Response:
     trouve = await joueur.certificat_valide(db, utilisateur.id)
     if trouve is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Tu n'as pas de certificat valide.")
+    # Le parcours au jour de la délivrance : un certificat d'avant la spec 034 attestait 12 quiz, pas 20.
+    nb_quiz = await db.scalar(
+        select(func.count())
+        .select_from(PlaceReussie)
+        .where(PlaceReussie.utilisateur_id == trouve.utilisateur_id, PlaceReussie.reussie_le <= trouve.delivre_le)
+    )
     return Response(
-        certificat_pdf.generer(trouve),
+        certificat_pdf.generer(trouve, min(nb_quiz or PLACES, PLACES)),
         media_type="application/pdf",
         headers=SANS_CACHE
         | {"Content-Disposition": f'attachment; filename="certificat-genie-imhotep-{trouve.numero}.pdf"'},

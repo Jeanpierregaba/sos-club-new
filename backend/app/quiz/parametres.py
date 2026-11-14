@@ -5,12 +5,17 @@ from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.quiz.models import PARCOURS_JEUX, ParametresQuiz
+from app.quiz.models import PARCOURS_CERTIFICATION, PARCOURS_JEUX, ParametresQuiz
 
-# Q12 : 15 questions, 5 secondes affichées (certification) plus 2 de tolérance, réussite à 12 ; plafond de 10 tentatives par jour.
+# Q12 : 15 questions, 2 secondes de tolérance, réussite à 12 ; plafond de 10 tentatives par jour.
 PAR_DEFAUT = {"nb_questions": 15, "temps_ms": 5000, "tolerance_ms": 2000, "seuil": 12, "tentatives_par_jour": 10}
-# Les quiz de la page des jeux passent à 20 secondes par question (2026-11-10) ; la certification garde 5 secondes.
-PAR_DEFAUT_PARCOURS = {PARCOURS_JEUX: PAR_DEFAUT | {"temps_ms": 20000}}
+# Les quiz de la page des jeux passent à 20 secondes par question (2026-11-10) ; la certification a les siens.
+PAR_DEFAUT_PARCOURS = {
+    PARCOURS_JEUX: PAR_DEFAUT | {"temps_ms": 20000},
+    # Spec 034 : 10 questions de 20 s, 10/10, arrêt à la première erreur, sans plafond.
+    PARCOURS_CERTIFICATION: PAR_DEFAUT
+    | {"nb_questions": 10, "temps_ms": 20000, "seuil": 10, "tentatives_par_jour": None, "arret_premiere_erreur": True},
+}
 
 
 async def en_cours(db: AsyncSession, parcours: str = PARCOURS_JEUX) -> ParametresQuiz:

@@ -1,5 +1,6 @@
-"""Banque des défis du jour (spec 021) et réponses des élèves (spec 022). Une question tirée chaque jour pour
-tous ; seule la première réponse du jour d'un élève compte, et rapporte des points si elle est juste."""
+"""Banque des défis du jour (spec 021) et réponses des élèves (spec 022) : une question tirée chaque jour pour tous ;
+seule la première réponse du jour d'un élève compte, et rapporte des points si elle est juste. Étoiles des Jeux
+(spec 034)."""
 
 from datetime import date, datetime
 from uuid import UUID, uuid7
@@ -90,3 +91,21 @@ class PartieQuelAxe(Base):
     autres: Mapped[list[str] | None] = mapped_column(JSONB)
     commencee_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     terminee_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class EtoileObtenue(Base):
+    """Une étoile des Jeux (spec 034) : son niveau a tous ses quiz publiés réussis. Une seule par élève et par niveau,
+    même entre deux réussites simultanées ; elle reste acquise si un quiz est ensuite ajouté ou dépublié."""
+
+    __tablename__ = "etoile_obtenue"
+    __table_args__ = (
+        UniqueConstraint("utilisateur_id", "niveau"),
+        CheckConstraint("niveau IN ('debutant', 'intermediaire', 'avance', 'expert')", name="niveau_valide"),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    utilisateur_id: Mapped[UUID] = mapped_column(ForeignKey("utilisateur.id", ondelete="CASCADE"))
+    niveau: Mapped[str] = mapped_column(String(20))
+    # Le bonus crédité ; nul si le barème était à 0 ou désactivé à ce moment.
+    mouvement_id: Mapped[UUID | None] = mapped_column(ForeignKey("mouvement_points.id", ondelete="RESTRICT"))
+    obtenue_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

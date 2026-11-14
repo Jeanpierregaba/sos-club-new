@@ -28,10 +28,12 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db import Base, Suivi
 
 PARCOURS_JEUX = "jeux"
-# Le parcours Génie Imhotep (spec 029) : 12 places, jouées dans l'ordre.
+# Le parcours Génie Imhotep (spec 029, puis 034) : 20 places, jouées dans l'ordre.
 PARCOURS_CERTIFICATION = "certification"
 PARCOURS = (PARCOURS_JEUX, PARCOURS_CERTIFICATION)
-PLACES = 12
+PLACES = 20
+# 5 thématiques de 4 places ; le badge d'une thématique tombe à sa dernière place (spec 034).
+PLACES_PAR_THEMATIQUE = 4
 
 
 class EtatQuiz(StrEnum):
@@ -39,6 +41,19 @@ class EtatQuiz(StrEnum):
     soumis = "soumis"
     publie = "publie"
     depublie = "depublie"
+
+
+class NiveauQuiz(StrEnum):
+    """Les quatre niveaux des 100 quiz Jeux (spec 034) : 40, 30, 20 et 10 quiz, mieux payés à chaque niveau."""
+
+    debutant = "debutant"
+    intermediaire = "intermediaire"
+    avance = "avance"
+    expert = "expert"
+
+
+# L'ordre des niveaux, et donc des étoiles 1 à 4.
+NIVEAUX: tuple[NiveauQuiz, ...] = tuple(NiveauQuiz)
 
 
 class EtatTentative(StrEnum):
@@ -59,7 +74,8 @@ class ParametresQuiz(Base):
         CheckConstraint("nb_questions BETWEEN 1 AND 50", name="nb_questions_valide"),
         CheckConstraint("seuil BETWEEN 1 AND nb_questions", name="seuil_valide"),
         CheckConstraint("temps_ms > 0 AND tolerance_ms >= 0", name="temps_valide"),
-        CheckConstraint("tentatives_par_jour >= 1", name="tentatives_valide"),
+        # Nul : aucun plafond (la certification se recommence jusqu'à réussite, spec 034).
+        CheckConstraint("tentatives_par_jour IS NULL OR tentatives_par_jour >= 1", name="tentatives_valide"),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
@@ -69,7 +85,9 @@ class ParametresQuiz(Base):
     temps_ms: Mapped[int] = mapped_column(Integer)
     tolerance_ms: Mapped[int] = mapped_column(Integer)
     seuil: Mapped[int] = mapped_column(Integer)
-    tentatives_par_jour: Mapped[int] = mapped_column(Integer)
+    tentatives_par_jour: Mapped[int | None] = mapped_column(Integer)
+    # Certification (spec 034) : une réponse fausse ou un temps dépassé arrête la tentative, non réussie.
+    arret_premiere_erreur: Mapped[bool] = mapped_column(server_default=text("false"))
     # Nul pour la version initiale, posée par la migration ou par défaut.
     cree_par: Mapped[UUID | None] = mapped_column(ForeignKey("utilisateur.id", ondelete="RESTRICT"))
     cree_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -83,10 +101,15 @@ class Quiz(Suivi, Base):
             name="publie_avec_validateur",
         ),
         CheckConstraint("parcours IN ('jeux', 'certification')", name="parcours_valide"),
-        # Un quiz de certification occupe une place de 1 à 12 ; un quiz de jeux n'en a pas, ni de fascicule.
+        # Un quiz de certification occupe une place de 1 à 20 ; un quiz de jeux n'en a pas, ni de fascicule.
         CheckConstraint("(parcours = 'certification') = (place IS NOT NULL)", name="place_si_certification"),
-        CheckConstraint("place BETWEEN 1 AND 12", name="place_valide"),
+        CheckConstraint("place BETWEEN 1 AND 20", name="place_valide"),
         CheckConstraint("parcours = 'certification' OR ressource_id IS NULL", name="fascicule_si_certification"),
+        # Le niveau et le numéro du parcours officiel n'existent que pour les quiz Jeux (spec 034).
+        CheckConstraint("parcours = 'jeux' OR (niveau IS NULL AND numero IS NULL)", name="niveau_si_jeux"),
+        CheckConstraint("numero BETWEEN 1 AND 100", name="numero_valide"),
+        # Un numéro n'a qu'un quiz publié, comme une place de certification.
+        Index("uq_quiz_numero_publie", "numero", unique=True, postgresql_where=text("etat = 'publie'")),
         # Une place n'a qu'un quiz publié : la base tranche entre deux approbations simultanées.
         Index("uq_quiz_place_publiee", "place", unique=True, postgresql_where=text("etat = 'publie'")),
     )
@@ -98,6 +121,11 @@ class Quiz(Suivi, Base):
     etat: Mapped[EtatQuiz] = mapped_column(_enum_texte(EtatQuiz, "etat"), default=EtatQuiz.brouillon, index=True)
     parcours: Mapped[str] = mapped_column(String(20), server_default=PARCOURS_JEUX, default=PARCOURS_JEUX)
     place: Mapped[int | None] = mapped_column(Integer)
+    # Quiz Jeux (spec 034) : son niveau (qui fixe ses points), son numéro dans le parcours officiel des 100 défis,
+    # et le lot du Jeu Quiz Santé d'où viennent ses questions.
+    niveau: Mapped[NiveauQuiz | None] = mapped_column(_enum_texte(NiveauQuiz, "niveau"))
+    numero: Mapped[int | None] = mapped_column(Integer)
+    lot: Mapped[int | None] = mapped_column(Integer)
     # Le fascicule de la bibliothèque à lire avant de jouer (certification seulement).
     ressource_id: Mapped[UUID | None] = mapped_column(ForeignKey("ressource.id", ondelete="RESTRICT"))
     # « Contenu de test » : chargé par seed_dev, jamais en prod (RULES).

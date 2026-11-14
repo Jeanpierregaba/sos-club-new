@@ -4,8 +4,9 @@ from uuid import UUID
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field
 
-from app.referentiel.models import FORMAT_CODE, StatutEtablissement, TypeEtablissement
+from app.referentiel.models import FORMAT_CODE, OrdreEnseignement, StatutEtablissement, TypeEtablissement
 from app.referentiel.normalisation import nettoyer
+from app.referentiel.regions import RegionScolaire
 
 
 def _nettoyer_facultatif(valeur: str | None) -> str | None:
@@ -19,6 +20,7 @@ Nom = Annotated[str, Field(max_length=300), AfterValidator(nettoyer)]
 NomComplet = Annotated[str, Field(max_length=400), AfterValidator(lambda v: nettoyer(v, 200))]
 Description = Annotated[str, Field(max_length=600), AfterValidator(lambda v: nettoyer(v, 300))]
 Facultatif = Annotated[str | None, Field(max_length=150), AfterValidator(_nettoyer_facultatif)]
+Prefecture = Annotated[str | None, Field(max_length=100), AfterValidator(_nettoyer_facultatif)]
 Code = Annotated[str, Field(min_length=2, max_length=30, pattern=FORMAT_CODE)]
 Version = Annotated[int, Field(ge=1)]
 
@@ -69,6 +71,8 @@ class EtablissementTrouve(EtablissementPublic):
     dre: str
     # La ville (spec 030) : l'encadreur voit la région et la ville de l'établissement choisi.
     localite: str | None = None
+    # La préfecture (spec 035) : elle distingue deux homonymes dans la recherche.
+    prefecture: str | None = None
 
 
 class EtablissementRattache(BaseModel):
@@ -82,6 +86,8 @@ class EtablissementRattache(BaseModel):
     dre: str
     # La ville de l'établissement (spec 030) : avec la DRE, elle donne la région et la ville d'un encadreur.
     localite: str | None = None
+    # La région de la DRE (spec 033).
+    region: str | None = None
 
 
 class Proposition(BaseModel):
@@ -118,6 +124,7 @@ class DreAdmin(BaseModel):
     code: str
     nom: str
     nom_complet: str
+    region: RegionScolaire
     ordre: int
     actif: bool
     version: int
@@ -137,6 +144,10 @@ class EtablissementAdmin(BaseModel):
     dre_code: str
     dre: str
     modifie_le: datetime
+    # Spec 035 : préfecture, ordre d'enseignement et origine (import de la liste nationale).
+    prefecture: str | None = None
+    ordre: OrdreEnseignement | None = None
+    import_source: str | None = None
     # Élèves rattachés (spec 017) : utile pour décider du sort d'un établissement proposé.
     nb_eleves: int
     nb_encadreurs: int = 0
@@ -168,6 +179,7 @@ class DreCreation(_Entree):
     code: Code
     nom: Nom
     nom_complet: NomComplet
+    region: RegionScolaire
     ordre: int | None = Field(default=None, ge=1, le=99)
 
 
@@ -177,6 +189,7 @@ class DreModification(_Entree):
     version: Version
     nom: Nom | None = None
     nom_complet: NomComplet | None = None
+    region: RegionScolaire | None = None
     ordre: int | None = Field(default=None, ge=1, le=99)
     actif: bool | None = None
 
@@ -200,6 +213,8 @@ class EtablissementCreation(_Entree):
     nom: Nom
     type: TypeEtablissement
     localite: Facultatif = None
+    prefecture: Prefecture = None
+    ordre: OrdreEnseignement | None = None
 
 
 class EtablissementModification(_Entree):
@@ -207,6 +222,8 @@ class EtablissementModification(_Entree):
     nom: Nom | None = None
     type: TypeEtablissement | None = None
     localite: Facultatif = None
+    prefecture: Prefecture = None
+    ordre: OrdreEnseignement | None = None
     iesg_id: UUID | None = None
     # « Proposé » vient de la création d'un club (R4) : il ne se choisit pas ici.
     statut: Literal[StatutEtablissement.actif, StatutEtablissement.inactif] | None = None

@@ -84,23 +84,20 @@ def test_un_refus_porte_toujours_un_motif(
         ajouter(en_base, Adhesion(eleve_id=eleve.id, club_id=club.id, motif_refus="Sans objet."))
 
 
-def test_un_encadreur_peut_avoir_plusieurs_clubs_mais_une_seule_demande_par_club(
+def test_un_encadreur_n_a_qu_un_rattachement_actif(
     club: Any,
     creer_eleve: Callable[..., Utilisateur],
     creer_club: Callable[..., Any],
     creer_encadreur: Callable[..., Utilisateur],
     en_base: Callable[..., Any],
 ) -> None:
+    """Spec 033 (amende Q16) : la base refuse un second rattachement actif, même à un autre club."""
     autre = creer_club(creer_eleve("president2", "Autre Président", dre="kara"), nom="Club de Kara")
     encadreur = creer_encadreur()
-    ajouter(
-        en_base,
-        Rattachement(encadreur_id=encadreur.id, club_id=club.id, etat=EtatRattachement.actif),
-        Rattachement(encadreur_id=encadreur.id, club_id=autre.id, supplementaire=True),
-    )
+    ajouter(en_base, Rattachement(encadreur_id=encadreur.id, club_id=club.id, etat=EtatRattachement.actif))
 
     with pytest.raises(IntegrityError):
-        ajouter(en_base, Rattachement(encadreur_id=encadreur.id, club_id=club.id))
+        ajouter(en_base, Rattachement(encadreur_id=encadreur.id, club_id=autre.id, etat=EtatRattachement.actif))
 
 
 def test_une_seule_passation_en_attente_par_club_meme_chez_lencadreur(

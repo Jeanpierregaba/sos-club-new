@@ -20,7 +20,8 @@ from app.admin.schemas import (
     ProfilEleveAdmin,
     ProfilEncadreurAdmin,
 )
-from app.clubs.models import Club, EtatClub, EtatRattachement, Rattachement
+from app.clubs.affiliations import recalculer_clubs_du_membre
+from app.clubs.models import CLUB_VIVANT, Club, EtatClub, EtatRattachement, Rattachement
 from app.clubs.rattachements import liberer_passation
 from app.comptes.inscription import etablissement_rattache
 from app.comptes.models import Role, StatutCompte, Utilisateur
@@ -156,6 +157,7 @@ async def detail(db: AsyncSession, utilisateur_id: UUID) -> InscritDetail:
             etablissement=await etablissement_rattache(db, eleve.etablissement_id),
             points=await points.resume(db, utilisateur.id, 50),
             club=await _club_de(db, utilisateur.id),
+            ancien_eleve_le=utilisateur.ancien_eleve_le,
         )
         if eleve
         else None
@@ -174,7 +176,7 @@ async def _club_de(db: AsyncSession, utilisateur_id: UUID) -> ClubInscrit | None
         select(Club)
         .where(or_(Club.demandeur_id == utilisateur_id, Club.president_id == utilisateur_id))
         .order_by(
-            case((Club.etat == EtatClub.actif, 0), (Club.etat == EtatClub.en_attente, 1), else_=2),
+            case((Club.etat.in_(CLUB_VIVANT), 0), (Club.etat == EtatClub.en_attente, 1), else_=2),
             Club.demande_le.desc(),
         )
         .limit(1)
@@ -185,7 +187,7 @@ async def _club_de(db: AsyncSession, utilisateur_id: UUID) -> ClubInscrit | None
         id=club.id,
         nom=club.nom,
         etat=club.etat,
-        president=club.president_id == utilisateur_id and club.etat is EtatClub.actif,
+        president=club.president_id == utilisateur_id and club.etat in CLUB_VIVANT,
         motif_refus=club.motif_refus,
     )
 
@@ -235,6 +237,11 @@ async def changer_statut(
             )
             for club_id in clubs.all():
                 await liberer_passation(db, club_id)
+    # Spec 033 : un compte suspendu ne compte plus dans les effectifs de son club ; réactivé, il compte à nouveau.
+    await recalculer_clubs_du_membre(
+        db, utilisateur.id, "compte_suspendu" if nouveau is not StatutCompte.actif else "compte_reactive",
+        auteur.utilisateur.id,
+    )  # fmt: skip
     journaliser(
         db,
         "inscrit_suspendu" if nouveau is StatutCompte.suspendu else "inscrit_reactive",

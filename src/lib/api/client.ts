@@ -31,6 +31,7 @@ export type DreAnnuaire = Schemas["DreAnnuaire"];
 export type EtablissementTrouve = Schemas["EtablissementTrouve"];
 export type TypeEtablissement = Schemas["TypeEtablissement"];
 export type StatutEtablissement = Schemas["StatutEtablissement"];
+export type OrdreEnseignement = Schemas["OrdreEnseignement"];
 export type AxePublic = Schemas["AxePublic"];
 export type DreAdmin = Schemas["DreAdmin"];
 export type IesgAdmin = Schemas["IesgAdmin"];
@@ -79,10 +80,6 @@ export type ClubPublic = Schemas["ClubPublic"];
 export type ClubFiche = Schemas["ClubFiche"];
 export type ClubResume = Schemas["ClubResume"];
 export type MonClub = Schemas["MonClub"];
-export type DemandeClub = Schemas["DemandeClub"];
-export type DemandeClubEntree = Schemas["DemandeClubEntree"];
-export type EncadreurAssocie = Schemas["EncadreurAssocie"];
-export type FileClubs = Schemas["FileClubs"];
 export type FilePassations = Schemas["FilePassations"];
 export type Passation = Schemas["Passation"];
 export type PassationApercu = Schemas["PassationApercu"];
@@ -91,20 +88,32 @@ export type EtatClub = Schemas["EtatClub"];
 export type ClubInscrit = Schemas["ClubInscrit"];
 export type EtablissementRattache = Schemas["EtablissementRattache"];
 export type AdhesionResume = Schemas["AdhesionResume"];
-export type DemandeAdhesion = Schemas["DemandeAdhesion"];
 export type MembreClub = Schemas["MembreClub"];
 export type EncadreurDuClub = Schemas["EncadreurDuClub"];
 export type MembresDuClub = Schemas["MembresDuClub"];
-export type RattachementResume = Schemas["RattachementResume"];
-export type DemandeRattachement = Schemas["DemandeRattachement"];
-export type MesClubs = Schemas["MesClubs"];
 export type PassationAConfirmer = Schemas["PassationAConfirmer"];
 export type AffiliationAValider = Schemas["AffiliationAValider"];
-export type RattachementAValider = Schemas["RattachementAValider"];
 export type FileAffiliations = Schemas["FileAffiliations"];
-export type FileRattachements = Schemas["FileRattachements"];
 export type ResultatLot = Schemas["ResultatLot"];
 export type ElementLot = Schemas["ElementLot"];
+export type RegionScolaire = Schemas["RegionScolaire"];
+export type StatutClub = MonClubSante["statut"];
+export type MonClubSante = Schemas["MonClubSante"];
+export type MembreEquipe = Schemas["MembreEquipe"];
+export type SignalementResume = Schemas["SignalementResume"];
+export type AffiliationDuClub = Schemas["AffiliationDuClub"];
+export type AffiliationsDuClub = Schemas["AffiliationsDuClub"];
+export type ClubSuivi = Schemas["ClubSuivi"];
+export type PageSuivi = Schemas["PageSuivi"];
+export type FicheSuivi = Schemas["FicheSuivi"];
+export type SignalementAdmin = Schemas["SignalementAdmin"];
+export type FileDesistements = Schemas["FileDesistements"];
+export type Seuils = Schemas["Seuils"];
+export type Carte = Schemas["Carte"];
+export type CarteRegion = Schemas["CarteRegion"];
+export type CarteDre = Schemas["CarteDre"];
+export type CarteIesg = Schemas["CarteIesg"];
+export type CarteEtablissement = Schemas["CarteEtablissement"];
 export type EtatQuelAxe = Schemas["EtatQuelAxe"];
 export type PartieQuelAxe = Schemas["PartieQuelAxe"];
 export type QuestionQuelAxe = Schemas["QuestionQuelAxe"];
@@ -410,6 +419,9 @@ export const adminCreerSemestre = (entree: SemestreCreation) =>
 export const adminModifierSemestre = (id: string, entree: SemestreModification) =>
   envoyerJson<SemestreAdmin>(`${POINTS}/semestres/${id}`, entree, "PATCH");
 export const adminListerBareme = () => requeteApi<LigneBaremeAdmin[]>(`${POINTS}/bareme`);
+// Spec 034 : les élèves aux 4 étoiles, éligibles au tirage au sort.
+export type EleveGold = Schemas["EleveGold"];
+export const adminListerGold = () => requeteApi<EleveGold[]>("/api/admin/jeux/gold");
 export const adminModifierBareme = (code: string, entree: LigneBaremeModification) =>
   envoyerJson<LigneBaremeAdmin>(`${POINTS}/bareme/${code}`, entree, "PATCH");
 
@@ -441,83 +453,100 @@ export const adminActiverEncadreur = (id: string, version: number) =>
 export const adminRefuserEncadreur = (id: string, version: number, motif: string) =>
   envoyerJson<DemandeEncadreur>(`${ENCADREURS}/${id}/refuser`, { version, motif });
 
-// Clubs et présidence (spec 019) --------------------------------------------------------------------------
+// Clubs (specs 019, 020 et 033) : un club naît et s'active seul (3 encadreurs + 21 élèves confirmés) -------------
 
-export const demanderClub = (entree: DemandeClubEntree) =>
-  envoyerJson<ClubResume>("/api/clubs/demande", entree);
-export const renvoyerDemandeClub = () => envoyerJson<ClubResume>("/api/clubs/demande/renvoyer");
 export const chargerMonClub = () => requeteApi<MonClub>("/api/clubs/moi");
+export const redemanderAffiliation = () => envoyerJson<MonClub>("/api/clubs/moi/affiliation");
 export const proposerPassation = (pseudonyme: string, version: number) =>
   envoyerJson<PassationApercu>("/api/clubs/moi/passation", { pseudonyme, version });
 export const annulerPassation = () =>
   envoyerJson<PassationApercu>("/api/clubs/moi/passation/annuler");
 
 export const chargerClubsPublics = () => requeteApi<ClubPublic[]>("/api/clubs");
+export const chargerCarteClubs = () => requeteApi<Carte>("/api/clubs/carte");
 export const chargerFicheClub = (id: string) => requeteApi<ClubFiche>(`/api/clubs/${id}`);
 export const chargerClubParEtablissement = (etablissementId: string) =>
   requeteApi<ClubPublic | undefined>(
     avecParametres("/api/clubs/par-etablissement", { etablissement_id: etablissementId }),
   );
 
-const CLUBS_ADMIN = "/api/admin/clubs";
-export const adminFileClubs = (etat: "en_attente" | "refuse") =>
-  requeteApi<FileClubs>(avecParametres(CLUBS_ADMIN, { etat }));
-export const adminActiverClub = (id: string, version: number) =>
-  envoyerJson<DemandeClub>(`${CLUBS_ADMIN}/${id}/activer`, { version });
-export const adminRefuserClub = (id: string, version: number, motif: string) =>
-  envoyerJson<DemandeClub>(`${CLUBS_ADMIN}/${id}/refuser`, { version, motif });
-export const adminFilePassations = () => requeteApi<FilePassations>(`${CLUBS_ADMIN}/passations`);
-export const adminValiderPassation = (id: string, version: number) =>
-  envoyerJson<Passation>(`${CLUBS_ADMIN}/passations/${id}/valider`, { version });
-export const adminRefuserPassation = (id: string, version: number, motif: string) =>
-  envoyerJson<Passation>(`${CLUBS_ADMIN}/passations/${id}/refuser`, { version, motif });
-
-// Affiliations et rattachements (spec 020) ------------------------------------------------------------------
-
 const club = (id: string) => `/api/clubs/${id}`;
-
-export const demanderAdhesion = (clubId: string) =>
-  envoyerJson<AdhesionResume>(`${club(clubId)}/adhesions`);
-export const quitterClub = (clubId: string) =>
-  envoyerJson<AdhesionResume>(`${club(clubId)}/adhesions/moi`, undefined, "DELETE");
-export const chargerDemandesAdhesion = (clubId: string) =>
-  requeteApi<DemandeAdhesion[]>(`${club(clubId)}/adhesions/demandes`);
-export const confirmerAdhesion = (clubId: string, id: string, version: number) =>
-  envoyerJson<AdhesionResume>(`${club(clubId)}/adhesions/${id}/confirmer`, { version });
-export const refuserAdhesion = (clubId: string, id: string, version: number, motif: string) =>
-  envoyerJson<AdhesionResume>(`${club(clubId)}/adhesions/${id}/refuser`, { version, motif });
-export const retirerMembre = (clubId: string, id: string, version: number, motif?: string) =>
-  envoyerJson<AdhesionResume>(`${club(clubId)}/adhesions/${id}/retirer`, {
-    version,
-    motif: motif || null,
-  });
 export const chargerMembres = (clubId: string) =>
   requeteApi<MembresDuClub>(`${club(clubId)}/membres`);
-
-export const demanderRattachement = (clubId: string) =>
-  envoyerJson<RattachementResume>(`${club(clubId)}/rattachements`);
-export const quitterClubEncadre = (clubId: string) =>
-  envoyerJson<RattachementResume>(`${club(clubId)}/rattachements/moi`, undefined, "DELETE");
-export const chargerDemandesRattachement = (clubId: string) =>
-  requeteApi<DemandeRattachement[]>(`${club(clubId)}/rattachements/demandes`);
-export const confirmerRattachement = (clubId: string, id: string, version: number) =>
-  envoyerJson<RattachementResume>(`${club(clubId)}/rattachements/${id}/confirmer`, { version });
-export const refuserRattachement = (clubId: string, id: string, version: number, motif: string) =>
-  envoyerJson<RattachementResume>(`${club(clubId)}/rattachements/${id}/refuser`, {
-    version,
-    motif,
-  });
-export const retirerEncadreur = (clubId: string, id: string, version: number, motif?: string) =>
-  envoyerJson<RattachementResume>(`${club(clubId)}/rattachements/${id}/retirer`, {
-    version,
-    motif: motif || null,
-  });
-export const chargerMesClubs = () => requeteApi<MesClubs>("/api/encadreurs/moi/clubs");
 export const confirmerPassationEncadreur = (clubId: string, version: number) =>
   envoyerJson<PassationAConfirmer>(`${club(clubId)}/passation/confirmer`, { version });
 export const refuserPassationEncadreur = (clubId: string, version: number, motif: string) =>
   envoyerJson<PassationAConfirmer>(`${club(clubId)}/passation/refuser`, { version, motif });
 
+// « Mon Club Santé » de l'encadreur (spec 033).
+const MON_CLUB_SANTE = "/api/clubs/mon-club-sante";
+export const chargerMonClubSante = () => requeteApi<MonClubSante>(MON_CLUB_SANTE);
+export const chargerAffiliationsDuClub = () =>
+  requeteApi<AffiliationsDuClub>(`${MON_CLUB_SANTE}/affiliations`);
+export const deciderAffiliation = (
+  id: string,
+  decision: "confirmer" | "refuser" | "retirer",
+  version: number,
+  motif?: string,
+) =>
+  envoyerJson<AffiliationsDuClub>(
+    `${MON_CLUB_SANTE}/affiliations/${id}/${decision}`,
+    decision === "confirmer" ? { version } : { version, motif },
+  );
+export const signalerDesistement = (encadreurId: string, motif: string) =>
+  envoyerJson<SignalementResume>(`${MON_CLUB_SANTE}/desistements`, {
+    encadreur_id: encadreurId,
+    motif,
+  });
+export const proposerPresident = (affiliationId: string) =>
+  envoyerJson<MonClubSante>(`${MON_CLUB_SANTE}/president`, { affiliation_id: affiliationId });
+
+// Suivi des clubs par l'équipe (spec 033).
+const CLUBS_ADMIN = "/api/admin/clubs";
+export type FiltresSuivi = {
+  statut?: StatutClub | undefined;
+  region?: RegionScolaire | undefined;
+  dre?: string | undefined;
+  recherche?: string | undefined;
+  terrain?: boolean | undefined;
+  page?: number | undefined;
+};
+export const adminSuiviClubs = (filtres: FiltresSuivi) =>
+  requeteApi<PageSuivi>(
+    avecParametres(`${CLUBS_ADMIN}/suivi`, {
+      statut: filtres.statut,
+      region: filtres.region,
+      dre: filtres.dre,
+      recherche: filtres.recherche || undefined,
+      terrain: filtres.terrain === undefined ? undefined : String(filtres.terrain),
+      page: filtres.page ? String(filtres.page) : undefined,
+    }),
+  );
+export const adminFicheSuivi = (id: string) => requeteApi<FicheSuivi>(`${CLUBS_ADMIN}/${id}/suivi`);
+export const adminDeclarerTerrain = (id: string, declare: boolean, note: string, version: number) =>
+  envoyerJson<FicheSuivi>(`${CLUBS_ADMIN}/${id}/terrain`, {
+    declare,
+    note: note.trim() || null,
+    version,
+  });
+export const adminSeuilsClubs = () => requeteApi<Seuils>(`${CLUBS_ADMIN}/seuils`);
+export const adminFileDesistements = () =>
+  requeteApi<FileDesistements>(`${CLUBS_ADMIN}/desistements`);
+export const adminDeciderDesistement = (
+  id: string,
+  decision: "confirmer" | "rejeter",
+  version: number,
+  motif?: string,
+) =>
+  envoyerJson<FileDesistements>(
+    `${CLUBS_ADMIN}/desistements/${id}/${decision}`,
+    decision === "rejeter" ? { version, motif } : { version },
+  );
+export const adminFilePassations = () => requeteApi<FilePassations>(`${CLUBS_ADMIN}/passations`);
+export const adminValiderPassation = (id: string, version: number) =>
+  envoyerJson<Passation>(`${CLUBS_ADMIN}/passations/${id}/valider`, { version });
+export const adminRefuserPassation = (id: string, version: number, motif: string) =>
+  envoyerJson<Passation>(`${CLUBS_ADMIN}/passations/${id}/refuser`, { version, motif });
 export const adminFileAffiliations = () =>
   requeteApi<FileAffiliations>(`${CLUBS_ADMIN}/affiliations`);
 export const adminDeciderAffiliations = (
@@ -527,17 +556,6 @@ export const adminDeciderAffiliations = (
 ) =>
   envoyerJson<ResultatLot>(
     `${CLUBS_ADMIN}/affiliations/${decision}`,
-    decision === "refuser" ? { elements, motif } : { elements },
-  );
-export const adminFileRattachements = () =>
-  requeteApi<FileRattachements>(`${CLUBS_ADMIN}/rattachements`);
-export const adminDeciderRattachements = (
-  decision: "valider" | "refuser",
-  elements: ElementLot[],
-  motif?: string,
-) =>
-  envoyerJson<ResultatLot>(
-    `${CLUBS_ADMIN}/rattachements/${decision}`,
     decision === "refuser" ? { elements, motif } : { elements },
   );
 
@@ -716,6 +734,25 @@ export const lancerQuiz = (quizId: string) =>
 export type CatalogueQuiz = Schemas["CatalogueQuiz"];
 export type QuizOuvert = Schemas["QuizOuvert"];
 export const chargerCatalogueJeux = () => requeteApi<CatalogueQuiz>("/api/jeux/quiz");
+// Spec 034 : la progression de l'élève dans les 100 quiz (étoiles, sous-totaux, carte Gold).
+export type ProgressionJeux = Schemas["ProgressionJeux"];
+export const chargerProgressionJeux = () =>
+  requeteApi<ProgressionJeux>("/api/jeux/quiz/progression");
+// Spec 034, lot 4 : le tableau de bord annuel de l'élève, le total de son club, les années académiques.
+export type TableauGamification = Schemas["TableauGamification"];
+export const chargerMaGamification = () =>
+  requeteApi<TableauGamification>("/api/eleves/moi/gamification");
+export type PointsDuClub = Schemas["PointsDuClub"];
+export const chargerPointsDuClub = () => requeteApi<PointsDuClub>("/api/points/mon-club");
+export type AnneeAdmin = Schemas["AnneeAdmin"];
+export type AnneeCreation = Schemas["AnneeCreation"];
+export const adminListerAnnees = () => requeteApi<AnneeAdmin[]>("/api/admin/points/annees");
+export const adminCreerAnnee = (entree: AnneeCreation) =>
+  envoyerJson<AnneeAdmin>("/api/admin/points/annees", entree);
+export const adminCloturerAnnee = (id: string) =>
+  envoyerJson<AnneeAdmin>(`/api/admin/points/annees/${id}/cloture`);
+export const adminPasserAncienEleve = (id: string) =>
+  envoyerJson<null>(`/api/admin/points/anciens-eleves/${id}`);
 export const lancerQuizOuvert = (quizId: string) =>
   envoyerJson<EtatPartie>(`/api/jeux/quiz/${quizId}/tentatives`);
 export const partieSansCompte: AppelsPartie = {

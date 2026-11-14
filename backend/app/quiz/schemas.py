@@ -80,7 +80,8 @@ class QuizJoueur(BaseModel):
     publie_le: datetime | None
     reussi: bool
     meilleur_score: int | None
-    tentatives_restantes: int
+    # Nul : aucun plafond quotidien.
+    tentatives_restantes: int | None
     # La partie en cours du joueur sur ce quiz, à reprendre (la liste clôt d'abord les parties abandonnées).
     tentative_en_cours: UUID | None = None
 

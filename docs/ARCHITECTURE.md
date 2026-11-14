@@ -147,7 +147,7 @@ Champs structurants :
   a_corriger, refuse, publie, depublie), `version_publiee_id` (seule source de ce qui est en ligne),
   `version_travail_id`, l'`adresse` publique (fixée à la première approbation), l'axe et `afficher_club` de la
   version en ligne, `dre_code` (copiée à la soumission, périmètre de la file) et `club_beneficiaire_id` (club de
-  l'élève affilié à la première approbation, que R13 créditera). Les champs du type vivent dans
+  l'élève affilié à la première approbation, qui reçoit la moitié de ses points, spec 034). Les champs du type vivent dans
   `version_contenu.donnees` (JSONB, validés par le schéma du type à chaque écriture) ; une version soumise ne
   change plus. Chaque décision (approuver, corriger, refuser, depublier) a sa ligne, motif obligatoire sauf
   pour approuver.
@@ -158,13 +158,16 @@ Champs structurants :
   placements de la précédente.
 - `notification` (spec 023) : `utilisateur_id`, `type`, `titre`, `message`, `lien`, `lue_le`. Écrite dans la
   transaction de l'événement ; seul son destinataire la lit.
-- `mouvement_points` (spec 017, ADR-0004) : `utilisateur_id` (R4 ajoutera `club_id`), `action` (code du
-  barème), `montant` copié du barème au moment du gain, `semestre_id` (nul hors semestre), `cle` unique
-  d'idempotence, `valide_par`, `annule_id` (une annulation est une ligne négative), `cree_le`. Jamais
-  modifié ni supprimé. Seule la fonction `points.service.crediter` y écrit.
-- `bareme` (spec 017) : une ligne par action et par bénéficiaire (`eleve.bienvenue`, `club.quiz_eleve`…),
+- `mouvement_points` (spec 017, ADR-0004) : `utilisateur_id`, `action` (code du barème), `montant` copié du
+  barème au moment du gain, `semestre_id` (nul hors semestre), `cle` unique d'idempotence, `valide_par`,
+  `annule_id` (une annulation est une ligne négative), `cree_le`. Spec 034 (ADR-0012) : `club_id` et
+  `demi_points_club`, la part du club d'un élève affilié à un club en service, toujours égale au montant en
+  demi-points (contrainte `demi_points_club = montant`, index partiel sur `club_id`). Jamais modifié ni
+  supprimé. Seule la fonction `points.service.crediter` y écrit.
+- `bareme` (spec 017) : une ligne par action et par bénéficiaire (`eleve.bienvenue`, `eleve.quiz_expert`…),
   `montant` réglable, `propose` (montant à valider, Q22), `en_service` (une spec livrée l'écrit déjà),
-  `actif`. Préremplie avec la grille du PRD.
+  `actif`, et depuis la spec 034 `parcours` (certification, jeux, vie) et `sous_compte` (quiz ou étoiles).
+  Préremplie avec la grille du PRD.
 - `semestre` (spec 017) : `libelle`, `debut`, `fin` (dates de Lomé, UTC+0). Une contrainte d'exclusion
   interdit deux semestres qui se chevauchent ; un semestre commencé ne se modifie plus, sauf pour
   prolonger un semestre en cours.

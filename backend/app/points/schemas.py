@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field, model_validator
 
-from app.points.models import MONTANT_MAX, Beneficiaire
+from app.points.models import MONTANT_MAX, Beneficiaire, Parcours, SousCompte
 from app.referentiel.normalisation import nettoyer
 
 Libelle = Annotated[str, AfterValidator(lambda valeur: nettoyer(valeur, 60))]
@@ -53,6 +53,9 @@ class LigneBaremeAdmin(BaseModel):
     beneficiaire: Beneficiaire
     libelle: str
     montant: int
+    # Spec 034 : le parcours de l'élève, et pour les Jeux le sous-compte (quiz ou étoiles).
+    parcours: Parcours | None
+    sous_compte: SousCompte | None
     propose: bool
     en_service: bool
     actif: bool

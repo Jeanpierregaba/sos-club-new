@@ -48,7 +48,7 @@ encore vers des pages absentes.
 | Rejoindre       | `/rejoindre`, `/connexion` | Choix du profil et formulaires                          | S'inscrire, se connecter           |
 | Passeport Santé | `/passeport`               | Points, badges, quiz réussis                            | Soumettre un témoignage            |
 | Console du club | `/console`                 | Score, élèves, articles et état de modération, agenda   | Publier, retirer un élève          |
-| Console admin   | `/admin`                   | Modération, clubs à valider, contenus, badges, chiffres | Approuver, rejeter, publier        |
+| Console admin   | `/admin`                   | Modération, suivi des clubs, contenus, badges, chiffres | Approuver, rejeter, publier        |
 
 Les routes publiques sont rendues côté serveur ; le menu masque ce qui ne concerne pas le rôle.
 
@@ -80,3 +80,18 @@ un ordinateur.
 Français, tutoiement partout (élèves, encadreurs, admin), sans exception. Phrases courtes et
 encourageantes. Les messages d'erreur disent quoi faire ensuite. Les contenus médicaux restent factuels,
 sans dramatiser. Aucun texte en anglais visible, y compris les pages d'erreur.
+
+## Statuts des clubs (spec 033)
+
+Une pastille arrondie, toujours accompagnée de son libellé (jamais la couleur seule) :
+
+| Statut            | Libellé           | Classes                         |
+| ----------------- | ----------------- | ------------------------------- |
+| Sans club         | Référencé         | `bg-mist text-muted-foreground` |
+| En constitution   | En constitution   | `bg-sun/30 text-ink`            |
+| Actif             | Club actif        | `bg-primary/10 text-primary`    |
+| En régularisation | En régularisation | `bg-sun/60 text-ink`            |
+| Suspendu          | Suspendu          | `bg-logo-red/10 text-logo-red`  |
+
+Sur la carte publique, un club en régularisation se montre « Club actif ». Les effectifs face aux seuils (3
+encadreurs, 21 élèves) se lisent sur des jauges avec `role="progressbar"` dans « Mon Club Santé ».

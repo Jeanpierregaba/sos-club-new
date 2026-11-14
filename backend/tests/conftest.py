@@ -295,6 +295,9 @@ class Navigateur:
     def delete(self, url: str, **options: Any) -> Any:
         return self.request("DELETE", url, **options)
 
+    def patch(self, url: str, **options: Any) -> Any:
+        return self.request("PATCH", url, **options)
+
 
 VERIFICATION_CLUBS = {
     ("tableau_de_bord", "consulter"),

@@ -1,6 +1,16 @@
 import { useState, type CSSProperties } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, Clock, Crown, Gamepad2, GraduationCap, Medal, UserPlus } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  Crown,
+  Gamepad2,
+  GraduationCap,
+  Medal,
+  Star,
+  UserPlus,
+} from "lucide-react";
 import { EnTete } from "@/components/EnTete";
 import { FilAriane } from "@/components/FilAriane";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -9,8 +19,14 @@ import { SiteMotion, retard } from "@/components/SiteMotion";
 import { DecorAnime } from "@/components/DecorAnime";
 import { DefiQuiz, type Defi } from "@/components/quiz/DefiQuiz";
 import { chargerCatalogueJeux, type CatalogueQuiz } from "@/lib/api/client";
-import { BAREME, points } from "@/lib/bareme";
-import { niveauDe, poles, type Niveau } from "@/lib/quiz";
+import {
+  MAX_POINTS_ETOILES,
+  MAX_POINTS_QUIZ,
+  NIVEAUX_JEUX,
+  points,
+  type NiveauJeux,
+} from "@/lib/bareme";
+import { niveauParNumero, poles } from "@/lib/quiz";
 import mascottesVs from "@/assets/mascottes-vs.webp";
 import mascottesTrophees from "@/assets/mascottes-trophees.webp";
 
@@ -34,14 +50,13 @@ export const Route = createFileRoute("/jeux")({
 // Numéro de chaque quiz dans le parcours (1 à 100) : les pôles se suivent.
 const departs = poles.map((_, i) => poles.slice(0, i).reduce((n, p) => n + p.quiz.length, 1));
 const totalQuiz = poles.reduce((n, p) => n + p.quiz.length, 0);
-const totalPoints = poles.reduce((n, p) => n + p.quiz.reduce((m, q) => m + q[1], 0), 0);
 
+// Spec 034 : 10 000 points de quiz et 6 000 points d'étoiles au plus, pour l'élève ; la moitié pour son club.
 const chiffres = [
   { n: totalQuiz, t: "Quiz défis" },
   { n: 922, t: "Questions" },
-  { n: "9/10", t: "Pour valider" },
-  // Séparateur des milliers écrit à la main : Intl varie d'un moteur à l'autre et ferait diverger serveur et navigateur.
-  { n: `+${String(totalPoints).replace(/\B(?=(\d{3})+$)/g, " ")}`, t: "Points à gagner" },
+  { n: NIVEAUX_JEUX.length, t: "Niveaux, 4 étoiles" },
+  { n: points(MAX_POINTS_QUIZ + MAX_POINTS_ETOILES), t: "Points à gagner" },
   { n: poles.length, t: "Pôles santé" },
 ];
 
@@ -72,19 +87,20 @@ const etapes = [
   },
 ];
 
-// Le niveau dit la difficulté, pas les points : tout quiz réussi rapporte le même barème (spec 022).
-const niveaux: { n: Niveau; c: string }[] = [
-  { n: "Débutant", c: "bg-primary/15 text-primary" },
-  { n: "Intermédiaire", c: "bg-sky/15 text-sky" },
-  { n: "Avancé", c: "bg-tangerine/15 text-tangerine" },
-  { n: "Championnat", c: "bg-grape/15 text-grape" },
-];
+// Spec 034 : le niveau fixe les points d'un quiz réussi et l'étoile à laquelle il compte.
+const COULEURS: Record<NiveauJeux, string> = {
+  debutant: "bg-primary/15 text-primary",
+  intermediaire: "bg-sky/15 text-sky",
+  avance: "bg-tangerine/15 text-tangerine",
+  expert: "bg-grape/15 text-grape",
+};
+const niveauDe = (code: NiveauJeux) =>
+  NIVEAUX_JEUX.find((x) => x.code === code) ?? NIVEAUX_JEUX[0]!;
 
-// Les quiz chargés depuis le document officiel portent leur lot au début de la description : « Lot 3 — … ».
-// Les défis d'un pôle se répartissent tour à tour sur les quiz du lot du pôle (décision du 2026-11-10).
-function quizDuLot(catalogue: CatalogueQuiz | null, lot: number) {
-  return (catalogue?.quiz ?? []).filter(
-    (q) => /^Lot (\d+)/.exec(q.description)?.[1] === String(lot),
+// Chaque défi a son quiz côté serveur, retrouvé par son numéro dans le parcours officiel (spec 034).
+function quizParNumero(catalogue: CatalogueQuiz | null) {
+  return new Map(
+    (catalogue?.quiz ?? []).flatMap((q) => (q.numero ? [[q.numero, q] as const] : [])),
   );
 }
 
@@ -92,16 +108,22 @@ function Jeux() {
   const catalogue = Route.useLoaderData();
   const [pole, setPole] = useState(2);
   const [defi, setDefi] = useState<Defi | null>(null);
-  const [niveau, setNiveau] = useState<Niveau | null>(null);
+  const [niveau, setNiveau] = useState<NiveauJeux | null>(null);
   const p = poles[pole] ?? poles[0]!;
-  const jouables = quizDuLot(catalogue, p.lot);
+  const jouables = quizParNumero(catalogue);
+  const reussis = new Set(catalogue?.progression?.reussis ?? []);
   const quiz = p.quiz
-    .map(([t, cotation], i) => ({
-      t,
-      n: (departs[pole] ?? 1) + i,
-      niveau: niveauDe(cotation),
-      quiz: jouables[i % Math.max(jouables.length, 1)],
-    }))
+    .map(([t], i) => {
+      const n = (departs[pole] ?? 1) + i;
+      const serveur = jouables.get(n);
+      return {
+        t,
+        n,
+        niveau: serveur?.niveau ?? niveauParNumero.get(n) ?? "debutant",
+        quiz: serveur,
+        reussi: serveur ? reussis.has(serveur.id) : false,
+      };
+    })
     .filter((q) => !niveau || q.niveau === niveau);
 
   return (
@@ -206,9 +228,14 @@ function Jeux() {
           bleu={`Les ${totalQuiz} quiz`}
           vert="de gamification"
         >
-          Chaque quiz compte exactement 10 questions issues des 922 QCM officiels. Chrono de 20 s
-          par question, et 9/10 minimum pour valider !
+          {catalogue
+            ? `Chaque quiz tire ${catalogue.nb_questions} questions des 922 QCM officiels. Chrono de ${catalogue.temps_ms / 1000} s par question, et ${catalogue.seuil}/${catalogue.nb_questions} minimum pour valider !`
+            : "Chaque quiz tire ses questions des 922 QCM officiels, avec un chrono par question."}{" "}
+          Réussis tous les quiz d’un niveau pour décrocher son étoile, et les 4 étoiles pour ta
+          carte Gold.
         </EnTete>
+
+        {catalogue?.progression && <ProgressionJeux progression={catalogue.progression} />}
 
         <div
           role="group"
@@ -282,29 +309,36 @@ function Jeux() {
           <div className="p-6 md:p-8">
             <div className="flex flex-wrap items-center gap-2">
               <span className="mr-2 text-sm font-extrabold">Difficulté :</span>
-              {[null, ...niveaux].map((x) => {
-                const on = niveau === (x?.n ?? null);
+              {[null, ...NIVEAUX_JEUX].map((x) => {
+                const on = niveau === (x?.code ?? null);
                 return (
                   <button
-                    key={x?.n ?? "toutes"}
+                    key={x?.code ?? "toutes"}
                     type="button"
                     aria-pressed={on}
-                    onClick={() => setNiveau(x?.n ?? null)}
+                    onClick={() => setNiveau(x?.code ?? null)}
                     className={`rounded-full px-3.5 py-1.5 text-sm font-bold transition ${
                       on ? "bg-ink text-white" : "bg-mist-soft ring-1 ring-border hover:ring-ink/30"
                     }`}
                   >
-                    {x ? x.n : "Toutes"}
+                    {x ? x.nom : "Toutes"}
                   </button>
                 );
               })}
             </div>
 
             <p className="mt-4 rounded-2xl bg-mist-soft px-4 py-3 text-sm font-semibold text-ink/80">
-              Chaque quiz réussi pour la première fois rapporte{" "}
-              <strong className="text-ink">{points(BAREME.quiz.eleve)} points</strong>, et{" "}
-              {points(BAREME.quiz.club)} à ton Club Santé si tu y es affilié. Rejouer un quiz déjà
-              réussi ne rapporte rien de plus.
+              Un quiz réussi pour la première fois rapporte selon son niveau :{" "}
+              {NIVEAUX_JEUX.map((x, i) => (
+                <span key={x.code}>
+                  {i > 0 && ", "}
+                  <strong className="text-ink">
+                    {x.nom} {points(x.eleve)}
+                  </strong>
+                </span>
+              ))}
+              . Ton Club Santé reçoit la moitié si tu y es affilié. Rejouer un quiz déjà réussi ne
+              rapporte rien de plus.
             </p>
 
             {quiz.length === 0 ? (
@@ -322,23 +356,35 @@ function Jeux() {
                       <span className="font-display text-lg text-(color:--c)">
                         Quiz {String(q.n).padStart(2, "0")}
                       </span>
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-[11px] font-extrabold uppercase ${niveaux.find((x) => x.n === q.niveau)?.c ?? ""}`}
-                      >
-                        {q.niveau}
+                      <span className="flex items-center gap-1.5">
+                        {q.reussi && (
+                          <CheckCircle2
+                            role="img"
+                            aria-label="Déjà réussi"
+                            className="size-4 text-primary"
+                          />
+                        )}
+                        <span
+                          className={`rounded-full px-2.5 py-0.5 text-[11px] font-extrabold uppercase ${COULEURS[q.niveau]}`}
+                        >
+                          {niveauDe(q.niveau).nom}
+                        </span>
                       </span>
                     </div>
                     <p className="mt-3 flex-1 font-extrabold leading-snug">{q.t}</p>
                     <p className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-                      <Clock className="size-3.5" /> 10 QCM · 20 s par question
+                      <Clock className="size-3.5" />{" "}
+                      {catalogue
+                        ? `${catalogue.nb_questions} QCM · ${catalogue.temps_ms / 1000} s par question`
+                        : "QCM chronométrés"}
                     </p>
                     <div className="mt-4 flex items-center justify-between gap-3 border-t pt-4">
                       <span className="leading-tight">
                         <span className="block font-display text-xl text-sun [text-shadow:0_1px_0_var(--ink)]">
-                          {points(BAREME.quiz.eleve)} pts
+                          {points(niveauDe(q.niveau).eleve)} pts
                         </span>
                         <span className="block text-[11px] font-bold text-muted-foreground">
-                          {points(BAREME.quiz.club)} pour ton club
+                          {points(niveauDe(q.niveau).eleve / 2)} pour ton club
                         </span>
                       </span>
                       {q.quiz ? (
@@ -411,7 +457,7 @@ function Jeux() {
               Gagne jusqu’à <span className="text-logo-blue">1 million FCFA</span> !
             </h2>
             <p className="mt-4 max-w-xl text-lg font-semibold text-ink/75">
-              Relève le défi des 12 quiz santé, décroche ton certificat officiel Génie Imhotep et
+              Relève le défi des 20 quiz santé, décroche ton certificat officiel Génie Imhotep et
               tes badges, et tente de remporter des lots exceptionnels.
             </p>
             <a
@@ -435,6 +481,62 @@ function Jeux() {
       {catalogue && <DefiQuiz defi={defi} catalogue={catalogue} onFermer={() => setDefi(null)} />}
 
       <SiteFooter />
+    </div>
+  );
+}
+
+// La progression d'un élève connecté (spec 034) : quiz réussis, les 4 étoiles, les deux sous-totaux et la carte Gold.
+function ProgressionJeux({
+  progression,
+}: {
+  progression: NonNullable<CatalogueQuiz["progression"]>;
+}) {
+  return (
+    <div className="mt-8 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-border md:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <p className="font-display text-2xl text-logo-blue">
+          {progression.quiz_reussis}{" "}
+          <span className="text-base text-ink/70">/ {totalQuiz} quiz réussis</span>
+        </p>
+        {progression.gold && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-sun px-4 py-1.5 text-sm font-extrabold text-ink">
+            <Crown className="size-4" /> Carte Gold
+          </span>
+        )}
+      </div>
+      <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {progression.niveaux.map((n, i) => (
+          <li key={n.niveau} className="flex items-center gap-3 rounded-2xl bg-mist-soft p-4">
+            <Star
+              aria-hidden
+              className={`size-8 shrink-0 ${n.etoile ? "fill-sun text-sun" : "text-ink/25"}`}
+            />
+            <span className="leading-tight">
+              <span className="block text-sm font-extrabold">
+                Étoile {i + 1} · {niveauDe(n.niveau).nom}
+              </span>
+              <span className="block text-xs font-semibold text-muted-foreground">
+                {n.etoile ? "Débloquée" : `${n.reussis} / ${n.total} quiz réussis`}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+      <dl className="mt-5 grid grid-cols-3 gap-3 text-center">
+        {[
+          { t: "Points des quiz", v: progression.points_quiz, max: MAX_POINTS_QUIZ },
+          { t: "Points des étoiles", v: progression.points_etoiles, max: MAX_POINTS_ETOILES },
+          { t: "Total Jeux", v: progression.total, max: MAX_POINTS_QUIZ + MAX_POINTS_ETOILES },
+        ].map((x) => (
+          <div key={x.t} className="rounded-2xl ring-1 ring-border p-3">
+            <dt className="text-xs font-bold text-muted-foreground">{x.t}</dt>
+            <dd className="font-display text-xl text-ink tabular-nums">
+              {points(x.v).slice(1)}{" "}
+              <span className="text-xs text-muted-foreground">/ {points(x.max).slice(1)}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
     </div>
   );
 }

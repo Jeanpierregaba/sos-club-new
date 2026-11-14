@@ -229,7 +229,7 @@
       stroke-dashoffset: -120;
     }
   }
-  /* Les 12 segments de l'anneau de la certification s'allument l'un après l'autre. */
+  /* Les 20 segments de l'anneau de la certification s'allument l'un après l'autre. */
   --animate-allume: allume 6s ease-in-out infinite;
   @keyframes allume {
     0%,

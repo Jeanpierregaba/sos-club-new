@@ -23,7 +23,15 @@ from app.comptes.models import StatutCompte, Utilisateur
 from app.comptes.service import VIOLATION_UNICITE
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur
-from app.referentiel.models import Axe, Dre, Etablissement, Iesg, StatutEtablissement, TypeEtablissement
+from app.referentiel.models import (
+    Axe,
+    Dre,
+    Etablissement,
+    Iesg,
+    OrdreEnseignement,
+    StatutEtablissement,
+    TypeEtablissement,
+)
 from app.referentiel.normalisation import normaliser
 from app.referentiel.schemas import (
     AxeAdmin,
@@ -223,6 +231,7 @@ async def lister_dre(db: AsyncSession, acces: Acces, code: str | None = None) ->
                 code=dre.code,
                 nom=dre.nom,
                 nom_complet=dre.nom_complet,
+                region=dre.region,
                 ordre=dre.ordre,
                 actif=dre.actif,
                 version=dre.version,
@@ -243,6 +252,7 @@ async def creer_dre(db: AsyncSession, acces: Acces, entree: DreCreation, ip: str
         nom=entree.nom,
         nom_normalise=normaliser(entree.nom),
         nom_complet=entree.nom_complet,
+        region=entree.region,
         ordre=entree.ordre or await _prochain_ordre(db, Dre.ordre),
         actif=True,
     )
@@ -250,7 +260,10 @@ async def creer_dre(db: AsyncSession, acces: Acces, entree: DreCreation, ip: str
         raise Refus(DOUBLONS["pk_dre"], 409)
     db.add(dre)
     await _ecrire(db)
-    apres = {"code": dre.code, "nom": dre.nom, "nom_complet": dre.nom_complet, "ordre": dre.ordre}
+    apres = {
+        "code": dre.code, "nom": dre.nom, "nom_complet": dre.nom_complet, "region": dre.region.value,
+        "ordre": dre.ordre,
+    }  # fmt: skip
     _journaliser(db, acces, "dre", dre.code, dre.code, {}, apres, ip=ip, creation=True)
     await db.commit()
     return await _une_dre(db, acces, dre.code)
@@ -368,6 +381,9 @@ def _etablissement_admin(
         dre_code=dre.code,
         dre=dre.nom,
         modifie_le=etablissement.modifie_le,
+        prefecture=etablissement.prefecture,
+        ordre=etablissement.ordre,
+        import_source=etablissement.import_source,
         nb_eleves=inscrits[0],
         nb_encadreurs=inscrits[1],
     )
@@ -384,6 +400,9 @@ async def lister_etablissements(
     statut: StatutEtablissement | None,
     page: int,
     par_page: int,
+    ordre: OrdreEnseignement | None = None,
+    prefecture: str | None = None,
+    importes: bool | None = None,
 ) -> PageEtablissements:
     requete = (
         select(Etablissement, Iesg, Dre)
@@ -402,6 +421,15 @@ async def lister_etablissements(
         requete = requete.where(Etablissement.type == type_)
     if statut:
         requete = requete.where(Etablissement.statut == statut)
+    if ordre:
+        requete = requete.where(Etablissement.ordre == ordre)
+    if prefecture:
+        # Les préfectures ont une graphie officielle (spec 035) : le back office les propose dans une liste fermée.
+        requete = requete.where(Etablissement.prefecture == prefecture.strip())
+    if importes is not None:
+        # Spec 035 : les établissements créés par l'import de la liste nationale, pour repérer les doublons.
+        importe = Etablissement.import_source.is_not(None)
+        requete = requete.where(importe if importes else ~importe)
     total = await db.scalar(select(func.count()).select_from(requete.subquery())) or 0
     lignes = (
         await db.execute(
@@ -453,11 +481,19 @@ async def creer_etablissement(
         nom_normalise=normaliser(entree.nom),
         type=entree.type,
         localite=entree.localite,
+        prefecture=entree.prefecture,
+        ordre=entree.ordre,
         statut=StatutEtablissement.actif,
     )
     db.add(etablissement)
     await _ecrire(db)
-    apres = {"iesg_id": str(iesg.id), "nom": etablissement.nom, "type": etablissement.type.value}
+    apres = {
+        "iesg_id": str(iesg.id),
+        "nom": etablissement.nom,
+        "type": etablissement.type.value,
+        "prefecture": etablissement.prefecture,
+        "ordre": etablissement.ordre.value if etablissement.ordre else None,
+    }
     _journaliser(db, acces, "etablissement", etablissement.id, iesg.dre_code, {}, apres, ip=ip, creation=True)
     await db.commit()
     return await _detail_etablissement(db, etablissement.id)
@@ -470,7 +506,7 @@ async def modifier_etablissement(
     iesg = await _obtenir(db, Iesg, etablissement.iesg_id)
     _dans_perimetre(acces, iesg.dre_code)
     _verifier_version(etablissement, entree.version)
-    changements = _changements(entree, effacables=("localite",))
+    changements = _changements(entree, effacables=("localite", "prefecture", "ordre"))
     if changements.get("iesg_id") not in (None, iesg.id):
         iesg = await _iesg_cible(db, acces, changements["iesg_id"])
     reactivation = (
@@ -515,6 +551,10 @@ async def remplacer_proposition(
     )
     proposition.statut = StatutEtablissement.inactif
     await _ecrire(db)
+    # Spec 033 : le club de la proposition et ses membres rejoignent le club du bon établissement.
+    from app.clubs.affiliations import remplacer_etablissement
+
+    await remplacer_etablissement(db, proposition.id, cible.id, acces.utilisateur, ip)
     journaliser(
         db, "etablissement_remplace", acces.utilisateur, cible_type="etablissement", cible_id=proposition.id,
         perimetre=iesg.dre_code,

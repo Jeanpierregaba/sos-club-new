@@ -1,4 +1,5 @@
-"""Barème harmonisé (spec 022, tâche 1) : les montants du référentiel du 2026-11-05."""
+"""Barème harmonisé (spec 022, tâche 1), puis spec 034 : les lignes `club.*_eleve` sont désactivées au profit de la
+part du club à 50 % (ADR-0012)."""
 
 from collections.abc import Callable
 from pathlib import Path
@@ -21,15 +22,6 @@ ATTENDU = {
     "eleve.question_jour": 20,
     "eleve.badge": 500,
     "eleve.certification": 1000,
-    "club.bienvenue_eleve": 50,
-    "club.commentaire_eleve": 20,
-    "club.republication_eleve": 2,
-    "club.article_eleve": 20,
-    "club.partage_eleve": 2,
-    "club.quiz_eleve": 25,
-    "club.question_jour_eleve": 10,
-    "club.badge_eleve": 200,
-    "club.certification_eleve": 500,
     "club.rapport_activite": 50,
     "club.bilan_semestriel": 100,
     "encadreur.quiz": 0,
@@ -47,7 +39,7 @@ def test_le_bareme_suit_le_referentiel(en_base: Callable[..., Any]) -> None:
     lus = montants(en_base)
 
     assert {code: lus[code] for code in ATTENDU} == ATTENDU
-    assert len(lus) == 37
+    assert len(lus) == 46
 
 
 def test_la_migration_aligne_le_bareme_sans_ecraser_un_montant_regle(en_base: Callable[..., Any]) -> None:
@@ -68,12 +60,14 @@ def test_la_migration_aligne_le_bareme_sans_ecraser_un_montant_regle(en_base: Ca
 
     apres = montants(en_base)
     assert apres["eleve.quiz"] == 50
+    # La spec 034 désactive ensuite la ligne, sans toucher au montant réglé par l'admin.
     assert apres["club.quiz_eleve"] == 15
     assert apres["eleve.question_jour"] == 20
-    assert len(apres) == 37
+    assert len(apres) == 46
 
     async def ordre(db: AsyncSession) -> list[str]:
         return list(await db.scalars(select(LigneBareme.code).order_by(LigneBareme.ordre)))
 
     codes = en_base(ordre)
-    assert codes.index("eleve.question_jour") == codes.index("eleve.quiz") + 1
+    # Ordre de la spec 034 : la question du jour avec la vie du site, avant les quiz.
+    assert codes.index("eleve.question_jour") == codes.index("eleve.partage") + 1

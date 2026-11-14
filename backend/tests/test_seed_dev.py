@@ -211,7 +211,7 @@ def test_le_seed_prepare_le_parcours_de_certification_une_seule_fois(
     parcours = en_base(
         lambda db: db.scalars(select(Quiz).where(Quiz.parcours == "certification").order_by(Quiz.place))
     ).all()
-    assert [q.place for q in parcours] == list(range(1, 13))
+    assert [q.place for q in parcours] == list(range(1, 21))
     assert all(q.etat.value == "publie" and q.contenu_de_test and q.titre.startswith("[Test]") for q in parcours)
     [fascicule] = en_base(lambda db: db.scalars(select(Ressource).where(Ressource.categorie == "fascicule"))).all()
     assert {q.ressource_id for q in parcours} == {fascicule.id}

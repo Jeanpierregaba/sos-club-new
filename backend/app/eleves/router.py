@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.inscription import InscriptionsFermees, Refus, TropDInscriptions
-from app.comptes.models import Utilisateur
+from app.comptes.models import Role, Utilisateur
 from app.comptes.router import _poser_cookie
 from app.comptes.schemas import Moi
 from app.comptes.service import cle_adresse, ouvrir_session, utilisateur_de_la_session
@@ -18,6 +18,7 @@ from app.db import get_session
 from app.eleves import fiche, service
 from app.eleves.schemas import EspaceEleve, EtatInscription, InscriptionEntree, ProfilModification
 from app.eleves.schemas_fiche import FicheModification, FicheSortie
+from app.points.annees import TableauGamification, tableau_gamification
 
 Base = Annotated[AsyncSession, Depends(get_session)]
 Connecte = Annotated[Utilisateur, Depends(utilisateur_courant)]
@@ -90,3 +91,11 @@ async def corriger_ma_fiche(
 ) -> FicheSortie:
     with _traduire_refus():
         return await fiche.corriger(db, utilisateur, entree, _adresse(request))
+
+
+@router.get("/moi/gamification")
+async def ma_gamification(moi: Connecte, db: Base) -> TableauGamification:
+    """Le tableau de bord de l'élève (spec 034) : l'année en cours, les trois parcours, son club et ses archives."""
+    if moi.role is not Role.eleve:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Cet espace est réservé aux élèves.")
+    return await tableau_gamification(db, moi)

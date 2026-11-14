@@ -12,7 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.articles.schemas import ArticlePublic, ArticlesPublics, AxeArticle, PhotoPublique, ResumeArticle, Signature
 from app.articles.service import TYPE
-from app.clubs.models import Adhesion, Club, EtatAdhesion, EtatClub
+from app.clubs.activation import en_service
+from app.clubs.models import Adhesion, Club, EtatAdhesion
 from app.comptes.models import Role, Utilisateur
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur, Fonction
@@ -60,9 +61,7 @@ async def signature(db: AsyncSession, contenu: Contenu) -> Signature:
             club = await db.scalar(
                 select(Club.nom)
                 .join(Adhesion, Adhesion.club_id == Club.id)
-                .where(
-                    Adhesion.eleve_id == auteur.id, Adhesion.etat == EtatAdhesion.active, Club.etat == EtatClub.actif
-                )
+                .where(Adhesion.eleve_id == auteur.id, Adhesion.etat == EtatAdhesion.active, en_service())
             )
         return Signature(profil="eleve", nom=eleve.pseudonyme if eleve else "Un élève", club=club)
     encadreur = await db.get(Encadreur, auteur.id)

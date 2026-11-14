@@ -19,7 +19,7 @@ import {
 // la tête de la mascotte ouvre une fenêtre avec la question. Le bouton « Retour en haut » remonte au-dessus.
 // La question vient de la banque de l'API (spec 021) : la même pour tous, elle change à minuit ; la bonne
 // réponse n'arrive qu'avec la correction. Sans défi (banque vide, API arrêtée), la bulle ne s'affiche pas.
-// Spec 022 : un élève connecté répond une fois par jour et gagne +20 (et +10 pour son club) si c'est juste ;
+// Spec 034 : un élève connecté répond une fois par jour et gagne +20 (et la moitié pour son club) si c'est juste ;
 // sa réponse reste affichée ensuite. Un visiteur joue sans points.
 
 function TeteMascotte({ className }: { className: string }) {

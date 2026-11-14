@@ -7,9 +7,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.certification.models import ReglesBadges
 
-# Les paliers affichés sur /certification, en attendant les règles de l'équipe pédagogique.
-NOMS_PAR_DEFAUT = ["Bronze", "Argent", "Or", "Platine", "Diamant Imhotep"]
-PALIERS_PAR_DEFAUT = [3, 5, 7, 9, 12]
+# Les 5 badges officiels (spec 034) : un par thématique de 4 places, dans l'ordre du parcours.
+NOMS_PAR_DEFAUT = [
+    "Ambassadeur Santé Junior",
+    "Pair Éducateur Santé et Citoyenneté",
+    "Sentinelle de la Prévention",
+    "Champion de la Santé et EVSS",
+    "Maître Génie Imhotep",
+]
+PALIERS_PAR_DEFAUT = [4, 8, 12, 16, 20]
 
 
 async def en_cours(db: AsyncSession) -> ReglesBadges:

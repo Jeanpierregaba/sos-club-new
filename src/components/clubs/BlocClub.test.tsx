@@ -9,7 +9,7 @@ import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { BlocClub } from "./BlocClub";
-import type { AxePublic, ClubPublic, ClubResume, EtablissementRattache } from "@/lib/api/client";
+import type { AdhesionResume, ClubResume, EtablissementRattache } from "@/lib/api/client";
 
 const etablissement: EtablissementRattache = {
   id: "etab-1",
@@ -20,20 +20,32 @@ const etablissement: EtablissementRattache = {
   dre: "Grand Lomé",
 };
 
-const clubActifEtablissement: ClubPublic = {
-  id: "club-existant",
-  nom: "Club Santé Tokoin",
+const club = (changements: Partial<ClubResume> = {}): ClubResume => ({
+  id: "club-1",
+  nom: "Club Santé — Lycée de Tokoin I",
+  description: null,
   etablissement,
-  axes: ["sante-environnement"],
-  actif_le: "2026-11-04T10:00:00Z",
-};
+  axes: [],
+  statut: "en_constitution",
+  actif_le: null,
+  regularisation_jusquau: null,
+  president: false,
+  version: 1,
+  ...changements,
+});
 
-const axes: AxePublic[] = [];
+const affiliation = (changements: Partial<AdhesionResume> = {}): AdhesionResume => ({
+  id: "adh-1",
+  club_id: "club-1",
+  club_nom: "Club Santé — Lycée de Tokoin I",
+  etat: "en_attente_validation",
+  demande_le: "2026-11-10T08:00:00Z",
+  version: 1,
+  ...changements,
+});
 
 async function afficher(element: React.ReactElement) {
-  const route = createRootRoute({
-    component: () => element,
-  });
+  const route = createRootRoute({ component: () => element });
   const router = createRouter({
     routeTree: route,
     history: createMemoryHistory({ initialEntries: ["/"] }),
@@ -45,64 +57,83 @@ async function afficher(element: React.ReactElement) {
 
 const rafraichir = vi.fn().mockResolvedValue(undefined);
 
-describe("BlocClub — état vide", () => {
-  it("propose le formulaire quand son établissement n'a pas de club", async () => {
+describe("BlocClub (spec 033)", () => {
+  it("n'offre plus de demande de création : le club s'ouvre tout seul", async () => {
     await afficher(
-      <BlocClub
-        club={null}
-        passation={null}
-        etablissement={etablissement}
-        axes={axes}
-        clubEtablissement={null}
-        onRafraichir={rafraichir}
-      />,
+      <BlocClub club={null} affiliation={null} passation={null} onRafraichir={rafraichir} />,
     );
-    expect(screen.getByRole("button", { name: "Ouvrir l'espace de mon club" })).toBeInTheDocument();
+    expect(screen.getByText(/Il s'ouvre tout seul/)).toBeInTheDocument();
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
-  it("ne propose pas le formulaire si un autre club est déjà actif", async () => {
+  it("explique le seuil d'un club en constitution et l'affiliation à confirmer", async () => {
     await afficher(
       <BlocClub
-        club={null}
+        club={club()}
+        affiliation={affiliation()}
         passation={null}
-        etablissement={etablissement}
-        axes={axes}
-        clubEtablissement={clubActifEtablissement}
         onRafraichir={rafraichir}
       />,
     );
-    expect(
-      screen.queryByRole("button", { name: "Ouvrir l'espace de mon club" }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByText("Club Santé Tokoin")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /fiche publique/ })).toBeInTheDocument();
+    expect(screen.getByText("En constitution")).toBeInTheDocument();
+    expect(screen.getByText(/3 encadreurs et 21 élèves/)).toBeInTheDocument();
+    expect(screen.getByText(/attend la confirmation d'un encadreur/)).toBeInTheDocument();
   });
-});
 
-describe("BlocClub — demande refusée", () => {
-  const club: ClubResume = {
-    id: "club-1",
-    nom: "Club Santé de Tokoin",
-    description: null,
-    etablissement,
-    axes: [],
-    etat: "refuse",
-    president: false,
-    motif_refus: "Nom déjà pris dans cet établissement.",
-    version: 2,
-  };
-
-  it("affiche le motif du refus", async () => {
+  it("annonce l'échéance d'une régularisation", async () => {
     await afficher(
       <BlocClub
-        club={club}
+        club={club({
+          statut: "en_regularisation",
+          actif_le: "2026-10-01T08:00:00Z",
+          regularisation_jusquau: "2026-11-25T08:00:00Z",
+        })}
+        affiliation={affiliation({ etat: "active" })}
         passation={null}
-        etablissement={etablissement}
-        axes={axes}
-        clubEtablissement={null}
         onRafraichir={rafraichir}
       />,
     );
-    expect(screen.getByText(/Nom déjà pris dans cet établissement\./)).toBeInTheDocument();
+    expect(screen.getByText("En régularisation")).toBeInTheDocument();
+    expect(screen.getByText(/jusqu'au 25/)).toBeInTheDocument();
+    expect(screen.getByText(/membre confirmé/)).toBeInTheDocument();
+  });
+
+  it("dit qu'un club suspendu garde les points de l'élève", async () => {
+    await afficher(
+      <BlocClub
+        club={club({ statut: "suspendu", actif_le: "2026-10-01T08:00:00Z" })}
+        affiliation={affiliation({ etat: "active" })}
+        passation={null}
+        onRafraichir={rafraichir}
+      />,
+    );
+    expect(screen.getByText(/Tes points à toi restent/)).toBeInTheDocument();
+  });
+
+  it("montre le motif d'une affiliation refusée", async () => {
+    await afficher(
+      <BlocClub
+        club={club()}
+        affiliation={affiliation({ etat: "refusee", motif_refus: "Pas inscrit ici." })}
+        passation={null}
+        onRafraichir={rafraichir}
+      />,
+    );
+    expect(screen.getByText("Affiliation refusée")).toBeInTheDocument();
+    expect(screen.getByText(/Pas inscrit ici/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Redemander mon affiliation" })).toBeInTheDocument();
+  });
+
+  it("laisse le président d'un club actif passer la main et gérer son club", async () => {
+    await afficher(
+      <BlocClub
+        club={club({ statut: "actif", actif_le: "2026-10-01T08:00:00Z", president: true })}
+        affiliation={affiliation({ etat: "active" })}
+        passation={null}
+        onRafraichir={rafraichir}
+      />,
+    );
+    expect(screen.getByRole("button", { name: /Passer la présidence/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Gérer mon club/ })).toBeInTheDocument();
   });
 });

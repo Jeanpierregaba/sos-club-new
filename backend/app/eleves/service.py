@@ -92,6 +92,10 @@ async def inscrire(db: AsyncSession, entree: InscriptionEntree, adresse_ip: str)
         )
     )
     await flush(db)
+    # Spec 033 : l'élève est affilié « à confirmer » au club de son établissement.
+    from app.clubs.affiliations import affilier_eleve
+
+    await affilier_eleve(db, utilisateur.id, etablissement.id)
     await fiche.enregistrer_a_linscription(db, utilisateur.id, entree.fiche)
     await points.crediter(db, BIENVENUE_ELEVE, utilisateur.id, f"bienvenue:{utilisateur.id}")
     journaliser(
@@ -153,10 +157,10 @@ async def modifier_profil(
         eleve.classe = entree.classe
     if entree.etablissement_id and entree.etablissement_id != eleve.etablissement_id:
         await etablissement_actif(db, entree.etablissement_id)
-        # Spec 020 : un président passe d'abord la main ; l'adhésion en cours prend fin.
-        from app.clubs.adhesions import quitter_au_changement_detablissement
+        # Spec 033 : un président passe d'abord la main ; l'affiliation suit le nouvel établissement, à confirmer.
+        from app.clubs.affiliations import changer_etablissement_eleve
 
-        await quitter_au_changement_detablissement(db, utilisateur, adresse_ip)
+        await changer_etablissement_eleve(db, utilisateur, entree.etablissement_id, adresse_ip)
         avant["etablissement_id"], apres["etablissement_id"] = str(eleve.etablissement_id), str(entree.etablissement_id)
         eleve.etablissement_id = entree.etablissement_id
     if "email" in entree.model_fields_set:

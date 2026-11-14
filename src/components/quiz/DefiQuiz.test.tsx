@@ -29,6 +29,8 @@ const quiz = {
   description: "Lot 4 — EVSS · questions 1 à 40.",
   axe_code: "sante-sexuelle-evss",
   nb_questions_reserve: 40,
+  numero: 42,
+  niveau: "debutant" as const,
 };
 const defi: Defi = { titre: "Prévenir les IST", numero: 42, quiz };
 

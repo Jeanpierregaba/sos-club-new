@@ -141,11 +141,9 @@ def test_relancer_remet_le_club_en_etat_sans_doublon(en_preprod: None, en_base: 
     en_base(semer)
 
     async def derouter(db: AsyncSession) -> None:
-        # Pendant les tests, le club a été refusé et confié à un autre élève.
+        # Pendant les tests, la présidence est passée à un autre élève.
         club = await db.scalar(select(Club))
         eleve = await db.scalar(select(Utilisateur).where(Utilisateur.identifiant == "preprod.eleve"))
-        club.etat = EtatClub.refuse
-        club.motif_refus = "Test de refus."
         club.president_id = eleve.id
 
     en_base(derouter)
@@ -179,39 +177,24 @@ def test_relancer_remet_le_club_en_etat_sans_doublon(en_preprod: None, en_base: 
     assert len(resultat["clubs"]) == 1
     club = resultat["clubs"][0]
     assert club.etat == EtatClub.actif
-    assert club.motif_refus is None
     assert resultat["president"] == "preprod.president"
-    # Le président est membre de droit de son club (spec 020), une seule fois.
+    # Le président est membre confirmé de son club, une seule fois.
     assert resultat["adhesions_president"] == ["active"]
-    # Élève, président et encadreur : un seul crédit de bienvenue chacun, même après deux lancements.
-    assert len(resultat["bienvenues"]) == len(set(resultat["bienvenues"])) == 3
-    assert resultat["eleves"] == 2
-    assert resultat["encadreurs"] == 1
+    # Un seul crédit de bienvenue par compte, même après deux lancements.
+    assert len(resultat["bienvenues"]) == len(set(resultat["bienvenues"]))
+    # Les comptes de test et les figurants (spec 033) : 2 + 20 élèves, 1 + 2 encadreurs.
+    assert resultat["eleves"] == 22
+    assert resultat["encadreurs"] == 3
 
 
-def test_refuse_si_un_autre_club_actif_occupe_l_etablissement(en_preprod: None, en_base: Callable[..., Any]) -> None:
+def test_l_eleve_de_test_attend_la_confirmation_d_un_encadreur(en_preprod: None, en_base: Callable[..., Any]) -> None:
     en_base(semer)
 
-    async def occuper(db: AsyncSession) -> None:
-        club = await db.scalar(select(Club))
-        club.etat = EtatClub.refuse
-        club.motif_refus = "Test de refus."
-        await db.flush()
-        db.add(
-            Club(
-                etablissement_id=club.etablissement_id,
-                nom="Club d'un testeur",
-                nom_normalise="club d un testeur",
-                demandeur_id=club.demandeur_id,
-                president_id=club.demandeur_id,
-                etat=EtatClub.actif,
-            )
-        )
+    async def etat(db: AsyncSession) -> EtatAdhesion:
+        eleve = await db.scalar(select(Utilisateur).where(Utilisateur.identifiant == "preprod.eleve"))
+        return await db.scalar(select(Adhesion.etat).where(Adhesion.eleve_id == eleve.id))
 
-    en_base(occuper)
-
-    with pytest.raises(PreparationImpossible, match="autre club actif"):
-        en_base(semer)
+    assert en_base(etat) is EtatAdhesion.en_attente_validation
 
 
 def test_refuse_si_une_passation_est_en_attente(en_preprod: None, en_base: Callable[..., Any]) -> None:

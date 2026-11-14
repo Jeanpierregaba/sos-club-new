@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_vali
 
 from app.certification.models import EtatCertificat
 from app.encadreurs.models import Fonction
+from app.quiz.models import PLACES, PLACES_PAR_THEMATIQUE
 
 EtatPlace = Literal["verrouillee", "ouverte", "reussie", "bientot"]
 
@@ -23,6 +24,9 @@ class Fascicule(BaseModel):
 
 class PlaceParcours(BaseModel):
     place: int
+    # Spec 034 : 5 thématiques de 4 places (1 à 5), qui portent le nom du badge qu'elles délivrent.
+    thematique: int
+    thematique_nom: str
     etat: EtatPlace
     # Le quiz publié sur cette place ; nul s'il n'y en a pas (« bientôt », ou place réussie sur un quiz retiré).
     quiz_id: UUID | None
@@ -100,14 +104,16 @@ class ReglesEntree(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     noms: Annotated[list[NomBadge], Field(min_length=5, max_length=5)]
-    paliers: Annotated[list[Annotated[int, Field(ge=1, le=12)]], Field(min_length=5, max_length=5)]
+    paliers: Annotated[list[Annotated[int, Field(ge=1, le=PLACES)]], Field(min_length=5, max_length=5)]
 
     @model_validator(mode="after")
     def coherentes(self) -> Self:
         if any(a >= b for a, b in zip(self.paliers, self.paliers[1:], strict=False)):
             raise ValueError("Les paliers doivent être strictement croissants.")
-        if self.paliers[-1] != 12:
-            raise ValueError("Le dernier badge se délivre à la réussite des 12 quiz.")
+        # Spec 034 : un badge par thématique de 4 quiz ; seuls les noms se règlent.
+        attendus = list(range(PLACES_PAR_THEMATIQUE, PLACES + 1, PLACES_PAR_THEMATIQUE))
+        if self.paliers != attendus:
+            raise ValueError(f"Les badges se délivrent à la fin de chaque thématique : {attendus}.")
         if len({n.casefold() for n in self.noms}) != 5:
             raise ValueError("Deux badges portent le même nom.")
         return self

@@ -15,7 +15,7 @@ PUBLIC = "/api/certificats"
 
 
 def certifier(en_base: Callable[..., Any], joueur: Utilisateur) -> Certificat:
-    acquerir(en_base, joueur, creer_parcours(en_base), range(1, 13))
+    acquerir(en_base, joueur, creer_parcours(en_base), range(1, 21))
     mettre_a_jour(en_base, joueur)
     return certificats(en_base, joueur.id)[0]
 

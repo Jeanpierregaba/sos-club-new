@@ -18,7 +18,9 @@ import {
   adminModifierIesg,
   type DreAdmin,
   type IesgAdmin,
+  type RegionScolaire,
 } from "@/lib/api/client";
+import { nomRegion, REGIONS_SCOLAIRES } from "@/lib/clubs";
 
 export const Route = createFileRoute("/_connecte/admin/referentiel/")({
   loader: () => adminListerDre(),
@@ -70,8 +72,9 @@ function DreEtIesg() {
                 <BadgeActif actif={dre.actif} />
               </h2>
               <p className="text-sm font-medium text-muted-foreground">
-                {dre.nom_complet} · code <code className="font-mono">{dre.code}</code> · ordre{" "}
-                {dre.ordre} · {dre.nb_etablissements} établissements actifs
+                {dre.nom_complet} · région {nomRegion(dre.region)} · code{" "}
+                <code className="font-mono">{dre.code}</code> · ordre {dre.ordre} ·{" "}
+                {dre.nb_etablissements} établissements actifs
               </p>
             </div>
             {gere && (
@@ -265,6 +268,7 @@ function FormulaireDre({
   const [nom, setNom] = useState(dre?.nom ?? "");
   const [nomComplet, setNomComplet] = useState(dre?.nom_complet ?? "");
   const [ordre, setOrdre] = useState(dre ? String(dre.ordre) : "");
+  const [region, setRegion] = useState<RegionScolaire>(dre?.region ?? "maritime");
 
   return (
     <DialogueFormulaire
@@ -277,7 +281,12 @@ function FormulaireDre({
       }
       bouton="Enregistrer"
       onEnvoie={async () => {
-        const champs = { nom, nom_complet: nomComplet, ordre: ordre ? Number(ordre) : null };
+        const champs = {
+          nom,
+          nom_complet: nomComplet,
+          region,
+          ordre: ordre ? Number(ordre) : null,
+        };
         if (dre) await adminModifierDre(dre.code, { version: dre.version, ...champs });
         else await adminCreerDre({ code, ...champs });
         await recharger();
@@ -314,6 +323,19 @@ function FormulaireDre({
           maxLength={200}
           className={CHAMP_ADMIN}
         />
+      </Champ>
+      <Champ libelle="Région">
+        <select
+          value={region}
+          onChange={(e) => setRegion(e.target.value as RegionScolaire)}
+          className={CHAMP_ADMIN}
+        >
+          {REGIONS_SCOLAIRES.map((r) => (
+            <option key={r.code} value={r.code}>
+              {r.nom}
+            </option>
+          ))}
+        </select>
       </Champ>
       <Champ libelle="Ordre d'affichage">
         <input

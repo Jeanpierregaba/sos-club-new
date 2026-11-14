@@ -1,5 +1,5 @@
-"""Files et décisions en lot des collaborateurs (spec 020, tâche 4) : périmètre DRE, résultat par élément,
-rattachement supplémentaire réservé à l'équipe nationale, compteur du tableau de bord."""
+"""Confirmation des affiliations en lot par l'équipe (spec 020, revue par la spec 033) : périmètre DRE, résultat par
+élément, compteur du tableau de bord."""
 
 from collections.abc import Callable
 from typing import Any
@@ -8,10 +8,10 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.clubs.models import Adhesion, EtatAdhesion, EtatRattachement, Rattachement
+from app.clubs.models import Adhesion, EtatAdhesion
 from app.comptes.models import Utilisateur
 from app.eleves.models import Eleve
-from tests.conftest import VERIFICATION_CLUBS, Navigateur, connecter_admin, etablissement_de
+from tests.conftest import VERIFICATION_CLUBS, connecter_admin, etablissement_de
 
 pytestmark = pytest.mark.usefixtures("annuaire")
 
@@ -28,27 +28,12 @@ def autre_club(creer_eleve: Callable[..., Utilisateur], creer_club: Callable[...
 
 
 def confirmee(en_base: Callable[..., Any], eleve: Utilisateur, club: Any) -> Adhesion:
-    """Une affiliation déjà confirmée par le président : elle attend le collaborateur."""
+    """Une affiliation à confirmer : un encadreur du club ou l'équipe la décide (spec 033)."""
 
     async def inserer(db: AsyncSession) -> Adhesion:
         adhesion = Adhesion(eleve_id=eleve.id, club_id=club.id, etat=EtatAdhesion.en_attente_validation)
         db.add(adhesion)
         return adhesion
-
-    return en_base(inserer)
-
-
-def rattachement(
-    en_base: Callable[..., Any],
-    encadreur: Utilisateur,
-    club: Any,
-    etat: EtatRattachement = EtatRattachement.en_attente_validation,
-    supplementaire: bool = False,
-) -> Rattachement:
-    async def inserer(db: AsyncSession) -> Rattachement:
-        ligne = Rattachement(encadreur_id=encadreur.id, club_id=club.id, etat=etat, supplementaire=supplementaire)
-        db.add(ligne)
-        return ligne
 
     return en_base(inserer)
 
@@ -185,134 +170,19 @@ def test_il_faut_le_droit_dapprouver_les_clubs(
 # Rattachements ----------------------------------------------------------------------------------------------
 
 
-def test_un_premier_rattachement_est_valide_par_la_dre(
-    collaborateur_dre: Callable[[str], TestClient],
-    club: Any,
-    creer_encadreur: Callable[..., Utilisateur],
-    en_base: Callable[..., Any],
-) -> None:
-    demande = rattachement(en_base, creer_encadreur("prof"), club)
-    client = collaborateur_dre("grand-lome")
-
-    file = client.get("/api/admin/clubs/rattachements").json()
-    reponse = client.post("/api/admin/clubs/rattachements/valider", json=lot(demande))
-
-    assert file["demandes"][0]["decidable"] is True
-    assert reponse.json()["reussies"] == [str(demande.id)]
-    assert en_base(lambda db: db.get(Rattachement, demande.id)).etat is EtatRattachement.actif
-
-
-def test_un_club_supplementaire_exige_lequipe_nationale(
-    verificateur_clubs: TestClient,
-    creer_collaborateur: Callable[..., Any],
-    club: Any,
-    autre_club: Any,
-    creer_encadreur: Callable[..., Utilisateur],
-    en_base: Callable[..., Any],
-) -> None:
-    prof = creer_encadreur("prof")
-    rattachement(en_base, prof, autre_club, etat=EtatRattachement.actif)
-    demande = rattachement(en_base, prof, club, supplementaire=True)
-    # Deux sessions : un collaborateur de la DRE (second navigateur) et l'équipe nationale.
-    creer_collaborateur("dre.grand-lome", droits=VERIFICATION_CLUBS, perimetre_dre="grand-lome", double_auth=True)
-    dre = Navigateur(verificateur_clubs)
-    connecter_admin(dre, "dre.grand-lome")
-
-    file = dre.get("/api/admin/clubs/rattachements").json()
-    refus_dre = dre.post("/api/admin/clubs/rattachements/valider", json=lot(demande)).json()
-    reponse = verificateur_clubs.post("/api/admin/clubs/rattachements/valider", json=lot(demande))
-
-    assert file["demandes"][0]["decidable"] is False
-    assert refus_dre["echecs"][0]["message"].startswith("Autorisation nationale requise")
-    assert reponse.json()["reussies"] == [str(demande.id)]
-
-
-def test_le_caractere_supplementaire_est_recalcule_a_la_decision(
-    collaborateur_dre: Callable[[str], TestClient],
-    club: Any,
-    autre_club: Any,
-    creer_encadreur: Callable[..., Utilisateur],
-    en_base: Callable[..., Any],
-) -> None:
-    prof = creer_encadreur("prof")
-    # Demandé comme premier club, mais un autre rattachement a été validé entre-temps.
-    demande = rattachement(en_base, prof, club, supplementaire=False)
-    rattachement(en_base, prof, autre_club, etat=EtatRattachement.actif)
-    client = collaborateur_dre("grand-lome")
-
-    reponse = client.post("/api/admin/clubs/rattachements/valider", json=lot(demande))
-
-    assert reponse.json()["echecs"][0]["message"].startswith("Autorisation nationale requise")
-    assert en_base(lambda db: db.get(Rattachement, demande.id)).etat is EtatRattachement.en_attente_validation
-
-
-def test_un_rattachement_hors_du_perimetre_est_introuvable(
-    collaborateur_dre: Callable[[str], TestClient],
-    club: Any,
-    creer_encadreur: Callable[..., Utilisateur],
-    en_base: Callable[..., Any],
-) -> None:
-    demande = rattachement(en_base, creer_encadreur("prof"), club)
-    client = collaborateur_dre("kara")
-
-    assert client.get("/api/admin/clubs/rattachements").json()["total"] == 0
-    reponse = client.post("/api/admin/clubs/rattachements/valider", json=lot(demande))
-
-    assert reponse.json()["echecs"] == [{"id": str(demande.id), "message": "Cette demande est introuvable."}]
-    assert en_base(lambda db: db.get(Rattachement, demande.id)).etat is EtatRattachement.en_attente_validation
-
-
-def test_la_file_recalcule_le_caractere_supplementaire(
-    collaborateur_dre: Callable[[str], TestClient],
-    club: Any,
-    autre_club: Any,
-    creer_encadreur: Callable[..., Utilisateur],
-    en_base: Callable[..., Any],
-) -> None:
-    prof = creer_encadreur("prof")
-    # Demandé comme supplémentaire, mais le premier club s'est terminé depuis : la DRE peut décider.
-    demande = rattachement(en_base, prof, club, supplementaire=True)
-    rattachement(en_base, prof, autre_club, etat=EtatRattachement.retire)
-    client = collaborateur_dre("grand-lome")
-
-    ligne = client.get("/api/admin/clubs/rattachements").json()["demandes"][0]
-
-    assert (ligne["id"], ligne["supplementaire"], ligne["decidable"]) == (str(demande.id), False, True)
-    assert client.get("/api/admin/moi").json()["clubs_a_valider"] == 1
-
-
-def test_un_refus_de_rattachement_porte_le_motif(
-    verificateur_clubs: TestClient, club: Any, creer_encadreur: Callable[..., Utilisateur], en_base: Callable[..., Any]
-) -> None:
-    demande = rattachement(en_base, creer_encadreur("prof"), club)
-
-    reponse = verificateur_clubs.post(
-        "/api/admin/clubs/rattachements/refuser", json={**lot(demande), "motif": "Encadreur inconnu."}
-    )
-
-    assert reponse.json()["reussies"] == [str(demande.id)]
-    refuse = en_base(lambda db: db.get(Rattachement, demande.id))
-    assert refuse.etat is EtatRattachement.refuse
-    assert refuse.motif_refus == "Encadreur inconnu."
-
-
 # Compteur ---------------------------------------------------------------------------------------------------
 
 
-def test_le_compteur_compte_les_demandes_decidables(
+def test_le_compteur_additionne_affiliations_passations_et_desistements(
     collaborateur_dre: Callable[[str], TestClient],
     club: Any,
     autre_club: Any,
     creer_eleve: Callable[..., Utilisateur],
-    creer_encadreur: Callable[..., Utilisateur],
     en_base: Callable[..., Any],
 ) -> None:
     confirmee(en_base, creer_eleve("kofi", "Kofi", etablissement_id=club.etablissement_id), club)
-    rattachement(en_base, creer_encadreur("prof"), club)
-    # Un club supplémentaire ne compte pas pour une DRE : elle ne peut pas le décider.
-    prof2 = creer_encadreur("prof2")
-    rattachement(en_base, prof2, autre_club, etat=EtatRattachement.actif)
-    rattachement(en_base, prof2, club)
+    # Celle d'une autre DRE ne compte pas.
+    confirmee(en_base, creer_eleve("ama.kara", "Ama de Kara", etablissement_id=autre_club.etablissement_id), autre_club)
     client = collaborateur_dre("grand-lome")
 
-    assert client.get("/api/admin/moi").json()["clubs_a_valider"] == 2
+    assert client.get("/api/admin/moi").json()["clubs_a_valider"] == 1

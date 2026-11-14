@@ -14,6 +14,25 @@ Format :
 - Prochaine étape :
 -->
 
+### 2026-11-14 — Fermeture des specs 033 à 035 et spec R13
+
+- Fait : comptes de préproduction créés par le seed dédié (`preprod.admin`, `preprod.encadreur`,
+  `preprod.eleve`, `preprod.president`, club « Club Santé Préprod » actif), refusé hors `ENVIRONNEMENT=preprod`,
+  mots de passe dans un fichier 600 sur le VPS. Vérification des e-mails d'inscription : le visiteur reçoit un code
+  à 6 chiffres, l'élève aucun e-mail, l'encadreur seulement à l'activation ou au refus par l'équipe. Specs 033,
+  034 et 035 relues et closes (tâches 15 et 7 cochées), commit groupé car leurs changements sont imbriqués.
+  Spec 036 (R13) écrite avec son plan et ses tâches, en attente de validation.
+- Pièges rencontrés : la suite API complète prend 28 min (chaque test tronque une vingtaine de tables) ; le seed de
+  préprod change les mots de passe et coupe les sessions ; `.claude/launch.json` est une modification locale à
+  laisser hors des commits ; la migration `4b93d2491b34` échoue sur une DRE inconnue, à tester sur une copie de la
+  base de préprod avant `main`.
+- Décisions : classements publics limités à la DRE et au national, classement interne d'un club privé ; page
+  `/hall-of-fame` et entrée « Classements » ; corrections motivées, journalisées, nationales et à double
+  authentification, sans part de club ; R14 garde le gel, les ex æquo et le Top 3. ADR-0013 à écrire avec
+  l'implémentation.
+- Prochaine étape : valider le plan de la spec 036 puis l'implémenter ; clore la spec 030 (tâche 17) et rédiger la
+  spec 031.
+
 ### 2026-11-09 — Certification Génie Imhotep (spec 029)
 
 - Fait : spec 029 livrée (R11). Un quiz porte un parcours (jeux ou certification) ; la certification a 12 places

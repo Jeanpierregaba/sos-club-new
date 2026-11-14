@@ -2334,6 +2334,55 @@
             }
           },
           {
+            "name": "ordre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/OrdreEnseignement"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ordre"
+            }
+          },
+          {
+            "name": "prefecture",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Prefecture"
+            }
+          },
+          {
+            "name": "importes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Importes"
+            }
+          },
+          {
             "name": "page",
             "in": "query",
             "required": false,
@@ -2836,6 +2885,175 @@
         }
       }
     },
+    "/api/admin/points/annees": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister Annees",
+        "operationId": "lister_annees_api_admin_points_annees_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AnneeAdmin"
+                  },
+                  "type": "array",
+                  "title": "Response Lister Annees Api Admin Points Annees Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Creer Annee",
+        "operationId": "creer_annee_api_admin_points_annees_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnneeCreation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnneeAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/annees/{annee_id}/cloture": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Cloturer Annee",
+        "operationId": "cloturer_annee_api_admin_points_annees__annee_id__cloture_post",
+        "parameters": [
+          {
+            "name": "annee_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Annee Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnneeAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/anciens-eleves/{eleve_id}": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Passer Ancien Eleve",
+        "operationId": "passer_ancien_eleve_api_admin_points_anciens_eleves__eleve_id__post",
+        "parameters": [
+          {
+            "name": "eleve_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Eleve Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/points/mon-club": {
+      "get": {
+        "tags": [
+          "points"
+        ],
+        "summary": "Points De Mon Club",
+        "operationId": "points_de_mon_club_api_points_mon_club_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointsDuClub"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/eleves/inscription": {
       "get": {
         "tags": [
@@ -3025,6 +3243,28 @@
         }
       }
     },
+    "/api/eleves/moi/gamification": {
+      "get": {
+        "tags": [
+          "eleves"
+        ],
+        "summary": "Ma Gamification",
+        "description": "Le tableau de bord de l'élève (spec 034) : l'année en cours, les trois parcours, son club et ses archives.",
+        "operationId": "ma_gamification_api_eleves_moi_gamification_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableauGamification"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/encadreurs/inscription": {
       "post": {
         "tags": [
@@ -3119,28 +3359,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/encadreurs/moi/clubs": {
-      "get": {
-        "tags": [
-          "encadreurs"
-        ],
-        "summary": "Mes Clubs",
-        "description": "Les rattachements de l'encadreur (spec 020) : en cours, puis les derniers terminés.",
-        "operationId": "mes_clubs_api_encadreurs_moi_clubs_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MesClubs"
                 }
               }
             }
@@ -3858,68 +4076,6 @@
         }
       }
     },
-    "/api/clubs/demande": {
-      "post": {
-        "tags": [
-          "clubs"
-        ],
-        "summary": "Demander",
-        "operationId": "demander_api_clubs_demande_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DemandeClubEntree"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClubResume"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clubs/demande/renvoyer": {
-      "post": {
-        "tags": [
-          "clubs"
-        ],
-        "summary": "Renvoyer Ma Demande",
-        "operationId": "renvoyer_ma_demande_api_clubs_demande_renvoyer_post",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClubResume"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/clubs/moi": {
       "get": {
         "tags": [
@@ -3929,6 +4085,28 @@
         "operationId": "mon_club_api_clubs_moi_get",
         "responses": {
           "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonClub"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/affiliation": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Redemander Affiliation",
+        "description": "Après un refus ou un retrait, l'élève redemande son affiliation : elle repart « à confirmer » (spec 033).",
+        "operationId": "redemander_affiliation_api_clubs_moi_affiliation_post",
+        "responses": {
+          "201": {
             "description": "Successful Response",
             "content": {
               "application/json": {
@@ -4003,133 +4181,20 @@
         }
       }
     },
-    "/api/clubs/{club_id}/adhesions": {
-      "post": {
-        "tags": [
-          "clubs"
-        ],
-        "summary": "Demander Adhesion",
-        "operationId": "demander_adhesion_api_clubs__club_id__adhesions_post",
-        "parameters": [
-          {
-            "name": "club_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Club Id"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdhesionResume"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clubs/{club_id}/adhesions/moi": {
-      "delete": {
-        "tags": [
-          "clubs"
-        ],
-        "summary": "Quitter Le Club",
-        "description": "Annule la demande en cours, ou quitte le club.",
-        "operationId": "quitter_le_club_api_clubs__club_id__adhesions_moi_delete",
-        "parameters": [
-          {
-            "name": "club_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Club Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdhesionResume"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clubs/{club_id}/adhesions/demandes": {
+    "/api/clubs/mon-club-sante": {
       "get": {
         "tags": [
           "clubs"
         ],
-        "summary": "Demandes Adhesion",
-        "operationId": "demandes_adhesion_api_clubs__club_id__adhesions_demandes_get",
-        "parameters": [
-          {
-            "name": "club_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Club Id"
-            }
-          }
-        ],
+        "summary": "Mon Club Sante",
+        "operationId": "mon_club_sante_api_clubs_mon_club_sante_get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DemandeAdhesion"
-                  },
-                  "title": "Response Demandes Adhesion Api Clubs  Club Id  Adhesions Demandes Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/MonClubSante"
                 }
               }
             }
@@ -4137,32 +4202,43 @@
         }
       }
     },
-    "/api/clubs/{club_id}/adhesions/{adhesion_id}/confirmer": {
+    "/api/clubs/mon-club-sante/affiliations": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Affiliations Du Club",
+        "operationId": "affiliations_du_club_api_clubs_mon_club_sante_affiliations_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AffiliationsDuClub"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/mon-club-sante/affiliations/{affiliation_id}/confirmer": {
       "post": {
         "tags": [
           "clubs"
         ],
-        "summary": "Confirmer Adhesion",
-        "operationId": "confirmer_adhesion_api_clubs__club_id__adhesions__adhesion_id__confirmer_post",
+        "summary": "Confirmer Affiliation",
+        "operationId": "confirmer_affiliation_api_clubs_mon_club_sante_affiliations__affiliation_id__confirmer_post",
         "parameters": [
           {
-            "name": "club_id",
+            "name": "affiliation_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
               "format": "uuid",
-              "title": "Club Id"
-            }
-          },
-          {
-            "name": "adhesion_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Adhesion Id"
+              "title": "Affiliation Id"
             }
           }
         ],
@@ -4182,7 +4258,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdhesionResume"
+                  "$ref": "#/components/schemas/AffiliationsDuClub"
                 }
               }
             }
@@ -4200,32 +4276,22 @@
         }
       }
     },
-    "/api/clubs/{club_id}/adhesions/{adhesion_id}/refuser": {
+    "/api/clubs/mon-club-sante/affiliations/{affiliation_id}/refuser": {
       "post": {
         "tags": [
           "clubs"
         ],
-        "summary": "Refuser Adhesion",
-        "operationId": "refuser_adhesion_api_clubs__club_id__adhesions__adhesion_id__refuser_post",
+        "summary": "Refuser Affiliation",
+        "operationId": "refuser_affiliation_api_clubs_mon_club_sante_affiliations__affiliation_id__refuser_post",
         "parameters": [
           {
-            "name": "club_id",
+            "name": "affiliation_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
               "format": "uuid",
-              "title": "Club Id"
-            }
-          },
-          {
-            "name": "adhesion_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Adhesion Id"
+              "title": "Affiliation Id"
             }
           }
         ],
@@ -4245,7 +4311,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdhesionResume"
+                  "$ref": "#/components/schemas/AffiliationsDuClub"
                 }
               }
             }
@@ -4263,32 +4329,22 @@
         }
       }
     },
-    "/api/clubs/{club_id}/adhesions/{adhesion_id}/retirer": {
+    "/api/clubs/mon-club-sante/affiliations/{affiliation_id}/retirer": {
       "post": {
         "tags": [
           "clubs"
         ],
-        "summary": "Retirer Membre",
-        "operationId": "retirer_membre_api_clubs__club_id__adhesions__adhesion_id__retirer_post",
+        "summary": "Retirer Affiliation",
+        "operationId": "retirer_affiliation_api_clubs_mon_club_sante_affiliations__affiliation_id__retirer_post",
         "parameters": [
           {
-            "name": "club_id",
+            "name": "affiliation_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
               "format": "uuid",
-              "title": "Club Id"
-            }
-          },
-          {
-            "name": "adhesion_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Adhesion Id"
+              "title": "Affiliation Id"
             }
           }
         ],
@@ -4297,7 +4353,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RetraitEntree"
+                "$ref": "#/components/schemas/RefusDemandeEntree"
               }
             }
           }
@@ -4308,7 +4364,89 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdhesionResume"
+                  "$ref": "#/components/schemas/AffiliationsDuClub"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/mon-club-sante/desistements": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Signaler Desistement",
+        "operationId": "signaler_desistement_api_clubs_mon_club_sante_desistements_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DesistementEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignalementResume"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/mon-club-sante/president": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Proposer President",
+        "operationId": "proposer_president_api_clubs_mon_club_sante_president_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresidentEntree"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonClubSante"
                 }
               }
             }
@@ -4490,329 +4628,6 @@
         }
       }
     },
-    "/api/clubs/{club_id}/rattachements": {
-      "post": {
-        "tags": [
-          "clubs"
-        ],
-        "summary": "Demander Rattachement",
-        "operationId": "demander_rattachement_api_clubs__club_id__rattachements_post",
-        "parameters": [
-          {
-            "name": "club_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Club Id"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RattachementResume"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clubs/{club_id}/rattachements/moi": {
-      "delete": {
-        "tags": [
-          "clubs"
-        ],
-        "summary": "Quitter Le Club Encadre",
-        "description": "Annule la demande en cours, ou met fin au rattachement.",
-        "operationId": "quitter_le_club_encadre_api_clubs__club_id__rattachements_moi_delete",
-        "parameters": [
-          {
-            "name": "club_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Club Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RattachementResume"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clubs/{club_id}/rattachements/demandes": {
-      "get": {
-        "tags": [
-          "clubs"
-        ],
-        "summary": "Demandes Rattachement",
-        "operationId": "demandes_rattachement_api_clubs__club_id__rattachements_demandes_get",
-        "parameters": [
-          {
-            "name": "club_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Club Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DemandeRattachement"
-                  },
-                  "title": "Response Demandes Rattachement Api Clubs  Club Id  Rattachements Demandes Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clubs/{club_id}/rattachements/{rattachement_id}/confirmer": {
-      "post": {
-        "tags": [
-          "clubs"
-        ],
-        "summary": "Confirmer Rattachement",
-        "operationId": "confirmer_rattachement_api_clubs__club_id__rattachements__rattachement_id__confirmer_post",
-        "parameters": [
-          {
-            "name": "club_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Club Id"
-            }
-          },
-          {
-            "name": "rattachement_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Rattachement Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DecisionEntree"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RattachementResume"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clubs/{club_id}/rattachements/{rattachement_id}/refuser": {
-      "post": {
-        "tags": [
-          "clubs"
-        ],
-        "summary": "Refuser Rattachement",
-        "operationId": "refuser_rattachement_api_clubs__club_id__rattachements__rattachement_id__refuser_post",
-        "parameters": [
-          {
-            "name": "club_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Club Id"
-            }
-          },
-          {
-            "name": "rattachement_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Rattachement Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RefusDemandeEntree"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RattachementResume"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clubs/{club_id}/rattachements/{rattachement_id}/retirer": {
-      "post": {
-        "tags": [
-          "clubs"
-        ],
-        "summary": "Retirer Encadreur",
-        "operationId": "retirer_encadreur_api_clubs__club_id__rattachements__rattachement_id__retirer_post",
-        "parameters": [
-          {
-            "name": "club_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Club Id"
-            }
-          },
-          {
-            "name": "rattachement_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Rattachement Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RetraitEntree"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RattachementResume"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/clubs/{club_id}/passation/confirmer": {
       "post": {
         "tags": [
@@ -4944,6 +4759,28 @@
         }
       }
     },
+    "/api/clubs/carte": {
+      "get": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Carte Des Clubs",
+        "description": "La carte nationale : trois chiffres réels et l'arbre région → DRE → inspection → établissement (spec 033).",
+        "operationId": "carte_des_clubs_api_clubs_carte_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clubs/podium": {
       "get": {
         "tags": [
@@ -5054,26 +4891,117 @@
         }
       }
     },
-    "/api/admin/clubs": {
+    "/api/admin/clubs/suivi": {
       "get": {
         "tags": [
           "admin"
         ],
-        "summary": "File Attente",
-        "operationId": "file_attente_api_admin_clubs_get",
+        "summary": "Suivi Des Clubs",
+        "operationId": "suivi_des_clubs_api_admin_clubs_suivi_get",
         "parameters": [
           {
-            "name": "etat",
+            "name": "statut",
             "in": "query",
             "required": false,
             "schema": {
-              "enum": [
-                "en_attente",
-                "refuse"
+              "anyOf": [
+                {
+                  "enum": [
+                    "en_constitution",
+                    "actif",
+                    "en_regularisation",
+                    "suspendu"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
               ],
-              "type": "string",
-              "default": "en_attente",
-              "title": "Etat"
+              "title": "Statut"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/RegionScolaire"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Region"
+            }
+          },
+          {
+            "name": "dre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 30
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dre"
+            }
+          },
+          {
+            "name": "iesg",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Iesg"
+            }
+          },
+          {
+            "name": "recherche",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Recherche"
+            }
+          },
+          {
+            "name": "terrain",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Terrain"
             }
           },
           {
@@ -5106,7 +5034,156 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileClubs"
+                  "$ref": "#/components/schemas/PageSuivi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/seuils": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Seuils Des Clubs",
+        "description": "Les seuils d'activation, fixés dans le code (spec 033) : en lecture seule.",
+        "operationId": "seuils_des_clubs_api_admin_clubs_seuils_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Seuils"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/desistements": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "File Desistements",
+        "operationId": "file_desistements_api_admin_clubs_desistements_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileDesistements"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/desistements/{signalement_id}/confirmer": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Confirmer Desistement",
+        "operationId": "confirmer_desistement_api_admin_clubs_desistements__signalement_id__confirmer_post",
+        "parameters": [
+          {
+            "name": "signalement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Signalement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionSignalementEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileDesistements"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/desistements/{signalement_id}/rejeter": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Rejeter Desistement",
+        "operationId": "rejeter_desistement_api_admin_clubs_desistements__signalement_id__rejeter_post",
+        "parameters": [
+          {
+            "name": "signalement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Signalement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejetSignalementEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileDesistements"
                 }
               }
             }
@@ -5248,6 +5325,102 @@
         }
       }
     },
+    "/api/admin/clubs/{club_id}/suivi": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Fiche De Suivi",
+        "operationId": "fiche_de_suivi_api_admin_clubs__club_id__suivi_get",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FicheSuivi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/clubs/{club_id}/terrain": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Declarer Terrain",
+        "operationId": "declarer_terrain_api_admin_clubs__club_id__terrain_post",
+        "parameters": [
+          {
+            "name": "club_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Club Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerrainEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FicheSuivi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/clubs/{club_id}/membres": {
       "get": {
         "tags": [
@@ -5274,109 +5447,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MembresDuClub"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/clubs/rattachements": {
-      "get": {
-        "tags": [
-          "admin"
-        ],
-        "summary": "File Rattachements",
-        "operationId": "file_rattachements_api_admin_clubs_rattachements_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FileRattachements"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/clubs/rattachements/valider": {
-      "post": {
-        "tags": [
-          "admin"
-        ],
-        "summary": "Valider Rattachements",
-        "operationId": "valider_rattachements_api_admin_clubs_rattachements_valider_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LotEntree"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResultatLot"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/clubs/rattachements/refuser": {
-      "post": {
-        "tags": [
-          "admin"
-        ],
-        "summary": "Refuser Rattachements",
-        "operationId": "refuser_rattachements_api_admin_clubs_rattachements_refuser_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LotRefusEntree"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResultatLot"
                 }
               }
             }
@@ -5490,119 +5560,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Passation"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/clubs/{club_id}/activer": {
-      "post": {
-        "tags": [
-          "admin"
-        ],
-        "summary": "Activer",
-        "operationId": "activer_api_admin_clubs__club_id__activer_post",
-        "parameters": [
-          {
-            "name": "club_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Club Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/app__clubs__schemas__ActivationEntree"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "title": "Entree"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DemandeClub"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/clubs/{club_id}/refuser": {
-      "post": {
-        "tags": [
-          "admin"
-        ],
-        "summary": "Refuser",
-        "operationId": "refuser_api_admin_clubs__club_id__refuser_post",
-        "parameters": [
-          {
-            "name": "club_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Club Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RefusEntree"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DemandeClub"
                 }
               }
             }
@@ -5922,6 +5879,28 @@
         }
       }
     },
+    "/api/jeux/quiz/progression": {
+      "get": {
+        "tags": [
+          "jeux"
+        ],
+        "summary": "Ma Progression",
+        "description": "La progression de l'élève connecté (spec 034), pour sa carte de membre dans « Mon espace ».",
+        "operationId": "ma_progression_api_jeux_quiz_progression_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressionJeux"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/jeux/quiz/{quiz_id}/tentatives": {
       "post": {
         "tags": [
@@ -6054,6 +6033,32 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/jeux/gold": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Eleves Gold",
+        "description": "Les élèves aux quatre étoiles, du plus ancien Gold au plus récent ; un responsable de DRE voit les siens.",
+        "operationId": "eleves_gold_api_admin_jeux_gold_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EleveGold"
+                  },
+                  "type": "array",
+                  "title": "Response Eleves Gold Api Admin Jeux Gold Get"
                 }
               }
             }
@@ -10005,7 +10010,193 @@
           "version"
         ],
         "title": "AffiliationAValider",
-        "description": "Une affiliation confirmée par le président, dans la file d'un collaborateur."
+        "description": "Une affiliation à confirmer, dans la file d'un collaborateur (à la place d'un encadreur du club)."
+      },
+      "AffiliationDuClub": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "pseudonyme": {
+            "type": "string",
+            "title": "Pseudonyme"
+          },
+          "classe": {
+            "$ref": "#/components/schemas/Classe"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "en_attente_validation",
+              "active"
+            ],
+            "title": "Etat"
+          },
+          "demande_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Demande Le"
+          },
+          "depuis": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Depuis"
+          },
+          "president": {
+            "type": "boolean",
+            "title": "President"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "pseudonyme",
+          "classe",
+          "etat",
+          "demande_le",
+          "depuis",
+          "president",
+          "version"
+        ],
+        "title": "AffiliationDuClub",
+        "description": "Un élève du club, vu par ses encadreurs : pseudonyme et classe seulement (décision 4 de la spec 033)."
+      },
+      "AffiliationsDuClub": {
+        "properties": {
+          "a_confirmer": {
+            "items": {
+              "$ref": "#/components/schemas/AffiliationDuClub"
+            },
+            "type": "array",
+            "title": "A Confirmer"
+          },
+          "confirmees": {
+            "items": {
+              "$ref": "#/components/schemas/AffiliationDuClub"
+            },
+            "type": "array",
+            "title": "Confirmees"
+          }
+        },
+        "type": "object",
+        "required": [
+          "a_confirmer",
+          "confirmees"
+        ],
+        "title": "AffiliationsDuClub"
+      },
+      "AnneeAdmin": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date",
+            "title": "Fin"
+          },
+          "cloturee_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cloturee Le"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "libelle",
+          "debut",
+          "fin",
+          "version"
+        ],
+        "title": "AnneeAdmin"
+      },
+      "AnneeCreation": {
+        "properties": {
+          "libelle": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{4}$",
+            "title": "Libelle"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date",
+            "title": "Fin"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "libelle",
+          "debut",
+          "fin"
+        ],
+        "title": "AnneeCreation"
+      },
+      "AnneeResume": {
+        "properties": {
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date",
+            "title": "Fin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "libelle",
+          "debut",
+          "fin"
+        ],
+        "title": "AnneeResume"
       },
       "Apercu": {
         "properties": {
@@ -10240,6 +10431,48 @@
           "version"
         ],
         "title": "ApprobationEntree"
+      },
+      "Archive": {
+        "properties": {
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region"
+          },
+          "rang": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rang"
+          }
+        },
+        "type": "object",
+        "required": [
+          "libelle",
+          "points",
+          "region",
+          "rang"
+        ],
+        "title": "Archive"
       },
       "ArticleAuteur": {
         "properties": {
@@ -10984,6 +11217,227 @@
         ],
         "title": "Body_deposer_fichier_api_admin_bibliotheque__ressource_id__fichier_put"
       },
+      "Carte": {
+        "properties": {
+          "chiffres": {
+            "$ref": "#/components/schemas/ChiffresCarte"
+          },
+          "regions": {
+            "items": {
+              "$ref": "#/components/schemas/CarteRegion"
+            },
+            "type": "array",
+            "title": "Regions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "chiffres",
+          "regions"
+        ],
+        "title": "Carte"
+      },
+      "CarteDre": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "nom_complet": {
+            "type": "string",
+            "title": "Nom Complet"
+          },
+          "nb_etablissements": {
+            "type": "integer",
+            "title": "Nb Etablissements"
+          },
+          "nb_clubs": {
+            "type": "integer",
+            "title": "Nb Clubs"
+          },
+          "nb_actifs": {
+            "type": "integer",
+            "title": "Nb Actifs"
+          },
+          "iesg": {
+            "items": {
+              "$ref": "#/components/schemas/CarteIesg"
+            },
+            "type": "array",
+            "title": "Iesg"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "nom",
+          "nom_complet",
+          "nb_etablissements",
+          "nb_clubs",
+          "nb_actifs",
+          "iesg"
+        ],
+        "title": "CarteDre"
+      },
+      "CarteEtablissement": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "localite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Localite"
+          },
+          "statut": {
+            "type": "string",
+            "enum": [
+              "reference",
+              "en_constitution",
+              "actif",
+              "suspendu"
+            ],
+            "title": "Statut"
+          },
+          "declare_terrain": {
+            "type": "boolean",
+            "title": "Declare Terrain"
+          },
+          "club_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "localite",
+          "statut",
+          "declare_terrain",
+          "club_id"
+        ],
+        "title": "CarteEtablissement"
+      },
+      "CarteIesg": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "zone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zone"
+          },
+          "nb_etablissements": {
+            "type": "integer",
+            "title": "Nb Etablissements"
+          },
+          "nb_clubs": {
+            "type": "integer",
+            "title": "Nb Clubs"
+          },
+          "nb_actifs": {
+            "type": "integer",
+            "title": "Nb Actifs"
+          },
+          "etablissements": {
+            "items": {
+              "$ref": "#/components/schemas/CarteEtablissement"
+            },
+            "type": "array",
+            "title": "Etablissements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "zone",
+          "nb_etablissements",
+          "nb_clubs",
+          "nb_actifs",
+          "etablissements"
+        ],
+        "title": "CarteIesg"
+      },
+      "CarteRegion": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "nb_etablissements": {
+            "type": "integer",
+            "title": "Nb Etablissements"
+          },
+          "nb_clubs": {
+            "type": "integer",
+            "title": "Nb Clubs"
+          },
+          "nb_actifs": {
+            "type": "integer",
+            "title": "Nb Actifs"
+          },
+          "dres": {
+            "items": {
+              "$ref": "#/components/schemas/CarteDre"
+            },
+            "type": "array",
+            "title": "Dres"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "nom",
+          "nb_etablissements",
+          "nb_clubs",
+          "nb_actifs",
+          "dres"
+        ],
+        "title": "CarteRegion"
+      },
       "Catalogue": {
         "properties": {
           "modules": {
@@ -11082,6 +11536,16 @@
             },
             "type": "array",
             "title": "Quiz"
+          },
+          "progression": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProgressionJeux"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -11300,6 +11764,29 @@
         ],
         "title": "Chiffres"
       },
+      "ChiffresCarte": {
+        "properties": {
+          "etablissements": {
+            "type": "integer",
+            "title": "Etablissements"
+          },
+          "clubs": {
+            "type": "integer",
+            "title": "Clubs"
+          },
+          "clubs_actifs": {
+            "type": "integer",
+            "title": "Clubs Actifs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "etablissements",
+          "clubs",
+          "clubs_actifs"
+        ],
+        "title": "ChiffresCarte"
+      },
       "ChoixClub": {
         "properties": {
           "afficher": {
@@ -11455,6 +11942,16 @@
             "type": "array",
             "title": "Axes"
           },
+          "statut": {
+            "type": "string",
+            "enum": [
+              "en_constitution",
+              "actif",
+              "en_regularisation",
+              "suspendu"
+            ],
+            "title": "Statut"
+          },
           "actif_le": {
             "anyOf": [
               {
@@ -11483,6 +11980,7 @@
           "description",
           "etablissement",
           "axes",
+          "statut",
           "actif_le"
         ],
         "title": "ClubFiche"
@@ -11551,7 +12049,7 @@
             "title": "Dre"
           },
           "points": {
-            "type": "integer",
+            "type": "number",
             "title": "Points"
           }
         },
@@ -11588,6 +12086,16 @@
             "type": "array",
             "title": "Axes"
           },
+          "statut": {
+            "type": "string",
+            "enum": [
+              "en_constitution",
+              "actif",
+              "en_regularisation",
+              "suspendu"
+            ],
+            "title": "Statut"
+          },
           "actif_le": {
             "anyOf": [
               {
@@ -11607,6 +12115,7 @@
           "nom",
           "etablissement",
           "axes",
+          "statut",
           "actif_le"
         ],
         "title": "ClubPublic"
@@ -11643,24 +12152,43 @@
             "type": "array",
             "title": "Axes"
           },
-          "etat": {
+          "statut": {
             "type": "string",
-            "title": "Etat"
+            "enum": [
+              "en_constitution",
+              "actif",
+              "en_regularisation",
+              "suspendu"
+            ],
+            "title": "Statut"
           },
-          "president": {
-            "type": "boolean",
-            "title": "President"
-          },
-          "motif_refus": {
+          "actif_le": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "format": "date-time"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Motif Refus"
+            "title": "Actif Le"
+          },
+          "regularisation_jusquau": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regularisation Jusquau"
+          },
+          "president": {
+            "type": "boolean",
+            "title": "President"
           },
           "version": {
             "type": "integer",
@@ -11674,11 +12202,110 @@
           "description",
           "etablissement",
           "axes",
-          "etat",
+          "statut",
+          "actif_le",
+          "regularisation_jusquau",
           "president",
           "version"
         ],
-        "title": "ClubResume"
+        "title": "ClubResume",
+        "description": "Le club de l'établissement de l'élève, vu par lui (spec 033)."
+      },
+      "ClubSuivi": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "etablissement": {
+            "type": "string",
+            "title": "Etablissement"
+          },
+          "iesg": {
+            "type": "string",
+            "title": "Iesg"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "region": {
+            "type": "string",
+            "title": "Region"
+          },
+          "statut": {
+            "type": "string",
+            "enum": [
+              "en_constitution",
+              "actif",
+              "en_regularisation",
+              "suspendu"
+            ],
+            "title": "Statut"
+          },
+          "nb_encadreurs": {
+            "type": "integer",
+            "title": "Nb Encadreurs"
+          },
+          "nb_eleves": {
+            "type": "integer",
+            "title": "Nb Eleves"
+          },
+          "a_confirmer": {
+            "type": "integer",
+            "title": "A Confirmer"
+          },
+          "actif_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actif Le"
+          },
+          "regularisation_jusquau": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regularisation Jusquau"
+          },
+          "declare_terrain": {
+            "type": "boolean",
+            "title": "Declare Terrain"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "etablissement",
+          "iesg",
+          "dre",
+          "region",
+          "statut",
+          "nb_encadreurs",
+          "nb_eleves",
+          "a_confirmer",
+          "actif_le",
+          "regularisation_jusquau",
+          "declare_terrain"
+        ],
+        "title": "ClubSuivi"
       },
       "CodeEntree": {
         "properties": {
@@ -12384,6 +13011,82 @@
         ],
         "title": "DecisionPassee"
       },
+      "DecisionSignalementEntree": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "DecisionSignalementEntree"
+      },
+      "DecompteCertification": {
+        "properties": {
+          "quiz_valides": {
+            "type": "integer",
+            "title": "Quiz Valides"
+          },
+          "badges": {
+            "type": "integer",
+            "title": "Badges"
+          },
+          "certificat": {
+            "type": "boolean",
+            "title": "Certificat"
+          },
+          "points_quiz": {
+            "type": "integer",
+            "title": "Points Quiz"
+          },
+          "points_badges": {
+            "type": "integer",
+            "title": "Points Badges"
+          },
+          "points_certificat": {
+            "type": "integer",
+            "title": "Points Certificat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "quiz_valides",
+          "badges",
+          "certificat",
+          "points_quiz",
+          "points_badges",
+          "points_certificat"
+        ],
+        "title": "DecompteCertification"
+      },
+      "DecompteVie": {
+        "properties": {
+          "en_attente": {
+            "type": "integer",
+            "title": "En Attente"
+          },
+          "approuvees": {
+            "type": "integer",
+            "title": "Approuvees"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "en_attente",
+          "approuvees",
+          "points"
+        ],
+        "title": "DecompteVie"
+      },
       "DefiDuJour": {
         "properties": {
           "id": {
@@ -12425,189 +13128,6 @@
           "options"
         ],
         "title": "DefiDuJour"
-      },
-      "DemandeAdhesion": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "pseudonyme": {
-            "type": "string",
-            "title": "Pseudonyme"
-          },
-          "classe": {
-            "type": "string",
-            "title": "Classe"
-          },
-          "demande_le": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Demande Le"
-          },
-          "version": {
-            "type": "integer",
-            "title": "Version"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "pseudonyme",
-          "classe",
-          "demande_le",
-          "version"
-        ],
-        "title": "DemandeAdhesion",
-        "description": "Une demande d'affiliation, vue par le président : le pseudonyme du demandeur, jamais son nom."
-      },
-      "DemandeClub": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "nom": {
-            "type": "string",
-            "title": "Nom"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
-          "axes": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Axes"
-          },
-          "demandeur_pseudonyme": {
-            "type": "string",
-            "title": "Demandeur Pseudonyme"
-          },
-          "etablissement": {
-            "$ref": "#/components/schemas/EtablissementRattache"
-          },
-          "encadreurs_associes": {
-            "items": {
-              "$ref": "#/components/schemas/EncadreurAssocie"
-            },
-            "type": "array",
-            "title": "Encadreurs Associes"
-          },
-          "etat": {
-            "$ref": "#/components/schemas/EtatClub"
-          },
-          "demande_le": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Demande Le"
-          },
-          "decide_le": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Decide Le"
-          },
-          "motif_refus": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Motif Refus"
-          },
-          "version": {
-            "type": "integer",
-            "title": "Version"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "nom",
-          "description",
-          "axes",
-          "demandeur_pseudonyme",
-          "etablissement",
-          "encadreurs_associes",
-          "etat",
-          "demande_le",
-          "decide_le",
-          "motif_refus",
-          "version"
-        ],
-        "title": "DemandeClub",
-        "description": "Copie d'une demande dans la file d'un collaborateur."
-      },
-      "DemandeClubEntree": {
-        "properties": {
-          "nom": {
-            "type": "string",
-            "maxLength": 150,
-            "minLength": 3,
-            "title": "Nom"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 300
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
-          "axes": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "maxItems": 3,
-            "title": "Axes"
-          },
-          "encadreurs_associes": {
-            "items": {
-              "$ref": "#/components/schemas/EncadreurAssocie"
-            },
-            "type": "array",
-            "maxItems": 10,
-            "title": "Encadreurs Associes"
-          },
-          "confirmation": {
-            "type": "boolean",
-            "const": true,
-            "title": "Confirmation"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "nom",
-          "confirmation"
-        ],
-        "title": "DemandeClubEntree"
       },
       "DemandeEncadreur": {
         "properties": {
@@ -12735,76 +13255,6 @@
         "title": "DemandeEncadreur",
         "description": "Une ligne de la file : tout ce qu'il faut pour vérifier la personne, sans ouvrir sa fiche."
       },
-      "DemandeRattachement": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "prenom": {
-            "type": "string",
-            "title": "Prenom"
-          },
-          "nom": {
-            "type": "string",
-            "title": "Nom"
-          },
-          "fonction": {
-            "type": "string",
-            "title": "Fonction"
-          },
-          "etablissement": {
-            "type": "string",
-            "title": "Etablissement"
-          },
-          "demande_le": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Demande Le"
-          },
-          "version": {
-            "type": "integer",
-            "title": "Version"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "prenom",
-          "nom",
-          "fonction",
-          "etablissement",
-          "demande_le",
-          "version"
-        ],
-        "title": "DemandeRattachement",
-        "description": "Une demande de rattachement, vue par le président : un encadreur est un adulte identifié par son nom."
-      },
-      "DemandesClub": {
-        "properties": {
-          "adhesions": {
-            "items": {
-              "$ref": "#/components/schemas/DemandeAdhesion"
-            },
-            "type": "array",
-            "title": "Adhesions"
-          },
-          "rattachements": {
-            "items": {
-              "$ref": "#/components/schemas/DemandeRattachement"
-            },
-            "type": "array",
-            "title": "Rattachements"
-          }
-        },
-        "type": "object",
-        "required": [
-          "adhesions",
-          "rattachements"
-        ],
-        "title": "DemandesClub"
-      },
       "DerniereDecision": {
         "properties": {
           "decision": {
@@ -12835,6 +13285,27 @@
         ],
         "title": "DerniereDecision"
       },
+      "DesistementEntree": {
+        "properties": {
+          "encadreur_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Encadreur Id"
+          },
+          "motif": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Motif"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "encadreur_id",
+          "motif"
+        ],
+        "title": "DesistementEntree"
+      },
       "DreAdmin": {
         "properties": {
           "code": {
@@ -12848,6 +13319,9 @@
           "nom_complet": {
             "type": "string",
             "title": "Nom Complet"
+          },
+          "region": {
+            "$ref": "#/components/schemas/RegionScolaire"
           },
           "ordre": {
             "type": "integer",
@@ -12878,6 +13352,7 @@
           "code",
           "nom",
           "nom_complet",
+          "region",
           "ordre",
           "actif",
           "version",
@@ -12941,6 +13416,9 @@
             "maxLength": 400,
             "title": "Nom Complet"
           },
+          "region": {
+            "$ref": "#/components/schemas/RegionScolaire"
+          },
           "ordre": {
             "anyOf": [
               {
@@ -12960,7 +13438,8 @@
         "required": [
           "code",
           "nom",
-          "nom_complet"
+          "nom_complet",
+          "region"
         ],
         "title": "DreCreation"
       },
@@ -12994,6 +13473,16 @@
               }
             ],
             "title": "Nom Complet"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RegionScolaire"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "ordre": {
             "anyOf": [
@@ -13287,45 +13776,70 @@
         ],
         "title": "ElementLot"
       },
-      "EncadreurAssocie": {
+      "EleveDuClub": {
         "properties": {
-          "nom": {
+          "pseudonyme": {
             "type": "string",
-            "maxLength": 100,
-            "minLength": 1,
-            "title": "Nom"
+            "title": "Pseudonyme"
           },
-          "email": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 254
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Email"
-          },
-          "telephone": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 30
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Telephone"
+          "classe": {
+            "type": "string",
+            "title": "Classe"
           }
         },
-        "additionalProperties": false,
         "type": "object",
         "required": [
-          "nom"
+          "pseudonyme",
+          "classe"
         ],
-        "title": "EncadreurAssocie"
+        "title": "EleveDuClub"
+      },
+      "EleveGold": {
+        "properties": {
+          "utilisateur_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Utilisateur Id"
+          },
+          "pseudonyme": {
+            "type": "string",
+            "title": "Pseudonyme"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "etablissement": {
+            "type": "string",
+            "title": "Etablissement"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "gold_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Gold Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "utilisateur_id",
+          "pseudonyme",
+          "club",
+          "etablissement",
+          "dre",
+          "gold_le"
+        ],
+        "title": "EleveGold"
       },
       "EncadreurDuClub": {
         "properties": {
@@ -13361,6 +13875,35 @@
         ],
         "title": "EncadreurDuClub",
         "description": "Un encadreur rattaché au club : un adulte, identifié par son nom et sa fonction."
+      },
+      "EncadreurSuivi": {
+        "properties": {
+          "utilisateur_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Utilisateur Id"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "fonction": {
+            "type": "string",
+            "title": "Fonction"
+          }
+        },
+        "type": "object",
+        "required": [
+          "utilisateur_id",
+          "prenom",
+          "nom",
+          "fonction"
+        ],
+        "title": "EncadreurSuivi"
       },
       "Enrolement": {
         "properties": {
@@ -13433,6 +13976,16 @@
           "club": {
             "$ref": "#/components/schemas/ClubEspace"
           },
+          "statut": {
+            "type": "string",
+            "enum": [
+              "en_constitution",
+              "actif",
+              "en_regularisation",
+              "suspendu"
+            ],
+            "title": "Statut"
+          },
           "role": {
             "type": "string",
             "enum": [
@@ -13455,16 +14008,6 @@
           "membres": {
             "$ref": "#/components/schemas/MembresDuClub"
           },
-          "demandes": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/DemandesClub"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
           "suivi": {
             "anyOf": [
               {
@@ -13479,15 +14022,15 @@
         "type": "object",
         "required": [
           "club",
+          "statut",
           "role",
           "indicateurs",
           "actualites",
           "membres",
-          "demandes",
           "suivi"
         ],
         "title": "EspaceClub",
-        "description": "La vue « Mon club » : la gestion (demandes, suivi) pour le président seul ; la lecture pour les membres et\nles encadreurs rattachés."
+        "description": "La vue « Mon club » : le suivi pour le président seul ; la lecture pour les membres et les encadreurs\nrattachés."
       },
       "EspaceEleve": {
         "properties": {
@@ -13799,6 +14342,38 @@
             "format": "date-time",
             "title": "Modifie Le"
           },
+          "prefecture": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefecture"
+          },
+          "ordre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OrdreEnseignement"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "import_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Import Source"
+          },
           "nb_eleves": {
             "type": "integer",
             "title": "Nb Eleves"
@@ -13852,6 +14427,28 @@
               }
             ],
             "title": "Localite"
+          },
+          "prefecture": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefecture"
+          },
+          "ordre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OrdreEnseignement"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -13903,6 +14500,28 @@
               }
             ],
             "title": "Localite"
+          },
+          "prefecture": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefecture"
+          },
+          "ordre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OrdreEnseignement"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "iesg_id": {
             "anyOf": [
@@ -13998,6 +14617,17 @@
               }
             ],
             "title": "Localite"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region"
           }
         },
         "type": "object",
@@ -14053,6 +14683,17 @@
               }
             ],
             "title": "Localite"
+          },
+          "prefecture": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefecture"
           }
         },
         "type": "object",
@@ -14131,8 +14772,11 @@
       "EtatClub": {
         "type": "string",
         "enum": [
-          "en_attente",
+          "en_constitution",
           "actif",
+          "en_regularisation",
+          "suspendu",
+          "en_attente",
           "refuse"
         ],
         "title": "EtatClub"
@@ -15148,6 +15792,92 @@
         ],
         "title": "FicheSortie"
       },
+      "FicheSuivi": {
+        "properties": {
+          "club": {
+            "$ref": "#/components/schemas/ClubSuivi"
+          },
+          "declare_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Declare Note"
+          },
+          "declare_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Declare Le"
+          },
+          "president_pseudonyme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "President Pseudonyme"
+          },
+          "encadreurs": {
+            "items": {
+              "$ref": "#/components/schemas/EncadreurSuivi"
+            },
+            "type": "array",
+            "title": "Encadreurs"
+          },
+          "eleves": {
+            "items": {
+              "$ref": "#/components/schemas/EleveDuClub"
+            },
+            "type": "array",
+            "title": "Eleves"
+          },
+          "journal": {
+            "items": {
+              "$ref": "#/components/schemas/LigneJournalClub"
+            },
+            "type": "array",
+            "title": "Journal"
+          },
+          "signalements": {
+            "items": {
+              "$ref": "#/components/schemas/SignalementAdmin"
+            },
+            "type": "array",
+            "title": "Signalements"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "club",
+          "declare_note",
+          "declare_le",
+          "president_pseudonyme",
+          "encadreurs",
+          "eleves",
+          "journal",
+          "signalements",
+          "version"
+        ],
+        "title": "FicheSuivi"
+      },
       "FileAffiliations": {
         "properties": {
           "total": {
@@ -15169,26 +15899,26 @@
         ],
         "title": "FileAffiliations"
       },
-      "FileClubs": {
+      "FileDesistements": {
         "properties": {
           "total": {
             "type": "integer",
             "title": "Total"
           },
-          "demandes": {
+          "signalements": {
             "items": {
-              "$ref": "#/components/schemas/DemandeClub"
+              "$ref": "#/components/schemas/SignalementAdmin"
             },
             "type": "array",
-            "title": "Demandes"
+            "title": "Signalements"
           }
         },
         "type": "object",
         "required": [
           "total",
-          "demandes"
+          "signalements"
         ],
-        "title": "FileClubs"
+        "title": "FileDesistements"
       },
       "FileEncadreurs": {
         "properties": {
@@ -15252,27 +15982,6 @@
           "passations"
         ],
         "title": "FilePassations"
-      },
-      "FileRattachements": {
-        "properties": {
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "demandes": {
-            "items": {
-              "$ref": "#/components/schemas/RattachementAValider"
-            },
-            "type": "array",
-            "title": "Demandes"
-          }
-        },
-        "type": "object",
-        "required": [
-          "total",
-          "demandes"
-        ],
-        "title": "FileRattachements"
       },
       "FiltresInscrits": {
         "properties": {
@@ -15688,25 +16397,13 @@
           "actualites": {
             "type": "integer",
             "title": "Actualites"
-          },
-          "demandes": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Demandes"
           }
         },
         "type": "object",
         "required": [
           "membres",
           "encadreurs",
-          "actualites",
-          "demandes"
+          "actualites"
         ],
         "title": "IndicateursClub"
       },
@@ -16312,6 +17009,26 @@
             "type": "integer",
             "title": "Montant"
           },
+          "parcours": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Parcours"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sous_compte": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SousCompte"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "propose": {
             "type": "boolean",
             "title": "Propose"
@@ -16335,6 +17052,8 @@
           "beneficiaire",
           "libelle",
           "montant",
+          "parcours",
+          "sous_compte",
           "propose",
           "en_service",
           "actif",
@@ -16391,6 +17110,52 @@
           "version"
         ],
         "title": "LigneBaremeModification"
+      },
+      "LigneJournalClub": {
+        "properties": {
+          "ancien": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ancien"
+          },
+          "nouveau": {
+            "type": "string",
+            "title": "Nouveau"
+          },
+          "cause": {
+            "type": "string",
+            "title": "Cause"
+          },
+          "nb_encadreurs": {
+            "type": "integer",
+            "title": "Nb Encadreurs"
+          },
+          "nb_eleves": {
+            "type": "integer",
+            "title": "Nb Eleves"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ancien",
+          "nouveau",
+          "cause",
+          "nb_encadreurs",
+          "nb_eleves",
+          "cree_le"
+        ],
+        "title": "LigneJournalClub"
       },
       "LignePoints": {
         "properties": {
@@ -16653,6 +17418,45 @@
         "title": "MembreClub",
         "description": "Un membre, dans la liste du club : son pseudonyme seulement, jamais son nom ni sa classe (docs/RULES.md).\n`id` et `version` sont ceux de l'adhésion : le président s'en sert pour retirer un membre."
       },
+      "MembreEquipe": {
+        "properties": {
+          "utilisateur_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Utilisateur Id"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "fonction": {
+            "$ref": "#/components/schemas/Fonction"
+          },
+          "moi": {
+            "type": "boolean",
+            "title": "Moi"
+          },
+          "signalement_en_attente": {
+            "type": "boolean",
+            "title": "Signalement En Attente"
+          }
+        },
+        "type": "object",
+        "required": [
+          "utilisateur_id",
+          "prenom",
+          "nom",
+          "fonction",
+          "moi",
+          "signalement_en_attente"
+        ],
+        "title": "MembreEquipe",
+        "description": "Un encadreur du club, vu par les autres encadreurs : un adulte identifié par son nom."
+      },
       "MembresDuClub": {
         "properties": {
           "membres": {
@@ -16692,31 +17496,6 @@
           "articles"
         ],
         "title": "MesArticles"
-      },
-      "MesClubs": {
-        "properties": {
-          "rattachements": {
-            "items": {
-              "$ref": "#/components/schemas/RattachementResume"
-            },
-            "type": "array",
-            "title": "Rattachements"
-          },
-          "passations": {
-            "items": {
-              "$ref": "#/components/schemas/PassationAConfirmer"
-            },
-            "type": "array",
-            "title": "Passations",
-            "default": []
-          }
-        },
-        "type": "object",
-        "required": [
-          "rattachements"
-        ],
-        "title": "MesClubs",
-        "description": "L'espace « Mes clubs » d'un encadreur : ses rattachements en cours, puis les derniers terminés, et les\npassations de ses clubs qu'il doit confirmer (Q19)."
       },
       "MesCommentaires": {
         "properties": {
@@ -16810,6 +17589,16 @@
               }
             ]
           },
+          "affiliation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdhesionResume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "passation": {
             "anyOf": [
               {
@@ -16826,6 +17615,138 @@
           "club"
         ],
         "title": "MonClub"
+      },
+      "MonClubSante": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "etablissement": {
+            "$ref": "#/components/schemas/EtablissementRattache"
+          },
+          "statut": {
+            "type": "string",
+            "enum": [
+              "en_constitution",
+              "actif",
+              "en_regularisation",
+              "suspendu"
+            ],
+            "title": "Statut"
+          },
+          "actif_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actif Le"
+          },
+          "regularisation_jusquau": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regularisation Jusquau"
+          },
+          "declare_terrain": {
+            "type": "boolean",
+            "title": "Declare Terrain"
+          },
+          "seuils": {
+            "$ref": "#/components/schemas/Seuils"
+          },
+          "nb_encadreurs": {
+            "type": "integer",
+            "title": "Nb Encadreurs"
+          },
+          "nb_eleves": {
+            "type": "integer",
+            "title": "Nb Eleves"
+          },
+          "a_confirmer": {
+            "type": "integer",
+            "title": "A Confirmer"
+          },
+          "equipe": {
+            "items": {
+              "$ref": "#/components/schemas/MembreEquipe"
+            },
+            "type": "array",
+            "title": "Equipe"
+          },
+          "president_pseudonyme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "President Pseudonyme"
+          },
+          "president_propose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "President Propose"
+          },
+          "passations_a_confirmer": {
+            "items": {
+              "$ref": "#/components/schemas/PassationAConfirmer"
+            },
+            "type": "array",
+            "title": "Passations A Confirmer"
+          },
+          "mes_signalements": {
+            "items": {
+              "$ref": "#/components/schemas/SignalementResume"
+            },
+            "type": "array",
+            "title": "Mes Signalements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "etablissement",
+          "statut",
+          "actif_le",
+          "regularisation_jusquau",
+          "declare_terrain",
+          "seuils",
+          "nb_encadreurs",
+          "nb_eleves",
+          "a_confirmer",
+          "equipe",
+          "president_pseudonyme",
+          "president_propose",
+          "passations_a_confirmer",
+          "mes_signalements"
+        ],
+        "title": "MonClubSante"
       },
       "MotDePasseEntree": {
         "properties": {
@@ -16891,6 +17812,44 @@
           "motif"
         ],
         "title": "MotifEntree"
+      },
+      "NiveauProgression": {
+        "properties": {
+          "niveau": {
+            "$ref": "#/components/schemas/NiveauQuiz"
+          },
+          "reussis": {
+            "type": "integer",
+            "title": "Reussis"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "etoile": {
+            "type": "boolean",
+            "title": "Etoile"
+          }
+        },
+        "type": "object",
+        "required": [
+          "niveau",
+          "reussis",
+          "total",
+          "etoile"
+        ],
+        "title": "NiveauProgression"
+      },
+      "NiveauQuiz": {
+        "type": "string",
+        "enum": [
+          "debutant",
+          "intermediaire",
+          "avance",
+          "expert"
+        ],
+        "title": "NiveauQuiz",
+        "description": "Les quatre niveaux des 100 quiz Jeux (spec 034) : 40, 30, 20 et 10 quiz, mieux payés à chaque niveau."
       },
       "NotificationSortie": {
         "properties": {
@@ -16971,6 +17930,19 @@
           "non_lues"
         ],
         "title": "Notifications"
+      },
+      "OrdreEnseignement": {
+        "type": "string",
+        "enum": [
+          "public",
+          "prive_laic",
+          "prive_catholique",
+          "prive_protestant",
+          "prive_islamique",
+          "communautaire"
+        ],
+        "title": "OrdreEnseignement",
+        "description": "L'ordre d'enseignement de la liste nationale (spec 035)."
       },
       "PageEtablissements": {
         "properties": {
@@ -17065,6 +18037,37 @@
         ],
         "title": "PageJournal"
       },
+      "PageSuivi": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "clubs": {
+            "items": {
+              "$ref": "#/components/schemas/ClubSuivi"
+            },
+            "type": "array",
+            "title": "Clubs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "page",
+          "par_page",
+          "clubs"
+        ],
+        "title": "PageSuivi"
+      },
       "ParametresEntree": {
         "properties": {
           "nb_questions": {
@@ -17091,10 +18094,28 @@
             "title": "Seuil"
           },
           "tentatives_par_jour": {
-            "type": "integer",
-            "maximum": 100.0,
-            "minimum": 1.0,
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Tentatives Par Jour"
+          },
+          "arret_premiere_erreur": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Arret Premiere Erreur"
           }
         },
         "additionalProperties": false,
@@ -17131,8 +18152,19 @@
             "title": "Seuil"
           },
           "tentatives_par_jour": {
-            "type": "integer",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Tentatives Par Jour"
+          },
+          "arret_premiere_erreur": {
+            "type": "boolean",
+            "title": "Arret Premiere Erreur"
           },
           "cree_le": {
             "type": "string",
@@ -17148,9 +18180,20 @@
           "tolerance_ms",
           "seuil",
           "tentatives_par_jour",
+          "arret_premiere_erreur",
           "cree_le"
         ],
         "title": "ParametresSortie"
+      },
+      "Parcours": {
+        "type": "string",
+        "enum": [
+          "certification",
+          "jeux",
+          "vie"
+        ],
+        "title": "Parcours",
+        "description": "Les trois parcours de l'élève (spec 034) ; une action d'encadreur n'en a pas."
       },
       "ParcoursAnterieur": {
         "properties": {
@@ -17750,6 +18793,14 @@
             "type": "integer",
             "title": "Place"
           },
+          "thematique": {
+            "type": "integer",
+            "title": "Thematique"
+          },
+          "thematique_nom": {
+            "type": "string",
+            "title": "Thematique Nom"
+          },
           "etat": {
             "type": "string",
             "enum": [
@@ -17846,6 +18897,8 @@
         "type": "object",
         "required": [
           "place",
+          "thematique",
+          "thematique_nom",
           "etat",
           "quiz_id",
           "titre",
@@ -17857,6 +18910,69 @@
           "tentative_en_cours"
         ],
         "title": "PlaceParcours"
+      },
+      "PointsDuClub": {
+        "properties": {
+          "annee": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnneeResume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "total_annuel": {
+            "type": "number",
+            "title": "Total Annuel"
+          },
+          "total_historique": {
+            "type": "number",
+            "title": "Total Historique"
+          },
+          "parcours": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Parcours"
+          },
+          "jeux_quiz": {
+            "type": "number",
+            "title": "Jeux Quiz"
+          },
+          "jeux_etoiles": {
+            "type": "number",
+            "title": "Jeux Etoiles"
+          }
+        },
+        "type": "object",
+        "required": [
+          "annee",
+          "total_annuel",
+          "total_historique",
+          "parcours",
+          "jeux_quiz",
+          "jeux_etoiles"
+        ],
+        "title": "PointsDuClub"
+      },
+      "PresidentEntree": {
+        "properties": {
+          "affiliation_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Affiliation Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "affiliation_id"
+        ],
+        "title": "PresidentEntree",
+        "description": "L'élève proposé comme président, désigné par son affiliation confirmée."
       },
       "ProfilEleveAdmin": {
         "properties": {
@@ -17886,6 +19002,18 @@
                 "type": "null"
               }
             ]
+          },
+          "ancien_eleve_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ancien Eleve Le"
           }
         },
         "type": "object",
@@ -18114,6 +19242,60 @@
           "version"
         ],
         "title": "ProfilModification"
+      },
+      "ProgressionJeux": {
+        "properties": {
+          "quiz_reussis": {
+            "type": "integer",
+            "title": "Quiz Reussis"
+          },
+          "niveaux": {
+            "items": {
+              "$ref": "#/components/schemas/NiveauProgression"
+            },
+            "type": "array",
+            "title": "Niveaux"
+          },
+          "niveau_courant": {
+            "$ref": "#/components/schemas/NiveauQuiz"
+          },
+          "points_quiz": {
+            "type": "integer",
+            "title": "Points Quiz"
+          },
+          "points_etoiles": {
+            "type": "integer",
+            "title": "Points Etoiles"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "gold": {
+            "type": "boolean",
+            "title": "Gold"
+          },
+          "reussis": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Reussis"
+          }
+        },
+        "type": "object",
+        "required": [
+          "quiz_reussis",
+          "niveaux",
+          "niveau_courant",
+          "points_quiz",
+          "points_etoiles",
+          "total",
+          "gold",
+          "reussis"
+        ],
+        "title": "ProgressionJeux"
       },
       "Proposition": {
         "properties": {
@@ -18460,6 +19642,27 @@
             ],
             "title": "Place"
           },
+          "niveau": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NiveauQuiz"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "numero": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero"
+          },
           "ressource_id": {
             "anyOf": [
               {
@@ -18579,6 +19782,8 @@
           "etat",
           "parcours",
           "place",
+          "niveau",
+          "numero",
           "ressource_id",
           "ressource_titre",
           "contenu_de_test",
@@ -18634,6 +19839,27 @@
               }
             ],
             "title": "Place"
+          },
+          "niveau": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NiveauQuiz"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "numero": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero"
           },
           "ressource_id": {
             "anyOf": [
@@ -18765,6 +19991,8 @@
           "etat",
           "parcours",
           "place",
+          "niveau",
+          "numero",
           "ressource_id",
           "ressource_titre",
           "contenu_de_test",
@@ -18814,7 +20042,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "maximum": 12.0,
+                "maximum": 20.0,
                 "minimum": 1.0
               },
               {
@@ -18834,6 +20062,16 @@
               }
             ],
             "title": "Ressource Id"
+          },
+          "niveau": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NiveauQuiz"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -18895,7 +20133,14 @@
             "title": "Meilleur Score"
           },
           "tentatives_restantes": {
-            "type": "integer",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Tentatives Restantes"
           },
           "tentative_en_cours": {
@@ -18947,6 +20192,27 @@
           "nb_questions_reserve": {
             "type": "integer",
             "title": "Nb Questions Reserve"
+          },
+          "numero": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero"
+          },
+          "niveau": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NiveauQuiz"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -18955,175 +20221,11 @@
           "titre",
           "description",
           "axe_code",
-          "nb_questions_reserve"
+          "nb_questions_reserve",
+          "numero",
+          "niveau"
         ],
         "title": "QuizOuvert"
-      },
-      "RattachementAValider": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "prenom": {
-            "type": "string",
-            "title": "Prenom"
-          },
-          "nom": {
-            "type": "string",
-            "title": "Nom"
-          },
-          "fonction": {
-            "type": "string",
-            "title": "Fonction"
-          },
-          "etablissement_encadreur": {
-            "type": "string",
-            "title": "Etablissement Encadreur"
-          },
-          "club_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Club Id"
-          },
-          "club_nom": {
-            "type": "string",
-            "title": "Club Nom"
-          },
-          "club_etablissement": {
-            "type": "string",
-            "title": "Club Etablissement"
-          },
-          "dre": {
-            "type": "string",
-            "title": "Dre"
-          },
-          "supplementaire": {
-            "type": "boolean",
-            "title": "Supplementaire"
-          },
-          "decidable": {
-            "type": "boolean",
-            "title": "Decidable"
-          },
-          "demande_le": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Demande Le"
-          },
-          "confirme_le": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Confirme Le"
-          },
-          "version": {
-            "type": "integer",
-            "title": "Version"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "prenom",
-          "nom",
-          "fonction",
-          "etablissement_encadreur",
-          "club_id",
-          "club_nom",
-          "club_etablissement",
-          "dre",
-          "supplementaire",
-          "decidable",
-          "demande_le",
-          "confirme_le",
-          "version"
-        ],
-        "title": "RattachementAValider",
-        "description": "Un rattachement confirmé par le président, dans la file d'un collaborateur."
-      },
-      "RattachementResume": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "club_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Club Id"
-          },
-          "club_nom": {
-            "type": "string",
-            "title": "Club Nom"
-          },
-          "etat": {
-            "type": "string",
-            "enum": [
-              "en_attente_president",
-              "en_attente_validation",
-              "actif",
-              "refuse",
-              "retire"
-            ],
-            "title": "Etat"
-          },
-          "supplementaire": {
-            "type": "boolean",
-            "title": "Supplementaire"
-          },
-          "demande_le": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Demande Le"
-          },
-          "motif_refus": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Motif Refus"
-          },
-          "motif_retrait": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Motif Retrait"
-          },
-          "version": {
-            "type": "integer",
-            "title": "Version"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "club_id",
-          "club_nom",
-          "etat",
-          "supplementaire",
-          "demande_le",
-          "version"
-        ],
-        "title": "RattachementResume",
-        "description": "Un rattachement, vu par l'encadreur concerné."
       },
       "RefusDemandeEntree": {
         "properties": {
@@ -19185,6 +20287,17 @@
         ],
         "title": "Region"
       },
+      "RegionScolaire": {
+        "type": "string",
+        "enum": [
+          "maritime",
+          "plateaux",
+          "centrale",
+          "kara",
+          "savanes"
+        ],
+        "title": "RegionScolaire"
+      },
       "ReglesEntree": {
         "properties": {
           "noms": {
@@ -19201,7 +20314,7 @@
           "paliers": {
             "items": {
               "type": "integer",
-              "maximum": 12.0,
+              "maximum": 20.0,
               "minimum": 1.0
             },
             "type": "array",
@@ -19252,6 +20365,27 @@
           "cree_le"
         ],
         "title": "ReglesSortie"
+      },
+      "RejetSignalementEntree": {
+        "properties": {
+          "motif": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Motif"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "motif",
+          "version"
+        ],
+        "title": "RejetSignalementEntree"
       },
       "Remplacement": {
         "properties": {
@@ -19995,34 +21129,6 @@
         ],
         "title": "ResumePoints"
       },
-      "RetraitEntree": {
-        "properties": {
-          "motif": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 500
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Motif"
-          },
-          "version": {
-            "type": "integer",
-            "minimum": 1.0,
-            "title": "Version"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "version"
-        ],
-        "title": "RetraitEntree",
-        "description": "Le retrait d'un membre par le président : le motif est facultatif."
-      },
       "Role": {
         "type": "string",
         "enum": [
@@ -20219,6 +21325,29 @@
         ],
         "title": "SemestreResume"
       },
+      "Seuils": {
+        "properties": {
+          "encadreurs": {
+            "type": "integer",
+            "title": "Encadreurs"
+          },
+          "eleves": {
+            "type": "integer",
+            "title": "Eleves"
+          },
+          "delai_jours": {
+            "type": "integer",
+            "title": "Delai Jours"
+          }
+        },
+        "type": "object",
+        "required": [
+          "encadreurs",
+          "eleves",
+          "delai_jours"
+        ],
+        "title": "Seuils"
+      },
       "Sexe": {
         "type": "string",
         "enum": [
@@ -20226,6 +21355,179 @@
           "masculin"
         ],
         "title": "Sexe"
+      },
+      "SignalementAdmin": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "club_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Club Id"
+          },
+          "club_nom": {
+            "type": "string",
+            "title": "Club Nom"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "encadreur_prenom": {
+            "type": "string",
+            "title": "Encadreur Prenom"
+          },
+          "encadreur_nom": {
+            "type": "string",
+            "title": "Encadreur Nom"
+          },
+          "signale_par": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signale Par"
+          },
+          "motif": {
+            "type": "string",
+            "title": "Motif"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "en_attente",
+              "confirme",
+              "rejete"
+            ],
+            "title": "Etat"
+          },
+          "signale_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Signale Le"
+          },
+          "decide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Le"
+          },
+          "motif_decision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Decision"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "club_id",
+          "club_nom",
+          "dre",
+          "encadreur_prenom",
+          "encadreur_nom",
+          "signale_par",
+          "motif",
+          "etat",
+          "signale_le",
+          "decide_le",
+          "motif_decision",
+          "version"
+        ],
+        "title": "SignalementAdmin"
+      },
+      "SignalementResume": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "encadreur_prenom": {
+            "type": "string",
+            "title": "Encadreur Prenom"
+          },
+          "encadreur_nom": {
+            "type": "string",
+            "title": "Encadreur Nom"
+          },
+          "motif": {
+            "type": "string",
+            "title": "Motif"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "en_attente",
+              "confirme",
+              "rejete"
+            ],
+            "title": "Etat"
+          },
+          "signale_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Signale Le"
+          },
+          "decide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Le"
+          },
+          "motif_decision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Decision"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "encadreur_prenom",
+          "encadreur_nom",
+          "motif",
+          "etat",
+          "signale_le",
+          "decide_le",
+          "motif_decision"
+        ],
+        "title": "SignalementResume"
       },
       "Signature": {
         "properties": {
@@ -20267,6 +21569,15 @@
         ],
         "title": "Signature",
         "description": "Jamais de nom complet : un élève par son pseudonyme (et son club s'il l'a choisi), un encadreur par son\nprénom, l'initiale de son nom et sa fonction, une actualité par le nom du club (`profil=\"club\"`)."
+      },
+      "SousCompte": {
+        "type": "string",
+        "enum": [
+          "quiz",
+          "etoiles"
+        ],
+        "title": "SousCompte",
+        "description": "Les Jeux se décomptent en deux : points des quiz et points des étoiles (spec 034)."
       },
       "StatutCompte": {
         "type": "string",
@@ -20441,6 +21752,141 @@
           "derniers_evenements"
         ],
         "title": "TableauDeBord"
+      },
+      "TableauGamification": {
+        "properties": {
+          "annee": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnneeResume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "total_annuel": {
+            "type": "integer",
+            "title": "Total Annuel"
+          },
+          "total_historique": {
+            "type": "integer",
+            "title": "Total Historique"
+          },
+          "apport_club": {
+            "type": "number",
+            "title": "Apport Club"
+          },
+          "rang_regional": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rang Regional"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region"
+          },
+          "place_club": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Place Club"
+          },
+          "parcours": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Parcours"
+          },
+          "certification": {
+            "$ref": "#/components/schemas/DecompteCertification"
+          },
+          "jeux": {
+            "$ref": "#/components/schemas/ProgressionJeux"
+          },
+          "vie": {
+            "$ref": "#/components/schemas/DecompteVie"
+          },
+          "archives": {
+            "items": {
+              "$ref": "#/components/schemas/Archive"
+            },
+            "type": "array",
+            "title": "Archives"
+          },
+          "ancien_eleve": {
+            "type": "boolean",
+            "title": "Ancien Eleve"
+          }
+        },
+        "type": "object",
+        "required": [
+          "annee",
+          "total_annuel",
+          "total_historique",
+          "apport_club",
+          "rang_regional",
+          "region",
+          "place_club",
+          "parcours",
+          "certification",
+          "jeux",
+          "vie",
+          "archives",
+          "ancien_eleve"
+        ],
+        "title": "TableauGamification"
+      },
+      "TerrainEntree": {
+        "properties": {
+          "declare": {
+            "type": "boolean",
+            "title": "Declare"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "declare",
+          "version"
+        ],
+        "title": "TerrainEntree"
       },
       "TitulaireEleve": {
         "properties": {

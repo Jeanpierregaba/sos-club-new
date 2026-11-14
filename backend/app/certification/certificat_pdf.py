@@ -19,6 +19,7 @@ from reportlab.pdfgen import canvas
 
 from app.certification.models import Certificat
 from app.config import settings
+from app.quiz.models import PLACES
 
 # Noto Sans (licence OFL, dans `polices/`) : elle couvre les lettres éwé et kabiyè (ɔ, ɛ, ŋ, ɖ, ʋ…) des noms,
 # qu'Helvetica ne sait pas écrire. Embarquée dans le PDF, sous-ensemble des seuls caractères utilisés.
@@ -56,7 +57,7 @@ def _centrer(c: canvas.Canvas, texte: str, y: float, police: str, taille: float,
     c.drawCentredString(landscape(A4)[0] / 2, y, texte)
 
 
-def generer(certificat: Certificat) -> bytes:
+def generer(certificat: Certificat, nb_quiz: int = PLACES) -> bytes:
     largeur, hauteur = landscape(A4)
     flux = io.BytesIO()
     c = canvas.Canvas(flux, pagesize=(largeur, hauteur), pageCompression=1)
@@ -81,7 +82,7 @@ def generer(certificat: Certificat) -> bytes:
         taille -= 1
     _centrer(c, nom, hauteur - 255, GRASSE, taille, VERT)
     _centrer(
-        c, "pour avoir réussi les 12 quiz du parcours officiel de certification Génie Imhotep,",
+        c, f"pour avoir réussi les {nb_quiz} quiz du parcours officiel de certification Génie Imhotep,",
         hauteur - 305, NORMALE, 15, GRIS,
     )  # fmt: skip
     _centrer(

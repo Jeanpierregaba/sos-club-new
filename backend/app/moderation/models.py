@@ -111,7 +111,7 @@ class Contenu(Suivi, Base):
     afficher_club: Mapped[bool] = mapped_column(server_default=text("true"))
     # DRE de l'établissement de l'auteur, copiée à chaque soumission : elle fixe le périmètre de la file.
     dre_code: Mapped[str | None] = mapped_column(ForeignKey("dre.code", ondelete="RESTRICT"))
-    # Club de l'élève affilié à la première approbation : R13 lui créditera `club.article_eleve`.
+    # Club de l'élève affilié à la première approbation ; il reçoit la moitié de ses points (spec 034).
     club_beneficiaire_id: Mapped[UUID | None] = mapped_column(ForeignKey("club.id", ondelete="RESTRICT"))
     soumis_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     # Date de la première publication : l'ordre public ne bouge pas avec une nouvelle version.

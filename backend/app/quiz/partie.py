@@ -17,9 +17,8 @@ from sqlalchemy import delete, exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.certification import progression
-from app.comptes.models import Role, StatutCompte, Utilisateur
-from app.points import service as points
-from app.points.bareme import QUIZ_ELEVE
+from app.comptes.models import Role, Utilisateur
+from app.jeux import progression as jeux_progression
 from app.points.models import MouvementPoints
 from app.quiz import horloge, parametres
 from app.quiz.models import (
@@ -148,7 +147,7 @@ async def lancer(db: AsyncSession, joueur: Utilisateur, quiz_id: UUID, *, essai:
                 TentativeQuiz.essai.is_(False),
             )
         )
-        if (du_jour or 0) >= p.tentatives_par_jour:
+        if p.tentatives_par_jour is not None and (du_jour or 0) >= p.tentatives_par_jour:
             raise PlafondAtteint
 
     reserve = list(
@@ -232,7 +231,11 @@ async def repondre(
     else:
         ligne.correcte = False
     tentative.derniere_activite = maintenant
-    await _envoyer_suivante(db, tentative, joueur, quiz, p, maintenant)
+    if not ligne.correcte and p.arret_premiere_erreur:
+        # Certification (spec 034) : la première erreur arrête la tentative ; la suivante repart de la question 1.
+        await _terminer(db, tentative, joueur, quiz, p, maintenant)
+    else:
+        await _envoyer_suivante(db, tentative, joueur, quiz, p, maintenant)
     return await _finir_reponse(db, tentative, quiz, p, maintenant, corrigee=ligne)
 
 
@@ -287,7 +290,9 @@ async def liste(db: AsyncSession, joueur: Utilisateur, axe: str | None = None) -
                 publie_le=q.publie_le,
                 reussi=resultats.get(q.id, (False, None))[0],
                 meilleur_score=resultats.get(q.id, (False, None))[1],
-                tentatives_restantes=max(0, p.tentatives_par_jour - du_jour.get(q.id, 0)),
+                tentatives_restantes=(
+                    None if p.tentatives_par_jour is None else max(0, p.tentatives_par_jour - du_jour.get(q.id, 0))
+                ),
                 tentative_en_cours=en_cours.get(q.id),
             )
             for q in tous
@@ -379,7 +384,10 @@ async def _avancer(
     if courante is not None and courante.envoyee_le is not None and maintenant > courante.envoyee_le + _delai(p):
         courante.correcte = False
         tentative.derniere_activite = maintenant
-        await _envoyer_suivante(db, tentative, joueur, quiz, p, maintenant)
+        if p.arret_premiere_erreur:
+            await _terminer(db, tentative, joueur, quiz, p, maintenant)
+        else:
+            await _envoyer_suivante(db, tentative, joueur, quiz, p, maintenant)
         return courante
     return None
 
@@ -415,16 +423,18 @@ async def _terminer(
         and quiz.etat is EtatQuiz.publie
         and quiz.parcours == PARCOURS_CERTIFICATION
     ):
-        await progression.enregistrer_reussite(db, joueur, quiz, tentative)
+        mouvement = await progression.enregistrer_reussite(db, joueur, quiz, tentative)
+        if mouvement is not None:
+            tentative.mouvement_id = mouvement.id
     elif (
         not tentative.essai
         and tentative.reussie
         and quiz.etat is EtatQuiz.publie
-        and joueur.role is Role.eleve
-        and joueur.statut is StatutCompte.actif
+        and jeux_progression.recompense(joueur)
     ):
-        # La clé unique du registre garantit un seul crédit par élève et par quiz, quelle que soit la tentative.
-        mouvement = await points.crediter(db, QUIZ_ELEVE, joueur.id, cle_points(quiz.id, joueur.id))
+        # Spec 034 : le montant du niveau du quiz, puis l'étoile du niveau. La clé unique du registre garantit un seul
+        # crédit par élève et par quiz, quelle que soit la tentative.
+        mouvement = await jeux_progression.apres_reussite(db, joueur, quiz, cle_points(quiz.id, joueur.id))
         if mouvement is not None:
             tentative.mouvement_id = mouvement.id
     await db.flush()

@@ -1,5 +1,7 @@
 # 019 — Clubs et présidence
 
+> **Remplacée en partie par la [spec 033](../033-activation-des-clubs/spec.md) (2026-11-10)** : le club ne naît plus d'une demande du président validée par l'admin ; il naît à la première affiliation et s'active au seuil de 3 encadreurs et 21 élèves. La présidence et la passation restent.
+
 ## Objectif
 
 Roadmap R4, phase 1 (P0, jalon A — démo pilote). Un élève désigné président demande la création de

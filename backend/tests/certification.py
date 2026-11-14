@@ -18,7 +18,7 @@ CERTIFICATION = "/api/certification"
 NUMERO = r"^GI-[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}$"
 
 
-def creer_parcours(en_base: Callable[..., Any], places: Iterable[int] = range(1, 13), **champs: Any) -> dict[int, Quiz]:
+def creer_parcours(en_base: Callable[..., Any], places: Iterable[int] = range(1, 21), **champs: Any) -> dict[int, Quiz]:
     """Un quiz publié sur chaque place demandée."""
     return {place: creer_quiz(en_base, titre=f"Place {place}", place=place, **champs) for place in places}
 

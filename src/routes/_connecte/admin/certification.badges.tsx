@@ -66,8 +66,8 @@ function Badges() {
           Règles des badges, version {regles.en_cours.version}
         </h2>
         <p className="text-sm text-muted-foreground">
-          Chaque badge se délivre après un nombre de quiz du parcours réussis. Les paliers montent
-          strictement et le dernier vaut 12. Un badge déjà obtenu garde son nom et son palier.
+          Chaque badge se délivre à la fin de sa thématique : après 4, 8, 12, 16 et 20 quiz réussis
+          (spec 034). Seuls les noms se règlent. Un badge déjà obtenu garde son nom et son palier.
         </p>
         <table className="w-full text-sm">
           <thead>
@@ -97,7 +97,7 @@ function Badges() {
                     className={CHAMP_ADMIN}
                     inputMode="numeric"
                     value={paliers[i]}
-                    disabled={!modifiable}
+                    disabled
                     onChange={(e) =>
                       setPaliers((p) => p.map((x, j) => (j === i ? e.target.value : x)))
                     }

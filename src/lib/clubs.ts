@@ -1,14 +1,36 @@
-// Aides d'affichage des clubs (spec 019) : états, axes et rattachement à un établissement.
-import type { AxePublic, ClubPublic, EtatClub } from "@/lib/api/client";
+// Aides d'affichage des clubs (specs 019 et 033) : statuts, axes et rattachement à un établissement.
+import type {
+  AxePublic,
+  CarteEtablissement,
+  ClubPublic,
+  RegionScolaire,
+  StatutClub,
+} from "@/lib/api/client";
 
 // Sur la carte, un établissement sans club ne doit plus passer pour un club.
 export const LIBELLE_SANS_CLUB = "Aucun club enregistré pour cet établissement";
 
-export const ETATS_CLUB: Record<EtatClub, { libelle: string; classe: string }> = {
-  en_attente: { libelle: "En attente de vérification", classe: "bg-sun/30 text-ink" },
+type Pastille = { libelle: string; classe: string };
+
+// Statuts calculés par l'API (spec 033, ADR-0011).
+export const STATUTS_CLUB: Record<StatutClub, Pastille> = {
+  en_constitution: { libelle: "En constitution", classe: "bg-sun/30 text-ink" },
   actif: { libelle: "Club actif", classe: "bg-primary/10 text-primary" },
-  refuse: { libelle: "Demande refusée", classe: "bg-logo-red/10 text-logo-red" },
+  en_regularisation: { libelle: "En régularisation", classe: "bg-sun/60 text-ink" },
+  suspendu: { libelle: "Suspendu", classe: "bg-logo-red/10 text-logo-red" },
 };
+
+// Le statut public d'un établissement sur la carte : une régularisation s'y montre « actif ».
+export const STATUTS_CARTE: Record<CarteEtablissement["statut"], Pastille> = {
+  reference: { libelle: "Référencé", classe: "bg-mist text-muted-foreground" },
+  en_constitution: STATUTS_CLUB.en_constitution,
+  actif: STATUTS_CLUB.actif,
+  suspendu: STATUTS_CLUB.suspendu,
+};
+
+// Les seuils d'activation (spec 033) : l'API les renvoie aussi, ces valeurs servent aux textes.
+export const SEUIL_ENCADREURS = 3;
+export const SEUIL_ELEVES = 21;
 
 // Un seul club actif par établissement : l'index suffit à savoir si un établissement en a un.
 export function clubsParEtablissement(clubs: ClubPublic[]): Map<string, ClubPublic> {
@@ -23,3 +45,15 @@ export function libellesDesAxes(axes: AxePublic[]): Map<string, string> {
 export function libelleAxes(codes: string[], libelles: Map<string, string>): string {
   return codes.map((code) => libelles.get(code) ?? code).join(" · ");
 }
+
+// Les 5 régions du Togo, du sud au nord (spec 033) : le niveau au-dessus des DRE.
+export const REGIONS_SCOLAIRES: { code: RegionScolaire; nom: string }[] = [
+  { code: "maritime", nom: "Maritime" },
+  { code: "plateaux", nom: "Plateaux" },
+  { code: "centrale", nom: "Centrale" },
+  { code: "kara", nom: "Kara" },
+  { code: "savanes", nom: "Savanes" },
+];
+
+export const nomRegion = (code: RegionScolaire) =>
+  REGIONS_SCOLAIRES.find((r) => r.code === code)?.nom ?? code;

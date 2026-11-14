@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import {
+  GraduationCap,
   ArrowLeft,
   ClipboardList,
   Copy,
@@ -38,6 +39,7 @@ import {
   type ProfilEleveAdmin,
   type ProfilEncadreurAdmin,
   type ResumePoints,
+  adminPasserAncienEleve,
 } from "@/lib/api/client";
 import { libelleClasse } from "@/lib/classes";
 import { LIBELLES_VERIFICATION, libelleFonction } from "@/lib/fonctions";
@@ -173,6 +175,11 @@ function SectionEleve({
   const [pseudonyme, setPseudonyme] = useState(false);
   const [reinitialiser, setReinitialiser] = useState(false);
   const [provisoire, setProvisoire] = useState<string | null>(null);
+  const [ancien, setAncien] = useState(false);
+  const { admin } = Route.useRouteContext();
+  // Spec 034 : seul un collaborateur national qui gère les points passe un élève en ancien élève.
+  const peutArchiver =
+    peut(admin, "points", "modifier") && admin.perimetre_dre === null && !eleve.ancien_eleve_le;
   const { points } = eleve;
 
   const champs: [string, React.ReactNode][] = [
@@ -192,6 +199,12 @@ function SectionEleve({
     ["IESG et DRE", `${eleve.etablissement.iesg} · ${eleve.etablissement.dre}`],
     ["Charte acceptée", eleve.charte_version],
     ["Points", `${points.points_semestre} ce semestre · ${points.total} au total`],
+    ...(eleve.ancien_eleve_le
+      ? ([["Statut", `Ancien élève depuis le ${dateCourte(eleve.ancien_eleve_le)}`]] as [
+          string,
+          React.ReactNode,
+        ][])
+      : []),
   ];
 
   return (
@@ -216,6 +229,15 @@ function SectionEleve({
             </Button>
           </div>
         )}
+        {peutArchiver && (
+          <Button
+            variant="outline"
+            onClick={() => setAncien(true)}
+            className="rounded-full font-bold"
+          >
+            <GraduationCap className="size-4" /> Passer en ancien élève
+          </Button>
+        )}
       </div>
       <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {champs.map(([libelle, valeur]) => (
@@ -236,6 +258,19 @@ function SectionEleve({
           fermer={() => setPseudonyme(false)}
         />
       )}
+      <DialogueFormulaire
+        ouvert={ancien}
+        onOuvert={setAncien}
+        titre="Passer en ancien élève ?"
+        description="L'élève a quitté le système scolaire : il garde l'accès à ses archives, mais ne gagne plus de récompense d'élève. Ce n'est pas réversible depuis l'espace admin."
+        bouton="Passer en ancien élève"
+        danger
+        onEnvoie={async () => {
+          await adminPasserAncienEleve(inscrit.id);
+          setAncien(false);
+          await router.invalidate();
+        }}
+      />
       <DialogueMotif
         ouvert={reinitialiser}
         onOuvert={setReinitialiser}

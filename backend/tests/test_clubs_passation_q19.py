@@ -19,7 +19,7 @@ from app.clubs.models import (
     Rattachement,
 )
 from app.comptes.models import StatutCompte, Utilisateur
-from tests.conftest import MOT_DE_PASSE, Navigateur, connecter_admin
+from tests.conftest import MOT_DE_PASSE, Navigateur, connecter_admin, etablissement_de
 
 pytestmark = pytest.mark.usefixtures("annuaire")
 
@@ -60,6 +60,11 @@ def rattacher(en_base: Callable[..., Any], encadreur: Utilisateur, club: Any) ->
 def proposer(client: TestClient, club: Any, pseudonyme: str = "Kofi Curieux") -> Any:
     connecter(client, "president")
     return client.post(PROPOSER, json={"pseudonyme": pseudonyme, "version": club.version})
+
+
+def changer_detablissement(client: Any, chemin: str, etablissement_id: Any) -> int:
+    version = client.get(chemin).json()["version"]
+    return client.patch(chemin, json={"version": version, "etablissement_id": str(etablissement_id)}).status_code
 
 
 def passation_du_club(en_base: Callable[..., Any], club: Any) -> ClubPassation:
@@ -108,7 +113,7 @@ def test_avec_un_encadreur_la_passation_attend_sa_confirmation(
     assert verificateur_clubs.get("/api/admin/clubs/passations").json()["total"] == 0
 
     connecter(navigateur, "prof")
-    a_confirmer = navigateur.get("/api/encadreurs/moi/clubs").json()["passations"]
+    a_confirmer = navigateur.get("/api/clubs/mon-club-sante").json()["passations_a_confirmer"]
     assert [(p["successeur_pseudonyme"], p["president_sortant_pseudonyme"]) for p in a_confirmer] == [
         ("Kofi Curieux", "Ama la Présidente")
     ]
@@ -181,7 +186,8 @@ def test_si_le_dernier_encadreur_part_la_passation_va_a_ladmin(
     proposer(client, club)
     connecter(client, "prof")
 
-    assert client.delete(f"/api/clubs/{club.id}/rattachements/moi").status_code == 200
+    # Spec 033 : un encadreur quitte le club en changeant d'établissement.
+    assert changer_detablissement(client, "/api/encadreurs/moi", etablissement_de(en_base, "savanes")) == 200
 
     assert passation_du_club(en_base, club).etat is EtatPassation.en_attente
 
@@ -205,7 +211,7 @@ def test_un_successeur_qui_a_quitte_le_club_nest_pas_valide(
     navigateur = Navigateur(client)
     corps = proposer(navigateur, club).json()
     connecter(navigateur, "kofi")
-    assert navigateur.delete(f"/api/clubs/{club.id}/adhesions/moi").status_code == 200
+    assert changer_detablissement(navigateur, "/api/eleves/moi", etablissement_de(en_base, "savanes")) == 200
 
     # Son départ a annulé la passation : le président sortant peut en proposer une autre.
     passation = passation_du_club(en_base, club)
@@ -218,15 +224,20 @@ def test_un_successeur_qui_a_quitte_le_club_nest_pas_valide(
     assert en_base(lambda db: db.get(Club, club.id)).president_id == club.president_id
 
 
-def test_le_successeur_retire_par_le_president_annule_la_passation(
-    client: TestClient, club: Any, successeur: Utilisateur, en_base: Callable[..., Any]
+def test_le_successeur_retire_par_un_encadreur_annule_la_passation(
+    client: TestClient, club: Any, successeur: Utilisateur, prof: Utilisateur, en_base: Callable[..., Any]
 ) -> None:
     proposer(client, club)
     adhesion = en_base(
         lambda db: db.scalar(select(Adhesion).where(Adhesion.eleve_id == successeur.id, Adhesion.club_id == club.id))
     )
+    # Spec 033 : le retrait d'un élève revient aux encadreurs du club, plus au président.
+    connecter(client, "prof")
 
-    reponse = client.post(f"/api/clubs/{club.id}/adhesions/{adhesion.id}/retirer", json={"version": adhesion.version})
+    reponse = client.post(
+        f"/api/clubs/mon-club-sante/affiliations/{adhesion.id}/retirer",
+        json={"motif": "A quitté le lycée.", "version": adhesion.version},
+    )
 
     assert reponse.status_code == 200, reponse.text
     assert passation_du_club(en_base, club).etat is EtatPassation.refusee

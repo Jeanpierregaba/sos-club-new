@@ -20,7 +20,7 @@ from tests.test_quiz_banque import PUBLICATION
 
 GESTION = "/api/admin/certification"
 PUBLIC = "/api/certificats"
-REGLES = {"noms": ["Cuivre", "Argent", "Or", "Platine", "Diamant Imhotep"], "paliers": [2, 5, 7, 9, 12]}
+REGLES = {"noms": ["Cuivre", "Argent", "Or", "Platine", "Diamant Imhotep"], "paliers": [4, 8, 12, 16, 20]}
 
 # Un collaborateur qui publie, avec la double authentification (spec 027).
 publieur = banque_027.publieur
@@ -32,7 +32,7 @@ def eleve(creer_eleve: Callable[..., Utilisateur]) -> Utilisateur:
 
 
 def certifier(en_base: Callable[..., Any], joueur: Utilisateur) -> Certificat:
-    acquerir(en_base, joueur, creer_parcours(en_base), range(1, 13))
+    acquerir(en_base, joueur, creer_parcours(en_base), range(1, 21))
     mettre_a_jour(en_base, joueur)
     return certificats(en_base, joueur.id)[0]
 
@@ -70,7 +70,7 @@ def test_changer_les_regles_ajoute_une_version(publieur: Navigateur, en_base: Ca
     assert reponse.status_code == 200, reponse.text
     assert reponse.json()["version"] == 2
     historique = publieur.get(f"{GESTION}/regles").json()
-    assert historique["en_cours"]["paliers"] == [2, 5, 7, 9, 12]
+    assert historique["en_cours"]["paliers"] == [4, 8, 12, 16, 20]
     assert [v["version"] for v in historique["versions"]] == [2, 1]
     assert journal(en_base) == ["certification_regles_modifiees"]
 
@@ -78,15 +78,17 @@ def test_changer_les_regles_ajoute_une_version(publieur: Navigateur, en_base: Ca
 @pytest.mark.parametrize(
     "entree",
     [
-        {"noms": REGLES["noms"], "paliers": [3, 3, 7, 9, 12]},
-        {"noms": REGLES["noms"], "paliers": [3, 5, 9, 7, 12]},
+        {"noms": REGLES["noms"], "paliers": [3, 3, 7, 9, 20]},
+        {"noms": REGLES["noms"], "paliers": [3, 5, 9, 7, 20]},
         {"noms": REGLES["noms"], "paliers": [3, 5, 7, 9, 11]},
-        {"noms": REGLES["noms"], "paliers": [0, 5, 7, 9, 12]},
-        {"noms": REGLES["noms"], "paliers": [3, 5, 7, 12]},
-        {"noms": ["Bronze", "", "Or", "Platine", "Diamant"], "paliers": [3, 5, 7, 9, 12]},
-        {"noms": ["Bronze", "bronze", "Or", "Platine", "Diamant"], "paliers": [3, 5, 7, 9, 12]},
-        {"noms": ["Bronze", "Argent", "Or", "Platine"], "paliers": [3, 5, 7, 9, 12]},
-        {"noms": ["x" * 41, "Argent", "Or", "Platine", "Diamant"], "paliers": [3, 5, 7, 9, 12]},
+        {"noms": REGLES["noms"], "paliers": [0, 5, 7, 9, 20]},
+        # Spec 034 : un badge par thématique de 4 quiz, rien d'autre.
+        {"noms": REGLES["noms"], "paliers": [2, 5, 9, 15, 20]},
+        {"noms": REGLES["noms"], "paliers": [3, 5, 7, 20]},
+        {"noms": ["Bronze", "", "Or", "Platine", "Diamant"], "paliers": [4, 8, 12, 16, 20]},
+        {"noms": ["Bronze", "bronze", "Or", "Platine", "Diamant"], "paliers": [4, 8, 12, 16, 20]},
+        {"noms": ["Bronze", "Argent", "Or", "Platine"], "paliers": [3, 5, 7, 9, 20]},
+        {"noms": ["x" * 41, "Argent", "Or", "Platine", "Diamant"], "paliers": [4, 8, 12, 16, 20]},
     ],
 )
 def test_des_regles_incoherentes_sont_refusees(publieur: Navigateur, entree: dict[str, Any]) -> None:
@@ -120,7 +122,13 @@ def test_lequipe_voit_les_certificats_et_les_badges(
         "valide",
         "eleve",
     )
-    assert [b["nom"] for b in delivres] == ["Diamant Imhotep", "Platine", "Or", "Argent", "Bronze"]
+    assert [b["nom"] for b in delivres] == [
+        "Maître Génie Imhotep",
+        "Champion de la Santé et EVSS",
+        "Sentinelle de la Prévention",
+        "Pair Éducateur Santé et Citoyenneté",
+        "Ambassadeur Santé Junior",
+    ]
     assert publieur.get(f"{GESTION}/certificats", params={"etat": "revoque"}).json()["certificats"] == []
 
 

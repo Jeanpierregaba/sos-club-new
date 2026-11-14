@@ -13,7 +13,6 @@ les mots de passe ne passent jamais par l'historique du terminal.
 import argparse
 import asyncio
 import sys
-from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
 
@@ -21,9 +20,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.journal import journaliser
-from app.clubs.adhesions import adhesion_president
-from app.clubs.models import PASSATION_EN_ATTENTE, Club, ClubAxe, ClubPassation, EtatClub
-from app.clubs.service import normaliser_nom
+from app.clubs import activation
+from app.clubs.models import CLUB_EN_SERVICE, PASSATION_EN_ATTENTE, Club, ClubAxe, ClubPassation
 from app.comptes.models import Role, Utilisateur
 from app.config import settings
 from app.db import SessionLocal, engine
@@ -31,6 +29,7 @@ from app.eleves.models import Classe
 from app.encadreurs.models import EtatVerification, Fonction
 from app.jeux import banque_initiale
 from app.referentiel.models import Axe, Etablissement, Iesg, StatutEtablissement
+from app.referentiel.normalisation import normaliser
 from app.seed_commun import (
     activer_double_auth,
     ecrire_fichier,
@@ -39,6 +38,7 @@ from app.seed_commun import (
     preparer_compte,
     preparer_eleve,
     preparer_encadreur,
+    preparer_figurants,
     preparer_semestre,
 )
 
@@ -95,51 +95,29 @@ async def _etablissement(db: AsyncSession) -> UUID:
 
 
 async def _preparer_club(db: AsyncSession, president: Utilisateur, etablissement_id: UUID) -> Club:
-    """Le club de test, actif et présidé par l'élève `preprod.president`. Sans lui, aucune affiliation ni
-    rattachement à essayer. Relancé, le seed le remet en état, même s'il a été refusé ou passé à un autre élève
-    pendant les tests."""
-    nom_normalise = normaliser_nom(NOM_CLUB)
-    club = await db.scalar(
-        select(Club).where(Club.etablissement_id == etablissement_id, Club.nom_normalise == nom_normalise)
-    )
-    # Un seul club actif par établissement : un club créé par un testeur bloquerait le club de test.
-    autre_actif = select(Club.nom).where(Club.etablissement_id == etablissement_id, Club.etat == EtatClub.actif)
-    if club is not None:
-        autre_actif = autre_actif.where(Club.id != club.id)
-    if (autre := await db.scalar(autre_actif)) is not None:
-        raise PreparationImpossible(
-            f"L'établissement de test a déjà un autre club actif (« {autre} ») : refuse-le ou retire-le d'abord."
-        )
-    if club is None:
-        club = Club(
-            etablissement_id=etablissement_id,
-            nom=NOM_CLUB,
-            nom_normalise=nom_normalise,
-            description="Club de test de la préproduction.",
-            demandeur_id=president.id,
-            encadreurs_associes=[],
-        )
-        db.add(club)
-    elif await db.scalar(
+    """Le club de test (spec 033) : né à la première affiliation, actif grâce à des figurants « [Test] » (2 encadreurs
+    et 20 élèves confirmés, sans accès) qui complètent preprod.encadreur et preprod.president jusqu'au seuil de 3 + 21.
+    preprod.eleve reste « à confirmer », pour essayer « Mon Club Santé ». Relancé, le seed le remet en état, même si
+    la présidence a changé pendant les tests."""
+    await preparer_figurants(db, "figurant.preprod", etablissement_id, encadreurs=2, eleves=20)
+    club = await activation.club_de(db, etablissement_id)
+    if await db.scalar(
         select(ClubPassation.id).where(ClubPassation.club_id == club.id, ClubPassation.etat.in_(PASSATION_EN_ATTENTE))
     ):
         raise PreparationImpossible("Une passation du club de test est en attente : décide-la d'abord.")
-    maintenant = datetime.now(UTC)
-    if club.etat is not EtatClub.actif:
-        club.decide_le = maintenant
-        club.actif_le = maintenant
-    club.etat = EtatClub.actif
-    club.motif_refus = None
+    club.nom = NOM_CLUB
+    club.nom_normalise = normaliser(NOM_CLUB)
+    club.description = club.description or "Club de test de la préproduction."
     club.president_id = president.id
     await db.flush()
-    # Le président est membre de droit de son club (spec 020), même s'il l'avait quitté pendant les tests.
-    await adhesion_president(db, club)
     if await db.scalar(select(ClubAxe.axe_code).where(ClubAxe.club_id == club.id)) is None:
         axes = list((await db.scalars(select(Axe.code).order_by(Axe.code).limit(2))).all())
         if not axes:
             raise PreparationImpossible("Aucun axe dans le référentiel : le club de test en demande au moins un.")
         for code in axes:
             db.add(ClubAxe(club_id=club.id, axe_code=code))
+    if await activation.recalculer(db, club.id, "seed") not in CLUB_EN_SERVICE:
+        raise PreparationImpossible("Le club de test n'a pas atteint le seuil : vérifie les comptes de test.")
     return club
 
 
@@ -171,7 +149,9 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
             await preparer_encadreur(db, utilisateur, Fonction.enseignant, etablissement_id, EtatVerification.actif)
         else:
             affiche, classe = PROFILS_ELEVES[identifiant]
-            await preparer_eleve(db, utilisateur, affiche, classe, etablissement_id)
+            await preparer_eleve(
+                db, utilisateur, affiche, classe, etablissement_id, confirmer=identifiant == "preprod.president"
+            )
         acces.append(ligne)
     assert president is not None  # COMPTES contient toujours preprod.president
     await _preparer_club(db, president, etablissement_id)

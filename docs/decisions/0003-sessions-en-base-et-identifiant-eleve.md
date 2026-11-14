@@ -44,3 +44,8 @@ la DRE). La présidence est une donnée du club (`club.president_id`), pas un r�
 se transmet par une passation proposée par le président sortant et validée ou refusée (avec motif)
 par l'admin, journalisée comme `club_passation`. Les rattachements d'élèves et d'encadreurs au club
 (Membres, R5) suivront ; les encadreurs associés cités dans une demande restent déclaratifs.
+
+## Note du 2026-11-10 : naissance automatique des clubs (spec 033)
+
+Le club n'a toujours pas de compte, mais il ne naît plus d'une demande du président : il est créé à la première
+affiliation sur son établissement et activé au seuil de 3 encadreurs et 21 élèves. Voir l'[ADR-0011](0011-activation-automatique-des-clubs.md).

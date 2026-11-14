@@ -17,6 +17,7 @@ from app.comptes.service import VIOLATION_UNICITE, _purger_vieux_essais
 from app.config import settings
 from app.referentiel.models import Dre, Etablissement, Iesg, StatutEtablissement, TypeEtablissement
 from app.referentiel.normalisation import normaliser
+from app.referentiel.regions import NOMS as NOMS_REGIONS
 from app.referentiel.schemas import EtablissementRattache
 
 # Pas une empreinte SHA-256 (64 caractères hexadécimaux) : elle ne se confond avec la clé d'aucune connexion.
@@ -140,5 +141,5 @@ async def etablissement_rattache(db: AsyncSession, etablissement_id: UUID) -> Et
     ).one()
     return EtablissementRattache(
         id=etablissement.id, nom=etablissement.nom, statut=etablissement.statut, iesg=iesg.nom, dre_code=dre.code,
-        dre=dre.nom, localite=etablissement.localite,
+        dre=dre.nom, localite=etablissement.localite, region=NOMS_REGIONS[dre.region],
     )  # fmt: skip

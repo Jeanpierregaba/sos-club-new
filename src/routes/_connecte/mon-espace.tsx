@@ -14,6 +14,8 @@ import {
   Info,
   MotDePasseChange,
 } from "@/components/espace/commun";
+import { CarteMembre } from "@/components/espace/CarteMembre";
+import { PointsClub, TableauAnnuel } from "@/components/espace/TableauAnnuel";
 import { EspaceEncadreur } from "@/components/espace/EspaceEncadreur";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -21,27 +23,23 @@ import { MonAxe } from "@/components/MonAxe";
 import { Button } from "@/components/ui/button";
 import { useDeconnexion } from "@/hooks/use-deconnexion";
 import {
-  chargerAxes,
-  chargerClubParEtablissement,
-  chargerDemandesAdhesion,
-  chargerDemandesRattachement,
   chargerMembres,
-  chargerMesClubs,
   chargerEspaceEleve,
+  chargerMaGamification,
+  chargerPointsDuClub,
   chargerEspaceEncadreur,
   chargerEspaceVisiteur,
+  chargerMonClubSante,
   chargerMonClub,
   ErreurApi,
   modifierProfilEleve,
-  type AxePublic,
   type Classe,
-  type ClubPublic,
-  type DemandeAdhesion,
-  type DemandeRattachement,
   type EspaceEleve,
   type EspaceVisiteur,
   type MembresDuClub,
   type MonClub,
+  type PointsDuClub,
+  type TableauGamification,
 } from "@/lib/api/client";
 import { CLASSES, libelleClasse } from "@/lib/classes";
 import { libelleRegion } from "@/lib/visiteurs";
@@ -66,74 +64,37 @@ export const Route = createFileRoute("/_connecte/mon-espace")({
   loader: async ({ context }) => {
     try {
       if (context.moi.role === "eleve") {
-        const [espace, club, axes] = await Promise.all([
+        const [espace, club, gamification, pointsClub] = await Promise.all([
           chargerEspaceEleve(),
           chargerMonClub(),
-          chargerAxes().catch(() => []),
+          // Spec 034 : le tableau annuel (carte de membre comprise) et le total du club ; sans eux, l'espace reste
+          // lisible.
+          chargerMaGamification().catch(() => null),
+          chargerPointsDuClub().catch(() => null),
         ]);
-        // Quand l'élève n'a pas lui-même de demande, l'établissement peut déjà avoir un club actif :
-        // le formulaire ne doit pas être proposé (§1 de la spec).
-        const clubEtablissement =
-          club.club === null
-            ? await chargerClubParEtablissement(espace.etablissement.id).catch(() => undefined)
-            : null;
-        // Spec 020 : le président reçoit ses demandes et la liste ; un membre, la liste seulement.
-        const preside = club.club?.president && club.club.etat === "actif" ? club.club.id : null;
-        const membreDe = espace.adhesion?.etat === "active" ? espace.adhesion.club_id : null;
-        const sansErreur = <T,>(promesse: Promise<T>, defaut: T) => promesse.catch(() => defaut);
-        const [membres, demandesAdhesion, demandesRattachement] = await Promise.all([
-          preside || membreDe
-            ? sansErreur(chargerMembres((preside ?? membreDe)!), null)
-            : Promise.resolve(null),
-          preside ? sansErreur(chargerDemandesAdhesion(preside), []) : Promise.resolve([]),
-          preside ? sansErreur(chargerDemandesRattachement(preside), []) : Promise.resolve([]),
-        ]);
-        return {
-          eleve: espace,
-          club,
-          axes,
-          clubEtablissement,
-          membres,
-          demandesAdhesion,
-          demandesRattachement,
-          encadreur: null,
-        };
+        // Le président choisit son successeur dans la liste des membres confirmés (spec 019).
+        const membres = club.club?.president
+          ? await chargerMembres(club.club.id).catch(() => null)
+          : null;
+        return { eleve: espace, club, membres, gamification, pointsClub, encadreur: null };
       }
       if (context.moi.role === "encadreur") {
         const encadreur = await chargerEspaceEncadreur();
-        // Spec 020 : ses clubs, le club de son établissement et les membres de ses clubs actifs.
-        const actif = encadreur.etat === "actif";
-        const [mesClubs, clubEtablissement] = await Promise.all([
-          actif ? chargerMesClubs().catch(() => null) : Promise.resolve(null),
-          actif
-            ? chargerClubParEtablissement(encadreur.etablissement.id).catch(() => undefined)
-            : Promise.resolve(undefined),
-        ]);
-        const actifs = (mesClubs?.rattachements ?? []).filter((r) => r.etat === "actif");
-        const listes = await Promise.all(
-          actifs.map((r) => chargerMembres(r.club_id).catch(() => null)),
-        );
-        const membresEncadres: Record<string, MembresDuClub> = {};
-        actifs.forEach((r, i) => {
-          const liste = listes[i];
-          if (liste) membresEncadres[r.club_id] = liste;
-        });
-        return {
-          eleve: null,
-          club: null,
-          axes: [],
-          clubEtablissement: clubEtablissement ?? null,
-          encadreur,
-          mesClubs,
-          membresEncadres,
-        };
+        // Spec 033 : un encadreur vérifié est rattaché au club de son établissement, qu'il suit dans « Mon Club
+        // Santé ».
+        const [monClubSante, pointsClub] =
+          encadreur.etat === "actif"
+            ? await Promise.all([
+                chargerMonClubSante().catch(() => null),
+                chargerPointsDuClub().catch(() => null),
+              ])
+            : [null, null];
+        return { eleve: null, club: null, encadreur, monClubSante, pointsClub };
       }
       if (context.moi.role === "visiteur") {
         return {
           eleve: null,
           club: null,
-          axes: [],
-          clubEtablissement: null,
           encadreur: null,
           visiteur: await chargerEspaceVisiteur(),
         };
@@ -144,14 +105,12 @@ export const Route = createFileRoute("/_connecte/mon-espace")({
         return {
           eleve: null,
           club: null,
-          axes: [],
-          clubEtablissement: null,
           encadreur: null,
           message: e.message,
         };
       throw e;
     }
-    return { eleve: null, club: null, axes: [], clubEtablissement: null, encadreur: null };
+    return { eleve: null, club: null, encadreur: null };
   },
   head: () => ({
     meta: [
@@ -171,11 +130,9 @@ function MonEspace() {
       <EspaceDeLEleve
         espace={donnees.eleve}
         club={donnees.club}
-        axes={donnees.axes}
-        clubEtablissement={donnees.clubEtablissement ?? null}
         membres={"membres" in donnees ? donnees.membres : null}
-        demandesAdhesion={"demandesAdhesion" in donnees ? donnees.demandesAdhesion : []}
-        demandesRattachement={"demandesRattachement" in donnees ? donnees.demandesRattachement : []}
+        gamification={"gamification" in donnees ? donnees.gamification : null}
+        pointsClub={"pointsClub" in donnees ? donnees.pointsClub : null}
       />
     );
   if (donnees.encadreur)
@@ -183,9 +140,8 @@ function MonEspace() {
       <EspaceEncadreur
         espace={donnees.encadreur}
         prenom={moi.prenom}
-        mesClubs={"mesClubs" in donnees ? donnees.mesClubs : null}
-        clubEtablissement={donnees.clubEtablissement ?? null}
-        membres={"membresEncadres" in donnees ? donnees.membresEncadres : {}}
+        monClubSante={"monClubSante" in donnees ? donnees.monClubSante : null}
+        pointsClub={"pointsClub" in donnees ? donnees.pointsClub : null}
       />
     );
   if ("visiteur" in donnees && donnees.visiteur)
@@ -289,19 +245,15 @@ function EspaceSimple({ message }: { message?: string | undefined }) {
 function EspaceDeLEleve({
   espace,
   club,
-  axes,
-  clubEtablissement,
   membres,
-  demandesAdhesion,
-  demandesRattachement,
+  gamification,
+  pointsClub,
 }: {
   espace: EspaceEleve;
   club: MonClub;
-  axes: AxePublic[];
-  clubEtablissement: ClubPublic | null;
   membres: MembresDuClub | null;
-  demandesAdhesion: DemandeAdhesion[];
-  demandesRattachement: DemandeRattachement[];
+  gamification: TableauGamification | null;
+  pointsClub: PointsDuClub | null;
 }) {
   const { bienvenue } = Route.useSearch();
   const router = useRouter();
@@ -316,10 +268,7 @@ function EspaceDeLEleve({
         <EnTeteEspace
           nom={espace.pseudonyme}
           articles
-          monClub={
-            (club.club?.president === true && club.club.etat === "actif") ||
-            espace.adhesion?.etat === "active"
-          }
+          monClub={club.club?.president === true || club.affiliation?.etat === "active"}
         >
           {motDePasseChange && <MotDePasseChange />}
         </EnTeteEspace>
@@ -353,16 +302,21 @@ function EspaceDeLEleve({
 
         <CartesPoints points={points} />
 
+        {gamification && (
+          <CarteMembre
+            pseudonyme={espace.pseudonyme}
+            club={club.affiliation?.etat === "active" ? (club.club?.nom ?? null) : null}
+            jeux={gamification.jeux}
+          />
+        )}
+        {gamification && <TableauAnnuel tableau={gamification} />}
+        {pointsClub && <PointsClub points={pointsClub} />}
+
         <BlocClub
           club={club.club}
+          affiliation={club.affiliation ?? null}
           passation={club.passation ?? null}
-          etablissement={espace.etablissement}
-          axes={axes}
-          clubEtablissement={clubEtablissement}
-          adhesion={espace.adhesion ?? null}
           membres={membres}
-          demandesAdhesion={demandesAdhesion}
-          demandesRattachement={demandesRattachement}
           onRafraichir={async () => {
             await router.invalidate();
           }}

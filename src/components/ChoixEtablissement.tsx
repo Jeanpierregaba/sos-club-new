@@ -13,10 +13,14 @@ export type EtablissementChoisi = {
   localite?: string | null;
 };
 
+// La préfecture (spec 035) en tête du détail : elle distingue deux homonymes de la liste nationale.
+const detailDe = (e: EtablissementTrouve) =>
+  [e.prefecture ? `Préfecture ${e.prefecture}` : null, e.iesg, e.dre].filter(Boolean).join(" · ");
+
 const choixDe = (e: EtablissementTrouve): EtablissementChoisi => ({
   id: e.id,
   nom: e.nom,
-  detail: `${e.iesg} · ${e.dre}`,
+  detail: detailDe(e),
   dre: e.dre,
   localite: e.localite ?? null,
 });
@@ -129,7 +133,7 @@ export function ChoixEtablissement({
                 >
                   <span className="block font-bold text-ink">{e.nom}</span>
                   <span className="block text-sm font-medium text-muted-foreground">
-                    {e.iesg} · {e.dre}
+                    {detailDe(e)}
                   </span>
                 </button>
               </li>

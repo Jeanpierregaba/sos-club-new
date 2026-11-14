@@ -8,13 +8,15 @@ import logging
 from datetime import UTC, datetime
 from uuid import UUID
 
-from sqlalchemy import case, or_, select
+from sqlalchemy import case, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.journal import journaliser
 from app.articles.public import actualites_du_club
+from app.clubs import activation
 from app.clubs.models import (
+    CLUB_VIVANT,
     PASSATION_EN_ATTENTE,
     Adhesion,
     Club,
@@ -30,7 +32,6 @@ from app.clubs.schemas import (
     ClubPodium,
     ClubPublic,
     ClubResume,
-    DemandeClubEntree,
     MonClub,
     PassationApercu,
     PassationEntree,
@@ -40,7 +41,7 @@ from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.eleves import pseudonyme
 from app.eleves.models import Eleve
 from app.points import service as points
-from app.referentiel.models import Axe, Dre, Etablissement, Iesg
+from app.referentiel.models import Dre, Etablissement, Iesg
 from app.referentiel.normalisation import normaliser
 
 logger = logging.getLogger(__name__)
@@ -63,48 +64,44 @@ async def eleve_de(db: AsyncSession, utilisateur: Utilisateur) -> Eleve:
 
 
 async def club_lie(db: AsyncSession, utilisateur: Utilisateur) -> ClubResume | None:
-    """Le club dont cet élève est le demandeur ou le président, ou None.
-
-    Un club refusé reste visible (avec son motif) tant qu'aucun club actif ou demande en attente ne le remplace :
-    c'est ce qui permet au demandeur de lire le refus et de renvoyer sa demande.
-    """
+    """Le club de l'établissement de l'élève (spec 033), quel que soit son statut, ou None s'il n'en a pas encore."""
+    eleve = await db.get(Eleve, utilisateur.id) if utilisateur.role is Role.eleve else None
+    if eleve is None:
+        return None
     club = await db.scalar(
-        select(Club)
-        .where(or_(Club.demandeur_id == utilisateur.id, Club.president_id == utilisateur.id))
-        .order_by(
-            case((Club.etat == EtatClub.actif, 0), (Club.etat == EtatClub.en_attente, 1), else_=2),
-            Club.demande_le.desc(),
-        )
-        .limit(1)
+        select(Club).where(Club.etablissement_id == eleve.etablissement_id, Club.etat.in_(CLUB_VIVANT))
     )
     if club is None:
         return None
     return await _resume(db, club, utilisateur)
 
 
+async def _axes(db: AsyncSession, club_id: UUID) -> list[str]:
+    return list(await db.scalars(select(ClubAxe.axe_code).where(ClubAxe.club_id == club_id).order_by(ClubAxe.axe_code)))
+
+
 async def _resume(db: AsyncSession, club: Club, utilisateur: Utilisateur) -> ClubResume:
-    axes = (
-        await db.scalars(select(ClubAxe.axe_code).where(ClubAxe.club_id == club.id).order_by(ClubAxe.axe_code))
-    ).all()
+    statut = activation.statut_effectif(club, activation.maintenant())
     return ClubResume(
         id=club.id,
         nom=club.nom,
         description=club.description,
         etablissement=await etablissement_rattache(db, club.etablissement_id),
-        axes=list(axes),
-        etat=club.etat.value,
-        president=club.president_id == utilisateur.id and club.etat is EtatClub.actif,
-        motif_refus=club.motif_refus,
+        axes=await _axes(db, club.id),
+        statut=statut.value,
+        actif_le=club.actif_le,
+        regularisation_jusquau=club.regularisation_jusquau if statut is EtatClub.en_regularisation else None,
+        president=club.president_id == utilisateur.id,
         version=club.version,
     )
 
 
 async def mon_club(db: AsyncSession, utilisateur: Utilisateur) -> MonClub:
+    from app.clubs.adhesions import mon_adhesion
+
     club = await club_lie(db, utilisateur)
-    passation = None
-    if club is not None:
-        passation = await _derniere_passation(db, club.id)
-    return MonClub(club=club, passation=passation)
+    passation = await _derniere_passation(db, club.id) if club is not None and club.president else None
+    return MonClub(club=club, affiliation=await mon_adhesion(db, utilisateur), passation=passation)
 
 
 async def _derniere_passation(db: AsyncSession, club_id: UUID) -> PassationApercu | None:
@@ -127,133 +124,39 @@ def normaliser_nom(nom: str) -> str:
     return " ".join(normaliser(nom).replace("-", " ").split())
 
 
-async def demarrer(
-    db: AsyncSession, utilisateur: Utilisateur, entree: DemandeClubEntree, adresse_ip: str
-) -> ClubResume:
-    """Une demande de création : le demandeur vient de son établissement, jamais d'un champ libre."""
-    eleve = await eleve_de(db, utilisateur)
-    nom_normalise = normaliser_nom(entree.nom)
-    if not 3 <= len(nom_normalise) <= 150:
-        raise Refus("Le nom du club fait de 3 à 150 caractères.")
-    if len(set(entree.axes)) != len(entree.axes):
-        raise Refus("Un axe ne peut être choisi qu'une fois.")
-    for axe_code in entree.axes:
-        if await db.scalar(select(Axe).where(Axe.code == axe_code, Axe.actif)) is None:
-            raise Refus(f"Axe inconnu : {axe_code}.")
-
-    existant = await db.scalar(
-        select(Club).where(Club.etablissement_id == eleve.etablissement_id, Club.nom_normalise == nom_normalise)
-    )
-    if existant is not None:
-        if existant.etat is EtatClub.refuse:
-            raise Refus(
-                "Une demande portant ce nom a déjà été refusée pour ton établissement : renvoie-la depuis ton espace.",
-                409,
-            )
-        raise Refus("Ce nom de club est déjà demandé pour cet établissement.", 409)
-    if await db.scalar(
-        select(Club).where(Club.etablissement_id == eleve.etablissement_id, Club.etat == EtatClub.actif)
-    ):
-        raise Refus("Ton établissement a déjà un club actif.", 409)
-    if await db.scalar(select(Club).where(Club.demandeur_id == utilisateur.id, Club.etat == EtatClub.en_attente)):
-        raise Refus("Tu as déjà une demande en attente.", 409)
-    if await db.scalar(select(Club).where(Club.president_id == utilisateur.id, Club.etat == EtatClub.actif)):
-        raise Refus("Tu es déjà président d'un club actif.", 409)
-
-    club = Club(
-        etablissement_id=eleve.etablissement_id,
-        nom=" ".join(entree.nom.split()),
-        nom_normalise=nom_normalise,
-        description=(entree.description.strip() or None) if entree.description else None,
-        demandeur_id=utilisateur.id,
-        encadreurs_associes=[a.model_dump() for a in entree.encadreurs_associes],
-    )
-    db.add(club)
-    try:
-        await db.flush()
-    except IntegrityError as erreur:
-        await db.rollback()
-        if getattr(erreur.orig, "sqlstate", None) != VIOLATION_UNICITE:
-            raise
-        raise Refus("Ce nom de club est déjà demandé pour cet établissement.", 409) from None
-    for axe_code in entree.axes:
-        db.add(ClubAxe(club_id=club.id, axe_code=axe_code))
-    journaliser(
-        db,
-        "demande_club",
-        utilisateur,
-        cible_type="club",
-        cible_id=club.id,
-        details={"nom": club.nom, "etablissement_id": str(club.etablissement_id)},
-        adresse_ip=adresse_ip,
-    )
-    await db.commit()
-    return await _resume(db, club, utilisateur)
-
-
-async def renvoyer(db: AsyncSession, utilisateur: Utilisateur, adresse_ip: str) -> ClubResume:
-    """Une demande refusée, après correction, repasse en attente. Le motif précédent reste au journal."""
-    club = await db.scalar(
-        select(Club)
-        .where(Club.demandeur_id == utilisateur.id, Club.etat == EtatClub.refuse)
-        .order_by(Club.demande_le.desc())
-        .limit(1)
-        .with_for_update()
-    )
-    if club is None:
-        raise Refus("Seule une demande refusée peut être renvoyée.", 409)
-    if await db.scalar(select(Club).where(Club.etablissement_id == club.etablissement_id, Club.etat == EtatClub.actif)):
-        raise Refus("Ton établissement a déjà un club actif : cette demande ne peut pas être renvoyée.", 409)
-    motif_precedent = club.motif_refus
-    club.etat = EtatClub.en_attente
-    club.motif_refus = None
-    club.demande_le = datetime.now(UTC)
-    club.decide_le = None
-    club.decide_par = None
-    journaliser(
-        db,
-        "club_redemande",
-        utilisateur,
-        cible_type="club",
-        cible_id=club.id,
-        details={"motif_precedent": motif_precedent},
-        adresse_ip=adresse_ip,
-    )
-    await db.commit()
-    return await _resume(db, club, utilisateur)
-
-
 # Lecture publique --------------------------------------------------------------------------------------------
 
 
+def _statut_public(club: Club) -> str:
+    return activation.statut_effectif(club, activation.maintenant()).value
+
+
 async def _club_public(db: AsyncSession, club: Club) -> ClubPublic:
-    axes = (
-        await db.scalars(select(ClubAxe.axe_code).where(ClubAxe.club_id == club.id).order_by(ClubAxe.axe_code))
-    ).all()
     return ClubPublic(
         id=club.id,
         nom=club.nom,
         etablissement=await etablissement_rattache(db, club.etablissement_id),
-        axes=list(axes),
+        axes=await _axes(db, club.id),
+        statut=_statut_public(club),
         actif_le=club.actif_le,
     )
 
 
 async def clubs_publics(db: AsyncSession) -> list[ClubPublic]:
-    """Les clubs actifs seulement, dans l'ordre de leur activation."""
-    clubs = (await db.scalars(select(Club).where(Club.etat == EtatClub.actif).order_by(Club.actif_le, Club.nom))).all()
+    """Les clubs en service (actifs ou en régularisation), dans l'ordre de leur première activation."""
+    clubs = (await db.scalars(select(Club).where(activation.en_service()).order_by(Club.actif_le, Club.nom))).all()
     return [await _club_public(db, club) for club in clubs]
 
 
 async def podium(db: AsyncSession, limite: int = 3) -> list[ClubPodium]:
-    """Les clubs actifs qui ont le plus de points (au moins un), à égalité par nom (spec 021)."""
+    """Les clubs en service qui ont le plus de points (au moins un), à égalité par nom (spec 021)."""
     lignes = (
         await db.execute(
             select(Club, Etablissement.nom, Dre.nom)
             .join(Etablissement, Etablissement.id == Club.etablissement_id)
             .join(Iesg, Iesg.id == Etablissement.iesg_id)
             .join(Dre, Dre.code == Iesg.dre_code)
-            .where(Club.etat == EtatClub.actif)
+            .where(activation.en_service())
         )
     ).all()
     scores = await points.scores_des_clubs(db, [club.id for club, _, _ in lignes])
@@ -269,25 +172,23 @@ async def podium(db: AsyncSession, limite: int = 3) -> list[ClubPodium]:
 
 
 async def club_public(db: AsyncSession, club_id: UUID) -> ClubFiche | None:
-    club = await db.scalar(select(Club).where(Club.id == club_id, Club.etat == EtatClub.actif))
+    club = await db.scalar(select(Club).where(Club.id == club_id, Club.etat.in_(CLUB_VIVANT)))
     if club is None:
         return None
-    axes = (
-        await db.scalars(select(ClubAxe.axe_code).where(ClubAxe.club_id == club.id).order_by(ClubAxe.axe_code))
-    ).all()
     return ClubFiche(
         id=club.id,
         nom=club.nom,
         description=club.description,
         etablissement=await etablissement_rattache(db, club.etablissement_id),
-        axes=list(axes),
+        axes=await _axes(db, club.id),
+        statut=_statut_public(club),
         actif_le=club.actif_le,
         actualites=await actualites_du_club(db, club.id),
     )
 
 
 async def club_par_etablissement(db: AsyncSession, etablissement_id: UUID) -> ClubPublic | None:
-    club = await db.scalar(select(Club).where(Club.etat == EtatClub.actif, Club.etablissement_id == etablissement_id))
+    club = await db.scalar(select(Club).where(Club.etat.in_(CLUB_VIVANT), Club.etablissement_id == etablissement_id))
     if club is None:
         return None
     return await _club_public(db, club)
@@ -297,8 +198,9 @@ async def club_par_etablissement(db: AsyncSession, etablissement_id: UUID) -> Cl
 
 
 async def club_preside(db: AsyncSession, utilisateur: Utilisateur) -> Club | None:
-    """Le club actif dont cet utilisateur est le président, ou None."""
-    return await db.scalar(select(Club).where(Club.president_id == utilisateur.id, Club.etat == EtatClub.actif))
+    """Le club dont cet utilisateur est le président, ou None. Un club suspendu garde son président, qui peut
+    passer la main (spec 033)."""
+    return await db.scalar(select(Club).where(Club.president_id == utilisateur.id, Club.etat.in_(CLUB_VIVANT)))
 
 
 async def proposer_passation(
@@ -308,7 +210,7 @@ async def proposer_passation(
     rattaché, celui-ci confirme d'abord le successeur (Q19) ; l'admin valide ou refuse ensuite."""
     club = await club_preside(db, utilisateur)
     if club is None:
-        raise Refus("Tu n'es pas président d'un club actif.", 403)
+        raise Refus("Tu n'es pas président d'un club.", 403)
     if club.version != entree.version:
         raise Refus(MESSAGE_CONFLIT, 409)
     cle = pseudonyme.cle(entree.pseudonyme)
@@ -370,7 +272,7 @@ async def annuler_passation(db: AsyncSession, utilisateur: Utilisateur, adresse_
     """Le président sortant annule sa propre proposition avant sa décision."""
     club = await club_preside(db, utilisateur)
     if club is None:
-        raise Refus("Tu n'es pas président d'un club actif.", 403)
+        raise Refus("Tu n'es pas président d'un club.", 403)
     passation = await db.scalar(
         select(ClubPassation)
         .where(

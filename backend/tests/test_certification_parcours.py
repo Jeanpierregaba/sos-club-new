@@ -38,7 +38,7 @@ def etats(corps: dict[str, Any]) -> list[str]:
     return [p["etat"] for p in corps["places"]]
 
 
-def test_ma_certification_montre_les_12_places_dans_lordre(
+def test_ma_certification_montre_les_20_places_dans_lordre(
     client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
 ) -> None:
     quiz = creer_parcours(en_base, places=[1, 2, 3, 5])
@@ -46,29 +46,34 @@ def test_ma_certification_montre_les_12_places_dans_lordre(
 
     corps = client.get(CERTIFICATION).json()
 
-    assert [p["place"] for p in corps["places"]] == list(range(1, 13))
+    assert [p["place"] for p in corps["places"]] == list(range(1, 21))
     assert etats(corps)[:6] == ["reussie", "ouverte", "verrouillee", "bientot", "verrouillee", "bientot"]
     assert corps["reussies"] == 1
     assert corps["places"][1]["titre"] == "Place 2"
-    assert corps["places"][1]["tentatives_restantes"] == 10
-    assert (corps["nb_questions"], corps["seuil"]) == (15, 12)
+    # Spec 034 : aucun plafond quotidien, 10 questions et 10/10 pour valider.
+    assert corps["places"][1]["tentatives_restantes"] is None
+    assert (corps["nb_questions"], corps["seuil"]) == (10, 10)
+    assert [(p["thematique"], p["thematique_nom"]) for p in corps["places"][3:5]] == [
+        (1, "Ambassadeur Santé Junior"),
+        (2, "Pair Éducateur Santé et Citoyenneté"),
+    ]
 
 
 def test_ma_certification_montre_les_badges_et_leurs_paliers(
     client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any]
 ) -> None:
-    quiz = creer_parcours(en_base, places=[1, 2, 3])
-    acquerir(en_base, eleve, quiz, [1, 2, 3])
+    quiz = creer_parcours(en_base, places=[1, 2, 3, 4])
+    acquerir(en_base, eleve, quiz, [1, 2, 3, 4])
 
     # L'ouverture de la page délivre ce qui est dû (rattrapage).
     corps = client.get(CERTIFICATION).json()
 
     assert [(b["nom"], b["palier"]) for b in corps["badges"]] == [
-        ("Bronze", 3),
-        ("Argent", 5),
-        ("Or", 7),
-        ("Platine", 9),
-        ("Diamant Imhotep", 12),
+        ("Ambassadeur Santé Junior", 4),
+        ("Pair Éducateur Santé et Citoyenneté", 8),
+        ("Sentinelle de la Prévention", 12),
+        ("Champion de la Santé et EVSS", 16),
+        ("Maître Génie Imhotep", 20),
     ]
     assert [b["obtenu_le"] is not None for b in corps["badges"]] == [True, False, False, False, False]
     assert corps["certificat"] is None
@@ -114,11 +119,11 @@ def test_une_place_reussie_sur_un_quiz_retire_reste_reussie(
 
 def test_le_certificat_obtenu_apparait(client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any]) -> None:
     quiz = creer_parcours(en_base)
-    acquerir(en_base, eleve, quiz, range(1, 13))
+    acquerir(en_base, eleve, quiz, range(1, 21))
 
     corps = client.get(CERTIFICATION).json()
 
-    assert corps["reussies"] == 12
+    assert corps["reussies"] == 20
     assert corps["certificat"]["etat"] == "valide"
     assert corps["certificat"]["numero"] == certificats(en_base, eleve.id)[0].numero
 
@@ -159,7 +164,7 @@ def test_un_collaborateur_ne_suit_pas_le_parcours(client: TestClient, creer_coll
 
 
 def certifier(en_base: Callable[..., Any], joueur: Utilisateur) -> Certificat:
-    acquerir(en_base, joueur, creer_parcours(en_base), range(1, 13))
+    acquerir(en_base, joueur, creer_parcours(en_base), range(1, 21))
     mettre_a_jour(en_base, joueur)
     return certificats(en_base, joueur.id)[0]
 

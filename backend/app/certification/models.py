@@ -29,7 +29,8 @@ class ReglesBadges(Base):
     __tablename__ = "regles_badges"
     __table_args__ = (
         CheckConstraint("cardinality(paliers) = 5 AND jsonb_array_length(noms) = 5", name="cinq_badges"),
-        CheckConstraint("paliers[5] = 12", name="dernier_palier_12"),
+        # Le dernier badge tombe à la dernière place : 12 jusqu'à la spec 034, 20 depuis (versions gardées).
+        CheckConstraint("paliers[5] IN (12, 20)", name="dernier_palier"),
         CheckConstraint(
             "paliers[1] >= 1 AND paliers[1] < paliers[2] AND paliers[2] < paliers[3] AND paliers[3] < paliers[4] "
             "AND paliers[4] < paliers[5]",
@@ -51,7 +52,7 @@ class PlaceReussie(Base):
     """Une place du parcours réussie par un joueur. Elle reste acquise si son quiz est dépublié ou remplacé."""
 
     __tablename__ = "place_reussie"
-    __table_args__ = (CheckConstraint("place BETWEEN 1 AND 12", name="place_valide"),)
+    __table_args__ = (CheckConstraint("place BETWEEN 1 AND 20", name="place_valide"),)
 
     utilisateur_id: Mapped[UUID] = mapped_column(ForeignKey("utilisateur.id", ondelete="RESTRICT"), primary_key=True)
     place: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -75,7 +76,7 @@ class BadgeObtenu(Base):
     nom: Mapped[str] = mapped_column(String(40))
     palier: Mapped[int] = mapped_column(Integer)
     regles_version: Mapped[int] = mapped_column(Integer)
-    # Le club de l'élève affilié au moment du badge, pour ses points (R13). Nul sinon.
+    # Le club de l'élève au moment du badge, qui reçoit la moitié de ses points (spec 034). Nul sinon.
     club_id: Mapped[UUID | None] = mapped_column(ForeignKey("club.id", ondelete="SET NULL"))
     # La ligne du registre créditée (élève actif) ; nulle pour un encadreur.
     mouvement_id: Mapped[UUID | None] = mapped_column(ForeignKey("mouvement_points.id", ondelete="RESTRICT"))

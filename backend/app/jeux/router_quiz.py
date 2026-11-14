@@ -12,14 +12,15 @@ from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.comptes.dependances import utilisateur_facultatif
-from app.comptes.models import Utilisateur
+from app.comptes.dependances import exiger_role, utilisateur_facultatif
+from app.comptes.models import Role, Utilisateur
 from app.comptes.service import cle_adresse
 from app.config import settings
 from app.db import get_session
-from app.jeux import invites
+from app.jeux import invites, progression
+from app.jeux.progression import ProgressionJeux
 from app.quiz import parametres, partie
-from app.quiz.models import PARCOURS_JEUX, EtatQuiz, QuestionQuiz, Quiz
+from app.quiz.models import PARCOURS_JEUX, EtatQuiz, NiveauQuiz, QuestionQuiz, Quiz
 from app.quiz.router import ERREURS, erreur_de_partie
 from app.quiz.schemas import EtatPartie, ReponseJoueur
 
@@ -35,6 +36,9 @@ class QuizOuvert(BaseModel):
     description: str
     axe_code: str
     nb_questions_reserve: int
+    # Spec 034 : le numéro du défi dans le parcours officiel des 100 quiz, et son niveau.
+    numero: int | None
+    niveau: NiveauQuiz | None
 
 
 class CatalogueQuiz(BaseModel):
@@ -46,6 +50,8 @@ class CatalogueQuiz(BaseModel):
     restants: int | None
     connecte: bool
     quiz: list[QuizOuvert]
+    # La progression d'un élève connecté (quiz réussis, étoiles, sous-totaux, carte Gold) ; None sinon.
+    progression: ProgressionJeux | None = None
 
 
 def _adresse(request: Request) -> str:
@@ -76,10 +82,11 @@ async def catalogue(request: Request, db: Db, moi: Facultatif) -> CatalogueQuiz:
             .where(Quiz.parcours == PARCOURS_JEUX, Quiz.etat == EtatQuiz.publie)
             .group_by(Quiz.id)
             .having(reserve >= p.nb_questions)
-            .order_by(Quiz.publie_le, Quiz.titre)
+            .order_by(Quiz.numero.nulls_last(), Quiz.publie_le, Quiz.titre)
         )
     ).all()
     restants: int | None = None
+    suivi = await progression.progression(db, moi.id) if moi is not None and moi.role is Role.eleve else None
     if moi is None:
         invite = await invites.invite_du_cookie(db, request.cookies.get(invites.COOKIE))
         joues = await invites.quiz_joues(db, invite) if invite else 0
@@ -93,10 +100,17 @@ async def catalogue(request: Request, db: Db, moi: Facultatif) -> CatalogueQuiz:
         connecte=moi is not None,
         quiz=[
             QuizOuvert(id=q.id, titre=q.titre, description=q.description, axe_code=q.axe_code,
-                       nb_questions_reserve=n)
+                       nb_questions_reserve=n, numero=q.numero, niveau=q.niveau)
             for q, n in lignes
         ],
+        progression=suivi,
     )  # fmt: skip
+
+
+@router.get("/progression")
+async def ma_progression(db: Db, moi: Annotated[Utilisateur, Depends(exiger_role(Role.eleve))]) -> ProgressionJeux:
+    """La progression de l'élève connecté (spec 034), pour sa carte de membre dans « Mon espace »."""
+    return await progression.progression(db, moi.id)
 
 
 async def _invite(request: Request, db: AsyncSession) -> Utilisateur:

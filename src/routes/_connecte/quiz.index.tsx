@@ -147,10 +147,11 @@ function PageQuiz() {
                       </p>
                       <div className="mt-auto flex items-center justify-between gap-3 pt-4">
                         <span className="text-xs text-muted-foreground">
-                          {q.tentatives_restantes} partie{q.tentatives_restantes > 1 ? "s" : ""}{" "}
-                          possible{q.tentatives_restantes > 1 ? "s" : ""} aujourd'hui
+                          {q.tentatives_restantes === null
+                            ? "Parties sans limite"
+                            : `${q.tentatives_restantes} partie${q.tentatives_restantes > 1 ? "s" : ""} possible${q.tentatives_restantes > 1 ? "s" : ""} aujourd'hui`}
                         </span>
-                        {q.tentatives_restantes > 0 ? (
+                        {q.tentatives_restantes === null || q.tentatives_restantes > 0 ? (
                           <Link
                             to="/quiz/$id"
                             params={{ id: q.id }}

@@ -1,5 +1,9 @@
 # 022 — Harmonisation du barème de gamification
 
+> **Remplacée en partie le 2026-11-11** par la [spec 034](../034-gamification-eleve-4-niveaux/spec.md) (ADR-0012) :
+> barème de l'élève par parcours, quiz payés selon leur niveau, et part du club égale à la moitié de chaque gain
+> d'un élève. Les lignes `club.*_eleve` ci-dessous n'existent plus ; le barème des encadreurs reste celui-ci.
+
 ## Objectif
 
 Appliquer partout le document « Harmonisation de la gamification » (référentiel du 2026-11-05, fourni le

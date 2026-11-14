@@ -6,14 +6,19 @@ import { BAREME, points } from "./bareme";
 
 const source = (chemin: string) => readFileSync(resolve(__dirname, "..", chemin), "utf8");
 
-describe("barème affiché (spec 022)", () => {
-  it("suit le référentiel du 2026-11-05", () => {
+describe("barème affiché (spec 034)", () => {
+  it("suit le cahier des charges du 2026-11-10", () => {
     expect(BAREME).toEqual({
       quiz: { eleve: 50, club: 25 },
+      quizCertification: { eleve: 50, club: 25 },
       questionDuJour: { eleve: 20, club: 10 },
-      badge: { eleve: 500, club: 200 },
+      badge: { eleve: 500, club: 250 },
       certification: { eleve: 1000, club: 500 },
     });
+  });
+
+  it("donne toujours au club la moitié du gain de l'élève", () => {
+    for (const { eleve, club } of Object.values(BAREME)) expect(club).toBe(eleve / 2);
   });
 
   it("écrit les milliers avec une espace fine", () => {
@@ -25,7 +30,8 @@ describe("barème affiché (spec 022)", () => {
     for (const page of ["routes/certification.tsx", "routes/jeux.tsx", "routes/club-sante.tsx"]) {
       const texte = source(page);
       expect(texte).not.toMatch(/palier/i);
-      expect(texte).not.toMatch(/\+150|\+250|pts: (150|250)/);
+      // +150 et +250 sont redevenus des montants légitimes (quiz Avancé, part du club d'un badge, spec 034).
+      expect(texte).not.toMatch(/pts: (150|250)/);
       expect(texte).not.toMatch(/60–65 pts|70–75 pts|80–100 pts/);
     }
   });

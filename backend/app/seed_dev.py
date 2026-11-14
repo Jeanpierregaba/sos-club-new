@@ -26,7 +26,7 @@ from app.admin.catalogue import LIBELLES_ROLES, RoleDepart
 from app.admin.journal import journaliser
 from app.admin.models import DoubleAuth
 from app.bibliotheque.models import CategorieRessource, EtatRessource, Ressource
-from app.clubs.adhesions import adhesion_president
+from app.clubs import activation
 from app.clubs.models import Adhesion, Club, ClubAxe, EtatAdhesion, EtatClub
 from app.comptes.models import Role, Sexe, Utilisateur
 from app.config import RACINE_PROJET, settings
@@ -60,6 +60,7 @@ from app.seed_commun import (
     preparer_compte,
     preparer_eleve,
     preparer_encadreur,
+    preparer_figurants,
     preparer_semestre,
 )
 from app.seed_commun import (
@@ -132,48 +133,58 @@ async def _etablissement_dre(db: AsyncSession, dre: str) -> UUID | None:
 
 
 async def _preparer_clubs(db: AsyncSession) -> None:
-    """Un club actif pour l'élève 1 et une demande en attente pour l'élève 2 (spec 019), une seule fois."""
-    if await db.scalar(select(Club.id)):
-        return
+    """Trois clubs de démonstration (spec 033), nés et activés seuls :
+
+    - celui de dev.eleve1 (président) et dev.encadreur, actif : 3 encadreurs et 21 élèves confirmés, plus deux élèves
+      à confirmer ;
+    - celui de dev.eleve2, en constitution ;
+    - un club de la DRE Maritime en régularisation (un élève retiré après l'activation).
+
+    Les autres membres sont des figurants « [Test] », sans accès. Relancé : rien en double."""
     eleve1 = await db.get(
         Eleve, (await db.scalar(select(Utilisateur.id).where(Utilisateur.identifiant == "dev.eleve1")))
     )
-    eleve2 = await db.get(
-        Eleve, (await db.scalar(select(Utilisateur.id).where(Utilisateur.identifiant == "dev.eleve2")))
-    )
-    if eleve1 is None or eleve2 is None:
+    if eleve1 is None:
         return
-    actif = Club(
-        etablissement_id=eleve1.etablissement_id,
-        nom="Club Santé Tokoin",
-        nom_normalise="club sante tokoin",
-        description="Le club de démonstration, animé par les élèves du lycée.",
-        demandeur_id=eleve1.utilisateur_id,
-        president_id=eleve1.utilisateur_id,
-        etat=EtatClub.actif,
-        decide_le=datetime.now(UTC),
-        actif_le=datetime.now(UTC),
-        encadreurs_associes=[{"nom": "M. Kodjo", "email": "kodjo@exemple.tg"}],
-    )
-    attente = Club(
-        etablissement_id=eleve2.etablissement_id,
-        nom="Club Santé Tokoin Est",
-        nom_normalise="club sante tokoin est",
-        demandeur_id=eleve2.utilisateur_id,
-        etat=EtatClub.en_attente,
-        encadreurs_associes=[{"nom": "Mme Afi"}],
-    )
-    db.add_all([actif, attente])
-    await db.flush()
-    # Le président est membre de droit de son club (spec 020).
-    await adhesion_president(db, actif)
-    db.add_all(
-        [
-            ClubAxe(club_id=actif.id, axe_code="sante-environnement"),
-            ClubAxe(club_id=actif.id, axe_code="sport-secourisme"),
-            ClubAxe(club_id=attente.id, axe_code="sante-sexuelle-evss"),
-        ]
-    )
+    club = await activation.club_de(db, eleve1.etablissement_id)
+    if club.president_id is None:
+        club.nom = "Club Santé Tokoin"
+        club.nom_normalise = "club sante tokoin"
+        club.description = "Le club de démonstration, animé par les élèves du lycée."
+        club.president_id = eleve1.utilisateur_id
+        db.add_all(
+            [
+                ClubAxe(club_id=club.id, axe_code="sante-environnement"),
+                ClubAxe(club_id=club.id, axe_code="sport-secourisme"),
+            ]
+        )
+        await db.flush()
+    await preparer_figurants(db, "figurant.tokoin", eleve1.etablissement_id, encadreurs=2, eleves=20)
+    for numero in (1, 2):
+        compte = await preparer_compte(
+            db, f"figurant.tokoin.nouveau{numero}", "[Test]", f"Nouvel élève {numero}", Role.eleve,
+            mot_de_passe_aleatoire(), None,
+        )  # fmt: skip
+        await preparer_eleve(db, compte, f"Nouveau Tokoin {numero}", Classe.sixieme, eleve1.etablissement_id)
+
+    maritime = await _etablissement_dre(db, "maritime")
+    if maritime is None:
+        return
+    await preparer_figurants(db, "figurant.maritime", maritime, encadreurs=3, eleves=21)
+    club_maritime = await activation.club_de(db, maritime)
+    if club_maritime.etat is EtatClub.actif:
+        adhesion = await db.scalar(
+            select(Adhesion)
+            .where(Adhesion.club_id == club_maritime.id, Adhesion.etat == EtatAdhesion.active)
+            .order_by(Adhesion.demande_le.desc())
+            .limit(1)
+        )
+        if adhesion is not None:
+            adhesion.etat = EtatAdhesion.retiree
+            adhesion.retire_le = datetime.now(UTC)
+            adhesion.motif_retrait = "[Test] Départ pour la démonstration de la régularisation."
+            await db.flush()
+            await activation.recalculer(db, club_maritime.id, "affiliation_retiree")
 
 
 def _article_de_test(titre: str, axe_code: str) -> dict[str, object]:
@@ -472,16 +483,26 @@ async def _preparer_bibliotheque(db: AsyncSession) -> None:
 
 
 async def _preparer_certification(db: AsyncSession) -> None:
-    """Le parcours Génie Imhotep de démonstration (spec 029), une fois : un fascicule publié et 12 quiz publiés, un
-    par place, reliés à ce fascicule. Marqués « Contenu de test » : des calculs et un PDF qui le dit, aucun contenu
-    de santé inventé (docs/RULES.md)."""
-    if await db.scalar(select(Quiz.id).where(Quiz.parcours == PARCOURS_CERTIFICATION)):
+    """Le parcours Génie Imhotep de démonstration (spec 029, 034) : un fascicule publié et un quiz publié par place
+    (20), reliés à ce fascicule ; une base qui en a déjà reçoit les places manquantes. Marqués « Contenu de test » :
+    des calculs et un PDF qui le dit, aucun contenu de santé inventé (docs/RULES.md)."""
+    occupees = set(
+        await db.scalars(
+            select(Quiz.place).where(Quiz.parcours == PARCOURS_CERTIFICATION, Quiz.etat == EtatQuiz.publie)
+        )
+    )
+    manquantes = [place for place in range(1, PLACES + 1) if place not in occupees]
+    if not manquantes:
         return
     pedagogie = await db.scalar(select(Utilisateur.id).where(Utilisateur.identifiant == "dev.pedagogie"))
     if pedagogie is None:
         return
     maintenant = datetime.now(UTC)
     titre = "[Test] Fascicule de démonstration du parcours Génie Imhotep"
+    existant = await db.scalar(select(Ressource.id).where(Ressource.titre == titre))
+    if existant is not None:
+        await _quiz_de_certification(db, manquantes, existant, pedagogie, maintenant)
+        return
     identifiant = uuid7()
     octets = _pdf_de_test(titre)
     cle = f"ressources/{identifiant}-document.pdf"
@@ -496,12 +517,18 @@ async def _preparer_certification(db: AsyncSession) -> None:
         )
     )  # fmt: skip
     await db.flush()
-    for place in range(1, PLACES + 1):
+    await _quiz_de_certification(db, manquantes, identifiant, pedagogie, maintenant)
+
+
+async def _quiz_de_certification(
+    db: AsyncSession, places: list[int], fascicule: UUID, pedagogie: UUID, maintenant: datetime
+) -> None:
+    for place in places:
         quiz = Quiz(
             id=uuid7(), titre=f"[Test] Génie Imhotep — quiz {place}",
             description="Quiz de démonstration du parcours de certification, non validé.",
             axe_code="sante-environnement", etat=EtatQuiz.publie, contenu_de_test=True, contributeurs=[pedagogie],
-            parcours=PARCOURS_CERTIFICATION, place=place, ressource_id=identifiant, soumis_par=pedagogie,
+            parcours=PARCOURS_CERTIFICATION, place=place, ressource_id=fascicule, soumis_par=pedagogie,
             soumis_le=maintenant, validateur_nom="Compte de test", validateur_qualite="Contenu de démonstration",
             publie_le=maintenant,
         )  # fmt: skip
@@ -584,13 +611,21 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
                 affiche, classe, nom_etablissement = PROFILS_ELEVES[identifiant]
                 etablissement_id = await _etablissement_eleve(db, nom_etablissement)
                 if etablissement_id is not None:
-                    await preparer_eleve(db, utilisateur, affiche, classe, etablissement_id)
+                    # Spec 033 : dev.eleve1 est membre confirmé du club actif ; dev.eleve2 attend la confirmation.
+                    await preparer_eleve(
+                        db, utilisateur, affiche, classe, etablissement_id, confirmer=identifiant == "dev.eleve1"
+                    )
                     # dev.eleve2 reste sans fiche : son espace montre l'invitation à la compléter.
                     if identifiant == "dev.eleve1":
                         await _preparer_fiche(db, utilisateur)
             else:
                 fonction, dre_etablissement, etat = PROFILS_ENCADREURS[identifiant]
-                etablissement_id = await _etablissement_dre(db, dre_etablissement)
+                # Spec 033 : dev.encadreur encadre le club de dev.eleve1, qu'il suit dans « Mon Club Santé ».
+                etablissement_id = (
+                    await _etablissement_eleve(db, PROFILS_ELEVES["dev.eleve1"][2])
+                    if identifiant == "dev.encadreur"
+                    else await _etablissement_dre(db, dre_etablissement)
+                )
                 if etablissement_id is not None:
                     await preparer_encadreur(db, utilisateur, fonction, etablissement_id, etat)
                 # Spec 030 : téléphone (fictif) et discipline ; « dev.encadreur.attente » reste sans téléphone.

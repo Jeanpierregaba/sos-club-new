@@ -10,8 +10,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.catalogue import Action
 from app.admin.dependances import Acces, adresse_ip, exiger_permission
+from app.comptes.dependances import utilisateur_courant
+from app.comptes.models import Utilisateur
 from app.db import get_session
-from app.points import administration
+from app.points import administration, annees
 from app.points.schemas import (
     LigneBaremeAdmin,
     LigneBaremeModification,
@@ -70,3 +72,46 @@ async def modifier_bareme(
 ) -> LigneBaremeAdmin:
     with _traduire_refus():
         return await administration.modifier_bareme(db, acces, code, entree, adresse_ip(request))
+
+
+# Années académiques et anciens élèves (spec 034, lot 4) -----------------------------------------------------------
+
+
+@router_admin.get("/annees")
+async def lister_annees(_: Lecteur, db: Base) -> list[annees.AnneeAdmin]:
+    return await annees.lister(db)
+
+
+@router_admin.post("/annees", status_code=status.HTTP_201_CREATED)
+async def creer_annee(
+    entree: annees.AnneeCreation, request: Request, acces: Modificateur, db: Base
+) -> annees.AnneeAdmin:
+    with _traduire_refus():
+        return await annees.creer(db, acces, entree, adresse_ip(request))
+
+
+@router_admin.post("/annees/{annee_id}/cloture")
+async def cloturer_annee(annee_id: UUID, request: Request, acces: Modificateur, db: Base) -> annees.AnneeAdmin:
+    with _traduire_refus():
+        return await annees.cloturer(db, acces, annee_id, adresse_ip(request))
+
+
+@router_admin.post("/anciens-eleves/{eleve_id}")
+async def passer_ancien_eleve(eleve_id: UUID, request: Request, acces: Modificateur, db: Base) -> None:
+    with _traduire_refus():
+        await annees.passer_ancien_eleve(db, acces, eleve_id, adresse_ip(request))
+
+
+# Le total du club, pour ses membres (spec 034) ------------------------------------------------------------------
+
+router = APIRouter(prefix="/points", tags=["points"])
+
+
+@router.get("/mon-club")
+async def points_de_mon_club(
+    moi: Annotated[Utilisateur, Depends(utilisateur_courant)], db: Base
+) -> annees.PointsDuClub:
+    try:
+        return await annees.points_du_club(db, moi)
+    except annees.HorsDuClub:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Tu n'es rattaché à aucun club.") from None

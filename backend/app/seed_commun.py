@@ -20,6 +20,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.catalogue import DROITS_DES_ROLES, SENSIBLES, RoleDepart
 from app.admin.double_auth import regenerer_codes_secours
 from app.admin.models import Collaborateur, DoubleAuth, Permission
+from app.clubs import activation
+from app.clubs.affiliations import affilier_eleve, rattacher_encadreur
+from app.clubs.models import ADHESION_EN_COURS, Adhesion, EtatAdhesion
 from app.comptes.models import Role, Session, StatutCompte, Utilisateur
 from app.comptes.motdepasse import hacher
 from app.config import settings
@@ -113,9 +116,16 @@ async def activer_double_auth(db: AsyncSession, utilisateur: Utilisateur) -> tup
 
 
 async def preparer_eleve(
-    db: AsyncSession, utilisateur: Utilisateur, affiche: str, classe: Classe, etablissement_id: UUID
+    db: AsyncSession,
+    utilisateur: Utilisateur,
+    affiche: str,
+    classe: Classe,
+    etablissement_id: UUID,
+    *,
+    confirmer: bool = False,
 ) -> None:
-    """Profil élève et points de bienvenue. Relancé : ni second profil, ni second crédit."""
+    """Profil élève, points de bienvenue et affiliation au club de son établissement (spec 033), confirmée si
+    `confirmer`. Relancé : ni second profil, ni second crédit, ni seconde affiliation."""
     if await db.get(Eleve, utilisateur.id) is None:
         db.add(
             Eleve(
@@ -130,6 +140,7 @@ async def preparer_eleve(
         utilisateur.consentement_le = datetime.now(UTC)
         await db.flush()
     await points.crediter(db, BIENVENUE_ELEVE, utilisateur.id, f"bienvenue:{utilisateur.id}")
+    await affilier(db, utilisateur.id, confirmer=confirmer)
 
 
 async def preparer_encadreur(
@@ -139,8 +150,13 @@ async def preparer_encadreur(
     etablissement_id: UUID,
     etat: EtatVerification,
 ) -> None:
-    """Profil encadreur ; points de bienvenue seulement s'il est actif. Relancé : ni second profil, ni second crédit."""
-    if await db.get(Encadreur, utilisateur.id) is None:
+    """Profil encadreur ; points de bienvenue seulement s'il est actif. Relancé : ni second profil, ni second crédit,
+    mais l'établissement est remis en état (son rattachement suit, spec 033)."""
+    existant = await db.get(Encadreur, utilisateur.id)
+    if existant is not None and existant.etablissement_id != etablissement_id:
+        existant.etablissement_id = etablissement_id
+        await db.flush()
+    if existant is None:
         actif = etat is EtatVerification.actif
         db.add(
             Encadreur(
@@ -157,6 +173,47 @@ async def preparer_encadreur(
         await db.flush()
     if etat is EtatVerification.actif:
         await points.crediter(db, BIENVENUE_ENCADREUR, utilisateur.id, f"bienvenue:{utilisateur.id}")
+        # Spec 033 : vérifié, l'encadreur est rattaché au club de son établissement (idempotent).
+        encadreur = await db.get(Encadreur, utilisateur.id)
+        assert encadreur is not None
+        await rattacher_encadreur(db, utilisateur.id, encadreur.etablissement_id, "seed", None)
+
+
+async def affilier(db: AsyncSession, eleve_id: UUID, *, confirmer: bool) -> None:
+    """L'affiliation de l'élève au club de son établissement, comme à l'inscription ; confirmée si demandé, avec le
+    recalcul du club. Une affiliation déjà en cours est gardée (seulement confirmée si demandé)."""
+    eleve = await db.get(Eleve, eleve_id)
+    assert eleve is not None
+    adhesion = await db.scalar(
+        select(Adhesion).where(Adhesion.eleve_id == eleve_id, Adhesion.etat.in_(ADHESION_EN_COURS))
+    )
+    if adhesion is None:
+        adhesion = await affilier_eleve(db, eleve_id, eleve.etablissement_id)
+    if confirmer and adhesion.etat is not EtatAdhesion.active:
+        adhesion.etat = EtatAdhesion.active
+        adhesion.decide_le = datetime.now(UTC)
+        await db.flush()
+        await activation.recalculer(db, adhesion.club_id, "seed")
+
+
+async def preparer_figurants(
+    db: AsyncSession, prefixe: str, etablissement_id: UUID, *, encadreurs: int, eleves: int
+) -> None:
+    """Des membres de démonstration pour peupler un club (spec 033) : encadreurs vérifiés et élèves confirmés. Leurs
+    mots de passe, aléatoires, ne sont écrits nulle part : on ne se connecte pas avec. Relancé : rien en double."""
+    for numero in range(1, encadreurs + 1):
+        compte = await preparer_compte(
+            db, f"{prefixe}.encadreur{numero}", "[Test]", f"Encadreur {numero}", Role.encadreur,
+            mot_de_passe_aleatoire(), f"{prefixe}.encadreur{numero}@exemple.tg",
+        )  # fmt: skip
+        await preparer_encadreur(db, compte, Fonction.accompagnateur, etablissement_id, EtatVerification.actif)
+    for numero in range(1, eleves + 1):
+        compte = await preparer_compte(
+            db, f"{prefixe}.eleve{numero:02}", "[Test]", f"Élève {numero}", Role.eleve, mot_de_passe_aleatoire(), None
+        )
+        await preparer_eleve(
+            db, compte, f"Figurant {prefixe} {numero:02}", Classe.seconde, etablissement_id, confirmer=True
+        )
 
 
 def ecrire_fichier(acces: list[dict[str, str]], chemin: Path, entete: list[str]) -> None:

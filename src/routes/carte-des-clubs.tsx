@@ -6,9 +6,16 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion } from "@/components/SiteMotion";
 import { DecorAnime } from "@/components/DecorAnime";
-import { chargerAnnuaire, chargerClubsPublics, type TypeEtablissement } from "@/lib/api/client";
+import {
+  chargerAnnuaire,
+  chargerCarteClubs,
+  type Carte,
+  type CarteEtablissement,
+  type RegionScolaire,
+  type TypeEtablissement,
+} from "@/lib/api/client";
 import { chercher, compterParType, indexer } from "@/lib/carte-des-clubs";
-import { clubsParEtablissement, LIBELLE_SANS_CLUB } from "@/lib/clubs";
+import { LIBELLE_SANS_CLUB, REGIONS_SCOLAIRES, STATUTS_CARTE } from "@/lib/clubs";
 import { DRE_PAR_DEFAUT, dessins, regions } from "@/lib/togo-dre";
 import mascottesEquipe from "@/assets/mascottes-equipe.webp";
 
@@ -24,15 +31,15 @@ export const Route = createFileRoute("/carte-des-clubs")({
       { property: "og:title", content: "La carte des Clubs Santé du Togo" },
     ],
   }),
-  // L'annuaire et les clubs actifs viennent de l'API (specs 016 et 019). Sans elle, la carte garde ses
-  // contours et l'explique ; l'échec des clubs (null) ne doit ni casser l'annuaire ni afficher, à tort,
-  // « aucun club » partout.
+  // L'annuaire et la carte des clubs viennent de l'API (specs 016 et 033). Sans elle, la carte garde ses
+  // contours et l'explique ; l'échec des clubs (null) ne doit ni casser l'annuaire, ni afficher de chiffre
+  // inventé, ni dire à tort « aucun club » partout.
   loader: async () => {
-    const [annuaire, clubs] = await Promise.all([
+    const [annuaire, carte] = await Promise.all([
       chargerAnnuaire().catch(() => null),
-      chargerClubsPublics().catch(() => null),
+      chargerCarteClubs().catch(() => null),
     ]);
-    return { annuaire, clubs };
+    return { annuaire, carte };
   },
   component: CarteDesClubs,
 });
@@ -47,22 +54,63 @@ const ORDRE_TYPES = Object.keys(types) as TypeEtablissement[];
 
 const APERCU = 30;
 
-function CarteDesClubs() {
-  const { annuaire, clubs } = Route.useLoaderData();
-  const dres = useMemo(() => regions(annuaire ?? []), [annuaire]);
-  const index = useMemo(() => indexer(dres), [dres]);
-  const clubParEtablissement = useMemo(
-    () => (clubs ? clubsParEtablissement(clubs) : new Map()),
-    [clubs],
+// Les statuts des établissements, la région et les clubs actifs de chaque DRE, lus dans la carte de l'API.
+function lireCarte(carte: Carte | null) {
+  const statuts = new Map<string, CarteEtablissement>();
+  const regionDe = new Map<string, RegionScolaire>();
+  const actifsDe = new Map<string, number>();
+  for (const region of carte?.regions ?? [])
+    for (const dre of region.dres) {
+      regionDe.set(dre.code, region.code as RegionScolaire);
+      actifsDe.set(dre.code, dre.nb_actifs);
+      for (const iesg of dre.iesg) for (const e of iesg.etablissements) statuts.set(e.id, e);
+    }
+  return { statuts, regionDe, actifsDe };
+}
+
+function StatutEtablissement({ statut }: { statut: CarteEtablissement | undefined }) {
+  if (!statut) return null;
+  if (statut.statut === "reference")
+    return (
+      <span className="mt-0.5 block text-xs font-medium text-muted-foreground">
+        {statut.declare_terrain ? "Club déclaré sur le terrain" : LIBELLE_SANS_CLUB}
+      </span>
+    );
+  const pastille = STATUTS_CARTE[statut.statut];
+  return (
+    <span className="mt-1 flex flex-wrap items-center gap-2">
+      <span className={`rounded-full px-2 py-0.5 text-[11px] font-extrabold ${pastille.classe}`}>
+        {pastille.libelle}
+      </span>
+      {statut.club_id && (
+        <Link
+          to="/clubs/$id"
+          params={{ id: statut.club_id }}
+          className="inline-flex items-center gap-1 text-xs font-bold text-logo-blue hover:underline"
+        >
+          Fiche du club <ArrowRight aria-hidden className="size-3" />
+        </Link>
+      )}
+    </span>
   );
-  const listeClubs = clubs ?? [];
-  const totalClubs = dres.reduce((n, r) => n + r.nb_etablissements, 0);
-  const chiffres = [
-    { n: dres.length, t: "Directions régionales" },
-    { n: dres.reduce((n, r) => n + r.iesg.length, 0), t: "Inspections (IESG)" },
-    { n: totalClubs, t: "Collèges & lycées" },
-    { n: listeClubs.length, t: "Clubs actifs" },
-  ];
+}
+
+function CarteDesClubs() {
+  const { annuaire, carte } = Route.useLoaderData();
+  const toutes = useMemo(() => regions(annuaire ?? []), [annuaire]);
+  const { statuts, regionDe, actifsDe } = useMemo(() => lireCarte(carte), [carte]);
+  const [region, setRegion] = useState<RegionScolaire | null>(null);
+  const dres = region ? toutes.filter((r) => regionDe.get(r.code) === region) : toutes;
+  const index = useMemo(() => indexer(toutes), [toutes]);
+  const totalEtablissements = toutes.reduce((n, r) => n + r.nb_etablissements, 0);
+  // Les trois chiffres du cahier des charges (spec 033), tous calculés par l'API ; sans elle, aucun chiffre.
+  const chiffres = carte
+    ? [
+        { n: carte.chiffres.etablissements, t: "Établissements" },
+        { n: carte.chiffres.clubs, t: "Clubs Santé" },
+        { n: carte.chiffres.clubs_actifs, t: "Clubs actifs sur la plateforme" },
+      ]
+    : [];
 
   const [code, setCode] = useState(DRE_PAR_DEFAUT);
   const [iesgId, setIesgId] = useState<string | null>(null);
@@ -72,9 +120,7 @@ function CarteDesClubs() {
 
   const dre = dres.find((r) => r.code === code) ?? dres[0];
   const iesg = dre?.iesg.find((i) => i.id === iesgId) ?? dre?.iesg[0];
-  const clubsDeLaDre = dre
-    ? listeClubs.filter((club) => club.etablissement.dre_code === dre.code).length
-    : 0;
+  const clubsDeLaDre = dre ? (actifsDe.get(dre.code) ?? 0) : 0;
 
   const choisir = (codeDre: string, idIesg: string | null = null) => {
     setCode(codeDre);
@@ -124,8 +170,9 @@ function CarteDesClubs() {
                 <span className="block text-sun">des clubs santé</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg font-medium text-white/80">
-                Les Clubs Santé actifs de chaque Direction Régionale de l’Éducation et de chaque
-                Inspection (IESG). Choisis ta région sur la carte, ou cherche directement ton
+                Les établissements du Togo et leur Club Santé, par région, Direction Régionale de
+                l’Éducation et Inspection (IESG). Un club devient actif dès qu’il réunit 3
+                encadreurs et 21 élèves. Choisis ta région sur la carte, ou cherche ton
                 établissement.
               </p>
 
@@ -163,8 +210,19 @@ function CarteDesClubs() {
                 )}
               </form>
 
-              {dre && (
-                <dl className="mt-8 grid max-w-xl grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+              {chiffres.length === 0 && (
+                <p className="mt-8 max-w-xl text-sm font-semibold text-white/75">
+                  Les chiffres des clubs sont momentanément indisponibles.
+                </p>
+              )}
+              {carte && carte.chiffres.clubs === 0 && (
+                <p className="mt-8 max-w-xl text-sm font-semibold text-white/80">
+                  Aucun Club Santé pour l’instant : les premiers s’ouvrent avec les inscriptions des
+                  élèves et des encadreurs.
+                </p>
+              )}
+              {chiffres.length > 0 && (
+                <dl className="mt-8 grid max-w-xl grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
                   {chiffres.map((c) => (
                     <div
                       key={c.t}
@@ -201,6 +259,30 @@ function CarteDesClubs() {
           data-reveal="left"
           className="grid grid-cols-[6.5rem_1fr] items-center gap-5 self-start rounded-[2rem] border bg-white p-5 sm:grid-cols-[8rem_1fr] lg:sticky lg:top-24 lg:grid-cols-1"
         >
+          <div role="group" aria-label="Régions" className="col-span-full flex flex-wrap gap-1.5">
+            {[{ code: null, nom: "Toutes" }, ...REGIONS_SCOLAIRES].map((r) => {
+              const on = region === r.code;
+              return (
+                <button
+                  key={r.code ?? "toutes"}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => {
+                    setRegion(r.code);
+                    const premiere = r.code
+                      ? toutes.find((d) => regionDe.get(d.code) === r.code)
+                      : undefined;
+                    if (premiere) choisir(premiere.code);
+                  }}
+                  className={`rounded-full px-3 py-1 text-xs font-bold transition ${
+                    on ? "bg-logo-blue text-white" : "bg-mist-soft text-ink hover:bg-mist"
+                  }`}
+                >
+                  {r.nom}
+                </button>
+              );
+            })}
+          </div>
           <svg
             viewBox="0 0 250 640"
             aria-hidden
@@ -279,7 +361,7 @@ function CarteDesClubs() {
               {resultats.length > 0 && (
                 <ul className="mt-5 divide-y border-y">
                   {resultats.slice(0, 50).map((e) => {
-                    const club = clubParEtablissement.get(e.id);
+                    const statut = statuts.get(e.id);
                     return (
                       <li key={e.id} className="flex items-center gap-3 py-3.5">
                         <MapPin
@@ -298,27 +380,12 @@ function CarteDesClubs() {
                           <span className="block text-sm text-muted-foreground">
                             {e.iesg.nom} · DRE {e.dre.nom}
                           </span>
-                          {club ? (
-                            <span className="block text-xs font-bold text-primary">{club.nom}</span>
-                          ) : clubs ? (
-                            <span className="block text-xs font-medium text-muted-foreground">
-                              {LIBELLE_SANS_CLUB}
-                            </span>
-                          ) : null}
                         </button>
                         <span className="flex shrink-0 flex-col items-end gap-1.5">
                           <span className={`text-xs font-extrabold uppercase ${types[e.type].c}`}>
                             {types[e.type].t}
                           </span>
-                          {club && (
-                            <Link
-                              to="/clubs/$id"
-                              params={{ id: club.id }}
-                              className="inline-flex items-center gap-1 text-xs font-bold text-logo-blue hover:underline"
-                            >
-                              Fiche <ArrowRight aria-hidden className="size-3.5" />
-                            </Link>
-                          )}
+                          <StatutEtablissement statut={statut} />
                         </span>
                       </li>
                     );
@@ -356,7 +423,7 @@ function CarteDesClubs() {
                   <strong className="text-ink">{clubsDeLaDre}</strong>{" "}
                   {clubsDeLaDre === 1 ? "club actif" : "clubs actifs"} ·{" "}
                   <strong className="text-ink">
-                    {Math.round((dre.nb_etablissements / (totalClubs || 1)) * 100)} %
+                    {Math.round((dre.nb_etablissements / (totalEtablissements || 1)) * 100)} %
                   </strong>{" "}
                   du réseau
                 </p>
@@ -417,7 +484,7 @@ function CarteDesClubs() {
 
               <ol className="mt-4 grid border-t sm:grid-cols-2 sm:gap-x-8 xl:grid-cols-3">
                 {visibles.map((e, k) => {
-                  const club = clubParEtablissement.get(e.id);
+                  const statut = statuts.get(e.id);
                   return (
                     <li
                       key={e.id}
@@ -435,19 +502,7 @@ function CarteDesClubs() {
                             {types[e.type].t}
                           </span>
                         </span>
-                        {club ? (
-                          <Link
-                            to="/clubs/$id"
-                            params={{ id: club.id }}
-                            className="mt-0.5 inline-flex items-center gap-1 text-xs font-bold text-logo-blue hover:underline"
-                          >
-                            {club.nom} <ArrowRight aria-hidden className="size-3" />
-                          </Link>
-                        ) : clubs ? (
-                          <span className="mt-0.5 block text-xs font-medium text-muted-foreground">
-                            {LIBELLE_SANS_CLUB}
-                          </span>
-                        ) : null}
+                        <StatutEtablissement statut={statut} />
                       </span>
                     </li>
                   );
@@ -479,8 +534,8 @@ function CarteDesClubs() {
               Ton établissement <span className="text-sun">n’a pas encore de club ?</span>
             </h2>
             <p className="mt-2 font-medium text-white/80">
-              Parles-en à ton chef d’établissement : l’affiliation se fait auprès de ta DRE et de la
-              coordination nationale.
+              Il s’ouvre tout seul : inscris-toi sur la plateforme avec tes camarades et tes
+              encadreurs. Dès 3 encadreurs et 21 élèves confirmés, ton club devient actif.
             </p>
           </div>
           <a

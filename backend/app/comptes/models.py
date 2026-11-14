@@ -56,6 +56,8 @@ class Utilisateur(Base):
     consentement_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     # Adresse confirmée par un code (spec 030) : exigée des seuls visiteurs, nulle pour les autres profils.
     email_confirme_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Spec 034 : un élève qui a quitté le système scolaire garde ses archives, sans nouvelle récompense d'élève.
+    ancien_eleve_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cree_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 

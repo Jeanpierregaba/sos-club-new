@@ -204,7 +204,7 @@ function FicheQuiz() {
           <span className="text-sm text-muted-foreground">{libelle(quiz.axe_code)}</span>
           {quiz.place !== null && (
             <span className="rounded-full bg-logo-blue/10 px-2.5 py-0.5 text-xs font-extrabold text-logo-blue">
-              Certification · quiz {quiz.place} sur 12
+              Certification · quiz {quiz.place} sur 20
             </span>
           )}
         </div>

@@ -61,8 +61,13 @@ def encadreur(client: TestClient, creer_encadreur: Callable[..., Utilisateur]) -
     return utilisateur
 
 
-def actions(en_base: Callable[..., Any], joueur: Utilisateur) -> list[tuple[str, int]]:
-    return sorted((g.action, g.montant) for g in gains(en_base, joueur.id))
+def actions(en_base: Callable[..., Any], joueur: Utilisateur, avec_places: bool = False) -> list[tuple[str, int]]:
+    """Les gains du joueur ; les +50 des places (spec 034) seulement si `avec_places`."""
+    return sorted(
+        (g.action, g.montant)
+        for g in gains(en_base, joueur.id)
+        if avec_places or g.action != "eleve.quiz_certification"
+    )
 
 
 def avis(en_base: Callable[..., Any], joueur: Utilisateur) -> list[str]:
@@ -141,22 +146,63 @@ def test_un_echec_ne_reussit_pas_la_place(
 ) -> None:
     quiz = creer_parcours(en_base, places=[1])
 
-    jouer(client, quiz[1], justes=11)
+    jouer(client, quiz[1], justes=9)
 
     assert places(en_base, eleve.id) == []
 
 
-def test_un_quiz_de_certification_reussi_ne_rapporte_pas_les_50_points_dun_quiz(
+def test_la_premiere_erreur_arrete_la_tentative_sans_point(
+    client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
+) -> None:
+    """Spec 034 : 10/10, ou rien ; la tentative suivante recommence à la question 1."""
+    quiz = creer_parcours(en_base, places=[1])
+
+    etat = jouer(client, quiz[1], justes=3)
+
+    assert etat["question"] is None
+    assert (etat["resultat"]["score"], etat["resultat"]["reussie"], etat["resultat"]["points"]) == (3, False, 0)
+    assert places(en_base, eleve.id) == []
+    assert actions(en_base, eleve) == []
+    relance = client.post(f"/api/quiz/{quiz[1].id}/tentatives").json()
+    assert relance["question"]["rang"] == 1
+
+
+def test_un_temps_depasse_arrete_aussi_la_tentative(
+    client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
+) -> None:
+    quiz = creer_parcours(en_base, places=[1])
+    etat = client.post(f"/api/quiz/{quiz[1].id}/tentatives").json()
+    heure.avancer(23)
+
+    reprise = client.get(f"/api/quiz/tentatives/{etat['tentative_id']}").json()
+
+    assert reprise["question"] is None
+    assert reprise["resultat"]["reussie"] is False
+
+
+def test_la_certification_n_a_pas_de_plafond_quotidien(
     client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
 ) -> None:
     quiz = creer_parcours(en_base, places=[1])
 
-    resultat = jouer(client, quiz[1], justes=15)["resultat"]
+    for _ in range(12):
+        jouer(client, quiz[1], justes=0)
 
-    assert resultat["reussie"] is True
-    assert resultat["points"] == 0
+    assert jouer(client, quiz[1], justes=10)["resultat"]["reussie"] is True
+
+
+def test_une_place_validee_rapporte_50_points_une_seule_fois(
+    client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
+) -> None:
+    quiz = creer_parcours(en_base, places=[1])
+
+    resultat = jouer(client, quiz[1], justes=10)["resultat"]
+    rejoue = jouer(client, quiz[1], justes=10)["resultat"]
+
+    assert (resultat["reussie"], resultat["points"], rejoue["points"]) == (True, 50, 0)
     assert places(en_base, eleve.id) == [1]
-    assert actions(en_base, eleve) == []
+    assert actions(en_base, eleve, avec_places=True) == [("eleve.quiz_certification", 50)]
+    assert [g.cle for g in gains(en_base, eleve.id)] == [f"certification:place:1:{eleve.id}"]
 
 
 def test_la_partie_suit_les_parametres_du_parcours_de_certification(
@@ -183,31 +229,32 @@ def test_la_liste_des_jeux_ne_montre_pas_les_quiz_de_certification(
 # Badges -----------------------------------------------------------------------------------------------------------
 
 
-def test_le_badge_bronze_a_la_3e_place_rapporte_500_une_seule_fois(
+def test_le_premier_badge_a_la_fin_de_la_1re_thematique_rapporte_500_une_seule_fois(
     client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
 ) -> None:
-    quiz = creer_parcours(en_base, places=range(1, 4))
-    acquerir(en_base, eleve, quiz, [1, 2])
+    quiz = creer_parcours(en_base, places=range(1, 5))
+    acquerir(en_base, eleve, quiz, [1, 2, 3])
 
-    jouer(client, quiz[3], justes=15)
-    jouer(client, quiz[3], justes=15)
+    jouer(client, quiz[4], justes=10)
+    jouer(client, quiz[4], justes=10)
 
-    [bronze] = badges(en_base, eleve.id)
-    assert (bronze.rang, bronze.nom, bronze.palier, bronze.regles_version) == (1, "Bronze", 3, 1)
+    [premier] = badges(en_base, eleve.id)
+    assert (premier.rang, premier.nom, premier.palier, premier.regles_version) == (
+        1, "Ambassadeur Santé Junior", 4, 1,
+    )  # fmt: skip
     assert actions(en_base, eleve) == [("eleve.badge", 500)]
-    assert [g.cle for g in gains(en_base, eleve.id)] == [f"badge:1:{eleve.id}"]
     assert avis(en_base, eleve) == ["certification_badge"]
 
 
 def test_un_encadreur_obtient_le_badge_sans_points(
     client: TestClient, encadreur: Utilisateur, en_base: Callable[..., Any], heure: Horloge
 ) -> None:
-    quiz = creer_parcours(en_base, places=range(1, 4))
-    acquerir(en_base, encadreur, quiz, [1, 2])
+    quiz = creer_parcours(en_base, places=range(1, 5))
+    acquerir(en_base, encadreur, quiz, [1, 2, 3])
 
-    jouer(client, quiz[3], justes=15)
+    jouer(client, quiz[4], justes=10)
 
-    assert [b.nom for b in badges(en_base, encadreur.id)] == ["Bronze"]
+    assert [b.nom for b in badges(en_base, encadreur.id)] == ["Ambassadeur Santé Junior"]
     assert gains(en_base, encadreur.id) == []
 
 
@@ -217,7 +264,7 @@ def test_un_palier_abaisse_delivre_le_badge_au_rattrapage(eleve: Utilisateur, en
     mettre_a_jour(en_base, eleve)
     assert badges(en_base, eleve.id) == []
 
-    regles(en_base, ["Cuivre", "Argent", "Or", "Platine", "Diamant Imhotep"], [2, 5, 7, 9, 12])
+    regles(en_base, ["Cuivre", "Argent", "Or", "Platine", "Diamant Imhotep"], [2, 5, 7, 9, 20])
     mettre_a_jour(en_base, eleve)
 
     [cuivre] = badges(en_base, eleve.id)
@@ -228,25 +275,25 @@ def test_un_palier_abaisse_delivre_le_badge_au_rattrapage(eleve: Utilisateur, en
 def test_une_nouvelle_version_des_regles_garde_les_badges_deja_obtenus(
     eleve: Utilisateur, en_base: Callable[..., Any]
 ) -> None:
-    quiz = creer_parcours(en_base, places=range(1, 6))
-    acquerir(en_base, eleve, quiz, [1, 2, 3])
+    quiz = creer_parcours(en_base, places=range(1, 7))
+    acquerir(en_base, eleve, quiz, [1, 2, 3, 4])
     mettre_a_jour(en_base, eleve)
 
-    regles(en_base, ["Cuivre", "Fer", "Or", "Platine", "Diamant Imhotep"], [3, 4, 7, 9, 12])
-    acquerir(en_base, eleve, quiz, [4])
+    regles(en_base, ["Cuivre", "Fer", "Or", "Platine", "Diamant Imhotep"], [3, 5, 7, 9, 20])
+    acquerir(en_base, eleve, quiz, [5])
     mettre_a_jour(en_base, eleve)
 
     assert [(b.nom, b.palier, b.regles_version) for b in badges(en_base, eleve.id)] == [
-        ("Bronze", 3, 1),
-        ("Fer", 4, 2),
+        ("Ambassadeur Santé Junior", 4, 1),
+        ("Fer", 5, 2),
     ]
 
 
 def test_un_compte_suspendu_recoit_ses_badges_a_la_reactivation(
     eleve: Utilisateur, en_base: Callable[..., Any]
 ) -> None:
-    quiz = creer_parcours(en_base, places=range(1, 4))
-    acquerir(en_base, eleve, quiz, [1, 2, 3])
+    quiz = creer_parcours(en_base, places=range(1, 5))
+    acquerir(en_base, eleve, quiz, [1, 2, 3, 4])
 
     def statut(valeur: StatutCompte) -> None:
         en_base(lambda db: db.execute(update(Utilisateur).where(Utilisateur.id == eleve.id).values(statut=valeur)))
@@ -257,20 +304,20 @@ def test_un_compte_suspendu_recoit_ses_badges_a_la_reactivation(
 
     statut(StatutCompte.actif)
     mettre_a_jour(en_base, eleve)
-    assert [b.nom for b in badges(en_base, eleve.id)] == ["Bronze"]
+    assert [b.nom for b in badges(en_base, eleve.id)] == ["Ambassadeur Santé Junior"]
     assert actions(en_base, eleve) == [("eleve.badge", 500)]
 
 
 # Certificat -------------------------------------------------------------------------------------------------------
 
 
-def test_la_12e_place_delivre_le_certificat_et_1000_points(
+def test_la_20e_place_delivre_le_certificat_et_1000_points(
     client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
 ) -> None:
     quiz = creer_parcours(en_base)
-    acquerir(en_base, eleve, quiz, range(1, 12))
+    acquerir(en_base, eleve, quiz, range(1, 20))
 
-    jouer(client, quiz[12], justes=15)
+    jouer(client, quiz[20], justes=10)
 
     [certificat] = certificats(en_base, eleve.id)
     assert re.match(NUMERO, certificat.numero)
@@ -287,7 +334,7 @@ def test_le_club_de_leleve_affilie_est_enregistre_pour_ses_points(
 ) -> None:
     club = creer_club(eleve)
     quiz = creer_parcours(en_base)
-    acquerir(en_base, eleve, quiz, range(1, 13))
+    acquerir(en_base, eleve, quiz, range(1, 21))
 
     mettre_a_jour(en_base, eleve)
 
@@ -297,7 +344,7 @@ def test_le_club_de_leleve_affilie_est_enregistre_pour_ses_points(
 
 def test_un_encadreur_certifie_gagne_1000_points(encadreur: Utilisateur, en_base: Callable[..., Any]) -> None:
     quiz = creer_parcours(en_base)
-    acquerir(en_base, encadreur, quiz, range(1, 13))
+    acquerir(en_base, encadreur, quiz, range(1, 21))
 
     mettre_a_jour(en_base, encadreur)
 
@@ -306,9 +353,9 @@ def test_un_encadreur_certifie_gagne_1000_points(encadreur: Utilisateur, en_base
     assert actions(en_base, encadreur) == [("encadreur.certification", 1000)]
 
 
-def test_onze_places_ne_suffisent_pas(eleve: Utilisateur, en_base: Callable[..., Any]) -> None:
+def test_dix_neuf_places_ne_suffisent_pas(eleve: Utilisateur, en_base: Callable[..., Any]) -> None:
     quiz = creer_parcours(en_base)
-    acquerir(en_base, eleve, quiz, range(1, 12))
+    acquerir(en_base, eleve, quiz, range(1, 20))
 
     mettre_a_jour(en_base, eleve)
 
@@ -318,7 +365,7 @@ def test_onze_places_ne_suffisent_pas(eleve: Utilisateur, en_base: Callable[...,
 
 def test_deux_fins_simultanees_ne_delivrent_quun_certificat(eleve: Utilisateur, en_base: Callable[..., Any]) -> None:
     quiz = creer_parcours(en_base)
-    acquerir(en_base, eleve, quiz, range(1, 13))
+    acquerir(en_base, eleve, quiz, range(1, 21))
 
     async def une_fin() -> None:
         async with AsyncSession(moteur_test, expire_on_commit=False) as db:
@@ -340,7 +387,7 @@ def test_deux_fins_simultanees_ne_delivrent_quun_certificat(eleve: Utilisateur, 
 
 def test_un_certificat_revoque_nest_pas_redelivre(eleve: Utilisateur, en_base: Callable[..., Any]) -> None:
     quiz = creer_parcours(en_base)
-    acquerir(en_base, eleve, quiz, range(1, 13))
+    acquerir(en_base, eleve, quiz, range(1, 21))
     mettre_a_jour(en_base, eleve)
     en_base(
         lambda db: db.execute(
@@ -353,3 +400,70 @@ def test_un_certificat_revoque_nest_pas_redelivre(eleve: Utilisateur, en_base: C
     mettre_a_jour(en_base, eleve)
 
     assert [c.etat for c in certificats(en_base, eleve.id)] == [EtatCertificat.revoque]
+
+
+# Spec 034 : relecture du lot 3 ------------------------------------------------------------------------------------
+
+
+def test_une_reponse_trop_tardive_arrete_la_tentative(
+    client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
+) -> None:
+    quiz = creer_parcours(en_base, places=[1])
+    etat = client.post(f"/api/quiz/{quiz[1].id}/tentatives").json()
+    heure.avancer(23)
+
+    fin = client.post(
+        f"/api/quiz/tentatives/{etat['tentative_id']}/reponses",
+        json={"rang": 1, "choix": bon_choix(etat["question"])},
+    ).json()
+
+    assert fin["question"] is None
+    assert (fin["resultat"]["reussie"], fin["resultat"]["points"]) == (False, 0)
+    assert places(en_base, eleve.id) == []
+
+
+def test_apres_l_arret_une_nouvelle_partie_est_une_autre_tentative(
+    client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
+) -> None:
+    quiz = creer_parcours(en_base, places=[1])
+    premiere = jouer(client, quiz[1], justes=0)
+
+    relance = client.post(f"/api/quiz/{quiz[1].id}/tentatives").json()
+
+    assert relance["tentative_id"] != premiere["tentative_id"]
+    assert client.get(f"/api/quiz/tentatives/{premiere['tentative_id']}").json()["question"] is None
+
+
+def test_le_club_recoit_la_moitie_de_toute_la_certification(
+    client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
+) -> None:
+    from app.clubs.models import Adhesion, Club, EtatAdhesion, EtatClub
+    from app.eleves.models import Eleve
+
+    async def affilier(db: AsyncSession) -> None:
+        from app.clubs import activation
+
+        profil = await db.get(Eleve, eleve.id)
+        assert profil is not None
+        club = await activation.club_de(db, profil.etablissement_id)
+        await db.execute(update(Club).where(Club.id == club.id).values(etat=EtatClub.actif))
+        db.add(Adhesion(eleve_id=eleve.id, club_id=club.id, etat=EtatAdhesion.active))
+
+    en_base(affilier)
+    quiz = creer_parcours(en_base)
+    for place in range(1, 21):
+        jouer(client, quiz[place], justes=10)
+
+    lignes = gains(en_base, eleve.id)
+    assert sum(g.montant for g in lignes) == 4500
+    assert sum(g.demi_points_club or 0 for g in lignes) / 2 == 2250
+
+
+def test_le_50_d_une_place_acquise_sans_lui_est_rattrape(eleve: Utilisateur, en_base: Callable[..., Any]) -> None:
+    quiz = creer_parcours(en_base, places=[1, 2])
+    acquerir(en_base, eleve, quiz, [1, 2])
+
+    mettre_a_jour(en_base, eleve)
+    mettre_a_jour(en_base, eleve)
+
+    assert actions(en_base, eleve, avec_places=True) == [("eleve.quiz_certification", 50)] * 2

@@ -10,8 +10,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.catalogue import Action
 from app.admin.dependances import Acces, adresse_ip, exiger_permission
-from app.clubs import rattachements
-from app.clubs.schemas import MesClubs
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.inscription import InscriptionsFermees, Refus, TropDInscriptions
 from app.comptes.models import Utilisateur
@@ -98,13 +96,6 @@ async def modifier_mon_profil(
 ) -> EspaceEncadreur:
     with _traduire_refus():
         return await service.modifier_profil(db, utilisateur, entree, _adresse(request))
-
-
-@router.get("/moi/clubs")
-async def mes_clubs(utilisateur: Connecte, db: Base) -> MesClubs:
-    """Les rattachements de l'encadreur (spec 020) : en cours, puis les derniers terminés."""
-    with _traduire_refus():
-        return await rattachements.mes_clubs(db, utilisateur)
 
 
 @router.post("/moi/renvoyer")

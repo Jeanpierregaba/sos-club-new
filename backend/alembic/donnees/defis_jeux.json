@@ -1,0 +1,902 @@
+[
+ {
+  "numero": 1,
+  "titre": "Histoire & fondation d’AIMES-AFRIQUE",
+  "cotation": 50,
+  "lot": 1,
+  "pole": "AIMES-AFRIQUE & SOS Docteur TV",
+  "axe": "production-tv-medias",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 2,
+  "titre": "Dr Michel Kodom : parcours & valeurs",
+  "cotation": 50,
+  "lot": 1,
+  "pole": "AIMES-AFRIQUE & SOS Docteur TV",
+  "axe": "production-tv-medias",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 3,
+  "titre": "SOS Docteur TV : 1re télévision 100 % santé",
+  "cotation": 50,
+  "lot": 1,
+  "pole": "AIMES-AFRIQUE & SOS Docteur TV",
+  "axe": "production-tv-medias",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 4,
+  "titre": "Missions médico-chirurgicales foraines gratuites",
+  "cotation": 60,
+  "lot": 1,
+  "pole": "AIMES-AFRIQUE & SOS Docteur TV",
+  "axe": "production-tv-medias",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 5,
+  "titre": "Cliniques mobiles & blocs opératoires ruraux",
+  "cotation": 60,
+  "lot": 1,
+  "pole": "AIMES-AFRIQUE & SOS Docteur TV",
+  "axe": "production-tv-medias",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 6,
+  "titre": "Mutuelle de santé des artisans & économie sociale",
+  "cotation": 60,
+  "lot": 1,
+  "pole": "AIMES-AFRIQUE & SOS Docteur TV",
+  "axe": "production-tv-medias",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 7,
+  "titre": "Les 10 villages pilotes et cantons d’intervention",
+  "cotation": 65,
+  "lot": 1,
+  "pole": "AIMES-AFRIQUE & SOS Docteur TV",
+  "axe": "production-tv-medias",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 8,
+  "titre": "Rayonnement panafricain & partenariats internationaux",
+  "cotation": 70,
+  "lot": 1,
+  "pole": "AIMES-AFRIQUE & SOS Docteur TV",
+  "axe": "production-tv-medias",
+  "niveau": "expert"
+ },
+ {
+  "numero": 9,
+  "titre": "Origine & charte des Clubs Santé scolaires",
+  "cotation": 50,
+  "lot": 2,
+  "pole": "Championnat national Génie Imhotep",
+  "axe": "genie-imhotep",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 10,
+  "titre": "Le championnat télévisé Génie Imhotep",
+  "cotation": 60,
+  "lot": 2,
+  "pole": "Championnat national Génie Imhotep",
+  "axe": "genie-imhotep",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 11,
+  "titre": "Rôle du capitaine de club & sentinelles de santé",
+  "cotation": 60,
+  "lot": 2,
+  "pole": "Championnat national Génie Imhotep",
+  "axe": "genie-imhotep",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 12,
+  "titre": "Les épreuves au buzzer & vitesse de réaction",
+  "cotation": 65,
+  "lot": 2,
+  "pole": "Championnat national Génie Imhotep",
+  "axe": "genie-imhotep",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 13,
+  "titre": "Fair-play, éthique & esprit d’équipe",
+  "cotation": 50,
+  "lot": 2,
+  "pole": "Championnat national Génie Imhotep",
+  "axe": "genie-imhotep",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 14,
+  "titre": "Boîtes à idées & initiatives écologiques scolaires",
+  "cotation": 60,
+  "lot": 2,
+  "pole": "Championnat national Génie Imhotep",
+  "axe": "genie-imhotep",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 15,
+  "titre": "Le journal mural & sensibilisation par les pairs",
+  "cotation": 65,
+  "lot": 2,
+  "pole": "Championnat national Génie Imhotep",
+  "axe": "genie-imhotep",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 16,
+  "titre": "Le grand podium national & titre d’ambassadeur or",
+  "cotation": 80,
+  "lot": 2,
+  "pole": "Championnat national Génie Imhotep",
+  "axe": "genie-imhotep",
+  "niveau": "expert"
+ },
+ {
+  "numero": 17,
+  "titre": "Les 7 étapes du lavage des mains à l’eau et au savon",
+  "cotation": 50,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 18,
+  "titre": "Eau potable, désinfection & conservation saine",
+  "cotation": 60,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 19,
+  "titre": "Diarrhées aiguës & solution de réhydratation orale (SRO)",
+  "cotation": 50,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 20,
+  "titre": "Hygiène bucco-dentaire : dents saines & brossage",
+  "cotation": 50,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 21,
+  "titre": "Protection contre les caries & visites dentaires",
+  "cotation": 60,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 22,
+  "titre": "Nutrition équilibrée : les 3 familles d’aliments",
+  "cotation": 50,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 23,
+  "titre": "Trésors nutritifs locaux : moringa, niébé & fonio",
+  "cotation": 60,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 24,
+  "titre": "Carence en fer & prévention de l’anémie nutritionnelle",
+  "cotation": 65,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 25,
+  "titre": "Risques des boissons gazeuses, sucres rapides & sodas",
+  "cotation": 60,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 26,
+  "titre": "Hygiène corporelle & prévention de la gale scolaire",
+  "cotation": 50,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 27,
+  "titre": "Sommeil réparateur, rythme circadien & écrans",
+  "cotation": 50,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 28,
+  "titre": "Posture scolaire, port du sac à dos & santé du dos",
+  "cotation": 60,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 29,
+  "titre": "Santé visuelle : fatigue oculaire & éclairage scolaire",
+  "cotation": 60,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 30,
+  "titre": "Intoxications alimentaires & conservation des plats",
+  "cotation": 65,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 31,
+  "titre": "Vente d’aliments en milieu scolaire & salubrité",
+  "cotation": 60,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 32,
+  "titre": "Bienfaits de l’activité physique & marche active",
+  "cotation": 50,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 33,
+  "titre": "Hydratation corporelle & besoins quotidiens en eau",
+  "cotation": 50,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 34,
+  "titre": "Prévention du choléra & épidémies hydriques",
+  "cotation": 70,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "expert"
+ },
+ {
+  "numero": 35,
+  "titre": "Santé mentale : gestion du stress & examens",
+  "cotation": 65,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "avance"
+ },
+ {
+  "numero": 36,
+  "titre": "Hygiène vestimentaire & séchage efficace au soleil",
+  "cotation": 50,
+  "lot": 5,
+  "pole": "Santé, hygiène & nutrition locale",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 37,
+  "titre": "La puberté chez la fille : transformations & rythmes",
+  "cotation": 50,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 38,
+  "titre": "La puberté chez le garçon : voix & spermatogenèse",
+  "cotation": 50,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 39,
+  "titre": "Anatomie de l’appareil reproducteur féminin",
+  "cotation": 60,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 40,
+  "titre": "Anatomie de l’appareil reproducteur masculin",
+  "cotation": 60,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 41,
+  "titre": "Le cycle menstruel & le calcul de l’ovulation",
+  "cotation": 65,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "avance"
+ },
+ {
+  "numero": 42,
+  "titre": "Gestion de l’hygiène menstruelle en milieu scolaire",
+  "cotation": 50,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 43,
+  "titre": "Démystification des tabous autour des menstruations",
+  "cotation": 50,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 44,
+  "titre": "Fécondation, nidation & développement de la grossesse",
+  "cotation": 60,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 45,
+  "titre": "Prévention des grossesses précoces en milieu scolaire",
+  "cotation": 65,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "avance"
+ },
+ {
+  "numero": 46,
+  "titre": "Conséquences scolaires & sanitaires des grossesses précoces",
+  "cotation": 65,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "avance"
+ },
+ {
+  "numero": 47,
+  "titre": "Le consentement éclairé & le respect de son corps",
+  "cotation": 50,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 48,
+  "titre": "Assertivité : compétences psychosociales pour dire NON",
+  "cotation": 60,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 49,
+  "titre": "Violences basées sur le genre (VBG) en milieu scolaire",
+  "cotation": 65,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "avance"
+ },
+ {
+  "numero": 50,
+  "titre": "Cadre juridique : le Code de l’enfant togolais",
+  "cotation": 70,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "expert"
+ },
+ {
+  "numero": 51,
+  "titre": "VIH/sida : modes de transmission & précautions",
+  "cotation": 60,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 52,
+  "titre": "Le test de diagnostic rapide (TDR) & dépistage anonyme",
+  "cotation": 50,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 53,
+  "titre": "Traitement post-exposition (TPE) dans les 72 heures",
+  "cotation": 65,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "avance"
+ },
+ {
+  "numero": 54,
+  "titre": "Vérités & mythes sur la transmission du VIH",
+  "cotation": 50,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 55,
+  "titre": "Les infections sexuellement transmissibles (IST) bactériennes",
+  "cotation": 60,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 56,
+  "titre": "Les IST virales : hépatite B, herpès & papillomavirus",
+  "cotation": 65,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "avance"
+ },
+ {
+  "numero": 57,
+  "titre": "Le préservatif masculin et féminin : mode d’emploi",
+  "cotation": 60,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 58,
+  "titre": "Non-discrimination des personnes vivant avec le VIH",
+  "cotation": 50,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 59,
+  "titre": "Communication parents-enfants sur la santé sexuelle",
+  "cotation": 50,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 60,
+  "titre": "Mutilations génitales féminines : dangers & lois",
+  "cotation": 70,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "expert"
+ },
+ {
+  "numero": 61,
+  "titre": "Mariages d’enfants & mariages forcés : conséquences",
+  "cotation": 65,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "avance"
+ },
+ {
+  "numero": 62,
+  "titre": "Estime de soi & préservation de son avenir",
+  "cotation": 50,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 63,
+  "titre": "Harcèlement en milieu scolaire & cyberharcèlement",
+  "cotation": 60,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 64,
+  "titre": "Numéros verts & centres d’écoute au Togo",
+  "cotation": 50,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 65,
+  "titre": "Égalité filles-garçons & coopération scolaire",
+  "cotation": 50,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 66,
+  "titre": "Construire son projet de vie professionnel & personnel",
+  "cotation": 60,
+  "lot": 4,
+  "pole": "Santé sexuelle & reproductive (EVSS)",
+  "axe": "sante-sexuelle-evss",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 67,
+  "titre": "Le calendrier OMS des Journées mondiales de la santé",
+  "cotation": 50,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 68,
+  "titre": "24 mars : Journée mondiale de lutte contre la tuberculose",
+  "cotation": 60,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 69,
+  "titre": "7 avril : Journée mondiale de la santé & rôle de l’OMS",
+  "cotation": 50,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 70,
+  "titre": "25 avril : Journée mondiale du paludisme",
+  "cotation": 50,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 71,
+  "titre": "Moustique anophèle, gîtes larvaires & moustiquaires imprégnées",
+  "cotation": 60,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 72,
+  "titre": "31 mai : Journée mondiale sans tabac & sevrage",
+  "cotation": 60,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 73,
+  "titre": "14 juin : Journée mondiale du donneur de sang bénévole",
+  "cotation": 50,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 74,
+  "titre": "Groupes sanguins, rhésus & don de sang",
+  "cotation": 65,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "avance"
+ },
+ {
+  "numero": 75,
+  "titre": "19 juin : Journée mondiale de la drépanocytose",
+  "cotation": 65,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "avance"
+ },
+ {
+  "numero": 76,
+  "titre": "Drépanocytose : électrophorèse de l’hémoglobine (AA, AS, SS)",
+  "cotation": 70,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "expert"
+ },
+ {
+  "numero": 77,
+  "titre": "28 juillet : Journée mondiale contre les hépatites virales",
+  "cotation": 65,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "avance"
+ },
+ {
+  "numero": 78,
+  "titre": "Octobre rose : prévention & dépistage du cancer du sein",
+  "cotation": 65,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "avance"
+ },
+ {
+  "numero": 79,
+  "titre": "Novembre bleu : dépistage précoce du cancer de la prostate",
+  "cotation": 65,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "avance"
+ },
+ {
+  "numero": 80,
+  "titre": "14 novembre : Journée mondiale du diabète",
+  "cotation": 65,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "avance"
+ },
+ {
+  "numero": 81,
+  "titre": "1er décembre : Journée mondiale de lutte contre le sida",
+  "cotation": 50,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 82,
+  "titre": "Hypertension artérielle : dépistage & mesure de la tension",
+  "cotation": 65,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "avance"
+ },
+ {
+  "numero": 83,
+  "titre": "Maladies tropicales négligées (MTN) au Togo",
+  "cotation": 70,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "expert"
+ },
+ {
+  "numero": 84,
+  "titre": "Santé environnementale : projet « 1 élève, 1 arbre »",
+  "cotation": 50,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 85,
+  "titre": "Éco-jogging & lutte contre la pollution plastique",
+  "cotation": 50,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 86,
+  "titre": "Changement climatique & santé des populations",
+  "cotation": 65,
+  "lot": 3,
+  "pole": "Journées mondiales & environnement",
+  "axe": "sante-environnement",
+  "niveau": "avance"
+ },
+ {
+  "numero": 87,
+  "titre": "La règle d’or du secourisme : protéger, alerter, secourir",
+  "cotation": 50,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 88,
+  "titre": "L’appel des sapeurs-pompiers : le numéro d’urgence 118",
+  "cotation": 50,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 89,
+  "titre": "La position latérale de sécurité (PLS) pas à pas",
+  "cotation": 65,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "avance"
+ },
+ {
+  "numero": 90,
+  "titre": "Étouffement & manœuvre de Heimlich chez l’adulte",
+  "cotation": 65,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "avance"
+ },
+ {
+  "numero": 91,
+  "titre": "Hémorragies externes & compression directe efficace",
+  "cotation": 65,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "avance"
+ },
+ {
+  "numero": 92,
+  "titre": "Brûlures thermiques & règle des 15 (eau fraîche)",
+  "cotation": 50,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 93,
+  "titre": "Malaise & perte de connaissance : réflexes immédiats",
+  "cotation": 60,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 94,
+  "titre": "Traumatismes : entorses, fractures & pas d’automédication",
+  "cotation": 60,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "intermediaire"
+ },
+ {
+  "numero": 95,
+  "titre": "Morsures de serpents : gestes qui sauvent & interdictions",
+  "cotation": 70,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "expert"
+ },
+ {
+  "numero": 96,
+  "titre": "Prévention des noyades & sécurité aux points d’eau",
+  "cotation": 50,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 97,
+  "titre": "Calendrier vaccinal du PEV au Togo & vaccins vitaux",
+  "cotation": 65,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "avance"
+ },
+ {
+  "numero": 98,
+  "titre": "La trousse d’urgence du Club Santé dans l’établissement",
+  "cotation": 50,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "debutant"
+ },
+ {
+  "numero": 99,
+  "titre": "Pyramide sanitaire togolaise : USP, CHP, CHR, CHU",
+  "cotation": 75,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "expert"
+ },
+ {
+  "numero": 100,
+  "titre": "Grand défi ultime des 100 quiz : champion Génie Imhotep",
+  "cotation": 100,
+  "lot": 6,
+  "pole": "Secourisme & santé publique pratique",
+  "axe": "sport-secourisme",
+  "niveau": "expert"
+ }
+]

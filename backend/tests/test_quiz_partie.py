@@ -344,7 +344,7 @@ def test_douze_bonnes_reponses_reussissent_et_rapportent_50_points(
 
     assert resultat == {"score": 12, "total": 15, "seuil": 12, "reussie": True, "points": 50, "erreurs": ANY}
     [ligne] = gains(en_base, eleve.id)
-    assert (ligne.action, ligne.montant, ligne.cle) == ("eleve.quiz", 50, f"quiz:{quiz.id}:{eleve.id}")
+    assert (ligne.action, ligne.montant, ligne.cle) == ("eleve.quiz_debutant", 50, f"quiz:{quiz.id}:{eleve.id}")
 
 
 def test_une_seconde_reussite_ne_rapporte_rien(

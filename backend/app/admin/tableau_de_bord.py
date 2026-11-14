@@ -10,7 +10,8 @@ from app.admin.catalogue import Action
 from app.admin.dependances import Acces
 from app.admin.models import Collaborateur, Export, Invitation, JournalAudit
 from app.admin.schemas import EvenementJournal, Indicateur, TableauDeBord
-from app.clubs.models import Club, EtatClub
+from app.clubs.activation import en_service
+from app.clubs.models import Club
 from app.clubs.verification import compter_en_attente as compter_clubs_en_attente
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.encadreurs.verification import compter_en_attente as compter_encadreurs_en_attente
@@ -75,7 +76,7 @@ async def calculer(db: AsyncSession, acces: Acces) -> TableauDeBord:
     etablissements_actifs = await db.scalar(
         select(func.count()).select_from(Etablissement).where(Etablissement.statut == StatutEtablissement.actif)
     )
-    clubs_actifs = await db.scalar(select(func.count()).select_from(Club).where(Club.etat == EtatClub.actif))
+    clubs_actifs = await db.scalar(select(func.count()).select_from(Club).where(en_service()))
 
     indicateurs = [
         Indicateur(id="collaborateurs_actifs", libelle="Collaborateurs actifs", valeur=collaborateurs_actifs or 0),

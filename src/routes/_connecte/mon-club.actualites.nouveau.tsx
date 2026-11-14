@@ -11,7 +11,9 @@ export const Route = createFileRoute("/_connecte/mon-club/actualites/nouveau")({
   // Le président en place seulement : un membre, un encadreur ou un ancien président revient à « Mon club ».
   beforeLoad: async ({ context }) => {
     const { club } = await chargerMonClub().catch(() => ({ club: null }));
-    if (context.moi.role !== "eleve" || !club?.president || club.etat !== "actif")
+    // Spec 033 : un club suspendu ou en constitution ne publie pas.
+    const enService = club?.statut === "actif" || club?.statut === "en_regularisation";
+    if (context.moi.role !== "eleve" || !club?.president || !enService)
       throw redirect({ to: "/mon-club" });
   },
   loader: async () => ({ axes: await chargerAxes() }),

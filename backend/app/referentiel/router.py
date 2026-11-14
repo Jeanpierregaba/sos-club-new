@@ -12,7 +12,7 @@ from app.admin.catalogue import Action
 from app.admin.dependances import Acces, adresse_ip, exiger_permission, exiger_super_admin_pour, refuser
 from app.db import get_session
 from app.referentiel import administration, service
-from app.referentiel.models import StatutEtablissement, TypeEtablissement
+from app.referentiel.models import OrdreEnseignement, StatutEtablissement, TypeEtablissement
 from app.referentiel.normalisation import normaliser
 from app.referentiel.schemas import (
     AxeAdmin,
@@ -135,6 +135,9 @@ async def admin_lister_etablissements(
     iesg: UUID | None = None,
     type: TypeEtablissement | None = None,
     statut: StatutEtablissement | None = None,
+    ordre: OrdreEnseignement | None = None,
+    prefecture: Annotated[str | None, Query(max_length=100)] = None,
+    importes: bool | None = None,
     page: Annotated[int, Query(ge=1)] = 1,
     par_page: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> PageEtablissements:
@@ -148,6 +151,9 @@ async def admin_lister_etablissements(
         statut=statut,
         page=page,
         par_page=par_page,
+        ordre=ordre,
+        prefecture=prefecture,
+        importes=importes,
     )
 
 

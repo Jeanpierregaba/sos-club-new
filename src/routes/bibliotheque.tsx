@@ -202,7 +202,7 @@ function Bibliotheque() {
         )}
       </section>
 
-      {/* Passerelle vers la certification : les fascicules servent à réviser les 12 quiz. */}
+      {/* Passerelle vers la certification : les fascicules servent à réviser les 20 quiz. */}
       <section className="mx-auto max-w-7xl px-5 pb-20">
         <div
           data-reveal="zoom"
@@ -221,7 +221,7 @@ function Bibliotheque() {
             </h2>
             <p className="mt-4 max-w-2xl text-lg font-medium text-white/80">
               Avant de passer les quiz, consulte et télécharge gratuitement les fascicules
-              pédagogiques : apprends, révise, puis lance-toi dans les 12 quiz du parcours.
+              pédagogiques : apprends, révise, puis lance-toi dans les 20 quiz du parcours.
             </p>
             <a
               href="/certification"

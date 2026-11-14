@@ -17,12 +17,14 @@ import {
 } from "@/lib/api/client";
 import { dateCourte } from "@/lib/dates";
 
-const CHAMPS: { cle: keyof ParametresEntree; libelle: string; secondes?: boolean }[] = [
+type Cle = Exclude<keyof ParametresEntree, "arret_premiere_erreur">;
+
+const CHAMPS: { cle: Cle; libelle: string; secondes?: boolean }[] = [
   { cle: "nb_questions", libelle: "Questions par partie" },
   { cle: "temps_ms", libelle: "Temps affiché par question (secondes)", secondes: true },
   { cle: "tolerance_ms", libelle: "Tolérance réseau (secondes)", secondes: true },
   { cle: "seuil", libelle: "Bonnes réponses pour réussir" },
-  { cle: "tentatives_par_jour", libelle: "Parties par quiz et par jour" },
+  { cle: "tentatives_par_jour", libelle: "Parties par quiz et par jour (vide : sans limite)" },
 ];
 
 // Les paramètres versionnés d'un parcours (spec 027 pour les jeux, spec 029 pour la certification).
@@ -39,13 +41,16 @@ export function FormulaireParametres({
   const router = useRouter();
   // Les règles de toutes les parties : réservé à qui publie (l'API exige aussi la double authentification).
   const modifiable = peut(admin, "quiz", "approuver");
-  const [valeurs, setValeurs] = useState<Record<keyof ParametresEntree, string>>({
+  const [valeurs, setValeurs] = useState<Record<Cle, string>>({
     nb_questions: String(en_cours.nb_questions),
     temps_ms: String(en_cours.temps_ms / 1000),
     tolerance_ms: String(en_cours.tolerance_ms / 1000),
     seuil: String(en_cours.seuil),
-    tentatives_par_jour: String(en_cours.tentatives_par_jour),
+    tentatives_par_jour:
+      en_cours.tentatives_par_jour === null ? "" : String(en_cours.tentatives_par_jour),
   });
+  // Spec 034 : la certification s'arrête à la première erreur ou au premier temps dépassé.
+  const [arret, setArret] = useState(en_cours.arret_premiere_erreur);
   const [erreur, setErreur] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [enCours, setEnCours] = useState(false);
@@ -54,7 +59,7 @@ export function FormulaireParametres({
     setErreur(null);
     setInfo(null);
     setEnCours(true);
-    const nombre = (cle: keyof ParametresEntree, secondes = false) =>
+    const nombre = (cle: Cle, secondes = false) =>
       Math.round(Number(valeurs[cle].replace(",", ".")) * (secondes ? 1000 : 1));
     try {
       const v = await changerParametresQuiz(
@@ -63,7 +68,10 @@ export function FormulaireParametres({
           temps_ms: nombre("temps_ms", true),
           tolerance_ms: nombre("tolerance_ms", true),
           seuil: nombre("seuil"),
-          tentatives_par_jour: nombre("tentatives_par_jour"),
+          tentatives_par_jour: valeurs.tentatives_par_jour.trim()
+            ? nombre("tentatives_par_jour")
+            : null,
+          arret_premiere_erreur: arret,
         },
         parcours,
       );
@@ -100,6 +108,18 @@ export function FormulaireParametres({
             />
           </Champ>
         ))}
+        {parcours === "certification" && (
+          <label className="flex items-center gap-2 text-sm font-semibold text-ink">
+            <input
+              type="checkbox"
+              checked={arret}
+              disabled={!modifiable}
+              onChange={(e) => setArret(e.target.checked)}
+            />
+            Arrêter la partie à la première erreur ou au premier temps dépassé (seuil = nombre de
+            questions)
+          </label>
+        )}
         {erreur && (
           <Alert variant="destructive">
             <AlertDescription>{erreur}</AlertDescription>
@@ -124,7 +144,10 @@ export function FormulaireParametres({
             <li key={v.version} className="rounded-2xl bg-mist/60 p-3">
               <strong>Version {v.version}</strong> · {dateCourte(v.cree_le)} — {v.nb_questions}{" "}
               questions, {v.temps_ms / 1000} s + {v.tolerance_ms / 1000} s, réussite à {v.seuil},{" "}
-              {v.tentatives_par_jour} parties par jour
+              {v.tentatives_par_jour === null
+                ? "sans limite de parties"
+                : `${v.tentatives_par_jour} parties par jour`}
+              {v.arret_premiere_erreur && ", arrêt à la première erreur"}
             </li>
           ))}
         </ul>

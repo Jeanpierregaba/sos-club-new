@@ -1,4 +1,4 @@
-"""Les quiz du parcours de certification dans la banque (spec 029) : une place de 1 à 12, un fascicule publié
+"""Les quiz du parcours de certification dans la banque (spec 029, 034) : une place de 1 à 20, un fascicule publié
 éventuel, une seule publication par place, et des paramètres propres au parcours."""
 
 import asyncio
@@ -69,7 +69,7 @@ def test_un_quiz_de_jeux_na_ni_place_ni_fascicule(
     assert (corps["parcours"], corps["place"], corps["ressource_id"]) == ("jeux", None, None)
 
 
-@pytest.mark.parametrize("place", [None, 0, 13])
+@pytest.mark.parametrize("place", [None, 0, 21])
 def test_une_place_absente_ou_hors_limites_est_refusee(
     client: TestClient, gestionnaire: Utilisateur, en_base: Callable[..., Any], place: int | None
 ) -> None:
@@ -231,7 +231,11 @@ def test_deux_approbations_simultanees_sur_une_place_une_seule_passe(
 
 
 def test_le_parcours_de_certification_a_ses_propres_parametres(publieur: Navigateur) -> None:
-    entree = {"nb_questions": 10, "temps_ms": 8000, "tolerance_ms": 2000, "seuil": 9, "tentatives_par_jour": 3}
+    # Sans arrêt à la première erreur, un seuil sous le nombre de questions reste possible.
+    entree = {
+        "nb_questions": 10, "temps_ms": 8000, "tolerance_ms": 2000, "seuil": 9, "tentatives_par_jour": 3,
+        "arret_premiere_erreur": False,
+    }  # fmt: skip
 
     reponse = publieur.put(f"{BANQUE}/parametres", params={"parcours": "certification"}, json=entree)
 
@@ -254,3 +258,13 @@ def test_la_reserve_dun_quiz_de_certification_suit_les_parametres_de_son_parcour
 
 def test_un_parcours_inconnu_est_refuse(publieur: Navigateur) -> None:
     assert publieur.get(f"{BANQUE}/parametres", params={"parcours": "autre"}).status_code == 422
+
+
+def test_l_arret_a_la_premiere_erreur_exige_un_sans_faute(publieur: Navigateur) -> None:
+    entree = {"nb_questions": 10, "temps_ms": 20000, "tolerance_ms": 2000, "seuil": 8, "tentatives_par_jour": None}
+
+    reponse = publieur.put(f"{BANQUE}/parametres", params={"parcours": "certification"}, json=entree)
+    jeux = publieur.put(f"{BANQUE}/parametres", json=entree | {"seuil": 10, "arret_premiere_erreur": True})
+
+    assert reponse.status_code == 422
+    assert jeux.status_code == 422

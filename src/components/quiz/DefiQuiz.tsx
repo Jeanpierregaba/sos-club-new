@@ -19,8 +19,17 @@ import {
   type EtatPartie,
   type QuizOuvert,
 } from "@/lib/api/client";
+import { NIVEAUX_JEUX, points } from "@/lib/bareme";
 
 export type Defi = { titre: string; numero: number; quiz: QuizOuvert };
+
+// Spec 034 : le niveau du quiz et ce qu'il rapporte ; à défaut de niveau, le titre du quiz servi par l'API.
+function descriptionDuDefi(defi: Defi) {
+  const niveau = NIVEAUX_JEUX.find((n) => n.code === defi.quiz.niveau);
+  if (!niveau)
+    return defi.quiz.titre === defi.titre ? "Quiz du parcours officiel" : defi.quiz.titre;
+  return `Niveau ${niveau.nom} · ${points(niveau.eleve)} points à la première réussite pour un élève, la moitié pour son club s'il y est affilié`;
+}
 
 // Le joueur sans compte a épuisé ses quiz d'essai : l'API le marque (X-Raison: fin-essai). Tout autre refus, même un
 // 403 (contrôle d'origine, certification) ou un 429, garde le message de l'API : c'était le bug du 2026-11-10.
@@ -153,7 +162,7 @@ export function DefiQuiz({
                 {affiche.titre}
               </DialogTitle>
               <DialogDescription className="mt-1 text-sm font-semibold text-muted-foreground">
-                {affiche.quiz.titre}
+                {descriptionDuDefi(affiche)}
               </DialogDescription>
             </header>
 

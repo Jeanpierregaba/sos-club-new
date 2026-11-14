@@ -43,9 +43,11 @@ def creer_quiz(
     axe: str | None = None,
     place: int | None = None,
     ressource_id: UUID | None = None,
+    niveau: str | None = None,
+    numero: int | None = None,
 ) -> Quiz:
     """Un quiz dont chaque bonne réponse commence par « Juste » : le test la retrouve dans l'ordre mélangé. Avec une
-    place, c'est un quiz du parcours de certification (spec 029)."""
+    place, c'est un quiz du parcours de certification (spec 029) ; un niveau le range parmi les Jeux (spec 034)."""
 
     async def inserer(db: AsyncSession) -> Quiz:
         code = axe or await db.scalar(select(Axe.code).order_by(Axe.code).limit(1))
@@ -62,6 +64,8 @@ def creer_quiz(
             parcours="jeux" if place is None else "certification",
             place=place,
             ressource_id=ressource_id,
+            niveau=niveau,
+            numero=numero,
         )
         db.add(quiz)
         await db.flush()

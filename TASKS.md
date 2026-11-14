@@ -45,7 +45,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 **Phase 5 — Classements (P0, jalon B)**
 
-- [ ] R13 — Classements Club, DRE et national, tableaux de bord, module Points (Q21) ; brancher les lignes des clubs dans `points.service.scores_des_clubs`, que lit déjà le podium de l'accueil (spec 021), et créditer `club.article_eleve` aux clubs enregistrés dans `contenu.club_beneficiaire_id` (spec 023), ainsi que `club.commentaire_eleve` pour les seuls commentaires qui ont rapporté des points à leur auteur (ligne `commentaire:<id>` au registre, plafond de 5 par jour, spec 025) et les parts Club du barème harmonisé (spec 022 : compte, commentaire, quiz, question du jour +10, badges, certification), affiliation active au moment du crédit
+- [ ] R13 — Classements DRE et national des élèves, encadreurs et clubs, classement interne du club, rangs personnels, registre des points et corrections motivées (Q21) — [spec 036](docs/specs/036-classements-et-tableaux-de-bord/spec.md) (spec, plan et tâches écrits le 2026-11-14, plan à valider ; la part du club est déjà livrée par la spec 034, le gel, les ex æquo et le Top 3 restent R14)
 - [ ] R14 — Clôture de semestre et Top 3 (Q21, Q25)
 - [ ] Avant l'ouverture : récépissé de l'IPDCP, avis juridique, sauvegardes hors du VPS, audit de sécurité (Q8, Q9)
 
@@ -61,6 +61,9 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 - [ ] R22 — Détection d'anomalies et analyses
 - [ ] R23 — Chatbot SOS, avec un ADR (Q26)
 
+- [ ] Suites de la spec 033 (cahier des charges « Gestion, activation et suivi des Clubs Santé ») : rapports d'activité adressés aux encadreurs du club (R12 amendé), agenda du club (R16 amendé), année académique et remise à zéro annuelle des points (amende ADR-0004, R13, R14), archives par année ; retrait d'un élève par l'équipe depuis le suivi des clubs ; une future suppression de compte élève ou encadreur devra appeler `recalculer_clubs_du_membre`
+- [ ] Avant la fusion dans `main` : passer la migration `4b93d2491b34` sur une copie de la base de préprod (une DRE au code inconnu la fait échouer) et ajouter la ligne cron des échéances sur le VPS (`deploy/README.md`, étape 8 bis)
+
 ### Petites tâches
 
 - [ ] Mettre à jour les dépendances du site : 13 failles élevées signalées par `bun audit` (zod, vite, nanoid…), puis rendre cet audit bloquant dans la CI
@@ -74,6 +77,9 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] [035 — Annuaire national des établissements du Secondaire I](docs/specs/035-annuaire-secondaire-i/spec.md) (2 396 collèges importés avec préfecture et ordre, noms en casse normale, doublons de nom approchant créés à part ; recherche publique et back office filtrable ; activation des clubs au seuil inchangée ; retour de migration refusé si un établissement importé a déjà des membres)
+- [x] [034 — Gamification de l'élève : 100 quiz sur 4 niveaux, étoiles, carte Gold, club à 50 %](docs/specs/034-gamification-eleve-4-niveaux/spec.md) (ADR-0012 : le club reçoit la moitié de chaque gain de l'élève en demi-points ; 100 quiz Jeux sur 4 niveaux, 4 étoiles et carte Gold ; certification à 20 places ; année académique de septembre à juillet, clôture qui fige le classement régional, anciens élèves ; tableau de bord élève et admin des années)
+- [x] [033 — Activation automatique des clubs](docs/specs/033-activation-des-clubs/spec.md) (cahier des charges du 2026-11-10, ADR-0011 : le club naît à la première affiliation et s'active seul à 3 encadreurs + 21 élèves confirmés ; régularisation de 15 jours, suspension et retour automatique ; désistement signalé par un encadreur et confirmé par l'équipe ; « Mon Club Santé » pour l'encadreur, suivi des clubs pour l'équipe ; carte nationale à trois chiffres réels et régions ; commande quotidienne des échéances ; demande de club, adhésion par le président et rattachements manuels retirés)
 - [x] [032 — « Quel axe est fait pour toi ? » : 7 questions, 3 participations](docs/specs/032-quel-axe-7-questions/spec.md) (parties gardées par l'API, reprise sur un autre appareil, réponse enregistrée à chaque choix ; limite de 3 tenue par le verrou du compte et des contraintes uniques ; résultat principal + 2 axes complémentaires, historique et partage dans le jeu et « Mon espace » ; aucun point ; parties effacées avec le compte)
 - [x] [029 — Certification Génie Imhotep](docs/specs/029-certification/spec.md) (R11 : quiz de certification sur 12 places jouées dans l'ordre, sans les +50 ; 5 badges aux paliers réglables et versionnés (+500 pour l'élève) ; certificat unique (+1 000 élève ou encadreur) au numéro non devinable, PDF au seul titulaire avec QR code, vérification publique sans nom complet, club au choix de l'élève ; révocation motivée qui retire les points, réémission ; club bénéficiaire enregistré pour R13)
 - [x] [028 — Bibliothèque : ressources et fascicules](docs/specs/028-bibliotheque/spec.md) (R10 : magazines, guides, fiches, affiches et fascicules en PDF, publiés à deux personnes avec validateur nommé ; PDF contrôlé et réécrit par pypdf, servi en flux ; « À la Une », filtres, compteur de téléchargements sans donnée personnelle ; bibliothèque publique)

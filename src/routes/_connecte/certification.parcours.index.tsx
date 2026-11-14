@@ -59,9 +59,11 @@ function MaCertificationPage() {
           </h1>
           {parcours && (
             <p className="mt-3 max-w-2xl text-muted-foreground">
-              12 quiz à réussir dans l'ordre, chacun avec {parcours.nb_questions} questions
-              chronométrées et {parcours.seuil} bonnes réponses pour le valider. Lis le fascicule
-              avant de jouer : chaque palier débloque un badge, et les 12 quiz ton certificat.
+              {parcours.places.length} quiz à réussir dans l'ordre, en 5 thématiques, chacun avec{" "}
+              {parcours.nb_questions} questions chronométrées et {parcours.seuil} bonnes réponses
+              pour le valider : à la première erreur, le quiz recommence. Lis le fascicule avant de
+              jouer : chaque thématique terminée débloque un badge, et les {parcours.places.length}{" "}
+              quiz ton certificat.
             </p>
           )}
         </header>
@@ -77,7 +79,10 @@ function MaCertificationPage() {
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <p className="font-display text-5xl text-logo-blue">
                   {parcours.reussies}
-                  <span className="text-2xl text-muted-foreground"> / 12 quiz réussis</span>
+                  <span className="text-2xl text-muted-foreground">
+                    {" "}
+                    / {parcours.places.length} quiz réussis
+                  </span>
                 </p>
                 {prochain && (
                   <p className="inline-flex items-center gap-2 rounded-full bg-sun/30 px-4 py-2 text-sm font-bold text-ink">
@@ -92,13 +97,13 @@ function MaCertificationPage() {
                 role="progressbar"
                 aria-label="Quiz du parcours réussis"
                 aria-valuemin={0}
-                aria-valuemax={12}
+                aria-valuemax={parcours.places.length}
                 aria-valuenow={parcours.reussies}
                 className="mt-4 h-3 overflow-hidden rounded-full bg-mist"
               >
                 <div
                   className="h-full rounded-full bg-primary transition-[width]"
-                  style={{ width: `${(parcours.reussies / 12) * 100}%` }}
+                  style={{ width: `${(parcours.reussies / parcours.places.length) * 100}%` }}
                 />
               </div>
               <div className="mt-6">
@@ -110,13 +115,24 @@ function MaCertificationPage() {
 
             <section aria-labelledby="titre-quiz">
               <h2 id="titre-quiz" className="font-sans text-xl font-extrabold text-logo-blue">
-                Les 12 quiz du parcours
+                Les {parcours.places.length} quiz du parcours
               </h2>
-              <ol className="mt-4 space-y-3">
-                {parcours.places.map((p) => (
-                  <CartePlace key={p.place} place={p} seuil={parcours.seuil} />
-                ))}
-              </ol>
+              {/* Spec 034 : 5 thématiques de 4 quiz, chacune avec le badge qu'elle délivre. */}
+              {[...new Set(parcours.places.map((p) => p.thematique))].map((t) => {
+                const places = parcours.places.filter((p) => p.thematique === t);
+                return (
+                  <div key={t} className="mt-6">
+                    <h3 className="font-sans text-base font-extrabold text-ink">
+                      Thématique {t} · badge {places[0]?.thematique_nom}
+                    </h3>
+                    <ol className="mt-3 space-y-3">
+                      {places.map((p) => (
+                        <CartePlace key={p.place} place={p} seuil={parcours.seuil} />
+                      ))}
+                    </ol>
+                  </div>
+                );
+              })}
             </section>
           </>
         )}

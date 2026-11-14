@@ -19,11 +19,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.certification import regles
 from app.certification.models import BadgeObtenu, Certificat, EtatCertificat, PlaceReussie
-from app.clubs.models import Adhesion, EtatAdhesion
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.notifications.service import notifier
 from app.points import service as points
-from app.points.bareme import BADGE_ELEVE, CERTIFICATION_ELEVE, CERTIFICATION_ENCADREUR
+from app.points.bareme import BADGE_ELEVE, CERTIFICATION_ELEVE, CERTIFICATION_ENCADREUR, QUIZ_CERTIFICATION_ELEVE
+from app.points.models import MouvementPoints
 from app.quiz import horloge
 from app.quiz.dependances import peut_certifier
 from app.quiz.models import PLACES, Quiz, TentativeQuiz
@@ -56,23 +56,23 @@ async def place_ouverte(db: AsyncSession, utilisateur_id: UUID, place: int) -> b
 
 
 async def club_beneficiaire(db: AsyncSession, utilisateur: Utilisateur) -> UUID | None:
-    """Le club de l'élève affilié, pour ses points (R13) ; aucun pour un encadreur ou un élève sans club."""
+    """Le club qui reçoit la moitié des gains de l'élève (spec 034, ADR-0012) ; aucun pour un encadreur."""
     if utilisateur.role is not Role.eleve:
         return None
-    return await db.scalar(
-        select(Adhesion.club_id).where(Adhesion.eleve_id == utilisateur.id, Adhesion.etat == EtatAdhesion.active)
-    )
+    return await points.club_beneficiaire(db, utilisateur.id)
 
 
-async def enregistrer_reussite(db: AsyncSession, joueur: Utilisateur, quiz: Quiz, tentative: TentativeQuiz) -> None:
-    """Une partie réussie sur un quiz publié du parcours : la place est acquise (une fois), puis ce qui est dû est
-    délivré."""
+async def enregistrer_reussite(
+    db: AsyncSession, joueur: Utilisateur, quiz: Quiz, tentative: TentativeQuiz
+) -> MouvementPoints | None:
+    """Une partie réussie sur un quiz publié du parcours : la place est acquise (une fois), +50 pour un élève actif
+    (spec 034), puis ce qui est dû est délivré. Renvoie le gain de la place."""
     assert quiz.place is not None
     # L'ordre est vérifié au lancement, et de nouveau ici : un quiz déplacé pendant une partie ne fait pas sauter
     # de place.
     if not await place_ouverte(db, joueur.id, quiz.place):
-        return
-    await db.execute(
+        return None
+    acquise = await db.scalar(
         insert(PlaceReussie)
         .values(
             utilisateur_id=joueur.id,
@@ -82,14 +82,29 @@ async def enregistrer_reussite(db: AsyncSession, joueur: Utilisateur, quiz: Quiz
             reussie_le=tentative.terminee_le or horloge.maintenant(),
         )
         .on_conflict_do_nothing()
+        .returning(PlaceReussie.place)
     )
+    gain = None
+    if (
+        acquise is not None
+        and joueur.role is Role.eleve
+        and joueur.statut is StatutCompte.actif
+        and joueur.ancien_eleve_le is None
+    ):
+        gain = await points.crediter(
+            db, QUIZ_CERTIFICATION_ELEVE, joueur.id, f"certification:place:{quiz.place}:{joueur.id}"
+        )
     await mettre_a_jour(db, joueur)
+    return gain
 
 
 async def mettre_a_jour(db: AsyncSession, joueur: Utilisateur) -> None:
-    """Délivre les badges dont le palier est atteint et, les 12 places réussies, le certificat. Rien pour un compte
+    """Délivre les badges dont le palier est atteint et, les 20 places réussies, le certificat. Rien pour un compte
     qui ne peut pas jouer (suspendu, encadreur non vérifié) : il sera rattrapé à son retour."""
     if not await peut_certifier(db, joueur):
+        return
+    if joueur.role is Role.eleve and joueur.ancien_eleve_le is not None:
+        # Un ancien élève (spec 034) garde ses places, ses badges et son certificat, mais n'en gagne plus.
         return
     reussies = len(await places_reussies(db, joueur.id))
     if reussies == 0:
@@ -97,6 +112,12 @@ async def mettre_a_jour(db: AsyncSession, joueur: Utilisateur) -> None:
     maintenant = horloge.maintenant()
     club_id = await club_beneficiaire(db, joueur)
     eleve = joueur.role is Role.eleve and joueur.statut is StatutCompte.actif
+
+    if eleve:
+        # Spec 034 : le +50 d'une place acquise quand il n'a pas pu être versé (compte suspendu, action désactivée)
+        # se rattrape ici ; la clé du registre le garde unique.
+        for place in await places_reussies(db, joueur.id):
+            await points.crediter(db, QUIZ_CERTIFICATION_ELEVE, joueur.id, f"certification:place:{place}:{joueur.id}")
 
     en_cours = await regles.en_cours(db)
     obtenus = set((await db.scalars(select(BadgeObtenu.rang).where(BadgeObtenu.utilisateur_id == joueur.id))).all())

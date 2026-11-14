@@ -18,28 +18,17 @@ import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteMotion } from "@/components/SiteMotion";
-import {
-  chargerAxes,
-  chargerFicheClub,
-  chargerMesClubs,
-  chargerMoi,
-  demanderRattachement,
-  ErreurApi,
-  type MesClubs,
-} from "@/lib/api/client";
-import { libelleAxes, libellesDesAxes } from "@/lib/clubs";
+import { chargerAxes, chargerFicheClub, ErreurApi } from "@/lib/api/client";
+import { libelleAxes, libellesDesAxes, STATUTS_CLUB } from "@/lib/clubs";
 import { dateCourte } from "@/lib/dates";
 
 export const Route = createFileRoute("/clubs/$id")({
   loader: async ({ params }) => {
-    const [club, axes, moi] = await Promise.all([
+    const [club, axes] = await Promise.all([
       chargerFicheClub(params.id),
       chargerAxes().catch(() => []),
-      chargerMoi().catch(() => null),
     ]);
-    // Un encadreur actif peut demander son rattachement depuis la fiche (spec 020) ; sinon, null.
-    const mesClubs = moi?.role === "encadreur" ? await chargerMesClubs().catch(() => null) : null;
-    return { club, axes, mesClubs };
+    return { club, axes };
   },
   head: () => ({
     meta: [
@@ -83,7 +72,7 @@ function ClubIntrouvable() {
 }
 
 function FicheClubPage() {
-  const { club, axes, mesClubs } = Route.useLoaderData();
+  const { club, axes } = Route.useLoaderData();
   const libelles = libellesDesAxes(axes);
 
   return (
@@ -100,7 +89,7 @@ function FicheClubPage() {
           <FilAriane rubrique="Vie du club" page="Fiche du club" clair />
           <div data-reveal="left" className="pt-10 md:pt-14">
             <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-bold backdrop-blur-sm">
-              <Sparkles className="size-4 text-sun" /> Club Santé actif
+              <Sparkles className="size-4 text-sun" /> {STATUTS_CLUB[club.statut].libelle}
             </p>
             <h1 className="mt-5 max-w-3xl text-4xl leading-tight md:text-6xl">{club.nom}</h1>
             <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-lg font-semibold text-white/85">
@@ -171,8 +160,6 @@ function FicheClubPage() {
             </>
           )}
 
-          {mesClubs && <RattachementFiche clubId={club.id} mesClubs={mesClubs} />}
-
           <div className="mt-8 rounded-2xl bg-mist-soft p-4 text-sm font-medium text-muted-foreground">
             Seuls le nom du club, son établissement, ses axes et ses actualités validées sont
             publics. La liste des membres n'est visible que de ses membres, de ses encadreurs et de
@@ -189,55 +176,6 @@ function FicheClubPage() {
       </main>
 
       <SiteFooter />
-    </div>
-  );
-}
-
-// Pour un encadreur actif (spec 020) : l'état de son rattachement à ce club, ou le bouton pour le demander.
-function RattachementFiche({ clubId, mesClubs }: { clubId: string; mesClubs: MesClubs }) {
-  const router = useRouter();
-  const [ouvert, setOuvert] = useState(false);
-  const enCours = mesClubs.rattachements.find(
-    (r) =>
-      r.club_id === clubId &&
-      ["en_attente_president", "en_attente_validation", "actif"].includes(r.etat),
-  );
-  const dejaRattache = mesClubs.rattachements.some((r) => r.etat === "actif");
-
-  if (enCours?.etat === "actif")
-    return (
-      <p className="mt-8 flex items-center gap-2 rounded-2xl bg-primary/10 p-4 font-semibold text-ink">
-        <ShieldCheck aria-hidden className="size-5 text-primary" /> Tu es rattaché à ce club.
-      </p>
-    );
-  if (enCours)
-    return (
-      <p className="mt-8 flex items-center gap-2 rounded-2xl bg-sun/20 p-4 font-semibold text-ink">
-        <Hourglass aria-hidden className="size-5" /> Ta demande de rattachement est en cours :
-        suis-la dans ton espace.
-      </p>
-    );
-  return (
-    <div className="mt-8 rounded-2xl border p-4">
-      <p className="font-medium text-ink/80">
-        Tu es encadreur : demande ton rattachement pour suivre ce club.
-        {dejaRattache &&
-          " Tu encadres déjà un club : l'équipe nationale devra autoriser ce club supplémentaire."}
-      </p>
-      <Button onClick={() => setOuvert(true)} className="mt-3 rounded-full font-bold">
-        <Send className="size-4" /> Demander mon rattachement
-      </Button>
-      <DialogueFormulaire
-        ouvert={ouvert}
-        onOuvert={setOuvert}
-        titre="Demander ton rattachement ?"
-        description="Le président du club confirmera ta demande, puis l'équipe la validera."
-        bouton="Envoyer ma demande"
-        onEnvoie={async () => {
-          await demanderRattachement(clubId);
-          await router.invalidate();
-        }}
-      />
     </div>
   );
 }

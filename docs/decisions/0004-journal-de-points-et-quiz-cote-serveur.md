@@ -61,3 +61,15 @@ Conséquence acceptée : un joueur qui rejoue un quiz connaît les réponses des
 de points d'un élève (première réussite) devient plus facile à obtenir si la réserve d'un quiz dépasse à peine le
 nombre de questions tirées. Le porteur du projet l'a accepté le 2026-11-10 : la correction vaut pour tous les
 joueurs, élèves compris, même sur un quiz qui leur rapporte encore des points.
+
+## Amendement du 2026-11-11 : certification à 20 places (spec 034)
+
+La certification Génie Imhotep passe à 20 quiz de 10 questions, 20 secondes par question, réussite à 10/10. Une
+réponse fausse ou un temps dépassé arrête aussitôt la tentative (`arret_premiere_erreur`, réservé à la
+certification et seulement avec seuil = nombre de questions) ; il n'y a plus de plafond quotidien de tentatives.
+Chaque place validée rapporte +50 une seule fois.
+
+Risque accepté : le score d'une tentative arrêtée dit quelle question était fausse ; avec des essais illimités, un
+élève peut éliminer les mauvais choix un à un. La certification ne montre toujours ni la bonne réponse ni
+l'explication. Si l'abus apparaît, deux parades restent possibles sans changer ce modèle : une réserve minimale de
+questions à la publication (par exemple 3 fois le nombre tiré) et une limite de débit des lancements.

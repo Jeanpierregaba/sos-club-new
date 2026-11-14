@@ -1,5 +1,7 @@
 # 020 — Affiliations des élèves et rattachements des encadreurs
 
+> **Remplacée en partie par la [spec 033](../033-activation-des-clubs/spec.md) (2026-11-10)** : l'affiliation d'un élève est confirmée par un encadreur de son établissement ou par l'équipe, plus par le président ; le rattachement d'un encadreur est automatique et unique.
+
 <!-- R5. Corrigée le 2026-11-05 avec le porteur du projet : quatre décisions (voir « Décisions »). -->
 
 ## Objectif

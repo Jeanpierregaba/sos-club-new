@@ -155,6 +155,10 @@ async def activer(
     encadreur.etat = EtatVerification.actif
     encadreur.decide_le = datetime.now(UTC)
     encadreur.decide_par = acces.utilisateur.id
+    # Spec 033 : vérifié, l'encadreur est rattaché au club de son établissement, qui est recalculé.
+    from app.clubs.affiliations import rattacher_encadreur
+
+    await rattacher_encadreur(db, utilisateur.id, encadreur.etablissement_id, "encadreur_verifie", acces.utilisateur.id)
     # Même clé que pour un élève : la bienvenue ne se gagne qu'une fois par compte, quoi qu'il arrive ensuite.
     await points.crediter(
         db, BIENVENUE_ENCADREUR, utilisateur.id, f"bienvenue:{utilisateur.id}", valide_par=acces.utilisateur.id

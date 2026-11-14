@@ -24,6 +24,8 @@ async function afficher(contenu: ReactNode) {
 
 const place = (champs: Partial<PlaceParcours>): PlaceParcours => ({
   place: 4,
+  thematique: 1,
+  thematique_nom: "Ambassadeur Santé Junior",
   etat: "ouverte",
   quiz_id: "quiz-4",
   titre: "Les gestes barrières",

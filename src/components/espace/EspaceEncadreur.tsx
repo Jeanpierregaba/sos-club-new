@@ -4,7 +4,8 @@ import { useState } from "react";
 
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { ChoixEtablissement, type EtablissementChoisi } from "@/components/ChoixEtablissement";
-import { MesClubsEncadreur } from "@/components/clubs/MesClubsEncadreur";
+import { ResumeClubSante } from "@/components/clubs/MonClubSante";
+import { PointsClub } from "@/components/espace/TableauAnnuel";
 import {
   CartesPoints,
   DernieresLignes,
@@ -21,29 +22,26 @@ import {
   MESSAGE_INDISPONIBLE,
   modifierProfilEncadreur,
   renvoyerDemandeEncadreur,
-  type ClubPublic,
   type EspaceEncadreur as Espace,
   type Fonction,
-  type MembresDuClub,
-  type MesClubs,
+  type MonClubSante,
+  type PointsDuClub,
 } from "@/lib/api/client";
 import { dateCourte } from "@/lib/dates";
 import { FONCTIONS, LIBELLES_VERIFICATION, libelleFonction } from "@/lib/fonctions";
 import { normaliserTelephone, telephoneValide } from "@/lib/telephone";
 
-// L'espace d'un encadreur (spec 018) : en attente, refusé ou actif ; ses clubs une fois actif (spec 020).
+// L'espace d'un encadreur (spec 018) : en attente, refusé ou actif ; « Mon Club Santé » une fois vérifié (spec 033).
 export function EspaceEncadreur({
   espace,
   prenom,
-  mesClubs = null,
-  clubEtablissement = null,
-  membres = {},
+  monClubSante = null,
+  pointsClub = null,
 }: {
   espace: Espace;
   prenom: string;
-  mesClubs?: MesClubs | null;
-  clubEtablissement?: ClubPublic | null;
-  membres?: Record<string, MembresDuClub>;
+  monClubSante?: MonClubSante | null;
+  pointsClub?: PointsDuClub | null;
 }) {
   const router = useRouter();
   const [profil, setProfil] = useState(false);
@@ -53,7 +51,12 @@ export function EspaceEncadreur({
   return (
     <main className="min-h-screen bg-carnet px-4 py-10 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <EnTeteEspace nom={prenom} articles={espace.etat === "actif"}>
+        <EnTeteEspace
+          nom={prenom}
+          articles={espace.etat === "actif"}
+          monClub={monClubSante !== null && monClubSante.statut !== "en_constitution"}
+          monClubSante={monClubSante !== null}
+        >
           {motDePasseChange && <MotDePasseChange />}
           {espace.etat === "en_attente" && <EnAttente espace={espace} />}
           {espace.etat === "refuse" && <Refuse espace={espace} />}
@@ -71,23 +74,13 @@ export function EspaceEncadreur({
         )}
 
         {espace.etat === "actif" && espace.points && <CartesPoints points={espace.points} />}
+        {pointsClub && <PointsClub points={pointsClub} />}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
           {espace.etat === "actif" && espace.points ? (
             <div className="space-y-6">
               <DernieresLignes points={espace.points} />
-              {mesClubs ? (
-                <MesClubsEncadreur
-                  mesClubs={mesClubs}
-                  clubEtablissement={clubEtablissement}
-                  membres={membres}
-                  onRafraichir={() => router.invalidate()}
-                />
-              ) : (
-                <p className="rounded-3xl bg-mist-soft p-6 font-medium text-muted-foreground">
-                  Tes clubs n'ont pas pu être chargés : recharge la page.
-                </p>
-              )}
+              <ResumeClubSante club={monClubSante} />
             </div>
           ) : (
             <section className="rounded-3xl bg-white p-6 shadow-card ring-1 ring-border">

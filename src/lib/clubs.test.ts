@@ -17,6 +17,7 @@ const club: ClubPublic = {
   nom: "Club Santé de Tokoin",
   etablissement,
   axes: ["sante-environnement"],
+  statut: "actif",
   actif_le: "2026-11-04T10:00:00Z",
 };
 

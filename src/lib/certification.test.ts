@@ -6,6 +6,8 @@ import { fondBadge, FONDS_BADGES, jouable, prochainBadge, quizRestants } from ".
 
 const place = (etat: PlaceParcours["etat"], quiz_id: string | null = "q"): PlaceParcours => ({
   place: 1,
+  thematique: 1,
+  thematique_nom: "Ambassadeur Santé Junior",
   etat,
   quiz_id,
   titre: null,

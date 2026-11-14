@@ -3,35 +3,35 @@ import { ArrowLeft, ExternalLink, Newspaper, PenLine, Trophy, Users } from "luci
 import type { ReactNode } from "react";
 
 import { EtatContenu } from "@/components/articles/EtatContenu";
-import { GestionClub } from "@/components/clubs/GestionClub";
 import { ListeMembres } from "@/components/clubs/ListeMembres";
 import { PropositionFiche } from "@/components/clubs/PropositionFiche";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import {
   chargerAxes,
   chargerEspaceClub,
-  chargerEspaceEleve,
-  chargerMesClubs,
   chargerMonClub,
+  chargerMonClubSante,
   ErreurApi,
   type AxePublic,
   type EspaceClub,
 } from "@/lib/api/client";
+import { STATUTS_CLUB } from "@/lib/clubs";
 import { dateCourte } from "@/lib/dates";
 
 type Recherche = { club?: string | undefined };
 
-// Le club à ouvrir : celui demandé (un encadreur rattaché à plusieurs clubs), sinon celui de l'élève (président
-// ou membre actif), sinon le premier club de l'encadreur. Null : aucun club.
+// Le club à ouvrir : celui demandé, sinon celui de l'élève (président ou membre confirmé), sinon celui de
+// l'encadreur (spec 033 : un seul club par encadreur). Null : aucun club.
 async function clubVise(role: string, demande: string | undefined): Promise<string | null> {
   if (demande) return demande;
   if (role === "eleve") {
-    const [monClub, espace] = await Promise.all([chargerMonClub(), chargerEspaceEleve()]);
-    if (monClub.club?.etat === "actif") return monClub.club.id;
-    return espace.adhesion?.etat === "active" ? espace.adhesion.club_id : null;
+    const monClub = await chargerMonClub();
+    if (monClub.club?.president || monClub.affiliation?.etat === "active")
+      return monClub.club?.id ?? null;
+    return null;
   }
-  const mesClubs = await chargerMesClubs();
-  return mesClubs.rattachements.find((r) => r.etat === "actif")?.club_id ?? null;
+  const club = await chargerMonClubSante().catch(() => null);
+  return club?.id ?? null;
 }
 
 export const Route = createFileRoute("/_connecte/mon-club/")({
@@ -105,8 +105,11 @@ function Espace({
   axes: AxePublic[];
   onRafraichir: () => Promise<unknown>;
 }) {
-  const president = espace.role === "president";
+  // Un club suspendu (spec 033) ne publie plus : le président garde son titre mais ne gère plus rien.
+  const enService = espace.statut === "actif" || espace.statut === "en_regularisation";
+  const president = espace.role === "president" && enService;
   const { club, indicateurs } = espace;
+  const statut = STATUTS_CLUB[espace.statut];
   const libelleAxe = (code: string) => axes.find((a) => a.code === code)?.libelle ?? code;
 
   return (
@@ -114,11 +117,23 @@ function Espace({
       <header>
         <p className="flex items-center gap-3 text-sm font-extrabold uppercase tracking-widest text-logo-red">
           <span className="h-1 w-8 rounded-full bg-primary" />
-          {president ? "Espace du président" : "Mon club"}
+          {espace.role === "president" ? "Espace du président" : "Mon club"}
         </p>
         <h1 className="mt-3 text-4xl leading-tight md:text-5xl">
           <span className="text-logo-blue">{club.nom}</span>
         </h1>
+        <span
+          className={`mt-3 inline-block rounded-full px-3 py-1 text-sm font-extrabold ${statut.classe}`}
+        >
+          {statut.libelle}
+        </span>
+        {!enService && (
+          <p className="mt-3 rounded-2xl bg-sun/25 px-4 py-3 text-sm font-semibold text-ink">
+            {espace.statut === "suspendu"
+              ? "Le club est suspendu : il ne publie plus et ne gagne plus de points jusqu'à ce qu'il retrouve 3 encadreurs et 21 élèves confirmés."
+              : "Le club s'activera dès qu'il réunira 3 encadreurs et 21 élèves confirmés : les publications s'ouvriront alors."}
+          </p>
+        )}
         <p className="mt-3 text-muted-foreground">
           {club.etablissement.nom}
           {club.actif_le && ` · actif depuis le ${dateCourte(club.actif_le)}`}
@@ -160,31 +175,11 @@ function Espace({
           valeur={indicateurs.actualites}
           libelle="actualités publiées"
         />
-        {indicateurs.demandes !== null ? (
-          <Indicateur
-            icone={<PenLine className="size-5" />}
-            valeur={indicateurs.demandes}
-            libelle="demandes à traiter"
-          />
-        ) : (
-          <li className="rounded-3xl bg-card p-4 shadow-card">
-            <Trophy className="size-5 text-logo-blue" />
-            <p className="mt-2 text-sm text-muted-foreground">Points et rang du club : bientôt</p>
-          </li>
-        )}
+        <li className="rounded-3xl bg-card p-4 shadow-card">
+          <Trophy className="size-5 text-logo-blue" />
+          <p className="mt-2 text-sm text-muted-foreground">Points et rang du club : bientôt</p>
+        </li>
       </ul>
-
-      {president && espace.demandes && (
-        <section className="rounded-3xl bg-card p-5 shadow-card sm:p-7">
-          <GestionClub
-            clubId={club.id}
-            demandesAdhesion={espace.demandes.adhesions}
-            demandesRattachement={espace.demandes.rattachements}
-            membres={espace.membres}
-            onRafraichir={onRafraichir}
-          />
-        </section>
-      )}
 
       <section className="space-y-4 rounded-3xl bg-card p-5 shadow-card sm:p-7">
         <div className="flex flex-wrap items-center justify-between gap-3">

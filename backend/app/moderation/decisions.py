@@ -18,7 +18,7 @@ from sqlalchemy.orm import aliased
 
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
-from app.clubs.models import Adhesion, Club, ClubAxe, EtatAdhesion, EtatClub
+from app.clubs.models import Club, ClubAxe
 from app.comptes.inscription import Refus
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.eleves.models import Eleve
@@ -346,14 +346,10 @@ async def approuver(db: AsyncSession, acces: Acces, contenu_id: UUID, version: i
     # Les lectures d'abord : une requête déclenche l'écriture des changements en attente (autoflush).
     adresse = await _adresse_libre(db, titre) if premiere and type_contenu.adresse else contenu.adresse
     club_id = None
-    # Le club bénéficiaire (R13) d'un contenu qui rapporte des points seulement : pas d'une actualité ni d'une fiche.
+    # Le club bénéficiaire d'un contenu qui rapporte des points seulement : pas d'une actualité ni d'une fiche.
     if premiere and auteur.role is Role.eleve and type_contenu.actions_auteur:
-        # Le club de l'élève affilié à la première approbation : R13 lui créditera ses points.
-        club_id = await db.scalar(
-            select(Adhesion.club_id)
-            .join(Club, Club.id == Adhesion.club_id)
-            .where(Adhesion.eleve_id == auteur.id, Adhesion.etat == EtatAdhesion.active, Club.etat == EtatClub.actif)
-        )
+        # Le club de l'élève affilié à la première approbation, celui qui reçoit la moitié de ses points (spec 034).
+        club_id = await points.club_beneficiaire(db, auteur.id)
 
     travail.etat = EtatVersion.approuvee
     contenu.version_publiee_id = travail.id

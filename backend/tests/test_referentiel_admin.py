@@ -75,7 +75,9 @@ def journal(en_base: Callable[..., Any], action: str | None = None) -> list[Jour
 
 
 def creer_dre_vide(client: TestClient, code: str = "oti", nom: str = "Oti") -> dict[str, Any]:
-    reponse = client.post(DRE, json={"code": code, "nom": nom, "nom_complet": f"Direction régionale {nom}"})
+    reponse = client.post(
+        DRE, json={"code": code, "nom": nom, "nom_complet": f"Direction régionale {nom}", "region": "kara"}
+    )
     assert reponse.status_code == 201, reponse.text
     return reponse.json()
 
@@ -112,7 +114,7 @@ def test_le_droit_clubs_ne_permet_pas_de_toucher_aux_dre_iesg_et_axes(
     axe = client.get(AXES).json()[0]
 
     refus = [
-        client.post(DRE, json={"code": "oti", "nom": "Oti", "nom_complet": "DRE Oti"}),
+        client.post(DRE, json={"code": "oti", "nom": "Oti", "nom_complet": "DRE Oti", "region": "kara"}),
         client.patch(f"{DRE}/kara", json={"version": kara["version"], "nom": "Kara Nord"}),
         client.post(IESG, json={"dre_code": "kara", "nom": "IESG Nouvelle"}),
         client.patch(f"{IESG}/{iesg['id']}", json={"version": iesg["version"], "nom": "IESG Renommée"}),
@@ -248,8 +250,14 @@ def test_une_version_perimee_est_refusee(super_admin: TestClient) -> None:
 
 
 def test_doublons_de_dre_d_iesg_et_d_axes_refuses(super_admin: TestClient) -> None:
-    assert super_admin.post(DRE, json={"code": "kara", "nom": "Autre", "nom_complet": "X"}).status_code == 409
-    assert super_admin.post(DRE, json={"code": "kara-2", "nom": "KARA", "nom_complet": "X"}).status_code == 409
+    assert (
+        super_admin.post(DRE, json={"code": "kara", "nom": "Autre", "nom_complet": "X", "region": "kara"}).status_code
+        == 409
+    )
+    assert (
+        super_admin.post(DRE, json={"code": "kara-2", "nom": "KARA", "nom_complet": "X", "region": "kara"}).status_code
+        == 409
+    )
     assert super_admin.post(IESG, json={"dre_code": "grand-lome", "nom": "iesg golfe"}).status_code == 409
     axe = {"code": "genie-2", "libelle": "génie imhotep", "description": "Doublon"}
     assert super_admin.post(AXES, json=axe).status_code == 409
@@ -258,10 +266,10 @@ def test_doublons_de_dre_d_iesg_et_d_axes_refuses(super_admin: TestClient) -> No
 @pytest.mark.parametrize(
     "corps",
     [
-        {"code": "Oti", "nom": "Oti", "nom_complet": "DRE Oti"},
-        {"code": "o ti", "nom": "Oti", "nom_complet": "DRE Oti"},
-        {"code": "oti", "nom": "   ", "nom_complet": "DRE Oti"},
-        {"code": "oti", "nom": "x" * 151, "nom_complet": "DRE Oti"},
+        {"code": "Oti", "nom": "Oti", "nom_complet": "DRE Oti", "region": "kara"},
+        {"code": "o ti", "nom": "Oti", "nom_complet": "DRE Oti", "region": "kara"},
+        {"code": "oti", "nom": "   ", "nom_complet": "DRE Oti", "region": "kara"},
+        {"code": "oti", "nom": "x" * 151, "nom_complet": "DRE Oti", "region": "kara"},
         {"code": "oti", "nom": "Oti", "nom_complet": "DRE Oti", "inconnu": 1},
         {"code": "oti", "nom": "Oti", "nom_complet": "x" * 201},
     ],
@@ -494,7 +502,7 @@ def test_le_tableau_de_bord_compte_dre_et_etablissements_actifs(super_admin: Tes
 
 
 def test_un_nom_complet_long_mais_valide_est_accepte(super_admin: TestClient) -> None:
-    reponse = super_admin.post(DRE, json={"code": "oti", "nom": "Oti", "nom_complet": "x" * 200})
+    reponse = super_admin.post(DRE, json={"code": "oti", "nom": "Oti", "nom_complet": "x" * 200, "region": "kara"})
     assert reponse.status_code == 201, reponse.text
 
 

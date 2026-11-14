@@ -15,6 +15,7 @@ import {
   urlRessource,
   type EtatPartie,
 } from "@/lib/api/client";
+import { QUIZ_CERTIFICATION } from "@/lib/bareme";
 import { jouable } from "@/lib/certification";
 
 export const Route = createFileRoute("/_connecte/certification/parcours/$place")({
@@ -57,6 +58,7 @@ export const Route = createFileRoute("/_connecte/certification/parcours/$place")
 
 function JouerPlace() {
   const { place, quizId, nbQuestions, seuil } = Route.useLoaderData();
+  const { moi } = Route.useRouteContext();
   const [partie, setPartie] = useState<EtatPartie | null>(null);
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
@@ -95,7 +97,7 @@ function JouerPlace() {
         <header>
           <p className="flex flex-wrap items-center gap-3 text-sm font-extrabold uppercase tracking-widest text-logo-red">
             <span className="h-1 w-8 rounded-full bg-primary" />
-            Génie Imhotep · quiz {place.place} sur 12
+            Génie Imhotep · quiz {place.place} sur {QUIZ_CERTIFICATION} · {place.thematique_nom}
             {place.contenu_de_test && (
               <span className="rounded-full bg-sun/30 px-2 py-0.5 text-xs normal-case tracking-normal text-ink">
                 Contenu de test
@@ -112,8 +114,8 @@ function JouerPlace() {
             <PartieQuiz
               depart={partie}
               appels={partieJoueur}
-              // Un quiz du parcours ne rapporte pas de points : ce sont les badges et le certificat qui en donnent.
-              avecPoints={false}
+              // Spec 034 : un quiz validé rapporte +50 à l'élève (rien à l'encadreur), en plus des badges.
+              avecPoints={moi.role === "eleve"}
               onRejouer={async () => setPartie(await lancerQuiz(quizId))}
               actions={retour}
             />
@@ -136,8 +138,13 @@ function JouerPlace() {
               )}
               <ul className="list-disc space-y-1 pl-5 text-sm">
                 <li>{nbQuestions} questions, une à la fois, avec un compte à rebours.</li>
-                <li>Sans réponse à temps, la question compte comme ratée.</li>
-                <li>Il faut {seuil} bonnes réponses pour réussir ce quiz et ouvrir le suivant.</li>
+                <li>
+                  Une erreur ou un temps dépassé arrête la partie : tu recommences à la question 1.
+                </li>
+                <li>
+                  Il faut {seuil}/{nbQuestions} pour valider ce quiz et ouvrir le suivant ; tu peux
+                  recommencer autant de fois que tu veux.
+                </li>
                 {place.tentatives_restantes !== null && (
                   <li>Parties restantes aujourd'hui sur ce quiz : {place.tentatives_restantes}.</li>
                 )}

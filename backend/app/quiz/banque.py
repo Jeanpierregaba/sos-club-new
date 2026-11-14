@@ -15,9 +15,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
 from app.bibliotheque.models import CategorieRessource, EtatRessource, Ressource
+from app.jeux import progression as jeux_progression
 from app.notifications.service import notifier
 from app.quiz import horloge, parametres
-from app.quiz.models import PARCOURS_JEUX, EtatQuiz, ParametresQuiz, QuestionQuiz, Quiz, ReponseQuiz, TentativeQuiz
+from app.quiz.models import (
+    PARCOURS_CERTIFICATION,
+    PARCOURS_JEUX,
+    EtatQuiz,
+    ParametresQuiz,
+    QuestionQuiz,
+    Quiz,
+    ReponseQuiz,
+    TentativeQuiz,
+)
 from app.quiz.schemas_banque import (
     Approbation,
     HistoriqueParametres,
@@ -83,6 +93,8 @@ def _resume(quiz: Quiz, actives: int, acces: Acces, titres: dict[UUID, str]) -> 
         "etat": quiz.etat,
         "parcours": quiz.parcours,
         "place": quiz.place,
+        "niveau": quiz.niveau,
+        "numero": quiz.numero,
         "ressource_id": quiz.ressource_id,
         "ressource_titre": titres.get(quiz.ressource_id) if quiz.ressource_id else None,
         "contenu_de_test": quiz.contenu_de_test,
@@ -197,7 +209,7 @@ async def _fascicule_publie(db: AsyncSession, ressource_id: UUID | None) -> None
 def _parcours(entree: QuizEntree) -> dict[str, object]:
     """Ce que l'audit retient du parcours d'un quiz."""
     if entree.parcours == PARCOURS_JEUX:
-        return {}
+        return {"niveau": entree.niveau.value} if entree.niveau else {}
     return {"parcours": entree.parcours, "place": entree.place, "ressource_id": str(entree.ressource_id or "")}
 
 
@@ -210,6 +222,7 @@ async def creer(db: AsyncSession, acces: Acces, entree: QuizEntree, ip: str) -> 
         axe_code=entree.axe_code,
         parcours=entree.parcours,
         place=entree.place,
+        niveau=entree.niveau,
         ressource_id=entree.ressource_id,
         etat=EtatQuiz.brouillon,
         contributeurs=[acces.utilisateur.id],
@@ -233,6 +246,10 @@ async def modifier(db: AsyncSession, acces: Acces, quiz_id: UUID, entree: QuizEn
             raise Invalide("Ce quiz a déjà été joué : son parcours et sa place ne changent plus.")
     quiz.titre, quiz.description, quiz.axe_code = entree.titre, entree.description, entree.axe_code
     quiz.parcours, quiz.place, quiz.ressource_id = entree.parcours, entree.place, entree.ressource_id
+    # Un niveau changé vaut pour les réussites à venir ; les gains déjà crédités restent (spec 034). Absent de la
+    # demande, il ne bouge pas : corriger un titre ne remet pas un quiz Expert au niveau Débutant.
+    if "niveau" in entree.model_fields_set or entree.parcours != PARCOURS_JEUX:
+        quiz.niveau = entree.niveau
     _contribue(quiz, acces)
     _journal(db, "modifie", acces, quiz, ip, **_parcours(entree))
 
@@ -386,6 +403,10 @@ async def depublier(db: AsyncSession, acces: Acces, quiz_id: UUID, motif: str, i
     quiz.decide_par, quiz.decide_le, quiz.motif = acces.utilisateur.id, horloge.maintenant(), motif
     _prevenir(db, quiz, f"Ton quiz « {quiz.titre} » est dépublié", motif)
     _journal(db, "depublie", acces, quiz, ip, motif=motif)
+    if quiz.parcours == PARCOURS_JEUX and quiz.niveau is not None and quiz.numero is not None:
+        # Spec 034 : le niveau compte un quiz de moins ; un élève qui avait réussi tous les autres reçoit son étoile.
+        await db.flush()
+        await jeux_progression.reverifier_niveau(db, quiz.niveau)
 
 
 # Paramètres -------------------------------------------------------------------------------------------------------
@@ -399,6 +420,7 @@ def _sortie(p: ParametresQuiz) -> ParametresSortie:
         tolerance_ms=p.tolerance_ms,
         seuil=p.seuil,
         tentatives_par_jour=p.tentatives_par_jour,
+        arret_premiere_erreur=p.arret_premiere_erreur,
         cree_le=p.cree_le,
     )
 
@@ -437,9 +459,14 @@ async def changer_parametres(
         raise Invalide(
             f"Ces quiz publiés ont moins de {entree.nb_questions} questions actives : " + ", ".join(trop_courts) + "."
         )
-    nouvelle = ParametresQuiz(
-        parcours=parcours, version=actuels.version + 1, cree_par=acces.utilisateur.id, **entree.model_dump()
-    )
+    valeurs = entree.model_dump()
+    if valeurs["arret_premiere_erreur"] is None:
+        valeurs["arret_premiere_erreur"] = actuels.arret_premiere_erreur
+    if valeurs["arret_premiere_erreur"] and parcours != PARCOURS_CERTIFICATION:
+        raise Invalide("L'arrêt à la première erreur est réservé à la certification.")
+    if valeurs["arret_premiere_erreur"] and entree.seuil != entree.nb_questions:
+        raise Invalide("L'arrêt à la première erreur demande toutes les bonnes réponses : seuil = nombre de questions.")
+    nouvelle = ParametresQuiz(parcours=parcours, version=actuels.version + 1, cree_par=acces.utilisateur.id, **valeurs)
     db.add(nouvelle)
     try:
         async with db.begin_nested():
@@ -448,7 +475,7 @@ async def changer_parametres(
         raise EtatInvalide("Les paramètres viennent d'être changés par quelqu'un d'autre : recharge la page.") from None
     journaliser(
         db, "quiz_parametres_modifies", acces.utilisateur, cible_type="parametres_quiz", cible_id=nouvelle.id,
-        perimetre="national", details={"parcours": parcours, "version": nouvelle.version, **entree.model_dump()}, adresse_ip=ip,
+        perimetre="national", details={"parcours": parcours, "version": nouvelle.version, **valeurs}, adresse_ip=ip,
     )  # fmt: skip
     await db.refresh(nouvelle)
     return _sortie(nouvelle)

@@ -90,16 +90,16 @@ def test_un_eleve_sans_club_na_pas_de_bloc_club(
     assert admin_inscrits.get(f"/api/admin/inscrits/{eleve.id}").json()["eleve"]["club"] is None
 
 
-def test_le_seed_cree_un_club_actif_et_une_demande_en_attente(client: TestClient, en_base: Callable[..., Any]) -> None:
+def test_le_seed_cree_trois_clubs_de_demonstration(client: TestClient, en_base: Callable[..., Any]) -> None:
+    """Spec 033 : un club actif, un en constitution et un en régularisation, une seule fois."""
     en_base(semer)
     en_base(semer)
 
-    async def compter(db: AsyncSession) -> tuple[int, int]:
-        actifs = await db.scalar(select(func.count()).select_from(Club).where(Club.etat == EtatClub.actif))
-        attente = await db.scalar(select(func.count()).select_from(Club).where(Club.etat == EtatClub.en_attente))
-        return (actifs or 0, attente or 0)
+    async def compter(db: AsyncSession) -> dict[str, int]:
+        lignes = await db.execute(select(Club.etat, func.count()).group_by(Club.etat))
+        return {etat.value: nombre for etat, nombre in lignes.all()}
 
-    assert en_base(compter) == (1, 1)
-    (actif,) = client.get("/api/clubs").json()
-    assert actif["nom"] == "Club Santé Tokoin"
-    assert actif["axes"] == ["sante-environnement", "sport-secourisme"]
+    assert en_base(compter) == {"actif": 1, "en_constitution": 1, "en_regularisation": 1}
+    noms = {club["nom"]: club for club in client.get("/api/clubs").json()}
+    assert noms["Club Santé Tokoin"]["axes"] == ["sante-environnement", "sport-secourisme"]
+    assert len(noms) == 2

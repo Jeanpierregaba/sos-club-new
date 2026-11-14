@@ -18,12 +18,11 @@ from app.admin.journal import journaliser
 from app.articles import public
 from app.articles.dependances import auteur as redacteur
 from app.articles.schemas import ChampsArticle, ResumeArticleAuteur
-from app.clubs import adhesions, rattachements
-from app.clubs.models import Adhesion, Club, ClubAxe, EtatAdhesion, EtatClub, Rattachement
+from app.clubs import activation, adhesions
+from app.clubs.models import CLUB_VIVANT, Adhesion, Club, ClubAxe, EtatAdhesion, Rattachement
 from app.clubs.requetes import encadreurs_actifs
 from app.clubs.schemas import (
     ClubEspace,
-    DemandesClub,
     EspaceClub,
     IndicateursClub,
     PropositionFiche,
@@ -54,8 +53,8 @@ class ChampsFiche(BaseModel):
 async def _appliquer_fiche(db: AsyncSession, contenu: Contenu) -> None:
     """À l'approbation : la fiche publique prend la description et les axes proposés, sous le verrou du club."""
     club = await db.get(Club, contenu.club_id, with_for_update=True, populate_existing=True)
-    if club is None or club.etat is not EtatClub.actif:
-        raise Refus("Ce club n'est plus actif : sa fiche ne peut pas changer.", 409)
+    if club is None or not activation.est_en_service(club):
+        raise Refus("Ce club n'est pas en service : sa fiche ne peut pas changer.", 409)
     version = await db.get(VersionContenu, contenu.version_publiee_id)
     assert version is not None
     champs = ChampsFiche.model_validate(version.donnees)
@@ -111,11 +110,11 @@ enregistrer(
 
 
 async def club_gere(db: AsyncSession, utilisateur: Utilisateur) -> Club | None:
-    """Le club actif présidé par cet utilisateur, sous verrou partagé : une passation (qui verrouille le club pour
+    """Le club en service (actif ou en régularisation, spec 033) présidé par cet utilisateur, sous verrou partagé : une passation (qui verrouille le club pour
     le modifier) attend la fin de l'opération en cours, et celle-ci ne voit jamais un président déjà remplacé.
     Aucun contenu créé pendant une passation ne reste ainsi à l'ancien président."""
     return await db.scalar(
-        select(Club).where(Club.president_id == utilisateur.id, Club.etat == EtatClub.actif).with_for_update(read=True)
+        select(Club).where(Club.president_id == utilisateur.id, activation.en_service()).with_for_update(read=True)
     )
 
 
@@ -223,7 +222,7 @@ async def _actualites_suivies(db: AsyncSession, club_id: UUID) -> list[ResumeArt
 
 
 async def espace(db: AsyncSession, utilisateur: Utilisateur, club_id: UUID) -> EspaceClub:
-    club = await db.scalar(select(Club).where(Club.id == club_id, Club.etat == EtatClub.actif))
+    club = await db.scalar(select(Club).where(Club.id == club_id, Club.etat.in_(CLUB_VIVANT)))
     role = await _role(db, club, utilisateur) if club else None
     if club is None or role is None:
         # Pour les autres, le club n'a pas d'espace à montrer : même réponse que s'il n'existait pas.
@@ -247,13 +246,8 @@ async def espace(db: AsyncSession, utilisateur: Utilisateur, club_id: UUID) -> E
             .where(Contenu.club_id == club.id, Contenu.type == ACTUALITE, Contenu.version_publiee_id.is_not(None))
         )
     ) or 0
-    demandes = None
     suivi = None
     if president:
-        demandes = DemandesClub(
-            adhesions=await adhesions.demandes_a_confirmer(db, utilisateur, club.id),
-            rattachements=await rattachements.demandes_a_confirmer(db, utilisateur, club.id),
-        )
         suivi = SuiviClub(
             propositions=await _propositions(db, club.id),
             actualites=await _actualites_suivies(db, club.id),
@@ -272,11 +266,10 @@ async def espace(db: AsyncSession, utilisateur: Utilisateur, club_id: UUID) -> E
             membres=membres,
             encadreurs=encadreurs,
             actualites=publiees,
-            demandes=len(demandes.adhesions) + len(demandes.rattachements) if demandes else None,
         ),
+        statut=activation.statut_effectif(club, activation.maintenant()).value,
         actualites=await public.actualites_du_club(db, club.id),
         membres=await adhesions.liste_membres(db, club),
-        demandes=demandes,
         suivi=suivi,
     )
 

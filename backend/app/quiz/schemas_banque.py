@@ -6,7 +6,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
-from app.quiz.models import EtatQuiz
+from app.quiz.models import EtatQuiz, NiveauQuiz
 
 Texte = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 
@@ -50,16 +50,20 @@ class QuizEntree(BaseModel):
     description: Annotated[str, StringConstraints(strip_whitespace=True, max_length=300)] = ""
     axe_code: Annotated[str, StringConstraints(max_length=40)]
     parcours: Parcours = "jeux"
-    # Certification seulement (spec 029) : la place de 1 à 12 et le fascicule à lire avant de jouer.
-    place: Annotated[int | None, Field(ge=1, le=12)] = None
+    # Certification seulement (spec 029, 034) : la place de 1 à 20 et le fascicule à lire avant de jouer.
+    place: Annotated[int | None, Field(ge=1, le=20)] = None
     ressource_id: UUID | None = None
+    # Jeux seulement (spec 034) : le niveau fixe les points du quiz et l'étoile à laquelle il compte.
+    niveau: NiveauQuiz | None = None
 
     @model_validator(mode="after")
     def coherente(self) -> Self:
         if self.parcours == "jeux":
             self.place = self.ressource_id = None
-        elif self.place is None:
-            raise ValueError("Un quiz de certification occupe une place de 1 à 12.")
+        else:
+            self.niveau = None
+        if self.parcours != "jeux" and self.place is None:
+            raise ValueError("Un quiz de certification occupe une place de 1 à 20.")
         return self
 
 
@@ -71,6 +75,8 @@ class QuizBanque(BaseModel):
     etat: EtatQuiz
     parcours: Parcours
     place: int | None
+    niveau: NiveauQuiz | None
+    numero: int | None
     ressource_id: UUID | None
     ressource_titre: str | None
     contenu_de_test: bool
@@ -116,12 +122,17 @@ class ParametresEntree(BaseModel):
     temps_ms: Annotated[int, Field(ge=1000, le=60000)]
     tolerance_ms: Annotated[int, Field(ge=0, le=30000)]
     seuil: Annotated[int, Field(ge=1)]
-    tentatives_par_jour: Annotated[int, Field(ge=1, le=100)]
+    # Nul : aucun plafond quotidien (la certification se recommence jusqu'à réussite, spec 034).
+    tentatives_par_jour: Annotated[int, Field(ge=1, le=100)] | None
+    # Nul : la valeur de la version en cours est gardée.
+    arret_premiere_erreur: bool | None = None
 
     @model_validator(mode="after")
     def coherents(self) -> Self:
         if self.seuil > self.nb_questions:
             raise ValueError("Le seuil de réussite ne peut pas dépasser le nombre de questions.")
+        if self.arret_premiere_erreur and self.seuil != self.nb_questions:
+            raise ValueError("L'arrêt à la première erreur demande toutes les bonnes réponses (seuil = nombre).")
         return self
 
 
@@ -131,7 +142,8 @@ class ParametresSortie(BaseModel):
     temps_ms: int
     tolerance_ms: int
     seuil: int
-    tentatives_par_jour: int
+    tentatives_par_jour: int | None
+    arret_premiere_erreur: bool
     cree_le: datetime
 
 

@@ -22,7 +22,7 @@ function Certification() {
   return (
     <div className="space-y-6">
       <EnTeteAdmin sur="Quiz et certification" bleu="Certification" vert="Génie Imhotep">
-        Les 12 quiz du parcours se préparent dans la{" "}
+        Les 20 quiz du parcours se préparent dans la{" "}
         <Link
           to="/admin/quiz"
           search={{ parcours: "certification" }}

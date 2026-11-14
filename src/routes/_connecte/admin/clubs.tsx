@@ -1,50 +1,81 @@
 import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
-import { Check, Crown, Mail, MapPin, Phone, Users, X } from "lucide-react";
+import { Check, Crown, MapPin, Search, X } from "lucide-react";
 import { useState } from "react";
 
 import { DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { DialogueMotif } from "@/components/admin/DialogueMotif";
 import { EnTeteAdmin } from "@/components/admin/EnTeteAdmin";
 import { FileMembres } from "@/components/admin/FileMembres";
+import { SuiviClubs } from "@/components/admin/SuiviClubs";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Button } from "@/components/ui/button";
 import { peut } from "@/lib/admin";
 import {
-  adminActiverClub,
+  adminDeciderDesistement,
   adminFileAffiliations,
-  adminFileClubs,
+  adminFileDesistements,
   adminFilePassations,
-  adminFileRattachements,
-  adminRefuserClub,
   adminRefuserPassation,
+  adminSeuilsClubs,
+  adminSuiviClubs,
   adminValiderPassation,
-  chargerAxes,
-  type DemandeClub,
+  type FileDesistements,
   type Passation,
+  type RegionScolaire,
+  type SignalementAdmin,
+  type StatutClub,
 } from "@/lib/api/client";
 import { dateCourte } from "@/lib/dates";
-import { libelleAxes, libellesDesAxes } from "@/lib/clubs";
 
-type Onglet = "en_attente" | "refuse" | "passations" | "affiliations" | "rattachements";
-const AUTRES_ONGLETS: Onglet[] = ["refuse", "passations", "affiliations", "rattachements"];
+type Onglet = "suivi" | "desistements" | "affiliations" | "passations";
+const AUTRES_ONGLETS: Onglet[] = ["desistements", "affiliations", "passations"];
+const STATUTS: StatutClub[] = ["en_constitution", "actif", "en_regularisation", "suspendu"];
+const REGIONS: RegionScolaire[] = ["maritime", "plateaux", "centrale", "kara", "savanes"];
+
+type Recherche = {
+  etat?: Onglet;
+  statut?: StatutClub;
+  region?: RegionScolaire;
+  q?: string;
+  page?: number;
+};
+
+const texte = (v: unknown) =>
+  typeof v === "string" && v.trim() ? v.trim().slice(0, 100) : undefined;
 
 export const Route = createFileRoute("/_connecte/admin/clubs")({
-  validateSearch: (search: Record<string, unknown>): { etat?: Onglet } =>
-    AUTRES_ONGLETS.includes(search["etat"] as Onglet) ? { etat: search["etat"] as Onglet } : {},
+  validateSearch: (search: Record<string, unknown>): Recherche => {
+    const resultat: Recherche = {};
+    if (AUTRES_ONGLETS.includes(search["etat"] as Onglet)) resultat.etat = search["etat"] as Onglet;
+    if (STATUTS.includes(search["statut"] as StatutClub))
+      resultat.statut = search["statut"] as StatutClub;
+    if (REGIONS.includes(search["region"] as RegionScolaire))
+      resultat.region = search["region"] as RegionScolaire;
+    const q = texte(search["q"]);
+    if (q) resultat.q = q;
+    const page = Number(search["page"]);
+    if (Number.isInteger(page) && page > 1) resultat.page = page;
+    return resultat;
+  },
   beforeLoad: ({ context }) => {
     if (!peut(context.admin, "clubs", "consulter")) throw redirect({ to: "/admin" });
   },
-  loaderDeps: ({ search }) => ({ etat: search.etat ?? "en_attente" }),
+  loaderDeps: ({ search }) => search,
   loader: async ({ deps }) => {
-    const axes = await chargerAxes().catch(() => []);
-    if (deps.etat === "passations") {
-      return { axes, passations: await adminFilePassations() };
-    }
-    // Spec 020 : les affiliations et rattachements confirmés par un président.
-    if (deps.etat === "affiliations") return { axes, affiliations: await adminFileAffiliations() };
-    if (deps.etat === "rattachements")
-      return { axes, rattachements: await adminFileRattachements() };
-    return { axes, file: await adminFileClubs(deps.etat) };
+    const etat = deps.etat ?? "suivi";
+    if (etat === "passations") return { passations: await adminFilePassations() };
+    if (etat === "affiliations") return { affiliations: await adminFileAffiliations() };
+    if (etat === "desistements") return { desistements: await adminFileDesistements() };
+    const [page, seuils] = await Promise.all([
+      adminSuiviClubs({
+        statut: deps.statut,
+        region: deps.region,
+        recherche: deps.q,
+        page: deps.page,
+      }),
+      adminSeuilsClubs(),
+    ]);
+    return { suivi: { page, seuils } };
   },
   gcTime: 0,
   errorComponent: ServiceIndisponible,
@@ -52,22 +83,18 @@ export const Route = createFileRoute("/_connecte/admin/clubs")({
 });
 
 const ONGLETS: { etat: Onglet; libelle: string }[] = [
-  { etat: "en_attente", libelle: "À vérifier" },
-  { etat: "refuse", libelle: "Refusés" },
-  { etat: "passations", libelle: "Passations" },
+  { etat: "suivi", libelle: "Suivi des clubs" },
+  { etat: "desistements", libelle: "Désistements" },
   { etat: "affiliations", libelle: "Affiliations" },
-  { etat: "rattachements", libelle: "Rattachements" },
+  { etat: "passations", libelle: "Présidents" },
 ];
 
 function Clubs() {
   const { admin, catalogue } = Route.useRouteContext();
   const donnees = Route.useLoaderData();
-  const { axes } = donnees;
-  const { etat = "en_attente" } = Route.useSearch();
+  const recherche = Route.useSearch();
+  const etat = recherche.etat ?? "suivi";
   const decideur = peut(admin, "clubs", "approuver");
-  const libelles = libellesDesAxes(axes);
-  const [activation, setActivation] = useState<DemandeClub | null>(null);
-  const [refus, setRefus] = useState<DemandeClub | null>(null);
   const [validation, setValidation] = useState<Passation | null>(null);
   const [refusPassation, setRefusPassation] = useState<Passation | null>(null);
   const router = useRouter();
@@ -77,26 +104,27 @@ function Clubs() {
       ? donnees.passations.total
       : "affiliations" in donnees
         ? donnees.affiliations.total
-        : "rattachements" in donnees
-          ? donnees.rattachements.total
-          : donnees.file.total;
+        : "desistements" in donnees
+          ? donnees.desistements.total
+          : donnees.suivi.page.total;
 
   return (
     <div className="space-y-6">
-      <EnTeteAdmin sur="Clubs Santé" bleu="Clubs" vert="à valider">
-        Vérifie le nom du club, son établissement et le demandeur avant d'activer. Une passation
-        change le président du club, jamais le compte des élèves. Les affiliations et les
-        rattachements arrivent ici une fois confirmés par le président du club.
+      <EnTeteAdmin sur="Clubs Santé" bleu="Suivi" vert="des clubs">
+        Un club s'active tout seul dès qu'il réunit 3 encadreurs et 21 élèves confirmés, et passe en
+        régularisation pour 15 jours s'il descend sous ce seuil. Ici, tu suis les statuts, tu
+        confirmes les désistements signalés par les encadreurs, tu confirmes les élèves sans
+        encadreur et tu valides les présidents.
         {admin.perimetre_dre &&
-          ` Tu vois les demandes de la DRE ${catalogue.dre[admin.perimetre_dre]}.`}
+          ` Tu vois les clubs de la DRE ${catalogue.dre[admin.perimetre_dre]}.`}
       </EnTeteAdmin>
 
-      <nav aria-label="File des clubs" className="flex flex-wrap gap-2">
+      <nav aria-label="Rubriques des clubs" className="flex flex-wrap gap-2">
         {ONGLETS.map((o) => (
           <Link
             key={o.etat}
             to="/admin/clubs"
-            search={o.etat === "en_attente" ? {} : { etat: o.etat }}
+            search={o.etat === "suivi" ? {} : { etat: o.etat }}
             className={`rounded-full px-4 py-2 text-sm font-bold ring-1 transition ${
               etat === o.etat
                 ? "bg-night text-white ring-night"
@@ -109,78 +137,45 @@ function Clubs() {
         ))}
       </nav>
 
-      {"affiliations" in donnees ? (
+      {"suivi" in donnees ? (
+        <SuiviClubs
+          page={donnees.suivi.page}
+          seuils={donnees.suivi.seuils}
+          filtres={recherche}
+          decideur={decideur}
+        />
+      ) : "affiliations" in donnees ? (
         <FileMembres
-          type="affiliations"
           demandes={donnees.affiliations.demandes}
           decideur={decideur}
           onRafraichir={() => router.invalidate()}
         />
-      ) : "rattachements" in donnees ? (
-        <FileMembres
-          type="rattachements"
-          demandes={donnees.rattachements.demandes}
+      ) : "desistements" in donnees ? (
+        <Desistements
+          file={donnees.desistements}
           decideur={decideur}
           onRafraichir={() => router.invalidate()}
         />
-      ) : etat === "passations" && "passations" in donnees ? (
+      ) : (
         <Passations
           passations={donnees.passations}
           decideur={decideur}
           onValider={setValidation}
           onRefuser={setRefusPassation}
         />
-      ) : "file" in donnees ? (
-        <Demandes
-          file={donnees.file}
-          etat={etat}
-          libelles={libelles}
-          decideur={decideur}
-          onActiver={setActivation}
-          onRefuser={setRefus}
-        />
-      ) : null}
+      )}
 
-      <DialogueFormulaire
-        ouvert={activation !== null}
-        onOuvert={(o) => !o && setActivation(null)}
-        titre="Activer ce club ?"
-        description={
-          activation &&
-          `« ${activation.nom} » à ${activation.etablissement.nom}. ${activation.demandeur_pseudonyme} devient président du club et le club apparaît sur la carte publique.`
-        }
-        bouton="Activer"
-        onEnvoie={async () => {
-          if (!activation) return;
-          await adminActiverClub(activation.id, activation.version);
-          await router.invalidate();
-        }}
-      />
-      <DialogueMotif
-        ouvert={refus !== null}
-        onOuvert={(o) => !o && setRefus(null)}
-        titre="Refuser cette demande de club ?"
-        description={
-          refus &&
-          `${refus.demandeur_pseudonyme} lira ce motif dans son espace et pourra renvoyer sa demande.`
-        }
-        bouton="Refuser"
-        danger
-        onConfirme={async (motif) => {
-          if (!refus) return;
-          await adminRefuserClub(refus.id, refus.version, motif);
-          await router.invalidate();
-        }}
-      />
       <DialogueFormulaire
         ouvert={validation !== null}
         onOuvert={(o) => !o && setValidation(null)}
-        titre="Valider cette passation ?"
+        titre="Valider ce président ?"
         description={
           validation &&
-          `${validation.successeur_pseudonyme} devient président de « ${validation.club_nom} ». ${validation.president_sortant_pseudonyme} perd la gestion du club.`
+          (validation.president_sortant_pseudonyme
+            ? `${validation.successeur_pseudonyme} devient président de « ${validation.club_nom} ». ${validation.president_sortant_pseudonyme} perd la gestion du club.`
+            : `${validation.successeur_pseudonyme} devient le premier président de « ${validation.club_nom} ».`)
         }
-        bouton="Valider la passation"
+        bouton="Valider"
         onEnvoie={async () => {
           if (!validation) return;
           await adminValiderPassation(validation.id, validation.version);
@@ -190,10 +185,10 @@ function Clubs() {
       <DialogueMotif
         ouvert={refusPassation !== null}
         onOuvert={(o) => !o && setRefusPassation(null)}
-        titre="Refuser cette passation ?"
+        titre="Refuser cette proposition ?"
         description={
           refusPassation &&
-          `${refusPassation.president_sortant_pseudonyme} reste président de « ${refusPassation.club_nom} » et lira ce motif.`
+          `La présidence de « ${refusPassation.club_nom} » ne change pas ; l'auteur de la proposition lira ce motif.`
         }
         bouton="Refuser"
         danger
@@ -207,128 +202,59 @@ function Clubs() {
   );
 }
 
-function Demandes({
+function Desistements({
   file,
-  etat,
-  libelles,
   decideur,
-  onActiver,
-  onRefuser,
+  onRafraichir,
 }: {
-  file: Awaited<ReturnType<typeof adminFileClubs>>;
-  etat: Onglet;
-  libelles: Map<string, string>;
+  file: FileDesistements;
   decideur: boolean;
-  onActiver: (demande: DemandeClub) => void;
-  onRefuser: (demande: DemandeClub) => void;
+  onRafraichir: () => Promise<unknown>;
 }) {
-  if (file.demandes.length === 0) {
+  const [aConfirmer, setAConfirmer] = useState<SignalementAdmin | null>(null);
+  const [aRejeter, setARejeter] = useState<SignalementAdmin | null>(null);
+
+  if (file.signalements.length === 0)
     return (
       <p className="rounded-3xl bg-white p-6 font-medium text-muted-foreground ring-1 ring-border">
-        {etat === "en_attente" ? "Aucune demande de club à vérifier." : "Aucun club refusé."}
+        Aucun désistement signalé n'attend ta décision.
       </p>
     );
-  }
 
   return (
     <>
-      {file.total > file.demandes.length && (
-        <p className="text-sm font-semibold text-muted-foreground">
-          Les {file.demandes.length} demandes les{" "}
-          {etat === "en_attente" ? "plus anciennes" : "plus récentes"} sont affichées sur{" "}
-          {file.total}.
-        </p>
-      )}
       <ul className="grid gap-3">
-        {file.demandes.map((d) => (
-          <li key={d.id} className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-border">
+        {file.signalements.map((s) => (
+          <li key={s.id} className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-border">
             <div className="flex flex-wrap items-start gap-4">
-              <div className="min-w-0 flex-1 space-y-2">
-                <div>
-                  <p className="text-lg font-extrabold text-logo-blue">{d.nom}</p>
-                  <p className="text-sm font-semibold text-ink">
-                    {d.etablissement.nom}
-                    {d.etablissement.statut === "propose" && (
-                      <span className="ml-2 rounded-full bg-sun/30 px-2 py-0.5 text-xs font-extrabold">
-                        Proposé
-                      </span>
-                    )}
-                    <span className="block font-medium text-muted-foreground">
-                      {d.etablissement.iesg} · {d.etablissement.dre}
-                    </span>
-                  </p>
-                </div>
-                <p className="text-sm font-semibold text-ink">
-                  Demandeur : {d.demandeur_pseudonyme}
-                  <span className="block text-xs font-medium text-muted-foreground">
-                    Demande du {dateCourte(d.demande_le)}
-                  </span>
+              <div className="min-w-0 flex-1 space-y-1">
+                <p className="text-lg font-extrabold text-logo-blue">
+                  {s.encadreur_prenom} {s.encadreur_nom}
                 </p>
-                {d.description && (
-                  <p className="text-sm font-medium text-ink/80">{d.description}</p>
-                )}
-                {d.axes.length > 0 && (
-                  <p className="flex flex-wrap gap-1.5">
-                    {d.axes.map((code) => (
-                      <span
-                        key={code}
-                        className="rounded-full bg-mist-soft px-2.5 py-0.5 text-xs font-bold text-ink"
-                      >
-                        {libelleAxes([code], libelles)}
-                      </span>
-                    ))}
-                  </p>
-                )}
-                {d.encadreurs_associes.length > 0 && (
-                  <div className="rounded-2xl bg-mist-soft p-3">
-                    <p className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide text-muted-foreground">
-                      <Users aria-hidden className="size-3.5" /> Encadreurs associés (déclaratif)
-                    </p>
-                    <ul className="mt-2 grid gap-1 text-sm font-semibold text-ink">
-                      {d.encadreurs_associes.map((personne, index) => (
-                        <li key={index} className="flex flex-wrap items-baseline gap-x-3">
-                          <span>{personne.nom}</span>
-                          {personne.email && (
-                            <a
-                              href={`mailto:${personne.email}`}
-                              className="inline-flex items-center gap-1 text-logo-blue hover:underline"
-                            >
-                              <Mail aria-hidden className="size-3.5" /> {personne.email}
-                            </a>
-                          )}
-                          {personne.telephone && (
-                            <a
-                              href={`tel:${personne.telephone}`}
-                              className="inline-flex items-center gap-1 text-logo-blue hover:underline"
-                            >
-                              <Phone aria-hidden className="size-3.5" /> {personne.telephone}
-                            </a>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {d.motif_refus && (
-                  <p className="rounded-2xl bg-logo-red/10 px-3 py-2 text-sm font-semibold text-ink">
-                    Refusé{d.decide_le ? ` le ${dateCourte(d.decide_le)}` : ""} : {d.motif_refus}
-                  </p>
-                )}
+                <p className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+                  <MapPin aria-hidden className="size-4" /> {s.club_nom}
+                  <span className="font-medium text-muted-foreground">· DRE {s.dre}</span>
+                </p>
+                <p className="text-sm font-medium text-ink/80">« {s.motif} »</p>
+                <p className="text-xs font-medium text-muted-foreground">
+                  Signalé {s.signale_par ? `par ${s.signale_par} ` : ""}le{" "}
+                  {dateCourte(s.signale_le)}
+                </p>
               </div>
-              {decideur && d.etat === "en_attente" && (
+              {decideur && (
                 <div className="flex w-full flex-wrap gap-2 sm:w-auto">
                   <Button
-                    onClick={() => onActiver(d)}
+                    onClick={() => setAConfirmer(s)}
                     className="flex-1 rounded-full font-bold sm:flex-none"
                   >
-                    <Check className="size-4" /> Activer
+                    <Check className="size-4" /> Confirmer le départ
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => onRefuser(d)}
+                    onClick={() => setARejeter(s)}
                     className="flex-1 rounded-full font-bold sm:flex-none"
                   >
-                    <X className="size-4" /> Refuser
+                    <X className="size-4" /> Rejeter
                   </Button>
                 </div>
               )}
@@ -336,6 +262,34 @@ function Demandes({
           </li>
         ))}
       </ul>
+      <DialogueFormulaire
+        ouvert={aConfirmer !== null}
+        onOuvert={(o) => !o && setAConfirmer(null)}
+        titre="Confirmer ce départ ?"
+        description={
+          aConfirmer &&
+          `${aConfirmer.encadreur_prenom} ${aConfirmer.encadreur_nom} ne fera plus partie de « ${aConfirmer.club_nom} ». Son compte et ses contributions restent. S'il manque un encadreur, le club entre en régularisation pour 15 jours.`
+        }
+        bouton="Confirmer"
+        onEnvoie={async () => {
+          if (!aConfirmer) return;
+          await adminDeciderDesistement(aConfirmer.id, "confirmer", aConfirmer.version);
+          await onRafraichir();
+        }}
+      />
+      <DialogueMotif
+        ouvert={aRejeter !== null}
+        onOuvert={(o) => !o && setARejeter(null)}
+        titre="Rejeter ce signalement ?"
+        description="Rien ne change pour le club. L'encadreur qui a signalé lira ton motif ; l'encadreur visé n'est pas prévenu."
+        bouton="Rejeter"
+        danger
+        onConfirme={async (motif) => {
+          if (!aRejeter) return;
+          await adminDeciderDesistement(aRejeter.id, "rejeter", aRejeter.version, motif);
+          await onRafraichir();
+        }}
+      />
     </>
   );
 }
@@ -382,7 +336,13 @@ function Passations({
                   </span>
                 </p>
                 <p className="text-sm font-semibold text-ink">
-                  De <strong>{p.president_sortant_pseudonyme}</strong> vers{" "}
+                  {p.president_sortant_pseudonyme ? (
+                    <>
+                      De <strong>{p.president_sortant_pseudonyme}</strong> vers{" "}
+                    </>
+                  ) : (
+                    "Premier président, proposé par un encadreur : "
+                  )}
                   <strong>{p.successeur_pseudonyme}</strong>
                   <span className="block text-xs font-medium text-muted-foreground">
                     Proposée le {dateCourte(p.propose_le)}

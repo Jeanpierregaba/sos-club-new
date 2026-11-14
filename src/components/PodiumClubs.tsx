@@ -17,8 +17,8 @@ const LIGNES = [
   "bg-white/70 text-ink",
 ];
 
-// Le podium de l'accueil (spec 021, spec 022) : les trois lycées dont le Club Santé a le plus de points. Le registre ne
-// crédite pas encore les clubs (R13) : tant que personne n'a de points, la carte annonce le classement.
+// Le podium de l'accueil (spec 021, spec 034) : les trois lycées dont le Club Santé a le plus de points. Un club reçoit la
+// moitié de chaque gain de ses élèves (« 2,5 » possible) ; tant que personne n'a de points, la carte annonce le classement.
 export function PodiumClubs() {
   const { data: podium = [] } = useQuery({
     queryKey: ["podium-clubs"],

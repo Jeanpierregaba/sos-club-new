@@ -31,8 +31,9 @@ def club(
 def test_le_president_voit_la_gestion(
     club: dict[str, Any], creer_eleve: Callable[..., Any], en_base: Callable[..., Any]
 ) -> None:
+    # Spec 033 : une affiliation à confirmer ne compte pas parmi les membres, et le président ne la traite plus.
     demandeur = creer_eleve("demandeur", "Yao Sportif", etablissement_id=club["club"].etablissement_id)
-    adherer(en_base, demandeur, club["club"], EtatAdhesion.en_attente_president)
+    adherer(en_base, demandeur, club["club"], EtatAdhesion.en_attente_validation)
 
     reponse = club["nav_president"].get(espace(club["club"].id))
 
@@ -44,8 +45,8 @@ def test_le_president_voit_la_gestion(
     assert vue["indicateurs"]["membres"] == 2  # le président et Ama
     assert vue["indicateurs"]["encadreurs"] == 1
     assert vue["indicateurs"]["actualites"] == 0
-    assert vue["indicateurs"]["demandes"] == 1
-    assert [d["pseudonyme"] for d in vue["demandes"]["adhesions"]] == ["Yao Sportif"]
+    assert "demandes" not in vue and "demandes" not in vue["indicateurs"]
+    assert vue["statut"] == "actif"
     assert vue["suivi"] == {"propositions": [], "actualites": []}
     assert {m["pseudonyme"] for m in vue["membres"]["membres"]} == {"Zoé la Présidente", "Ama du Golfe"}
 
@@ -59,9 +60,8 @@ def test_un_membre_et_un_encadreur_rattache_lisent_sans_gestion(
     assert reponse.status_code == 200, reponse.text
     vue = reponse.json()
     assert vue["role"] == role
-    assert vue["demandes"] is None
     assert vue["suivi"] is None
-    assert vue["indicateurs"]["demandes"] is None
+    assert vue["statut"] == "actif"
     assert vue["club"]["nom"] == "Club Santé du Lycée"
     assert len(vue["membres"]["membres"]) == 2
 
