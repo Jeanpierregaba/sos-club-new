@@ -334,7 +334,7 @@ def test_l_equipe_voit_les_eleves_gold(
             db.add(EtoileObtenue(utilisateur_id=eleve.id, niveau=niveau))
 
     en_base(quatre)
-    creer_collaborateur("gold", droits={("tableau_de_bord", "consulter"), ("points", "consulter")})
+    creer_collaborateur("gold", droits={("tableau_de_bord", "consulter"), ("points", "consulter")}, double_auth=True)
     connecter_admin(client, "gold")
 
     corps = client.get("/api/admin/jeux/gold").json()
@@ -481,7 +481,12 @@ def test_un_responsable_de_dre_ne_voit_que_les_eleves_gold_de_sa_dre(
                 db.add(EtoileObtenue(utilisateur_id=eleve.id, niveau=niveau))
 
     en_base(quatre)
-    creer_collaborateur("dre", droits={("tableau_de_bord", "consulter"), ("points", "consulter")}, perimetre_dre="kara")
+    creer_collaborateur(
+        "dre",
+        droits={("tableau_de_bord", "consulter"), ("points", "consulter")},
+        perimetre_dre="kara",
+        double_auth=True,
+    )
     connecter_admin(client, "dre")
 
     assert [e["pseudonyme"] for e in client.get("/api/admin/jeux/gold").json()] == ["Kossi de Kara"]

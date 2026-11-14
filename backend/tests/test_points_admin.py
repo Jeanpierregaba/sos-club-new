@@ -29,7 +29,8 @@ def gestionnaire(client: TestClient, creer_collaborateur: Callable[..., Any]) ->
 
 @pytest.fixture
 def lecteur(client: TestClient, creer_collaborateur: Callable[..., Any]) -> TestClient:
-    creer_collaborateur("lecteur", droits=LECTEUR)
+    # Consulter les points est sensible depuis la spec 036 (le registre montre les noms) : double authentification.
+    creer_collaborateur("lecteur", droits=LECTEUR, double_auth=True)
     connecter_admin(client, "lecteur")
     return client
 

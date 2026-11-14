@@ -3033,6 +3033,134 @@
         }
       }
     },
+    "/api/admin/points/classements": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Classements Admin",
+        "operationId": "classements_admin_api_admin_points_classements_get",
+        "parameters": [
+          {
+            "name": "categorie",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Categorie",
+              "default": "eleves"
+            }
+          },
+          {
+            "name": "niveau",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Niveau",
+              "default": "national"
+            }
+          },
+          {
+            "name": "dre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 30
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dre"
+            }
+          },
+          {
+            "name": "periode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Periode",
+              "default": "semestre"
+            }
+          },
+          {
+            "name": "club_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Club Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "par_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Par Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ClassementPersonnesAdmin"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ClassementClubsAdmin"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ClassementClubAdminInterne"
+                    }
+                  ],
+                  "title": "Response Classements Admin Api Admin Points Classements Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/points/mon-club": {
       "get": {
         "tags": [
@@ -3047,6 +3175,209 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PointsDuClub"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/classements": {
+      "get": {
+        "tags": [
+          "classements"
+        ],
+        "summary": "Classement Public",
+        "operationId": "classement_public_api_classements_get",
+        "parameters": [
+          {
+            "name": "categorie",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Categorie",
+              "default": "eleves"
+            }
+          },
+          {
+            "name": "niveau",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Niveau",
+              "default": "national"
+            }
+          },
+          {
+            "name": "dre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 30
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dre"
+            }
+          },
+          {
+            "name": "periode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Periode",
+              "default": "semestre"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "par_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Par Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ClassementPersonnesPublic"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ClassementClubsPublic"
+                    }
+                  ],
+                  "title": "Response Classement Public Api Classements Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/classements/moi": {
+      "get": {
+        "tags": [
+          "classements"
+        ],
+        "summary": "Mon Classement",
+        "operationId": "mon_classement_api_classements_moi_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClassementPersonnel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/classements/mon-club": {
+      "get": {
+        "tags": [
+          "classements"
+        ],
+        "summary": "Classement De Mon Club",
+        "operationId": "classement_de_mon_club_api_classements_mon_club_get",
+        "parameters": [
+          {
+            "name": "categorie",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Categorie",
+              "default": "eleves"
+            }
+          },
+          {
+            "name": "periode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Periode",
+              "default": "semestre"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "par_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Par Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClassementClubInterne"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -11075,7 +11406,8 @@
         "enum": [
           "eleve",
           "encadreur",
-          "club"
+          "club",
+          "admin"
         ],
         "title": "Beneficiaire"
       },
@@ -11560,6 +11892,15 @@
         ],
         "title": "CatalogueQuiz"
       },
+      "Categorie": {
+        "type": "string",
+        "enum": [
+          "eleves",
+          "encadreurs",
+          "clubs"
+        ],
+        "title": "Categorie"
+      },
       "CategorieRessource": {
         "type": "string",
         "enum": [
@@ -11833,6 +12174,517 @@
           "tle"
         ],
         "title": "Classe"
+      },
+      "ClassementClubAdminInterne": {
+        "properties": {
+          "club": {
+            "$ref": "#/components/schemas/ClubClasse"
+          },
+          "statut": {
+            "type": "string",
+            "title": "Statut"
+          },
+          "categorie": {
+            "type": "string",
+            "enum": [
+              "eleves",
+              "encadreurs"
+            ],
+            "title": "Categorie"
+          },
+          "periode": {
+            "type": "string",
+            "enum": [
+              "semestre",
+              "historique"
+            ],
+            "title": "Periode"
+          },
+          "semestre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SemestrePublic"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "lignes": {
+            "items": {
+              "$ref": "#/components/schemas/LigneClubAdminInterne"
+            },
+            "type": "array",
+            "title": "Lignes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "club",
+          "statut",
+          "categorie",
+          "periode",
+          "semestre",
+          "page",
+          "par_page",
+          "total",
+          "lignes"
+        ],
+        "title": "ClassementClubAdminInterne"
+      },
+      "ClassementClubInterne": {
+        "properties": {
+          "club": {
+            "$ref": "#/components/schemas/ClubClasse"
+          },
+          "categorie": {
+            "type": "string",
+            "enum": [
+              "eleves",
+              "encadreurs"
+            ],
+            "title": "Categorie"
+          },
+          "periode": {
+            "type": "string",
+            "enum": [
+              "semestre",
+              "historique"
+            ],
+            "title": "Periode"
+          },
+          "semestre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SemestrePublic"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "lignes": {
+            "items": {
+              "$ref": "#/components/schemas/LigneClubInterne"
+            },
+            "type": "array",
+            "title": "Lignes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "club",
+          "categorie",
+          "periode",
+          "semestre",
+          "page",
+          "par_page",
+          "total",
+          "lignes"
+        ],
+        "title": "ClassementClubInterne"
+      },
+      "ClassementClubsAdmin": {
+        "properties": {
+          "categorie": {
+            "type": "string",
+            "const": "clubs",
+            "title": "Categorie"
+          },
+          "niveau": {
+            "type": "string",
+            "enum": [
+              "national",
+              "dre"
+            ],
+            "title": "Niveau"
+          },
+          "dre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DreResume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "periode": {
+            "type": "string",
+            "enum": [
+              "semestre",
+              "historique"
+            ],
+            "title": "Periode"
+          },
+          "semestre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SemestrePublic"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "lignes": {
+            "items": {
+              "$ref": "#/components/schemas/LigneClubAdmin"
+            },
+            "type": "array",
+            "title": "Lignes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "categorie",
+          "niveau",
+          "dre",
+          "periode",
+          "semestre",
+          "page",
+          "par_page",
+          "total",
+          "lignes"
+        ],
+        "title": "ClassementClubsAdmin"
+      },
+      "ClassementClubsPublic": {
+        "properties": {
+          "categorie": {
+            "type": "string",
+            "const": "clubs",
+            "title": "Categorie"
+          },
+          "niveau": {
+            "type": "string",
+            "enum": [
+              "national",
+              "dre"
+            ],
+            "title": "Niveau"
+          },
+          "dre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DreResume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "periode": {
+            "type": "string",
+            "enum": [
+              "semestre",
+              "historique"
+            ],
+            "title": "Periode"
+          },
+          "semestre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SemestrePublic"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "lignes": {
+            "items": {
+              "$ref": "#/components/schemas/LigneClubPublic"
+            },
+            "type": "array",
+            "title": "Lignes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "categorie",
+          "niveau",
+          "dre",
+          "periode",
+          "semestre",
+          "page",
+          "par_page",
+          "total",
+          "lignes"
+        ],
+        "title": "ClassementClubsPublic"
+      },
+      "ClassementPersonnel": {
+        "properties": {
+          "categorie": {
+            "type": "string",
+            "enum": [
+              "eleves",
+              "encadreurs"
+            ],
+            "title": "Categorie"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubClasse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "semestre": {
+            "$ref": "#/components/schemas/RangPersonnel"
+          },
+          "historique": {
+            "$ref": "#/components/schemas/RangPersonnel"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "categorie",
+          "club",
+          "semestre",
+          "historique"
+        ],
+        "title": "ClassementPersonnel"
+      },
+      "ClassementPersonnesAdmin": {
+        "properties": {
+          "categorie": {
+            "type": "string",
+            "enum": [
+              "eleves",
+              "encadreurs"
+            ],
+            "title": "Categorie"
+          },
+          "niveau": {
+            "type": "string",
+            "enum": [
+              "national",
+              "dre"
+            ],
+            "title": "Niveau"
+          },
+          "dre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DreResume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "periode": {
+            "type": "string",
+            "enum": [
+              "semestre",
+              "historique"
+            ],
+            "title": "Periode"
+          },
+          "semestre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SemestrePublic"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "lignes": {
+            "items": {
+              "$ref": "#/components/schemas/LignePersonneAdmin"
+            },
+            "type": "array",
+            "title": "Lignes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "categorie",
+          "niveau",
+          "dre",
+          "periode",
+          "semestre",
+          "page",
+          "par_page",
+          "total",
+          "lignes"
+        ],
+        "title": "ClassementPersonnesAdmin"
+      },
+      "ClassementPersonnesPublic": {
+        "properties": {
+          "categorie": {
+            "type": "string",
+            "enum": [
+              "eleves",
+              "encadreurs"
+            ],
+            "title": "Categorie"
+          },
+          "niveau": {
+            "type": "string",
+            "enum": [
+              "national",
+              "dre"
+            ],
+            "title": "Niveau"
+          },
+          "dre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DreResume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "periode": {
+            "type": "string",
+            "enum": [
+              "semestre",
+              "historique"
+            ],
+            "title": "Periode"
+          },
+          "semestre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SemestrePublic"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "lignes": {
+            "items": {
+              "$ref": "#/components/schemas/LignePersonnePublic"
+            },
+            "type": "array",
+            "title": "Lignes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "categorie",
+          "niveau",
+          "dre",
+          "periode",
+          "semestre",
+          "page",
+          "par_page",
+          "total",
+          "lignes"
+        ],
+        "title": "ClassementPersonnesPublic"
+      },
+      "ClubClasse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "nom"
+        ],
+        "title": "ClubClasse",
+        "description": "Le club d'un classement (spec 036). Un autre nom que `clubs.schemas.ClubResume` : deux schémas de même\nnom seraient renommés dans le schéma de l'API, et le site ne les trouverait plus."
       },
       "ClubContenu": {
         "properties": {
@@ -13552,6 +14404,25 @@
           "iesg"
         ],
         "title": "DrePublique"
+      },
+      "DreResume": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "nom"
+        ],
+        "title": "DreResume"
       },
       "Droit": {
         "properties": {
@@ -17111,6 +17982,145 @@
         ],
         "title": "LigneBaremeModification"
       },
+      "LigneClubAdmin": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "club_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Club Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "etablissement": {
+            "type": "string",
+            "title": "Etablissement"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "points": {
+            "type": "number",
+            "title": "Points"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rang",
+          "club_id",
+          "nom",
+          "etablissement",
+          "dre",
+          "points"
+        ],
+        "title": "LigneClubAdmin"
+      },
+      "LigneClubAdminInterne": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "utilisateur_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Utilisateur Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rang",
+          "utilisateur_id",
+          "nom",
+          "points"
+        ],
+        "title": "LigneClubAdminInterne"
+      },
+      "LigneClubInterne": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          },
+          "est_moi": {
+            "type": "boolean",
+            "title": "Est Moi"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rang",
+          "nom",
+          "points",
+          "est_moi"
+        ],
+        "title": "LigneClubInterne"
+      },
+      "LigneClubPublic": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "club_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Club Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "etablissement": {
+            "type": "string",
+            "title": "Etablissement"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "points": {
+            "type": "number",
+            "title": "Points"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rang",
+          "club_id",
+          "nom",
+          "etablissement",
+          "dre",
+          "points"
+        ],
+        "title": "LigneClubPublic"
+      },
       "LigneJournalClub": {
         "properties": {
           "ancien": {
@@ -17156,6 +18166,108 @@
           "cree_le"
         ],
         "title": "LigneJournalClub"
+      },
+      "LignePersonneAdmin": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "utilisateur_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Utilisateur Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "club_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club Id"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rang",
+          "utilisateur_id",
+          "nom",
+          "club_id",
+          "club",
+          "dre",
+          "points"
+        ],
+        "title": "LignePersonneAdmin"
+      },
+      "LignePersonnePublic": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rang",
+          "nom",
+          "club",
+          "dre",
+          "points"
+        ],
+        "title": "LignePersonnePublic",
+        "description": "Un élève ou un encadreur, sans aucun identifiant ni contact."
       },
       "LignePoints": {
         "properties": {
@@ -17812,6 +18924,14 @@
           "motif"
         ],
         "title": "MotifEntree"
+      },
+      "Niveau": {
+        "type": "string",
+        "enum": [
+          "national",
+          "dre"
+        ],
+        "title": "Niveau"
       },
       "NiveauProgression": {
         "properties": {
@@ -18588,6 +19708,14 @@
           "version"
         ],
         "title": "PassationEntree"
+      },
+      "Periode": {
+        "type": "string",
+        "enum": [
+          "semestre",
+          "historique"
+        ],
+        "title": "Periode"
       },
       "PhotoAuteur": {
         "properties": {
@@ -20227,6 +21355,61 @@
         ],
         "title": "QuizOuvert"
       },
+      "RangPersonnel": {
+        "properties": {
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          },
+          "rang_club": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rang Club"
+          },
+          "rang_dre": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rang Dre"
+          },
+          "rang_national": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rang National"
+          },
+          "classe": {
+            "type": "boolean",
+            "title": "Classe"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "points",
+          "rang_club",
+          "rang_dre",
+          "rang_national",
+          "classe"
+        ],
+        "title": "RangPersonnel"
+      },
       "RefusDemandeEntree": {
         "properties": {
           "motif": {
@@ -21299,6 +22482,32 @@
           "version"
         ],
         "title": "SemestreModification"
+      },
+      "SemestrePublic": {
+        "properties": {
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date",
+            "title": "Fin"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "libelle",
+          "debut",
+          "fin"
+        ],
+        "title": "SemestrePublic"
       },
       "SemestreResume": {
         "properties": {

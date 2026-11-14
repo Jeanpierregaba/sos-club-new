@@ -82,6 +82,8 @@ SENSIBLES: frozenset[tuple[str, Action]] = frozenset(
         ("quiz", D),
         ("bibliotheque", A),
         ("bibliotheque", D),
+        # Le registre des points (spec 036) montre le nom complet et les corrections du bénéficiaire.
+        ("points", C),
         ("points", M),
         # La file montre l'e-mail et le téléphone ; un encadreur actif accédera aux données de ses élèves.
         ("encadreurs", C),

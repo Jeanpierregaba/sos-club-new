@@ -39,7 +39,8 @@ def test_le_bareme_suit_le_referentiel(en_base: Callable[..., Any]) -> None:
     lus = montants(en_base)
 
     assert {code: lus[code] for code in ATTENDU} == ATTENDU
-    assert len(lus) == 46
+    # La ligne technique `admin.correction` (spec 036) s'ajoute aux 46 actions du barème.
+    assert len(set(lus) - {"admin.correction"}) == 46
 
 
 def test_la_migration_aligne_le_bareme_sans_ecraser_un_montant_regle(en_base: Callable[..., Any]) -> None:
@@ -63,7 +64,7 @@ def test_la_migration_aligne_le_bareme_sans_ecraser_un_montant_regle(en_base: Ca
     # La spec 034 désactive ensuite la ligne, sans toucher au montant réglé par l'admin.
     assert apres["club.quiz_eleve"] == 15
     assert apres["eleve.question_jour"] == 20
-    assert len(apres) == 46
+    assert len(set(apres) - {"admin.correction"}) == 46
 
     async def ordre(db: AsyncSession) -> list[str]:
         return list(await db.scalars(select(LigneBareme.code).order_by(LigneBareme.ordre)))

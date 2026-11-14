@@ -1009,6 +1009,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/points/classements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Classements Admin */
+        get: operations["classements_admin_api_admin_points_classements_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/points/mon-club": {
         parameters: {
             query?: never;
@@ -1018,6 +1035,57 @@ export interface paths {
         };
         /** Points De Mon Club */
         get: operations["points_de_mon_club_api_points_mon_club_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/classements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Classement Public */
+        get: operations["classement_public_api_classements_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/classements/moi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mon Classement */
+        get: operations["mon_classement_api_classements_moi_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/classements/mon-club": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Classement De Mon Club */
+        get: operations["classement_de_mon_club_api_classements_mon_club_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3805,7 +3873,7 @@ export interface components {
          * Beneficiaire
          * @enum {string}
          */
-        Beneficiaire: "eleve" | "encadreur" | "club";
+        Beneficiaire: "eleve" | "encadreur" | "club" | "admin";
         /** Bibliotheque */
         Bibliotheque: {
             /** A La Une */
@@ -3979,6 +4047,11 @@ export interface components {
             progression?: components["schemas"]["ProgressionJeux"] | null;
         };
         /**
+         * Categorie
+         * @enum {string}
+         */
+        Categorie: "eleves" | "encadreurs" | "clubs";
+        /**
          * CategorieRessource
          * @enum {string}
          */
@@ -4084,6 +4157,191 @@ export interface components {
          * @enum {string}
          */
         Classe: "6e" | "5e" | "4e" | "3e" | "2nde" | "1re" | "tle";
+        /** ClassementClubAdminInterne */
+        ClassementClubAdminInterne: {
+            club: components["schemas"]["ClubClasse"];
+            /** Statut */
+            statut: string;
+            /**
+             * Categorie
+             * @enum {string}
+             */
+            categorie: "eleves" | "encadreurs";
+            /**
+             * Periode
+             * @enum {string}
+             */
+            periode: "semestre" | "historique";
+            semestre: components["schemas"]["SemestrePublic"] | null;
+            /** Page */
+            page: number;
+            /** Par Page */
+            par_page: number;
+            /** Total */
+            total: number;
+            /** Lignes */
+            lignes: components["schemas"]["LigneClubAdminInterne"][];
+        };
+        /** ClassementClubInterne */
+        ClassementClubInterne: {
+            club: components["schemas"]["ClubClasse"];
+            /**
+             * Categorie
+             * @enum {string}
+             */
+            categorie: "eleves" | "encadreurs";
+            /**
+             * Periode
+             * @enum {string}
+             */
+            periode: "semestre" | "historique";
+            semestre: components["schemas"]["SemestrePublic"] | null;
+            /** Page */
+            page: number;
+            /** Par Page */
+            par_page: number;
+            /** Total */
+            total: number;
+            /** Lignes */
+            lignes: components["schemas"]["LigneClubInterne"][];
+        };
+        /** ClassementClubsAdmin */
+        ClassementClubsAdmin: {
+            /**
+             * Categorie
+             * @constant
+             */
+            categorie: "clubs";
+            /**
+             * Niveau
+             * @enum {string}
+             */
+            niveau: "national" | "dre";
+            dre: components["schemas"]["DreResume"] | null;
+            /**
+             * Periode
+             * @enum {string}
+             */
+            periode: "semestre" | "historique";
+            semestre: components["schemas"]["SemestrePublic"] | null;
+            /** Page */
+            page: number;
+            /** Par Page */
+            par_page: number;
+            /** Total */
+            total: number;
+            /** Lignes */
+            lignes: components["schemas"]["LigneClubAdmin"][];
+        };
+        /** ClassementClubsPublic */
+        ClassementClubsPublic: {
+            /**
+             * Categorie
+             * @constant
+             */
+            categorie: "clubs";
+            /**
+             * Niveau
+             * @enum {string}
+             */
+            niveau: "national" | "dre";
+            dre: components["schemas"]["DreResume"] | null;
+            /**
+             * Periode
+             * @enum {string}
+             */
+            periode: "semestre" | "historique";
+            semestre: components["schemas"]["SemestrePublic"] | null;
+            /** Page */
+            page: number;
+            /** Par Page */
+            par_page: number;
+            /** Total */
+            total: number;
+            /** Lignes */
+            lignes: components["schemas"]["LigneClubPublic"][];
+        };
+        /** ClassementPersonnel */
+        ClassementPersonnel: {
+            /**
+             * Categorie
+             * @enum {string}
+             */
+            categorie: "eleves" | "encadreurs";
+            club: components["schemas"]["ClubClasse"] | null;
+            semestre: components["schemas"]["RangPersonnel"];
+            historique: components["schemas"]["RangPersonnel"];
+        };
+        /** ClassementPersonnesAdmin */
+        ClassementPersonnesAdmin: {
+            /**
+             * Categorie
+             * @enum {string}
+             */
+            categorie: "eleves" | "encadreurs";
+            /**
+             * Niveau
+             * @enum {string}
+             */
+            niveau: "national" | "dre";
+            dre: components["schemas"]["DreResume"] | null;
+            /**
+             * Periode
+             * @enum {string}
+             */
+            periode: "semestre" | "historique";
+            semestre: components["schemas"]["SemestrePublic"] | null;
+            /** Page */
+            page: number;
+            /** Par Page */
+            par_page: number;
+            /** Total */
+            total: number;
+            /** Lignes */
+            lignes: components["schemas"]["LignePersonneAdmin"][];
+        };
+        /** ClassementPersonnesPublic */
+        ClassementPersonnesPublic: {
+            /**
+             * Categorie
+             * @enum {string}
+             */
+            categorie: "eleves" | "encadreurs";
+            /**
+             * Niveau
+             * @enum {string}
+             */
+            niveau: "national" | "dre";
+            dre: components["schemas"]["DreResume"] | null;
+            /**
+             * Periode
+             * @enum {string}
+             */
+            periode: "semestre" | "historique";
+            semestre: components["schemas"]["SemestrePublic"] | null;
+            /** Page */
+            page: number;
+            /** Par Page */
+            par_page: number;
+            /** Total */
+            total: number;
+            /** Lignes */
+            lignes: components["schemas"]["LignePersonnePublic"][];
+        };
+        /**
+         * ClubClasse
+         * @description Le club d'un classement (spec 036). Un autre nom que `clubs.schemas.ClubResume` : deux schémas de même
+         *     nom seraient renommés dans le schéma de l'API, et le site ne les trouverait plus.
+         */
+        ClubClasse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+        };
         /**
          * ClubContenu
          * @description Le club au nom duquel le président écrit (spec 026).
@@ -4699,6 +4957,13 @@ export interface components {
             nb_etablissements: number;
             /** Iesg */
             iesg: components["schemas"]["IesgPublique"][];
+        };
+        /** DreResume */
+        DreResume: {
+            /** Code */
+            code: string;
+            /** Nom */
+            nom: string;
         };
         /** Droit */
         Droit: {
@@ -5815,6 +6080,67 @@ export interface components {
             /** Actif */
             actif?: boolean | null;
         };
+        /** LigneClubAdmin */
+        LigneClubAdmin: {
+            /** Rang */
+            rang: number;
+            /**
+             * Club Id
+             * Format: uuid
+             */
+            club_id: string;
+            /** Nom */
+            nom: string;
+            /** Etablissement */
+            etablissement: string;
+            /** Dre */
+            dre: string;
+            /** Points */
+            points: number;
+        };
+        /** LigneClubAdminInterne */
+        LigneClubAdminInterne: {
+            /** Rang */
+            rang: number;
+            /**
+             * Utilisateur Id
+             * Format: uuid
+             */
+            utilisateur_id: string;
+            /** Nom */
+            nom: string;
+            /** Points */
+            points: number;
+        };
+        /** LigneClubInterne */
+        LigneClubInterne: {
+            /** Rang */
+            rang: number;
+            /** Nom */
+            nom: string;
+            /** Points */
+            points: number;
+            /** Est Moi */
+            est_moi: boolean;
+        };
+        /** LigneClubPublic */
+        LigneClubPublic: {
+            /** Rang */
+            rang: number;
+            /**
+             * Club Id
+             * Format: uuid
+             */
+            club_id: string;
+            /** Nom */
+            nom: string;
+            /** Etablissement */
+            etablissement: string;
+            /** Dre */
+            dre: string;
+            /** Points */
+            points: number;
+        };
         /** LigneJournalClub */
         LigneJournalClub: {
             /** Ancien */
@@ -5832,6 +6158,42 @@ export interface components {
              * Format: date-time
              */
             cree_le: string;
+        };
+        /** LignePersonneAdmin */
+        LignePersonneAdmin: {
+            /** Rang */
+            rang: number;
+            /**
+             * Utilisateur Id
+             * Format: uuid
+             */
+            utilisateur_id: string;
+            /** Nom */
+            nom: string;
+            /** Club Id */
+            club_id: string | null;
+            /** Club */
+            club: string | null;
+            /** Dre */
+            dre: string;
+            /** Points */
+            points: number;
+        };
+        /**
+         * LignePersonnePublic
+         * @description Un élève ou un encadreur, sans aucun identifiant ni contact.
+         */
+        LignePersonnePublic: {
+            /** Rang */
+            rang: number;
+            /** Nom */
+            nom: string;
+            /** Club */
+            club: string | null;
+            /** Dre */
+            dre: string;
+            /** Points */
+            points: number;
         };
         /** LignePoints */
         LignePoints: {
@@ -6057,6 +6419,11 @@ export interface components {
             /** Motif */
             motif: string;
         };
+        /**
+         * Niveau
+         * @enum {string}
+         */
+        Niveau: "national" | "dre";
         /** NiveauProgression */
         NiveauProgression: {
             niveau: components["schemas"]["NiveauQuiz"];
@@ -6341,6 +6708,11 @@ export interface components {
             /** Version */
             version: number;
         };
+        /**
+         * Periode
+         * @enum {string}
+         */
+        Periode: "semestre" | "historique";
         /** PhotoAuteur */
         PhotoAuteur: {
             /**
@@ -6823,6 +7195,19 @@ export interface components {
             numero: number | null;
             niveau: components["schemas"]["NiveauQuiz"] | null;
         };
+        /** RangPersonnel */
+        RangPersonnel: {
+            /** Points */
+            points: number;
+            /** Rang Club */
+            rang_club: number | null;
+            /** Rang Dre */
+            rang_dre: number | null;
+            /** Rang National */
+            rang_national: number | null;
+            /** Classe */
+            classe: boolean;
+        };
         /** RefusDemandeEntree */
         RefusDemandeEntree: {
             /** Motif */
@@ -7195,6 +7580,21 @@ export interface components {
             debut?: string | null;
             /** Fin */
             fin?: string | null;
+        };
+        /** SemestrePublic */
+        SemestrePublic: {
+            /** Libelle */
+            libelle: string;
+            /**
+             * Debut
+             * Format: date
+             */
+            debut: string;
+            /**
+             * Fin
+             * Format: date
+             */
+            fin: string;
         };
         /** SemestreResume */
         SemestreResume: {
@@ -9477,6 +9877,43 @@ export interface operations {
             };
         };
     };
+    classements_admin_api_admin_points_classements_get: {
+        parameters: {
+            query?: {
+                categorie?: components["schemas"]["Categorie"];
+                niveau?: components["schemas"]["Niveau"];
+                dre?: string | null;
+                periode?: components["schemas"]["Periode"];
+                club_id?: string | null;
+                page?: number;
+                par_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassementPersonnesAdmin"] | components["schemas"]["ClassementClubsAdmin"] | components["schemas"]["ClassementClubAdminInterne"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     points_de_mon_club_api_points_mon_club_get: {
         parameters: {
             query?: never;
@@ -9493,6 +9930,96 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PointsDuClub"];
+                };
+            };
+        };
+    };
+    classement_public_api_classements_get: {
+        parameters: {
+            query?: {
+                categorie?: components["schemas"]["Categorie"];
+                niveau?: components["schemas"]["Niveau"];
+                dre?: string | null;
+                periode?: components["schemas"]["Periode"];
+                page?: number;
+                par_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassementPersonnesPublic"] | components["schemas"]["ClassementClubsPublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mon_classement_api_classements_moi_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassementPersonnel"];
+                };
+            };
+        };
+    };
+    classement_de_mon_club_api_classements_mon_club_get: {
+        parameters: {
+            query?: {
+                categorie?: components["schemas"]["Categorie"];
+                periode?: components["schemas"]["Periode"];
+                page?: number;
+                par_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassementClubInterne"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
