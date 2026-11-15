@@ -100,6 +100,15 @@ export const ACTIONS_JOURNAL: Record<string, string> = {
   export_demande: "Export demandé",
   export_telecharge: "Export téléchargé",
   super_admin_cree_en_ligne_de_commande: "Super-administrateur créé",
+  points_corriges: "Score corrigé",
+  points_annules: "Ligne de points annulée",
+  semestre_gele: "Semestre gelé",
+  semestre_regele: "Semestre regelé",
+  candidat_ecarte: "Candidat au Top 3 écarté",
+  candidat_reintegre: "Candidat au Top 3 réintégré",
+  cloture_validee: "Top 3 validé",
+  validation_annulee: "Validation du Top 3 annulée",
+  palmares_publie: "Palmarès publié",
 };
 
 const formatDate = new Intl.DateTimeFormat("fr-FR", {

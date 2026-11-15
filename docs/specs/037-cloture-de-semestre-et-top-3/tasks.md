@@ -24,7 +24,7 @@ ex æquo, cycle de clôture, données publiques) sont écrites en TDD : les test
       absents, valeurs figées), champ `distinctions` de `/classements/moi` ; types de l'API et client du site.
 - [x] 8. Site : section **Palmarès des semestres** de `/hall-of-fame` (lauréats, règle d'ex æquo, état vide,
       mobile) et bloc **Mes distinctions** de l'espace élève ; tests des composants.
-- [ ] 9. Site : onglet **Clôtures** de l'admin, liste des semestres et écran d'une clôture (photo, Top 3 proposé,
+- [x] 9. Site : onglet **Clôtures** de l'admin, liste des semestres et écran d'une clôture (photo, Top 3 proposé,
       écarts, actions selon l'état, dialogues motivés, écart avec le classement actuel, refus affichés) ;
       libellés du journal dans `src/lib/admin.ts`.
 - [ ] 10. Lint, typecheck, tests backend et site ; vérification dans le navigateur ; `TASKS.md`.

@@ -17,6 +17,7 @@ const ONGLETS = [
   { to: "/admin/points/gold", libelle: "Élèves Gold", exact: false },
   { to: "/admin/points/registre", libelle: "Registre", exact: false, national: true },
   { to: "/admin/points/classements", libelle: "Classements", exact: false, national: true },
+  { to: "/admin/points/clotures", libelle: "Clôtures", exact: false, national: true },
 ] as const;
 
 function Points() {

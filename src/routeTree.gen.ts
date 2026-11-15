@@ -84,6 +84,8 @@ import { Route as ConnecteCertificationParcoursIndexRouteImport } from './routes
 import { Route as ConnecteCertificationParcoursPlaceRouteImport } from './routes/_connecte/certification.parcours.$place'
 import { Route as ConnecteMonClubActualitesIdRouteImport } from './routes/_connecte/mon-club.actualites.$id'
 import { Route as ConnecteMonClubActualitesNouveauRouteImport } from './routes/_connecte/mon-club.actualites.nouveau'
+import { Route as ConnecteAdminPointsCloturesIndexRouteImport } from './routes/_connecte/admin/points.clotures.index'
+import { Route as ConnecteAdminPointsCloturesSemestreIdRouteImport } from './routes/_connecte/admin/points.clotures.$semestreId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -490,6 +492,18 @@ const ConnecteMonClubActualitesNouveauRoute =
     path: '/mon-club/actualites/nouveau',
     getParentRoute: () => ConnecteRoute,
   } as any)
+const ConnecteAdminPointsCloturesIndexRoute =
+  ConnecteAdminPointsCloturesIndexRouteImport.update({
+    id: '/clotures/',
+    path: '/clotures/',
+    getParentRoute: () => ConnecteAdminPointsRoute,
+  } as any)
+const ConnecteAdminPointsCloturesSemestreIdRoute =
+  ConnecteAdminPointsCloturesSemestreIdRouteImport.update({
+    id: '/clotures/$semestreId',
+    path: '/clotures/$semestreId',
+    getParentRoute: () => ConnecteAdminPointsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -566,6 +580,8 @@ export interface FileRoutesByFullPath {
   '/admin/quiz/': typeof ConnecteAdminQuizIndexRoute
   '/admin/referentiel/': typeof ConnecteAdminReferentielIndexRoute
   '/certification/parcours/': typeof ConnecteCertificationParcoursIndexRoute
+  '/admin/points/clotures/$semestreId': typeof ConnecteAdminPointsCloturesSemestreIdRoute
+  '/admin/points/clotures/': typeof ConnecteAdminPointsCloturesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -636,6 +652,8 @@ export interface FileRoutesByTo {
   '/admin/quiz': typeof ConnecteAdminQuizIndexRoute
   '/admin/referentiel': typeof ConnecteAdminReferentielIndexRoute
   '/certification/parcours': typeof ConnecteCertificationParcoursIndexRoute
+  '/admin/points/clotures/$semestreId': typeof ConnecteAdminPointsCloturesSemestreIdRoute
+  '/admin/points/clotures': typeof ConnecteAdminPointsCloturesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -714,6 +732,8 @@ export interface FileRoutesById {
   '/_connecte/admin/quiz/': typeof ConnecteAdminQuizIndexRoute
   '/_connecte/admin/referentiel/': typeof ConnecteAdminReferentielIndexRoute
   '/_connecte/certification/parcours/': typeof ConnecteCertificationParcoursIndexRoute
+  '/_connecte/admin/points/clotures/$semestreId': typeof ConnecteAdminPointsCloturesSemestreIdRoute
+  '/_connecte/admin/points/clotures/': typeof ConnecteAdminPointsCloturesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -792,6 +812,8 @@ export interface FileRouteTypes {
     | '/admin/quiz/'
     | '/admin/referentiel/'
     | '/certification/parcours/'
+    | '/admin/points/clotures/$semestreId'
+    | '/admin/points/clotures/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -862,6 +884,8 @@ export interface FileRouteTypes {
     | '/admin/quiz'
     | '/admin/referentiel'
     | '/certification/parcours'
+    | '/admin/points/clotures/$semestreId'
+    | '/admin/points/clotures'
   id:
     | '__root__'
     | '/'
@@ -939,6 +963,8 @@ export interface FileRouteTypes {
     | '/_connecte/admin/quiz/'
     | '/_connecte/admin/referentiel/'
     | '/_connecte/certification/parcours/'
+    | '/_connecte/admin/points/clotures/$semestreId'
+    | '/_connecte/admin/points/clotures/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1497,6 +1523,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteMonClubActualitesNouveauRouteImport
       parentRoute: typeof ConnecteRoute
     }
+    '/_connecte/admin/points/clotures/': {
+      id: '/_connecte/admin/points/clotures/'
+      path: '/clotures'
+      fullPath: '/admin/points/clotures/'
+      preLoaderRoute: typeof ConnecteAdminPointsCloturesIndexRouteImport
+      parentRoute: typeof ConnecteAdminPointsRoute
+    }
+    '/_connecte/admin/points/clotures/$semestreId': {
+      id: '/_connecte/admin/points/clotures/$semestreId'
+      path: '/clotures/$semestreId'
+      fullPath: '/admin/points/clotures/$semestreId'
+      preLoaderRoute: typeof ConnecteAdminPointsCloturesSemestreIdRouteImport
+      parentRoute: typeof ConnecteAdminPointsRoute
+    }
   }
 }
 
@@ -1543,6 +1583,8 @@ interface ConnecteAdminPointsRouteChildren {
   ConnecteAdminPointsGoldRoute: typeof ConnecteAdminPointsGoldRoute
   ConnecteAdminPointsRegistreRoute: typeof ConnecteAdminPointsRegistreRoute
   ConnecteAdminPointsIndexRoute: typeof ConnecteAdminPointsIndexRoute
+  ConnecteAdminPointsCloturesSemestreIdRoute: typeof ConnecteAdminPointsCloturesSemestreIdRoute
+  ConnecteAdminPointsCloturesIndexRoute: typeof ConnecteAdminPointsCloturesIndexRoute
 }
 
 const ConnecteAdminPointsRouteChildren: ConnecteAdminPointsRouteChildren = {
@@ -1552,6 +1594,9 @@ const ConnecteAdminPointsRouteChildren: ConnecteAdminPointsRouteChildren = {
   ConnecteAdminPointsGoldRoute: ConnecteAdminPointsGoldRoute,
   ConnecteAdminPointsRegistreRoute: ConnecteAdminPointsRegistreRoute,
   ConnecteAdminPointsIndexRoute: ConnecteAdminPointsIndexRoute,
+  ConnecteAdminPointsCloturesSemestreIdRoute:
+    ConnecteAdminPointsCloturesSemestreIdRoute,
+  ConnecteAdminPointsCloturesIndexRoute: ConnecteAdminPointsCloturesIndexRoute,
 }
 
 const ConnecteAdminPointsRouteWithChildren =
