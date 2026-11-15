@@ -43,7 +43,8 @@ le rapport approuvé rejoint l'archive privée du club.
 5. **Participants** : nombre total obligatoire ; répartition agrégée facultative (filles, garçons, élèves du club,
    autres). Aucun nom d'élève n'est demandé ; le formulaire rappelle de ne pas en écrire dans les textes.
 6. **Justificatifs** (Q29) : photos JPEG, PNG ou WebP ; documents PDF ou Word (`.docx`) ; vidéos par lien YouTube
-   seulement (ADR-0005). Au plus 10 fichiers de 10 Mo chacun et 5 liens par rapport. Joindre une photo exige de
+   seulement (ADR-0005). Au plus 5 photos de 8 Mo (limite des photos de la spec 024) et 5 documents de
+   10 Mo, soit 10 fichiers, et 5 liens par rapport. Joindre une photo exige de
    cocher « Les personnes photographiées, ou leurs parents pour les mineurs, ont accepté la prise de vue ».
 
 ### 2. Cycle d'un rapport
@@ -124,7 +125,7 @@ voit les rapports d'activité du club, mais pas les mensuels ni les bilans des e
       est refusé.
 - [ ] Étant donné un champ obligatoire manquant ou un nombre de participants négatif, alors la soumission est
       refusée avec un message clair, et le brouillon reste enregistré.
-- [ ] Étant donné un fichier d'un autre type, de plus de 10 Mo, un onzième fichier, un PDF ou un Word au contenu
+- [ ] Étant donné un fichier d'un autre type, de plus de 10 Mo, un sixième document ou une sixième photo, un PDF ou un Word au contenu
       non conforme, ou un lien qui n'est pas YouTube, alors il est refusé.
 - [ ] Étant donné une photo jointe sans l'attestation cochée, alors la soumission est refusée.
 - [ ] Une version soumise ne se modifie plus ; un brouillon n'est visible que par son auteur.
