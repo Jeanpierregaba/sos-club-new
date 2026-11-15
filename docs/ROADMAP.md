@@ -97,6 +97,10 @@ La part du club est déjà livrée par la spec 034 : chaque gain d'un élève cr
 demi-points (ADR-0012). R13 ne crédite plus de lignes `club.*` ; il branche les classements sur le registre et sur
 cette part, et ajoute le registre consultable et les corrections motivées (spec 036).
 
+R14 est décrit par la spec 037 : le gel photographie le classement national des élèves du semestre, l'admin écarte
+un candidat avec un motif, l'égalité se tranche au premier arrivé, et le palmarès publié rejoint `/hall-of-fame`.
+Les distinctions des encadreurs restent hors périmètre (Q25).
+
 ## Phase 6 — Vie du réseau (P1)
 
 | Code | Spec                   | Contenu                                                                                                                                               | Taille | Questions |

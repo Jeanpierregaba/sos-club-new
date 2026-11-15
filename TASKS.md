@@ -8,6 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
+- [ ] R14 — Clôture de semestre et Top 3 (Q21, Q25) — [spec 037](docs/specs/037-cloture-de-semestre-et-top-3/spec.md) (spec, plan et tâches validés le 2026-11-15 : ex æquo au premier arrivé, un seul admin, titre sans points, validation annulable)
 - [ ] Quiz santé (922 QCM) jouables depuis la page des jeux, 3 quiz sans compte puis compte visiteur ; correction en vert ou rouge et récapitulatif des erreurs (2026-11-10, ADR-0004 amendé) (spec 031, livré en urgence le 2026-11-09 : spec écrite à rédiger)
 - [ ] Fiches d'inscription : élève, encadreur et visiteur, e-mails (R19 avancé) — [spec 030](docs/specs/030-fiches-d-inscription/spec.md)
 
@@ -45,7 +46,6 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 **Phase 5 — Classements (P0, jalon B)**
 
-- [ ] R14 — Clôture de semestre et Top 3 (Q21, Q25)
 - [ ] Avant l'ouverture : récépissé de l'IPDCP, avis juridique, sauvegardes hors du VPS, audit de sécurité (Q8, Q9)
 
 **Phases 6 à 8 — Après l'ouverture (P1, P2)**

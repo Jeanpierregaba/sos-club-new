@@ -31,7 +31,8 @@ immuable (ADR-0004) : une erreur doit pouvoir être corrigée sans réécrire l'
 - Un élève apparaît par son **pseudonyme** et, s'il en a un, son **club** ; un encadreur par son **prénom** et
   l'**initiale de son nom**, comme les signatures d'articles ; un club par son **nom** et son **établissement**.
   Aucune charge publique ne porte de nom complet, d'e-mail, de téléphone ni d'identifiant utilisateur.
-- Les classements sont **calculés à la demande**, sans table dédiée. R14 figera les palmarès de fin de semestre.
+- Les classements sont **calculés à la demande**, sans table dédiée. R14 figera les palmarès de fin de semestre
+  (spec 037 : photo du classement national des élèves, ex æquo départagés par la date d'atteinte du total).
 - Un club n'apparaît que s'il est **en service** (ADR-0011). Son score est la somme de ses `demi_points_club`
   divisée par 2, affichée avec sa décimale. Seuls les totaux **strictement positifs** sont classés : un total nul ou
   négatif (possible après correction) n'apparaît dans aucun classement, public ou interne (relecture du

@@ -122,7 +122,8 @@ groupe deviendra une ou plusieurs specs dans `docs/specs/`.
       les clubs ont un classement DRE et national ; chacun montre le semestre en cours et le total historique
       (R13, spec 036 : les classements DRE et national sont publics, celui du club reste réservé à ses membres).
 - [ ] En fin de semestre, l'admin gèle le classement, le contrôle, tranche les ex æquo et publie le Top 3
-      des élèves ; le semestre suivant repart de zéro (R14).
+      des élèves ; le semestre suivant repart de zéro (R14, [spec 037](specs/037-cloture-de-semestre-et-top-3/spec.md) :
+      à égalité, le premier à atteindre son total passe devant ; la distinction ne rapporte pas de points).
 - [x] L'admin corrige un score par une ligne motivée et journalisée, jamais en modifiant l'historique
       (R13, spec 036 : registre national, correction à double authentification, annulation liée à la ligne d'origine).
 
