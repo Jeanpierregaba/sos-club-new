@@ -7,6 +7,7 @@ import {
   Pagination,
   Podium,
 } from "@/components/classements/TableauClassement";
+import { Palmares } from "@/components/classements/Palmares";
 import { FilAriane } from "@/components/FilAriane";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -15,6 +16,7 @@ import { SiteMotion } from "@/components/SiteMotion";
 import {
   chargerClassementPublic,
   chargerDre,
+  chargerPalmares,
   ErreurApi,
   type CategorieClassement,
   type PeriodeClassement,
@@ -44,7 +46,7 @@ export const Route = createFileRoute("/hall-of-fame")({
   },
   loaderDeps: ({ search }) => search,
   loader: async ({ deps }) => {
-    const [classement, dres] = await Promise.all([
+    const [classement, dres, palmares] = await Promise.all([
       chargerClassementPublic({
         categorie: deps.categorie ?? "eleves",
         niveau: deps.dre ? "dre" : "national",
@@ -61,8 +63,10 @@ export const Route = createFileRoute("/hall-of-fame")({
         throw erreur;
       }),
       chargerDre().catch(() => []),
+      // Le palmarès est secondaire : s'il ne se charge pas, la page des classements reste utilisable.
+      chargerPalmares().catch(() => null),
     ]);
-    return { classement, dres };
+    return { classement, dres, palmares };
   },
   head: () => ({
     meta: [
@@ -86,7 +90,7 @@ const MESSAGES_VIDES: Record<CategorieClassement, string> = {
 };
 
 function HallOfFame() {
-  const { classement, dres } = Route.useLoaderData();
+  const { classement, dres, palmares } = Route.useLoaderData();
   const recherche = Route.useSearch();
   const naviguer = useNavigate({ from: Route.fullPath });
   const categorie = recherche.categorie ?? "eleves";
@@ -222,6 +226,8 @@ function HallOfFame() {
             />
           </>
         )}
+
+        {palmares && <Palmares palmares={palmares} />}
 
         <aside className="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-logo-blue p-6 text-white">
           <p className="flex items-center gap-3 font-bold">

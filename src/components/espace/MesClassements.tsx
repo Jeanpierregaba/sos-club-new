@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Lock, Medal } from "lucide-react";
+import { Award, Lock, Medal } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Choix, ListeClassement, Pagination } from "@/components/classements/TableauClassement";
@@ -49,6 +49,23 @@ export function RangsPersonnels({ classement }: { classement: ClassementPersonne
           club={classement.club !== null}
         />
       </div>
+      {classement.distinctions.length > 0 && (
+        <div className="mt-5 rounded-2xl bg-sun/25 p-4 ring-1 ring-sun">
+          <p className="flex items-center gap-2 text-sm font-extrabold text-logo-blue">
+            <Award aria-hidden className="size-5 text-primary" /> Mes distinctions
+          </p>
+          <ul className="mt-2 space-y-1">
+            {classement.distinctions.map((d) => (
+              <li key={`${d.semestre}-${d.place}`} className="font-bold text-ink">
+                {d.distinction} du semestre {d.semestre}
+                <span className="ml-2 text-sm font-semibold text-muted-foreground">
+                  {formaterPoints(d.points)} points
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <Link
         to="/hall-of-fame"
         className="mt-4 inline-flex text-sm font-bold text-primary underline-offset-4 hover:underline"

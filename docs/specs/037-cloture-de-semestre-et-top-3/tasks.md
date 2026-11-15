@@ -22,7 +22,7 @@ ex æquo, cycle de clôture, données publiques) sont écrites en TDD : les test
 - [x] 7. Tests puis code des routes : admin des clôtures (droits, double authentification, périmètre national,
       collaborateur de DRE refusé), `GET /api/palmares` (schéma fermé, clés exactes, écartés et non publiés
       absents, valeurs figées), champ `distinctions` de `/classements/moi` ; types de l'API et client du site.
-- [ ] 8. Site : section **Palmarès des semestres** de `/hall-of-fame` (lauréats, règle d'ex æquo, état vide,
+- [x] 8. Site : section **Palmarès des semestres** de `/hall-of-fame` (lauréats, règle d'ex æquo, état vide,
       mobile) et bloc **Mes distinctions** de l'espace élève ; tests des composants.
 - [ ] 9. Site : onglet **Clôtures** de l'admin, liste des semestres et écran d'une clôture (photo, Top 3 proposé,
       écarts, actions selon l'état, dialogues motivés, écart avec le classement actuel, refus affichés) ;

@@ -72,6 +72,28 @@ describe("RangsPersonnels (spec 036)", () => {
     expect(screen.queryByText("Pas encore classé")).not.toBeInTheDocument();
   });
 
+  it("affiche les distinctions du lauréat", async () => {
+    await afficher(
+      <RangsPersonnels
+        classement={{
+          ...classement(true, true),
+          distinctions: [
+            { semestre: "S1 2026", place: 1, distinction: "Grand Champion", points: 300 },
+          ],
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Mes distinctions")).toBeInTheDocument();
+    expect(screen.getByText(/Grand Champion du semestre S1 2026/)).toBeInTheDocument();
+  });
+
+  it("n'a pas de bloc de distinctions sans distinction", async () => {
+    await afficher(<RangsPersonnels classement={classement(true, true)} />);
+
+    expect(screen.queryByText("Mes distinctions")).not.toBeInTheDocument();
+  });
+
   it("n'a pas de rang de club sans club", async () => {
     await afficher(<RangsPersonnels classement={classement(false, true)} />);
 

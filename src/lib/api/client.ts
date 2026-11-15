@@ -509,9 +509,7 @@ export const adminEcarterCandidat = (semestreId: string, utilisateurId: string, 
     motif,
   });
 export const adminReintegrerCandidat = (semestreId: string, utilisateurId: string) =>
-  envoyerJson<ClotureDetail>(
-    `${CLOTURES}/${semestreId}/candidats/${utilisateurId}/reintegration`,
-  );
+  envoyerJson<ClotureDetail>(`${CLOTURES}/${semestreId}/candidats/${utilisateurId}/reintegration`);
 export const adminValiderCloture = (semestreId: string) =>
   envoyerJson<ClotureDetail>(`${CLOTURES}/${semestreId}/validation`);
 export const adminAnnulerValidation = (semestreId: string, motif: string) =>
