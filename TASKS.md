@@ -45,7 +45,6 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 **Phase 5 — Classements (P0, jalon B)**
 
-- [ ] R13 — Classements DRE et national des élèves, encadreurs et clubs, classement interne du club, rangs personnels, registre des points et corrections motivées (Q21) — [spec 036](docs/specs/036-classements-et-tableaux-de-bord/spec.md) (spec, plan et tâches écrits le 2026-11-14, plan à valider ; la part du club est déjà livrée par la spec 034, le gel, les ex æquo et le Top 3 restent R14)
 - [ ] R14 — Clôture de semestre et Top 3 (Q21, Q25)
 - [ ] Avant l'ouverture : récépissé de l'IPDCP, avis juridique, sauvegardes hors du VPS, audit de sécurité (Q8, Q9)
 
@@ -77,6 +76,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] [036 — Classements et tableaux de bord](docs/specs/036-classements-et-tableaux-de-bord/spec.md) (R13 : page `/hall-of-fame` DRE et national pour élèves, encadreurs et clubs, semestre et historique ; rangs personnels et classement interne privé du club ; registre admin filtrable, corrections motivées et annulations journalisées, nationales, sous double authentification ; seuls les totaux positifs sont classés. Question ouverte : club affiché sans choix de l'élève, voir la spec)
 - [x] [035 — Annuaire national des établissements du Secondaire I](docs/specs/035-annuaire-secondaire-i/spec.md) (2 396 collèges importés avec préfecture et ordre, noms en casse normale, doublons de nom approchant créés à part ; recherche publique et back office filtrable ; activation des clubs au seuil inchangée ; retour de migration refusé si un établissement importé a déjà des membres)
 - [x] [034 — Gamification de l'élève : 100 quiz sur 4 niveaux, étoiles, carte Gold, club à 50 %](docs/specs/034-gamification-eleve-4-niveaux/spec.md) (ADR-0012 : le club reçoit la moitié de chaque gain de l'élève en demi-points ; 100 quiz Jeux sur 4 niveaux, 4 étoiles et carte Gold ; certification à 20 places ; année académique de septembre à juillet, clôture qui fige le classement régional, anciens élèves ; tableau de bord élève et admin des années)
 - [x] [033 — Activation automatique des clubs](docs/specs/033-activation-des-clubs/spec.md) (cahier des charges du 2026-11-10, ADR-0011 : le club naît à la première affiliation et s'active seul à 3 encadreurs + 21 élèves confirmés ; régularisation de 15 jours, suspension et retour automatique ; désistement signalé par un encadreur et confirmé par l'équipe ; « Mon Club Santé » pour l'encadreur, suivi des clubs pour l'équipe ; carte nationale à trois chiffres réels et régions ; commande quotidienne des échéances ; demande de club, adhésion par le président et rattachements manuels retirés)

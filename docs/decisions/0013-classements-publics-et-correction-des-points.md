@@ -33,8 +33,9 @@ immuable (ADR-0004) : une erreur doit pouvoir être corrigée sans réécrire l'
   Aucune charge publique ne porte de nom complet, d'e-mail, de téléphone ni d'identifiant utilisateur.
 - Les classements sont **calculés à la demande**, sans table dédiée. R14 figera les palmarès de fin de semestre.
 - Un club n'apparaît que s'il est **en service** (ADR-0011). Son score est la somme de ses `demi_points_club`
-  divisée par 2, affichée avec sa décimale. Un élève ou un club dont le total est exactement zéro n'est pas classé ;
-  un total négatif reste possible après correction et s'affiche en bas du classement.
+  divisée par 2, affichée avec sa décimale. Seuls les totaux **strictement positifs** sont classés : un total nul ou
+  négatif (possible après correction) n'apparaît dans aucun classement, public ou interne (relecture du
+  2026-11-14 : un mineur n'est pas affiché en bas d'un palmarès avec un score négatif).
 - Le **classement interne** d'un club est lisible par ses **membres affiliés actifs**, ses **encadreurs rattachés
   actifs**, son **président** et l'**admin**. Pour un élève, il additionne les gains **crédités à ce club**
   (`mouvement_points.club_id`) : un changement de club ne transfère donc pas les points de l'ancien. Pour un
@@ -58,8 +59,9 @@ immuable (ADR-0004) : une erreur doit pouvoir être corrigée sans réécrire l'
   correction négative motivée. Les gains ordinaires restent strictement positifs.
 - La ligne technique `admin.correction` est masquée du barème et refusée à la modification : elle ne peut jamais
   devenir un gain automatique.
-- Un total historique peut devenir négatif ; l'espace du bénéficiaire et le registre l'affichent, le classement
-  public le place en bas.
-- Les classements ne montrent que les totaux non nuls : un compte sans point ou entièrement corrigé n'est pas classé.
+- Un total historique peut devenir négatif ; l'espace du bénéficiaire et le registre l'affichent, aucun
+  classement ne le montre.
+- Les classements ne montrent que les totaux positifs : un compte sans point, entièrement corrigé ou en négatif
+  n'est pas classé.
 - Le retour de la migration refuse de s'exécuter si des motifs ou des corrections existent : ces données
   n'existaient pas avant R13 et ne peuvent pas être représentées par l'ancien schéma.

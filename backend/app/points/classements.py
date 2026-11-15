@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from uuid import UUID
 
-from sqlalchemy import Select, and_, func, select
+from sqlalchemy import Select, and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
@@ -17,6 +17,7 @@ from app.clubs.models import Adhesion, Club, EtatAdhesion, EtatRattachement, Rat
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur, EtatVerification
+from app.points.bareme import ACTION_CORRECTION
 from app.points.models import MouvementPoints, Semestre
 from app.points.service import semestre_en_cours
 from app.referentiel.models import Dre, Etablissement, Iesg
@@ -110,6 +111,7 @@ class RangPersonnel:
 class ClassementPersonnel:
     categorie: Categorie
     club: Club | None
+    semestre_en_cours: Semestre | None
     semestre: RangPersonnel
     historique: RangPersonnel
 
@@ -165,7 +167,7 @@ def _base_eleves(points: Select, periode: Periode, dre_code: str | None) -> Sele
         .where(
             Utilisateur.role == Role.eleve,
             Utilisateur.statut == StatutCompte.actif,
-            points.c.points != 0,
+            points.c.points > 0,
         )
     )
     if periode is Periode.semestre:
@@ -205,7 +207,7 @@ def _base_encadreurs(points: Select, dre_code: str | None) -> Select:
             Utilisateur.role == Role.encadreur,
             Utilisateur.statut == StatutCompte.actif,
             Encadreur.etat == EtatVerification.actif,
-            points.c.points != 0,
+            points.c.points > 0,
         )
     )
     if dre_code is not None:
@@ -228,7 +230,7 @@ def _base_clubs(periode: Periode, semestre: Semestre | None, dre_code: str | Non
         .join(Dre, Dre.code == Iesg.dre_code)
         .where(activation.en_service(), MouvementPoints.demi_points_club.is_not(None))
         .group_by(Club.id, Club.nom, Etablissement.nom, Dre.nom)
-        .having(func.sum(MouvementPoints.demi_points_club) != 0)
+        .having(func.sum(MouvementPoints.demi_points_club) > 0)
     )
     if periode is Periode.semestre and semestre is not None:
         requete = requete.where(MouvementPoints.semestre_id == semestre.id)
@@ -361,7 +363,14 @@ def _points_du_club(periode: Periode, semestre: Semestre | None, club_id: UUID) 
             MouvementPoints.utilisateur_id.label("utilisateur_id"),
             func.sum(MouvementPoints.montant).label("points"),
         )
-        .where(MouvementPoints.club_id == club_id)
+        # Les gains comptent pour le club où ils ont été faits ; une correction de l'équipe (et son annulation) n'a
+        # pas de club et vaut pour le club actuel, sinon elle ne changerait jamais le classement interne.
+        .where(
+            or_(
+                MouvementPoints.club_id == club_id,
+                and_(MouvementPoints.club_id.is_(None), MouvementPoints.action == ACTION_CORRECTION),
+            )
+        )
         .group_by(MouvementPoints.utilisateur_id)
     )
     if periode is Periode.semestre and semestre is not None:
@@ -389,7 +398,7 @@ def _base_club_eleves(points: Select, club_id: UUID, periode: Periode) -> Select
         .where(
             Utilisateur.role == Role.eleve,
             Utilisateur.statut == StatutCompte.actif,
-            points.c.points != 0,
+            points.c.points > 0,
         )
     )
     if periode is Periode.semestre:
@@ -419,7 +428,7 @@ def _base_club_encadreurs(points: Select, club_id: UUID) -> Select:
             Utilisateur.role == Role.encadreur,
             Utilisateur.statut == StatutCompte.actif,
             Encadreur.etat == EtatVerification.actif,
-            points.c.points != 0,
+            points.c.points > 0,
         )
     )
 
@@ -628,6 +637,7 @@ async def classement_personnel(db: AsyncSession, utilisateur: Utilisateur) -> Cl
     return ClassementPersonnel(
         categorie=categorie,
         club=club,
+        semestre_en_cours=semestre,
         semestre=await _rang_personnel(db, utilisateur, categorie, club, Periode.semestre, semestre),
         historique=await _rang_personnel(db, utilisateur, categorie, club, Periode.historique, semestre),
     )

@@ -3161,6 +3161,355 @@
         }
       }
     },
+    "/api/admin/points/registre": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister Registre",
+        "operationId": "lister_registre_api_admin_points_registre_get",
+        "parameters": [
+          {
+            "name": "semestre_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Semestre Id"
+            }
+          },
+          {
+            "name": "annee_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Annee Id"
+            }
+          },
+          {
+            "name": "du",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Du"
+            }
+          },
+          {
+            "name": "au",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Au"
+            }
+          },
+          {
+            "name": "action",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 60
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Action"
+            }
+          },
+          {
+            "name": "beneficiaire",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Role"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Beneficiaire"
+            }
+          },
+          {
+            "name": "club_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Club Id"
+            }
+          },
+          {
+            "name": "correction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Correction"
+            }
+          },
+          {
+            "name": "recherche",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Recherche"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "par_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Par Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageRegistre"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/beneficiaires": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Chercher Beneficiaires",
+        "operationId": "chercher_beneficiaires_api_admin_points_beneficiaires_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 100,
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BeneficiairePoints"
+                  },
+                  "title": "Response Chercher Beneficiaires Api Admin Points Beneficiaires Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/corrections": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Corriger Points",
+        "operationId": "corriger_points_api_admin_points_corrections_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectionPoints"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LigneRegistre"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/lignes/{ligne_id}/annulation": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Annuler Ligne",
+        "operationId": "annuler_ligne_api_admin_points_lignes__ligne_id__annulation_post",
+        "parameters": [
+          {
+            "name": "ligne_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Ligne Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnulationPoints"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LigneRegistre"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/points/mon-club": {
       "get": {
         "tags": [
@@ -10529,6 +10878,22 @@
         ],
         "title": "AnneeResume"
       },
+      "AnnulationPoints": {
+        "properties": {
+          "motif": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 10,
+            "title": "Motif"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "motif"
+        ],
+        "title": "AnnulationPoints"
+      },
       "Apercu": {
         "properties": {
           "nb_lignes": {
@@ -11147,6 +11512,25 @@
         "title": "AuteurFile",
         "description": "Le modérateur voit qui écrit (nom complet, établissement) : la file est réservée à l'espace admin."
       },
+      "AuteurRegistre": {
+        "properties": {
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "identifiant": {
+            "type": "string",
+            "title": "Identifiant"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nom",
+          "identifiant"
+        ],
+        "title": "AuteurRegistre"
+      },
       "AxeAdmin": {
         "properties": {
           "code": {
@@ -11410,6 +11794,57 @@
           "admin"
         ],
         "title": "Beneficiaire"
+      },
+      "BeneficiairePoints": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "eleve",
+              "encadreur"
+            ],
+            "title": "Role"
+          },
+          "nom_public": {
+            "type": "string",
+            "title": "Nom Public"
+          },
+          "identifiant": {
+            "type": "string",
+            "title": "Identifiant"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "points_total": {
+            "type": "integer",
+            "title": "Points Total"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "role",
+          "nom_public",
+          "identifiant",
+          "club",
+          "points_total"
+        ],
+        "title": "BeneficiairePoints"
       },
       "Bibliotheque": {
         "properties": {
@@ -12486,6 +12921,16 @@
               }
             ]
           },
+          "semestre_en_cours": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SemestrePublic"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "semestre": {
             "$ref": "#/components/schemas/RangPersonnel"
           },
@@ -12498,6 +12943,7 @@
         "required": [
           "categorie",
           "club",
+          "semestre_en_cours",
           "semestre",
           "historique"
         ],
@@ -13748,6 +14194,41 @@
           "explication"
         ],
         "title": "CorrectionDefi"
+      },
+      "CorrectionPoints": {
+        "properties": {
+          "utilisateur_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Utilisateur Id"
+          },
+          "montant": {
+            "type": "integer",
+            "maximum": 10000.0,
+            "minimum": -10000.0,
+            "title": "Montant"
+          },
+          "motif": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 10,
+            "title": "Motif"
+          },
+          "cle": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Cle"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "utilisateur_id",
+          "montant",
+          "motif",
+          "cle"
+        ],
+        "title": "CorrectionPoints"
       },
       "CorrectionReponse": {
         "properties": {
@@ -18305,6 +18786,183 @@
         ],
         "title": "LignePoints"
       },
+      "LigneRegistre": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          },
+          "utilisateur_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Utilisateur Id"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "identifiant": {
+            "type": "string",
+            "title": "Identifiant"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "pseudonyme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudonyme"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "action_libelle": {
+            "type": "string",
+            "title": "Action Libelle"
+          },
+          "montant": {
+            "type": "integer",
+            "title": "Montant"
+          },
+          "points_club": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points Club"
+          },
+          "semestre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Semestre"
+          },
+          "annee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Annee"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubClasse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cle": {
+            "type": "string",
+            "title": "Cle"
+          },
+          "valide_par": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuteurRegistre"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          },
+          "annule_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Annule Id"
+          },
+          "est_annulation": {
+            "type": "boolean",
+            "title": "Est Annulation"
+          },
+          "est_correction": {
+            "type": "boolean",
+            "title": "Est Correction"
+          },
+          "annulee": {
+            "type": "boolean",
+            "title": "Annulee"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "cree_le",
+          "utilisateur_id",
+          "role",
+          "identifiant",
+          "prenom",
+          "nom",
+          "pseudonyme",
+          "action",
+          "action_libelle",
+          "montant",
+          "points_club",
+          "semestre",
+          "annee",
+          "club",
+          "cle",
+          "valide_par",
+          "motif",
+          "annule_id",
+          "est_annulation",
+          "est_correction",
+          "annulee"
+        ],
+        "title": "LigneRegistre"
+      },
       "ListeBadges": {
         "properties": {
           "badges": {
@@ -19156,6 +19814,38 @@
           "evenements"
         ],
         "title": "PageJournal"
+      },
+      "PageRegistre": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "lignes": {
+            "items": {
+              "$ref": "#/components/schemas/LigneRegistre"
+            },
+            "type": "array",
+            "title": "Lignes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "total",
+          "page",
+          "par_page",
+          "lignes"
+        ],
+        "title": "PageRegistre"
       },
       "PageSuivi": {
         "properties": {

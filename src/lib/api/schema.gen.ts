@@ -1026,6 +1026,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/points/registre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister Registre */
+        get: operations["lister_registre_api_admin_points_registre_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/points/beneficiaires": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Chercher Beneficiaires */
+        get: operations["chercher_beneficiaires_api_admin_points_beneficiaires_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/points/corrections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Corriger Points */
+        post: operations["corriger_points_api_admin_points_corrections_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/points/lignes/{ligne_id}/annulation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Annuler Ligne */
+        post: operations["annuler_ligne_api_admin_points_lignes__ligne_id__annulation_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/points/mon-club": {
         parameters: {
             query?: never;
@@ -3579,6 +3647,11 @@ export interface components {
              */
             fin: string;
         };
+        /** AnnulationPoints */
+        AnnulationPoints: {
+            /** Motif */
+            motif: string;
+        };
         /** Apercu */
         Apercu: {
             /** Nb Lignes */
@@ -3787,6 +3860,13 @@ export interface components {
             /** Dre Code */
             dre_code: string | null;
         };
+        /** AuteurRegistre */
+        AuteurRegistre: {
+            /** Nom */
+            nom: string;
+            /** Identifiant */
+            identifiant: string;
+        };
         /** AxeAdmin */
         AxeAdmin: {
             /** Code */
@@ -3874,6 +3954,27 @@ export interface components {
          * @enum {string}
          */
         Beneficiaire: "eleve" | "encadreur" | "club" | "admin";
+        /** BeneficiairePoints */
+        BeneficiairePoints: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "eleve" | "encadreur";
+            /** Nom Public */
+            nom_public: string;
+            /** Identifiant */
+            identifiant: string;
+            /** Club */
+            club: string | null;
+            /** Points Total */
+            points_total: number;
+        };
         /** Bibliotheque */
         Bibliotheque: {
             /** A La Une */
@@ -4269,6 +4370,7 @@ export interface components {
              */
             categorie: "eleves" | "encadreurs";
             club: components["schemas"]["ClubClasse"] | null;
+            semestre_en_cours: components["schemas"]["SemestrePublic"] | null;
             semestre: components["schemas"]["RangPersonnel"];
             historique: components["schemas"]["RangPersonnel"];
         };
@@ -4735,6 +4837,23 @@ export interface components {
              * @default false
              */
             deja_repondu: boolean;
+        };
+        /** CorrectionPoints */
+        CorrectionPoints: {
+            /**
+             * Utilisateur Id
+             * Format: uuid
+             */
+            utilisateur_id: string;
+            /** Montant */
+            montant: number;
+            /** Motif */
+            motif: string;
+            /**
+             * Cle
+             * Format: uuid
+             */
+            cle: string;
         };
         /**
          * CorrectionReponse
@@ -6209,6 +6328,60 @@ export interface components {
             /** Semestre */
             semestre: string | null;
         };
+        /** LigneRegistre */
+        LigneRegistre: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Cree Le
+             * Format: date-time
+             */
+            cree_le: string;
+            /**
+             * Utilisateur Id
+             * Format: uuid
+             */
+            utilisateur_id: string;
+            /** Role */
+            role: string;
+            /** Identifiant */
+            identifiant: string;
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            /** Pseudonyme */
+            pseudonyme: string | null;
+            /** Action */
+            action: string;
+            /** Action Libelle */
+            action_libelle: string;
+            /** Montant */
+            montant: number;
+            /** Points Club */
+            points_club: number | null;
+            /** Semestre */
+            semestre: string | null;
+            /** Annee */
+            annee: string | null;
+            club: components["schemas"]["ClubClasse"] | null;
+            /** Cle */
+            cle: string;
+            valide_par: components["schemas"]["AuteurRegistre"] | null;
+            /** Motif */
+            motif: string | null;
+            /** Annule Id */
+            annule_id: string | null;
+            /** Est Annulation */
+            est_annulation: boolean;
+            /** Est Correction */
+            est_correction: boolean;
+            /** Annulee */
+            annulee: boolean;
+        };
         /** ListeBadges */
         ListeBadges: {
             /** Badges */
@@ -6508,6 +6681,17 @@ export interface components {
             par_page: number;
             /** Evenements */
             evenements: components["schemas"]["EvenementJournal"][];
+        };
+        /** PageRegistre */
+        PageRegistre: {
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Par Page */
+            par_page: number;
+            /** Lignes */
+            lignes: components["schemas"]["LigneRegistre"][];
         };
         /** PageSuivi */
         PageSuivi: {
@@ -9901,6 +10085,146 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClassementPersonnesAdmin"] | components["schemas"]["ClassementClubsAdmin"] | components["schemas"]["ClassementClubAdminInterne"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lister_registre_api_admin_points_registre_get: {
+        parameters: {
+            query?: {
+                semestre_id?: string | null;
+                annee_id?: string | null;
+                du?: string | null;
+                au?: string | null;
+                action?: string | null;
+                beneficiaire?: components["schemas"]["Role"] | null;
+                club_id?: string | null;
+                correction?: boolean | null;
+                recherche?: string | null;
+                page?: number;
+                par_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageRegistre"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    chercher_beneficiaires_api_admin_points_beneficiaires_get: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BeneficiairePoints"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    corriger_points_api_admin_points_corrections_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CorrectionPoints"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LigneRegistre"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    annuler_ligne_api_admin_points_lignes__ligne_id__annulation_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ligne_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnnulationPoints"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LigneRegistre"];
                 };
             };
             /** @description Validation Error */

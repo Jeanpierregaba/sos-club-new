@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { ChoixEtablissement, type EtablissementChoisi } from "@/components/ChoixEtablissement";
 import { ResumeClubSante } from "@/components/clubs/MonClubSante";
+import { ClassementDuClub, RangsPersonnels } from "@/components/espace/MesClassements";
 import { PointsClub } from "@/components/espace/TableauAnnuel";
 import {
   CartesPoints,
@@ -24,6 +25,7 @@ import {
   renvoyerDemandeEncadreur,
   type EspaceEncadreur as Espace,
   type Fonction,
+  type ClassementPersonnel,
   type MonClubSante,
   type PointsDuClub,
 } from "@/lib/api/client";
@@ -37,11 +39,13 @@ export function EspaceEncadreur({
   prenom,
   monClubSante = null,
   pointsClub = null,
+  classement = null,
 }: {
   espace: Espace;
   prenom: string;
   monClubSante?: MonClubSante | null;
   pointsClub?: PointsDuClub | null;
+  classement?: ClassementPersonnel | null;
 }) {
   const router = useRouter();
   const [profil, setProfil] = useState(false);
@@ -74,7 +78,9 @@ export function EspaceEncadreur({
         )}
 
         {espace.etat === "actif" && espace.points && <CartesPoints points={espace.points} />}
+        {classement && <RangsPersonnels classement={classement} />}
         {pointsClub && <PointsClub points={pointsClub} />}
+        {espace.etat === "actif" && monClubSante && <ClassementDuClub />}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
           {espace.etat === "actif" && espace.points ? (

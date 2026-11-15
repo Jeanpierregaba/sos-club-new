@@ -2,10 +2,11 @@
 
 from collections.abc import Iterator
 from contextlib import contextmanager
+from datetime import date
 from typing import Annotated, Any
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.catalogue import Action
@@ -15,8 +16,10 @@ from app.clubs.models import Club
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.models import Role, Utilisateur
 from app.db import get_session
-from app.points import administration, annees, classements
+from app.points import administration, annees, classements, registre
 from app.points.schemas import (
+    AnnulationPoints,
+    BeneficiairePoints,
     ClassementClubAdminInterne,
     ClassementClubInterne,
     ClassementClubsAdmin,
@@ -24,6 +27,7 @@ from app.points.schemas import (
     ClassementPersonnesAdmin,
     ClassementPersonnesPublic,
     ClubClasse,
+    CorrectionPoints,
     DreResume,
     LigneBaremeAdmin,
     LigneBaremeModification,
@@ -33,6 +37,8 @@ from app.points.schemas import (
     LigneClubPublic,
     LignePersonneAdmin,
     LignePersonnePublic,
+    LigneRegistre,
+    PageRegistre,
     SemestreAdmin,
     SemestreCreation,
     SemestreModification,
@@ -53,6 +59,8 @@ router_admin = APIRouter(prefix="/admin/points", tags=["admin"])
 Lecteur = Annotated[Acces, Depends(exiger_permission("points", Action.consulter))]
 # Les semestres et le barème valent pour tout le pays : un responsable de DRE ne les change pas.
 Modificateur = Annotated[Acces, Depends(exiger_permission("points", Action.modifier, national=True))]
+# Le registre et les classements admin montrent des noms et des identifiants : périmètre national (spec 036).
+LecteurNational = Annotated[Acces, Depends(exiger_permission("points", Action.consulter, national=True))]
 
 
 @contextmanager
@@ -300,6 +308,7 @@ def _classement_personnel(resultat: classements.ClassementPersonnel) -> Classeme
     return ClassementPersonnelSchema(
         categorie=resultat.categorie.value,
         club=ClubClasse(id=resultat.club.id, nom=resultat.club.nom) if resultat.club is not None else None,
+        semestre_en_cours=_semestre_public(resultat.semestre_en_cours),
         semestre=RangPersonnelSchema(**resultat.semestre.__dict__),
         historique=RangPersonnelSchema(**resultat.historique.__dict__),
     )
@@ -382,7 +391,7 @@ async def classement_de_mon_club(
     response_model=ClassementPersonnesAdmin | ClassementClubsAdmin | ClassementClubAdminInterne,
 )
 async def classements_admin(
-    _: Lecteur,
+    _: LecteurNational,
     db: Base,
     categorie: CategoriePublique = classements.Categorie.eleves,
     niveau: NiveauPublic = classements.Niveau.national,
@@ -422,3 +431,81 @@ async def classements_admin(
     except classements.DreIntrouvable:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Cette DRE est introuvable.") from None
     return _classement_admin(resultat, page, par_page)
+
+
+# Admin — registre, correction et annulation (spec 036) --------------------------------------------------------
+
+
+@router_admin.get("/registre")
+async def lister_registre(
+    _: LecteurNational,
+    db: Base,
+    semestre_id: UUID | None = None,
+    annee_id: UUID | None = None,
+    du: date | None = None,
+    au: date | None = None,
+    action: Annotated[str | None, Query(max_length=60)] = None,
+    beneficiaire: Annotated[Role | None, Query()] = None,
+    club_id: UUID | None = None,
+    correction: bool | None = None,
+    recherche: Annotated[str | None, Query(max_length=100)] = None,
+    page: Page = 1,
+    par_page: ParPage = 50,
+) -> PageRegistre:
+    if beneficiaire is not None and beneficiaire not in registre.ROLES_CORRIGIBLES:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Choisis les élèves ou les encadreurs.")
+    if du is not None and au is not None and au < du:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "La date de fin précède la date de début.")
+    filtres = registre.FiltresRegistre(
+        semestre_id=semestre_id,
+        annee_id=annee_id,
+        du=du,
+        au=au,
+        action=action,
+        beneficiaire=beneficiaire,
+        club_id=club_id,
+        correction=correction,
+        recherche=recherche,
+    )
+    resultat = await registre.lister(db, filtres, page, par_page)
+    return PageRegistre(
+        total=resultat.total,
+        page=page,
+        par_page=par_page,
+        lignes=[LigneRegistre(**ligne) for ligne in resultat.lignes],
+    )
+
+
+@router_admin.get("/beneficiaires")
+async def chercher_beneficiaires(
+    _: Modificateur, db: Base, q: Annotated[str, Query(min_length=2, max_length=100)]
+) -> list[BeneficiairePoints]:
+    return [BeneficiairePoints(**element) for element in await registre.chercher_beneficiaires(db, q)]
+
+
+async def _ligne_registre(db: AsyncSession, ligne_id: UUID) -> LigneRegistre:
+    resultat = await registre.lister_une(db, ligne_id)
+    return LigneRegistre(**resultat)
+
+
+@router_admin.post("/corrections", status_code=status.HTTP_201_CREATED)
+async def corriger_points(
+    entree: CorrectionPoints, request: Request, response: Response, acces: Modificateur, db: Base
+) -> LigneRegistre:
+    with _traduire_refus():
+        ecriture = await registre.corriger(
+            db, acces, entree.utilisateur_id, entree.montant, entree.motif, entree.cle, adresse_ip(request)
+        )
+    if not ecriture.creee:
+        # Même clé : la correction est déjà écrite, rien n'est dupliqué.
+        response.status_code = status.HTTP_200_OK
+    return await _ligne_registre(db, ecriture.ligne.id)
+
+
+@router_admin.post("/lignes/{ligne_id}/annulation", status_code=status.HTTP_201_CREATED)
+async def annuler_ligne(
+    ligne_id: UUID, entree: AnnulationPoints, request: Request, acces: Modificateur, db: Base
+) -> LigneRegistre:
+    with _traduire_refus():
+        ligne = await registre.annuler_ligne(db, acces, ligne_id, entree.motif, adresse_ip(request))
+    return await _ligne_registre(db, ligne.id)

@@ -140,9 +140,12 @@ export function CartesPoints({ points }: { points: ResumePoints }) {
           <Trophy aria-hidden className="size-4 text-primary" /> Total depuis ton inscription
         </p>
         <p className="mt-2 font-display text-5xl text-logo-blue">{points.total}</p>
-        <p className="mt-2 text-sm font-semibold text-muted-foreground">
-          Les classements arrivent bientôt.
-        </p>
+        <Link
+          to="/hall-of-fame"
+          className="mt-2 inline-flex text-sm font-bold text-primary underline-offset-4 hover:underline"
+        >
+          Voir les classements du réseau
+        </Link>
       </div>
     </section>
   );

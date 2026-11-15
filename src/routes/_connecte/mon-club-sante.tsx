@@ -2,6 +2,7 @@ import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-rout
 import { ArrowLeft } from "lucide-react";
 
 import { EspaceClubSante } from "@/components/clubs/MonClubSante";
+import { ClassementDuClub } from "@/components/espace/MesClassements";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { chargerAffiliationsDuClub, chargerMonClubSante, ErreurApi } from "@/lib/api/client";
 
@@ -57,11 +58,14 @@ function PageMonClubSante() {
           <span className="text-primary">Santé</span>
         </h1>
         {club && affiliations ? (
-          <EspaceClubSante
-            club={club}
-            affiliations={affiliations}
-            onRafraichir={() => router.invalidate()}
-          />
+          <>
+            <EspaceClubSante
+              club={club}
+              affiliations={affiliations}
+              onRafraichir={() => router.invalidate()}
+            />
+            <ClassementDuClub />
+          </>
         ) : (
           <p className="mt-6 rounded-3xl bg-white p-6 font-medium text-ink/80 shadow-card ring-1 ring-border">
             {message}

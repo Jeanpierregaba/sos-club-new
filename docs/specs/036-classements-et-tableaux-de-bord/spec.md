@@ -135,83 +135,83 @@ divergue.
 
 ### Classements publics
 
-- [ ] Étant donné des élèves de deux DRE avec des points, quand un visiteur ouvre `/hall-of-fame` en
+- [x] Étant donné des élèves de deux DRE avec des points, quand un visiteur ouvre `/hall-of-fame` en
       **National / Semestre en cours**, alors il voit les élèves classés par points décroissants, avec leur
       pseudonyme, leur club, leur DRE et leurs points.
-- [ ] Étant donné la même situation, quand il choisit une **DRE**, alors seuls les élèves dont l'établissement
+- [x] Étant donné la même situation, quand il choisit une **DRE**, alors seuls les élèves dont l'établissement
       actuel est dans cette DRE apparaissent, classés entre eux.
-- [ ] Étant donné des encadreurs avec des points, quand il ouvre la catégorie **Encadreurs**, alors les
+- [x] Étant donné des encadreurs avec des points, quand il ouvre la catégorie **Encadreurs**, alors les
       classements sont séparés de ceux des élèves et chaque encadreur est affiché par son prénom, l'initiale de son
       nom et son club.
-- [ ] Étant donné des clubs en service avec des parts de points, quand il ouvre la catégorie **Clubs**, alors les
+- [x] Étant donné des clubs en service avec des parts de points, quand il ouvre la catégorie **Clubs**, alors les
       clubs sont classés par score décroissant, avec leur score décimal, leur établissement et leur DRE.
-- [ ] Étant donné un club suspendu, en attente ou en constitution, alors il n'apparaît dans aucun classement de
+- [x] Étant donné un club suspendu, en attente ou en constitution, alors il n'apparaît dans aucun classement de
       clubs.
-- [ ] Étant donné un club en régularisation dans le délai, alors il apparaît dans le classement de clubs.
-- [ ] Étant donné des élèves à égalité de points, alors ils partagent le même rang et l'ordre d'affichage est
+- [x] Étant donné un club en régularisation dans le délai, alors il apparaît dans le classement de clubs.
+- [x] Étant donné des élèves à égalité de points, alors ils partagent le même rang et l'ordre d'affichage est
       stable (nom public puis club).
-- [ ] Étant donné un élève ou un encadreur sans point, alors il n'apparaît pas dans le classement.
-- [ ] Étant donné un compte suspendu, alors il n'apparaît pas dans les classements publics.
-- [ ] Étant donné un ancien élève, alors il n'apparaît pas dans le classement du semestre en cours ; il peut
+- [x] Étant donné un élève ou un encadreur sans point, alors il n'apparaît pas dans le classement.
+- [x] Étant donné un compte suspendu, alors il n'apparaît pas dans les classements publics.
+- [x] Étant donné un ancien élève, alors il n'apparaît pas dans le classement du semestre en cours ; il peut
       apparaître dans le total historique s'il a des points.
-- [ ] Étant donné le **Total historique**, alors les points de tous les semestres et hors semestre sont additionnés,
+- [x] Étant donné le **Total historique**, alors les points de tous les semestres et hors semestre sont additionnés,
       sans remise à zéro.
-- [ ] Étant donné l'absence de semestre en cours, alors l'onglet Semestre affiche « Aucun semestre en cours » et le
+- [x] Étant donné l'absence de semestre en cours, alors l'onglet Semestre affiche « Aucun semestre en cours » et le
       Total historique reste consultable.
-- [ ] Étant donné un classement de plus de 50 lignes, alors la page 1 en montre 50, la page 2 la suite, et le
+- [x] Étant donné un classement de plus de 50 lignes, alors la page 1 en montre 50, la page 2 la suite, et le
       total est annoncé.
-- [ ] La réponse publique ne contient ni nom complet, ni e-mail, ni téléphone, ni identifiant utilisateur ; elle ne
+- [x] La réponse publique ne contient ni nom complet, ni e-mail, ni téléphone, ni identifiant utilisateur ; elle ne
       contient que le rang, le nom public, le club, la DRE et les points (et l'identifiant public du club pour la
       catégorie Clubs).
 
 ### Classement interne
 
-- [ ] Étant donné un élève affilié actif, quand il ouvre son espace, alors il voit le classement des élèves de son
+- [x] Étant donné un élève affilié actif, quand il ouvre son espace, alors il voit le classement des élèves de son
       club pour le semestre et le total historique, avec sa ligne mise en évidence.
-- [ ] Étant donné un encadreur rattaché actif, quand il ouvre Mon Club Santé, alors il voit les classements des
+- [x] Étant donné un encadreur rattaché actif, quand il ouvre Mon Club Santé, alors il voit les classements des
       élèves et des encadreurs de son club.
-- [ ] Étant donné un président, alors il voit le classement des élèves de son club.
-- [ ] Étant donné un compte qui n'appartient pas au club, quand il demande ce classement, alors l'API refuse.
-- [ ] Le classement interne ne contient aucun nom complet d'élève, aucune adresse, aucun téléphone et aucun
+- [x] Étant donné un président, alors il voit le classement des élèves de son club.
+- [x] Étant donné un compte qui n'appartient pas au club, quand il demande ce classement, alors l'API refuse.
+- [x] Le classement interne ne contient aucun nom complet d'élève, aucune adresse, aucun téléphone et aucun
       identifiant utilisateur.
-- [ ] Le classement interne n'est accessible par aucune route publique.
+- [x] Le classement interne n'est accessible par aucune route publique.
 
 ### Tableaux de bord
 
-- [ ] L'espace d'un élève affiche ses rangs club, DRE et national pour le semestre et pour l'historique.
-- [ ] L'espace d'un encadreur affiche les mêmes rangs.
-- [ ] Le rang régional annuel et la place dans le club de la spec 034 restent visibles et étiquetés « Année
+- [x] L'espace d'un élève affiche ses rangs club, DRE et national pour le semestre et pour l'historique.
+- [x] L'espace d'un encadreur affiche les mêmes rangs.
+- [x] Le rang régional annuel et la place dans le club de la spec 034 restent visibles et étiquetés « Année
       académique ».
-- [ ] Un élève sans club n'a pas de rang de club et garde ses rangs DRE et national.
-- [ ] Un élève sans point voit « Pas encore classé » au lieu d'un rang inventé.
-- [ ] Un visiteur ne voit aucun classement personnel.
+- [x] Un élève sans club n'a pas de rang de club et garde ses rangs DRE et national.
+- [x] Un élève sans point voit « Pas encore classé » au lieu d'un rang inventé.
+- [x] Un visiteur ne voit aucun classement personnel.
 
 ### Admin — registre
 
-- [ ] Le registre liste les lignes avec leur bénéficiaire, action, montant, semestre, année, club, auteur, clé,
+- [x] Le registre liste les lignes avec leur bénéficiaire, action, montant, semestre, année, club, auteur, clé,
       motif et annulation éventuelle.
-- [ ] Les filtres par période, action, type de bénéficiaire, club, correction et recherche fonctionnent ensemble.
-- [ ] Le registre est paginé et annonce le total.
-- [ ] Aucune route du registre ne permet de modifier ou de supprimer une ligne.
-- [ ] Le registre exige `points:consulter`, le périmètre national et la double authentification.
+- [x] Les filtres par période, action, type de bénéficiaire, club, correction et recherche fonctionnent ensemble.
+- [x] Le registre est paginé et annonce le total.
+- [x] Aucune route du registre ne permet de modifier ou de supprimer une ligne.
+- [x] Le registre exige `points:consulter`, le périmètre national et la double authentification.
 
 ### Admin — correction et annulation
 
-- [ ] Étant donné une ligne de +100, quand l'admin l'annule avec un motif, alors une ligne de -100 liée à
+- [x] Étant donné une ligne de +100, quand l'admin l'annule avec un motif, alors une ligne de -100 liée à
       l'originale est écrite, la part du club est retirée, et la ligne d'origine reste intacte.
-- [ ] Étant donné un élève, quand l'admin saisit une correction de +25 avec un motif, alors une ligne
+- [x] Étant donné un élève, quand l'admin saisit une correction de +25 avec un motif, alors une ligne
       `admin.correction` de +25 est écrite, sans part de club.
-- [ ] Étant donné une correction de -10, alors le total de l'élève baisse de 10 et le club ne bouge pas.
-- [ ] Étant donné un montant nul, un montant au-delà de ±10 000 ou un motif de moins de 10 caractères, alors la
+- [x] Étant donné une correction de -10, alors le total de l'élève baisse de 10 et le club ne bouge pas.
+- [x] Étant donné un montant nul, un montant au-delà de ±10 000 ou un motif de moins de 10 caractères, alors la
       correction est refusée.
-- [ ] Étant donné une correction visant un admin, un visiteur ou un joueur sans compte, alors elle est refusée.
-- [ ] Étant donné une correction sans droit `points:modifier`, sans périmètre national ou sans double
+- [x] Étant donné une correction visant un admin, un visiteur ou un joueur sans compte, alors elle est refusée.
+- [x] Étant donné une correction sans droit `points:modifier`, sans périmètre national ou sans double
       authentification, alors elle est refusée.
-- [ ] Étant donné une correction réussie, alors le journal d'audit contient le bénéficiaire, le montant, le motif,
+- [x] Étant donné une correction réussie, alors le journal d'audit contient le bénéficiaire, le montant, le motif,
       le semestre, l'année et le club.
-- [ ] Étant donné la même clé d'idempotence envoyée deux fois, alors une seule ligne est écrite.
-- [ ] Étant donné une correction annulée, alors l'annulation retire exactement la correction et laisse une trace.
-- [ ] Le total historique d'un bénéficiaire peut devenir négatif après une correction ; il s'affiche sans erreur.
+- [x] Étant donné la même clé d'idempotence envoyée deux fois, alors une seule ligne est écrite.
+- [x] Étant donné une correction annulée, alors l'annulation retire exactement la correction et laisse une trace.
+- [x] Le total historique d'un bénéficiaire peut devenir négatif après une correction ; il s'affiche sans erreur.
 
 ## Cas limites et erreurs
 
@@ -235,6 +235,13 @@ divergue.
   service.
 - **Correction d'un élève suspendu ou ancien** : autorisée pour l'archive, sans part de club ; le total peut
   devenir négatif.
+- **Total négatif ou nul** : il s'affiche dans l'espace du bénéficiaire et dans le registre, jamais dans un
+  classement public ou interne (seuls les totaux positifs sont classés) ; un mineur n'est pas affiché en bas d'un
+  palmarès avec un score négatif.
+- **Correction et classement interne** : une correction n'a pas de part de club, mais elle compte dans le
+  classement interne du club actuel de l'élève ; sinon son rang de club contredirait son total corrigé.
+- **Points d'un certificat** : une ligne `eleve.certification` ou `encadreur.certification` ne s'annule pas depuis
+  le registre ; on révoque le certificat, qui retire ses points (spec Génie Imhotep).
 - **Double clic sur une correction** : la clé d'idempotence empêche le doublon ; le bouton se désactive pendant
   l'envoi.
 - **Recherche admin sans résultat** : message vide, pas d'erreur.
@@ -260,5 +267,6 @@ divergue.
 
 ## Questions ouvertes
 
-Aucune. Les choix de mise en œuvre sont proposés dans l'introduction et détaillés dans `plan.md` ; ils restent à
-valider avec le plan avant l'implémentation.
+- **Club affiché sans choix de l'élève (relecture du 2026-11-14)** : `docs/RULES.md` dit qu'un élève apparaît par
+  son pseudonyme et, **s'il le souhaite**, son club. Cette spec affiche le club dès qu'il en a un, sans préférence.
+  À trancher par le porteur : confirmer l'écart (et l'écrire dans l'ADR-0013) ou ajouter une préférence d'élève.

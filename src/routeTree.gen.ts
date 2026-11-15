@@ -20,6 +20,7 @@ import { Route as CharteRouteImport } from './routes/charte'
 import { Route as ClubSanteRouteImport } from './routes/club-sante'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as GalerieRouteImport } from './routes/galerie'
+import { Route as HallOfFameRouteImport } from './routes/hall-of-fame'
 import { Route as InscriptionRouteImport } from './routes/inscription'
 import { Route as JeuxRouteImport } from './routes/jeux'
 import { Route as Les7AxesRouteImport } from './routes/les-7-axes'
@@ -70,7 +71,9 @@ import { Route as ConnecteAdminInscritsIdRouteImport } from './routes/_connecte/
 import { Route as ConnecteAdminPointsIndexRouteImport } from './routes/_connecte/admin/points.index'
 import { Route as ConnecteAdminPointsAnneesRouteImport } from './routes/_connecte/admin/points.annees'
 import { Route as ConnecteAdminPointsBaremeRouteImport } from './routes/_connecte/admin/points.bareme'
+import { Route as ConnecteAdminPointsClassementsRouteImport } from './routes/_connecte/admin/points.classements'
 import { Route as ConnecteAdminPointsGoldRouteImport } from './routes/_connecte/admin/points.gold'
+import { Route as ConnecteAdminPointsRegistreRouteImport } from './routes/_connecte/admin/points.registre'
 import { Route as ConnecteAdminQuizIndexRouteImport } from './routes/_connecte/admin/quiz.index'
 import { Route as ConnecteAdminQuizIdRouteImport } from './routes/_connecte/admin/quiz.$id'
 import { Route as ConnecteAdminQuizParametresRouteImport } from './routes/_connecte/admin/quiz.parametres'
@@ -134,6 +137,11 @@ const ConnexionRoute = ConnexionRouteImport.update({
 const GalerieRoute = GalerieRouteImport.update({
   id: '/galerie',
   path: '/galerie',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HallOfFameRoute = HallOfFameRouteImport.update({
+  id: '/hall-of-fame',
+  path: '/hall-of-fame',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InscriptionRoute = InscriptionRouteImport.update({
@@ -407,11 +415,23 @@ const ConnecteAdminPointsBaremeRoute =
     path: '/bareme',
     getParentRoute: () => ConnecteAdminPointsRoute,
   } as any)
+const ConnecteAdminPointsClassementsRoute =
+  ConnecteAdminPointsClassementsRouteImport.update({
+    id: '/classements',
+    path: '/classements',
+    getParentRoute: () => ConnecteAdminPointsRoute,
+  } as any)
 const ConnecteAdminPointsGoldRoute = ConnecteAdminPointsGoldRouteImport.update({
   id: '/gold',
   path: '/gold',
   getParentRoute: () => ConnecteAdminPointsRoute,
 } as any)
+const ConnecteAdminPointsRegistreRoute =
+  ConnecteAdminPointsRegistreRouteImport.update({
+    id: '/registre',
+    path: '/registre',
+    getParentRoute: () => ConnecteAdminPointsRoute,
+  } as any)
 const ConnecteAdminQuizIndexRoute = ConnecteAdminQuizIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -482,6 +502,7 @@ export interface FileRoutesByFullPath {
   '/club-sante': typeof ClubSanteRoute
   '/connexion': typeof ConnexionRoute
   '/galerie': typeof GalerieRoute
+  '/hall-of-fame': typeof HallOfFameRoute
   '/inscription': typeof InscriptionRoute
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
@@ -527,7 +548,9 @@ export interface FileRoutesByFullPath {
   '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
   '/admin/points/annees': typeof ConnecteAdminPointsAnneesRoute
   '/admin/points/bareme': typeof ConnecteAdminPointsBaremeRoute
+  '/admin/points/classements': typeof ConnecteAdminPointsClassementsRoute
   '/admin/points/gold': typeof ConnecteAdminPointsGoldRoute
+  '/admin/points/registre': typeof ConnecteAdminPointsRegistreRoute
   '/admin/quiz/$id': typeof ConnecteAdminQuizIdRoute
   '/admin/quiz/parametres': typeof ConnecteAdminQuizParametresRoute
   '/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
@@ -555,6 +578,7 @@ export interface FileRoutesByTo {
   '/club-sante': typeof ClubSanteRoute
   '/connexion': typeof ConnexionRoute
   '/galerie': typeof GalerieRoute
+  '/hall-of-fame': typeof HallOfFameRoute
   '/inscription': typeof InscriptionRoute
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
@@ -594,7 +618,9 @@ export interface FileRoutesByTo {
   '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
   '/admin/points/annees': typeof ConnecteAdminPointsAnneesRoute
   '/admin/points/bareme': typeof ConnecteAdminPointsBaremeRoute
+  '/admin/points/classements': typeof ConnecteAdminPointsClassementsRoute
   '/admin/points/gold': typeof ConnecteAdminPointsGoldRoute
+  '/admin/points/registre': typeof ConnecteAdminPointsRegistreRoute
   '/admin/quiz/$id': typeof ConnecteAdminQuizIdRoute
   '/admin/quiz/parametres': typeof ConnecteAdminQuizParametresRoute
   '/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
@@ -624,6 +650,7 @@ export interface FileRoutesById {
   '/club-sante': typeof ClubSanteRoute
   '/connexion': typeof ConnexionRoute
   '/galerie': typeof GalerieRoute
+  '/hall-of-fame': typeof HallOfFameRoute
   '/inscription': typeof InscriptionRoute
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
@@ -669,7 +696,9 @@ export interface FileRoutesById {
   '/_connecte/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
   '/_connecte/admin/points/annees': typeof ConnecteAdminPointsAnneesRoute
   '/_connecte/admin/points/bareme': typeof ConnecteAdminPointsBaremeRoute
+  '/_connecte/admin/points/classements': typeof ConnecteAdminPointsClassementsRoute
   '/_connecte/admin/points/gold': typeof ConnecteAdminPointsGoldRoute
+  '/_connecte/admin/points/registre': typeof ConnecteAdminPointsRegistreRoute
   '/_connecte/admin/quiz/$id': typeof ConnecteAdminQuizIdRoute
   '/_connecte/admin/quiz/parametres': typeof ConnecteAdminQuizParametresRoute
   '/_connecte/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
@@ -699,6 +728,7 @@ export interface FileRouteTypes {
     | '/club-sante'
     | '/connexion'
     | '/galerie'
+    | '/hall-of-fame'
     | '/inscription'
     | '/jeux'
     | '/les-7-axes'
@@ -744,7 +774,9 @@ export interface FileRouteTypes {
     | '/admin/inscrits/$id'
     | '/admin/points/annees'
     | '/admin/points/bareme'
+    | '/admin/points/classements'
     | '/admin/points/gold'
+    | '/admin/points/registre'
     | '/admin/quiz/$id'
     | '/admin/quiz/parametres'
     | '/admin/referentiel/axes'
@@ -772,6 +804,7 @@ export interface FileRouteTypes {
     | '/club-sante'
     | '/connexion'
     | '/galerie'
+    | '/hall-of-fame'
     | '/inscription'
     | '/jeux'
     | '/les-7-axes'
@@ -811,7 +844,9 @@ export interface FileRouteTypes {
     | '/admin/inscrits/$id'
     | '/admin/points/annees'
     | '/admin/points/bareme'
+    | '/admin/points/classements'
     | '/admin/points/gold'
+    | '/admin/points/registre'
     | '/admin/quiz/$id'
     | '/admin/quiz/parametres'
     | '/admin/referentiel/axes'
@@ -840,6 +875,7 @@ export interface FileRouteTypes {
     | '/club-sante'
     | '/connexion'
     | '/galerie'
+    | '/hall-of-fame'
     | '/inscription'
     | '/jeux'
     | '/les-7-axes'
@@ -885,7 +921,9 @@ export interface FileRouteTypes {
     | '/_connecte/admin/inscrits/$id'
     | '/_connecte/admin/points/annees'
     | '/_connecte/admin/points/bareme'
+    | '/_connecte/admin/points/classements'
     | '/_connecte/admin/points/gold'
+    | '/_connecte/admin/points/registre'
     | '/_connecte/admin/quiz/$id'
     | '/_connecte/admin/quiz/parametres'
     | '/_connecte/admin/referentiel/axes'
@@ -915,6 +953,7 @@ export interface RootRouteChildren {
   ClubSanteRoute: typeof ClubSanteRoute
   ConnexionRoute: typeof ConnexionRoute
   GalerieRoute: typeof GalerieRoute
+  HallOfFameRoute: typeof HallOfFameRoute
   InscriptionRoute: typeof InscriptionRoute
   JeuxRoute: typeof JeuxRoute
   Les7AxesRoute: typeof Les7AxesRoute
@@ -1008,6 +1047,13 @@ declare module '@tanstack/react-router' {
       path: '/galerie'
       fullPath: '/galerie'
       preLoaderRoute: typeof GalerieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hall-of-fame': {
+      id: '/hall-of-fame'
+      path: '/hall-of-fame'
+      fullPath: '/hall-of-fame'
+      preLoaderRoute: typeof HallOfFameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inscription': {
@@ -1360,11 +1406,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteAdminPointsBaremeRouteImport
       parentRoute: typeof ConnecteAdminPointsRoute
     }
+    '/_connecte/admin/points/classements': {
+      id: '/_connecte/admin/points/classements'
+      path: '/classements'
+      fullPath: '/admin/points/classements'
+      preLoaderRoute: typeof ConnecteAdminPointsClassementsRouteImport
+      parentRoute: typeof ConnecteAdminPointsRoute
+    }
     '/_connecte/admin/points/gold': {
       id: '/_connecte/admin/points/gold'
       path: '/gold'
       fullPath: '/admin/points/gold'
       preLoaderRoute: typeof ConnecteAdminPointsGoldRouteImport
+      parentRoute: typeof ConnecteAdminPointsRoute
+    }
+    '/_connecte/admin/points/registre': {
+      id: '/_connecte/admin/points/registre'
+      path: '/registre'
+      fullPath: '/admin/points/registre'
+      preLoaderRoute: typeof ConnecteAdminPointsRegistreRouteImport
       parentRoute: typeof ConnecteAdminPointsRoute
     }
     '/_connecte/admin/quiz/': {
@@ -1479,14 +1539,18 @@ const ConnecteAdminCertificationRouteWithChildren =
 interface ConnecteAdminPointsRouteChildren {
   ConnecteAdminPointsAnneesRoute: typeof ConnecteAdminPointsAnneesRoute
   ConnecteAdminPointsBaremeRoute: typeof ConnecteAdminPointsBaremeRoute
+  ConnecteAdminPointsClassementsRoute: typeof ConnecteAdminPointsClassementsRoute
   ConnecteAdminPointsGoldRoute: typeof ConnecteAdminPointsGoldRoute
+  ConnecteAdminPointsRegistreRoute: typeof ConnecteAdminPointsRegistreRoute
   ConnecteAdminPointsIndexRoute: typeof ConnecteAdminPointsIndexRoute
 }
 
 const ConnecteAdminPointsRouteChildren: ConnecteAdminPointsRouteChildren = {
   ConnecteAdminPointsAnneesRoute: ConnecteAdminPointsAnneesRoute,
   ConnecteAdminPointsBaremeRoute: ConnecteAdminPointsBaremeRoute,
+  ConnecteAdminPointsClassementsRoute: ConnecteAdminPointsClassementsRoute,
   ConnecteAdminPointsGoldRoute: ConnecteAdminPointsGoldRoute,
+  ConnecteAdminPointsRegistreRoute: ConnecteAdminPointsRegistreRoute,
   ConnecteAdminPointsIndexRoute: ConnecteAdminPointsIndexRoute,
 }
 
@@ -1626,6 +1690,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClubSanteRoute: ClubSanteRoute,
   ConnexionRoute: ConnexionRoute,
   GalerieRoute: GalerieRoute,
+  HallOfFameRoute: HallOfFameRoute,
   InscriptionRoute: InscriptionRoute,
   JeuxRoute: JeuxRoute,
   Les7AxesRoute: Les7AxesRoute,

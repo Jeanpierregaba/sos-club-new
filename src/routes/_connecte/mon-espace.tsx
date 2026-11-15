@@ -15,6 +15,7 @@ import {
   MotDePasseChange,
 } from "@/components/espace/commun";
 import { CarteMembre } from "@/components/espace/CarteMembre";
+import { ClassementDuClub, RangsPersonnels } from "@/components/espace/MesClassements";
 import { PointsClub, TableauAnnuel } from "@/components/espace/TableauAnnuel";
 import { EspaceEncadreur } from "@/components/espace/EspaceEncadreur";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
@@ -31,9 +32,11 @@ import {
   chargerEspaceVisiteur,
   chargerMonClubSante,
   chargerMonClub,
+  chargerMonClassement,
   ErreurApi,
   modifierProfilEleve,
   type Classe,
+  type ClassementPersonnel,
   type EspaceEleve,
   type EspaceVisiteur,
   type MembresDuClub,
@@ -64,32 +67,43 @@ export const Route = createFileRoute("/_connecte/mon-espace")({
   loader: async ({ context }) => {
     try {
       if (context.moi.role === "eleve") {
-        const [espace, club, gamification, pointsClub] = await Promise.all([
+        const [espace, club, gamification, pointsClub, classement] = await Promise.all([
           chargerEspaceEleve(),
           chargerMonClub(),
           // Spec 034 : le tableau annuel (carte de membre comprise) et le total du club ; sans eux, l'espace reste
           // lisible.
           chargerMaGamification().catch(() => null),
           chargerPointsDuClub().catch(() => null),
+          // Spec 036 : les rangs personnels ; sans eux, l'espace reste lisible.
+          chargerMonClassement().catch(() => null),
         ]);
         // Le président choisit son successeur dans la liste des membres confirmés (spec 019).
         const membres = club.club?.president
           ? await chargerMembres(club.club.id).catch(() => null)
           : null;
-        return { eleve: espace, club, membres, gamification, pointsClub, encadreur: null };
+        return {
+          eleve: espace,
+          club,
+          membres,
+          gamification,
+          pointsClub,
+          classement,
+          encadreur: null,
+        };
       }
       if (context.moi.role === "encadreur") {
         const encadreur = await chargerEspaceEncadreur();
         // Spec 033 : un encadreur vérifié est rattaché au club de son établissement, qu'il suit dans « Mon Club
         // Santé ».
-        const [monClubSante, pointsClub] =
+        const [monClubSante, pointsClub, classement] =
           encadreur.etat === "actif"
             ? await Promise.all([
                 chargerMonClubSante().catch(() => null),
                 chargerPointsDuClub().catch(() => null),
+                chargerMonClassement().catch(() => null),
               ])
-            : [null, null];
-        return { eleve: null, club: null, encadreur, monClubSante, pointsClub };
+            : [null, null, null];
+        return { eleve: null, club: null, encadreur, monClubSante, pointsClub, classement };
       }
       if (context.moi.role === "visiteur") {
         return {
@@ -133,6 +147,7 @@ function MonEspace() {
         membres={"membres" in donnees ? donnees.membres : null}
         gamification={"gamification" in donnees ? donnees.gamification : null}
         pointsClub={"pointsClub" in donnees ? donnees.pointsClub : null}
+        classement={"classement" in donnees ? donnees.classement : null}
       />
     );
   if (donnees.encadreur)
@@ -142,6 +157,7 @@ function MonEspace() {
         prenom={moi.prenom}
         monClubSante={"monClubSante" in donnees ? donnees.monClubSante : null}
         pointsClub={"pointsClub" in donnees ? donnees.pointsClub : null}
+        classement={"classement" in donnees ? donnees.classement : null}
       />
     );
   if ("visiteur" in donnees && donnees.visiteur)
@@ -248,12 +264,14 @@ function EspaceDeLEleve({
   membres,
   gamification,
   pointsClub,
+  classement,
 }: {
   espace: EspaceEleve;
   club: MonClub;
   membres: MembresDuClub | null;
   gamification: TableauGamification | null;
   pointsClub: PointsDuClub | null;
+  classement: ClassementPersonnel | null;
 }) {
   const { bienvenue } = Route.useSearch();
   const router = useRouter();
@@ -301,6 +319,7 @@ function EspaceDeLEleve({
         )}
 
         <CartesPoints points={points} />
+        {classement && <RangsPersonnels classement={classement} />}
 
         {gamification && (
           <CarteMembre
@@ -311,6 +330,7 @@ function EspaceDeLEleve({
         )}
         {gamification && <TableauAnnuel tableau={gamification} />}
         {pointsClub && <PointsClub points={pointsClub} />}
+        {club.affiliation?.etat === "active" && <ClassementDuClub />}
 
         <BlocClub
           club={club.club}

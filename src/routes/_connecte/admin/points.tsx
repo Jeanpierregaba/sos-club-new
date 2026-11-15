@@ -15,17 +15,22 @@ const ONGLETS = [
   { to: "/admin/points/bareme", libelle: "Barème", exact: false },
   { to: "/admin/points/annees", libelle: "Années académiques", exact: false },
   { to: "/admin/points/gold", libelle: "Élèves Gold", exact: false },
+  { to: "/admin/points/registre", libelle: "Registre", exact: false, national: true },
+  { to: "/admin/points/classements", libelle: "Classements", exact: false, national: true },
 ] as const;
 
 function Points() {
+  const { admin } = Route.useRouteContext();
+  // Le registre et les classements de l'équipe sont nationaux (spec 036) : un collaborateur de DRE ne les voit pas.
+  const onglets = ONGLETS.filter((o) => !("national" in o) || admin.perimetre_dre === null);
   return (
     <div className="space-y-6">
-      <EnTeteAdmin sur="Points et classements" bleu="Semestres et" vert="barème">
-        Chaque point est une ligne du registre, avec son semestre. Un changement vaut pour les gains
-        à venir : les points déjà gagnés ne bougent pas.
+      <EnTeteAdmin sur="Points et classements" bleu="Points et" vert="classements">
+        Chaque point est une ligne du registre, avec son semestre. Un changement de barème vaut pour
+        les gains à venir : les points déjà gagnés ne bougent pas.
       </EnTeteAdmin>
       <nav aria-label="Parties des points" className="flex flex-wrap gap-2">
-        {ONGLETS.map((o) => (
+        {onglets.map((o) => (
           <Link
             key={o.to}
             to={o.to}

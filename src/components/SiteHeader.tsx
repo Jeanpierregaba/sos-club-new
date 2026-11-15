@@ -38,6 +38,7 @@ const menu: { t: string; items: { t: string; href: string }[] }[] = [
     items: [
       { t: "Jeux", href: "/jeux" },
       { t: "Certification", href: "/certification" },
+      { t: "Classements", href: "/hall-of-fame" },
     ],
   },
   {

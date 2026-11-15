@@ -1,5 +1,5 @@
-"""Le podium des clubs de l'accueil (spec 021, tâche 3). Le registre ne crédite pas encore les clubs (R13) :
-les tests remplacent `scores_des_clubs` pour vérifier le classement."""
+"""Le podium des clubs de l'accueil (spec 021, tâche 3). Le score d'un club est la somme de ses parts dans le
+registre (spec 034, ADR-0012) : les tests écrivent de vraies lignes (spec 036)."""
 
 from collections.abc import Callable
 from typing import Any
@@ -8,23 +8,23 @@ from uuid import UUID
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.clubs.models import EtatClub
 from app.comptes.models import Utilisateur
 from app.points import service as points
 from app.referentiel.models import Etablissement
+from tests.test_classements import point
 
 pytestmark = pytest.mark.usefixtures("annuaire")
 
 PODIUM = "/api/clubs/podium"
 
 
-def scores(monkeypatch: pytest.MonkeyPatch, valeurs: dict[UUID, int]) -> None:
-    async def remplacer(db: AsyncSession, club_ids: list[UUID]) -> dict[UUID, int]:
-        return {i: valeurs[i] for i in club_ids if i in valeurs}
-
-    monkeypatch.setattr(points, "scores_des_clubs", remplacer)
+def scores(en_base: Callable[..., Any], valeurs: dict[Any, float]) -> None:
+    """Crédite chaque club de son score par une ligne de son président : le club reçoit la moitié du gain."""
+    for club, score in valeurs.items():
+        demi = int(score * 2)
+        point(en_base, club.president_id, demi, f"podium:{club.id}", club_id=club.id, demi_points=demi)
 
 
 def etablissements(en_base: Callable[..., Any], nombre: int) -> list[UUID]:
@@ -52,10 +52,10 @@ def test_sans_points_le_podium_est_vide(client: TestClient, clubs: list[Any]) ->
 
 
 def test_les_trois_meilleurs_clubs_actifs_tries_par_points(
-    client: TestClient, clubs: list[Any], monkeypatch: pytest.MonkeyPatch
+    client: TestClient, clubs: list[Any], en_base: Callable[..., Any]
 ) -> None:
     alpha, beta, gamma, delta, _ = clubs
-    scores(monkeypatch, {alpha.id: 120, beta.id: 450, gamma.id: 300, delta.id: 10})
+    scores(en_base, {alpha: 120, beta: 450, gamma: 300, delta: 10})
 
     podium = client.get(PODIUM).json()
 
@@ -72,25 +72,35 @@ def test_un_club_sans_point_ou_inactif_nest_pas_sur_le_podium(
     clubs: list[Any],
     creer_eleve: Callable[..., Utilisateur],
     creer_club: Callable[..., Any],
-    monkeypatch: pytest.MonkeyPatch,
+    en_base: Callable[..., Any],
 ) -> None:
     alpha, *_ = clubs
     en_attente = creer_club(
         creer_eleve("demandeur", "Demandeur", dre="maritime"), nom="Club en attente", etat=EtatClub.en_attente
     )
-    scores(monkeypatch, {alpha.id: 50, en_attente.id: 900})
+    en_attente_id = en_attente.id
+    president = creer_eleve("membre", "Membre", dre="maritime")
+    scores(en_base, {alpha: 50})
+    point(en_base, president.id, 1800, "attente", club_id=en_attente_id, demi_points=1800)
 
     assert [c["nom"] for c in client.get(PODIUM).json()] == ["Club Alpha"]
 
 
-def test_a_egalite_lordre_alphabetique(client: TestClient, clubs: list[Any], monkeypatch: pytest.MonkeyPatch) -> None:
+def test_a_egalite_lordre_alphabetique(client: TestClient, clubs: list[Any], en_base: Callable[..., Any]) -> None:
     alpha, _, _, delta, _ = clubs
-    scores(monkeypatch, {delta.id: 100, alpha.id: 100})
+    scores(en_base, {delta: 100, alpha: 100})
 
     assert [c["nom"] for c in client.get(PODIUM).json()] == ["Club Alpha", "Club Delta"]
 
 
-def test_aujourdhui_aucun_club_na_de_points() -> None:
+def test_un_score_de_club_garde_sa_decimale(client: TestClient, clubs: list[Any], en_base: Callable[..., Any]) -> None:
+    alpha, *_ = clubs
+    scores(en_base, {alpha: 2.5})
+
+    assert [c["points"] for c in client.get(PODIUM).json()] == [2.5]
+
+
+def test_sans_club_aucun_score() -> None:
     import asyncio
 
     assert asyncio.run(points.scores_des_clubs(None, [])) == {}  # type: ignore[arg-type]

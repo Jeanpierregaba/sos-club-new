@@ -451,7 +451,7 @@ def test_le_classement_des_clubs_filtre_par_dre(
     assert [(ligne.nom, ligne.points) for ligne in resultat.lignes] == [("Club Lomé", 5.0)]
 
 
-def test_un_club_a_total_nul_ou_negatif(
+def test_un_club_a_total_nul_ou_negatif_nest_pas_classe(
     creer_eleve: Callable[..., Utilisateur],
     creer_club: Callable[..., Any],
     en_base: Callable[..., Any],
@@ -493,7 +493,8 @@ def test_un_club_a_total_nul_ou_negatif(
 
     resultat = classement(en_base, categorie=classements.Categorie.clubs)
 
-    assert [(ligne.nom, ligne.points) for ligne in resultat.lignes] == [("Club Négatif", -10.0)]
+    # Seuls les totaux positifs sont classés (ADR-0013) : ni le club à zéro ni le club en négatif.
+    assert resultat.lignes == []
 
 
 # Pagination, semestre absent, DRE -----------------------------------------------------------------------------

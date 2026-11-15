@@ -39,7 +39,7 @@ const tableau: TableauGamification = {
 describe("TableauAnnuel", () => {
   it("montre l'année, la part du club, le rang et les archives", () => {
     render(<TableauAnnuel tableau={tableau} />);
-    expect(screen.getByText("Année 2026-2027")).toBeInTheDocument();
+    expect(screen.getByText("Année académique 2026-2027")).toBeInTheDocument();
     expect(screen.getByText("277,5")).toBeInTheDocument();
     expect(screen.getByText("Rang · Maritime")).toBeInTheDocument();
     expect(screen.getByText("2 en attente de modération")).toBeInTheDocument();

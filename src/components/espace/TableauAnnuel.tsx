@@ -18,7 +18,7 @@ export function TableauAnnuel({ tableau }: { tableau: TableauGamification }) {
       className="mt-6 rounded-3xl bg-white p-6 shadow-card ring-1 ring-border sm:p-8"
     >
       <p className="text-xs font-extrabold uppercase tracking-widest text-logo-red">
-        {tableau.annee ? `Année ${tableau.annee.libelle}` : "Hors année scolaire"}
+        {tableau.annee ? `Année académique ${tableau.annee.libelle}` : "Hors année académique"}
       </p>
       <h2 id="titre-annee" className="mt-1 text-2xl">
         <span className="text-logo-blue">Mon année</span>{" "}

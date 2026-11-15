@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { EtatContenu } from "@/components/articles/EtatContenu";
 import { ListeMembres } from "@/components/clubs/ListeMembres";
 import { PropositionFiche } from "@/components/clubs/PropositionFiche";
+import { ClassementDuClub } from "@/components/espace/MesClassements";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import {
   chargerAxes,
@@ -250,6 +251,7 @@ function Espace({
           <ListeMembres liste={espace.membres} />
         </section>
       )}
+      {espace.role === "president" && <ClassementDuClub />}
     </>
   );
 }

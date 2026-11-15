@@ -425,6 +425,70 @@ export const adminListerGold = () => requeteApi<EleveGold[]>("/api/admin/jeux/go
 export const adminModifierBareme = (code: string, entree: LigneBaremeModification) =>
   envoyerJson<LigneBaremeAdmin>(`${POINTS}/bareme/${code}`, entree, "PATCH");
 
+// Classements, registre et corrections (spec 036) -------------------------------------------------------
+
+export type ClassementPersonnesPublic = Schemas["ClassementPersonnesPublic"];
+export type ClassementClubsPublic = Schemas["ClassementClubsPublic"];
+export type ClassementPublic = ClassementPersonnesPublic | ClassementClubsPublic;
+export type ClassementPersonnel = Schemas["ClassementPersonnel"];
+export type RangPersonnel = Schemas["RangPersonnel"];
+export type ClassementClubInterne = Schemas["ClassementClubInterne"];
+export type ClassementPersonnesAdmin = Schemas["ClassementPersonnesAdmin"];
+export type ClassementClubsAdmin = Schemas["ClassementClubsAdmin"];
+export type ClassementClubAdminInterne = Schemas["ClassementClubAdminInterne"];
+export type ClassementAdmin =
+  ClassementPersonnesAdmin | ClassementClubsAdmin | ClassementClubAdminInterne;
+export type PageRegistre = Schemas["PageRegistre"];
+export type LigneRegistre = Schemas["LigneRegistre"];
+export type BeneficiairePoints = Schemas["BeneficiairePoints"];
+export type CorrectionPoints = Schemas["CorrectionPoints"];
+
+export type CategorieClassement = "eleves" | "encadreurs" | "clubs";
+export type PeriodeClassement = "semestre" | "historique";
+export type FiltresClassement = {
+  categorie?: CategorieClassement | undefined;
+  niveau?: "national" | "dre" | undefined;
+  dre?: string | undefined;
+  periode?: PeriodeClassement | undefined;
+  page?: number | undefined;
+  par_page?: number | undefined;
+};
+
+export const chargerClassementPublic = (filtres: FiltresClassement) =>
+  requeteApi<ClassementPublic>(avecParametres("/api/classements", filtres));
+export const chargerMonClassement = () => requeteApi<ClassementPersonnel>("/api/classements/moi");
+export const chargerClassementMonClub = (filtres: {
+  categorie?: "eleves" | "encadreurs";
+  periode?: PeriodeClassement;
+  page?: number;
+  par_page?: number;
+}) => requeteApi<ClassementClubInterne>(avecParametres("/api/classements/mon-club", filtres));
+
+export type FiltresRegistre = {
+  semestre_id?: string | undefined;
+  annee_id?: string | undefined;
+  du?: string | undefined;
+  au?: string | undefined;
+  action?: string | undefined;
+  beneficiaire?: "eleve" | "encadreur" | undefined;
+  club_id?: string | undefined;
+  correction?: "true" | "false" | undefined;
+  recherche?: string | undefined;
+  page?: number | undefined;
+  par_page?: number | undefined;
+};
+
+export const adminListerRegistre = (filtres: FiltresRegistre) =>
+  requeteApi<PageRegistre>(avecParametres(`${POINTS}/registre`, filtres));
+export const adminChercherBeneficiaires = (q: string) =>
+  requeteApi<BeneficiairePoints[]>(avecParametres(`${POINTS}/beneficiaires`, { q }));
+export const adminCorrigerPoints = (entree: CorrectionPoints) =>
+  envoyerJson<LigneRegistre>(`${POINTS}/corrections`, entree);
+export const adminAnnulerLigne = (id: string, motif: string) =>
+  envoyerJson<LigneRegistre>(`${POINTS}/lignes/${id}/annulation`, { motif });
+export const adminClassements = (filtres: FiltresClassement & { club_id?: string }) =>
+  requeteApi<ClassementAdmin>(avecParametres(`${POINTS}/classements`, filtres));
+
 // Compte encadreur (spec 018) ----------------------------------------------------------------------------
 
 export const inscrireEncadreur = (entree: InscriptionEncadreur) =>

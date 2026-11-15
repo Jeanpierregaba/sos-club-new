@@ -188,6 +188,8 @@ class ClassementPersonnel(BaseModel):
 
     categorie: Literal["eleves", "encadreurs"]
     club: ClubClasse | None
+    # Sans semestre en cours, l'espace dit « Aucun semestre en cours » au lieu de « Pas encore classé ».
+    semestre_en_cours: SemestrePublic | None
     semestre: RangPersonnel
     historique: RangPersonnel
 
@@ -286,3 +288,75 @@ class ClassementClubAdminInterne(BaseModel):
     par_page: int
     total: int
     lignes: list[LigneClubAdminInterne]
+
+
+# Registre, recherche et correction (spec 036) ---------------------------------------------------------------------
+
+
+class AuteurRegistre(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    nom: str
+    identifiant: str
+
+
+class LigneRegistre(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: UUID
+    cree_le: datetime
+    utilisateur_id: UUID
+    role: str
+    identifiant: str
+    prenom: str
+    nom: str
+    pseudonyme: str | None
+    action: str
+    action_libelle: str
+    montant: int
+    points_club: float | None
+    semestre: str | None
+    annee: str | None
+    club: ClubClasse | None
+    cle: str
+    valide_par: AuteurRegistre | None
+    motif: str | None
+    annule_id: UUID | None
+    est_annulation: bool
+    est_correction: bool
+    annulee: bool
+
+
+class PageRegistre(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    total: int
+    page: int
+    par_page: int
+    lignes: list[LigneRegistre]
+
+
+class BeneficiairePoints(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: UUID
+    role: Literal["eleve", "encadreur"]
+    nom_public: str
+    identifiant: str
+    club: str | None
+    points_total: int
+
+
+class CorrectionPoints(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    utilisateur_id: UUID
+    montant: int = Field(ge=-MONTANT_MAX, le=MONTANT_MAX)
+    motif: str = Field(min_length=10, max_length=500)
+    cle: UUID
+
+
+class AnnulationPoints(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    motif: str = Field(min_length=10, max_length=500)
