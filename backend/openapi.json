@@ -11137,6 +11137,53 @@
         }
       }
     },
+    "/api/admin/rapports/{contenu_id}/documents/{piece_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lire Document",
+        "description": "Un document d'une version envoyée par l'auteur, jamais d'une version de travail ; hors de la DRE du\ncollaborateur, le rapport n'existe pas.",
+        "operationId": "lire_document_api_admin_rapports__contenu_id__documents__piece_id__get",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          },
+          {
+            "name": "piece_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Piece Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/certification": {
       "get": {
         "tags": [
@@ -12171,6 +12218,16 @@
                 "type": "null"
               }
             ]
+          },
+          "rapport": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RapportModeration"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -12223,6 +12280,18 @@
           "version": {
             "type": "integer",
             "title": "Version"
+          },
+          "doublon_de": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doublon De"
           }
         },
         "type": "object",
@@ -16169,6 +16238,35 @@
           "points"
         ],
         "title": "Distinction"
+      },
+      "DocumentModeration": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "octets": {
+            "type": "integer",
+            "title": "Octets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "type",
+          "octets"
+        ],
+        "title": "DocumentModeration"
       },
       "DocumentRapport": {
         "properties": {
@@ -24196,6 +24294,106 @@
         ],
         "title": "RapportDetail"
       },
+      "RapportModeration": {
+        "properties": {
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "modele": {
+            "type": "string",
+            "title": "Modele"
+          },
+          "periode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Periode"
+          },
+          "type_activite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type Activite"
+          },
+          "doublon_de": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RapportVoisin"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "doublons_probables": {
+            "items": {
+              "$ref": "#/components/schemas/RapportVoisin"
+            },
+            "type": "array",
+            "title": "Doublons Probables"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentModeration"
+            },
+            "type": "array",
+            "title": "Documents"
+          },
+          "points_auteur": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points Auteur"
+          },
+          "points_club": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points Club"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "modele",
+          "periode",
+          "type_activite",
+          "doublon_de",
+          "doublons_probables",
+          "documents",
+          "points_auteur",
+          "points_club"
+        ],
+        "title": "RapportModeration"
+      },
       "RapportResume": {
         "properties": {
           "id": {
@@ -24319,6 +24517,34 @@
           "lectures"
         ],
         "title": "RapportResume"
+      },
+      "RapportVoisin": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatContenu"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "reference",
+          "etat",
+          "titre"
+        ],
+        "title": "RapportVoisin"
       },
       "RefusDemandeEntree": {
         "properties": {

@@ -221,8 +221,10 @@ async def apercu(db: AsyncSession, acces: Acces, contenu_id: UUID) -> ApercuMode
             select(ClubAxe.axe_code).where(ClubAxe.club_id == contenu.club_id).order_by(ClubAxe.axe_code)
         )
         fiche_actuelle = FicheActuelle(description=club.description if club else None, axes=list(axes))
+    complement = type_de(contenu.type).complement_apercu
     return ApercuModeration(
         fiche_actuelle=fiche_actuelle,
+        rapport=await complement(db, contenu, soumise.id) if complement is not None else None,
         **_element(*ligne).model_dump(),
         soumise=soumise.donnees if autre else None,
         photos_soumises=[_photo(p, ph) for p, ph in await photos_de(db, soumise.id)] if autre else [],
@@ -260,6 +262,12 @@ async def _a_decider(db: AsyncSession, acces: Acces, contenu_id: UUID, version: 
     if contenu.version != version:
         raise Refus("Ce contenu a changé depuis que tu l'as ouvert : recharge la page et relis-le.", 409)
     return contenu
+
+
+def _motif_suffisant(contenu: Contenu, motif: str) -> None:
+    minimum = type_de(contenu.type).motif_min
+    if len(motif.strip()) < minimum:
+        raise Refus(f"Le motif compte au moins {minimum} caractères : l'auteur doit comprendre quoi changer.", 422)
 
 
 def _en_attente(contenu: Contenu) -> None:
@@ -399,6 +407,7 @@ async def demander_correction(
 ) -> None:
     contenu = await _a_decider(db, acces, contenu_id, version)
     _en_attente(contenu)
+    _motif_suffisant(contenu, motif)
     if not type_de(contenu.type).correction:
         raise Refus("Ce contenu ne se corrige pas : approuve-le ou refuse-le avec un motif.", 409)
     travail = await _travail(db, contenu)
@@ -414,6 +423,7 @@ async def demander_correction(
 async def refuser(db: AsyncSession, acces: Acces, contenu_id: UUID, version: int, motif: str, ip: str) -> None:
     contenu = await _a_decider(db, acces, contenu_id, version)
     _en_attente(contenu)
+    _motif_suffisant(contenu, motif)
     travail = await _travail(db, contenu)
     titre = type_de(contenu.type).titre(travail.donnees)
     travail.etat = EtatVersion.refusee

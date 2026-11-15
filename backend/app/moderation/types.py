@@ -49,6 +49,10 @@ class TypeContenu:
     lier_doublon: Callable[[AsyncSession, Contenu, UUID], Awaitable[None]] | None = None
     # Les autres destinataires des notifications de soumission et de décision (encadreurs du club…).
     destinataires: Callable[[AsyncSession, Contenu], Awaitable[list[UUID]]] | None = None
+    # Le complément d'aperçu propre au type, à partir de la version soumise (un rapport : référence, documents…).
+    complement_apercu: Callable[[AsyncSession, Contenu, UUID], Awaitable[Any]] | None = None
+    # La longueur minimale du motif d'une correction ou d'un refus (10 pour un rapport, spec 038).
+    motif_min: int = 1
     # Le nombre de contenus de ce type qu'un auteur peut avoir en attente de modération.
     max_en_attente: int = 3
 

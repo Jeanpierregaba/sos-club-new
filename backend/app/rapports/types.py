@@ -13,10 +13,12 @@ from app.clubs.models import Club
 from app.clubs.requetes import encadreurs_actifs
 from app.comptes.inscription import Refus
 from app.comptes.models import Role, Utilisateur
-from app.moderation.models import Contenu, EtatContenu
+from app.moderation.models import Contenu, EtatContenu, VersionContenu
+from app.moderation.schemas import DocumentModeration, RapportModeration, RapportVoisin
 from app.moderation.types import TypeContenu, enregistrer
 from app.points import service as points
-from app.rapports.models import TYPES_CONTENU, ModeleRapport, Rapport
+from app.points.models import LigneBareme, Semestre
+from app.rapports.models import TYPES_CONTENU, ModeleRapport, PieceRapport, Rapport, VersionPiece
 from app.rapports.schemas import SCHEMAS, titre_de
 
 ENCADREUR = {
@@ -95,6 +97,76 @@ async def destinataires(db: AsyncSession, contenu: Contenu) -> list[UUID]:
     return [i for i in dict.fromkeys(ids) if i != contenu.auteur_id]
 
 
+async def _complement_apercu(db: AsyncSession, contenu: Contenu, version_id: UUID) -> RapportModeration:
+    """Ce que le modérateur voit en plus : la référence, la période, les documents de la version soumise, les
+    doublons probables et les points que l'approbation créditerait au barème actuel."""
+    from app.rapports import service  # import tardif : le service importe ce module
+
+    rapport = await db.get(Rapport, contenu.id)
+    assert rapport is not None
+    auteur = await db.get(Utilisateur, contenu.auteur_id)
+    semestres = {}
+    if rapport.semestre_id is not None:
+        semestre = await db.get(Semestre, rapport.semestre_id)
+        semestres = {semestre.id: semestre.libelle} if semestre else {}
+    references = await service.doublons_probables(db, contenu, rapport) if rapport.reference else []
+    voisins = []
+    for reference in references:
+        autre = await db.scalar(select(Rapport).where(Rapport.reference == reference))
+        if autre is not None:
+            voisins.append(await _voisin(db, autre))
+    original = await db.get(Rapport, rapport.doublon_de_id) if rapport.doublon_de_id else None
+    documents = (
+        await db.scalars(
+            select(PieceRapport)
+            .join(VersionPiece, VersionPiece.piece_id == PieceRapport.id)
+            .where(VersionPiece.version_id == version_id, PieceRapport.efface_le.is_(None))
+            .order_by(VersionPiece.ordre)
+        )
+    ).all()
+    sans_points = rapport.doublon_de_id is not None or contenu.publie_le is not None
+    montant_auteur = (
+        await db.scalar(
+            select(LigneBareme.montant).where(LigneBareme.code == ENCADREUR[rapport.modele], LigneBareme.actif)
+        )
+        if auteur is not None and auteur.role is Role.encadreur and not sans_points
+        else None
+    )
+    montant_club = (
+        await db.scalar(select(LigneBareme.montant).where(LigneBareme.code == CLUB[rapport.modele], LigneBareme.actif))
+        if rapport.modele in CLUB and not sans_points
+        else None
+    )
+    return RapportModeration(
+        reference=rapport.reference,
+        modele=rapport.modele.value,
+        periode=service._periode(rapport, semestres),
+        type_activite=rapport.type_activite,
+        doublon_de=await _voisin(db, original) if original else None,
+        doublons_probables=voisins,
+        documents=[DocumentModeration(id=d.id, nom=d.nom, type=d.type.value, octets=d.octets) for d in documents],
+        points_auteur=rapport.points_auteur if contenu.publie_le else montant_auteur,
+        points_club=rapport.points_club if contenu.publie_le else montant_club,
+    )
+
+
+async def _voisin(db: AsyncSession, rapport: Rapport) -> RapportVoisin:
+    contenu = await db.get(Contenu, rapport.contenu_id)
+    assert contenu is not None
+    version = await db.scalar(
+        select(VersionContenu)
+        .where(VersionContenu.contenu_id == contenu.id, VersionContenu.soumise_le.is_not(None))
+        .order_by(VersionContenu.numero.desc())
+        .limit(1)
+    )
+    return RapportVoisin(
+        id=contenu.id,
+        reference=rapport.reference or "",
+        etat=contenu.etat,
+        titre=titre_de(rapport.modele, version.donnees if version else {}),
+    )
+
+
 LIBELLES = {
     ModeleRapport.activite: "rapport d'activité",
     ModeleRapport.mensuel: "rapport mensuel",
@@ -117,5 +189,7 @@ for _modele, _code in TYPES_CONTENU.items():
             lier_doublon=_lier_doublon,
             destinataires=destinataires,
             max_en_attente=MAX_EN_ATTENTE,
+            complement_apercu=_complement_apercu,
+            motif_min=10,
         )
     )

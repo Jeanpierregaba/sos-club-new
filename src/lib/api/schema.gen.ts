@@ -3614,6 +3614,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/rapports/{contenu_id}/documents/{piece_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Lire Document
+         * @description Un document d'une version envoyée par l'auteur, jamais d'une version de travail ; hors de la DRE du
+         *     collaborateur, le rapport n'existe pas.
+         */
+        get: operations["lire_document_api_admin_rapports__contenu_id__documents__piece_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/certification": {
         parameters: {
             query?: never;
@@ -4064,6 +4085,7 @@ export interface components {
             /** Decisions */
             decisions: components["schemas"]["DecisionPassee"][];
             fiche_actuelle?: components["schemas"]["FicheActuelle"] | null;
+            rapport?: components["schemas"]["RapportModeration"] | null;
         };
         /** Approbation */
         Approbation: {
@@ -4076,6 +4098,8 @@ export interface components {
         ApprobationEntree: {
             /** Version */
             version: number;
+            /** Doublon De */
+            doublon_de?: string | null;
         };
         /** Archive */
         Archive: {
@@ -5514,6 +5538,20 @@ export interface components {
             distinction: string;
             /** Points */
             points: number;
+        };
+        /** DocumentModeration */
+        DocumentModeration: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            /** Type */
+            type: string;
+            /** Octets */
+            octets: number;
         };
         /** DocumentRapport */
         DocumentRapport: {
@@ -8079,6 +8117,26 @@ export interface components {
             /** Doublons Probables */
             doublons_probables: string[];
         };
+        /** RapportModeration */
+        RapportModeration: {
+            /** Reference */
+            reference: string | null;
+            /** Modele */
+            modele: string;
+            /** Periode */
+            periode: string | null;
+            /** Type Activite */
+            type_activite: string | null;
+            doublon_de: components["schemas"]["RapportVoisin"] | null;
+            /** Doublons Probables */
+            doublons_probables: components["schemas"]["RapportVoisin"][];
+            /** Documents */
+            documents: components["schemas"]["DocumentModeration"][];
+            /** Points Auteur */
+            points_auteur: number | null;
+            /** Points Club */
+            points_club: number | null;
+        };
         /** RapportResume */
         RapportResume: {
             /**
@@ -8116,6 +8174,19 @@ export interface components {
             doublon_de: string | null;
             /** Lectures */
             lectures: components["schemas"]["Lecture"][];
+        };
+        /** RapportVoisin */
+        RapportVoisin: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Reference */
+            reference: string;
+            etat: components["schemas"]["EtatContenu"];
+            /** Titre */
+            titre: string;
         };
         /** RefusDemandeEntree */
         RefusDemandeEntree: {
@@ -16207,6 +16278,36 @@ export interface operations {
                 contenu_id: string;
                 photo_id: string;
                 taille: "grande" | "vignette";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_document_api_admin_rapports__contenu_id__documents__piece_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+                piece_id: string;
             };
             cookie?: never;
         };

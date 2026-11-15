@@ -11,6 +11,8 @@ Motif = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, ma
 
 class ApprobationEntree(BaseModel):
     version: int
+    # Spec 038 : approuver un rapport comme doublon d'un rapport approuvé du même club (aucun point).
+    doublon_de: UUID | None = None
 
 
 class DecisionModerationEntree(BaseModel):
@@ -105,3 +107,38 @@ class ApercuModeration(ElementFile):
     photos_publiees: list[PhotoModeration]
     decisions: list[DecisionPassee]
     fiche_actuelle: FicheActuelle | None = None
+    # Spec 038 : ce qui est propre à un rapport (référence, période, documents, doublons, points prévus).
+    rapport: RapportModeration | None = None
+
+
+# Rapports (spec 038) -------------------------------------------------------------------------------------------
+
+
+class RapportVoisin(BaseModel):
+    id: UUID
+    reference: str
+    etat: EtatContenu
+    titre: str
+
+
+class DocumentModeration(BaseModel):
+    id: UUID
+    nom: str
+    type: str
+    octets: int
+
+
+class RapportModeration(BaseModel):
+    reference: str | None
+    modele: str
+    periode: str | None
+    type_activite: str | None
+    doublon_de: RapportVoisin | None
+    doublons_probables: list[RapportVoisin]
+    documents: list[DocumentModeration]
+    # Ce que l'approbation créditerait au barème actuel ; rien pour un président (auteur) ni pour un doublon.
+    points_auteur: int | None
+    points_club: int | None
+
+
+ApercuModeration.model_rebuild()

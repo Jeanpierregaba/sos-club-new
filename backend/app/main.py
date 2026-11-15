@@ -46,6 +46,7 @@ from app.points.router import router_classements, router_palmares
 from app.quiz.router import router as router_quiz
 from app.quiz.router_banque import router_banque as router_quiz_banque
 from app.rapports.router import router as router_rapports
+from app.rapports.router_admin import router_admin as router_rapports_admin
 from app.referentiel.router import router_admin as router_referentiel_admin
 from app.referentiel.router import router_public as router_referentiel
 from app.visiteurs.router import router as router_visiteurs
@@ -108,6 +109,7 @@ api.include_router(router_quiz_banque)
 api.include_router(router_bibliotheque_gestion)
 api.include_router(router_bibliotheque)
 api.include_router(router_rapports)
+api.include_router(router_rapports_admin)
 api.include_router(router_certification)
 api.include_router(router_certificats)
 api.include_router(router_certification_gestion)

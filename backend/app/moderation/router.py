@@ -68,7 +68,9 @@ async def approuver(
     contenu_id: UUID, entree: ApprobationEntree, request: Request, db: Base, acces: Decideur
 ) -> ApercuModeration:
     with _traduire():
-        await decisions.approuver(db, acces, contenu_id, entree.version, adresse_ip(request))
+        await decisions.approuver(
+            db, acces, contenu_id, entree.version, adresse_ip(request), doublon_de=entree.doublon_de
+        )
         return await decisions.apercu(db, acces, contenu_id)
 
 
