@@ -39,6 +39,18 @@ class TypeContenu:
     points_permis: Callable[[AsyncSession, Contenu], Awaitable[bool]] | None = None
     # Appelée à la première approbation, dans la transaction de la décision (notifier l'auteur de l'article…).
     a_la_publication: Callable[[AsyncSession, Contenu], Awaitable[None]] | None = None
+    # Spec 038 (rapports) ------------------------------------------------------------------------------------------
+    # La fin de la notification d'approbation : « est approuvé » plutôt que « est publié » pour un contenu privé.
+    avis_approbation: str | None = None
+    # Remplace le crédit par défaut (`actions_auteur`, clé `<type>:<contenu>`) à la première approbation : reçoit le
+    # modérateur, pour des clés et des bénéficiaires propres au type (club, mois, semestre).
+    crediter: Callable[[AsyncSession, Contenu, UUID], Awaitable[None]] | None = None
+    # L'approbation « comme doublon » d'un autre contenu : vérifie et enregistre le lien, avant le crédit.
+    lier_doublon: Callable[[AsyncSession, Contenu, UUID], Awaitable[None]] | None = None
+    # Les autres destinataires des notifications de soumission et de décision (encadreurs du club…).
+    destinataires: Callable[[AsyncSession, Contenu], Awaitable[list[UUID]]] | None = None
+    # Le nombre de contenus de ce type qu'un auteur peut avoir en attente de modération.
+    max_en_attente: int = 3
 
 
 TYPES: dict[str, TypeContenu] = {}

@@ -251,3 +251,32 @@ class Remplacement(BaseModel):
 
     version: Version
     cible_id: UUID
+
+
+# Types d'activité des rapports (spec 038) ---------------------------------------------------------------------
+
+
+class TypeActivitePublic(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    code: str
+    libelle: str
+
+
+class TypeActiviteAdmin(TypeActivitePublic):
+    ordre: int
+    actif: bool
+    version: int
+
+
+class TypeActiviteCreation(_Entree):
+    code: Annotated[str, Field(min_length=2, max_length=40, pattern=FORMAT_CODE)]
+    libelle: Annotated[str, Field(min_length=2, max_length=120), AfterValidator(nettoyer)]
+    ordre: int | None = Field(default=None, ge=1, le=99)
+
+
+class TypeActiviteModification(_Entree):
+    version: Version
+    libelle: Annotated[str, Field(min_length=2, max_length=120), AfterValidator(nettoyer)] | None = None
+    ordre: int | None = Field(default=None, ge=1, le=99)
+    actif: bool | None = None

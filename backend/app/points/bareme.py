@@ -139,6 +139,12 @@ EN_SERVICE: frozenset[str] = frozenset(
         CERTIFICATION_ENCADREUR,
         # Spec 036 : la correction manuelle, utilisée par le registre admin.
         ACTION_CORRECTION,
+        # Spec 038 : les rapports d'activité, mensuels et bilans, pour l'encadreur et le compte collectif du club.
+        "encadreur.rapport_activite",
+        "encadreur.rapport_mensuel",
+        "encadreur.bilan_semestriel",
+        "club.rapport_activite",
+        "club.bilan_semestriel",
     }
 )
 

@@ -543,3 +543,39 @@ def test_une_ecriture_concurrente_entre_lecture_et_ecriture_est_refusee() -> Non
     import asyncio
 
     assert asyncio.run(scenario()) == (409, "Second")
+
+
+TYPES_ACTIVITE = "/api/admin/referentiel/types-activite"
+
+
+def test_les_types_dactivite_se_lisent_mais_ne_se_changent_pas_sans_le_super_admin(
+    gestionnaire_national: TestClient,
+) -> None:
+    assert gestionnaire_national.get(TYPES_ACTIVITE).status_code == 200
+    assert gestionnaire_national.post(TYPES_ACTIVITE, json={"code": "xx", "libelle": "XX"}).status_code == 403
+
+
+def test_les_types_dactivite_des_rapports_se_gerent_comme_les_axes(super_admin: TestClient, en_base: Any) -> None:
+    """Spec 038 : liste fermée, modifiable par le super-administrateur, journalisée ; jamais vide."""
+    cree = super_admin.post(TYPES_ACTIVITE, json={"code": "forum-sante", "libelle": "Forum santé"})
+    assert cree.status_code == 201, cree.text
+    assert super_admin.post(TYPES_ACTIVITE, json={"code": "forum-sante", "libelle": "Autre"}).status_code == 409
+    assert super_admin.post(TYPES_ACTIVITE, json={"code": "autre-code", "libelle": "Forum santé"}).status_code == 409
+
+    types = super_admin.get(TYPES_ACTIVITE).json()
+    for element in types[:-1]:
+        reponse = super_admin.patch(
+            f"{TYPES_ACTIVITE}/{element['code']}", json={"version": element["version"], "actif": False}
+        )
+        assert reponse.status_code == 200, reponse.text
+    dernier = types[-1]
+    reponse = super_admin.patch(
+        f"{TYPES_ACTIVITE}/{dernier['code']}", json={"version": dernier["version"], "actif": False}
+    )
+    assert reponse.status_code == 400
+    journal = en_base(
+        lambda db: db.scalar(
+            select(func.count()).select_from(JournalAudit).where(JournalAudit.cible_type == "type_activite")
+        )
+    )
+    assert journal == len(types)

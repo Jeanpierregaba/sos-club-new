@@ -33,6 +33,9 @@ from app.referentiel.schemas import (
     IesgModification,
     PageEtablissements,
     Remplacement,
+    TypeActiviteAdmin,
+    TypeActiviteCreation,
+    TypeActiviteModification,
 )
 
 Base = Annotated[AsyncSession, Depends(get_session)]
@@ -198,3 +201,27 @@ async def admin_modifier_axe(
 ) -> AxeAdmin:
     async with _traduire_refus(db, request, acces, "referentiel:administrer"):
         return await administration.modifier_axe(db, acces, code, entree, adresse_ip(request))
+
+
+# Types d'activité des rapports (spec 038) : paramètres nationaux, comme les axes.
+
+
+@router_admin.get("/types-activite")
+async def admin_lister_types_activite(_: Lecteur, db: Base) -> list[TypeActiviteAdmin]:
+    return await administration.lister_types_activite(db)
+
+
+@router_admin.post("/types-activite", status_code=status.HTTP_201_CREATED)
+async def admin_creer_type_activite(
+    entree: TypeActiviteCreation, request: Request, acces: SuperAdmin, db: Base
+) -> TypeActiviteAdmin:
+    async with _traduire_refus(db, request, acces, "referentiel:administrer"):
+        return await administration.creer_type_activite(db, acces, entree, adresse_ip(request))
+
+
+@router_admin.patch("/types-activite/{code}")
+async def admin_modifier_type_activite(
+    code: str, entree: TypeActiviteModification, request: Request, acces: SuperAdmin, db: Base
+) -> TypeActiviteAdmin:
+    async with _traduire_refus(db, request, acces, "referentiel:administrer"):
+        return await administration.modifier_type_activite(db, acces, code, entree, adresse_ip(request))

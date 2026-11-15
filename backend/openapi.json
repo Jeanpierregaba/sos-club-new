@@ -2691,6 +2691,122 @@
         }
       }
     },
+    "/api/admin/referentiel/types-activite": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Lister Types Activite",
+        "operationId": "admin_lister_types_activite_api_admin_referentiel_types_activite_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TypeActiviteAdmin"
+                  },
+                  "type": "array",
+                  "title": "Response Admin Lister Types Activite Api Admin Referentiel Types Activite Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Creer Type Activite",
+        "operationId": "admin_creer_type_activite_api_admin_referentiel_types_activite_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TypeActiviteCreation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TypeActiviteAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/referentiel/types-activite/{code}": {
+      "patch": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Modifier Type Activite",
+        "operationId": "admin_modifier_type_activite_api_admin_referentiel_types_activite__code__patch",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TypeActiviteModification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TypeActiviteAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/points/semestres": {
       "get": {
         "tags": [
@@ -4827,7 +4943,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VersionEntree"
+                "$ref": "#/components/schemas/app__articles__schemas__VersionEntree"
               }
             }
           }
@@ -4880,7 +4996,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VersionEntree"
+                "$ref": "#/components/schemas/app__articles__schemas__VersionEntree"
               }
             }
           }
@@ -7438,7 +7554,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VersionEntree"
+                "$ref": "#/components/schemas/app__articles__schemas__VersionEntree"
               }
             }
           }
@@ -7491,7 +7607,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VersionEntree"
+                "$ref": "#/components/schemas/app__articles__schemas__VersionEntree"
               }
             }
           }
@@ -10422,6 +10538,605 @@
         }
       }
     },
+    "/api/rapports": {
+      "get": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Lister",
+        "operationId": "lister_api_rapports_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MesRapports"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Creer",
+        "operationId": "creer_api_rapports_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Creation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RapportDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rapports/types-activite": {
+      "get": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Types Activite",
+        "operationId": "types_activite_api_rapports_types_activite_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TypeActivite"
+                  },
+                  "type": "array",
+                  "title": "Response Types Activite Api Rapports Types Activite Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rapports/{contenu_id}": {
+      "get": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Lire",
+        "operationId": "lire_api_rapports__contenu_id__get",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RapportDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Modifier",
+        "operationId": "modifier_api_rapports__contenu_id__put",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Modification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RapportDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Supprimer",
+        "operationId": "supprimer_api_rapports__contenu_id__delete",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rapports/{contenu_id}/soumission": {
+      "post": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Soumettre",
+        "operationId": "soumettre_api_rapports__contenu_id__soumission_post",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__rapports__schemas__VersionEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RapportDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rapports/{contenu_id}/documents": {
+      "post": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Ajouter Document",
+        "operationId": "ajouter_document_api_rapports__contenu_id__documents_post",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_ajouter_document_api_rapports__contenu_id__documents_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RapportDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rapports/{contenu_id}/documents/{piece_id}": {
+      "delete": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Retirer Document",
+        "operationId": "retirer_document_api_rapports__contenu_id__documents__piece_id__delete",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          },
+          {
+            "name": "piece_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Piece Id"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RapportDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Lire Document",
+        "operationId": "lire_document_api_rapports__contenu_id__documents__piece_id__get",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          },
+          {
+            "name": "piece_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Piece Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rapports/{contenu_id}/photos": {
+      "post": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Ajouter Photo",
+        "operationId": "ajouter_photo_api_rapports__contenu_id__photos_post",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_ajouter_photo_api_rapports__contenu_id__photos_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RapportDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rapports/{contenu_id}/photos/{photo_id}": {
+      "delete": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Retirer Photo",
+        "operationId": "retirer_photo_api_rapports__contenu_id__photos__photo_id__delete",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          },
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Photo Id"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RapportDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rapports/{contenu_id}/photos/{photo_id}/{taille}": {
+      "get": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Lire Photo",
+        "operationId": "lire_photo_api_rapports__contenu_id__photos__photo_id___taille__get",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          },
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Photo Id"
+            }
+          },
+          {
+            "name": "taille",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "grande",
+                "vignette"
+              ],
+              "type": "string",
+              "title": "Taille"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/certification": {
       "get": {
         "tags": [
@@ -12262,6 +12977,25 @@
         ],
         "title": "Bibliotheque"
       },
+      "Body_ajouter_document_api_rapports__contenu_id__documents_post": {
+        "properties": {
+          "fichier": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Fichier"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fichier",
+          "version"
+        ],
+        "title": "Body_ajouter_document_api_rapports__contenu_id__documents_post"
+      },
       "Body_ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post": {
         "properties": {
           "fichier": {
@@ -12343,6 +13077,42 @@
           "version"
         ],
         "title": "Body_ajouter_photo_api_mes_articles__contenu_id__photos_post"
+      },
+      "Body_ajouter_photo_api_rapports__contenu_id__photos_post": {
+        "properties": {
+          "fichier": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Fichier"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "attestation": {
+            "type": "boolean",
+            "title": "Attestation",
+            "default": false
+          },
+          "legende": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Legende"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fichier",
+          "version"
+        ],
+        "title": "Body_ajouter_photo_api_rapports__contenu_id__photos_post"
       },
       "Body_deposer_couverture_api_admin_bibliotheque__ressource_id__couverture_put": {
         "properties": {
@@ -14082,6 +14852,25 @@
         ],
         "title": "ClubPublic"
       },
+      "ClubRapport": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom"
+        ],
+        "title": "ClubRapport"
+      },
       "ClubResume": {
         "properties": {
           "id": {
@@ -14930,6 +15719,19 @@
         "title": "CorrectionReponse",
         "description": "La correction de la question à laquelle le joueur vient de répondre (quiz des jeux, 2026-11-10). Elle n'arrive\nqu'après sa réponse : la question en cours ne porte jamais la sienne (ADR-0004)."
       },
+      "Creation": {
+        "properties": {
+          "modele": {
+            "$ref": "#/components/schemas/ModeleRapport"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "modele"
+        ],
+        "title": "Creation"
+      },
       "DecisionEntree": {
         "properties": {
           "version": {
@@ -15007,6 +15809,42 @@
           "decide_le"
         ],
         "title": "DecisionPassee"
+      },
+      "DecisionRapport": {
+        "properties": {
+          "decision": {
+            "type": "string",
+            "title": "Decision"
+          },
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          },
+          "decide_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Decide Le"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "decision",
+          "motif",
+          "decide_le",
+          "version"
+        ],
+        "title": "DecisionRapport"
       },
       "DecisionSignalementEntree": {
         "properties": {
@@ -15331,6 +16169,35 @@
           "points"
         ],
         "title": "Distinction"
+      },
+      "DocumentRapport": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "octets": {
+            "type": "integer",
+            "title": "Octets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "type",
+          "octets"
+        ],
+        "title": "DocumentRapport"
       },
       "DreAdmin": {
         "properties": {
@@ -19231,6 +20098,32 @@
         ],
         "title": "LaureatPublic"
       },
+      "Lecture": {
+        "properties": {
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "consulte_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consulte Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "nom",
+          "consulte_le"
+        ],
+        "title": "Lecture"
+      },
       "LigneBaremeAdmin": {
         "properties": {
           "code": {
@@ -20197,6 +21090,63 @@
           "commentaires"
         ],
         "title": "MesCommentaires"
+      },
+      "MesRapports": {
+        "properties": {
+          "rapports": {
+            "items": {
+              "$ref": "#/components/schemas/RapportResume"
+            },
+            "type": "array",
+            "title": "Rapports"
+          },
+          "club": {
+            "$ref": "#/components/schemas/ClubRapport"
+          },
+          "modeles": {
+            "items": {
+              "$ref": "#/components/schemas/ModeleRapport"
+            },
+            "type": "array",
+            "title": "Modeles"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rapports",
+          "club",
+          "modeles"
+        ],
+        "title": "MesRapports"
+      },
+      "ModeleRapport": {
+        "type": "string",
+        "enum": [
+          "activite",
+          "mensuel",
+          "bilan"
+        ],
+        "title": "ModeleRapport"
+      },
+      "Modification": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "donnees": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Donnees"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version",
+          "donnees"
+        ],
+        "title": "Modification"
       },
       "ModuleCatalogue": {
         "properties": {
@@ -21552,6 +22502,32 @@
           "hauteur"
         ],
         "title": "PhotoPublique"
+      },
+      "PhotoRapport": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "legende": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Legende"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "legende"
+        ],
+        "title": "PhotoRapport"
       },
       "PlaceParcours": {
         "properties": {
@@ -23047,6 +24023,302 @@
           "classe"
         ],
         "title": "RangPersonnel"
+      },
+      "RapportDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "modele": {
+            "$ref": "#/components/schemas/ModeleRapport"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "brouillon",
+              "soumis",
+              "a_corriger",
+              "approuve",
+              "refuse"
+            ],
+            "title": "Etat"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "periode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Periode"
+          },
+          "club": {
+            "$ref": "#/components/schemas/ClubRapport"
+          },
+          "auteur": {
+            "type": "string",
+            "title": "Auteur"
+          },
+          "mien": {
+            "type": "boolean",
+            "title": "Mien"
+          },
+          "soumis_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soumis Le"
+          },
+          "modifie_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Modifie Le"
+          },
+          "points": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points"
+          },
+          "doublon_de": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doublon De"
+          },
+          "lectures": {
+            "items": {
+              "$ref": "#/components/schemas/Lecture"
+            },
+            "type": "array",
+            "title": "Lectures"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "donnees": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Donnees"
+          },
+          "photos": {
+            "items": {
+              "$ref": "#/components/schemas/PhotoRapport"
+            },
+            "type": "array",
+            "title": "Photos"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentRapport"
+            },
+            "type": "array",
+            "title": "Documents"
+          },
+          "historique": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionRapport"
+            },
+            "type": "array",
+            "title": "Historique"
+          },
+          "modifiable": {
+            "type": "boolean",
+            "title": "Modifiable"
+          },
+          "doublons_probables": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Doublons Probables"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "modele",
+          "reference",
+          "etat",
+          "titre",
+          "periode",
+          "club",
+          "auteur",
+          "mien",
+          "soumis_le",
+          "modifie_le",
+          "points",
+          "doublon_de",
+          "lectures",
+          "version",
+          "donnees",
+          "photos",
+          "documents",
+          "historique",
+          "modifiable",
+          "doublons_probables"
+        ],
+        "title": "RapportDetail"
+      },
+      "RapportResume": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "modele": {
+            "$ref": "#/components/schemas/ModeleRapport"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "brouillon",
+              "soumis",
+              "a_corriger",
+              "approuve",
+              "refuse"
+            ],
+            "title": "Etat"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "periode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Periode"
+          },
+          "club": {
+            "$ref": "#/components/schemas/ClubRapport"
+          },
+          "auteur": {
+            "type": "string",
+            "title": "Auteur"
+          },
+          "mien": {
+            "type": "boolean",
+            "title": "Mien"
+          },
+          "soumis_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soumis Le"
+          },
+          "modifie_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Modifie Le"
+          },
+          "points": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points"
+          },
+          "doublon_de": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doublon De"
+          },
+          "lectures": {
+            "items": {
+              "$ref": "#/components/schemas/Lecture"
+            },
+            "type": "array",
+            "title": "Lectures"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "modele",
+          "reference",
+          "etat",
+          "titre",
+          "periode",
+          "club",
+          "auteur",
+          "mien",
+          "soumis_le",
+          "modifie_le",
+          "points",
+          "doublon_de",
+          "lectures"
+        ],
+        "title": "RapportResume"
       },
       "RefusDemandeEntree": {
         "properties": {
@@ -24859,6 +26131,146 @@
         ],
         "title": "TitulaireEncadreur"
       },
+      "TypeActivite": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "libelle"
+        ],
+        "title": "TypeActivite"
+      },
+      "TypeActiviteAdmin": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "ordre": {
+            "type": "integer",
+            "title": "Ordre"
+          },
+          "actif": {
+            "type": "boolean",
+            "title": "Actif"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "libelle",
+          "ordre",
+          "actif",
+          "version"
+        ],
+        "title": "TypeActiviteAdmin"
+      },
+      "TypeActiviteCreation": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 2,
+            "pattern": "^[a-z0-9-]+$",
+            "title": "Code"
+          },
+          "libelle": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Libelle"
+          },
+          "ordre": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 99.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ordre"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "libelle"
+        ],
+        "title": "TypeActiviteCreation"
+      },
+      "TypeActiviteModification": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "libelle": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120,
+                "minLength": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Libelle"
+          },
+          "ordre": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 99.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ordre"
+          },
+          "actif": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actif"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "TypeActiviteModification"
+      },
       "TypeDecision": {
         "type": "string",
         "enum": [
@@ -24974,19 +26386,6 @@
         ],
         "title": "Verification"
       },
-      "VersionEntree": {
-        "properties": {
-          "version": {
-            "type": "integer",
-            "title": "Version"
-          }
-        },
-        "type": "object",
-        "required": [
-          "version"
-        ],
-        "title": "VersionEntree"
-      },
       "app__admin__schemas__ActivationEntree": {
         "properties": {
           "jeton": {
@@ -25015,6 +26414,19 @@
           "mot_de_passe"
         ],
         "title": "ActivationEntree"
+      },
+      "app__articles__schemas__VersionEntree": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "VersionEntree"
       },
       "app__clubs__schemas__ActivationEntree": {
         "properties": {
@@ -25053,6 +26465,20 @@
         "additionalProperties": false,
         "type": "object",
         "title": "ActivationEntree"
+      },
+      "app__rapports__schemas__VersionEntree": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "VersionEntree"
       }
     }
   }

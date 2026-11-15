@@ -24,6 +24,7 @@ from app.eleves import pseudonyme
 from app.eleves.models import Classe, Eleve
 from app.main import app
 from app.points import bareme
+from app.rapports.models import charger_types
 from app.referentiel.chargement import charger
 from app.referentiel.models import Dre, Etablissement, Iesg
 
@@ -59,6 +60,8 @@ async def _vider_tables() -> None:
         await connexion.run_sync(lambda c: charger(c, etablissements=False))
         # Le barème initial (spec 017) : chaque gain de points y lit son montant.
         await connexion.run_sync(bareme.charger)
+        # Les types d'activité des rapports (spec 038).
+        await connexion.run_sync(charger_types)
 
 
 async def _charger_annuaire() -> None:

@@ -291,7 +291,7 @@ async def _adresse_libre(db: AsyncSession, titre: str) -> str:
     return adresse
 
 
-def _consigner(
+async def _consigner(
     db: AsyncSession,
     acces: Acces,
     contenu: Contenu,
@@ -316,6 +316,13 @@ def _consigner(
     notifier(
         db, contenu.auteur_id, f"{contenu.type}_{type_avis}", titre_avis, motif, type_contenu.lien_auteur(contenu.id)
     )
+    if type_contenu.destinataires is not None:
+        for destinataire in await type_contenu.destinataires(db, contenu):
+            if destinataire != contenu.auteur_id:
+                notifier(
+                    db, destinataire, f"{contenu.type}_{type_avis}", titre_avis, motif,
+                    type_contenu.lien_auteur(contenu.id),
+                )  # fmt: skip
     details: dict[str, Any] = {"version": version.numero}
     if motif:
         details["motif"] = motif
@@ -325,9 +332,16 @@ def _consigner(
     )  # fmt: skip
 
 
-async def approuver(db: AsyncSession, acces: Acces, contenu_id: UUID, version: int, ip: str) -> None:
+async def approuver(
+    db: AsyncSession, acces: Acces, contenu_id: UUID, version: int, ip: str, *, doublon_de: UUID | None = None
+) -> None:
     contenu = await _a_decider(db, acces, contenu_id, version)
     _en_attente(contenu)
+    if doublon_de is not None:
+        lier = type_de(contenu.type).lier_doublon
+        if lier is None:
+            raise Refus("Ce contenu ne s'approuve pas comme doublon.", 422)
+        await lier(db, contenu, doublon_de)
     auteur = await db.get(Utilisateur, contenu.auteur_id, with_for_update=True, populate_existing=True)
     assert auteur is not None
     if auteur.statut is not StatutCompte.actif:
@@ -364,16 +378,19 @@ async def approuver(db: AsyncSession, acces: Acces, contenu_id: UUID, version: i
     # Les points à la première approbation seulement (jamais pour une révision ni une republication), et une seule
     # ligne par contenu grâce à la clé.
     action = type_contenu.actions_auteur.get(auteur.role)
-    if action and premiere and (type_contenu.points_permis is None or await type_contenu.points_permis(db, contenu)):
+    if premiere and type_contenu.crediter is not None:
+        await type_contenu.crediter(db, contenu, acces.utilisateur.id)
+    elif action and premiere and (type_contenu.points_permis is None or await type_contenu.points_permis(db, contenu)):
         await points.crediter(db, action, auteur.id, f"{contenu.type}:{contenu.id}", valide_par=acces.utilisateur.id)
     if premiere and type_contenu.a_la_publication is not None:
         await type_contenu.a_la_publication(db, contenu)
     titre_avis = (
         f"Ta nouvelle version de « {titre} » est en ligne"
         if revision
-        else f"{type_contenu.determinant} {type_contenu.libelle} « {titre} » est publié{type_contenu.accord}"
+        else f"{type_contenu.determinant} {type_contenu.libelle} « {titre} » "
+        f"{type_contenu.avis_approbation or 'est publié' + type_contenu.accord}"
     )
-    _consigner(db, acces, contenu, travail, TypeDecision.approuver, None, ip, titre_avis, "approuve")
+    await _consigner(db, acces, contenu, travail, TypeDecision.approuver, None, ip, titre_avis, "approuve")
     await db.commit()
 
 
@@ -388,7 +405,7 @@ async def demander_correction(
     titre = type_de(contenu.type).titre(travail.donnees)
     travail.etat = EtatVersion.a_corriger
     contenu.etat = EtatContenu.a_corriger
-    _consigner(
+    await _consigner(
         db, acces, contenu, travail, TypeDecision.corriger, motif, ip, f"« {titre} » est à corriger", "a_corriger"
     )
     await db.commit()
@@ -408,7 +425,7 @@ async def refuser(db: AsyncSession, acces: Acces, contenu_id: UUID, version: int
     else:
         contenu.etat = EtatContenu.refuse
         titre_avis = f"« {titre} » n'a pas été retenu"
-    _consigner(db, acces, contenu, travail, TypeDecision.refuser, motif, ip, titre_avis, "refuse")
+    await _consigner(db, acces, contenu, travail, TypeDecision.refuser, motif, ip, titre_avis, "refuse")
     await db.commit()
 
 
@@ -438,7 +455,7 @@ async def depublier(db: AsyncSession, acces: Acces, contenu_id: UUID, version: i
             )
     contenu.version_publiee_id = None
     contenu.etat = EtatContenu.depublie
-    _consigner(
+    await _consigner(
         db, acces, contenu, publiee, TypeDecision.depublier, motif, ip, f"« {titre} » a été retiré du site", "depublie"
     )
     await db.commit()

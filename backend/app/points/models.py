@@ -249,7 +249,8 @@ class MouvementPoints(Base):
         # La part du club (spec 034, ADR-0012) : toujours la moitié du gain de l'élève, en demi-points entiers.
         CheckConstraint("(club_id IS NULL) = (demi_points_club IS NULL)", name="club_et_part"),
         CheckConstraint(
-            "demi_points_club IS NULL OR demi_points_club = montant OR utilisateur_id IS NULL", name="part_du_club_moitie"
+            "demi_points_club IS NULL OR demi_points_club = montant OR utilisateur_id IS NULL",
+            name="part_du_club_moitie",
         ),
         # Une ligne du compte collectif (spec 038) : sans personne, pour une action du club, au double en demi-points.
         CheckConstraint(

@@ -888,6 +888,41 @@ export interface paths {
         patch: operations["admin_modifier_axe_api_admin_referentiel_axes__code__patch"];
         trace?: never;
     };
+    "/api/admin/referentiel/types-activite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Lister Types Activite */
+        get: operations["admin_lister_types_activite_api_admin_referentiel_types_activite_get"];
+        put?: never;
+        /** Admin Creer Type Activite */
+        post: operations["admin_creer_type_activite_api_admin_referentiel_types_activite_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/referentiel/types-activite/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Admin Modifier Type Activite */
+        patch: operations["admin_modifier_type_activite_api_admin_referentiel_types_activite__code__patch"];
+        trace?: never;
+    };
     "/api/admin/points/semestres": {
         parameters: {
             query?: never;
@@ -3422,6 +3457,163 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/rapports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister */
+        get: operations["lister_api_rapports_get"];
+        put?: never;
+        /** Creer */
+        post: operations["creer_api_rapports_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/rapports/types-activite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Types Activite */
+        get: operations["types_activite_api_rapports_types_activite_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/rapports/{contenu_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire */
+        get: operations["lire_api_rapports__contenu_id__get"];
+        /** Modifier */
+        put: operations["modifier_api_rapports__contenu_id__put"];
+        post?: never;
+        /** Supprimer */
+        delete: operations["supprimer_api_rapports__contenu_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/rapports/{contenu_id}/soumission": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Soumettre */
+        post: operations["soumettre_api_rapports__contenu_id__soumission_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/rapports/{contenu_id}/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ajouter Document */
+        post: operations["ajouter_document_api_rapports__contenu_id__documents_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/rapports/{contenu_id}/documents/{piece_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire Document */
+        get: operations["lire_document_api_rapports__contenu_id__documents__piece_id__get"];
+        put?: never;
+        post?: never;
+        /** Retirer Document */
+        delete: operations["retirer_document_api_rapports__contenu_id__documents__piece_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/rapports/{contenu_id}/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ajouter Photo */
+        post: operations["ajouter_photo_api_rapports__contenu_id__photos_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/rapports/{contenu_id}/photos/{photo_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Retirer Photo */
+        delete: operations["retirer_photo_api_rapports__contenu_id__photos__photo_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/rapports/{contenu_id}/photos/{photo_id}/{taille}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire Photo */
+        get: operations["lire_photo_api_rapports__contenu_id__photos__photo_id___taille__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/certification": {
         parameters: {
             query?: never;
@@ -4139,6 +4331,13 @@ export interface components {
             ressources: components["schemas"]["RessourcePublique"][];
             chiffres: components["schemas"]["Chiffres"];
         };
+        /** Body_ajouter_document_api_rapports__contenu_id__documents_post */
+        Body_ajouter_document_api_rapports__contenu_id__documents_post: {
+            /** Fichier */
+            fichier: string;
+            /** Version */
+            version: number;
+        };
         /** Body_ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post */
         Body_ajouter_photo_api_clubs_moi_actualites__contenu_id__photos_post: {
             /** Fichier */
@@ -4176,6 +4375,20 @@ export interface components {
              * @default false
              */
             couverture: boolean;
+        };
+        /** Body_ajouter_photo_api_rapports__contenu_id__photos_post */
+        Body_ajouter_photo_api_rapports__contenu_id__photos_post: {
+            /** Fichier */
+            fichier: string;
+            /** Version */
+            version: number;
+            /**
+             * Attestation
+             * @default false
+             */
+            attestation: boolean;
+            /** Legende */
+            legende?: string | null;
         };
         /** Body_deposer_couverture_api_admin_bibliotheque__ressource_id__couverture_put */
         Body_deposer_couverture_api_admin_bibliotheque__ressource_id__couverture_put: {
@@ -4821,6 +5034,16 @@ export interface components {
             /** Actif Le */
             actif_le: string | null;
         };
+        /** ClubRapport */
+        ClubRapport: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+        };
         /**
          * ClubResume
          * @description Le club de l'établissement de l'élève, vu par lui (spec 033).
@@ -5131,6 +5354,10 @@ export interface components {
             /** Choix Attendu */
             choix_attendu: number;
         };
+        /** Creation */
+        Creation: {
+            modele: components["schemas"]["ModeleRapport"];
+        };
         /** DecisionEntree */
         DecisionEntree: {
             /** Version */
@@ -5158,6 +5385,20 @@ export interface components {
              * Format: date-time
              */
             decide_le: string;
+        };
+        /** DecisionRapport */
+        DecisionRapport: {
+            /** Decision */
+            decision: string;
+            /** Motif */
+            motif: string | null;
+            /**
+             * Decide Le
+             * Format: date-time
+             */
+            decide_le: string;
+            /** Version */
+            version: number;
         };
         /** DecisionSignalementEntree */
         DecisionSignalementEntree: {
@@ -5273,6 +5514,20 @@ export interface components {
             distinction: string;
             /** Points */
             points: number;
+        };
+        /** DocumentRapport */
+        DocumentRapport: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            /** Type */
+            type: string;
+            /** Octets */
+            octets: number;
         };
         /** DreAdmin */
         DreAdmin: {
@@ -6500,6 +6755,13 @@ export interface components {
             /** Points */
             points: number;
         };
+        /** Lecture */
+        Lecture: {
+            /** Nom */
+            nom: string;
+            /** Consulte Le */
+            consulte_le: string | null;
+        };
         /** LigneBaremeAdmin */
         LigneBaremeAdmin: {
             /** Code */
@@ -6827,6 +7089,28 @@ export interface components {
         MesCommentaires: {
             /** Commentaires */
             commentaires: components["schemas"]["CommentaireAuteur"][];
+        };
+        /** MesRapports */
+        MesRapports: {
+            /** Rapports */
+            rapports: components["schemas"]["RapportResume"][];
+            club: components["schemas"]["ClubRapport"];
+            /** Modeles */
+            modeles: components["schemas"]["ModeleRapport"][];
+        };
+        /**
+         * ModeleRapport
+         * @enum {string}
+         */
+        ModeleRapport: "activite" | "mensuel" | "bilan";
+        /** Modification */
+        Modification: {
+            /** Version */
+            version: number;
+            /** Donnees */
+            donnees: {
+                [key: string]: unknown;
+            };
         };
         /** ModuleCatalogue */
         ModuleCatalogue: {
@@ -7308,6 +7592,16 @@ export interface components {
             /** Hauteur */
             hauteur: number;
         };
+        /** PhotoRapport */
+        PhotoRapport: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Legende */
+            legende: string | null;
+        };
         /** PlaceParcours */
         PlaceParcours: {
             /** Place */
@@ -7730,6 +8024,98 @@ export interface components {
             rang_national: number | null;
             /** Classe */
             classe: boolean;
+        };
+        /** RapportDetail */
+        RapportDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            modele: components["schemas"]["ModeleRapport"];
+            /** Reference */
+            reference: string | null;
+            /**
+             * Etat
+             * @enum {string}
+             */
+            etat: "brouillon" | "soumis" | "a_corriger" | "approuve" | "refuse";
+            /** Titre */
+            titre: string;
+            /** Periode */
+            periode: string | null;
+            club: components["schemas"]["ClubRapport"];
+            /** Auteur */
+            auteur: string;
+            /** Mien */
+            mien: boolean;
+            /** Soumis Le */
+            soumis_le: string | null;
+            /**
+             * Modifie Le
+             * Format: date-time
+             */
+            modifie_le: string;
+            /** Points */
+            points: number | null;
+            /** Doublon De */
+            doublon_de: string | null;
+            /** Lectures */
+            lectures: components["schemas"]["Lecture"][];
+            /** Version */
+            version: number;
+            /** Donnees */
+            donnees: {
+                [key: string]: unknown;
+            };
+            /** Photos */
+            photos: components["schemas"]["PhotoRapport"][];
+            /** Documents */
+            documents: components["schemas"]["DocumentRapport"][];
+            /** Historique */
+            historique: components["schemas"]["DecisionRapport"][];
+            /** Modifiable */
+            modifiable: boolean;
+            /** Doublons Probables */
+            doublons_probables: string[];
+        };
+        /** RapportResume */
+        RapportResume: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            modele: components["schemas"]["ModeleRapport"];
+            /** Reference */
+            reference: string | null;
+            /**
+             * Etat
+             * @enum {string}
+             */
+            etat: "brouillon" | "soumis" | "a_corriger" | "approuve" | "refuse";
+            /** Titre */
+            titre: string;
+            /** Periode */
+            periode: string | null;
+            club: components["schemas"]["ClubRapport"];
+            /** Auteur */
+            auteur: string;
+            /** Mien */
+            mien: boolean;
+            /** Soumis Le */
+            soumis_le: string | null;
+            /**
+             * Modifie Le
+             * Format: date-time
+             */
+            modifie_le: string;
+            /** Points */
+            points: number | null;
+            /** Doublon De */
+            doublon_de: string | null;
+            /** Lectures */
+            lectures: components["schemas"]["Lecture"][];
         };
         /** RefusDemandeEntree */
         RefusDemandeEntree: {
@@ -8393,6 +8779,46 @@ export interface components {
             initiale: string;
             fonction: components["schemas"]["Fonction"];
         };
+        /** TypeActivite */
+        TypeActivite: {
+            /** Code */
+            code: string;
+            /** Libelle */
+            libelle: string;
+        };
+        /** TypeActiviteAdmin */
+        TypeActiviteAdmin: {
+            /** Code */
+            code: string;
+            /** Libelle */
+            libelle: string;
+            /** Ordre */
+            ordre: number;
+            /** Actif */
+            actif: boolean;
+            /** Version */
+            version: number;
+        };
+        /** TypeActiviteCreation */
+        TypeActiviteCreation: {
+            /** Code */
+            code: string;
+            /** Libelle */
+            libelle: string;
+            /** Ordre */
+            ordre?: number | null;
+        };
+        /** TypeActiviteModification */
+        TypeActiviteModification: {
+            /** Version */
+            version: number;
+            /** Libelle */
+            libelle?: string | null;
+            /** Ordre */
+            ordre?: number | null;
+            /** Actif */
+            actif?: boolean | null;
+        };
         /**
          * TypeDecision
          * @enum {string}
@@ -8436,11 +8862,6 @@ export interface components {
             /** Remplace Par */
             remplace_par: string | null;
         };
-        /** VersionEntree */
-        VersionEntree: {
-            /** Version */
-            version: number;
-        };
         /** ActivationEntree */
         app__admin__schemas__ActivationEntree: {
             /** Jeton */
@@ -8449,6 +8870,11 @@ export interface components {
             identifiant: string;
             /** Mot De Passe */
             mot_de_passe: string;
+        };
+        /** VersionEntree */
+        app__articles__schemas__VersionEntree: {
+            /** Version */
+            version: number;
         };
         /** ActivationEntree */
         app__clubs__schemas__ActivationEntree: {
@@ -8459,6 +8885,11 @@ export interface components {
         app__encadreurs__schemas__ActivationEntree: {
             /** Version */
             version?: number | null;
+        };
+        /** VersionEntree */
+        app__rapports__schemas__VersionEntree: {
+            /** Version */
+            version: number;
         };
     };
     responses: never;
@@ -10179,6 +10610,94 @@ export interface operations {
             };
         };
     };
+    admin_lister_types_activite_api_admin_referentiel_types_activite_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeActiviteAdmin"][];
+                };
+            };
+        };
+    };
+    admin_creer_type_activite_api_admin_referentiel_types_activite_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TypeActiviteCreation"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeActiviteAdmin"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_modifier_type_activite_api_admin_referentiel_types_activite__code__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TypeActiviteModification"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeActiviteAdmin"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     lister_semestres_api_admin_points_semestres_get: {
         parameters: {
             query?: never;
@@ -11536,7 +12055,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VersionEntree"];
+                "application/json": components["schemas"]["app__articles__schemas__VersionEntree"];
             };
         };
         responses: {
@@ -11571,7 +12090,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VersionEntree"];
+                "application/json": components["schemas"]["app__articles__schemas__VersionEntree"];
             };
         };
         responses: {
@@ -13377,7 +13896,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VersionEntree"];
+                "application/json": components["schemas"]["app__articles__schemas__VersionEntree"];
             };
         };
         responses: {
@@ -13412,7 +13931,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VersionEntree"];
+                "application/json": components["schemas"]["app__articles__schemas__VersionEntree"];
             };
         };
         responses: {
@@ -15286,6 +15805,408 @@ export interface operations {
             path: {
                 ressource_id: string;
                 taille: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lister_api_rapports_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MesRapports"];
+                };
+            };
+        };
+    };
+    creer_api_rapports_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Creation"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RapportDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    types_activite_api_rapports_types_activite_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TypeActivite"][];
+                };
+            };
+        };
+    };
+    lire_api_rapports__contenu_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RapportDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modifier_api_rapports__contenu_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Modification"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RapportDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    supprimer_api_rapports__contenu_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    soumettre_api_rapports__contenu_id__soumission_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__rapports__schemas__VersionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RapportDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ajouter_document_api_rapports__contenu_id__documents_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_ajouter_document_api_rapports__contenu_id__documents_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RapportDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_document_api_rapports__contenu_id__documents__piece_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+                piece_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retirer_document_api_rapports__contenu_id__documents__piece_id__delete: {
+        parameters: {
+            query: {
+                version: number;
+            };
+            header?: never;
+            path: {
+                contenu_id: string;
+                piece_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RapportDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ajouter_photo_api_rapports__contenu_id__photos_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_ajouter_photo_api_rapports__contenu_id__photos_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RapportDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retirer_photo_api_rapports__contenu_id__photos__photo_id__delete: {
+        parameters: {
+            query: {
+                version: number;
+            };
+            header?: never;
+            path: {
+                contenu_id: string;
+                photo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RapportDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_photo_api_rapports__contenu_id__photos__photo_id___taille__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+                photo_id: string;
+                taille: "grande" | "vignette";
             };
             cookie?: never;
         };

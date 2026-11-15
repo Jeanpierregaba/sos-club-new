@@ -2,7 +2,7 @@
 
 Passer à un stockage S3 revient à écrire une seconde implémentation de `Stockage` : les domaines ne connaissent
 que `enregistrer`, `lire`, `lire_par_morceaux` et `supprimer`. Les clés sont toujours tirées par l'API
-(`photos/<uuid>-<taille>.webp`, `ressources/<uuid>-document.pdf`) : aucun nom choisi par un utilisateur n'arrive sur
+(`photos/<uuid>-<taille>.webp`, `ressources/<uuid>-document.pdf`, `rapports/<uuid>-document.docx`) : aucun nom choisi par un utilisateur n'arrive sur
 le disque.
 """
 
@@ -16,7 +16,7 @@ from typing import Protocol
 
 from app.config import settings
 
-FORMAT_CLE = re.compile(r"^[a-z]+/[0-9a-f-]{36}-[a-z]+\.(webp|pdf)$")
+FORMAT_CLE = re.compile(r"^[a-z]+/[0-9a-f-]{36}-[a-z]+\.(webp|pdf|docx)$")
 
 
 class CleInvalide(ValueError):

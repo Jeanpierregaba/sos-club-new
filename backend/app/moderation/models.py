@@ -46,6 +46,10 @@ class TypeDecision(StrEnum):
     depublier = "depublier"
 
 
+# Les rapports (spec 038) : privés, approuvés sans adresse publique.
+RAPPORTS = "'rapport_activite', 'rapport_mensuel', 'bilan_semestriel'"
+
+
 def _enum_texte(enum: type[StrEnum], nom: str) -> Enum:
     return Enum(enum, name=nom, native_enum=False, create_constraint=True, length=20)
 
@@ -57,11 +61,14 @@ class Contenu(Suivi, Base):
         # Un commentaire (spec 025) n'en a pas : il se lit sous son article.
         # Une proposition de fiche (spec 026) non plus : elle s'applique à la fiche du club.
         CheckConstraint(
-            "version_publiee_id IS NULL OR adresse IS NOT NULL OR parent_id IS NOT NULL OR type = 'fiche_club'",
+            "version_publiee_id IS NULL OR adresse IS NOT NULL OR parent_id IS NOT NULL"
+            f" OR type IN ('fiche_club', {RAPPORTS})",
             name="adresse_si_publie",
         ),
-        # Les contenus du club (spec 026), et eux seuls, portent leur club.
-        CheckConstraint("(type IN ('actualite', 'fiche_club')) = (club_id IS NOT NULL)", name="contenu_du_club"),
+        # Les contenus du club (spec 026) et les rapports (spec 038), et eux seuls, portent leur club.
+        CheckConstraint(
+            f"(type IN ('actualite', 'fiche_club', {RAPPORTS})) = (club_id IS NOT NULL)", name="contenu_du_club"
+        ),
         # Un commentaire, et lui seul, a un contenu parent : son article.
         CheckConstraint("(type = 'commentaire') = (parent_id IS NOT NULL)", name="commentaire_a_un_parent"),
         # Un contenu refusé, dépublié ou retiré n'a plus de version en ligne ; un contenu « publié » en a toujours une.

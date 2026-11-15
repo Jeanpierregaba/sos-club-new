@@ -23,6 +23,7 @@ from app.comptes.models import StatutCompte, Utilisateur
 from app.comptes.service import VIOLATION_UNICITE
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur
+from app.rapports.models import TypeActivite
 from app.referentiel.models import (
     Axe,
     Dre,
@@ -48,6 +49,9 @@ from app.referentiel.schemas import (
     IesgModification,
     PageEtablissements,
     Remplacement,
+    TypeActiviteAdmin,
+    TypeActiviteCreation,
+    TypeActiviteModification,
 )
 from app.referentiel.service import filtrer_par_mots
 
@@ -61,6 +65,8 @@ DOUBLONS = {
     "uq_etablissement_iesg_id_nom_normalise": "Un établissement du même nom existe déjà dans cette IESG.",
     "pk_axe": "Ce code d'axe existe déjà.",
     "uq_axe_libelle_normalise": "Un axe du même libellé existe déjà.",
+    "pk_type_activite": "Ce code de type d'activité existe déjà.",
+    "uq_type_activite_libelle": "Un type d'activité du même libellé existe déjà.",
 }
 
 
@@ -607,3 +613,48 @@ async def modifier_axe(db: AsyncSession, acces: Acces, code: str, entree: AxeMod
         _journaliser(db, acces, "axe", axe.code, "national", avant, apres, ip=ip)
     await db.commit()
     return AxeAdmin.model_validate(axe)
+
+
+# Types d'activité des rapports (spec 038) ---------------------------------------------------------------------
+
+
+async def lister_types_activite(db: AsyncSession) -> list[TypeActiviteAdmin]:
+    types = await db.scalars(select(TypeActivite).order_by(TypeActivite.ordre, TypeActivite.code))
+    return [TypeActiviteAdmin.model_validate(t) for t in types.all()]
+
+
+async def creer_type_activite(
+    db: AsyncSession, acces: Acces, entree: TypeActiviteCreation, ip: str
+) -> TypeActiviteAdmin:
+    if await db.get(TypeActivite, entree.code) is not None:
+        raise Refus(DOUBLONS["pk_type_activite"], 409)
+    element = TypeActivite(
+        code=entree.code,
+        libelle=entree.libelle,
+        ordre=entree.ordre or await _prochain_ordre(db, TypeActivite.ordre),
+        actif=True,
+    )
+    db.add(element)
+    await _ecrire(db)
+    apres = {"code": element.code, "libelle": element.libelle, "ordre": element.ordre}
+    _journaliser(db, acces, "type_activite", element.code, "national", {}, apres, ip=ip, creation=True)
+    await db.commit()
+    return TypeActiviteAdmin.model_validate(element)
+
+
+async def modifier_type_activite(
+    db: AsyncSession, acces: Acces, code: str, entree: TypeActiviteModification, ip: str
+) -> TypeActiviteAdmin:
+    element = await _obtenir(db, TypeActivite, code)
+    _verifier_version(element, entree.version)
+    changements = _changements(entree)
+    if changements.get("actif") is False and element.actif:
+        autres = await db.scalar(select(func.count()).where(TypeActivite.actif, TypeActivite.code != code))
+        if not autres:
+            raise Refus("Il faut garder au moins un type d'activité actif.")
+    avant, apres = _appliquer(element, changements)
+    await _ecrire(db)
+    if apres:
+        _journaliser(db, acces, "type_activite", element.code, "national", avant, apres, ip=ip)
+    await db.commit()
+    return TypeActiviteAdmin.model_validate(element)

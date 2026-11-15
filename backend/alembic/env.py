@@ -17,6 +17,7 @@ import app.moderation.models
 import app.notifications.models
 import app.points.models
 import app.quiz.models
+import app.rapports.models
 import app.referentiel.models
 import app.visiteurs.models  # noqa: F401
 from alembic import context

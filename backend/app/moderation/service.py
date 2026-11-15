@@ -183,9 +183,10 @@ async def soumettre(db: AsyncSession, contenu: Contenu, auteur: Utilisateur, adr
         .where(Contenu.auteur_id == auteur.id, Contenu.type == contenu.type, Contenu.etat == EtatContenu.en_attente)
     )
     # Compté par type : des commentaires en attente ne bloquent pas un article, et l'inverse.
-    if (en_attente or 0) >= MAX_EN_ATTENTE:
+    plafond = type_de(contenu.type).max_en_attente
+    if (en_attente or 0) >= plafond:
         raise Refus(
-            f"Tu as déjà {MAX_EN_ATTENTE} {type_de(contenu.type).libelle}s en attente de modération : attends une "
+            f"Tu as déjà {plafond} {type_de(contenu.type).libelle}s en attente de modération : attends une "
             "décision avant d'en envoyer un autre.",
             409,
         )
