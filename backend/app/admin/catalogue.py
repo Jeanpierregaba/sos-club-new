@@ -52,7 +52,8 @@ MODULES: dict[str, tuple[str, bool, tuple[Action, ...]]] = {
     "clubs": ("Clubs et DRE", True, (C, CR, M, A)),
     "contenus": ("Contenus et rubriques", False, (C, CR, M, S, A, D)),
     "agenda": ("Agenda et campagnes", False, (C, CR, M, S, A, D)),
-    "rapports": ("Rapports d'activités", False, (C, A)),
+    # Archive des rapports (spec 038) : les décisions passent par la modération ; ici, lire et exporter.
+    "rapports": ("Rapports d'activités", True, (C, E)),
     "quiz": ("Quiz et certification", True, (C, CR, M, S, A, D)),
     # Bibliothèque (spec 028) : publiée à deux personnes, comme les quiz.
     "bibliotheque": ("Bibliothèque", True, (C, CR, M, S, A, D)),
@@ -92,6 +93,9 @@ SENSIBLES: frozenset[tuple[str, Action]] = frozenset(
         ("clubs", C),
         ("clubs", A),
         ("recompenses", A),
+        # L'archive des rapports (spec 038) montre le nom complet des encadreurs auteurs.
+        ("rapports", C),
+        ("rapports", E),
     }
 )
 
@@ -131,7 +135,8 @@ _PREPARER_BIBLIOTHEQUE = {("bibliotheque", C), ("bibliotheque", CR), ("bibliothe
 # Préréglages : le super-administrateur ajuste ensuite la grille.
 DROITS_DES_ROLES: dict[RoleDepart, set[tuple[str, Action]]] = {
     RoleDepart.admin_national: tous_les_droits(),
-    RoleDepart.moderateur: _TABLEAU | {("moderation", C), ("moderation", A), ("moderation", D), ("contenus", C)},
+    RoleDepart.moderateur: _TABLEAU
+    | {("moderation", C), ("moderation", A), ("moderation", D), ("contenus", C), ("rapports", C)},
     RoleDepart.gestionnaire_contenus: _TABLEAU
     | {("contenus", C), ("contenus", CR), ("contenus", M), ("contenus", S)}
     | _PREPARER_BIBLIOTHEQUE,

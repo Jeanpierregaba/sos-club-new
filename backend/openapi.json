@@ -11163,6 +11163,43 @@
         }
       }
     },
+    "/api/rapports/{contenu_id}/export.pdf": {
+      "get": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Exporter Pdf",
+        "description": "Le PDF d'un rapport approuvé, pour ses lecteurs ; il n'est jamais stocké.",
+        "operationId": "exporter_pdf_api_rapports__contenu_id__export_pdf_get",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/rapports/{contenu_id}/documents/{piece_id}": {
       "get": {
         "tags": [
@@ -11190,6 +11227,359 @@
               "type": "string",
               "format": "uuid",
               "title": "Piece Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/rapports": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister",
+        "operationId": "lister_api_admin_rapports_get",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "modele",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ModeleRapport"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Modele"
+            }
+          },
+          {
+            "name": "etat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "soumis",
+                    "a_corriger",
+                    "approuve",
+                    "refuse"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Etat"
+            }
+          },
+          {
+            "name": "club_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Club Id"
+            }
+          },
+          {
+            "name": "dre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 30
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dre"
+            }
+          },
+          {
+            "name": "recherche",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Recherche"
+            }
+          },
+          {
+            "name": "du",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Du"
+            }
+          },
+          {
+            "name": "au",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Au"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageArchive"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/rapports/export.csv": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Exporter Csv",
+        "operationId": "exporter_csv_api_admin_rapports_export_csv_get",
+        "parameters": [
+          {
+            "name": "modele",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ModeleRapport"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Modele"
+            }
+          },
+          {
+            "name": "etat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "soumis",
+                    "a_corriger",
+                    "approuve",
+                    "refuse"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Etat"
+            }
+          },
+          {
+            "name": "club_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Club Id"
+            }
+          },
+          {
+            "name": "dre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 30
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dre"
+            }
+          },
+          {
+            "name": "recherche",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Recherche"
+            }
+          },
+          {
+            "name": "du",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Du"
+            }
+          },
+          {
+            "name": "au",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Au"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/rapports/{contenu_id}/export.pdf": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Exporter Pdf",
+        "operationId": "exporter_pdf_api_admin_rapports__contenu_id__export_pdf_get",
+        "parameters": [
+          {
+            "name": "contenu_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Contenu Id"
             }
           }
         ],
@@ -20248,6 +20638,140 @@
         ],
         "title": "Lecture"
       },
+      "LigneArchive": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "modele": {
+            "$ref": "#/components/schemas/ModeleRapport"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "brouillon",
+              "soumis",
+              "a_corriger",
+              "approuve",
+              "refuse"
+            ],
+            "title": "Etat"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "club": {
+            "$ref": "#/components/schemas/ClubRapport"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "auteur": {
+            "type": "string",
+            "title": "Auteur"
+          },
+          "periode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Periode"
+          },
+          "type_activite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type Activite"
+          },
+          "soumis_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soumis Le"
+          },
+          "points_auteur": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points Auteur"
+          },
+          "points_club": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points Club"
+          },
+          "doublon_de": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doublon De"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "reference",
+          "modele",
+          "etat",
+          "titre",
+          "club",
+          "dre",
+          "auteur",
+          "periode",
+          "type_activite",
+          "soumis_le",
+          "points_auteur",
+          "points_club",
+          "doublon_de"
+        ],
+        "title": "LigneArchive"
+      },
       "LigneBaremeAdmin": {
         "properties": {
           "code": {
@@ -21726,6 +22250,37 @@
         ],
         "title": "OrdreEnseignement",
         "description": "L'ordre d'enseignement de la liste nationale (spec 035)."
+      },
+      "PageArchive": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "rapports": {
+            "items": {
+              "$ref": "#/components/schemas/LigneArchive"
+            },
+            "type": "array",
+            "title": "Rapports"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "page",
+          "par_page",
+          "rapports"
+        ],
+        "title": "PageArchive"
       },
       "PageEtablissements": {
         "properties": {

@@ -3634,6 +3634,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/rapports/{contenu_id}/export.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Exporter Pdf
+         * @description Le PDF d'un rapport approuvé, pour ses lecteurs ; il n'est jamais stocké.
+         */
+        get: operations["exporter_pdf_api_rapports__contenu_id__export_pdf_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/rapports/{contenu_id}/documents/{piece_id}": {
         parameters: {
             query?: never;
@@ -3647,6 +3667,57 @@ export interface paths {
          *     collaborateur, le rapport n'existe pas.
          */
         get: operations["lire_document_api_admin_rapports__contenu_id__documents__piece_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/rapports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister */
+        get: operations["lister_api_admin_rapports_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/rapports/export.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Exporter Csv */
+        get: operations["exporter_csv_api_admin_rapports_export_csv_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/rapports/{contenu_id}/export.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Exporter Pdf */
+        get: operations["exporter_pdf_api_admin_rapports__contenu_id__export_pdf_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6820,6 +6891,41 @@ export interface components {
             /** Consulte Le */
             consulte_le: string | null;
         };
+        /** LigneArchive */
+        LigneArchive: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Reference */
+            reference: string | null;
+            modele: components["schemas"]["ModeleRapport"];
+            /**
+             * Etat
+             * @enum {string}
+             */
+            etat: "brouillon" | "soumis" | "a_corriger" | "approuve" | "refuse";
+            /** Titre */
+            titre: string;
+            club: components["schemas"]["ClubRapport"];
+            /** Dre */
+            dre: string;
+            /** Auteur */
+            auteur: string;
+            /** Periode */
+            periode: string | null;
+            /** Type Activite */
+            type_activite: string | null;
+            /** Soumis Le */
+            soumis_le: string | null;
+            /** Points Auteur */
+            points_auteur: number | null;
+            /** Points Club */
+            points_club: number | null;
+            /** Doublon De */
+            doublon_de: string | null;
+        };
         /** LigneBaremeAdmin */
         LigneBaremeAdmin: {
             /** Code */
@@ -7325,6 +7431,17 @@ export interface components {
          * @enum {string}
          */
         OrdreEnseignement: "public" | "prive_laic" | "prive_catholique" | "prive_protestant" | "prive_islamique" | "communautaire";
+        /** PageArchive */
+        PageArchive: {
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Par Page */
+            par_page: number;
+            /** Rapports */
+            rapports: components["schemas"]["LigneArchive"][];
+        };
         /** PageEtablissements */
         PageEtablissements: {
             /** Total */
@@ -16361,6 +16478,35 @@ export interface operations {
             };
         };
     };
+    exporter_pdf_api_rapports__contenu_id__export_pdf_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     lire_document_api_admin_rapports__contenu_id__documents__piece_id__get: {
         parameters: {
             query?: never;
@@ -16368,6 +16514,108 @@ export interface operations {
             path: {
                 contenu_id: string;
                 piece_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lister_api_admin_rapports_get: {
+        parameters: {
+            query?: {
+                page?: number;
+                modele?: components["schemas"]["ModeleRapport"] | null;
+                etat?: ("soumis" | "a_corriger" | "approuve" | "refuse") | null;
+                club_id?: string | null;
+                dre?: string | null;
+                recherche?: string | null;
+                du?: string | null;
+                au?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageArchive"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    exporter_csv_api_admin_rapports_export_csv_get: {
+        parameters: {
+            query?: {
+                modele?: components["schemas"]["ModeleRapport"] | null;
+                etat?: ("soumis" | "a_corriger" | "approuve" | "refuse") | null;
+                club_id?: string | null;
+                dre?: string | null;
+                recherche?: string | null;
+                du?: string | null;
+                au?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    exporter_pdf_api_admin_rapports__contenu_id__export_pdf_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contenu_id: string;
             };
             cookie?: never;
         };

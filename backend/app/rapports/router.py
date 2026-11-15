@@ -21,8 +21,8 @@ from app.db import get_session
 from app.fichiers import reponse
 from app.moderation.service import Introuvable
 from app.points.models import Semestre
-from app.points.service import aujourd_hui
-from app.rapports import pieces, service
+from app.points.service import aujourd_hui, maintenant
+from app.rapports import export_pdf, pieces, service
 from app.rapports import types as _types  # noqa: F401 : déclare les trois types au moteur de modération
 from app.rapports.models import PieceRapport
 from app.rapports.schemas import (
@@ -195,3 +195,24 @@ async def lire_photo(
     with _traduire():
         octets = await pieces.lire_photo(db, utilisateur, contenu_id, photo_id, taille)
     return reponse.image(octets, publique=False)
+
+
+@router.get("/{contenu_id}/export.pdf", response_class=Response)
+async def exporter_pdf(contenu_id: UUID, utilisateur: Connecte, db: Base) -> Response:
+    """Le PDF d'un rapport approuvé, pour ses lecteurs ; il n'est jamais stocké."""
+    with _traduire():
+        rapport = await service.pour_export(db, utilisateur, contenu_id)
+    return pdf_de(rapport)
+
+
+def pdf_de(rapport: RapportDetail) -> Response:
+    octets = export_pdf.generer(rapport, maintenant())
+    return Response(
+        content=octets,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{rapport.reference or "rapport"}.pdf"',
+            "Cache-Control": "private, no-store",
+            "X-Content-Type-Options": "nosniff",
+        },
+    )

@@ -218,3 +218,27 @@ class SemestreRapport(BaseModel):
     libelle: str
     debut: date
     fin: date
+
+
+class LigneArchive(BaseModel):
+    id: UUID
+    reference: str | None
+    modele: ModeleRapport
+    etat: EtatRapport
+    titre: str
+    club: ClubRapport
+    dre: str
+    auteur: str
+    periode: str | None
+    type_activite: str | None
+    soumis_le: datetime | None
+    points_auteur: int | None
+    points_club: int | None
+    doublon_de: str | None
+
+
+class PageArchive(BaseModel):
+    total: int
+    page: int
+    par_page: int
+    rapports: list[LigneArchive]

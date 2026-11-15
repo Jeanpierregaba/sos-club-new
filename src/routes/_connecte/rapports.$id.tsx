@@ -12,6 +12,7 @@ import {
   chargerSemestresRapport,
   chargerTypesActivite,
   urlDocumentRapport,
+  urlPdfRapport,
   urlPhotoRapport,
 } from "@/lib/api/client";
 import { dateCourte } from "@/lib/dates";
@@ -141,9 +142,13 @@ function Rapport() {
               </ul>
             )}
             {rapport.etat === "approuve" && (
-              <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                <Download className="size-4" /> L'export PDF du rapport arrive avec l'archive.
-              </p>
+              <a
+                href={urlPdfRapport(rapport.id)}
+                download
+                className="inline-flex items-center gap-2 font-bold text-logo-blue hover:underline"
+              >
+                <Download className="size-4" /> Télécharger le rapport en PDF
+              </a>
             )}
           </section>
         )}

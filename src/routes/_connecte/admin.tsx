@@ -10,11 +10,12 @@ import {
 import {
   Award,
   Brain,
+  ClipboardList,
   Download,
   ExternalLink,
   Flag,
-  LibraryBig,
   LayoutDashboard,
+  LibraryBig,
   LogOut,
   MapPinned,
   Menu,
@@ -129,6 +130,12 @@ function entrees(admin: AdminMoi): Entree[] {
       i: Flag,
       visible: peut(admin, "clubs", "consulter"),
       compteur: admin.clubs_a_valider ?? 0,
+    },
+    {
+      to: "/admin/rapports",
+      libelle: "Rapports",
+      i: ClipboardList,
+      visible: peut(admin, "rapports", "consulter"),
     },
     { to: "/admin/exports", libelle: "Exports", i: Download, visible: peutExporter(admin) },
     {

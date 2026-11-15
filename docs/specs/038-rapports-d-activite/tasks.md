@@ -36,10 +36,10 @@ le bilan (13 et 14), l'archive et les exports (15 à 17).
 
 ## Archive et exports
 
-- [ ] 15. Archive admin : - module de droits `rapports` (consulter, exporter) au catalogue, et rôle modérateur ; - `GET /api/admin/rapports` filtrable, périmètre DRE ; écran `admin/rapports` ; tests.
-- [ ] 16. Export PDF d'un rapport approuvé (auteur, lecteurs du club, admin) avec son historique ; refus pour un
+- [x] 15. Archive admin : - module de droits `rapports` (consulter, exporter) au catalogue, et rôle modérateur ; - `GET /api/admin/rapports` filtrable, périmètre DRE ; écran `admin/rapports` ; tests.
+- [x] 16. Export PDF d'un rapport approuvé (auteur, lecteurs du club, admin) avec son historique ; refus pour un
       rapport non approuvé ; tests.
-- [ ] 17. Export CSV de l'archive : - sans nom ni identifiant d'élève, limité au périmètre ; - journalisé ; tests.
+- [x] 17. Export CSV de l'archive : - sans nom ni identifiant d'élève, limité au périmètre ; - journalisé ; tests.
 
 ## Fin
 

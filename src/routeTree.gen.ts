@@ -48,6 +48,7 @@ import { Route as ConnecteAdminJournalRouteImport } from './routes/_connecte/adm
 import { Route as ConnecteAdminModerationRouteImport } from './routes/_connecte/admin/moderation'
 import { Route as ConnecteAdminPointsRouteImport } from './routes/_connecte/admin/points'
 import { Route as ConnecteAdminQuizRouteImport } from './routes/_connecte/admin/quiz'
+import { Route as ConnecteAdminRapportsRouteImport } from './routes/_connecte/admin/rapports'
 import { Route as ConnecteAdminReferentielRouteImport } from './routes/_connecte/admin/referentiel'
 import { Route as ConnecteMesArticlesIndexRouteImport } from './routes/_connecte/mes-articles.index'
 import { Route as ConnecteMesArticlesIdRouteImport } from './routes/_connecte/mes-articles.$id'
@@ -285,6 +286,11 @@ const ConnecteAdminPointsRoute = ConnecteAdminPointsRouteImport.update({
 const ConnecteAdminQuizRoute = ConnecteAdminQuizRouteImport.update({
   id: '/quiz',
   path: '/quiz',
+  getParentRoute: () => ConnecteAdminRoute,
+} as any)
+const ConnecteAdminRapportsRoute = ConnecteAdminRapportsRouteImport.update({
+  id: '/rapports',
+  path: '/rapports',
   getParentRoute: () => ConnecteAdminRoute,
 } as any)
 const ConnecteAdminReferentielRoute =
@@ -562,6 +568,7 @@ export interface FileRoutesByFullPath {
   '/admin/moderation': typeof ConnecteAdminModerationRoute
   '/admin/points': typeof ConnecteAdminPointsRouteWithChildren
   '/admin/quiz': typeof ConnecteAdminQuizRouteWithChildren
+  '/admin/rapports': typeof ConnecteAdminRapportsRoute
   '/admin/referentiel': typeof ConnecteAdminReferentielRouteWithChildren
   '/mes-articles/$id': typeof ConnecteMesArticlesIdRoute
   '/mes-articles/nouveau': typeof ConnecteMesArticlesNouveauRoute
@@ -638,6 +645,7 @@ export interface FileRoutesByTo {
   '/admin/exports': typeof ConnecteAdminExportsRoute
   '/admin/journal': typeof ConnecteAdminJournalRoute
   '/admin/moderation': typeof ConnecteAdminModerationRoute
+  '/admin/rapports': typeof ConnecteAdminRapportsRoute
   '/mes-articles/$id': typeof ConnecteMesArticlesIdRoute
   '/mes-articles/nouveau': typeof ConnecteMesArticlesNouveauRoute
   '/quiz/$id': typeof ConnecteQuizIdRoute
@@ -720,6 +728,7 @@ export interface FileRoutesById {
   '/_connecte/admin/moderation': typeof ConnecteAdminModerationRoute
   '/_connecte/admin/points': typeof ConnecteAdminPointsRouteWithChildren
   '/_connecte/admin/quiz': typeof ConnecteAdminQuizRouteWithChildren
+  '/_connecte/admin/rapports': typeof ConnecteAdminRapportsRoute
   '/_connecte/admin/referentiel': typeof ConnecteAdminReferentielRouteWithChildren
   '/_connecte/mes-articles/$id': typeof ConnecteMesArticlesIdRoute
   '/_connecte/mes-articles/nouveau': typeof ConnecteMesArticlesNouveauRoute
@@ -803,6 +812,7 @@ export interface FileRouteTypes {
     | '/admin/moderation'
     | '/admin/points'
     | '/admin/quiz'
+    | '/admin/rapports'
     | '/admin/referentiel'
     | '/mes-articles/$id'
     | '/mes-articles/nouveau'
@@ -879,6 +889,7 @@ export interface FileRouteTypes {
     | '/admin/exports'
     | '/admin/journal'
     | '/admin/moderation'
+    | '/admin/rapports'
     | '/mes-articles/$id'
     | '/mes-articles/nouveau'
     | '/quiz/$id'
@@ -960,6 +971,7 @@ export interface FileRouteTypes {
     | '/_connecte/admin/moderation'
     | '/_connecte/admin/points'
     | '/_connecte/admin/quiz'
+    | '/_connecte/admin/rapports'
     | '/_connecte/admin/referentiel'
     | '/_connecte/mes-articles/$id'
     | '/_connecte/mes-articles/nouveau'
@@ -1306,6 +1318,13 @@ declare module '@tanstack/react-router' {
       path: '/quiz'
       fullPath: '/admin/quiz'
       preLoaderRoute: typeof ConnecteAdminQuizRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
+    '/_connecte/admin/rapports': {
+      id: '/_connecte/admin/rapports'
+      path: '/rapports'
+      fullPath: '/admin/rapports'
+      preLoaderRoute: typeof ConnecteAdminRapportsRouteImport
       parentRoute: typeof ConnecteAdminRoute
     }
     '/_connecte/admin/referentiel': {
@@ -1708,6 +1727,7 @@ interface ConnecteAdminRouteChildren {
   ConnecteAdminModerationRoute: typeof ConnecteAdminModerationRoute
   ConnecteAdminPointsRoute: typeof ConnecteAdminPointsRouteWithChildren
   ConnecteAdminQuizRoute: typeof ConnecteAdminQuizRouteWithChildren
+  ConnecteAdminRapportsRoute: typeof ConnecteAdminRapportsRoute
   ConnecteAdminReferentielRoute: typeof ConnecteAdminReferentielRouteWithChildren
   ConnecteAdminIndexRoute: typeof ConnecteAdminIndexRoute
   ConnecteAdminCollaborateursIdRoute: typeof ConnecteAdminCollaborateursIdRoute
@@ -1728,6 +1748,7 @@ const ConnecteAdminRouteChildren: ConnecteAdminRouteChildren = {
   ConnecteAdminModerationRoute: ConnecteAdminModerationRoute,
   ConnecteAdminPointsRoute: ConnecteAdminPointsRouteWithChildren,
   ConnecteAdminQuizRoute: ConnecteAdminQuizRouteWithChildren,
+  ConnecteAdminRapportsRoute: ConnecteAdminRapportsRoute,
   ConnecteAdminReferentielRoute: ConnecteAdminReferentielRouteWithChildren,
   ConnecteAdminIndexRoute: ConnecteAdminIndexRoute,
   ConnecteAdminCollaborateursIdRoute: ConnecteAdminCollaborateursIdRoute,

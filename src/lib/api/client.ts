@@ -1067,3 +1067,17 @@ export const adminModifierTypeActivite = (code: string, entree: TypeActiviteModi
   envoyerJson<TypeActiviteAdmin>(`${REFERENTIEL}/types-activite/${code}`, entree, "PATCH");
 export type SemestreRapport = Schemas["SemestreRapport"];
 export const chargerSemestresRapport = () => requeteApi<SemestreRapport[]>(`${RAPPORTS}/semestres`);
+export type PageArchive = Schemas["PageArchive"];
+export type FiltresArchive = {
+  modele?: ModeleRapport | undefined;
+  etat?: "soumis" | "a_corriger" | "approuve" | "refuse" | undefined;
+  dre?: string | undefined;
+  recherche?: string | undefined;
+  page?: number | undefined;
+};
+export const adminArchiveRapports = (filtres: FiltresArchive) =>
+  requeteApi<PageArchive>(avecParametres("/api/admin/rapports", filtres));
+export const urlExportRapports = (filtres: FiltresArchive) =>
+  avecParametres("/api/admin/rapports/export.csv", { ...filtres, page: undefined });
+export const urlPdfRapport = (id: string) => `${RAPPORTS}/${id}/export.pdf`;
+export const urlPdfRapportAdmin = (id: string) => `/api/admin/rapports/${id}/export.pdf`;

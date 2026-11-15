@@ -504,3 +504,11 @@ async def soumettre(
         )  # fmt: skip
     await db.commit()
     return await detail(db, utilisateur, contenu, rapport, "auteur")
+
+
+async def pour_export(db: AsyncSession, utilisateur: Utilisateur, contenu_id: UUID) -> RapportDetail:
+    """Le rapport tel que son lecteur le voit, s'il est approuvé : seul un rapport approuvé s'exporte."""
+    contenu, rapport, lecteur = await _charger(db, utilisateur, contenu_id)
+    if contenu.etat is not EtatContenu.publie:
+        raise Refus("Seul un rapport approuvé s'exporte en PDF.", 409)
+    return await detail(db, utilisateur, contenu, rapport, lecteur)
