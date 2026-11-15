@@ -29,6 +29,7 @@ import {
   chargerMaGamification,
   chargerPointsDuClub,
   chargerEspaceEncadreur,
+  chargerMesRapports,
   chargerEspaceVisiteur,
   chargerMonClubSante,
   chargerMonClub,
@@ -95,15 +96,27 @@ export const Route = createFileRoute("/_connecte/mon-espace")({
         const encadreur = await chargerEspaceEncadreur();
         // Spec 033 : un encadreur vérifié est rattaché au club de son établissement, qu'il suit dans « Mon Club
         // Santé ».
-        const [monClubSante, pointsClub, classement] =
+        const [monClubSante, pointsClub, classement, rapports] =
           encadreur.etat === "actif"
             ? await Promise.all([
                 chargerMonClubSante().catch(() => null),
                 chargerPointsDuClub().catch(() => null),
                 chargerMonClassement().catch(() => null),
+                // Spec 038 : les rapports à finir ou à corriger, pour le bloc « À faire ».
+                chargerMesRapports()
+                  .then((r) => r.rapports.filter((x) => x.mien))
+                  .catch(() => null),
               ])
-            : [null, null, null];
-        return { eleve: null, club: null, encadreur, monClubSante, pointsClub, classement };
+            : [null, null, null, null];
+        return {
+          eleve: null,
+          club: null,
+          encadreur,
+          monClubSante,
+          pointsClub,
+          classement,
+          rapports,
+        };
       }
       if (context.moi.role === "visiteur") {
         return {
@@ -158,6 +171,7 @@ function MonEspace() {
         monClubSante={"monClubSante" in donnees ? donnees.monClubSante : null}
         pointsClub={"pointsClub" in donnees ? donnees.pointsClub : null}
         classement={"classement" in donnees ? donnees.classement : null}
+        rapports={"rapports" in donnees ? donnees.rapports : null}
       />
     );
   if ("visiteur" in donnees && donnees.visiteur)
@@ -287,6 +301,7 @@ function EspaceDeLEleve({
           nom={espace.pseudonyme}
           articles
           monClub={club.club?.president === true || club.affiliation?.etat === "active"}
+          rapports={club.club?.president === true}
         >
           {motDePasseChange && <MotDePasseChange />}
         </EnTeteEspace>

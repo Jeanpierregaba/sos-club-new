@@ -211,3 +211,10 @@ class MesRapports(BaseModel):
     rapports: list[RapportResume]
     club: ClubRapport
     modeles: list[ModeleRapport]
+
+
+class SemestreRapport(BaseModel):
+    id: UUID
+    libelle: str
+    debut: date
+    fin: date

@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import {
   Brain,
-  HeartPulse,
   CalendarRange,
+  ClipboardList,
+  HeartPulse,
   LogOut,
   MessageCircle,
   PenLine,
@@ -26,8 +27,11 @@ export function EnTeteEspace({
   articles = false,
   monClub = false,
   monClubSante = false,
+  rapports = false,
   children,
 }: {
+  // « Rapports » (spec 038) : l'encadreur vérifié d'un club, ou le président.
+  rapports?: boolean;
   nom: string;
   // « Mon Club Santé » (spec 033) : l'encadreur vérifié rattaché au club de son établissement.
   monClubSante?: boolean;
@@ -82,6 +86,14 @@ export function EnTeteEspace({
               className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
             >
               <Users className="size-4" /> Mon club
+            </Link>
+          )}
+          {rapports && (
+            <Link
+              to="/rapports"
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
+            >
+              <ClipboardList className="size-4" /> Rapports
             </Link>
           )}
           {articles && (

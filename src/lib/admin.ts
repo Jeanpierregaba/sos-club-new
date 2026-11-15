@@ -109,6 +109,22 @@ export const ACTIONS_JOURNAL: Record<string, string> = {
   cloture_validee: "Top 3 validé",
   validation_annulee: "Validation du Top 3 annulée",
   palmares_publie: "Palmarès publié",
+  // Rapports (spec 038).
+  ...Object.fromEntries(
+    (
+      [
+        ["rapport_activite", "Rapport d'activité"],
+        ["rapport_mensuel", "Rapport mensuel"],
+        ["bilan_semestriel", "Bilan semestriel"],
+      ] as const
+    ).flatMap(([code, libelle]) => [
+      [`${code}_soumis`, `${libelle} soumis`],
+      [`${code}_approuve`, `${libelle} approuvé`],
+      [`${code}_a_corriger`, `${libelle} à corriger`],
+      [`${code}_refuse`, `${libelle} refusé`],
+    ]),
+  ),
+  rapports_exportes: "Archive des rapports exportée",
 };
 
 const formatDate = new Intl.DateTimeFormat("fr-FR", {

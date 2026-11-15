@@ -9,6 +9,7 @@ from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Response, UploadFile, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.dependances import adresse_ip
@@ -19,10 +20,20 @@ from app.config import settings
 from app.db import get_session
 from app.fichiers import reponse
 from app.moderation.service import Introuvable
+from app.points.models import Semestre
+from app.points.service import aujourd_hui
 from app.rapports import pieces, service
 from app.rapports import types as _types  # noqa: F401 : déclare les trois types au moteur de modération
 from app.rapports.models import PieceRapport
-from app.rapports.schemas import Creation, MesRapports, Modification, RapportDetail, TypeActivite, VersionEntree
+from app.rapports.schemas import (
+    Creation,
+    MesRapports,
+    Modification,
+    RapportDetail,
+    SemestreRapport,
+    TypeActivite,
+    VersionEntree,
+)
 
 Base = Annotated[AsyncSession, Depends(get_session)]
 Connecte = Annotated[Utilisateur, Depends(utilisateur_courant)]
@@ -49,6 +60,15 @@ async def lister(utilisateur: Connecte, db: Base) -> MesRapports:
 @router.get("/types-activite")
 async def types_activite(_: Connecte, db: Base) -> list[TypeActivite]:
     return [TypeActivite(code=t.code, libelle=t.libelle) for t in await service.types_activite(db)]
+
+
+@router.get("/semestres")
+async def semestres(_: Connecte, db: Base) -> list[SemestreRapport]:
+    """Les semestres commencés, du plus récent au plus ancien : ceux qu'un bilan peut couvrir."""
+    lignes = await db.scalars(
+        select(Semestre).where(Semestre.debut <= aujourd_hui()).order_by(Semestre.debut.desc()).limit(6)
+    )
+    return [SemestreRapport(id=s.id, libelle=s.libelle, debut=s.debut, fin=s.fin) for s in lignes.all()]
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)

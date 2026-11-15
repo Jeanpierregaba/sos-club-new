@@ -723,10 +723,13 @@ export const deciderModeration = (
   decision: "approuver" | "corriger" | "refuser" | "depublier",
   version: number,
   motif?: string,
+  doublonDe?: string,
 ) =>
   envoyerJson<ApercuModeration>(
     `${MODERATION}/${id}/${decision}`,
-    decision === "approuver" ? { version } : { version, motif },
+    decision === "approuver"
+      ? { version, ...(doublonDe ? { doublon_de: doublonDe } : {}) }
+      : { version, motif },
   );
 
 // Centre de notifications (spec 023).
@@ -998,3 +1001,69 @@ export function deposerFichierRessource(
     requete.send(donnees);
   });
 }
+
+// Rapports d'activité, mensuels et bilans (spec 038) : privés, lus par l'auteur, les encadreurs du club et le
+// président (rapport d'activité). Les justificatifs se téléchargent en pièce jointe.
+export type ModeleRapport = Schemas["ModeleRapport"];
+export type RapportResume = Schemas["RapportResume"];
+export type RapportDetail = Schemas["RapportDetail"];
+export type MesRapports = Schemas["MesRapports"];
+export type TypeActivite = Schemas["TypeActivite"];
+export type RapportModeration = Schemas["RapportModeration"];
+export type TypeActiviteAdmin = Schemas["TypeActiviteAdmin"];
+export type TypeActiviteCreation = Schemas["TypeActiviteCreation"];
+export type TypeActiviteModification = Schemas["TypeActiviteModification"];
+export type SortePiece = "documents" | "photos";
+
+const RAPPORTS = "/api/rapports";
+export const chargerMesRapports = () => requeteApi<MesRapports>(RAPPORTS);
+export const chargerRapport = (id: string) => requeteApi<RapportDetail>(`${RAPPORTS}/${id}`);
+export const chargerTypesActivite = () => requeteApi<TypeActivite[]>(`${RAPPORTS}/types-activite`);
+export const creerRapport = (modele: ModeleRapport) =>
+  envoyerJson<RapportDetail>(RAPPORTS, { modele });
+export const modifierRapport = (id: string, version: number, donnees: Record<string, unknown>) =>
+  envoyerJson<RapportDetail>(`${RAPPORTS}/${id}`, { version, donnees }, "PUT");
+export const soumettreRapport = (id: string, version: number) =>
+  envoyerJson<RapportDetail>(`${RAPPORTS}/${id}/soumission`, { version });
+export const supprimerRapport = (id: string) =>
+  envoyerJson<void>(`${RAPPORTS}/${id}`, undefined, "DELETE");
+export const retirerPieceRapport = (
+  id: string,
+  sorte: SortePiece,
+  pieceId: string,
+  version: number,
+) =>
+  envoyerJson<RapportDetail>(
+    avecParametres(`${RAPPORTS}/${id}/${sorte}/${pieceId}`, { version }),
+    undefined,
+    "DELETE",
+  );
+export const urlDocumentRapport = (id: string, pieceId: string) =>
+  `${RAPPORTS}/${id}/documents/${pieceId}`;
+export const urlPhotoRapport = (id: string, photoId: string, taille: TaillePhoto) =>
+  `${RAPPORTS}/${id}/photos/${photoId}/${taille}`;
+export const urlDocumentModeration = (id: string, pieceId: string) =>
+  `/api/admin/rapports/${id}/documents/${pieceId}`;
+
+export async function envoyerPieceRapport(
+  id: string,
+  sorte: SortePiece,
+  entree: { fichier: File; version: number; legende?: string },
+): Promise<RapportDetail> {
+  const donnees = new FormData();
+  donnees.append("fichier", entree.fichier);
+  donnees.append("version", String(entree.version));
+  // L'attestation est cochée dans le formulaire avant que l'envoi d'une photo soit possible.
+  if (sorte === "photos") donnees.append("attestation", "true");
+  if (entree.legende?.trim()) donnees.append("legende", entree.legende.trim());
+  return requeteApi<RapportDetail>(`${RAPPORTS}/${id}/${sorte}`, { method: "POST", body: donnees });
+}
+
+export const adminListerTypesActivite = () =>
+  requeteApi<TypeActiviteAdmin[]>(`${REFERENTIEL}/types-activite`);
+export const adminCreerTypeActivite = (entree: TypeActiviteCreation) =>
+  envoyerJson<TypeActiviteAdmin>(`${REFERENTIEL}/types-activite`, entree);
+export const adminModifierTypeActivite = (code: string, entree: TypeActiviteModification) =>
+  envoyerJson<TypeActiviteAdmin>(`${REFERENTIEL}/types-activite/${code}`, entree, "PATCH");
+export type SemestreRapport = Schemas["SemestreRapport"];
+export const chargerSemestresRapport = () => requeteApi<SemestreRapport[]>(`${RAPPORTS}/semestres`);

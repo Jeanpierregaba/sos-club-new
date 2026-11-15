@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { ChoixEtablissement, type EtablissementChoisi } from "@/components/ChoixEtablissement";
 import { ResumeClubSante } from "@/components/clubs/MonClubSante";
+import { AFaireRapports } from "@/components/rapports/AFaireRapports";
 import { ClassementDuClub, RangsPersonnels } from "@/components/espace/MesClassements";
 import { PointsClub } from "@/components/espace/TableauAnnuel";
 import {
@@ -28,6 +29,7 @@ import {
   type ClassementPersonnel,
   type MonClubSante,
   type PointsDuClub,
+  type RapportResume,
 } from "@/lib/api/client";
 import { dateCourte } from "@/lib/dates";
 import { FONCTIONS, LIBELLES_VERIFICATION, libelleFonction } from "@/lib/fonctions";
@@ -40,7 +42,10 @@ export function EspaceEncadreur({
   monClubSante = null,
   pointsClub = null,
   classement = null,
+  rapports = null,
 }: {
+  // Spec 038 : les rapports de l'encadreur, pour le bloc « À faire ».
+  rapports?: RapportResume[] | null;
   espace: Espace;
   prenom: string;
   monClubSante?: MonClubSante | null;
@@ -60,6 +65,7 @@ export function EspaceEncadreur({
           articles={espace.etat === "actif"}
           monClub={monClubSante !== null && monClubSante.statut !== "en_constitution"}
           monClubSante={monClubSante !== null}
+          rapports={espace.etat === "actif" && monClubSante !== null}
         >
           {motDePasseChange && <MotDePasseChange />}
           {espace.etat === "en_attente" && <EnAttente espace={espace} />}
@@ -77,6 +83,7 @@ export function EspaceEncadreur({
           </div>
         )}
 
+        {rapports && <AFaireRapports rapports={rapports} />}
         {espace.etat === "actif" && espace.points && <CartesPoints points={espace.points} />}
         {classement && <RangsPersonnels classement={classement} />}
         {pointsClub && <PointsClub points={pointsClub} />}

@@ -14,6 +14,7 @@ const ONGLETS = [
   { to: "/admin/referentiel", libelle: "DRE et IESG", exact: true },
   { to: "/admin/referentiel/etablissements", libelle: "Établissements", exact: false },
   { to: "/admin/referentiel/axes", libelle: "Axes", exact: false },
+  { to: "/admin/referentiel/types-activite", libelle: "Types d'activité", exact: false },
 ] as const;
 
 function Referentiel() {

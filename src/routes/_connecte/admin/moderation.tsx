@@ -7,6 +7,7 @@ import { DialogueMotif } from "@/components/admin/DialogueMotif";
 import { EnTeteAdmin } from "@/components/admin/EnTeteAdmin";
 import { EtatContenu } from "@/components/articles/EtatContenu";
 import { TexteArticle } from "@/components/articles/TexteArticle";
+import { ChampsRapport } from "@/components/rapports/ChampsRapport";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -26,10 +27,14 @@ import {
   ErreurApi,
   MESSAGE_INDISPONIBLE,
   type ApercuModeration,
+  type ModeleRapport,
+  type RapportModeration,
+  urlDocumentModeration,
   urlPhotoModeration,
   type EtatContenu as Etat,
 } from "@/lib/api/client";
 import { dateCourte } from "@/lib/dates";
+import { MODELES } from "@/lib/rapports";
 
 type Recherche = {
   etat?: Etat | undefined;
@@ -40,17 +45,31 @@ type Recherche = {
 };
 type Decision = "corriger" | "refuser" | "depublier";
 // Les types du moteur de modération (specs 023, 025 et 026).
-type TypeContenu = "article" | "commentaire" | "actualite" | "fiche_club";
+type TypeContenu =
+  | "article"
+  | "commentaire"
+  | "actualite"
+  | "fiche_club"
+  | "rapport_activite"
+  | "rapport_mensuel"
+  | "bilan_semestriel";
 const TYPES: { code: TypeContenu; libelle: string }[] = [
   { code: "article", libelle: "Articles" },
   { code: "actualite", libelle: "Actualités des clubs" },
   { code: "fiche_club", libelle: "Fiches des clubs" },
   { code: "commentaire", libelle: "Commentaires" },
+  // Spec 038 : privés, approuvés sans publication.
+  { code: "rapport_activite", libelle: "Rapports d'activité" },
+  { code: "rapport_mensuel", libelle: "Rapports mensuels" },
+  { code: "bilan_semestriel", libelle: "Bilans semestriels" },
 ];
 const BADGES: Partial<Record<string, string>> = {
   commentaire: "Commentaire",
   actualite: "Actualité du club",
   fiche_club: "Fiche du club",
+  rapport_activite: "Rapport d'activité",
+  rapport_mensuel: "Rapport mensuel",
+  bilan_semestriel: "Bilan semestriel",
 };
 
 const ONGLETS: { etat: Etat; libelle: string }[] = [
@@ -329,6 +348,8 @@ function Apercu({
   const [erreur, setErreur] = useState<string | null>(null);
   const [approbation, setApprobation] = useState(false);
   const [decision, setDecision] = useState<Decision | null>(null);
+  // Spec 038 : approuver un rapport comme doublon d'un rapport approuvé du même club (aucun point).
+  const [doublonDe, setDoublonDe] = useState<{ id: string; reference: string } | null>(null);
 
   useEffect(() => {
     setApercu(null);
@@ -358,6 +379,7 @@ function Apercu({
   const commentaire = apercu?.type === "commentaire";
   // Une proposition de fiche (spec 026) : l'avant est la fiche actuelle du club, l'après la proposition.
   const fiche = apercu?.type === "fiche_club";
+  const rapport = apercu?.rapport ?? null;
   // En attente : la version soumise. Sinon : ce qui est en ligne (le modérateur qui dépublie lit ce qui est publié).
   const affichee = enAttente ? soumise : (publiee ?? soumise);
   // Les photos de la version affichée, et ce qui change par rapport à la version en ligne (spec 024).
@@ -389,7 +411,9 @@ function Apercu({
               ? "Commentaire"
               : fiche
                 ? `Fiche du ${apercu?.club?.nom ?? "club"}`
-                : (affichee?.["titre"] ?? "Aperçu")}
+                : rapport
+                  ? affichee?.["titre"] || MODELES[rapport.modele as ModeleRapport].libelle
+                  : (affichee?.["titre"] ?? "Aperçu")}
           </DialogTitle>
           <DialogDescription>
             {apercu
@@ -478,7 +502,25 @@ function Apercu({
               </section>
             )}
 
-            {fiche ? (
+            {rapport ? (
+              <>
+                <BlocRapport
+                  rapport={rapport}
+                  club={apercu.club?.nom ?? null}
+                  decideur={decideur && enAttente}
+                  onDoublon={(v) => {
+                    setDoublonDe(v);
+                    setApprobation(true);
+                  }}
+                />
+                <ChampsRapport
+                  modele={rapport.modele as ModeleRapport}
+                  donnees={affichee as unknown as Record<string, unknown>}
+                  documents={rapport.documents}
+                  urlDocument={(piece) => urlDocumentModeration(apercu.id, piece)}
+                />
+              </>
+            ) : fiche ? (
               <FicheAvantApres
                 avant={apercu.fiche_actuelle}
                 apres={affichee as unknown as { description: string | null; axes: string[] }}
@@ -572,7 +614,13 @@ function Apercu({
             <div className="flex flex-wrap gap-2 border-t pt-4">
               {decideur && enAttente && (
                 <>
-                  <Button className="rounded-full font-bold" onClick={() => setApprobation(true)}>
+                  <Button
+                    className="rounded-full font-bold"
+                    onClick={() => {
+                      setDoublonDe(null);
+                      setApprobation(true);
+                    }}
+                  >
                     <Check className="size-4" /> Approuver
                   </Button>
                   {apercu.correction_possible && (
@@ -609,22 +657,40 @@ function Apercu({
         <DialogueFormulaire
           ouvert={approbation}
           onOuvert={setApprobation}
-          titre="Approuver et publier ?"
+          titre={
+            doublonDe
+              ? `Approuver comme doublon de ${doublonDe.reference} ?`
+              : rapport
+                ? "Approuver ce rapport ?"
+                : "Approuver et publier ?"
+          }
           description={
-            apercu?.nouvelle_version
-              ? "Cette nouvelle version remplace la version en ligne. Aucun point n'est crédité de nouveau."
-              : apercu?.type === "fiche_club"
-                ? "La fiche publique du club prend aussitôt cette description et ces axes."
-                : apercu?.type === "actualite"
-                  ? "L'actualité est publiée au nom du club, sur sa fiche et dans les articles. Elle ne rapporte pas de points."
-                  : apercu?.type === "commentaire"
-                    ? "Le commentaire apparaît sous l'article. Son auteur reçoit +5 points, dans la limite de 5 commentaires rémunérés par jour."
-                    : "L'article est publié sur le site et l'auteur reçoit ses points."
+            doublonDe
+              ? "Le rapport est archivé et lié à l'original, sans aucun point. Rien n'est publié."
+              : rapport
+                ? `Le rapport reste privé : rien n'est publié. ${pointsPrevus(rapport)}`
+                : apercu?.nouvelle_version
+                  ? "Cette nouvelle version remplace la version en ligne. Aucun point n'est crédité de nouveau."
+                  : apercu?.type === "fiche_club"
+                    ? "La fiche publique du club prend aussitôt cette description et ces axes."
+                    : apercu?.type === "actualite"
+                      ? "L'actualité est publiée au nom du club, sur sa fiche et dans les articles. Elle ne rapporte pas de points."
+                      : apercu?.type === "commentaire"
+                        ? "Le commentaire apparaît sous l'article. Son auteur reçoit +5 points, dans la limite de 5 commentaires rémunérés par jour."
+                        : "L'article est publié sur le site et l'auteur reçoit ses points."
           }
           bouton="Approuver"
           onEnvoie={async () => {
             if (!apercu) return;
-            await apres(await deciderModeration(apercu.id, "approuver", apercu.version));
+            await apres(
+              await deciderModeration(
+                apercu.id,
+                "approuver",
+                apercu.version,
+                undefined,
+                doublonDe?.id,
+              ),
+            );
           }}
         />
         <DialogueMotif
@@ -643,6 +709,74 @@ function Apercu({
     </Dialog>
   );
 }
+
+function pointsPrevus(rapport: RapportModeration) {
+  const parts = [
+    rapport.points_auteur !== null ? `+${rapport.points_auteur} pour l'encadreur auteur` : null,
+    rapport.points_club !== null ? `+${rapport.points_club} pour le club` : null,
+  ].filter(Boolean);
+  return parts.length > 0 ? `Points crédités : ${parts.join(", ")}.` : "Aucun point n'est crédité.";
+}
+
+// Ce qui est propre à un rapport (spec 038) : référence, période, alerte de doublon et points prévus.
+function BlocRapport({
+  rapport,
+  club,
+  decideur,
+  onDoublon,
+}: {
+  rapport: RapportModeration;
+  club: string | null;
+  decideur: boolean;
+  onDoublon: (original: { id: string; reference: string }) => void;
+}) {
+  return (
+    <section className="space-y-3 rounded-2xl bg-mist-soft p-4 text-sm">
+      <p className="font-semibold">
+        <strong>{rapport.reference ?? "Sans référence"}</strong>
+        {club && ` · ${club}`}
+        {rapport.periode && ` · ${rapport.periode}`}
+        {rapport.type_activite && ` · ${rapport.type_activite}`}
+      </p>
+      <p className="text-muted-foreground">{pointsPrevus(rapport)}</p>
+      {rapport.doublon_de && (
+        <p className="font-semibold">
+          Approuvé comme doublon de {rapport.doublon_de.reference} (« {rapport.doublon_de.titre} »).
+        </p>
+      )}
+      {rapport.doublons_probables.length > 0 && (
+        <div role="status" className="rounded-xl bg-sun/30 p-3 ring-1 ring-sun">
+          <p className="font-bold">Doublon probable : même club, même date et même type.</p>
+          <ul className="mt-2 space-y-2">
+            {rapport.doublons_probables.map((v) => (
+              <li key={v.id} className="flex flex-wrap items-center gap-2">
+                <span>
+                  {v.reference} · « {v.titre} » · {LIBELLES_ETATS[v.etat] ?? v.etat}
+                </span>
+                {decideur && v.etat === "publie" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full font-bold"
+                    onClick={() => onDoublon({ id: v.id, reference: v.reference })}
+                  >
+                    Approuver comme doublon de {v.reference}
+                  </Button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  );
+}
+
+const LIBELLES_ETATS: Partial<Record<string, string>> = {
+  en_attente: "en attente",
+  publie: "approuvé",
+  a_corriger: "à corriger",
+};
 
 const LIBELLES_DECISIONS: Record<ApercuModeration["decisions"][number]["decision"], string> = {
   approuver: "Approuvé",

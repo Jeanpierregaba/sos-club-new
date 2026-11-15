@@ -10623,6 +10623,32 @@
         }
       }
     },
+    "/api/rapports/semestres": {
+      "get": {
+        "tags": [
+          "rapports"
+        ],
+        "summary": "Semestres",
+        "description": "Les semestres commencés, du plus récent au plus ancien : ceux qu'un bilan peut couvrir.",
+        "operationId": "semestres_api_rapports_semestres_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SemestreRapport"
+                  },
+                  "type": "array",
+                  "title": "Response Semestres Api Rapports Semestres Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/rapports/{contenu_id}": {
       "get": {
         "tags": [
@@ -25709,6 +25735,37 @@
           "fin"
         ],
         "title": "SemestrePublic"
+      },
+      "SemestreRapport": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date",
+            "title": "Fin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "libelle",
+          "debut",
+          "fin"
+        ],
+        "title": "SemestreRapport"
       },
       "SemestreResume": {
         "properties": {
