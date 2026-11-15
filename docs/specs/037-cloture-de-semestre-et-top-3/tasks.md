@@ -3,10 +3,10 @@
 Ordonnées. Chaque tâche est petite, testable et committable seule. Les parties critiques (photo du classement,
 ex æquo, cycle de clôture, données publiques) sont écrites en TDD : les tests précèdent le code.
 
-- [ ] 1. Documents : mettre à jour `docs/PRD.md` (ligne R14), `docs/ROADMAP.md`, `docs/DESIGN.md` (section
+- [x] 1. Documents : mettre à jour `docs/PRD.md` (ligne R14), `docs/ROADMAP.md`, `docs/DESIGN.md` (section
       Palmarès de `/hall-of-fame`, onglet Clôtures) et ADR-0013 (renvoi vers la règle d'ex æquo publiée) ;
       `TASKS.md` : R14 en cours.
-- [ ] 2. Migration non destructive et modèles `ClotureSemestre`, `CandidatCloture`, `EtatCloture` : contraintes
+- [x] 2. Migration non destructive et modèles `ClotureSemestre`, `CandidatCloture`, `EtatCloture` : contraintes
       d'état, d'unicité (rang, place, élève) et d'écart ; test d'aller-retour de la migration.
 - [ ] 3. Tests puis code de `classement_a_figer` dans `points/classements.py` : 50 premiers, exclusions
       (suspendus, anciens, totaux nuls ou négatifs), rang brut et rang départagé, date d'atteinte, ex æquo par

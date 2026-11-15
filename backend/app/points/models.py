@@ -113,6 +113,93 @@ class ClassementAnnuel(Base):
     rang: Mapped[int] = mapped_column(Integer)
 
 
+class EtatCloture(StrEnum):
+    """Les étapes de la clôture d'un semestre (spec 037), toujours dans cet ordre ; la validation peut revenir à
+    l'état gelé tant que rien n'est publié."""
+
+    gele = "gele"
+    valide = "valide"
+    publie = "publie"
+
+
+class ClotureSemestre(Suivi, Base):
+    """La clôture d'un semestre (spec 037) : une photo du classement national des élèves, contrôlée puis publiée.
+    Ce n'est jamais une source de points : le registre reste la seule (ADR-0004)."""
+
+    __tablename__ = "cloture_semestre"
+    __table_args__ = (
+        CheckConstraint(
+            "(etat = 'gele' AND valide_le IS NULL AND publie_le IS NULL)"
+            " OR (etat = 'valide' AND valide_le IS NOT NULL AND publie_le IS NULL)"
+            " OR (etat = 'publie' AND valide_le IS NOT NULL AND publie_le IS NOT NULL)",
+            name="etat_coherent",
+        ),
+        CheckConstraint("(valide_le IS NULL) = (valide_par IS NULL)", name="validation_complete"),
+        CheckConstraint("(publie_le IS NULL) = (publie_par IS NULL)", name="publication_complete"),
+    )
+
+    semestre_id: Mapped[UUID] = mapped_column(ForeignKey("semestre.id", ondelete="RESTRICT"), primary_key=True)
+    etat: Mapped[EtatCloture] = mapped_column(
+        Enum(EtatCloture, name="etat_cloture", native_enum=False, create_constraint=True, length=10)
+    )
+    # Copie du semestre au gel : le palmarès garde son libellé même si le semestre est renommé.
+    libelle: Mapped[str] = mapped_column(String(60))
+    debut: Mapped[date] = mapped_column(Date)
+    fin: Mapped[date] = mapped_column(Date)
+    gele_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    gele_par: Mapped[UUID] = mapped_column(ForeignKey("utilisateur.id", ondelete="RESTRICT"))
+    valide_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    valide_par: Mapped[UUID | None] = mapped_column(ForeignKey("utilisateur.id", ondelete="RESTRICT"))
+    publie_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    publie_par: Mapped[UUID | None] = mapped_column(ForeignKey("utilisateur.id", ondelete="RESTRICT"))
+
+    __mapper_args__ = {"version_id_col": Suivi.version}  # noqa: RUF012
+
+
+class CandidatCloture(Base):
+    """Un élève de la photo (les 50 premiers) : pseudonyme, club et DRE copiés au gel, jamais de nom complet (RULES).
+    `rang` est départagé (ex æquo au premier arrivé), `rang_brut` garde l'égalité ; `place` désigne le Top 3."""
+
+    __tablename__ = "candidat_cloture"
+    __table_args__ = (
+        UniqueConstraint("semestre_id", "utilisateur_id"),
+        UniqueConstraint("semestre_id", "rang"),
+        CheckConstraint("place BETWEEN 1 AND 3", name="place_du_podium"),
+        CheckConstraint("rang >= 1 AND rang_brut >= 1 AND rang_brut <= rang", name="rangs_coherents"),
+        CheckConstraint("points > 0", name="points_positifs"),
+        CheckConstraint(
+            "(ecarte_le IS NULL AND ecarte_par IS NULL AND motif_ecart IS NULL)"
+            " OR (ecarte_le IS NOT NULL AND ecarte_par IS NOT NULL AND motif_ecart IS NOT NULL)",
+            name="ecart_complet",
+        ),
+        CheckConstraint("place IS NULL OR ecarte_le IS NULL", name="laureat_non_ecarte"),
+        Index(
+            "uq_candidat_cloture_place",
+            "semestre_id",
+            "place",
+            unique=True,
+            postgresql_where=text("place IS NOT NULL"),
+        ),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    semestre_id: Mapped[UUID] = mapped_column(
+        ForeignKey("cloture_semestre.semestre_id", ondelete="CASCADE"), index=True
+    )
+    utilisateur_id: Mapped[UUID] = mapped_column(ForeignKey("utilisateur.id", ondelete="CASCADE"))
+    rang: Mapped[int] = mapped_column(Integer)
+    rang_brut: Mapped[int] = mapped_column(Integer)
+    pseudonyme: Mapped[str] = mapped_column(String(60))
+    club: Mapped[str | None] = mapped_column(String(200))
+    dre: Mapped[str] = mapped_column(String(150))
+    points: Mapped[int] = mapped_column(Integer)
+    atteint_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    ecarte_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ecarte_par: Mapped[UUID | None] = mapped_column(ForeignKey("utilisateur.id", ondelete="RESTRICT"))
+    motif_ecart: Mapped[str | None] = mapped_column(String(500))
+    place: Mapped[int | None] = mapped_column(Integer)
+
+
 class LigneBareme(Suivi, Base):
     __tablename__ = "bareme"
     __table_args__ = (
