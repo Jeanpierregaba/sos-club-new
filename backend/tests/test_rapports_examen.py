@@ -322,3 +322,107 @@ def test_deux_approbations_simultanees_ne_creditent_quune_fois(
 
     assert sorted(asyncio.run(scenario())) == [False, True]
     assert len(lignes(en_base)) == 2
+
+
+# Suites de la relecture (2026-11-15) -----------------------------------------------------------------------------
+
+
+def test_un_rapport_approuve_ne_se_modifie_plus(
+    client: TestClient, club: dict[str, Any], equipe: Navigateur, en_base: Callable[..., Any]
+) -> None:
+    from tests.test_rapports_pieces import photo
+
+    rapport = depose(client, "prof")
+    decider(equipe, rapport["id"], "approuver")
+    prof = connecter(client, "prof")
+    actuel = prof.get(f"{RAPPORTS}/{rapport['id']}").json()
+
+    assert (
+        prof.put(f"{RAPPORTS}/{rapport['id']}", json={"version": actuel["version"], "donnees": complet()}).status_code
+        == 409
+    )
+    assert envoyer(prof, actuel, pdf()).status_code == 409
+    assert photo(prof, actuel).status_code == 409
+    assert soumettre(prof, actuel).status_code == 409
+    apres = prof.get(f"{RAPPORTS}/{rapport['id']}").json()
+    assert (apres["etat"], apres["modifiable"]) == ("approuve", False)
+    assert len(lignes(en_base)) == 2
+
+
+def test_loriginal_affiche_ses_doublons(client: TestClient, club: dict[str, Any], equipe: Navigateur) -> None:
+    premier = depose(client, "prof")
+    decider(equipe, premier["id"], "approuver")
+    second = depose(client, "presidente", donnees=complet(titre="La même"))
+    decider(equipe, second["id"], "approuver", doublon_de=premier["id"])
+
+    vu = connecter(client, "prof").get(f"{RAPPORTS}/{premier['id']}").json()
+
+    assert vu["doublons"] == [second["reference"]]
+
+
+def test_un_club_suspendu_laisse_lauteur_suivre_ses_rapports(
+    client: TestClient, club: dict[str, Any], en_base: Callable[..., Any]
+) -> None:
+    rapport = depose(client, "prof")
+    etat_club(en_base, club["club"].id, EtatClub.suspendu)
+    prof = connecter(client, "prof")
+
+    liste = prof.get(RAPPORTS)
+
+    assert liste.status_code == 200, liste.text
+    assert (liste.json()["club"], liste.json()["modeles"]) == (None, [])
+    assert [r["id"] for r in liste.json()["rapports"]] == [rapport["id"]]
+    assert prof.post(RAPPORTS, json={"modele": "activite"}).status_code == 403
+
+
+def test_laperçu_nannonce_pas_de_points_deja_pris(client: TestClient, club: dict[str, Any], equipe: Navigateur) -> None:
+    donnees = {"mois": mois_precedent(), "synthese": "Trois causeries."}
+    premier = depose(client, "prof", "mensuel", donnees)
+    second = depose(client, "prof", "mensuel", {**donnees, "titre": "Encore"})
+    decider(equipe, premier["id"], "approuver")
+
+    assert equipe.get(f"{FILE}/{second['id']}").json()["rapport"]["points_auteur"] is None
+
+
+def test_un_club_suspendu_nannonce_pas_de_part_du_club(
+    client: TestClient, club: dict[str, Any], equipe: Navigateur, en_base: Callable[..., Any]
+) -> None:
+    rapport = depose(client, "prof")
+    etat_club(en_base, club["club"].id, EtatClub.suspendu)
+
+    apercu = equipe.get(f"{FILE}/{rapport['id']}").json()["rapport"]
+
+    assert (apercu["points_auteur"], apercu["points_club"]) == (100, None)
+
+
+def test_la_route_publique_des_photos_ne_sert_jamais_un_rapport(
+    client: TestClient, club: dict[str, Any], equipe: Navigateur
+) -> None:
+    from tests.test_rapports_pieces import photo
+
+    prof = connecter(client, "prof")
+    rapport = photo(prof, brouillon(prof, donnees=complet())).json()
+    rapport = soumettre(prof, rapport).json()
+    decider(equipe, rapport["id"], "approuver")
+    photo_id = rapport["photos"][0]["id"]
+
+    for adresse in ("rapport", rapport["id"], rapport["reference"]):
+        assert client.get(f"/api/articles/{adresse}/photos/{photo_id}/grande").status_code == 404
+
+
+def test_les_documents_dun_rapport_refuse_sont_purges_apres_90_jours(
+    client: TestClient, club: dict[str, Any], equipe: Navigateur, en_base: Callable[..., Any]
+) -> None:
+    from datetime import UTC, datetime
+
+    from app.rapports import pieces
+    from app.rapports.models import PieceRapport
+
+    prof = connecter(client, "prof")
+    rapport = soumettre(prof, envoyer(prof, brouillon(prof, donnees=complet()), pdf()).json()).json()
+    decider(equipe, rapport["id"], "refuser", motif="Activité non réalisée.")
+
+    assert en_base(lambda db: pieces.purger(db, datetime.now(UTC))) == 0
+    assert en_base(lambda db: pieces.purger(db, datetime.now(UTC) + timedelta(days=91))) == 1
+    (piece,) = en_base(lambda db: db.scalars(select(PieceRapport))).all()
+    assert piece.efface_le is not None

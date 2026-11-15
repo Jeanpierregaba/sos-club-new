@@ -170,6 +170,8 @@ class RapportResume(BaseModel):
     modifie_le: datetime
     points: int | None
     doublon_de: str | None
+    # Les rapports approuvés comme doublons de celui-ci.
+    doublons: list[str]
     lectures: list[Lecture]
 
 
@@ -209,7 +211,8 @@ class TypeActivite(BaseModel):
 
 class MesRapports(BaseModel):
     rapports: list[RapportResume]
-    club: ClubRapport
+    # Nul si l'utilisateur n'a plus de club en service : il garde la liste de ses rapports.
+    club: ClubRapport | None
     modeles: list[ModeleRapport]
 
 

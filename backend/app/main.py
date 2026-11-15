@@ -45,6 +45,7 @@ from app.points.router import router_admin as router_points_admin
 from app.points.router import router_classements, router_palmares
 from app.quiz.router import router as router_quiz
 from app.quiz.router_banque import router_banque as router_quiz_banque
+from app.rapports.pieces import purger_regulierement as purger_pieces_regulierement
 from app.rapports.router import router as router_rapports
 from app.rapports.router_admin import router_admin as router_rapports_admin
 from app.referentiel.router import router_admin as router_referentiel_admin
@@ -65,6 +66,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     purges = [
         asyncio.create_task(purger_regulierement()),
         asyncio.create_task(purger_photos_regulierement()),
+        asyncio.create_task(purger_pieces_regulierement()),
         asyncio.create_task(purger_visiteurs_regulierement()),
     ]
     yield

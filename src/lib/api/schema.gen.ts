@@ -7258,7 +7258,7 @@ export interface components {
         MesRapports: {
             /** Rapports */
             rapports: components["schemas"]["RapportResume"][];
-            club: components["schemas"]["ClubRapport"];
+            club: components["schemas"]["ClubRapport"] | null;
             /** Modeles */
             modeles: components["schemas"]["ModeleRapport"][];
         };
@@ -8235,6 +8235,8 @@ export interface components {
             points: number | null;
             /** Doublon De */
             doublon_de: string | null;
+            /** Doublons */
+            doublons: string[];
             /** Lectures */
             lectures: components["schemas"]["Lecture"][];
             /** Version */
@@ -8309,6 +8311,8 @@ export interface components {
             points: number | null;
             /** Doublon De */
             doublon_de: string | null;
+            /** Doublons */
+            doublons: string[];
             /** Lectures */
             lectures: components["schemas"]["Lecture"][];
         };

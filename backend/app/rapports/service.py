@@ -126,6 +126,9 @@ async def _du_redacteur(
     if lecteur != "auteur":
         raise Introuvable
     moteur.verifier_version(contenu, version)
+    # Seul un brouillon ou un rapport à corriger se modifie : approuvé, refusé ou en examen, il est figé (spec 038).
+    if contenu.etat not in (EtatContenu.brouillon, EtatContenu.a_corriger):
+        raise Refus("Ce rapport est soumis, approuvé ou refusé : il ne se modifie plus.", 409)
     return contenu, rapport
 
 
@@ -181,6 +184,16 @@ async def _resumes(
         contenu = next(c for c, _ in lignes if c.id == version.contenu_id)
         if contenu.auteur_id == utilisateur.id or version.soumise_le is not None:
             versions[version.contenu_id] = version
+    # Les rapports approuvés comme doublons de chacun : le lien se voit des deux côtés.
+    lies: dict[UUID, list[str]] = {}
+    for original_id, reference in (
+        await db.execute(
+            select(Rapport.doublon_de_id, Rapport.reference)
+            .where(Rapport.doublon_de_id.in_(ids))
+            .order_by(Rapport.reference)
+        )
+    ).all():
+        lies.setdefault(original_id, []).append(reference or "")
     references = {
         r.contenu_id: r.reference
         for r in (
@@ -224,6 +237,7 @@ async def _resumes(
                 modifie_le=contenu.modifie_le,
                 points=rapport.points_auteur if contenu.auteur_id == utilisateur.id else None,
                 doublon_de=references.get(rapport.doublon_de_id) if rapport.doublon_de_id else None,
+                doublons=lies.get(contenu.id, []),
                 lectures=lectures,
             )
         )
@@ -321,14 +335,23 @@ async def detail(
 
 
 async def mes_rapports(db: AsyncSession, utilisateur: Utilisateur) -> MesRapports:
-    """Mes rapports, puis ceux du club que je reçois, du plus récent au plus ancien."""
-    club, president = await club_de_l_auteur(db, utilisateur)
-    du_club = Rapport.club_id == club.id
-    visibles = (Contenu.auteur_id == utilisateur.id) | (du_club & Rapport.reference.is_not(None))
-    if president:
-        visibles = (Contenu.auteur_id == utilisateur.id) | (
-            du_club & Rapport.reference.is_not(None) & (Rapport.modele == ModeleRapport.activite)
-        )
+    """Mes rapports, puis ceux du club que je reçois, du plus récent au plus ancien. Un auteur garde toujours la
+    liste des siens, même si son club n'est plus en service ou qu'il l'a quitté (spec 038, 7)."""
+    try:
+        club, president = await club_de_l_auteur(db, utilisateur)
+    except Refus:
+        club, president = None, False
+    visibles = Contenu.auteur_id == utilisateur.id
+    if club is not None:
+        du_club = (Rapport.club_id == club.id) & Rapport.reference.is_not(None)
+        if president:
+            du_club = du_club & (Rapport.modele == ModeleRapport.activite)
+        visibles = visibles | du_club
+    elif not await db.scalar(
+        select(Contenu.id).join(Rapport, Rapport.contenu_id == Contenu.id).where(visibles).limit(1)
+    ):
+        # Ni club ni rapport : la page explique pourquoi.
+        await club_de_l_auteur(db, utilisateur)
     lignes = (
         await db.execute(
             select(Contenu, Rapport)
@@ -340,8 +363,8 @@ async def mes_rapports(db: AsyncSession, utilisateur: Utilisateur) -> MesRapport
     ).all()
     return MesRapports(
         rapports=await _resumes(db, utilisateur, [(c, r) for c, r in lignes]),
-        club=ClubRapport(id=club.id, nom=club.nom),
-        modeles=[ModeleRapport.activite] if president else list(ModeleRapport),
+        club=ClubRapport(id=club.id, nom=club.nom) if club is not None else None,
+        modeles=[] if club is None else [ModeleRapport.activite] if president else list(ModeleRapport),
     )
 
 

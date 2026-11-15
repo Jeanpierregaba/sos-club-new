@@ -79,12 +79,19 @@ function Rapport() {
               <span className="font-bold text-ink">+{rapport.points} points</span>
             )}
             {rapport.doublon_de && <span>Lié à {rapport.doublon_de} (doublon, sans point)</span>}
+            {rapport.doublons.length > 0 && (
+              <span>Doublons liés à ce rapport : {rapport.doublons.join(", ")}</span>
+            )}
           </div>
           {rapport.doublons_probables.length > 0 && rapport.etat !== "approuve" && (
             <p className="mt-3 rounded-2xl bg-sun/25 p-3 text-sm font-semibold ring-1 ring-sun">
-              Un rapport du même jour et du même type existe déjà :{" "}
-              {rapport.doublons_probables.join(", ")}. L'équipe vérifiera qu'il s'agit bien d'une
-              autre activité.
+              {rapport.modele === "activite"
+                ? "Un rapport du même jour et du même type existe déjà"
+                : rapport.modele === "mensuel"
+                  ? "Tu as déjà un rapport mensuel pour ce mois"
+                  : "Tu as déjà un bilan pour ce semestre"}{" "}
+              : {rapport.doublons_probables.join(", ")}. L'équipe le vérifiera ; un doublon ne
+              rapporte pas de points.
             </p>
           )}
         </header>

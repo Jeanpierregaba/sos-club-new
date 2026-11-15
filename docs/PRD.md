@@ -112,11 +112,11 @@ groupe deviendra une ou plusieurs specs dans `docs/specs/`.
 
 **Rapports d'activités**
 
-- [ ] L'encadreur et le président déposent un rapport avec ses justificatifs ; seul un rapport validé
+- [x] L'encadreur et le président déposent un rapport avec ses justificatifs ; seul un rapport validé
       crédite des points, une seule fois par activité (R12, [spec 038](specs/038-rapports-d-activite/spec.md) :
       rapport d'activité, mensuel et bilan semestriel ; les encadreurs du club le reçoivent sans le cosigner ; un
       doublon est lié sans point).
-- [ ] Un rapport validé reste privé ; la publication de son résumé est une décision distincte (résumé public
+- [x] Un rapport validé reste privé ; la publication de son résumé est une décision distincte (résumé public
       reporté avec les pages publiques des clubs, R21).
 
 **Classements**

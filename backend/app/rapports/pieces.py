@@ -5,19 +5,31 @@ du rapport, en pièce jointe, et jamais d'une version qu'ils ne voient pas.
 """
 
 import asyncio
+import logging
 import re
 import unicodedata
+from datetime import UTC, datetime
 from uuid import UUID, uuid7
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.comptes.inscription import Refus
 from app.comptes.models import Utilisateur
+from app.db import SessionLocal
 from app.fichiers import docx, pdf
 from app.fichiers.stockage import StockageIndisponible, stockage
 from app.moderation import photos
-from app.moderation.models import Photo, VersionContenu, VersionPhoto
+from app.moderation.models import (
+    Contenu,
+    DecisionModeration,
+    EtatContenu,
+    EtatVersion,
+    Photo,
+    TypeDecision,
+    VersionContenu,
+    VersionPhoto,
+)
 from app.moderation.service import Introuvable
 from app.rapports import service
 from app.rapports.models import PieceRapport, TypePiece, VersionPiece
@@ -25,6 +37,7 @@ from app.rapports.schemas import RapportDetail
 
 OCTETS_MAX = 10 * 1024 * 1024
 DOCUMENTS_MAX = 5
+logger = logging.getLogger(__name__)
 TYPES_MEDIA = {
     TypePiece.pdf: "application/pdf",
     TypePiece.docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -193,3 +206,50 @@ async def derniere_version_envoyee(db: AsyncSession, contenu_id: UUID) -> Versio
         .order_by(VersionContenu.numero.desc())
         .limit(1)
     )
+
+
+# Purge ---------------------------------------------------------------------------------------------------------
+
+
+async def purger(db: AsyncSession, maintenant: datetime | None = None) -> int:
+    """Efface les documents des rapports refusés depuis plus de 90 jours, comme les photos (spec 024) : ceux d'un
+    rapport clos par un refus, et ceux que seules des versions refusées utilisent. La ligne reste pour l'historique ;
+    la mise à jour conditionnelle désigne un seul processus par document."""
+    limite = (maintenant or datetime.now(UTC)) - photos.DELAI_EFFACEMENT
+    vivante = (
+        select(VersionPiece.piece_id)
+        .join(VersionContenu, VersionContenu.id == VersionPiece.version_id)
+        .join(Contenu, Contenu.id == VersionContenu.contenu_id)
+        .where(VersionContenu.etat != EtatVersion.refusee, Contenu.etat != EtatContenu.refuse)
+    )
+    refus = select(DecisionModeration.contenu_id).where(DecisionModeration.decision == TypeDecision.refuser)
+    refus_recent = refus.where(DecisionModeration.decide_le > limite)
+    effaces = list(
+        await db.scalars(
+            update(PieceRapport)
+            .where(
+                PieceRapport.efface_le.is_(None),
+                PieceRapport.contenu_id.in_(refus),
+                PieceRapport.contenu_id.not_in(refus_recent),
+                PieceRapport.id.not_in(vivante),
+            )
+            .values(efface_le=func.now())
+            .returning(PieceRapport)
+        )
+    )
+    await db.commit()
+    await service.effacer_pieces(effaces)
+    return len(effaces)
+
+
+async def purger_regulierement() -> None:
+    """Au démarrage, puis une fois par jour."""
+    while True:
+        try:
+            async with SessionLocal() as db:
+                nombre = await purger(db)
+            if nombre:
+                logger.info("%s document(s) de rapport refusé depuis plus de 90 jours effacé(s)", nombre)
+        except Exception:
+            logger.exception("Échec de la purge des documents des rapports")
+        await asyncio.sleep(86_400)

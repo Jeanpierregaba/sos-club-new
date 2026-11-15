@@ -43,7 +43,10 @@ le bilan (13 et 14), l'archive et les exports (15 à 17).
 
 ## Fin
 
-- [ ] 18. Lint, typecheck, tests backend et site ; vérification dans le navigateur ; libellés du journal dans
+- [x] 18. Lint, typecheck, tests backend et site ; vérification dans le navigateur (route et redirection vers la connexion ; les écrans connectés sont couverts par
+      les tests des composants, la session de démonstration n'ayant pas pu être ouverte) ; libellés du journal dans
       `src/lib/admin.ts` ; `TASKS.md`.
-- [ ] Vérifier tous les critères d'acceptation de `spec.md`.
-- [ ] Relecture finale par le sous-agent `reviewer`.
+- [x] Vérifier tous les critères d'acceptation de `spec.md`.
+- [x] Relecture finale par le sous-agent `reviewer` (2026-11-15) : rapport approuvé figé, doublon visible des deux
+      côtés, liste gardée sans club, Word sans objet intégré ni modèle distant, purge des documents refusés, filtres
+      DRE et période de l'archive, points annoncés exacts ; le reste est dans `TASKS.md`.

@@ -117,56 +117,56 @@ voit les rapports d'activité du club, mais pas les mensuels ni les bilans des e
 
 ### Dépôt
 
-- [ ] Étant donné un encadreur vérifié d'un club en service, quand il soumet un rapport d'activité complet, alors
+- [x] Étant donné un encadreur vérifié d'un club en service, quand il soumet un rapport d'activité complet, alors
       le rapport passe « soumis » avec une référence unique et chaque encadreur du club reçoit une notification.
-- [ ] Étant donné un président, quand il soumet un rapport d'activité, alors il est soumis au nom du club ; il ne
+- [x] Étant donné un président, quand il soumet un rapport d'activité, alors il est soumis au nom du club ; il ne
       peut pas créer de mensuel ni de bilan.
-- [ ] Étant donné un élève qui n'est pas président, un visiteur ou un encadreur d'un autre club, alors le dépôt
+- [x] Étant donné un élève qui n'est pas président, un visiteur ou un encadreur d'un autre club, alors le dépôt
       est refusé.
-- [ ] Étant donné un champ obligatoire manquant ou un nombre de participants négatif, alors la soumission est
+- [x] Étant donné un champ obligatoire manquant ou un nombre de participants négatif, alors la soumission est
       refusée avec un message clair, et le brouillon reste enregistré.
-- [ ] Étant donné un fichier d'un autre type, de plus de 10 Mo, un sixième document ou une sixième photo, un PDF ou un Word au contenu
+- [x] Étant donné un fichier d'un autre type, de plus de 10 Mo, un sixième document ou une sixième photo, un PDF ou un Word au contenu
       non conforme, ou un lien qui n'est pas YouTube, alors il est refusé.
-- [ ] Étant donné une photo jointe sans l'attestation cochée, alors la soumission est refusée.
-- [ ] Une version soumise ne se modifie plus ; un brouillon n'est visible que par son auteur.
+- [x] Étant donné une photo jointe sans l'attestation cochée, alors la soumission est refusée.
+- [x] Une version soumise ne se modifie plus ; un brouillon n'est visible que par son auteur.
 
 ### Lecture et confidentialité
 
-- [ ] Les encadreurs du club voient les rapports du club ; ouvrir un rapport le marque « consulté » pour celui qui
+- [x] Les encadreurs du club voient les rapports du club ; ouvrir un rapport le marque « consulté » pour celui qui
       l'ouvre, et le statut de chacun est visible des autres.
-- [ ] Le président voit les rapports d'activité du club, pas les mensuels ni les bilans.
-- [ ] Un justificatif ne se télécharge que pour l'auteur, les encadreurs du club, le président (rapport d'activité)
+- [x] Le président voit les rapports d'activité du club, pas les mensuels ni les bilans.
+- [x] Un justificatif ne se télécharge que pour l'auteur, les encadreurs du club, le président (rapport d'activité)
       et l'équipe habilitée ; toute autre demande reçoit 404.
-- [ ] Aucune route publique ne renvoie un rapport ou un justificatif.
+- [x] Aucune route publique ne renvoie un rapport ou un justificatif.
 
 ### Examen et points
 
-- [ ] Étant donné un rapport d'activité d'un encadreur approuvé, alors l'encadreur reçoit +100 et le club +50, une
+- [x] Étant donné un rapport d'activité d'un encadreur approuvé, alors l'encadreur reçoit +100 et le club +50, une
       seule fois, même si l'approbation est rejouée.
-- [ ] Étant donné un rapport d'activité du président approuvé, alors le club reçoit +50 et le président aucun
+- [x] Étant donné un rapport d'activité du président approuvé, alors le club reçoit +50 et le président aucun
       point.
-- [ ] Étant donné un rapport approuvé comme doublon, alors aucun point n'est écrit et les deux rapports affichent
+- [x] Étant donné un rapport approuvé comme doublon, alors aucun point n'est écrit et les deux rapports affichent
       leur lien.
-- [ ] Étant donné un deuxième mensuel du même encadreur pour le même mois, approuvé, alors il ne crédite rien.
-- [ ] Étant donné deux bilans du même semestre approuvés pour deux encadreurs du club, alors chacun reçoit +200
+- [x] Étant donné un deuxième mensuel du même encadreur pour le même mois, approuvé, alors il ne crédite rien.
+- [x] Étant donné deux bilans du même semestre approuvés pour deux encadreurs du club, alors chacun reçoit +200
       et le club +100 une seule fois.
-- [ ] Étant donné un rapport à corriger, quand l'auteur soumet sa nouvelle version, alors l'ancienne version et la
+- [x] Étant donné un rapport à corriger, quand l'auteur soumet sa nouvelle version, alors l'ancienne version et la
       décision restent dans l'historique.
-- [ ] Étant donné un rapport refusé, à corriger, soumis ou en brouillon, alors aucun point n'est écrit.
-- [ ] Refuser ou demander une correction sans motif de 10 caractères au moins est refusé.
-- [ ] Un auteur ne décide jamais de son propre rapport ; un collaborateur de DRE ne voit ni ne décide les rapports
+- [x] Étant donné un rapport refusé, à corriger, soumis ou en brouillon, alors aucun point n'est écrit.
+- [x] Refuser ou demander une correction sans motif de 10 caractères au moins est refusé.
+- [x] Un auteur ne décide jamais de son propre rapport ; un collaborateur de DRE ne voit ni ne décide les rapports
       d'une autre région.
-- [ ] Deux décisions simultanées sur le même rapport : une seule passe, l'autre reçoit 409.
+- [x] Deux décisions simultanées sur le même rapport : une seule passe, l'autre reçoit 409.
 
 ### Doublons
 
-- [ ] Étant donné un rapport d'activité du même club, du même type et de la même date déjà soumis, alors l'auteur
+- [x] Étant donné un rapport d'activité du même club, du même type et de la même date déjà soumis, alors l'auteur
       est prévenu à la soumission sans être bloqué, et l'examinateur voit l'alerte avec la référence de l'autre.
 
 ### Export
 
-- [ ] Un rapport approuvé s'exporte en PDF avec son historique ; un rapport non approuvé ne s'exporte pas.
-- [ ] L'export CSV de l'archive admin ne contient aucun nom d'élève et respecte le périmètre du collaborateur.
+- [x] Un rapport approuvé s'exporte en PDF avec son historique ; un rapport non approuvé ne s'exporte pas.
+- [x] L'export CSV de l'archive admin ne contient aucun nom d'élève et respecte le périmètre du collaborateur.
 
 ## Cas limites et erreurs
 

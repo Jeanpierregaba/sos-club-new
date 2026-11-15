@@ -19,7 +19,8 @@ from app.admin.exports import neutraliser
 from app.admin.journal import journaliser
 from app.clubs.models import Club
 from app.comptes.models import Role, Utilisateur
-from app.moderation.models import Contenu, EtatContenu, VersionContenu
+from app.moderation.models import Contenu, VersionContenu
+from app.moderation.service import Introuvable
 from app.points.models import Semestre
 from app.rapports.models import ModeleRapport, Rapport, TypeActivite
 from app.rapports.schemas import titre_de
@@ -183,10 +184,5 @@ async def visible(db: AsyncSession, acces: Acces, contenu_id: UUID) -> Contenu:
         or rapport.reference is None
         or (not acces.national and contenu.dre_code != acces.collaborateur.perimetre_dre)
     ):
-        from app.moderation.service import Introuvable
-
         raise Introuvable
     return contenu
-
-
-__all__ = ["EtatContenu", "Filtres", "exporter_csv", "lister", "visible"]

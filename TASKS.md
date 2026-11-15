@@ -8,7 +8,6 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] R12 — Rapports d'activité, rapports mensuels et bilans semestriels (Q22, Q29) — [spec 038](docs/specs/038-rapports-d-activite/spec.md) (spec, plan et tâches validés le 2026-11-15 : lecture seule des encadreurs, doublon sans point, résumé public reporté, mensuel et bilan inclus)
 - [ ] Quiz santé (922 QCM) jouables depuis la page des jeux, 3 quiz sans compte puis compte visiteur ; correction en vert ou rouge et récapitulatif des erreurs (2026-11-10, ADR-0004 amendé) (spec 031, livré en urgence le 2026-11-09 : spec écrite à rédiger)
 - [ ] Fiches d'inscription : élève, encadreur et visiteur, e-mails (R19 avancé) — [spec 030](docs/specs/030-fiches-d-inscription/spec.md)
 
@@ -63,6 +62,8 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 - [ ] Suites de la spec 033 (cahier des charges « Gestion, activation et suivi des Clubs Santé ») : rapports d'activité adressés aux encadreurs du club (R12 amendé), agenda du club (R16 amendé), année académique et remise à zéro annuelle des points (amende ADR-0004, R13, R14), archives par année ; retrait d'un élève par l'équipe depuis le suivi des clubs ; une future suppression de compte élève ou encadreur devra appeler `recalculer_clubs_du_membre`
 - [ ] Avant la fusion dans `main` : passer la migration `4b93d2491b34` sur une copie de la base de préprod (une DRE au code inconnu la fait échouer) et ajouter la ligne cron des échéances sur le VPS (`deploy/README.md`, étape 8 bis)
 
+- [ ] Suites de la spec 038 (relecture du 2026-11-15) : filtres par club et par date dans la file de modération ; « reçu » calculé sur les encadreurs présents à la soumission (aujourd'hui : ceux du club à la lecture) ; correction motivée visant le compte d'un club au registre ; résumé public d'un rapport avec les pages publiques des clubs (R21) ; lien d'un rapport avec un événement de l'agenda (R16)
+
 ### Petites tâches
 
 - [ ] Mettre à jour les dépendances du site : 13 failles élevées signalées par `bun audit` (zod, vite, nanoid…), puis rendre cet audit bloquant dans la CI
@@ -76,6 +77,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] R12 — Rapports d'activité, rapports mensuels et bilans semestriels (Q22, Q29) — [spec 038](docs/specs/038-rapports-d-activite/spec.md) (2026-11-15 : trois modèles dans le moteur de modération, justificatifs PDF, Word et photos, « reçu / consulté », doublons liés sans point, compte collectif du club au registre, archive admin, CSV sans nom d'élève, PDF des rapports approuvés)
 - [x] R14 — Clôture de semestre et Top 3 (Q21, Q25) — [spec 037](docs/specs/037-cloture-de-semestre-et-top-3/spec.md) (2026-11-15 : gel, contrôle, validation annulable et publication du Top 3, palmarès sur `/hall-of-fame`, distinctions dans l'espace élève ; reste à trancher : le pseudonyme publié à retirer, le club affiché sans choix de l'élève)
 - [x] [036 — Classements et tableaux de bord](docs/specs/036-classements-et-tableaux-de-bord/spec.md) (R13 : page `/hall-of-fame` DRE et national pour élèves, encadreurs et clubs, semestre et historique ; rangs personnels et classement interne privé du club ; registre admin filtrable, corrections motivées et annulations journalisées, nationales, sous double authentification ; seuls les totaux positifs sont classés. Question ouverte : club affiché sans choix de l'élève, voir la spec)
 - [x] [035 — Annuaire national des établissements du Secondaire I](docs/specs/035-annuaire-secondaire-i/spec.md) (2 396 collèges importés avec préfecture et ordre, noms en casse normale, doublons de nom approchant créés à part ; recherche publique et back office filtrable ; activation des clubs au seuil inchangée ; retour de migration refusé si un établissement importé a déjà des membres)

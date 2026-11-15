@@ -38,12 +38,13 @@ export function ListeRapports({ rapports, vide }: { rapports: RapportResume[]; v
               <span>Modifié le {dateCourte(r.modifie_le)}</span>
               {r.points !== null && <span className="font-bold text-ink">+{r.points} points</span>}
               {r.doublon_de && <span>Lié à {r.doublon_de}</span>}
+              {r.doublons.length > 0 && <span>Doublons liés : {r.doublons.join(", ")}</span>}
             </div>
             {r.lectures.length > 0 && (
               <ul className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
-                {r.lectures.map((l) => (
+                {r.lectures.map((l, i) => (
                   <li
-                    key={l.nom}
+                    key={`${l.nom}-${i}`}
                     className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 ${l.consulte_le ? "bg-leaf/20 text-ink" : "bg-mist text-muted-foreground"}`}
                   >
                     {l.consulte_le ? (

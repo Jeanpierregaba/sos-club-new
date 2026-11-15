@@ -49,6 +49,7 @@ const resume = (options: Partial<RapportResume> = {}): RapportResume => ({
   modifie_le: "2026-03-13T08:00:00Z",
   points: null,
   doublon_de: null,
+  doublons: [],
   lectures: [],
   ...options,
 });

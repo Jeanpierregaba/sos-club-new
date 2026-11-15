@@ -21749,7 +21749,14 @@
             "title": "Rapports"
           },
           "club": {
-            "$ref": "#/components/schemas/ClubRapport"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubRapport"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "modeles": {
             "items": {
@@ -24800,6 +24807,13 @@
             ],
             "title": "Doublon De"
           },
+          "doublons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Doublons"
+          },
           "lectures": {
             "items": {
               "$ref": "#/components/schemas/Lecture"
@@ -24864,6 +24878,7 @@
           "modifie_le",
           "points",
           "doublon_de",
+          "doublons",
           "lectures",
           "version",
           "donnees",
@@ -25072,6 +25087,13 @@
             ],
             "title": "Doublon De"
           },
+          "doublons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Doublons"
+          },
           "lectures": {
             "items": {
               "$ref": "#/components/schemas/Lecture"
@@ -25095,6 +25117,7 @@
           "modifie_le",
           "points",
           "doublon_de",
+          "doublons",
           "lectures"
         ],
         "title": "RapportResume"

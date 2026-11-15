@@ -1,13 +1,17 @@
 """Contrôle d'un document Word `.docx` (spec 038) sans jamais l'ouvrir ni l'afficher : une archive ZIP valide, avec
-les parties d'un document Word, sans macro ni contrôle actif, et de taille décompressée bornée (bombe ZIP)."""
+les parties d'un document Word, sans macro, contrôle actif, objet intégré (OLE) ni relation externe (modèle
+distant qui chargerait des macros), et de taille décompressée bornée (bombe ZIP)."""
 
+import re
 import zipfile
 from io import BytesIO
 
 ENTREES_MAX = 1000
 DECOMPRESSE_MAX = 50 * 1024 * 1024
 RATIO_MAX = 200
-INTERDITS = ("vbaproject.bin", "/activex/", "vbadata.xml")
+INTERDITS = ("vbaproject.bin", "/activex/", "vbadata.xml", "oleobject", "/embeddings/")
+RELATIONS_MAX = 1024 * 1024
+RELATION = re.compile(r"<relationship\b[^>]*>")
 
 
 class DocxRefuse(Exception):
@@ -45,3 +49,15 @@ def verifier(octets: bytes) -> None:
         raise DocxRefuse("Ce fichier n'est pas un document Word valide.") from None
     if "macroenabled" in types or "vbaproject" in types:
         raise DocxRefuse("Les documents Word avec macros ne sont pas acceptés.")
+    # Une relation externe (modèle attaché, cadre, objet lié) ferait charger un fichier distant à l'ouverture.
+    for entree in entrees:
+        if entree.filename.lower().endswith(".rels"):
+            if entree.file_size > RELATIONS_MAX:
+                raise DocxRefuse("Ce document Word est anormal.")
+            relations = archive.read(entree.filename).decode("utf-8", "replace").lower().replace("'", '"')
+            for relation in RELATION.findall(relations):
+                # Un lien hypertexte reste permis : il ne s'ouvre que si le lecteur clique.
+                if 'targetmode="external"' in relation and not re.search(r'type="[^"]*/hyperlink"', relation):
+                    raise DocxRefuse(
+                        "Les documents Word qui chargent un modèle ou un fichier distant ne sont pas acceptés."
+                    )

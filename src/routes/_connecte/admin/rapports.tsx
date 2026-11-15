@@ -7,6 +7,7 @@ import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { peut } from "@/lib/admin";
 import {
   adminArchiveRapports,
+  chargerDre,
   urlExportRapports,
   urlPdfRapportAdmin,
   type FiltresArchive,
@@ -16,6 +17,7 @@ import { dateCourte } from "@/lib/dates";
 import { ETATS_RAPPORT, MODELES } from "@/lib/rapports";
 
 const ETATS = ["soumis", "a_corriger", "approuve", "refuse"] as const;
+const JOUR = /^\d{4}-\d{2}-\d{2}$/;
 
 export const Route = createFileRoute("/_connecte/admin/rapports")({
   validateSearch: (s: Record<string, unknown>): FiltresArchive => ({
@@ -28,10 +30,18 @@ export const Route = createFileRoute("/_connecte/admin/rapports")({
     ...(typeof s["recherche"] === "string" && s["recherche"].trim()
       ? { recherche: s["recherche"].slice(0, 100) }
       : {}),
+    ...(typeof s["dre"] === "string" && /^[a-z0-9-]{1,30}$/.test(s["dre"])
+      ? { dre: s["dre"] }
+      : {}),
+    ...(typeof s["du"] === "string" && JOUR.test(s["du"]) ? { du: s["du"] } : {}),
+    ...(typeof s["au"] === "string" && JOUR.test(s["au"]) ? { au: s["au"] } : {}),
     ...(Number(s["page"]) > 1 ? { page: Number(s["page"]) } : {}),
   }),
   loaderDeps: ({ search }) => search,
-  loader: ({ deps }) => adminArchiveRapports(deps),
+  loader: async ({ deps }) => {
+    const [archive, dre] = await Promise.all([adminArchiveRapports(deps), chargerDre()]);
+    return { archive, dre };
+  },
   gcTime: 0,
   errorComponent: ServiceIndisponible,
   component: Archive,
@@ -43,7 +53,7 @@ const CHAMP =
 // L'archive des rapports (spec 038) : tous les rapports soumis du périmètre, leurs points et leurs doublons. Les
 // décisions se prennent dans la file de modération ; ici, on cherche et on exporte.
 function Archive() {
-  const archive = Route.useLoaderData();
+  const { archive, dre } = Route.useLoaderData();
   const recherche = Route.useSearch();
   const { admin } = Route.useRouteContext();
   const naviguer = useNavigate({ from: Route.fullPath });
@@ -98,6 +108,39 @@ function Archive() {
             </option>
           ))}
         </select>
+        {admin.perimetre_dre === null && (
+          <select
+            aria-label="DRE"
+            value={recherche.dre ?? ""}
+            onChange={(e) => filtrer({ dre: e.target.value || undefined })}
+            className={CHAMP}
+          >
+            <option value="">Toutes les DRE</option>
+            {dre.map((d) => (
+              <option key={d.code} value={d.code}>
+                {d.nom}
+              </option>
+            ))}
+          </select>
+        )}
+        <label className="flex items-center gap-2 text-sm font-semibold">
+          Soumis du
+          <input
+            type="date"
+            value={recherche.du ?? ""}
+            onChange={(e) => filtrer({ du: e.target.value || undefined })}
+            className={CHAMP}
+          />
+        </label>
+        <label className="flex items-center gap-2 text-sm font-semibold">
+          au
+          <input
+            type="date"
+            value={recherche.au ?? ""}
+            onChange={(e) => filtrer({ au: e.target.value || undefined })}
+            className={CHAMP}
+          />
+        </label>
         {peut(admin, "rapports", "exporter") && (
           <a
             href={urlExportRapports(recherche)}

@@ -85,8 +85,9 @@ function Rapports() {
         ) : (
           <>
             <p className="mt-4 max-w-2xl text-muted-foreground">
-              Chaque rapport de {mes.club.nom} est reçu par les encadreurs du club, puis examiné par
-              l'équipe. Les points arrivent à l'approbation ; rien n'est publié sur le site.
+              {mes.club
+                ? `Chaque rapport de ${mes.club.nom} est reçu par les encadreurs du club, puis examiné par l'équipe. Les points arrivent à l'approbation ; rien n'est publié sur le site.`
+                : "Ton club n'est plus en service, ou tu ne le suis plus : tu retrouves ici tes rapports, sans pouvoir en déposer de nouveaux."}
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
               {mes.modeles.map((modele) => (

@@ -256,14 +256,11 @@ class Remplacement(BaseModel):
 # Types d'activité des rapports (spec 038) ---------------------------------------------------------------------
 
 
-class TypeActivitePublic(BaseModel):
+class TypeActiviteAdmin(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     code: str
     libelle: str
-
-
-class TypeActiviteAdmin(TypeActivitePublic):
     ordre: int
     actif: bool
     version: int

@@ -144,3 +144,39 @@ def test_les_justificatifs_suivent_les_droits_du_rapport(
             assert connecter(client, intrus).get(adresse).status_code == 404
     for adresse in adresses:
         assert client.get(adresse).status_code == 401
+
+
+def docx_avec(nom: str, contenu: str | bytes) -> bytes:
+    sortie = io.BytesIO()
+    with zipfile.ZipFile(sortie, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("[Content_Types].xml", CONTENT_TYPES)
+        archive.writestr("word/document.xml", "<w:document/>")
+        archive.writestr(nom, contenu)
+    return sortie.getvalue()
+
+
+RELATION = (
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    '<Relationship Id="r1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/{type}" '
+    'Target="https://exemple.tg/x" TargetMode="External"/></Relationships>'
+)
+
+
+@pytest.mark.parametrize(
+    ("nom", "contenu", "accepte"),
+    [
+        ("word/embeddings/oleObject1.bin", b"\x00" * 64, False),
+        ("word/_rels/settings.xml.rels", RELATION.format(type="attachedTemplate"), False),
+        ("word/_rels/document.xml.rels", RELATION.format(type="oleObject"), False),
+        ("word/_rels/document.xml.rels", RELATION.format(type="hyperlink"), True),
+    ],
+)
+def test_le_word_refuse_les_objets_integres_et_les_modeles_distants(
+    client: TestClient, club: dict[str, Any], nom: str, contenu: str | bytes, accepte: bool
+) -> None:
+    prof = connecter(client, "prof")
+    rapport = brouillon(prof)
+
+    reponse = envoyer(prof, rapport, docx_avec(nom, contenu), "rapport.docx")
+
+    assert reponse.status_code == (200 if accepte else 422), reponse.text

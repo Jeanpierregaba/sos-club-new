@@ -9,6 +9,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.clubs import activation
 from app.clubs.models import Club
 from app.clubs.requetes import encadreurs_actifs
 from app.comptes.inscription import Refus
@@ -17,7 +18,7 @@ from app.moderation.models import Contenu, EtatContenu, VersionContenu
 from app.moderation.schemas import DocumentModeration, RapportModeration, RapportVoisin
 from app.moderation.types import TypeContenu, enregistrer
 from app.points import service as points
-from app.points.models import LigneBareme, Semestre
+from app.points.models import LigneBareme, MouvementPoints, Semestre
 from app.rapports.models import TYPES_CONTENU, ModeleRapport, PieceRapport, Rapport, VersionPiece
 from app.rapports.schemas import SCHEMAS, titre_de
 
@@ -125,18 +126,27 @@ async def _complement_apercu(db: AsyncSession, contenu: Contenu, version_id: UUI
         )
     ).all()
     sans_points = rapport.doublon_de_id is not None or contenu.publie_le is not None
-    montant_auteur = (
-        await db.scalar(
-            select(LigneBareme.montant).where(LigneBareme.code == ENCADREUR[rapport.modele], LigneBareme.actif)
+    montant_auteur = montant_club = None
+    if not sans_points and auteur is not None and rapport.reference is not None:
+        cle_auteur, cle_club = cles(rapport, auteur.id)
+        # Ce qui serait vraiment crédité : rien si la clé est déjà prise (second mensuel, bilan du club déjà
+        # crédité) ou si le club n'est plus en service.
+        pris = set(
+            (
+                await db.scalars(
+                    select(MouvementPoints.cle).where(MouvementPoints.cle.in_([cle_auteur, cle_club or ""]))
+                )
+            ).all()
         )
-        if auteur is not None and auteur.role is Role.encadreur and not sans_points
-        else None
-    )
-    montant_club = (
-        await db.scalar(select(LigneBareme.montant).where(LigneBareme.code == CLUB[rapport.modele], LigneBareme.actif))
-        if rapport.modele in CLUB and not sans_points
-        else None
-    )
+        if auteur.role is Role.encadreur and cle_auteur not in pris:
+            montant_auteur = await db.scalar(
+                select(LigneBareme.montant).where(LigneBareme.code == ENCADREUR[rapport.modele], LigneBareme.actif)
+            )
+        club = await db.get(Club, rapport.club_id)
+        if cle_club is not None and cle_club not in pris and club is not None and activation.est_en_service(club):
+            montant_club = await db.scalar(
+                select(LigneBareme.montant).where(LigneBareme.code == CLUB[rapport.modele], LigneBareme.actif)
+            )
     return RapportModeration(
         reference=rapport.reference,
         modele=rapport.modele.value,

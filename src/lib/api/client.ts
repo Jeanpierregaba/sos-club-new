@@ -1073,6 +1073,8 @@ export type FiltresArchive = {
   etat?: "soumis" | "a_corriger" | "approuve" | "refuse" | undefined;
   dre?: string | undefined;
   recherche?: string | undefined;
+  du?: string | undefined;
+  au?: string | undefined;
   page?: number | undefined;
 };
 export const adminArchiveRapports = (filtres: FiltresArchive) =>

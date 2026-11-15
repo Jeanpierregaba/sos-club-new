@@ -21,7 +21,6 @@ from app.moderation.models import Contenu, EtatContenu, EtatVersion, Photo, Vers
 from app.moderation.types import type_de
 from app.referentiel.models import Etablissement, Iesg
 
-MAX_EN_ATTENTE = 3
 MAX_BROUILLONS = 20
 MESSAGE_VERSION = "Ce contenu a été modifié entre-temps : recharge la page."
 
