@@ -8,7 +8,7 @@ ex æquo, cycle de clôture, données publiques) sont écrites en TDD : les test
       `TASKS.md` : R14 en cours.
 - [x] 2. Migration non destructive et modèles `ClotureSemestre`, `CandidatCloture`, `EtatCloture` : contraintes
       d'état, d'unicité (rang, place, élève) et d'écart ; test d'aller-retour de la migration.
-- [ ] 3. Tests puis code de `classement_a_figer` dans `points/classements.py` : 50 premiers, exclusions
+- [x] 3. Tests puis code de `classement_a_figer` dans `points/classements.py` : 50 premiers, exclusions
       (suspendus, anciens, totaux nuls ou négatifs), rang brut et rang départagé, date d'atteinte, ex æquo par
       date puis pseudonyme, égalité qui déborde la 3e place.
 - [ ] 4. Tests puis code du gel et du regel dans `points/clotures.py` : refus avant la date de fin, photo copiée

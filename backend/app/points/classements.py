@@ -5,6 +5,7 @@ utilisateur, de nom complet ni de contact ; le routeur choisit le schéma qui ex
 """
 
 from dataclasses import dataclass
+from datetime import datetime
 from enum import StrEnum
 from uuid import UUID
 
@@ -641,3 +642,67 @@ async def classement_personnel(db: AsyncSession, utilisateur: Utilisateur) -> Cl
         semestre=await _rang_personnel(db, utilisateur, categorie, club, Periode.semestre, semestre),
         historique=await _rang_personnel(db, utilisateur, categorie, club, Periode.historique, semestre),
     )
+
+
+# Photo de fin de semestre (spec 037) ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class LigneAFiger:
+    utilisateur_id: UUID
+    rang: int
+    rang_brut: int
+    pseudonyme: str
+    club: str | None
+    dre: str
+    points: int
+    atteint_le: datetime
+
+
+async def classement_a_figer(db: AsyncSession, semestre: Semestre, *, limite: int = 50) -> list[LigneAFiger]:
+    """Le classement national des élèves d'un semestre, tel que le public le voit (mêmes exclusions), avec les
+    égalités départagées par la règle publiée : à points égaux, le premier à atteindre son total passe devant, puis
+    l'ordre alphabétique du pseudonyme. La date d'atteinte est celle de la dernière ligne du semestre : c'est elle
+    qui a fixé le total final. `rang_brut` garde l'égalité visible dans l'archive."""
+    points = (
+        select(
+            MouvementPoints.utilisateur_id.label("utilisateur_id"),
+            func.sum(MouvementPoints.montant).label("points"),
+            func.max(MouvementPoints.cree_le).label("atteint_le"),
+        )
+        .where(MouvementPoints.semestre_id == semestre.id)
+        .group_by(MouvementPoints.utilisateur_id)
+        .subquery()
+    )
+    sous = _base_eleves(points, Periode.semestre, None).add_columns(points.c.atteint_le).subquery()
+    requete = (
+        select(
+            sous.c.utilisateur_id,
+            sous.c.nom,
+            sous.c.club,
+            sous.c.dre,
+            sous.c.points,
+            sous.c.atteint_le,
+            func.rank().over(order_by=sous.c.points.desc()).label("rang_brut"),
+            func.row_number()
+            .over(
+                order_by=(sous.c.points.desc(), sous.c.atteint_le.asc(), func.lower(sous.c.nom), sous.c.utilisateur_id)
+            )
+            .label("rang"),
+        )
+        .order_by("rang")
+        .limit(limite)
+    )
+    return [
+        LigneAFiger(
+            utilisateur_id=ligne.utilisateur_id,
+            rang=int(ligne.rang),
+            rang_brut=int(ligne.rang_brut),
+            pseudonyme=ligne.nom,
+            club=ligne.club,
+            dre=ligne.dre,
+            points=int(ligne.points),
+            atteint_le=ligne.atteint_le,
+        )
+        for ligne in (await db.execute(requete)).all()
+    ]
