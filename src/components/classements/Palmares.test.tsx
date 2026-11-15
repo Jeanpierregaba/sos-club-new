@@ -41,7 +41,7 @@ describe("Palmares (spec 037)", () => {
     expect(screen.getByText("Ama")).toBeInTheDocument();
     expect(screen.getByText("Club Santé Tokoin · Grand Lomé")).toBeInTheDocument();
     expect(screen.getByText("Maritime")).toBeInTheDocument();
-    expect(screen.getByText(/atteint son total le premier/)).toBeInTheDocument();
+    expect(screen.getByText(/n'a plus bougé depuis le plus longtemps/)).toBeInTheDocument();
   });
 
   it("annonce le premier palmarès quand rien n'est publié", () => {

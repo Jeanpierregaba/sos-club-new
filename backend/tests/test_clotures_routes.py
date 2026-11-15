@@ -2,21 +2,25 @@
 """Cycle de clôture d'un semestre et palmarès (spec 037, R14) : gel, contrôle, validation, publication, droits et
 données publiques. Partie critique, écrite avant le code (docs/TESTING.md)."""
 
+import asyncio
 from collections.abc import Callable
 from datetime import timedelta
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import func, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.models import JournalAudit
 from app.comptes.models import StatutCompte, Utilisateur
 from app.eleves.models import Eleve
 from app.notifications.models import Notification
-from app.points.models import ClotureSemestre, MouvementPoints, Semestre
+from app.points import clotures
+from app.points.models import CandidatCloture, ClotureSemestre, MouvementPoints, Semestre
 from app.points.service import aujourd_hui
+from app.referentiel.administration import Refus
 from tests.conftest import Navigateur, connecter_admin
 from tests.espace_club import connecter
 from tests.test_clotures import DEBUT, gain, termine  # noqa: F401
@@ -363,7 +367,7 @@ def test_publier_rend_le_palmares_public_et_notifie(
         lambda db: db.scalars(select(Notification).where(Notification.type == "distinction_semestre"))
     ).all()
     assert {n.utilisateur_id for n in notifications} == {podium[n].id for n in ("ama", "kofi", "yao")}
-    assert any(n.titre == "Tu es Grand Champion du semestre Semestre 1 2026" for n in notifications)
+    assert any(n.titre == "Tu es Grand Champion : Semestre 1 2026" for n in notifications)
     assert en_base(lambda db: db.scalar(select(func.count()).select_from(MouvementPoints))) == lignes_avant
     assert len(journal(en_base, "palmares_publie")) == 1
 
@@ -501,3 +505,225 @@ def test_un_eleve_ou_un_anonyme_ne_touche_pas_aux_clotures(
     eleve = connecter(client, "ama")
     assert eleve.get(CLOTURES).status_code in {401, 403}
     assert eleve.post(url(termine, "/gel")).status_code in {401, 403}
+
+
+ROUTES_ADMIN = [
+    ("get", ""),
+    ("get", "/{id}"),
+    ("post", "/{id}/gel"),
+    ("post", "/{id}/candidats/{eleve}/ecart"),
+    ("post", "/{id}/candidats/{eleve}/reintegration"),
+    ("post", "/{id}/validation"),
+    ("post", "/{id}/annulation-validation"),
+    ("post", "/{id}/publication"),
+]
+
+
+@pytest.mark.parametrize(("methode", "chemin"), ROUTES_ADMIN)
+def test_chaque_route_de_cloture_exige_la_2fa_le_droit_et_le_national(
+    client: TestClient,
+    creer_collaborateur: Callable[..., Any],
+    podium: dict[str, Utilisateur],
+    termine: Semestre,
+    methode: str,
+    chemin: str,
+) -> None:
+    adresse = CLOTURES + chemin.format(id=termine.id, eleve=podium["ama"].id)
+    corps = {"json": {"motif": MOTIF}} if methode == "post" else {}
+    refuses = [
+        admin(client, creer_collaborateur, GESTIONNAIRE, identifiant="sans2fa"),
+        admin(
+            client, creer_collaborateur, GESTIONNAIRE, identifiant="dre", perimetre_dre="grand-lome", double_auth=True
+        ),
+    ]
+    if methode == "post":
+        refuses.append(admin(client, creer_collaborateur, LECTEUR, identifiant="lecteur", double_auth=True))
+
+    for navigateur in refuses:
+        assert getattr(navigateur, methode)(adresse, **corps).status_code == 403
+
+
+# Concurrence, comptes disparus et cas secondaires ------------------------------------------------------------------
+
+
+def acces_de(qui: Utilisateur) -> Callable[[AsyncSession], Any]:
+    async def construire(db: AsyncSession) -> Any:
+        from app.admin.dependances import Acces
+        from app.admin.models import Collaborateur
+
+        collaborateur = await db.scalar(select(Collaborateur).where(Collaborateur.utilisateur_id == qui.id))
+        return Acces(utilisateur=await db.get(Utilisateur, qui.id), collaborateur=collaborateur)  # type: ignore[arg-type]
+
+    return construire
+
+
+def en_parallele(*actions: Callable[[AsyncSession], Any]) -> list[Any]:
+    """Lance chaque action dans sa propre session, en même temps ; rend le résultat ou l'exception de chacune."""
+    from tests.conftest import moteur_test
+
+    async def une(action: Callable[[AsyncSession], Any]) -> Any:
+        async with AsyncSession(moteur_test, expire_on_commit=False) as db:
+            return await action(db)
+
+    async def scenario() -> list[Any]:
+        return await asyncio.gather(*(une(a) for a in actions), return_exceptions=True)
+
+    return asyncio.run(scenario())
+
+
+def test_deux_gels_simultanes_ne_creent_quune_cloture(
+    creer_collaborateur: Callable[..., Any],
+    podium: dict[str, Utilisateur],
+    en_base: Callable[..., Any],
+    termine: Semestre,
+) -> None:
+    premier = creer_collaborateur("premier", droits=GESTIONNAIRE, double_auth=True)
+    second = creer_collaborateur("second", droits=GESTIONNAIRE, double_auth=True)
+
+    def gel(qui: Utilisateur) -> Callable[[AsyncSession], Any]:
+        async def action(db: AsyncSession) -> Any:
+            return await clotures.geler(db, await acces_de(qui)(db), termine.id, "127.0.0.1")
+
+        return action
+
+    resultats = en_parallele(gel(premier), gel(second))
+
+    assert [type(r).__name__ for r in resultats] == ["ClotureDetail", "ClotureDetail"]
+    assert en_base(lambda db: db.scalar(select(func.count()).select_from(ClotureSemestre))) == 1
+    assert sorted(e.action for e in journal(en_base, "semestre_gele") + journal(en_base, "semestre_regele")) == [
+        "semestre_gele",
+        "semestre_regele",
+    ]
+    assert en_base(lambda db: db.scalar(select(func.count()).select_from(CandidatCloture))) == 4
+
+
+def test_deux_publications_simultanees_nen_font_quune(
+    creer_collaborateur: Callable[..., Any],
+    equipe: Navigateur,
+    podium: dict[str, Utilisateur],
+    en_base: Callable[..., Any],
+    termine: Semestre,
+) -> None:
+    geler(equipe, termine)
+    equipe.post(url(termine, "/validation"))
+    premier = creer_collaborateur("premier", droits=GESTIONNAIRE, double_auth=True)
+    second = creer_collaborateur("second", droits=GESTIONNAIRE, double_auth=True)
+
+    def publication(qui: Utilisateur) -> Callable[[AsyncSession], Any]:
+        async def action(db: AsyncSession) -> Any:
+            return await clotures.publier(db, await acces_de(qui)(db), termine.id, "127.0.0.1")
+
+        return action
+
+    resultats = en_parallele(publication(premier), publication(second))
+
+    refus = [r for r in resultats if isinstance(r, Refus)]
+    assert len(refus) == 1 and refus[0].statut == 409
+    assert len(journal(en_base, "palmares_publie")) == 1
+    assert (
+        en_base(
+            lambda db: db.scalar(
+                select(func.count()).select_from(Notification).where(Notification.type == "distinction_semestre")
+            )
+        )
+        == 3
+    )
+
+
+def test_un_laureat_disparu_bloque_la_publication(
+    equipe: Navigateur,
+    podium: dict[str, Utilisateur],
+    en_base: Callable[..., Any],
+    termine: Semestre,
+) -> None:
+    geler(equipe, termine)
+    equipe.post(url(termine, "/validation"))
+    # Un élève qui a des points ne se supprime pas (FK RESTRICT du registre) : on simule la ligne disparue.
+    en_base(lambda db: db.execute(delete(CandidatCloture).where(CandidatCloture.utilisateur_id == podium["kofi"].id)))
+
+    reponse = equipe.post(url(termine, "/publication"))
+
+    assert reponse.status_code == 422
+    assert "annule la validation" in reponse.json()["detail"]
+    assert equipe.get(PALMARES).json() == {"semestres": []}
+
+
+def test_le_palmares_garde_le_club_du_gel(
+    equipe: Navigateur,
+    podium: dict[str, Utilisateur],
+    en_base: Callable[..., Any],
+    termine: Semestre,
+) -> None:
+    publier_tout(equipe, termine)
+    from app.clubs.models import Club
+
+    en_base(lambda db: db.execute(update(Club).values(nom="Club renommé")))
+
+    (semestre,) = equipe.get(PALMARES).json()["semestres"]
+    assert semestre["laureats"][0]["club"] == "Club Santé Tokoin"
+
+
+def test_on_ne_reintegre_pas_sur_une_cloture_validee(
+    equipe: Navigateur,
+    podium: dict[str, Utilisateur],
+    termine: Semestre,
+) -> None:
+    geler(equipe, termine)
+    ecarter(equipe, termine, podium["ama"])
+    equipe.post(url(termine, "/validation"))
+
+    reponse = equipe.post(url(termine, f"/candidats/{podium['ama'].id}/reintegration"))
+
+    assert reponse.status_code == 409
+
+
+def test_le_journal_nomme_lauteur_et_le_semestre(
+    equipe: Navigateur,
+    podium: dict[str, Utilisateur],
+    en_base: Callable[..., Any],
+    termine: Semestre,
+) -> None:
+    geler(equipe, termine)
+    ecarter(equipe, termine, podium["kofi"])
+    auteur = en_base(lambda db: db.scalar(select(Utilisateur.id).where(Utilisateur.identifiant == "equipe")))
+
+    for action in ("semestre_gele", "candidat_ecarte"):
+        (entree,) = journal(en_base, action)
+        assert (entree.auteur_id, entree.cible_id) == (auteur, str(termine.id))
+
+    (candidat,) = [c for c in equipe.get(url(termine)).json()["candidats"] if c["pseudonyme"] == "Kofi"]
+    assert candidat["ecarte_par"] == "equipe"
+
+
+def test_le_regel_ne_compte_que_les_ecarts_reportes(
+    equipe: Navigateur,
+    podium: dict[str, Utilisateur],
+    en_base: Callable[..., Any],
+    termine: Semestre,
+) -> None:
+    geler(equipe, termine)
+    ecarter(equipe, termine, podium["kofi"])
+    ecarter(equipe, termine, podium["yao"])
+    suspendre(en_base, podium["yao"])
+
+    geler(equipe, termine)
+
+    (entree,) = journal(en_base, "semestre_regele")
+    assert (entree.details["ecartes_reportes"], entree.details["ecarts_perdus"]) == (1, 1)
+
+
+def test_un_eleve_sorti_des_cinquante_reste_distinct_dun_exclu(
+    equipe: Navigateur,
+    podium: dict[str, Utilisateur],
+    en_base: Callable[..., Any],
+    termine: Semestre,
+) -> None:
+    geler(equipe, termine)
+    suspendre(en_base, podium["afi"])
+    with patch.object(clotures, "TAILLE_PHOTO", 2):
+        changements = equipe.get(url(termine)).json()["ecart_actuel"]["changements"]
+
+    par_nom = {c["pseudonyme"]: c for c in changements}
+    assert par_nom["Yao"] == {"pseudonyme": "Yao", "points_gel": 100, "points_actuels": 100, "hors_photo": True}
+    assert par_nom["Afi"]["points_actuels"] is None
+    assert "Ama" not in par_nom

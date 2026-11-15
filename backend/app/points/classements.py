@@ -659,11 +659,11 @@ class LigneAFiger:
     atteint_le: datetime
 
 
-async def classement_a_figer(db: AsyncSession, semestre: Semestre, *, limite: int = 50) -> list[LigneAFiger]:
+async def classement_a_figer(db: AsyncSession, semestre: Semestre, *, limite: int | None = 50) -> list[LigneAFiger]:
     """Le classement national des élèves d'un semestre, tel que le public le voit (mêmes exclusions), avec les
-    égalités départagées par la règle publiée : à points égaux, le premier à atteindre son total passe devant, puis
-    l'ordre alphabétique du pseudonyme. La date d'atteinte est celle de la dernière ligne du semestre : c'est elle
-    qui a fixé le total final. `rang_brut` garde l'égalité visible dans l'archive."""
+    égalités départagées par la règle publiée : à points égaux, passe devant l'élève dont la dernière ligne de points
+    du semestre est la plus ancienne (c'est elle qui a fixé le total final), puis l'ordre alphabétique du pseudonyme.
+    `limite=None` rend tout le classement. `rang_brut` garde l'égalité visible dans l'archive."""
     points = (
         select(
             MouvementPoints.utilisateur_id.label("utilisateur_id"),

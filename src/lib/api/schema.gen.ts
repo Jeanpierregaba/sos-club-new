@@ -4225,6 +4225,8 @@ export interface components {
             motif_ecart: string | null;
             /** Ecarte Le */
             ecarte_le: string | null;
+            /** Ecarte Par */
+            ecarte_par: string | null;
         };
         /** Carte */
         Carte: {
@@ -4419,7 +4421,11 @@ export interface components {
              */
             afficher_club: boolean;
         };
-        /** ChangementActuel */
+        /**
+         * ChangementActuel
+         * @description `points_actuels` vaut None si l'élève n'est plus classable (suspendu, ancien, total nul) ; `hors_photo`
+         *     signale un élève toujours classé, mais au-delà des 50 premiers.
+         */
         ChangementActuel: {
             /** Pseudonyme */
             pseudonyme: string;
@@ -4427,6 +4433,11 @@ export interface components {
             points_gel: number | null;
             /** Points Actuels */
             points_actuels: number | null;
+            /**
+             * Hors Photo
+             * @default false
+             */
+            hors_photo: boolean;
         };
         /** Chiffres */
         Chiffres: {

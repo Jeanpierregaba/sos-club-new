@@ -8,7 +8,6 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] R14 — Clôture de semestre et Top 3 (Q21, Q25) — [spec 037](docs/specs/037-cloture-de-semestre-et-top-3/spec.md) (spec, plan et tâches validés le 2026-11-15 : ex æquo au premier arrivé, un seul admin, titre sans points, validation annulable)
 - [ ] Quiz santé (922 QCM) jouables depuis la page des jeux, 3 quiz sans compte puis compte visiteur ; correction en vert ou rouge et récapitulatif des erreurs (2026-11-10, ADR-0004 amendé) (spec 031, livré en urgence le 2026-11-09 : spec écrite à rédiger)
 - [ ] Fiches d'inscription : élève, encadreur et visiteur, e-mails (R19 avancé) — [spec 030](docs/specs/030-fiches-d-inscription/spec.md)
 
@@ -76,6 +75,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] R14 — Clôture de semestre et Top 3 (Q21, Q25) — [spec 037](docs/specs/037-cloture-de-semestre-et-top-3/spec.md) (2026-11-15 : gel, contrôle, validation annulable et publication du Top 3, palmarès sur `/hall-of-fame`, distinctions dans l'espace élève ; reste à trancher : le pseudonyme publié à retirer, le club affiché sans choix de l'élève)
 - [x] [036 — Classements et tableaux de bord](docs/specs/036-classements-et-tableaux-de-bord/spec.md) (R13 : page `/hall-of-fame` DRE et national pour élèves, encadreurs et clubs, semestre et historique ; rangs personnels et classement interne privé du club ; registre admin filtrable, corrections motivées et annulations journalisées, nationales, sous double authentification ; seuls les totaux positifs sont classés. Question ouverte : club affiché sans choix de l'élève, voir la spec)
 - [x] [035 — Annuaire national des établissements du Secondaire I](docs/specs/035-annuaire-secondaire-i/spec.md) (2 396 collèges importés avec préfecture et ordre, noms en casse normale, doublons de nom approchant créés à part ; recherche publique et back office filtrable ; activation des clubs au seuil inchangée ; retour de migration refusé si un établissement importé a déjà des membres)
 - [x] [034 — Gamification de l'élève : 100 quiz sur 4 niveaux, étoiles, carte Gold, club à 50 %](docs/specs/034-gamification-eleve-4-niveaux/spec.md) (ADR-0012 : le club reçoit la moitié de chaque gain de l'élève en demi-points ; 100 quiz Jeux sur 4 niveaux, 4 étoiles et carte Gold ; certification à 20 places ; année académique de septembre à juillet, clôture qui fige le classement régional, anciens élèves ; tableau de bord élève et admin des années)

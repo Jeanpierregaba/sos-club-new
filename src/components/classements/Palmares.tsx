@@ -12,7 +12,7 @@ const COULEURS = [
 
 // La règle d'égalité publiée (spec 037) : elle s'affiche avec le palmarès, comme le demande le cahier des charges.
 export const REGLE_EX_AEQUO =
-  "À égalité de points, l'élève qui a atteint son total le premier passe devant ; à la même seconde, l'ordre alphabétique du nom de joueur décide.";
+  "À égalité de points, passe devant l'élève dont le total n'a plus bougé depuis le plus longtemps (date de sa dernière ligne de points du semestre, gain, correction ou annulation) ; à la même seconde, l'ordre alphabétique du nom de joueur décide.";
 
 // Le palmarès des semestres clôturés (spec 037) : Grand Champion, Vice-Champion et Jeune Talent, par leur nom de
 // joueur, leur club et leur DRE. Rien d'autre n'est public.

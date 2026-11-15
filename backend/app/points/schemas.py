@@ -368,7 +368,9 @@ class AnnulationPoints(BaseModel):
 
 
 class MotifCloture(BaseModel):
-    motif: str = Field(min_length=1, max_length=500)
+    model_config = ConfigDict(extra="forbid")
+
+    motif: str = Field(min_length=10, max_length=500)
 
 
 class ClotureResume(BaseModel):
@@ -413,6 +415,7 @@ class CandidatAdmin(BaseModel):
     ecarte: bool
     motif_ecart: str | None
     ecarte_le: datetime | None
+    ecarte_par: str | None
 
 
 class LaureatAdmin(BaseModel):
@@ -426,9 +429,13 @@ class LaureatAdmin(BaseModel):
 
 
 class ChangementActuel(BaseModel):
+    """`points_actuels` vaut None si l'élève n'est plus classable (suspendu, ancien, total nul) ; `hors_photo`
+    signale un élève toujours classé, mais au-delà des 50 premiers."""
+
     pseudonyme: str
     points_gel: int | None
     points_actuels: int | None
+    hors_photo: bool = False
 
 
 class EcartActuel(BaseModel):

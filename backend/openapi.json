@@ -12457,6 +12457,17 @@
               }
             ],
             "title": "Ecarte Le"
+          },
+          "ecarte_par": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ecarte Par"
           }
         },
         "type": "object",
@@ -12475,7 +12486,8 @@
           "annulations",
           "ecarte",
           "motif_ecart",
-          "ecarte_le"
+          "ecarte_le",
+          "ecarte_par"
         ],
         "title": "CandidatAdmin"
       },
@@ -13044,6 +13056,11 @@
               }
             ],
             "title": "Points Actuels"
+          },
+          "hors_photo": {
+            "type": "boolean",
+            "title": "Hors Photo",
+            "default": false
           }
         },
         "type": "object",
@@ -13052,7 +13069,8 @@
           "points_gel",
           "points_actuels"
         ],
-        "title": "ChangementActuel"
+        "title": "ChangementActuel",
+        "description": "`points_actuels` vaut None si l'élève n'est plus classable (suspendu, ancien, total nul) ; `hors_photo`\nsignale un élève toujours classé, mais au-delà des 50 premiers."
       },
       "Chiffres": {
         "properties": {
@@ -20442,10 +20460,11 @@
           "motif": {
             "type": "string",
             "maxLength": 500,
-            "minLength": 1,
+            "minLength": 10,
             "title": "Motif"
           }
         },
+        "additionalProperties": false,
         "type": "object",
         "required": [
           "motif"

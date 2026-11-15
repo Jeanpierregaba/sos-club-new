@@ -85,8 +85,10 @@ Une clôture de semestre passe par quatre états, toujours dans cet ordre :
 
 1. Les classements courants (spec 036) montrent les égalités telles quelles : même rang partagé.
 2. Pour le Top 3, les égalités sont tranchées **automatiquement** : à points égaux, passe devant l'élève dont le
-   total du semestre a été **atteint le plus tôt** (date de la ligne qui l'a porté à ce total). À date identique,
-   ce qui n'arrive qu'en théorie, l'ordre alphabétique du pseudonyme tranche.
+   total du semestre a été **atteint le plus tôt**, c'est-à-dire la date de sa **dernière ligne** de points du
+   semestre (gain, correction ou annulation) : c'est elle qui a fixé le total final. Une correction ou une
+   annulation tardive repousse donc cette date. À date identique, ce qui n'arrive qu'en théorie, l'ordre
+   alphabétique du pseudonyme tranche. Le texte public dit exactement cela (relecture du 2026-11-15).
 3. La règle est écrite en clair sur la page publique du palmarès et sur l'écran de l'admin.
 4. La photo enregistre, pour chaque candidat, son rang départagé et son rang brut, pour que l'égalité reste
    visible dans l'archive.
@@ -128,56 +130,56 @@ Une clôture de semestre passe par quatre états, toujours dans cet ordre :
 
 ### Gel
 
-- [ ] Étant donné un semestre dont la date de fin n'est pas passée, quand l'admin demande le gel, alors l'API
+- [x] Étant donné un semestre dont la date de fin n'est pas passée, quand l'admin demande le gel, alors l'API
       refuse avec un message clair.
-- [ ] Étant donné un semestre terminé avec des élèves classés, quand l'admin gèle, alors la photo contient les 50
+- [x] Étant donné un semestre terminé avec des élèves classés, quand l'admin gèle, alors la photo contient les 50
       premiers élèves du classement national du semestre, avec rang, rang brut, pseudonyme, club, DRE et points.
-- [ ] Étant donné un élève suspendu ou ancien élève, alors il n'est pas dans la photo.
-- [ ] Étant donné une clôture gelée, quand une correction change les points d'un candidat, alors la photo ne
+- [x] Étant donné un élève suspendu ou ancien élève, alors il n'est pas dans la photo.
+- [x] Étant donné une clôture gelée, quand une correction change les points d'un candidat, alors la photo ne
       change pas et l'écran signale l'écart ; un regel prend la correction en compte.
-- [ ] Étant donné deux gels simultanés du même semestre, alors une seule clôture existe.
-- [ ] Étant donné une clôture validée ou publiée, alors le regel est refusé.
+- [x] Étant donné deux gels simultanés du même semestre, alors une seule clôture existe.
+- [x] Étant donné une clôture validée ou publiée, alors le regel est refusé.
 
 ### Ex æquo
 
-- [ ] Étant donné deux élèves à égalité de points, alors celui qui a atteint ce total le plus tôt passe devant
+- [x] Étant donné deux élèves à égalité de points, alors celui qui a atteint ce total le plus tôt passe devant
       dans le Top 3, et la photo garde leur rang brut identique.
-- [ ] Étant donné une égalité à la même seconde, alors l'ordre alphabétique du pseudonyme tranche.
+- [x] Étant donné une égalité à la même seconde, alors l'ordre alphabétique du pseudonyme tranche.
 
 ### Contrôle
 
-- [ ] Étant donné un candidat du Top 3 proposé, quand l'admin l'écarte avec un motif, alors le candidat suivant
+- [x] Étant donné un candidat du Top 3 proposé, quand l'admin l'écarte avec un motif, alors le candidat suivant
       entre dans le Top 3 proposé et le motif est journalisé.
-- [ ] Étant donné un motif de moins de 10 caractères, alors l'écart est refusé.
-- [ ] Étant donné un candidat écarté, quand l'admin le réintègre avant validation, alors il retrouve sa place.
-- [ ] Étant donné une clôture validée, alors écarter ou réintégrer est refusé.
+- [x] Étant donné un motif de moins de 10 caractères, alors l'écart est refusé.
+- [x] Étant donné un candidat écarté, quand l'admin le réintègre avant validation, alors il retrouve sa place.
+- [x] Étant donné une clôture validée, alors écarter ou réintégrer est refusé.
 
 ### Validation et publication
 
-- [ ] Étant donné une clôture gelée, quand l'admin valide, alors le Top 3 est figé dans l'ordre proposé.
-- [ ] Étant donné une clôture validée, quand l'admin publie, alors le palmarès apparaît sur `/hall-of-fame` et
+- [x] Étant donné une clôture gelée, quand l'admin valide, alors le Top 3 est figé dans l'ordre proposé.
+- [x] Étant donné une clôture validée, quand l'admin publie, alors le palmarès apparaît sur `/hall-of-fame` et
       chaque lauréat reçoit une notification ; aucun point n'est écrit au registre.
-- [ ] Étant donné une clôture validée, quand l'admin annule la validation avec un motif, alors elle revient à
+- [x] Étant donné une clôture validée, quand l'admin annule la validation avec un motif, alors elle revient à
       l'état gelé et l'annulation est journalisée ; sans motif valable, elle est refusée.
-- [ ] Étant donné une clôture publiée, alors l'annulation de la validation est refusée.
-- [ ] Étant donné une clôture publiée, alors aucune route ne permet de la modifier, de la regeler ou de la
+- [x] Étant donné une clôture publiée, alors l'annulation de la validation est refusée.
+- [x] Étant donné une clôture publiée, alors aucune route ne permet de la modifier, de la regeler ou de la
       supprimer.
 
 ### Public et espace élève
 
-- [ ] La réponse publique du palmarès ne contient ni nom complet, ni identifiant, ni e-mail, ni téléphone, ni
+- [x] La réponse publique du palmarès ne contient ni nom complet, ni identifiant, ni e-mail, ni téléphone, ni
       candidat écarté, ni motif.
-- [ ] Un semestre gelé ou validé mais non publié n'apparaît pas dans le palmarès public.
-- [ ] Étant donné un lauréat qui change ensuite de pseudonyme ou de club, alors le palmarès publié garde les
+- [x] Un semestre gelé ou validé mais non publié n'apparaît pas dans le palmarès public.
+- [x] Étant donné un lauréat qui change ensuite de pseudonyme ou de club, alors le palmarès publié garde les
       valeurs du gel.
-- [ ] Un lauréat voit sa distinction dans son espace ; un autre élève ne la voit pas dans le sien.
-- [ ] Sans palmarès publié, la section affiche un état vide.
+- [x] Un lauréat voit sa distinction dans son espace ; un autre élève ne la voit pas dans le sien.
+- [x] Sans palmarès publié, la section affiche un état vide.
 
 ### Droits
 
-- [ ] Chaque route admin de clôture exige le droit attendu, le périmètre national et la double
+- [x] Chaque route admin de clôture exige le droit attendu, le périmètre national et la double
       authentification ; un collaborateur de DRE est refusé.
-- [ ] Chaque étape est écrite au journal d'audit avec son auteur, sa date et le semestre.
+- [x] Chaque étape est écrite au journal d'audit avec son auteur, sa date et le semestre.
 
 ## Cas limites et erreurs
 
@@ -197,7 +199,10 @@ Une clôture de semestre passe par quatre états, toujours dans cet ordre :
 - **Lauréat suspendu entre la validation et la publication** : la publication est refusée tant que le Top 3
   contient un compte suspendu ; l'admin annule la validation, puis écarte le lauréat ou regèle.
 - **Deux admins en même temps** : chaque étape vérifie l'état attendu ; la seconde action reçoit un conflit
-  explicite.
+  explicite. Exception : deux gels simultanés donnent une seule clôture, et le second devient un regel journalisé,
+  puisque le regel est permis tant que la clôture est gelée.
+- **Lauréat dont le compte est supprimé après la validation** : la publication est refusée ; l'admin annule la
+  validation pour recalculer le Top 3.
 - **Notification qui échoue** : la publication est une seule transaction avec les notifications ; rien n'est publié
   à moitié.
 
@@ -214,5 +219,11 @@ Une clôture de semestre passe par quatre états, toujours dans cet ordre :
 
 ## Questions ouvertes
 
-Aucune : les quatre questions ont été tranchées le 2026-11-15. La question du club affiché sans choix de l'élève
-(spec 036) vaut aussi pour le palmarès ; sa réponse s'appliquera aux deux.
+Les quatre questions de départ ont été tranchées le 2026-11-15. Restent ouvertes :
+
+- La question du club affiché sans choix de l'élève (spec 036) vaut aussi pour le palmarès ; sa réponse
+  s'appliquera aux deux.
+- **Pseudonyme publié à retirer** (relecture du 2026-11-15) : le palmarès publié garde le pseudonyme du gel et
+  aucune route ne le modifie. Si l'admin fait changer un pseudonyme qui révèle un nom réel ou est inapproprié (Q20),
+  la copie publiée reste. À trancher : une route de masquage réservée au super-admin et journalisée, ou une
+  procédure hors plateforme.

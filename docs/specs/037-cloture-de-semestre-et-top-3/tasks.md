@@ -27,6 +27,9 @@ ex æquo, cycle de clôture, données publiques) sont écrites en TDD : les test
 - [x] 9. Site : onglet **Clôtures** de l'admin, liste des semestres et écran d'une clôture (photo, Top 3 proposé,
       écarts, actions selon l'état, dialogues motivés, écart avec le classement actuel, refus affichés) ;
       libellés du journal dans `src/lib/admin.ts`.
-- [ ] 10. Lint, typecheck, tests backend et site ; vérification dans le navigateur ; `TASKS.md`.
-- [ ] Vérifier tous les critères d'acceptation de `spec.md`.
-- [ ] Relecture finale par le sous-agent `reviewer`.
+- [x] 10. Lint, typecheck, tests backend et site ; vérification dans le navigateur (palmarès public ; écran admin couvert par les tests,
+      la connexion admin exige la double authentification) ; `TASKS.md`.
+- [x] Vérifier tous les critères d'acceptation de `spec.md`.
+- [x] Relecture finale par le sous-agent `reviewer` (2026-11-15) : lien vers le registre, règle d'ex æquo publiée
+      exacte, tests de droits sur les 8 routes et de concurrence, écran admin testé, auteur des écarts ; question du
+      pseudonyme publié reportée dans la spec.

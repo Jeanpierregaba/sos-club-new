@@ -76,12 +76,11 @@ async def _candidats(db: AsyncSession, semestre_id: UUID) -> list[CandidatClotur
     )
 
 
-def _top3(candidats: list[CandidatCloture]) -> list[CandidatCloture]:
+def _top3(candidats: list[CandidatCloture], etat: EtatCloture) -> list[CandidatCloture]:
     """Après validation, les places figées ; avant, les trois premiers candidats non écartés de la photo."""
-    places = sorted((c for c in candidats if c.place is not None), key=lambda c: c.place or 0)
-    if places:
-        return places
-    return [c for c in candidats if c.ecarte_le is None][:3]
+    if etat is EtatCloture.gele:
+        return [c for c in candidats if c.ecarte_le is None][:3]
+    return sorted((c for c in candidats if c.place is not None), key=lambda c: c.place or 0)
 
 
 def _laureat(candidat: CandidatCloture, position: int) -> LaureatAdmin:
@@ -142,24 +141,29 @@ async def _registre_du_semestre(db: AsyncSession, semestre_id: UUID, ids: set[UU
     return {utilisateur_id: (int(c), int(a)) for utilisateur_id, c, a in lignes.all()}
 
 
-async def _ecart_actuel(db: AsyncSession, semestre: Semestre, candidats: list[CandidatCloture]) -> EcartActuel:
-    """Ce que donnerait un regel maintenant : candidats dont les points ont changé, entrants, et Top 3 différent."""
-    actuel = await classements.classement_a_figer(db, semestre, limite=TAILLE_PHOTO)
+async def _ecart_actuel(
+    db: AsyncSession, semestre: Semestre, cloture: ClotureSemestre, candidats: list[CandidatCloture]
+) -> EcartActuel:
+    """Ce que donnerait un regel maintenant : candidats dont les points ont changé, entrants, sortants (exclus ou
+    simplement au-delà des 50 premiers) et Top 3 différent."""
+    complet = await classements.classement_a_figer(db, semestre, limite=None)
     ecartes = {c.utilisateur_id for c in candidats if c.ecarte_le is not None}
     gel = {c.utilisateur_id: c for c in candidats}
-    maintenant_ = {ligne.utilisateur_id: ligne for ligne in actuel}
+    tous = {ligne.utilisateur_id: ligne for ligne in complet}
+    photo = {ligne.utilisateur_id for ligne in complet[:TAILLE_PHOTO]}
     changements = [
         ChangementActuel(pseudonyme=ligne.pseudonyme, points_gel=gel[uid].points if uid in gel else None,
-                         points_actuels=ligne.points)
-        for uid, ligne in maintenant_.items()
-        if uid not in gel or gel[uid].points != ligne.points
+                         points_actuels=ligne.points, hors_photo=uid not in photo)
+        for uid, ligne in tous.items()
+        if (uid in photo and uid not in gel)
+        or (uid in gel and (gel[uid].points != ligne.points or uid not in photo))
     ] + [
         ChangementActuel(pseudonyme=candidat.pseudonyme, points_gel=candidat.points, points_actuels=None)
         for uid, candidat in gel.items()
-        if uid not in maintenant_
+        if uid not in tous
     ]  # fmt: skip
-    top_actuel = [ligne.utilisateur_id for ligne in actuel if ligne.utilisateur_id not in ecartes][:3]
-    top_gel = [c.utilisateur_id for c in _top3(candidats)]
+    top_actuel = [ligne.utilisateur_id for ligne in complet if ligne.utilisateur_id not in ecartes][:3]
+    top_gel = [c.utilisateur_id for c in _top3(candidats, cloture.etat)]
     return EcartActuel(top3_different=top_actuel != top_gel, changements=changements)
 
 
@@ -170,9 +174,8 @@ async def detail(db: AsyncSession, semestre_id: UUID) -> ClotureDetail:
         raise Introuvable
     candidats = await _candidats(db, semestre_id)
     ids = {c.utilisateur_id for c in candidats}
-    auteurs = await _identifiants(
-        db, ids | {u for u in (cloture.gele_par, cloture.valide_par, cloture.publie_par) if u is not None}
-    )
+    etapes = (cloture.gele_par, cloture.valide_par, cloture.publie_par, *(c.ecarte_par for c in candidats))
+    auteurs = await _identifiants(db, ids | {u for u in etapes if u is not None})
     registre = await _registre_du_semestre(db, semestre_id, ids)
 
     def identifiant(utilisateur_id: UUID | None) -> str | None:
@@ -206,12 +209,13 @@ async def detail(db: AsyncSession, semestre_id: UUID) -> ClotureDetail:
                 ecarte=c.ecarte_le is not None,
                 motif_ecart=c.motif_ecart,
                 ecarte_le=c.ecarte_le,
+                ecarte_par=identifiant(c.ecarte_par),
             )
             for c in candidats
         ],
-        top3=[_laureat(c, position) for position, c in enumerate(_top3(candidats), start=1)],
+        top3=[_laureat(c, position) for position, c in enumerate(_top3(candidats, cloture.etat), start=1)],
         ecart_actuel=(
-            await _ecart_actuel(db, semestre, candidats)
+            await _ecart_actuel(db, semestre, cloture, candidats)
             if cloture.etat is not EtatCloture.publie
             else EcartActuel(top3_different=False, changements=[])
         ),
@@ -242,9 +246,11 @@ async def geler(db: AsyncSession, acces: Acces, semestre_id: UUID, ip: str) -> C
     cloture = await _verrouiller(db, semestre.id)
     _exiger(cloture, EtatCloture.gele, "Cette clôture est validée ou publiée : elle ne se regèle plus.")
 
+    # Un second gel concurrent devient un regel journalisé : le regel est permis tant que la clôture est gelée.
     anciens = {c.utilisateur_id: c for c in await _candidats(db, semestre.id) if c.ecarte_le is not None}
     await db.execute(delete(CandidatCloture).where(CandidatCloture.semestre_id == semestre.id))
     photo = await classements.classement_a_figer(db, semestre, limite=TAILLE_PHOTO)
+    reportes = sum(1 for ligne in photo if ligne.utilisateur_id in anciens)
     for ligne in photo:
         ecart = anciens.get(ligne.utilisateur_id)
         db.add(
@@ -261,7 +267,8 @@ async def geler(db: AsyncSession, acces: Acces, semestre_id: UUID, ip: str) -> C
     journaliser(
         db, "semestre_regele" if regel else "semestre_gele", acces.utilisateur, cible_type="semestre",
         cible_id=semestre.id, perimetre="national",
-        details={"libelle": semestre.libelle, "candidats": len(photo), "ecartes_reportes": len(anciens)},
+        details={"libelle": semestre.libelle, "candidats": len(photo), "ecartes_reportes": reportes,
+                 "ecarts_perdus": len(anciens) - reportes},
         adresse_ip=ip,
     )  # fmt: skip
     await db.commit()
@@ -363,7 +370,10 @@ async def publier(db: AsyncSession, acces: Acces, semestre_id: UUID, ip: str) ->
     """Publie le palmarès et notifie les lauréats, dans une seule transaction ; aucun point n'est écrit."""
     cloture = await _verrouiller(db, semestre_id)
     _exiger(cloture, EtatCloture.valide, "Seule une clôture validée se publie.")
-    laureats = _top3(await _candidats(db, semestre_id))
+    laureats = _top3(await _candidats(db, semestre_id), cloture.etat)
+    if [c.place for c in laureats] != list(range(1, len(laureats) + 1)) or not laureats:
+        # Un lauréat validé a disparu (compte supprimé) : publier laisserait une place vide sans le dire.
+        raise Refus("Un lauréat validé n'existe plus : annule la validation pour recalculer le Top 3.", 422)
     comptes = await _identifiants(db, {c.utilisateur_id for c in laureats})
     inactifs = [
         c.pseudonyme
@@ -380,7 +390,7 @@ async def publier(db: AsyncSession, acces: Acces, semestre_id: UUID, ip: str) ->
         distinction = DISTINCTIONS[candidat.place or 0]
         notifier(
             db, candidat.utilisateur_id, "distinction_semestre",
-            f"Tu es {distinction} du semestre {cloture.libelle}",
+            f"Tu es {distinction} : {cloture.libelle}",
             f"Bravo ! Tu termines {_ordinal(candidat.place or 0)} du classement national avec {candidat.points} "
             "points. Ton nom de joueur rejoint le palmarès du Hall of Fame.",
             LIEN_PALMARES,
