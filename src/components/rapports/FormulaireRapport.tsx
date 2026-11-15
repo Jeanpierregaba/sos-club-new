@@ -20,6 +20,7 @@ import {
   urlPhotoRapport,
   type AxePublic,
   type RapportDetail,
+  type RapportResume,
   type SemestreRapport,
   type SortePiece,
   type TypeActivite,
@@ -37,7 +38,10 @@ export function FormulaireRapport({
   axes,
   types,
   semestres,
+  activites = [],
 }: {
+  // Spec 038 : les rapports d'activité du club, rappelés dans un mensuel pour le mois choisi.
+  activites?: RapportResume[];
   rapport: RapportDetail;
   axes: AxePublic[];
   types: TypeActivite[];
@@ -129,6 +133,9 @@ export function FormulaireRapport({
             onChange={(e) => changer("mois", e.target.value ? `${e.target.value}-01` : null)}
           />
         </Bloc>
+      )}
+      {modele === "mensuel" && typeof donnees["mois"] === "string" && (
+        <RappelDuMois mois={donnees["mois"]} activites={activites} />
       )}
       {modele === "bilan" && (
         <Bloc libelle="Semestre *" id="semestre_id">
@@ -370,6 +377,31 @@ export function FormulaireRapport({
         )}
       </div>
     </div>
+  );
+}
+
+function RappelDuMois({ mois, activites }: { mois: string; activites: RapportResume[] }) {
+  // La période d'un rapport d'activité s'écrit JJ/MM/AAAA ; le mois choisi, AAAA-MM-01.
+  const suffixe = `/${mois.slice(5, 7)}/${mois.slice(0, 4)}`;
+  const duMois = activites.filter((r) => r.periode?.endsWith(suffixe));
+  return (
+    <section className="rounded-2xl bg-mist-soft p-4 text-sm">
+      <h2 className="font-bold text-ink">Rapports d'activité du club ce mois-là</h2>
+      {duMois.length === 0 ? (
+        <p className="mt-1 text-muted-foreground">Aucun rapport d'activité soumis pour ce mois.</p>
+      ) : (
+        <ul className="mt-1 list-disc pl-5">
+          {duMois.map((r) => (
+            <li key={r.id}>
+              {r.reference} · {r.periode} · {r.titre}
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="mt-2 text-xs text-muted-foreground">
+        Ils gardent leurs propres points : le mensuel en fait la synthèse, sans les redonner.
+      </p>
+    </section>
   );
 }
 

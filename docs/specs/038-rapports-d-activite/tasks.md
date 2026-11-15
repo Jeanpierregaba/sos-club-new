@@ -30,9 +30,9 @@ le bilan (13 et 14), l'archive et les exports (15 à 17).
 
 ## Président, mensuel et bilan
 
-- [ ] 12. Président : - dépôt d'un rapport d'activité au nom du club (club +50 seulement) ; mensuel et bilan refusés ; - il voit les rapports d'activité du club, pas les mensuels ni les bilans ; - passation sans transfert des rapports ; club sans encadreur vérifié ; - écrans `mon-club.rapports.*` ; tests.
-- [ ] 13. Rapport mensuel : - schéma et formulaire ; soumission dès le dernier jour du mois ; - rappel des rapports d'activité du mois ; - +75 une fois par encadreur et par mois (second mensuel : rien) ; doublon probable ; tests.
-- [ ] 14. Bilan semestriel : - schéma et formulaire ; soumission dès le dernier jour du semestre ; - +200 par encadreur et par semestre, +100 club une fois ; tests.
+- [x] 12. Président : - dépôt d'un rapport d'activité au nom du club (club +50 seulement) ; mensuel et bilan refusés ; - il voit les rapports d'activité du club, pas les mensuels ni les bilans ; - passation sans transfert des rapports ; club sans encadreur vérifié ; - écrans `mon-club.rapports.*` ; tests.
+- [x] 13. Rapport mensuel : - schéma et formulaire ; soumission dès le dernier jour du mois ; - rappel des rapports d'activité du mois ; - +75 une fois par encadreur et par mois (second mensuel : rien) ; doublon probable ; tests.
+- [x] 14. Bilan semestriel : - schéma et formulaire ; soumission dès le dernier jour du semestre ; - +200 par encadreur et par semestre, +100 club une fois ; tests.
 
 ## Archive et exports
 

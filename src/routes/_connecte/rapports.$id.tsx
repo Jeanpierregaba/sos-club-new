@@ -7,6 +7,7 @@ import { FormulaireRapport } from "@/components/rapports/FormulaireRapport";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import {
   chargerAxes,
+  chargerMesRapports,
   chargerRapport,
   chargerSemestresRapport,
   chargerTypesActivite,
@@ -23,13 +24,16 @@ export const Route = createFileRoute("/_connecte/rapports/$id")({
   },
   loader: async ({ params }) => {
     const rapport = await chargerRapport(params.id);
-    if (!rapport.modifiable) return { rapport, axes: [], types: [], semestres: [] };
-    const [axes, types, semestres] = await Promise.all([
+    if (!rapport.modifiable) return { rapport, axes: [], types: [], semestres: [], activites: [] };
+    const [axes, types, semestres, mes] = await Promise.all([
       chargerAxes(),
       chargerTypesActivite(),
       chargerSemestresRapport(),
+      // Le mensuel rappelle les rapports d'activité du club, sans les recopier.
+      rapport.modele === "mensuel" ? chargerMesRapports().catch(() => null) : null,
     ]);
-    return { rapport, axes, types, semestres };
+    const activites = mes?.rapports.filter((r) => r.modele === "activite" && r.reference) ?? [];
+    return { rapport, axes, types, semestres, activites };
   },
   head: () => ({
     meta: [
@@ -48,7 +52,7 @@ const DECISIONS: Record<string, string> = {
 };
 
 function Rapport() {
-  const { rapport, axes, types, semestres } = Route.useLoaderData();
+  const { rapport, axes, types, semestres, activites } = Route.useLoaderData();
   return (
     <main className="min-h-screen bg-carnet px-4 py-10 sm:px-6">
       <div className="mx-auto max-w-3xl space-y-6">
@@ -106,6 +110,7 @@ function Rapport() {
             axes={axes}
             types={types}
             semestres={semestres}
+            activites={activites}
           />
         ) : (
           <section className="space-y-4 rounded-3xl bg-card p-5 shadow-card">

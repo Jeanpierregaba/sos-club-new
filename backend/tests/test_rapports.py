@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.comptes.models import Utilisateur
 from app.notifications.models import Notification
@@ -282,3 +282,38 @@ def test_les_types_dactivite_actifs(client: TestClient, club: dict[str, Any]) ->
     types = connecter(client, "prof").get(f"{RAPPORTS}/types-activite").json()
 
     assert types[0] == {"code": "causerie", "libelle": "Causerie éducative"}
+
+
+def test_une_passation_ne_transfere_pas_les_rapports(
+    client: TestClient, club: dict[str, Any], creer_eleve: Callable[..., Utilisateur], en_base: Callable[..., Any]
+) -> None:
+    from uuid import UUID
+
+    from app.clubs.espace import transferer_contenus
+    from app.moderation.models import Contenu
+
+    presidente = connecter(client, "presidente")
+    rapport = soumettre(presidente, brouillon(presidente, donnees=complet())).json()
+    successeur = creer_eleve("successeur", "Esi")
+
+    en_base(lambda db: transferer_contenus(db, club["club"].id, successeur.id))
+
+    auteur = en_base(lambda db: db.scalar(select(Contenu.auteur_id).where(Contenu.id == UUID(rapport["id"]))))
+    assert auteur == club["presidente"].id
+
+
+def test_un_club_sans_encadreur_verifie_recoit_le_rapport_de_son_president(
+    client: TestClient,
+    creer_eleve: Callable[..., Utilisateur],
+    creer_club: Callable[..., Any],
+    en_base: Callable[..., Any],
+) -> None:
+    seul = creer_eleve("seul", "Kodjo")
+    creer_club(seul, nom="Club Santé Solitaire")
+    navigateur = connecter(client, "seul")
+
+    reponse = soumettre(navigateur, brouillon(navigateur, donnees=complet()))
+
+    assert reponse.status_code == 200, reponse.text
+    assert reponse.json()["lectures"] == []
+    assert en_base(lambda db: db.scalar(select(func.count()).select_from(Notification))) == 0
