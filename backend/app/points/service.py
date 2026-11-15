@@ -110,6 +110,37 @@ async def crediter(
     return await db.scalar(requete)
 
 
+async def crediter_club(
+    db: AsyncSession, action: str, club_id: UUID, cle: str, *, valide_par: UUID | None = None
+) -> MouvementPoints | None:
+    """Écrit une ligne du compte collectif du club (spec 038, note de l'ADR-0012) : sans personne, au montant actuel
+    du barème, comptée au double en demi-points. Renvoie None si l'action est désactivée, à 0, déjà créditée sous
+    cette clé, ou si le club n'est pas en service."""
+    ligne = await db.get(LigneBareme, action)
+    if ligne is None:
+        raise ActionInconnue(action)
+    if ligne.beneficiaire is not Beneficiaire.club:
+        raise ValueError(f"{action} n'est pas une action du club")
+    if not ligne.actif or ligne.montant == 0:
+        return None
+    club = await db.get(Club, club_id)
+    if club is None or not activation.est_en_service(club):
+        return None
+    semestre = await semestre_en_cours(db)
+    annee = await annee_en_cours(db)
+    requete = (
+        insert(MouvementPoints)
+        .values(
+            id=uuid7(), utilisateur_id=None, action=action, montant=ligne.montant,
+            semestre_id=semestre.id if semestre else None, annee_id=annee.id if annee else None, cle=cle,
+            valide_par=valide_par, club_id=club_id, demi_points_club=2 * ligne.montant,
+        )
+        .on_conflict_do_nothing(index_elements=["cle"])
+        .returning(MouvementPoints)
+    )  # fmt: skip
+    return await db.scalar(requete)
+
+
 async def annuler(
     db: AsyncSession, mouvement: MouvementPoints, *, valide_par: UUID | None = None
 ) -> MouvementPoints | None:

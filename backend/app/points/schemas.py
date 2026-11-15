@@ -307,11 +307,12 @@ class LigneRegistre(BaseModel):
 
     id: UUID
     cree_le: datetime
-    utilisateur_id: UUID
+    # Nuls pour une ligne du compte collectif du club (spec 038) : `role` vaut alors « club ».
+    utilisateur_id: UUID | None
     role: str
-    identifiant: str
-    prenom: str
-    nom: str
+    identifiant: str | None
+    prenom: str | None
+    nom: str | None
     pseudonyme: str | None
     action: str
     action_libelle: str

@@ -248,7 +248,15 @@ class MouvementPoints(Base):
         Index("ix_mouvement_points_utilisateur_id_semestre_id", "utilisateur_id", "semestre_id"),
         # La part du club (spec 034, ADR-0012) : toujours la moitié du gain de l'élève, en demi-points entiers.
         CheckConstraint("(club_id IS NULL) = (demi_points_club IS NULL)", name="club_et_part"),
-        CheckConstraint("demi_points_club IS NULL OR demi_points_club = montant", name="part_du_club_moitie"),
+        CheckConstraint(
+            "demi_points_club IS NULL OR demi_points_club = montant OR utilisateur_id IS NULL", name="part_du_club_moitie"
+        ),
+        # Une ligne du compte collectif (spec 038) : sans personne, pour une action du club, au double en demi-points.
+        CheckConstraint(
+            "utilisateur_id IS NOT NULL"
+            " OR (club_id IS NOT NULL AND action LIKE 'club.%' AND demi_points_club = 2 * montant)",
+            name="ligne_de_club",
+        ),
         Index("ix_mouvement_points_club_id", "club_id", postgresql_where=text("club_id IS NOT NULL")),
         Index("ix_mouvement_points_annee_id_utilisateur_id", "annee_id", "utilisateur_id"),
         # Les classements lisent par semestre et par club ; le registre trie par date (spec 036).
@@ -263,7 +271,8 @@ class MouvementPoints(Base):
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
-    utilisateur_id: Mapped[UUID] = mapped_column(ForeignKey("utilisateur.id", ondelete="RESTRICT"))
+    # Nul pour une ligne du compte collectif du club (spec 038).
+    utilisateur_id: Mapped[UUID | None] = mapped_column(ForeignKey("utilisateur.id", ondelete="RESTRICT"))
     action: Mapped[str] = mapped_column(ForeignKey("bareme.code", ondelete="RESTRICT"))
     # Copié du barème au moment du gain : un total ne dépend jamais du barème actuel.
     montant: Mapped[int] = mapped_column(Integer)

@@ -290,16 +290,24 @@ function LigneDuRegistre({
   onAnnuler: (() => void) | null;
   onClub: (clubId: string) => void;
 }) {
-  const nom = ligne.pseudonyme
-    ? `${ligne.pseudonyme} (${ligne.identifiant})`
-    : `${ligne.prenom} ${ligne.nom} (${ligne.identifiant})`;
+  // Une ligne du compte collectif du club (spec 038) n'a pas de personne.
+  const nom =
+    ligne.role === "club"
+      ? `Club : ${ligne.club?.nom ?? "inconnu"}`
+      : ligne.pseudonyme
+        ? `${ligne.pseudonyme} (${ligne.identifiant})`
+        : `${ligne.prenom} ${ligne.nom} (${ligne.identifiant})`;
   return (
     <li id={`ligne-${ligne.id}`} className="flex flex-wrap items-start gap-3 px-4 py-3 sm:px-5">
       <div className="min-w-0 flex-1">
         <p className="break-words font-bold text-ink">
           {nom}
           <span className="ml-2 text-xs font-semibold text-muted-foreground">
-            {ligne.role === "eleve" ? "Élève" : "Encadreur"}
+            {ligne.role === "eleve"
+              ? "Élève"
+              : ligne.role === "club"
+                ? "Compte du club"
+                : "Encadreur"}
           </span>
         </p>
         <p className="break-words text-sm font-semibold text-ink/80">

@@ -13,9 +13,10 @@ le bilan (13 et 14), l'archive et les exports (15 à 17).
       Écrire d'abord le test de non-régression : une ligne de club ne change aucun total, rang ou date d'atteinte
       personnels, et compte dans le classement des clubs. Si la revue montre trop de risques, s'arrêter et
       proposer la table séparée.
-- [ ] 3. Migration du registre et `crediter_club` : - `utilisateur_id` nullable ; contraintes `ligne_de_club` et `part_du_club_moitie` ; annulation d'une ligne
+- [x] 3. Migration du registre et `crediter_club` : - `utilisateur_id` nullable ; contraintes `ligne_de_club` et `part_du_club_moitie` ; annulation d'une ligne
       de club ; - tests de contraintes (action qui n'est pas `club.*` refusée, part = 2 × montant) ; - club suspendu non crédité ; descente de migration refusée s'il existe des lignes de club.
-- [ ] 4. Registre admin (spec 036) : - bénéficiaire « Club : <nom> » ; filtre par club ; - annulation d'une ligne de club ; correction motivée visant un club ; - tests des routes et de l'écran.
+- [x] 4. Registre admin (spec 036) : - bénéficiaire « Club : <nom> » ; filtre par club ; - annulation d'une ligne de club ; la correction motivée visant un club est reportée (une
+      correction vise toujours une personne ; l'annulation suffit pour retirer un crédit de club) ; - tests des routes et de l'écran.
 
 ## Rapport d'activité de l'encadreur
 

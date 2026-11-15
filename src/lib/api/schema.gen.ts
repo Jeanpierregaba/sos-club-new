@@ -6672,19 +6672,16 @@ export interface components {
              * Format: date-time
              */
             cree_le: string;
-            /**
-             * Utilisateur Id
-             * Format: uuid
-             */
-            utilisateur_id: string;
+            /** Utilisateur Id */
+            utilisateur_id: string | null;
             /** Role */
             role: string;
             /** Identifiant */
-            identifiant: string;
+            identifiant: string | null;
             /** Prenom */
-            prenom: string;
+            prenom: string | null;
             /** Nom */
-            nom: string;
+            nom: string | null;
             /** Pseudonyme */
             pseudonyme: string | null;
             /** Action */

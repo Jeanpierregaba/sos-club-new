@@ -189,3 +189,25 @@ def test_la_recherche_est_reservee_aux_correcteurs(
     lecteur = admin(client, creer_collaborateur, LECTEUR, double_auth=True)
 
     assert lecteur.get(BENEFICIAIRES, params={"q": "ama"}).status_code == 403
+
+
+def test_une_ligne_du_compte_du_club_apparait_et_sannule(
+    equipe: Navigateur, lignes: dict[str, Any], en_base: Callable[..., Any]
+) -> None:
+    """Spec 038 : une ligne sans personne, au nom du club, se lit, se cherche par le club et s'annule."""
+    from app.points import service
+
+    club = lignes["club"]
+    ligne = en_base(lambda db: service.crediter_club(db, "club.rapport_activite", club.id, "club.rapport_activite:r1"))
+
+    corps = equipe.get(REGISTRE, params={"recherche": "tokoin"}).json()
+    (du_club,) = [l for l in corps["lignes"] if l["id"] == str(ligne.id)]
+    assert (du_club["role"], du_club["utilisateur_id"], du_club["identifiant"]) == ("club", None, None)
+    assert (du_club["montant"], du_club["points_club"], du_club["club"]["nom"]) == (50, 50, "Club Santé Tokoin")
+    assert str(ligne.id) in {l["id"] for l in equipe.get(REGISTRE, params={"club_id": str(club.id)}).json()["lignes"]}
+    assert equipe.get(REGISTRE, params={"beneficiaire": "eleve"}).json()["total"] == 2
+
+    reponse = equipe.post(f"/api/admin/points/lignes/{ligne.id}/annulation", json={"motif": "Rapport frauduleux."})
+
+    assert reponse.status_code == 201
+    assert reponse.json()["montant"] == -50 and reponse.json()["role"] == "club"

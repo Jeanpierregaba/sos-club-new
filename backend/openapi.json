@@ -19686,8 +19686,15 @@
             "title": "Cree Le"
           },
           "utilisateur_id": {
-            "type": "string",
-            "format": "uuid",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Utilisateur Id"
           },
           "role": {
@@ -19695,15 +19702,36 @@
             "title": "Role"
           },
           "identifiant": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Identifiant"
           },
           "prenom": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Prenom"
           },
           "nom": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Nom"
           },
           "pseudonyme": {

@@ -11,7 +11,7 @@ from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
 from uuid import UUID, uuid7
 
-from sqlalchemy import Select, func, or_, select
+from sqlalchemy import Select, and_, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
@@ -82,7 +82,8 @@ def _requete_registre(filtres: FiltresRegistre) -> Select:
             auteur.nom.label("auteur_nom"),
             auteur.identifiant.label("auteur_identifiant"),
         )
-        .join(Utilisateur, Utilisateur.id == MouvementPoints.utilisateur_id)
+        # Une ligne du compte collectif du club (spec 038) n'a pas de personne : jointure externe.
+        .outerjoin(Utilisateur, Utilisateur.id == MouvementPoints.utilisateur_id)
         .join(LigneBareme, LigneBareme.code == MouvementPoints.action)
         .outerjoin(Eleve, Eleve.utilisateur_id == MouvementPoints.utilisateur_id)
         .outerjoin(Semestre, Semestre.id == MouvementPoints.semestre_id)
@@ -117,6 +118,10 @@ def _requete_registre(filtres: FiltresRegistre) -> Select:
                 func.lower(Utilisateur.prenom).like(motif, escape="\\"),
                 func.lower(Utilisateur.nom).like(motif, escape="\\"),
                 func.lower(func.coalesce(Eleve.pseudonyme, "")).like(motif, escape="\\"),
+                and_(
+                    MouvementPoints.utilisateur_id.is_(None),
+                    func.lower(func.coalesce(Club.nom, "")).like(motif, escape="\\"),
+                ),
             )
         )
     return requete
@@ -140,7 +145,7 @@ def _ligne(rangee: Any) -> dict[str, Any]:
         "id": mouvement.id,
         "cree_le": mouvement.cree_le,
         "utilisateur_id": mouvement.utilisateur_id,
-        "role": rangee.role.value,
+        "role": rangee.role.value if rangee.role is not None else "club",
         "identifiant": rangee.identifiant,
         "prenom": rangee.prenom,
         "nom": rangee.nom,
@@ -247,7 +252,7 @@ async def chercher_beneficiaires(db: AsyncSession, texte: str) -> list[dict[str,
         resultats.append(
             {
                 "id": rangee.id,
-                "role": rangee.role.value,
+                "role": rangee.role.value if rangee.role is not None else "club",
                 "nom_public": nom_public,
                 "identifiant": rangee.identifiant,
                 "club": rangee.club,
@@ -271,7 +276,7 @@ async def _contexte_journal(db: AsyncSession, ligne: MouvementPoints) -> dict[st
     annee = await db.get(AnneeAcademique, ligne.annee_id) if ligne.annee_id else None
     club = await db.get(Club, ligne.club_id) if ligne.club_id else None
     return {
-        "beneficiaire": str(ligne.utilisateur_id),
+        "beneficiaire": str(ligne.utilisateur_id) if ligne.utilisateur_id else "club",
         "montant": ligne.montant,
         "points_club": ligne.demi_points_club / 2 if ligne.demi_points_club is not None else None,
         "motif": ligne.motif,
