@@ -3510,6 +3510,372 @@
         }
       }
     },
+    "/api/admin/points/clotures": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister Clotures",
+        "operationId": "lister_clotures_api_admin_points_clotures_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ClotureResume"
+                  },
+                  "type": "array",
+                  "title": "Response Lister Clotures Api Admin Points Clotures Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/clotures/{semestre_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Detail Cloture",
+        "operationId": "detail_cloture_api_admin_points_clotures__semestre_id__get",
+        "parameters": [
+          {
+            "name": "semestre_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Semestre Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClotureDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/clotures/{semestre_id}/gel": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Geler Semestre",
+        "operationId": "geler_semestre_api_admin_points_clotures__semestre_id__gel_post",
+        "parameters": [
+          {
+            "name": "semestre_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Semestre Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClotureDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/clotures/{semestre_id}/candidats/{utilisateur_id}/ecart": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Ecarter Candidat",
+        "operationId": "ecarter_candidat_api_admin_points_clotures__semestre_id__candidats__utilisateur_id__ecart_post",
+        "parameters": [
+          {
+            "name": "semestre_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Semestre Id"
+            }
+          },
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotifCloture"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClotureDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/clotures/{semestre_id}/candidats/{utilisateur_id}/reintegration": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Reintegrer Candidat",
+        "operationId": "reintegrer_candidat_api_admin_points_clotures__semestre_id__candidats__utilisateur_id__reintegration_post",
+        "parameters": [
+          {
+            "name": "semestre_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Semestre Id"
+            }
+          },
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClotureDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/clotures/{semestre_id}/validation": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Valider Cloture",
+        "operationId": "valider_cloture_api_admin_points_clotures__semestre_id__validation_post",
+        "parameters": [
+          {
+            "name": "semestre_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Semestre Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClotureDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/clotures/{semestre_id}/annulation-validation": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Annuler Validation",
+        "operationId": "annuler_validation_api_admin_points_clotures__semestre_id__annulation_validation_post",
+        "parameters": [
+          {
+            "name": "semestre_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Semestre Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotifCloture"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClotureDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/points/clotures/{semestre_id}/publication": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Publier Cloture",
+        "operationId": "publier_cloture_api_admin_points_clotures__semestre_id__publication_post",
+        "parameters": [
+          {
+            "name": "semestre_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Semestre Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClotureDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/points/mon-club": {
       "get": {
         "tags": [
@@ -3727,6 +4093,28 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/palmares": {
+      "get": {
+        "tags": [
+          "classements"
+        ],
+        "summary": "Palmares",
+        "description": "Les palmarès publiés des semestres (spec 037) : pseudonyme, club, DRE, points et distinction, rien d'autre.",
+        "operationId": "palmares_api_palmares_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PalmaresPublic"
                 }
               }
             }
@@ -11984,6 +12372,113 @@
         ],
         "title": "Body_deposer_fichier_api_admin_bibliotheque__ressource_id__fichier_put"
       },
+      "CandidatAdmin": {
+        "properties": {
+          "utilisateur_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Utilisateur Id"
+          },
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "rang_brut": {
+            "type": "integer",
+            "title": "Rang Brut"
+          },
+          "pseudonyme": {
+            "type": "string",
+            "title": "Pseudonyme"
+          },
+          "identifiant": {
+            "type": "string",
+            "title": "Identifiant"
+          },
+          "statut": {
+            "type": "string",
+            "title": "Statut"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          },
+          "atteint_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Atteint Le"
+          },
+          "corrections": {
+            "type": "integer",
+            "title": "Corrections"
+          },
+          "annulations": {
+            "type": "integer",
+            "title": "Annulations"
+          },
+          "ecarte": {
+            "type": "boolean",
+            "title": "Ecarte"
+          },
+          "motif_ecart": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Ecart"
+          },
+          "ecarte_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ecarte Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "utilisateur_id",
+          "rang",
+          "rang_brut",
+          "pseudonyme",
+          "identifiant",
+          "statut",
+          "club",
+          "dre",
+          "points",
+          "atteint_le",
+          "corrections",
+          "annulations",
+          "ecarte",
+          "motif_ecart",
+          "ecarte_le"
+        ],
+        "title": "CandidatAdmin"
+      },
       "Carte": {
         "properties": {
           "chiffres": {
@@ -12522,6 +13017,43 @@
         "title": "ChampsArticle",
         "description": "Les champs d'une version, stockés en JSONB (`version_contenu.donnees`)."
       },
+      "ChangementActuel": {
+        "properties": {
+          "pseudonyme": {
+            "type": "string",
+            "title": "Pseudonyme"
+          },
+          "points_gel": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points Gel"
+          },
+          "points_actuels": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points Actuels"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pseudonyme",
+          "points_gel",
+          "points_actuels"
+        ],
+        "title": "ChangementActuel"
+      },
       "Chiffres": {
         "properties": {
           "documents": {
@@ -12936,6 +13468,13 @@
           },
           "historique": {
             "$ref": "#/components/schemas/RangPersonnel"
+          },
+          "distinctions": {
+            "items": {
+              "$ref": "#/components/schemas/Distinction"
+            },
+            "type": "array",
+            "title": "Distinctions"
           }
         },
         "additionalProperties": false,
@@ -12945,7 +13484,8 @@
           "club",
           "semestre_en_cours",
           "semestre",
-          "historique"
+          "historique",
+          "distinctions"
         ],
         "title": "ClassementPersonnel"
       },
@@ -13110,6 +13650,112 @@
           "lignes"
         ],
         "title": "ClassementPersonnesPublic"
+      },
+      "ClotureDetail": {
+        "properties": {
+          "semestre": {
+            "$ref": "#/components/schemas/SemestreCloture"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "gele",
+              "valide",
+              "publie"
+            ],
+            "title": "Etat"
+          },
+          "etapes": {
+            "$ref": "#/components/schemas/EtapesCloture"
+          },
+          "candidats": {
+            "items": {
+              "$ref": "#/components/schemas/CandidatAdmin"
+            },
+            "type": "array",
+            "title": "Candidats"
+          },
+          "top3": {
+            "items": {
+              "$ref": "#/components/schemas/LaureatAdmin"
+            },
+            "type": "array",
+            "title": "Top3"
+          },
+          "ecart_actuel": {
+            "$ref": "#/components/schemas/EcartActuel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "semestre",
+          "etat",
+          "etapes",
+          "candidats",
+          "top3",
+          "ecart_actuel"
+        ],
+        "title": "ClotureDetail"
+      },
+      "ClotureResume": {
+        "properties": {
+          "semestre_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Semestre Id"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date",
+            "title": "Fin"
+          },
+          "termine": {
+            "type": "boolean",
+            "title": "Termine"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "ouvert",
+              "gele",
+              "valide",
+              "publie"
+            ],
+            "title": "Etat"
+          },
+          "publie_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publie Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "semestre_id",
+          "libelle",
+          "debut",
+          "fin",
+          "termine",
+          "etat",
+          "publie_le"
+        ],
+        "title": "ClotureResume"
       },
       "ClubClasse": {
         "properties": {
@@ -14639,6 +15285,35 @@
         ],
         "title": "DesistementEntree"
       },
+      "Distinction": {
+        "properties": {
+          "semestre": {
+            "type": "string",
+            "title": "Semestre"
+          },
+          "place": {
+            "type": "integer",
+            "title": "Place"
+          },
+          "distinction": {
+            "type": "string",
+            "title": "Distinction"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "semestre",
+          "place",
+          "distinction",
+          "points"
+        ],
+        "title": "Distinction"
+      },
       "DreAdmin": {
         "properties": {
           "code": {
@@ -14967,6 +15642,27 @@
           "motif"
         ],
         "title": "DroitsEntree"
+      },
+      "EcartActuel": {
+        "properties": {
+          "top3_different": {
+            "type": "boolean",
+            "title": "Top3 Different"
+          },
+          "changements": {
+            "items": {
+              "$ref": "#/components/schemas/ChangementActuel"
+            },
+            "type": "array",
+            "title": "Changements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "top3_different",
+          "changements"
+        ],
+        "title": "EcartActuel"
       },
       "EchecLot": {
         "properties": {
@@ -16111,6 +16807,75 @@
         ],
         "title": "EtapeConfirmation",
         "description": "Visiteur au bon mot de passe dont l'adresse n'est pas confirmée (spec 030) : un code lui est renvoyé."
+      },
+      "EtapesCloture": {
+        "properties": {
+          "gele_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Gele Le"
+          },
+          "gele_par": {
+            "type": "string",
+            "title": "Gele Par"
+          },
+          "valide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valide Le"
+          },
+          "valide_par": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valide Par"
+          },
+          "publie_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publie Le"
+          },
+          "publie_par": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publie Par"
+          }
+        },
+        "type": "object",
+        "required": [
+          "gele_le",
+          "gele_par",
+          "valide_le",
+          "valide_par",
+          "publie_le",
+          "publie_par"
+        ],
+        "title": "EtapesCloture"
       },
       "EtatCertificat": {
         "type": "string",
@@ -18344,6 +19109,110 @@
         ],
         "title": "JetonEntree"
       },
+      "LaureatAdmin": {
+        "properties": {
+          "utilisateur_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Utilisateur Id"
+          },
+          "place": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Place"
+          },
+          "distinction": {
+            "type": "string",
+            "title": "Distinction"
+          },
+          "pseudonyme": {
+            "type": "string",
+            "title": "Pseudonyme"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "utilisateur_id",
+          "place",
+          "distinction",
+          "pseudonyme",
+          "club",
+          "dre",
+          "points"
+        ],
+        "title": "LaureatAdmin"
+      },
+      "LaureatPublic": {
+        "properties": {
+          "place": {
+            "type": "integer",
+            "title": "Place"
+          },
+          "distinction": {
+            "type": "string",
+            "title": "Distinction"
+          },
+          "pseudonyme": {
+            "type": "string",
+            "title": "Pseudonyme"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "place",
+          "distinction",
+          "pseudonyme",
+          "club",
+          "dre",
+          "points"
+        ],
+        "title": "LaureatPublic"
+      },
       "LigneBaremeAdmin": {
         "properties": {
           "code": {
@@ -19568,6 +20437,21 @@
         ],
         "title": "Motif"
       },
+      "MotifCloture": {
+        "properties": {
+          "motif": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Motif"
+          }
+        },
+        "type": "object",
+        "required": [
+          "motif"
+        ],
+        "title": "MotifCloture"
+      },
       "MotifEntree": {
         "properties": {
           "motif": {
@@ -19877,6 +20761,23 @@
           "clubs"
         ],
         "title": "PageSuivi"
+      },
+      "PalmaresPublic": {
+        "properties": {
+          "semestres": {
+            "items": {
+              "$ref": "#/components/schemas/SemestrePalmares"
+            },
+            "type": "array",
+            "title": "Semestres"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "semestres"
+        ],
+        "title": "PalmaresPublic"
       },
       "ParametresEntree": {
         "properties": {
@@ -23097,6 +23998,37 @@
         ],
         "title": "SemestreAdmin"
       },
+      "SemestreCloture": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date",
+            "title": "Fin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "libelle",
+          "debut",
+          "fin"
+        ],
+        "title": "SemestreCloture"
+      },
       "SemestreCreation": {
         "properties": {
           "libelle": {
@@ -23172,6 +24104,40 @@
           "version"
         ],
         "title": "SemestreModification"
+      },
+      "SemestrePalmares": {
+        "properties": {
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date",
+            "title": "Fin"
+          },
+          "laureats": {
+            "items": {
+              "$ref": "#/components/schemas/LaureatPublic"
+            },
+            "type": "array",
+            "title": "Laureats"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "libelle",
+          "debut",
+          "fin",
+          "laureats"
+        ],
+        "title": "SemestrePalmares"
       },
       "SemestrePublic": {
         "properties": {

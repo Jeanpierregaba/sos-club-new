@@ -1094,6 +1094,142 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/points/clotures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister Clotures */
+        get: operations["lister_clotures_api_admin_points_clotures_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/points/clotures/{semestre_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail Cloture */
+        get: operations["detail_cloture_api_admin_points_clotures__semestre_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/points/clotures/{semestre_id}/gel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Geler Semestre */
+        post: operations["geler_semestre_api_admin_points_clotures__semestre_id__gel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/points/clotures/{semestre_id}/candidats/{utilisateur_id}/ecart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ecarter Candidat */
+        post: operations["ecarter_candidat_api_admin_points_clotures__semestre_id__candidats__utilisateur_id__ecart_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/points/clotures/{semestre_id}/candidats/{utilisateur_id}/reintegration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reintegrer Candidat */
+        post: operations["reintegrer_candidat_api_admin_points_clotures__semestre_id__candidats__utilisateur_id__reintegration_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/points/clotures/{semestre_id}/validation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Valider Cloture */
+        post: operations["valider_cloture_api_admin_points_clotures__semestre_id__validation_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/points/clotures/{semestre_id}/annulation-validation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Annuler Validation */
+        post: operations["annuler_validation_api_admin_points_clotures__semestre_id__annulation_validation_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/points/clotures/{semestre_id}/publication": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publier Cloture */
+        post: operations["publier_cloture_api_admin_points_clotures__semestre_id__publication_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/points/mon-club": {
         parameters: {
             query?: never;
@@ -1154,6 +1290,26 @@ export interface paths {
         };
         /** Classement De Mon Club */
         get: operations["classement_de_mon_club_api_classements_mon_club_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/palmares": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Palmares
+         * @description Les palmarès publiés des semestres (spec 037) : pseudonyme, club, DRE, points et distinction, rien d'autre.
+         */
+        get: operations["palmares_api_palmares_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4031,6 +4187,45 @@ export interface components {
             /** Fichier */
             fichier: string;
         };
+        /** CandidatAdmin */
+        CandidatAdmin: {
+            /**
+             * Utilisateur Id
+             * Format: uuid
+             */
+            utilisateur_id: string;
+            /** Rang */
+            rang: number;
+            /** Rang Brut */
+            rang_brut: number;
+            /** Pseudonyme */
+            pseudonyme: string;
+            /** Identifiant */
+            identifiant: string;
+            /** Statut */
+            statut: string;
+            /** Club */
+            club: string | null;
+            /** Dre */
+            dre: string;
+            /** Points */
+            points: number;
+            /**
+             * Atteint Le
+             * Format: date-time
+             */
+            atteint_le: string;
+            /** Corrections */
+            corrections: number;
+            /** Annulations */
+            annulations: number;
+            /** Ecarte */
+            ecarte: boolean;
+            /** Motif Ecart */
+            motif_ecart: string | null;
+            /** Ecarte Le */
+            ecarte_le: string | null;
+        };
         /** Carte */
         Carte: {
             chiffres: components["schemas"]["ChiffresCarte"];
@@ -4224,6 +4419,15 @@ export interface components {
              */
             afficher_club: boolean;
         };
+        /** ChangementActuel */
+        ChangementActuel: {
+            /** Pseudonyme */
+            pseudonyme: string;
+            /** Points Gel */
+            points_gel: number | null;
+            /** Points Actuels */
+            points_actuels: number | null;
+        };
         /** Chiffres */
         Chiffres: {
             /** Documents */
@@ -4373,6 +4577,8 @@ export interface components {
             semestre_en_cours: components["schemas"]["SemestrePublic"] | null;
             semestre: components["schemas"]["RangPersonnel"];
             historique: components["schemas"]["RangPersonnel"];
+            /** Distinctions */
+            distinctions: components["schemas"]["Distinction"][];
         };
         /** ClassementPersonnesAdmin */
         ClassementPersonnesAdmin: {
@@ -4429,6 +4635,50 @@ export interface components {
             total: number;
             /** Lignes */
             lignes: components["schemas"]["LignePersonnePublic"][];
+        };
+        /** ClotureDetail */
+        ClotureDetail: {
+            semestre: components["schemas"]["SemestreCloture"];
+            /**
+             * Etat
+             * @enum {string}
+             */
+            etat: "gele" | "valide" | "publie";
+            etapes: components["schemas"]["EtapesCloture"];
+            /** Candidats */
+            candidats: components["schemas"]["CandidatAdmin"][];
+            /** Top3 */
+            top3: components["schemas"]["LaureatAdmin"][];
+            ecart_actuel: components["schemas"]["EcartActuel"];
+        };
+        /** ClotureResume */
+        ClotureResume: {
+            /**
+             * Semestre Id
+             * Format: uuid
+             */
+            semestre_id: string;
+            /** Libelle */
+            libelle: string;
+            /**
+             * Debut
+             * Format: date
+             */
+            debut: string;
+            /**
+             * Fin
+             * Format: date
+             */
+            fin: string;
+            /** Termine */
+            termine: boolean;
+            /**
+             * Etat
+             * @enum {string}
+             */
+            etat: "ouvert" | "gele" | "valide" | "publie";
+            /** Publie Le */
+            publie_le: string | null;
         };
         /**
          * ClubClasse
@@ -5002,6 +5252,17 @@ export interface components {
             /** Motif */
             motif: string;
         };
+        /** Distinction */
+        Distinction: {
+            /** Semestre */
+            semestre: string;
+            /** Place */
+            place: number;
+            /** Distinction */
+            distinction: string;
+            /** Points */
+            points: number;
+        };
         /** DreAdmin */
         DreAdmin: {
             /** Code */
@@ -5100,6 +5361,13 @@ export interface components {
             fin_acces?: string | null;
             /** Motif */
             motif: string;
+        };
+        /** EcartActuel */
+        EcartActuel: {
+            /** Top3 Different */
+            top3_different: boolean;
+            /** Changements */
+            changements: components["schemas"]["ChangementActuel"][];
         };
         /** EchecLot */
         EchecLot: {
@@ -5503,6 +5771,24 @@ export interface components {
             email: string;
             /** Code De Test */
             code_de_test?: string | null;
+        };
+        /** EtapesCloture */
+        EtapesCloture: {
+            /**
+             * Gele Le
+             * Format: date-time
+             */
+            gele_le: string;
+            /** Gele Par */
+            gele_par: string;
+            /** Valide Le */
+            valide_le: string | null;
+            /** Valide Par */
+            valide_par: string | null;
+            /** Publie Le */
+            publie_le: string | null;
+            /** Publie Par */
+            publie_par: string | null;
         };
         /**
          * EtatCertificat
@@ -6168,6 +6454,41 @@ export interface components {
             /** Jeton */
             jeton: string;
         };
+        /** LaureatAdmin */
+        LaureatAdmin: {
+            /**
+             * Utilisateur Id
+             * Format: uuid
+             */
+            utilisateur_id: string;
+            /** Place */
+            place: number | null;
+            /** Distinction */
+            distinction: string;
+            /** Pseudonyme */
+            pseudonyme: string;
+            /** Club */
+            club: string | null;
+            /** Dre */
+            dre: string;
+            /** Points */
+            points: number;
+        };
+        /** LaureatPublic */
+        LaureatPublic: {
+            /** Place */
+            place: number;
+            /** Distinction */
+            distinction: string;
+            /** Pseudonyme */
+            pseudonyme: string;
+            /** Club */
+            club: string | null;
+            /** Dre */
+            dre: string;
+            /** Points */
+            points: number;
+        };
         /** LigneBaremeAdmin */
         LigneBaremeAdmin: {
             /** Code */
@@ -6587,6 +6908,11 @@ export interface components {
             /** Motif */
             motif: string;
         };
+        /** MotifCloture */
+        MotifCloture: {
+            /** Motif */
+            motif: string;
+        };
         /** MotifEntree */
         MotifEntree: {
             /** Motif */
@@ -6703,6 +7029,11 @@ export interface components {
             par_page: number;
             /** Clubs */
             clubs: components["schemas"]["ClubSuivi"][];
+        };
+        /** PalmaresPublic */
+        PalmaresPublic: {
+            /** Semestres */
+            semestres: components["schemas"]["SemestrePalmares"][];
         };
         /** ParametresEntree */
         ParametresEntree: {
@@ -7739,6 +8070,26 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** SemestreCloture */
+        SemestreCloture: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Libelle */
+            libelle: string;
+            /**
+             * Debut
+             * Format: date
+             */
+            debut: string;
+            /**
+             * Fin
+             * Format: date
+             */
+            fin: string;
+        };
         /** SemestreCreation */
         SemestreCreation: {
             /** Libelle */
@@ -7764,6 +8115,23 @@ export interface components {
             debut?: string | null;
             /** Fin */
             fin?: string | null;
+        };
+        /** SemestrePalmares */
+        SemestrePalmares: {
+            /** Libelle */
+            libelle: string;
+            /**
+             * Debut
+             * Format: date
+             */
+            debut: string;
+            /**
+             * Fin
+             * Format: date
+             */
+            fin: string;
+            /** Laureats */
+            laureats: components["schemas"]["LaureatPublic"][];
         };
         /** SemestrePublic */
         SemestrePublic: {
@@ -10238,6 +10606,253 @@ export interface operations {
             };
         };
     };
+    lister_clotures_api_admin_points_clotures_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClotureResume"][];
+                };
+            };
+        };
+    };
+    detail_cloture_api_admin_points_clotures__semestre_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                semestre_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClotureDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    geler_semestre_api_admin_points_clotures__semestre_id__gel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                semestre_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClotureDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ecarter_candidat_api_admin_points_clotures__semestre_id__candidats__utilisateur_id__ecart_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                semestre_id: string;
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifCloture"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClotureDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reintegrer_candidat_api_admin_points_clotures__semestre_id__candidats__utilisateur_id__reintegration_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                semestre_id: string;
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClotureDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    valider_cloture_api_admin_points_clotures__semestre_id__validation_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                semestre_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClotureDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    annuler_validation_api_admin_points_clotures__semestre_id__annulation_validation_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                semestre_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifCloture"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClotureDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publier_cloture_api_admin_points_clotures__semestre_id__publication_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                semestre_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClotureDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     points_de_mon_club_api_points_mon_club_get: {
         parameters: {
             query?: never;
@@ -10344,6 +10959,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    palmares_api_palmares_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PalmaresPublic"];
                 };
             };
         };

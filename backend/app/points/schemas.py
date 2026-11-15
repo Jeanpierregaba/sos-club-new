@@ -192,6 +192,8 @@ class ClassementPersonnel(BaseModel):
     semestre_en_cours: SemestrePublic | None
     semestre: RangPersonnel
     historique: RangPersonnel
+    # Les distinctions de fin de semestre (spec 037), du plus récent au plus ancien ; vide pour qui n'en a pas.
+    distinctions: list[Distinction]
 
 
 class LigneClubInterne(BaseModel):
@@ -360,3 +362,122 @@ class AnnulationPoints(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     motif: str = Field(min_length=10, max_length=500)
+
+
+# Clôtures de semestre et palmarès (spec 037) -------------------------------------------------------------------
+
+
+class MotifCloture(BaseModel):
+    motif: str = Field(min_length=1, max_length=500)
+
+
+class ClotureResume(BaseModel):
+    semestre_id: UUID
+    libelle: str
+    debut: date
+    fin: date
+    termine: bool
+    etat: Literal["ouvert", "gele", "valide", "publie"]
+    publie_le: datetime | None
+
+
+class SemestreCloture(BaseModel):
+    id: UUID
+    libelle: str
+    debut: date
+    fin: date
+
+
+class EtapesCloture(BaseModel):
+    gele_le: datetime
+    gele_par: str
+    valide_le: datetime | None
+    valide_par: str | None
+    publie_le: datetime | None
+    publie_par: str | None
+
+
+class CandidatAdmin(BaseModel):
+    utilisateur_id: UUID
+    rang: int
+    rang_brut: int
+    pseudonyme: str
+    identifiant: str
+    statut: str
+    club: str | None
+    dre: str
+    points: int
+    atteint_le: datetime
+    corrections: int
+    annulations: int
+    ecarte: bool
+    motif_ecart: str | None
+    ecarte_le: datetime | None
+
+
+class LaureatAdmin(BaseModel):
+    utilisateur_id: UUID
+    place: int | None
+    distinction: str
+    pseudonyme: str
+    club: str | None
+    dre: str
+    points: int
+
+
+class ChangementActuel(BaseModel):
+    pseudonyme: str
+    points_gel: int | None
+    points_actuels: int | None
+
+
+class EcartActuel(BaseModel):
+    top3_different: bool
+    changements: list[ChangementActuel]
+
+
+class ClotureDetail(BaseModel):
+    semestre: SemestreCloture
+    etat: Literal["gele", "valide", "publie"]
+    etapes: EtapesCloture
+    candidats: list[CandidatAdmin]
+    top3: list[LaureatAdmin]
+    ecart_actuel: EcartActuel
+
+
+class LaureatPublic(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    place: int
+    distinction: str
+    pseudonyme: str
+    club: str | None
+    dre: str
+    points: int
+
+
+class SemestrePalmares(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    libelle: str
+    debut: date
+    fin: date
+    laureats: list[LaureatPublic]
+
+
+class PalmaresPublic(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    semestres: list[SemestrePalmares]
+
+
+class Distinction(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    semestre: str
+    place: int
+    distinction: str
+    points: int
+
+
+ClassementPersonnel.model_rebuild()

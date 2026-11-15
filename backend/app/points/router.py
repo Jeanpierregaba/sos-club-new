@@ -16,7 +16,7 @@ from app.clubs.models import Club
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.models import Role, Utilisateur
 from app.db import get_session
-from app.points import administration, annees, classements, registre
+from app.points import administration, annees, classements, clotures, registre
 from app.points.schemas import (
     AnnulationPoints,
     BeneficiairePoints,
@@ -26,6 +26,8 @@ from app.points.schemas import (
     ClassementClubsPublic,
     ClassementPersonnesAdmin,
     ClassementPersonnesPublic,
+    ClotureDetail,
+    ClotureResume,
     ClubClasse,
     CorrectionPoints,
     DreResume,
@@ -38,7 +40,9 @@ from app.points.schemas import (
     LignePersonneAdmin,
     LignePersonnePublic,
     LigneRegistre,
+    MotifCloture,
     PageRegistre,
+    PalmaresPublic,
     SemestreAdmin,
     SemestreCreation,
     SemestreModification,
@@ -304,8 +308,11 @@ def _club_admin(
     )
 
 
-def _classement_personnel(resultat: classements.ClassementPersonnel) -> ClassementPersonnelSchema:
+def _classement_personnel(
+    resultat: classements.ClassementPersonnel, distinctions: list[Any]
+) -> ClassementPersonnelSchema:
     return ClassementPersonnelSchema(
+        distinctions=distinctions,
         categorie=resultat.categorie.value,
         club=ClubClasse(id=resultat.club.id, nom=resultat.club.nom) if resultat.club is not None else None,
         semestre_en_cours=_semestre_public(resultat.semestre_en_cours),
@@ -351,7 +358,7 @@ async def mon_classement(
         raise HTTPException(
             status.HTTP_403_FORBIDDEN, "Les classements personnels sont réservés aux élèves et aux encadreurs."
         ) from None
-    return _classement_personnel(resultat)
+    return _classement_personnel(resultat, await clotures.distinctions_de(db, moi.id))
 
 
 @router_classements.get("/mon-club", response_model=ClassementClubInterne)
@@ -509,3 +516,68 @@ async def annuler_ligne(
     with _traduire_refus():
         ligne = await registre.annuler_ligne(db, acces, ligne_id, entree.motif, adresse_ip(request))
     return await _ligne_registre(db, ligne.id)
+
+
+# Clôtures de semestre et palmarès (spec 037) -------------------------------------------------------------------
+
+
+@router_admin.get("/clotures")
+async def lister_clotures(_: LecteurNational, db: Base) -> list[ClotureResume]:
+    return await clotures.lister(db)
+
+
+@router_admin.get("/clotures/{semestre_id}")
+async def detail_cloture(semestre_id: UUID, _: LecteurNational, db: Base) -> ClotureDetail:
+    with _traduire_refus():
+        return await clotures.detail(db, semestre_id)
+
+
+@router_admin.post("/clotures/{semestre_id}/gel")
+async def geler_semestre(semestre_id: UUID, request: Request, acces: Modificateur, db: Base) -> ClotureDetail:
+    with _traduire_refus():
+        return await clotures.geler(db, acces, semestre_id, adresse_ip(request))
+
+
+@router_admin.post("/clotures/{semestre_id}/candidats/{utilisateur_id}/ecart")
+async def ecarter_candidat(
+    semestre_id: UUID, utilisateur_id: UUID, entree: MotifCloture, request: Request, acces: Modificateur, db: Base
+) -> ClotureDetail:
+    with _traduire_refus():
+        return await clotures.ecarter(db, acces, semestre_id, utilisateur_id, entree.motif, adresse_ip(request))
+
+
+@router_admin.post("/clotures/{semestre_id}/candidats/{utilisateur_id}/reintegration")
+async def reintegrer_candidat(
+    semestre_id: UUID, utilisateur_id: UUID, request: Request, acces: Modificateur, db: Base
+) -> ClotureDetail:
+    with _traduire_refus():
+        return await clotures.reintegrer(db, acces, semestre_id, utilisateur_id, adresse_ip(request))
+
+
+@router_admin.post("/clotures/{semestre_id}/validation")
+async def valider_cloture(semestre_id: UUID, request: Request, acces: Modificateur, db: Base) -> ClotureDetail:
+    with _traduire_refus():
+        return await clotures.valider(db, acces, semestre_id, adresse_ip(request))
+
+
+@router_admin.post("/clotures/{semestre_id}/annulation-validation")
+async def annuler_validation(
+    semestre_id: UUID, entree: MotifCloture, request: Request, acces: Modificateur, db: Base
+) -> ClotureDetail:
+    with _traduire_refus():
+        return await clotures.annuler_validation(db, acces, semestre_id, entree.motif, adresse_ip(request))
+
+
+@router_admin.post("/clotures/{semestre_id}/publication")
+async def publier_cloture(semestre_id: UUID, request: Request, acces: Modificateur, db: Base) -> ClotureDetail:
+    with _traduire_refus():
+        return await clotures.publier(db, acces, semestre_id, adresse_ip(request))
+
+
+router_palmares = APIRouter(prefix="/palmares", tags=["classements"])
+
+
+@router_palmares.get("", response_model=PalmaresPublic)
+async def palmares(db: Base) -> PalmaresPublic:
+    """Les palmarès publiés des semestres (spec 037) : pseudonyme, club, DRE, points et distinction, rien d'autre."""
+    return await clotures.palmares_public(db)

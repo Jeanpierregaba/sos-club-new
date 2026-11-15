@@ -489,6 +489,37 @@ export const adminAnnulerLigne = (id: string, motif: string) =>
 export const adminClassements = (filtres: FiltresClassement & { club_id?: string }) =>
   requeteApi<ClassementAdmin>(avecParametres(`${POINTS}/classements`, filtres));
 
+// Clôtures de semestre et palmarès (spec 037) -------------------------------------------------------------
+
+export type ClotureResume = Schemas["ClotureResume"];
+export type ClotureDetail = Schemas["ClotureDetail"];
+export type CandidatAdmin = Schemas["CandidatAdmin"];
+export type LaureatAdmin = Schemas["LaureatAdmin"];
+export type PalmaresPublic = Schemas["PalmaresPublic"];
+export type Distinction = Schemas["Distinction"];
+
+const CLOTURES = `${POINTS}/clotures`;
+export const adminListerClotures = () => requeteApi<ClotureResume[]>(CLOTURES);
+export const adminCloture = (semestreId: string) =>
+  requeteApi<ClotureDetail>(`${CLOTURES}/${semestreId}`);
+export const adminGelerSemestre = (semestreId: string) =>
+  envoyerJson<ClotureDetail>(`${CLOTURES}/${semestreId}/gel`);
+export const adminEcarterCandidat = (semestreId: string, utilisateurId: string, motif: string) =>
+  envoyerJson<ClotureDetail>(`${CLOTURES}/${semestreId}/candidats/${utilisateurId}/ecart`, {
+    motif,
+  });
+export const adminReintegrerCandidat = (semestreId: string, utilisateurId: string) =>
+  envoyerJson<ClotureDetail>(
+    `${CLOTURES}/${semestreId}/candidats/${utilisateurId}/reintegration`,
+  );
+export const adminValiderCloture = (semestreId: string) =>
+  envoyerJson<ClotureDetail>(`${CLOTURES}/${semestreId}/validation`);
+export const adminAnnulerValidation = (semestreId: string, motif: string) =>
+  envoyerJson<ClotureDetail>(`${CLOTURES}/${semestreId}/annulation-validation`, { motif });
+export const adminPublierCloture = (semestreId: string) =>
+  envoyerJson<ClotureDetail>(`${CLOTURES}/${semestreId}/publication`);
+export const chargerPalmares = () => requeteApi<PalmaresPublic>("/api/palmares");
+
 // Compte encadreur (spec 018) ----------------------------------------------------------------------------
 
 export const inscrireEncadreur = (entree: InscriptionEncadreur) =>

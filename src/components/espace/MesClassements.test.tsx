@@ -32,6 +32,7 @@ const classement = (club: boolean, classe: boolean, enCours = true): ClassementP
   categorie: "eleves",
   club: club ? { id: "c1", nom: "Club Santé Tokoin" } : null,
   semestre_en_cours: enCours ? { libelle: "S1", debut: "2026-11-01", fin: "2027-04-30" } : null,
+  distinctions: [],
   semestre: {
     points: classe ? 120 : 0,
     rang_club: club && classe ? 2 : null,

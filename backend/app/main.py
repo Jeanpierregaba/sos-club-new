@@ -42,7 +42,7 @@ from app.moderation.router import router_admin as router_moderation_admin
 from app.notifications.router import router as router_notifications
 from app.points.router import router as router_points
 from app.points.router import router_admin as router_points_admin
-from app.points.router import router_classements
+from app.points.router import router_classements, router_palmares
 from app.quiz.router import router as router_quiz
 from app.quiz.router_banque import router_banque as router_quiz_banque
 from app.referentiel.router import router_admin as router_referentiel_admin
@@ -86,6 +86,7 @@ api.include_router(router_referentiel_admin)
 api.include_router(router_points_admin)
 api.include_router(router_points)
 api.include_router(router_classements)
+api.include_router(router_palmares)
 api.include_router(router_eleves)
 api.include_router(router_encadreurs)
 api.include_router(router_encadreurs_admin)
