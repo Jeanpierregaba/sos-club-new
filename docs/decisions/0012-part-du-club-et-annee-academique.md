@@ -45,3 +45,18 @@ verrou exclusif : aucun gain n'entre dans une année après sa clôture.
 - Les lignes `club.*_eleve` du barème disparaissent (aucune n'avait été créditée). `club.rapport_activite` et
   `club.bilan_semestriel` restent, pour le référentiel du compte collectif.
 - Un nouveau barème ne change jamais les lignes déjà écrites : le montant est copié à chaque gain.
+
+## Note (2026-11-15, spec 038) : lignes du compte collectif
+
+Les rapports d'activité et les bilans semestriels créditent le club lui-même (+50 et +100, proposés), sans
+personne bénéficiaire. Une **ligne de club** a `utilisateur_id` NULL, `club_id` renseigné, `montant` égal au gain
+du club et `demi_points_club = 2 × montant`. Une contrainte réserve ce cas aux actions `club.*` ; la règle
+`demi_points_club = montant` reste celle des lignes personnelles. `crediter_club` écrit ces lignes, seulement pour
+un club en service (ADR-0011) ; une annulation les copie telles quelles.
+
+Le score d'un club reste la somme de ses demi-points divisée par 2, sans requête nouvelle. Une revue de chaque
+lecture du registre (2026-11-15) a vérifié qu'aucun total ni rang personnel ne bouge : toutes filtrent sur un
+compte ou joignent la ligne à un élève ou à un encadreur. Seul le registre admin (spec 036) devait passer à une
+jointure externe pour montrer ces lignes. Écarté : une ligne à 0 point portée par l'auteur, qui aurait déplacé la
+date d'atteinte des ex æquo (spec 037) ; une table séparée, qui aurait fait du score d'un club la somme de deux
+sources.

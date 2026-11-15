@@ -74,3 +74,11 @@ dans `contenu.club_id`. Leur auteur est le président en place : la validation d
 de notification. Le journal garde qui a soumis chaque version. Réglage ajouté : `depublication` (une proposition
 de fiche ne se dépublie pas). Un index unique partiel limite à une proposition de fiche en attente par club.
 
+## Note (2026-11-15, spec 038)
+
+Trois types privés : `rapport_activite`, `rapport_mensuel` et `bilan_semestriel`. Approuver un rapport ne le
+publie pas : il n'a ni adresse, ni dépublication, ni révision après approbation, et aucune route publique ne lit
+ces types. Le moteur gagne deux réglages : `avis_approbation` (« Ton rapport … est approuvé ») et l'approbation
+« comme doublon » d'un rapport du même club, qui enregistre le lien et laisse `points_permis` refuser tout crédit.
+Ce qui est propre aux rapports (référence, club, date, mois, semestre, doublon) vit dans la table `rapport`, une
+ligne par contenu. Leur auteur reste l'auteur historique : la passation de présidence ne les transfère pas.

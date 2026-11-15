@@ -8,6 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
+- [ ] R12 — Rapports d'activité, rapports mensuels et bilans semestriels (Q22, Q29) — [spec 038](docs/specs/038-rapports-d-activite/spec.md) (spec, plan et tâches validés le 2026-11-15 : lecture seule des encadreurs, doublon sans point, résumé public reporté, mensuel et bilan inclus)
 - [ ] Quiz santé (922 QCM) jouables depuis la page des jeux, 3 quiz sans compte puis compte visiteur ; correction en vert ou rouge et récapitulatif des erreurs (2026-11-10, ADR-0004 amendé) (spec 031, livré en urgence le 2026-11-09 : spec écrite à rédiger)
 - [ ] Fiches d'inscription : élève, encadreur et visiteur, e-mails (R19 avancé) — [spec 030](docs/specs/030-fiches-d-inscription/spec.md)
 

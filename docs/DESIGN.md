@@ -101,3 +101,15 @@ Une pastille arrondie, toujours accompagnée de son libellé (jamais la couleur 
 
 Sur la carte publique, un club en régularisation se montre « Club actif ». Les effectifs face aux seuils (3
 encadreurs, 21 élèves) se lisent sur des jauges avec `role="progressbar"` dans « Mon Club Santé ».
+
+## Rapports d'activité (spec 038)
+
+- **Encadreur** : « Mes rapports » avec deux onglets, _Mes rapports_ (état, référence, points) et _Rapports du
+  club_ (qui l'a reçu, qui l'a consulté). Un bouton « Nouveau rapport » propose les trois modèles : rapport
+  d'activité, rapport mensuel, bilan semestriel. Le formulaire est découpé en sections (identification,
+  description, participants, justificatifs) et rappelle de n'écrire aucun nom d'élève.
+- **Président** : la même liste et le même formulaire depuis l'espace du club, rapport d'activité seulement.
+- **États** : badges _Brouillon_ (gris), _Soumis_ (bleu), _À corriger_ (soleil), _Approuvé_ (vert), _Refusé_
+  (rouge) ; un doublon approuvé affiche « Lié à RA-… ».
+- **Admin** : l'aperçu de modération montre les champs, les justificatifs et, en haut, l'alerte de doublon
+  probable ; l'archive « Rapports » filtre et exporte.

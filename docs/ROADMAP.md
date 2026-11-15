@@ -82,9 +82,9 @@ pièces jointes (suite de l'ADR-0005).
 
 ## Phase 4 — Rapports d'activités (P0)
 
-| Code | Spec                                  | Côté utilisateurs                                                                                                                                | Côté admin                                                                                                                          | Taille | Questions |
-| ---- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- | ------ | --------- |
-| R12  | Rapports, rapports mensuels et bilans | L'encadreur et le président déposent un rapport (champs du CDC, pièces justificatives), le suivent, le corrigent ; modèles mensuel et semestriel | Examen, archive privée, publication d'un résumé sur décision distincte, détection des doublons (club, date, référence ou événement) | L      | Q22, Q29  |
+| Code | Spec                                                                                      | Côté utilisateurs                                                                                                                                | Côté admin                                                                                                                          | Taille | Questions |
+| ---- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- | ------ | --------- |
+| R12  | Rapports, rapports mensuels et bilans ([spec 038](specs/038-rapports-d-activite/spec.md)) | L'encadreur et le président déposent un rapport (champs du CDC, pièces justificatives), le suivent, le corrigent ; modèles mensuel et semestriel | Examen, archive privée, publication d'un résumé sur décision distincte, détection des doublons (club, date, référence ou événement) | L      | Q22, Q29  |
 
 ## Phase 5 — Classements (P0)
 
