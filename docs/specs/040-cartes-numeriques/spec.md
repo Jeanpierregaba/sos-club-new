@@ -150,6 +150,8 @@ Pour un élève, la fin de l'affiliation ne rend pas la carte non valide : son c
   rappelle que le nom figure sur la carte.
 - **Nom avec accents ou très long** : le PDF et l'image restent lisibles (coupure propre, polices avec accents).
 - **Code mal formé dans l'adresse** : même réponse qu'un code inconnu.
+- **Ancien élève** (clôture de l'année, spec 034) : sa carte « Membre » reste valide, même numéro ; seule une
+  suspension du compte ou par l'équipe la rend non valide (décidé le 2026-11-16).
 - **Suspension par l'équipe d'une carte déjà non valide** : acceptée et journalisée ; la carte reste non valide après
   le retour de la cause automatique.
 
