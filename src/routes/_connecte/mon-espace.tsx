@@ -14,6 +14,7 @@ import {
   Info,
   MotDePasseChange,
 } from "@/components/espace/commun";
+import { BandeauMotDePasse } from "@/components/espace/BandeauMotDePasse";
 import { CarteMembre } from "@/components/espace/CarteMembre";
 import { ClassementDuClub, RangsPersonnels } from "@/components/espace/MesClassements";
 import { PointsClub, TableauAnnuel } from "@/components/espace/TableauAnnuel";
@@ -292,6 +293,7 @@ function EspaceDeLEleve({
   const [profil, setProfil] = useState(false);
   const [motDePasse, setMotDePasse] = useState(false);
   const [motDePasseChange, setMotDePasseChange] = useState(false);
+  const { moi } = Route.useRouteContext();
   const { points } = espace;
 
   return (
@@ -305,6 +307,9 @@ function EspaceDeLEleve({
         >
           {motDePasseChange && <MotDePasseChange />}
         </EnTeteEspace>
+        {moi.mot_de_passe_provisoire && !motDePasseChange && (
+          <BandeauMotDePasse onChanger={() => setMotDePasse(true)} />
+        )}
         {bienvenue && (
           <div className="mt-6 flex items-start gap-3 rounded-3xl bg-primary/10 p-5 ring-1 ring-primary/30">
             <PartyPopper aria-hidden className="mt-0.5 size-6 shrink-0 text-primary" />

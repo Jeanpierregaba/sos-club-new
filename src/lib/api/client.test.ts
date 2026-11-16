@@ -18,7 +18,14 @@ vi.mock("@tanstack/react-start", () => ({
 }));
 vi.mock("@tanstack/react-start/server", () => ({ getRequestHeader: vi.fn() }));
 
-const moi: Moi = { id: "1", identifiant: "jeank", prenom: "Jean", nom: "K", role: "eleve" };
+const moi: Moi = {
+  id: "1",
+  identifiant: "jeank",
+  prenom: "Jean",
+  nom: "K",
+  role: "eleve",
+  mot_de_passe_provisoire: false,
+};
 
 function repondre(statut: number, corps?: string) {
   vi.stubGlobal(

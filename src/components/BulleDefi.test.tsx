@@ -39,7 +39,14 @@ const correction = (extra: Partial<CorrectionDefi>): CorrectionDefi => ({
   ...extra,
 });
 
-const eleve: Moi = { id: "u-1", identifiant: "ama", prenom: "Ama", nom: "K", role: "eleve" };
+const eleve: Moi = {
+  id: "u-1",
+  identifiant: "ama",
+  prenom: "Ama",
+  nom: "K",
+  role: "eleve",
+  mot_de_passe_provisoire: false,
+};
 
 async function afficher() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });

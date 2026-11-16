@@ -35,6 +35,7 @@ const moi = (role: Moi["role"]): Moi => ({
   prenom: "Ama",
   nom: "K",
   role,
+  mot_de_passe_provisoire: false,
 });
 
 const questions: QuestionQuelAxe[] = [1, 2, 3, 4, 5, 6, 7].map((numero) => ({

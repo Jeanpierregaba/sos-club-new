@@ -116,7 +116,17 @@ function Connexion() {
             <FormulaireConnexion onConnecte={allerAuCompte} />
             <p className="mt-6 flex items-start gap-3 rounded-2xl bg-mist-soft p-4 text-sm font-medium text-ink/75">
               <KeyRound aria-hidden className="mt-0.5 size-4 shrink-0 text-logo-blue" />
-              Mot de passe oublié ? Demande à un encadreur de ton club de le réinitialiser.
+              <span>
+                Mot de passe oublié ? Élève, demande à un encadreur de ton club de le réinitialiser.
+                Encadreur ou visiteur,{" "}
+                <Link
+                  to="/mot-de-passe-oublie"
+                  className="font-bold text-logo-blue underline-offset-4 hover:underline"
+                >
+                  reçois un lien par e-mail
+                </Link>
+                .
+              </span>
             </p>
           </div>
           <p className="mt-6 text-center text-sm font-semibold text-muted-foreground">

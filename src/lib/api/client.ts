@@ -1083,3 +1083,17 @@ export const urlExportRapports = (filtres: FiltresArchive) =>
   avecParametres("/api/admin/rapports/export.csv", { ...filtres, page: undefined });
 export const urlPdfRapport = (id: string) => `${RAPPORTS}/${id}/export.pdf`;
 export const urlPdfRapportAdmin = (id: string) => `/api/admin/rapports/${id}/export.pdf`;
+
+// Réinitialisation du mot de passe (spec 039) : un membre confirmé par l'encadreur de son club ; « mot de passe
+// oublié » par e-mail pour les encadreurs et les visiteurs.
+export const reinitialiserMembre = (affiliationId: string, motif: string) =>
+  envoyerJson<{ mot_de_passe: string }>(
+    `/api/clubs/mon-club-sante/affiliations/${affiliationId}/mot-de-passe`,
+    { motif },
+  );
+export const demanderLienMotDePasse = (email: string) =>
+  envoyerJson<{ message: string }>("/api/comptes/mot-de-passe-oublie", { email });
+export const verifierLienMotDePasse = (jeton: string) =>
+  requeteApi<{ valide: boolean }>(`/api/comptes/mot-de-passe-oublie/${encodeURIComponent(jeton)}`);
+export const choisirMotDePasse = (jeton: string, nouveau: string) =>
+  envoyerJson<void>(`/api/comptes/mot-de-passe-oublie/${encodeURIComponent(jeton)}`, { nouveau });

@@ -15,6 +15,7 @@ import { useState } from "react";
 
 import { Champ, CHAMP_ADMIN, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { DialogueMotif } from "@/components/admin/DialogueMotif";
+import { ReinitialiserMembre } from "@/components/clubs/ReinitialiserMembre";
 import { Button } from "@/components/ui/button";
 import {
   confirmerPassationEncadreur,
@@ -405,17 +406,22 @@ export function EspaceClubSante({
                     {a.depuis && ` · confirmé le ${dateCourte(a.depuis)}`}
                   </span>
                 </span>
-                {!a.president && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setARetirer(a)}
-                    className="rounded-full font-bold"
-                    aria-label={`Retirer ${a.pseudonyme}`}
-                  >
-                    <UserMinus className="size-4" /> Retirer
-                  </Button>
-                )}
+                <span className="flex flex-wrap gap-2">
+                  {enService && (
+                    <ReinitialiserMembre affiliationId={a.id} pseudonyme={a.pseudonyme} />
+                  )}
+                  {!a.president && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setARetirer(a)}
+                      className="rounded-full font-bold"
+                      aria-label={`Retirer ${a.pseudonyme}`}
+                    >
+                      <UserMinus className="size-4" /> Retirer
+                    </Button>
+                  )}
+                </span>
               </li>
             ))}
           </ul>

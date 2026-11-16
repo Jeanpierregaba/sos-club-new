@@ -27,7 +27,14 @@ vi.mock("@/lib/api/client", async (original) => ({
   ...api,
 }));
 
-const eleve: Moi = { id: "u-1", identifiant: "ama", prenom: "Ama", nom: "K", role: "eleve" };
+const eleve: Moi = {
+  id: "u-1",
+  identifiant: "ama",
+  prenom: "Ama",
+  nom: "K",
+  role: "eleve",
+  mot_de_passe_provisoire: false,
+};
 const aucun: CommentairesPublics = { commentaires: [], page: 1, pages: 1, total: 0 };
 const piege = '<img src=x onerror="alert(1)"> **gras**';
 const un: CommentairesPublics = {

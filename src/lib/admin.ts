@@ -125,6 +125,9 @@ export const ACTIONS_JOURNAL: Record<string, string> = {
     ]),
   ),
   rapports_exportes: "Archive des rapports exportée",
+  // Spec 039.
+  lien_mot_de_passe_envoye: "Lien « mot de passe oublié » envoyé",
+  mot_de_passe_choisi: "Mot de passe choisi depuis un lien",
 };
 
 const formatDate = new Intl.DateTimeFormat("fr-FR", {

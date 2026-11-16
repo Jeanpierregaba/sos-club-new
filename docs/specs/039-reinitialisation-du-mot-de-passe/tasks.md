@@ -24,10 +24,10 @@ sont écrites en TDD : les tests précèdent le code.
 
 ## Site
 
-- [ ] 7. « Mon Club Santé » : bouton **Réinitialiser son mot de passe** sur chaque membre confirmé, dialogue avec le
+- [x] 7. « Mon Club Santé » : bouton **Réinitialiser son mot de passe** sur chaque membre confirmé, dialogue avec le
       motif, affichage unique du provisoire avec copie et consigne ; tests du composant.
-- [ ] 8. Bandeau de l'élève au mot de passe provisoire, ouvrant le changement de mot de passe ; tests.
-- [ ] 9. Pages **Mot de passe oublié** (élève renvoyé vers son encadreur, formulaire pour les autres, message
+- [x] 8. Bandeau de l'élève au mot de passe provisoire, ouvrant le changement de mot de passe ; tests.
+- [x] 9. Pages **Mot de passe oublié** (élève renvoyé vers son encadreur, formulaire pour les autres, message
       identique) et **Nouveau mot de passe** (lien valide, expiré, erreurs, `no-referrer`) ; lien depuis la
       connexion ; tests ; libellés du journal dans `src/lib/admin.ts`.
 
