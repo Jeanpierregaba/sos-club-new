@@ -62,3 +62,21 @@ def code_visiteur(prenom: str, code: str, minutes: int) -> Courriel:
             "Si tu n'as pas créé de compte, ignore ce message.",
         ],
     )
+
+
+def lien_mot_de_passe(prenom: str, lien: str, minutes: int) -> Courriel:
+    return rendre(
+        "Choisis un nouveau mot de passe",
+        surtitre="Mot de passe oublié",
+        titre=("Un nouveau", "mot de passe"),
+        salutation=f"Bonjour {prenom},",
+        paragraphes=[
+            "Tu as demandé à changer ton mot de passe sur la plateforme des Clubs Santé SOS Docteur TV.",
+            "Ouvre ce lien pour en choisir un nouveau :",
+        ],
+        bouton=Bouton("Choisir mon mot de passe", lien),
+        apres=[
+            f"Ce lien ne sert qu'une fois et expire dans {minutes} minutes.",
+            "Si tu n'as rien demandé, ignore ce message : ton mot de passe ne change pas.",
+        ],
+    )

@@ -89,6 +89,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/comptes/mot-de-passe-oublie": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mot De Passe Oublie
+         * @description Toujours la même réponse : elle ne dit pas si un compte existe. L'e-mail part après la réponse.
+         */
+        post: operations["mot_de_passe_oublie_api_comptes_mot_de_passe_oublie_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/comptes/mot-de-passe-oublie/{jeton}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Etat Du Lien */
+        get: operations["etat_du_lien_api_comptes_mot_de_passe_oublie__jeton__get"];
+        put?: never;
+        /** Choisir Mot De Passe */
+        post: operations["choisir_mot_de_passe_api_comptes_mot_de_passe_oublie__jeton__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/visiteurs/inscription": {
         parameters: {
             query?: never;
@@ -1806,6 +1844,26 @@ export interface paths {
         put?: never;
         /** Retirer Affiliation */
         post: operations["retirer_affiliation_api_clubs_mon_club_sante_affiliations__affiliation_id__retirer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/mon-club-sante/affiliations/{affiliation_id}/mot-de-passe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reinitialiser Membre
+         * @description Spec 039 : le mot de passe provisoire d'un membre confirmé, montré une seule fois, jamais gardé en cache.
+         */
+        post: operations["reinitialiser_membre_api_clubs_mon_club_sante_affiliations__affiliation_id__mot_de_passe_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5598,6 +5656,11 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** DemandeLien */
+        DemandeLien: {
+            /** Email */
+            email: string;
+        };
         /** DerniereDecision */
         DerniereDecision: {
             decision: components["schemas"]["TypeDecision"];
@@ -6206,6 +6269,11 @@ export interface components {
             ouvertes: boolean;
             /** Version Charte */
             version_charte: string;
+        };
+        /** EtatLien */
+        EtatLien: {
+            /** Valide */
+            valide: boolean;
         };
         /** EtatPartie */
         EtatPartie: {
@@ -7301,6 +7369,11 @@ export interface components {
             /** Nom */
             nom: string;
             role: components["schemas"]["Role"];
+            /**
+             * Mot De Passe Provisoire
+             * @default false
+             */
+            mot_de_passe_provisoire: boolean;
         };
         /** MonClub */
         MonClub: {
@@ -7374,6 +7447,11 @@ export interface components {
             /** Motif */
             motif: string;
         };
+        /** MotifReinitialisation */
+        MotifReinitialisation: {
+            /** Motif */
+            motif: string;
+        };
         /**
          * Niveau
          * @enum {string}
@@ -7424,6 +7502,11 @@ export interface components {
             notifications: components["schemas"]["NotificationSortie"][];
             /** Non Lues */
             non_lues: number;
+        };
+        /** NouveauMotDePasse */
+        NouveauMotDePasse: {
+            /** Nouveau */
+            nouveau: string;
         };
         /**
          * OrdreEnseignement
@@ -8412,6 +8495,11 @@ export interface components {
             /** Choix */
             choix: number;
         };
+        /** ReponseDemandeLien */
+        ReponseDemandeLien: {
+            /** Message */
+            message: string;
+        };
         /** ReponseJoueur */
         ReponseJoueur: {
             /** Rang */
@@ -9246,6 +9334,103 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["MotDePasseEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mot_de_passe_oublie_api_comptes_mot_de_passe_oublie_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DemandeLien"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReponseDemandeLien"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    etat_du_lien_api_comptes_mot_de_passe_oublie__jeton__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jeton: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatLien"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    choisir_mot_de_passe_api_comptes_mot_de_passe_oublie__jeton__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                jeton: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NouveauMotDePasse"];
             };
         };
         responses: {
@@ -12707,6 +12892,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AffiliationsDuClub"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reinitialiser_membre_api_clubs_mon_club_sante_affiliations__affiliation_id__mot_de_passe_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                affiliation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifReinitialisation"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MotDePasseProvisoire"];
                 };
             };
             /** @description Validation Error */

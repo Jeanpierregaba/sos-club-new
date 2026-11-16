@@ -167,6 +167,135 @@
         }
       }
     },
+    "/api/comptes/mot-de-passe-oublie": {
+      "post": {
+        "tags": [
+          "comptes"
+        ],
+        "summary": "Mot De Passe Oublie",
+        "description": "Toujours la même réponse : elle ne dit pas si un compte existe. L'e-mail part après la réponse.",
+        "operationId": "mot_de_passe_oublie_api_comptes_mot_de_passe_oublie_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemandeLien"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReponseDemandeLien"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/comptes/mot-de-passe-oublie/{jeton}": {
+      "get": {
+        "tags": [
+          "comptes"
+        ],
+        "summary": "Etat Du Lien",
+        "operationId": "etat_du_lien_api_comptes_mot_de_passe_oublie__jeton__get",
+        "parameters": [
+          {
+            "name": "jeton",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "title": "Jeton"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatLien"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "comptes"
+        ],
+        "summary": "Choisir Mot De Passe",
+        "operationId": "choisir_mot_de_passe_api_comptes_mot_de_passe_oublie__jeton__post",
+        "parameters": [
+          {
+            "name": "jeton",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "title": "Jeton"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NouveauMotDePasse"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/visiteurs/inscription": {
       "post": {
         "tags": [
@@ -5549,6 +5678,60 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AffiliationsDuClub"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/mon-club-sante/affiliations/{affiliation_id}/mot-de-passe": {
+      "post": {
+        "tags": [
+          "clubs"
+        ],
+        "summary": "Reinitialiser Membre",
+        "description": "Spec 039 : le mot de passe provisoire d'un membre confirmé, montré une seule fois, jamais gardé en cache.",
+        "operationId": "reinitialiser_membre_api_clubs_mon_club_sante_affiliations__affiliation_id__mot_de_passe_post",
+        "parameters": [
+          {
+            "name": "affiliation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Affiliation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotifReinitialisation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MotDePasseProvisoire"
                 }
               }
             }
@@ -16575,6 +16758,22 @@
         "title": "DemandeEncadreur",
         "description": "Une ligne de la file : tout ce qu'il faut pour vérifier la personne, sans ouvrir sa fiche."
       },
+      "DemandeLien": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "minLength": 3,
+            "title": "Email"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "DemandeLien"
+      },
       "DerniereDecision": {
         "properties": {
           "decision": {
@@ -18327,6 +18526,19 @@
           "version_charte"
         ],
         "title": "EtatInscription"
+      },
+      "EtatLien": {
+        "properties": {
+          "valide": {
+            "type": "boolean",
+            "title": "Valide"
+          }
+        },
+        "type": "object",
+        "required": [
+          "valide"
+        ],
+        "title": "EtatLien"
       },
       "EtatPartie": {
         "properties": {
@@ -21855,6 +22067,11 @@
           },
           "role": {
             "$ref": "#/components/schemas/Role"
+          },
+          "mot_de_passe_provisoire": {
+            "type": "boolean",
+            "title": "Mot De Passe Provisoire",
+            "default": false
           }
         },
         "type": "object",
@@ -22119,6 +22336,22 @@
         ],
         "title": "MotifEntree"
       },
+      "MotifReinitialisation": {
+        "properties": {
+          "motif": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 10,
+            "title": "Motif"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "motif"
+        ],
+        "title": "MotifReinitialisation"
+      },
       "Niveau": {
         "type": "string",
         "enum": [
@@ -22244,6 +22477,21 @@
           "non_lues"
         ],
         "title": "Notifications"
+      },
+      "NouveauMotDePasse": {
+        "properties": {
+          "nouveau": {
+            "type": "string",
+            "maxLength": 256,
+            "title": "Nouveau"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nouveau"
+        ],
+        "title": "NouveauMotDePasse"
       },
       "OrdreEnseignement": {
         "type": "string",
@@ -25380,6 +25628,19 @@
           "choix"
         ],
         "title": "ReponseDefi"
+      },
+      "ReponseDemandeLien": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "ReponseDemandeLien"
       },
       "ReponseJoueur": {
         "properties": {

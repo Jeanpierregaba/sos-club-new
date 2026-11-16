@@ -59,3 +59,26 @@ class Moi(BaseModel):
 class MotDePasseEntree(BaseModel):
     actuel: str = Field(min_length=1, max_length=LONGUEUR_MAX_MOT_DE_PASSE)
     nouveau: str = Field(max_length=LONGUEUR_MAX_MOT_DE_PASSE)
+
+
+# Mot de passe oublié (spec 039) -------------------------------------------------------------------------------
+
+
+class DemandeLien(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    email: str = Field(min_length=3, max_length=254)
+
+
+class ReponseDemandeLien(BaseModel):
+    message: str
+
+
+class EtatLien(BaseModel):
+    valide: bool
+
+
+class NouveauMotDePasse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    nouveau: str = Field(max_length=LONGUEUR_MAX_MOT_DE_PASSE)

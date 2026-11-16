@@ -18,9 +18,9 @@ sont écrites en TDD : les tests précèdent le code.
 
 ## Lien par e-mail
 
-- [ ] 5. Tests puis code de la demande (`POST /api/comptes/mot-de-passe-oublie`) : - e-mail envoyé à un encadreur activé et à un visiteur confirmé ; - rien pour une adresse inconnue, un élève, un collaborateur, un compte suspendu, un encadreur en attente ou un
+- [x] 5. Tests puis code de la demande (`POST /api/comptes/mot-de-passe-oublie`) : - e-mail envoyé à un encadreur activé et à un visiteur confirmé ; - rien pour une adresse inconnue, un élève, un collaborateur, un compte suspendu, un encadreur en attente ou un
       visiteur non confirmé, avec la même réponse ; - adresse normalisée (majuscules, espaces) ; 3 liens par adresse et par heure ; limite par adresse IP ; - un nouveau lien remplace le précédent ; jeton stocké en empreinte seulement ; message `lien_mot_de_passe`.
-- [ ] 6. Tests puis code du choix (`GET` puis `POST /api/comptes/mot-de-passe-oublie/{jeton}`) : - lien valide : mot de passe changé, sessions coupées, marqueur effacé, adresse confirmée, journal ; - lien expiré, utilisé ou remplacé : 410 ; compte suspendu entre-temps : 410 ; - règles de longueur du mot de passe ; limite d'essais.
+- [x] 6. Tests puis code du choix (`GET` puis `POST /api/comptes/mot-de-passe-oublie/{jeton}`) : - lien valide : mot de passe changé, sessions coupées, marqueur effacé, adresse confirmée, journal ; - lien expiré, utilisé ou remplacé : 410 ; compte suspendu entre-temps : 410 ; - règles de longueur du mot de passe ; limite d'essais.
 
 ## Site
 

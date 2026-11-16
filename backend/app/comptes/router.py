@@ -1,12 +1,24 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Path, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.double_auth import verifier_code
+from app.comptes import oubli
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.models import Utilisateur
-from app.comptes.schemas import CodeEntree, ConnexionEntree, EtapeCode, EtapeConfirmation, Moi, MotDePasseEntree
+from app.comptes.schemas import (
+    CodeEntree,
+    ConnexionEntree,
+    DemandeLien,
+    EtapeCode,
+    EtapeConfirmation,
+    EtatLien,
+    Moi,
+    MotDePasseEntree,
+    NouveauMotDePasse,
+    ReponseDemandeLien,
+)
 from app.comptes.service import (
     AccesTermine,
     CodeIncorrect,
@@ -128,5 +140,46 @@ async def changer_mon_mot_de_passe(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Ton mot de passe actuel est incorrect.") from None
     except TropDEssais:
         raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, TROP_D_ESSAIS) from None
+    except CompteInvalide as erreur:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(erreur)) from None
+
+
+# Mot de passe oublié (spec 039) -------------------------------------------------------------------------------
+
+REPONSE_LIEN = "Si cette adresse correspond à un compte, un lien vient d'y être envoyé."
+
+
+@router.post("/mot-de-passe-oublie", status_code=status.HTTP_202_ACCEPTED)
+async def mot_de_passe_oublie(
+    entree: DemandeLien, request: Request, taches: BackgroundTasks, db: Base
+) -> ReponseDemandeLien:
+    """Toujours la même réponse : elle ne dit pas si un compte existe. L'e-mail part après la réponse."""
+    adresse_ip = cle_adresse(request.client.host if request.client else None)
+    try:
+        envoi = await oubli.demander(db, entree.email, adresse_ip)
+    except TropDEssais:
+        raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, TROP_D_ESSAIS) from None
+    if envoi is not None:
+        taches.add_task(oubli.expedier, envoi)
+    return ReponseDemandeLien(message=REPONSE_LIEN)
+
+
+@router.get("/mot-de-passe-oublie/{jeton}")
+async def etat_du_lien(jeton: Annotated[str, Path(max_length=100)], response: Response, db: Base) -> EtatLien:
+    response.headers["Cache-Control"] = "no-store"
+    return EtatLien(valide=await oubli.lien_valide(db, jeton))
+
+
+@router.post("/mot-de-passe-oublie/{jeton}", status_code=status.HTTP_204_NO_CONTENT)
+async def choisir_mot_de_passe(
+    jeton: Annotated[str, Path(max_length=100)], entree: NouveauMotDePasse, request: Request, db: Base
+) -> None:
+    adresse_ip = cle_adresse(request.client.host if request.client else None)
+    try:
+        await oubli.choisir(db, jeton, entree.nouveau, adresse_ip)
+    except oubli.LienInvalide:
+        raise HTTPException(
+            status.HTTP_410_GONE, "Ce lien a expiré ou a déjà servi. Demande un nouveau lien."
+        ) from None
     except CompteInvalide as erreur:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(erreur)) from None
