@@ -56,7 +56,7 @@ unicité) sont écrites en TDD : les tests précèdent le code.
 
 ## Admin
 
-- [ ] 8. Tests puis code de la carte dans la fiche « Inscrits » et des routes `carte/suspendre` et `carte/reactiver` :
+- [x] 8. Tests puis code de la carte dans la fiche « Inscrits » et des routes `carte/suspendre` et `carte/reactiver` :
   - `InscritDetail.carte` avec l'historique tiré du journal ;
   - droit `inscrits:modifier` et double authentification ;
   - motif de 10 à 200 caractères ;

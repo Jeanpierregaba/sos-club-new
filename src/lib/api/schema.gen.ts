@@ -3868,6 +3868,108 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/cartes/moi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ma Carte */
+        get: operations["ma_carte_api_cartes_moi_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/cartes/moi.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ma Carte Pdf */
+        get: operations["ma_carte_pdf_api_cartes_moi_pdf_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/cartes/moi.png": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ma Carte Png */
+        get: operations["ma_carte_png_api_cartes_moi_png_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/cartes/verification/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Verifier */
+        get: operations["verifier_api_cartes_verification__code__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/inscrits/{utilisateur_id}/carte/suspendre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Suspendre */
+        post: operations["suspendre_api_admin_inscrits__utilisateur_id__carte_suspendre_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/inscrits/{utilisateur_id}/carte/reactiver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reactiver */
+        post: operations["reactiver_api_admin_inscrits__utilisateur_id__carte_reactiver_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/certification/regles": {
         parameters: {
             query?: never;
@@ -4635,6 +4737,32 @@ export interface components {
             chiffres: components["schemas"]["ChiffresCarte"];
             /** Regions */
             regions: components["schemas"]["CarteRegion"][];
+        };
+        /**
+         * CarteAdmin
+         * @description La carte dans la fiche d'un inscrit. Le code du QR n'y figure pas.
+         */
+        CarteAdmin: {
+            type: components["schemas"]["TypeCarte"];
+            /** Numero */
+            numero: string;
+            /** Valide */
+            valide: boolean;
+            /** Cause */
+            cause: ("compte_supprime" | "compte_suspendu" | "suspendue_par_l_equipe" | "non_verifie" | "sans_rattachement") | null;
+            /** Club */
+            club: string | null;
+            /**
+             * Delivree Le
+             * Format: date-time
+             */
+            delivree_le: string;
+            /** Suspendue Le */
+            suspendue_le: string | null;
+            /** Motif Suspension */
+            motif_suspension: string | null;
+            /** Historique */
+            historique: components["schemas"]["EvenementCarte"][];
         };
         /** CarteDre */
         CarteDre: {
@@ -6343,6 +6471,21 @@ export interface components {
          * @enum {string}
          */
         EtatVerification: "en_attente" | "actif" | "refuse";
+        /** EvenementCarte */
+        EvenementCarte: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "carte_delivree" | "carte_suspendue" | "carte_reactivee";
+            /**
+             * Le
+             * Format: date-time
+             */
+            le: string;
+            /** Motif */
+            motif?: string | null;
+        };
         /** EvenementJournal */
         EvenementJournal: {
             /**
@@ -6902,6 +7045,7 @@ export interface components {
             historique: components["schemas"]["EvenementJournal"][];
             eleve?: components["schemas"]["ProfilEleveAdmin"] | null;
             encadreur?: components["schemas"]["ProfilEncadreurAdmin"] | null;
+            carte?: components["schemas"]["CarteAdmin"] | null;
         };
         /** InvitationCree */
         InvitationCree: {
@@ -7269,6 +7413,39 @@ export interface components {
             /** Motif */
             motif: string;
         };
+        /**
+         * MaCarte
+         * @description La carte vue par son titulaire : tout ce qui est imprimé dessus, plus son statut et sa cause.
+         */
+        MaCarte: {
+            type: components["schemas"]["TypeCarte"];
+            /** Numero */
+            numero: string;
+            /** Prenom */
+            prenom: string;
+            /** Nom */
+            nom: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "membre" | "president" | "encadreur";
+            /** Etablissement */
+            etablissement: string | null;
+            /** Club */
+            club: string | null;
+            /**
+             * Delivree Le
+             * Format: date-time
+             */
+            delivree_le: string;
+            /** Valide */
+            valide: boolean;
+            /** Cause */
+            cause: ("compte_supprime" | "compte_suspendu" | "suspendue_par_l_equipe" | "non_verifie" | "sans_rattachement") | null;
+            /** Adresse Verification */
+            adresse_verification: string;
+        };
         /** MaCertification */
         MaCertification: {
             /** Reussies */
@@ -7455,6 +7632,11 @@ export interface components {
         };
         /** Motif */
         Motif: {
+            /** Motif */
+            motif: string;
+        };
+        /** MotifCarte */
+        MotifCarte: {
             /** Motif */
             motif: string;
         };
@@ -9163,6 +9345,11 @@ export interface components {
             actif?: boolean | null;
         };
         /**
+         * TypeCarte
+         * @enum {string}
+         */
+        TypeCarte: "membre" | "encadreur";
+        /**
          * TypeDecision
          * @enum {string}
          */
@@ -9204,6 +9391,24 @@ export interface components {
             titulaire: components["schemas"]["TitulaireEleve"] | components["schemas"]["TitulaireEncadreur"];
             /** Remplace Par */
             remplace_par: string | null;
+        };
+        /**
+         * VerificationCarte
+         * @description La page publique du QR (Q30) : le type, le numéro, le club et le statut. Rien d'autre, jamais.
+         */
+        VerificationCarte: {
+            type: components["schemas"]["TypeCarte"];
+            /** Numero */
+            numero: string;
+            /** Club */
+            club: string | null;
+            /** Valide */
+            valide: boolean;
+            /**
+             * Verifiee Le
+             * Format: date-time
+             */
+            verifiee_le: string;
         };
         /** ActivationEntree */
         app__admin__schemas__ActivationEntree: {
@@ -16977,6 +17182,167 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Verification"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ma_carte_api_cartes_moi_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MaCarte"];
+                };
+            };
+        };
+    };
+    ma_carte_pdf_api_cartes_moi_pdf_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
+                };
+            };
+        };
+    };
+    ma_carte_png_api_cartes_moi_png_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                };
+            };
+        };
+    };
+    verifier_api_cartes_verification__code__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerificationCarte"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    suspendre_api_admin_inscrits__utilisateur_id__carte_suspendre_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifCarte"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CarteAdmin"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reactiver_api_admin_inscrits__utilisateur_id__carte_reactiver_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotifCarte"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CarteAdmin"];
                 };
             };
             /** @description Validation Error */

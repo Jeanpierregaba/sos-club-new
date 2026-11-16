@@ -11892,6 +11892,209 @@
         }
       }
     },
+    "/api/cartes/moi": {
+      "get": {
+        "tags": [
+          "cartes"
+        ],
+        "summary": "Ma Carte",
+        "operationId": "ma_carte_api_cartes_moi_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaCarte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cartes/moi.pdf": {
+      "get": {
+        "tags": [
+          "cartes"
+        ],
+        "summary": "Ma Carte Pdf",
+        "operationId": "ma_carte_pdf_api_cartes_moi_pdf_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/pdf": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/cartes/moi.png": {
+      "get": {
+        "tags": [
+          "cartes"
+        ],
+        "summary": "Ma Carte Png",
+        "operationId": "ma_carte_png_api_cartes_moi_png_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "image/png": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/cartes/verification/{code}": {
+      "get": {
+        "tags": [
+          "cartes"
+        ],
+        "summary": "Verifier",
+        "operationId": "verifier_api_cartes_verification__code__get",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationCarte"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/inscrits/{utilisateur_id}/carte/suspendre": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Suspendre",
+        "operationId": "suspendre_api_admin_inscrits__utilisateur_id__carte_suspendre_post",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotifCarte"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarteAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/inscrits/{utilisateur_id}/carte/reactiver": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Reactiver",
+        "operationId": "reactiver_api_admin_inscrits__utilisateur_id__carte_reactiver_post",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MotifCarte"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarteAdmin"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/certification/regles": {
       "get": {
         "tags": [
@@ -13936,6 +14139,99 @@
           "regions"
         ],
         "title": "Carte"
+      },
+      "CarteAdmin": {
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/TypeCarte"
+          },
+          "numero": {
+            "type": "string",
+            "title": "Numero"
+          },
+          "valide": {
+            "type": "boolean",
+            "title": "Valide"
+          },
+          "cause": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "compte_supprime",
+                  "compte_suspendu",
+                  "suspendue_par_l_equipe",
+                  "non_verifie",
+                  "sans_rattachement"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cause"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "delivree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Delivree Le"
+          },
+          "suspendue_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suspendue Le"
+          },
+          "motif_suspension": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Suspension"
+          },
+          "historique": {
+            "items": {
+              "$ref": "#/components/schemas/EvenementCarte"
+            },
+            "type": "array",
+            "title": "Historique"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "numero",
+          "valide",
+          "cause",
+          "club",
+          "delivree_le",
+          "suspendue_le",
+          "motif_suspension",
+          "historique"
+        ],
+        "title": "CarteAdmin",
+        "description": "La carte dans la fiche d'un inscrit. Le code du QR n'y figure pas."
       },
       "CarteDre": {
         "properties": {
@@ -18670,6 +18966,41 @@
         ],
         "title": "EtatVerification"
       },
+      "EvenementCarte": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "carte_delivree",
+              "carte_suspendue",
+              "carte_reactivee"
+            ],
+            "title": "Action"
+          },
+          "le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Le"
+          },
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action",
+          "le"
+        ],
+        "title": "EvenementCarte"
+      },
       "EvenementJournal": {
         "properties": {
           "id": {
@@ -20582,6 +20913,16 @@
                 "type": "null"
               }
             ]
+          },
+          "carte": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CarteAdmin"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -21774,6 +22115,103 @@
         ],
         "title": "LotRefusEntree"
       },
+      "MaCarte": {
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/TypeCarte"
+          },
+          "numero": {
+            "type": "string",
+            "title": "Numero"
+          },
+          "prenom": {
+            "type": "string",
+            "title": "Prenom"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "membre",
+              "president",
+              "encadreur"
+            ],
+            "title": "Role"
+          },
+          "etablissement": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Etablissement"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "delivree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Delivree Le"
+          },
+          "valide": {
+            "type": "boolean",
+            "title": "Valide"
+          },
+          "cause": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "compte_supprime",
+                  "compte_suspendu",
+                  "suspendue_par_l_equipe",
+                  "non_verifie",
+                  "sans_rattachement"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cause"
+          },
+          "adresse_verification": {
+            "type": "string",
+            "title": "Adresse Verification"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "numero",
+          "prenom",
+          "nom",
+          "role",
+          "etablissement",
+          "club",
+          "delivree_le",
+          "valide",
+          "cause",
+          "adresse_verification"
+        ],
+        "title": "MaCarte",
+        "description": "La carte vue par son titulaire : tout ce qui est imprimé dessus, plus son statut et sa cause."
+      },
       "MaCertification": {
         "properties": {
           "reussies": {
@@ -22308,6 +22746,22 @@
           "motif"
         ],
         "title": "Motif"
+      },
+      "MotifCarte": {
+        "properties": {
+          "motif": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 10,
+            "title": "Motif"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "motif"
+        ],
+        "title": "MotifCarte"
       },
       "MotifCloture": {
         "properties": {
@@ -27404,6 +27858,14 @@
         ],
         "title": "TypeActiviteModification"
       },
+      "TypeCarte": {
+        "type": "string",
+        "enum": [
+          "membre",
+          "encadreur"
+        ],
+        "title": "TypeCarte"
+      },
       "TypeDecision": {
         "type": "string",
         "enum": [
@@ -27518,6 +27980,48 @@
           "remplace_par"
         ],
         "title": "Verification"
+      },
+      "VerificationCarte": {
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/TypeCarte"
+          },
+          "numero": {
+            "type": "string",
+            "title": "Numero"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "valide": {
+            "type": "boolean",
+            "title": "Valide"
+          },
+          "verifiee_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Verifiee Le"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "numero",
+          "club",
+          "valide",
+          "verifiee_le"
+        ],
+        "title": "VerificationCarte",
+        "description": "La page publique du QR (Q30) : le type, le numéro, le club et le statut. Rien d'autre, jamais."
       },
       "app__admin__schemas__ActivationEntree": {
         "properties": {

@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.admin.catalogue import Action, RoleDepart
 from app.admin.models import FormatExport, StatutExport, TypeExport
+from app.cartes.schemas import CarteAdmin
 from app.clubs.models import EtatClub
 from app.comptes.models import Role, StatutCompte
 from app.eleves.models import Classe
@@ -231,6 +232,8 @@ class InscritDetail(Inscrit):
     eleve: ProfilEleveAdmin | None = None
     # Pour un encadreur qui a son profil (spec 018).
     encadreur: ProfilEncadreurAdmin | None = None
+    # Spec 040 : la carte numérique de l'élève ou de l'encadreur, sans le code du QR.
+    carte: CarteAdmin | None = None
 
 
 class PseudonymeEntree(BaseModel):

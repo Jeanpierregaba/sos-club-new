@@ -400,3 +400,88 @@ def test_une_carte_non_valide_ne_se_telecharge_pas(
     assert navigateur.get(MOI).json()["cause"] == "sans_rattachement"
     assert navigateur.get(f"{MOI}.pdf").status_code == 409
     assert navigateur.get(f"{MOI}.png").status_code == 409
+
+
+# Admin --------------------------------------------------------------------------------------------------------
+
+INSCRITS = "/api/admin/inscrits"
+GESTION = {("tableau_de_bord", "consulter"), ("inscrits", "consulter"), ("inscrits", "modifier")}
+MOTIF = "Carte prêtée à un tiers, signalée par l'établissement."
+
+
+@pytest.fixture
+def equipe(client: TestClient, creer_collaborateur: Callable[..., Any]) -> Navigateur:
+    creer_collaborateur("equipe", droits=GESTION, double_auth=True)
+    navigateur = Navigateur(client)
+    connecter_admin(navigateur, "equipe")  # type: ignore[arg-type]
+    return navigateur
+
+
+def test_lequipe_suspend_puis_reactive_une_carte(
+    client: TestClient, equipe: Navigateur, creer_eleve: Callable[..., Utilisateur], en_base: Callable[..., Any]
+) -> None:
+    from app.admin.models import JournalAudit
+    from app.notifications.models import Notification
+
+    eleve = creer_eleve("ama")
+    code = cartes(en_base, eleve.id)[0].code
+
+    suspendue = equipe.post(f"{INSCRITS}/{eleve.id}/carte/suspendre", json={"motif": MOTIF})
+    assert suspendue.status_code == 200, suspendue.text
+    assert (suspendue.json()["valide"], suspendue.json()["cause"]) == (False, "suspendue_par_l_equipe")
+    assert equipe.post(f"{INSCRITS}/{eleve.id}/carte/suspendre", json={"motif": MOTIF}).status_code == 409
+
+    fiche = equipe.get(f"{INSCRITS}/{eleve.id}").json()
+    assert fiche["carte"]["motif_suspension"] == MOTIF
+    assert [e["action"] for e in fiche["carte"]["historique"]] == ["carte_suspendue", "carte_delivree"]
+    assert code not in str(fiche)
+
+    reactivee = equipe.post(f"{INSCRITS}/{eleve.id}/carte/reactiver", json={"motif": "Erreur de signalement vérifiée."})
+    assert reactivee.status_code == 200 and reactivee.json()["valide"] is True
+    assert equipe.post(f"{INSCRITS}/{eleve.id}/carte/reactiver", json={"motif": MOTIF}).status_code == 409
+
+    entrees = en_base(lambda db: db.scalars(select(JournalAudit).where(JournalAudit.cible_type == "carte"))).all()
+    assert sorted(e.action for e in entrees) == ["carte_reactivee", "carte_suspendue"]
+    assert all(code not in str(e.details) for e in entrees)
+    avis = en_base(lambda db: db.scalars(select(Notification).where(Notification.utilisateur_id == eleve.id))).all()
+    assert {a.titre for a in avis} == {
+        "Ta carte a été suspendue par l'équipe des Clubs Santé",
+        "Ta carte est de nouveau valide",
+    }
+    collaborateur = en_base(lambda db: db.scalar(select(Utilisateur).where(Utilisateur.identifiant == "equipe")))
+    assert all(collaborateur.nom not in f"{a.titre}{a.message}" for a in avis)
+
+
+@pytest.mark.parametrize("motif", ["", "Fraude", "x" * 201])
+def test_le_motif_compte_10_a_200_caracteres(
+    equipe: Navigateur, creer_eleve: Callable[..., Utilisateur], motif: str
+) -> None:
+    eleve = creer_eleve("ama")
+
+    assert equipe.post(f"{INSCRITS}/{eleve.id}/carte/suspendre", json={"motif": motif}).status_code == 422
+
+
+def test_sans_le_droit_de_modifier_cest_refuse(
+    client: TestClient, creer_collaborateur: Callable[..., Any], creer_eleve: Callable[..., Utilisateur]
+) -> None:
+    eleve = creer_eleve("ama")
+    creer_collaborateur(
+        "lecteur", droits={("tableau_de_bord", "consulter"), ("inscrits", "consulter")}, double_auth=True
+    )
+    lecteur = Navigateur(client)
+    connecter_admin(lecteur, "lecteur")  # type: ignore[arg-type]
+
+    assert lecteur.post(f"{INSCRITS}/{eleve.id}/carte/suspendre", json={"motif": MOTIF}).status_code == 403
+    assert Navigateur(client).post(f"{INSCRITS}/{eleve.id}/carte/suspendre", json={"motif": MOTIF}).status_code in (
+        401,
+        403,
+    )
+
+
+def test_un_compte_sans_carte_repond_404(equipe: Navigateur, creer_utilisateur: Callable[..., Utilisateur]) -> None:
+    from app.comptes.models import Role
+
+    visiteur = creer_utilisateur("passant", Role.visiteur, email="passant@exemple.tg")
+
+    assert equipe.post(f"{INSCRITS}/{visiteur.id}/carte/suspendre", json={"motif": MOTIF}).status_code == 404
+    assert equipe.get(f"{INSCRITS}/{visiteur.id}").json()["carte"] is None

@@ -20,6 +20,7 @@ from app.admin.schemas import (
     ProfilEleveAdmin,
     ProfilEncadreurAdmin,
 )
+from app.cartes.administration import carte_admin
 from app.clubs.affiliations import recalculer_clubs_du_membre
 from app.clubs.models import CLUB_VIVANT, Club, EtatClub, EtatRattachement, Rattachement
 from app.clubs.rattachements import liberer_passation
@@ -167,6 +168,7 @@ async def detail(db: AsyncSession, utilisateur_id: UUID) -> InscritDetail:
         historique=await historique(db, utilisateur.id),
         eleve=profil,
         encadreur=await _profil_encadreur(db, utilisateur.id),
+        carte=await carte_admin(db, utilisateur.id),
     )
 
 

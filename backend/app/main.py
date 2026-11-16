@@ -21,6 +21,7 @@ from app.articles.router import router_public as router_articles
 from app.bibliotheque.router import router as router_bibliotheque
 from app.bibliotheque.router_gestion import router_gestion as router_bibliotheque_gestion
 from app.cartes.router import router as router_cartes
+from app.cartes.router_admin import router_admin as router_cartes_admin
 from app.certification.router import router as router_certification
 from app.certification.router import router_public as router_certificats
 from app.certification.router_gestion import router_gestion as router_certification_gestion
@@ -116,6 +117,7 @@ api.include_router(router_rapports_admin)
 api.include_router(router_certification)
 api.include_router(router_certificats)
 api.include_router(router_cartes)
+api.include_router(router_cartes_admin)
 api.include_router(router_certification_gestion)
 app.include_router(api)
 
