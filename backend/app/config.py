@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     essais_max_adresse: int = 50
     # Spec 039 : demandes de lien « mot de passe oublié » par adresse IP, sur la fenêtre des essais.
     oubli_max_adresse: int = 20
+    # Spec 040 : vérifications d'une carte par adresse IP sur la fenêtre des essais (une école derrière une seule
+    # adresse en fait peu ; le code de 192 bits rend les essais en masse vains de toute façon).
+    verifications_carte_max_adresse: int = 60
 
     # Espace administrateur (spec 015).
     duree_invitation_heures: int = 72

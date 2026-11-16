@@ -277,3 +277,126 @@ def test_la_migration_delivre_les_cartes_des_comptes_existants(
     assert [c.type for c in cartes(en_base, prof.id)] == [TypeCarte.encadreur]
     assert cartes(en_base, attente.id) == []
     assert all(len(c.code) == 32 for c in cartes(en_base, eleve.id))
+
+
+# Espace et fichiers ----------------------------------------------------------------------------------------------
+
+MOI = "/api/cartes/moi"
+
+
+def test_le_titulaire_voit_sa_carte_et_seulement_la_sienne(
+    client: TestClient,
+    creer_eleve: Callable[..., Utilisateur],
+    creer_club: Callable[..., Any],
+    en_base: Callable[..., Any],
+) -> None:
+    from tests.espace_club import connecter
+
+    presidente = creer_eleve("presidente", "Ama")
+    creer_club(presidente, nom="Club Santé Tokoin")
+    creer_eleve("autre", "Kofi")
+    reponse = connecter(client, "presidente").get(MOI)
+
+    assert reponse.status_code == 200, reponse.text
+    assert reponse.headers["cache-control"] == "no-store"
+    carte = reponse.json()
+    assert carte["numero"] == cartes(en_base, presidente.id)[0].numero
+    assert (carte["role"], carte["club"], carte["valide"], carte["cause"]) == (
+        "president",
+        "Club Santé Tokoin",
+        True,
+        None,
+    )
+    code = cartes(en_base, presidente.id)[0].code
+    assert carte["adresse_verification"].endswith(f"/carte/{code}")
+
+
+def test_sans_carte_la_page_repond_404(
+    client: TestClient,
+    creer_utilisateur: Callable[..., Utilisateur],
+    creer_encadreur: Callable[..., Utilisateur],
+) -> None:
+    from app.comptes.models import Role
+    from tests.espace_club import connecter
+
+    creer_utilisateur("passant", Role.visiteur, email="passant@exemple.tg", email_confirme_le=None)
+    creer_encadreur("nouveau", etat=EtatVerification.en_attente)
+
+    assert connecter(client, "nouveau").get(MOI).status_code == 404
+    assert Navigateur(client).get(MOI).status_code == 401
+
+
+def test_le_pdf_et_limage_de_la_carte(
+    client: TestClient, creer_eleve: Callable[..., Utilisateur], en_base: Callable[..., Any]
+) -> None:
+    import io
+
+    from PIL import Image
+
+    from tests.espace_club import connecter
+
+    eleve = creer_eleve("ama")
+    navigateur = connecter(client, "ama")
+
+    document = navigateur.get(f"{MOI}.pdf")
+    assert document.status_code == 200, document.text
+    assert document.headers["content-type"] == "application/pdf"
+    assert document.headers["cache-control"] == "no-store"
+    numero = cartes(en_base, eleve.id)[0].numero
+    assert f'filename="carte-membre-{numero}.pdf"' in document.headers["content-disposition"]
+    assert document.content.startswith(b"%PDF")
+
+    image = navigateur.get(f"{MOI}.png")
+    assert image.status_code == 200 and image.headers["content-type"] == "image/png"
+    assert Image.open(io.BytesIO(image.content)).size == (1012, 638)
+
+
+def test_le_rendu_porte_le_nom_le_numero_et_ladresse(
+    creer_eleve: Callable[..., Utilisateur], en_base: Callable[..., Any]
+) -> None:
+    from app.cartes import rendu
+
+    eleve = creer_eleve("ama")
+    en_base(
+        lambda db: db.execute(update(Utilisateur).where(Utilisateur.id == eleve.id).values(prenom="Ɖɔkɔ", nom="Ŋʋɛ"))
+    )
+    vue = etat(en_base, eleve.id)
+    vus: list[str] = []
+    adresses: list[str] = []
+    origine = rendu._qr
+
+    def qr_espion(e: service.EtatCarte) -> Any:
+        adresses.append(rendu.adresse_de_verification(e.code))
+        return origine(e)
+
+    with pytest.MonkeyPatch.context() as m:
+        m.setattr(rendu, "_qr", qr_espion)
+        textes = [t.texte for t in rendu._textes(vue)]
+        vus.extend(textes)
+        assert rendu.pdf(vue).startswith(b"%PDF")
+        rendu.png(vue)
+
+    assert "Ɖɔkɔ ŊƲƐ" in vus and vue.numero in vus and "Non affilié" in vus
+    assert adresses == [f"{settings.site_origine.rstrip('/')}/carte/{vue.code}"] * 2
+
+
+def test_un_nom_trop_long_est_coupe() -> None:
+    from app.cartes import rendu
+    from app.certification.certificat_pdf import GRASSE
+
+    texte, taille = rendu._ajuster("Prénom " * 20, GRASSE, 11, 50)
+
+    assert texte.endswith("…") and taille < 11
+
+
+def test_une_carte_non_valide_ne_se_telecharge_pas(
+    client: TestClient, creer_encadreur: Callable[..., Utilisateur]
+) -> None:
+    from tests.espace_club import connecter
+
+    creer_encadreur("prof")
+    navigateur = connecter(client, "prof")
+
+    assert navigateur.get(MOI).json()["cause"] == "sans_rattachement"
+    assert navigateur.get(f"{MOI}.pdf").status_code == 409
+    assert navigateur.get(f"{MOI}.png").status_code == 409

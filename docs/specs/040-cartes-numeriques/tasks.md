@@ -35,11 +35,11 @@ unicité) sont écrites en TDD : les tests précèdent le code.
 
 ## Espace
 
-- [ ] 5. Tests puis code de `GET /api/cartes/moi` :
+- [x] 5. Tests puis code de `GET /api/cartes/moi` :
   - le titulaire ne voit que sa carte ;
   - 404 pour un visiteur, un collaborateur ou un encadreur pas encore vérifié ;
   - `no-store`.
-- [ ] 6. Rendu PDF et PNG (`cartes/rendu.py`), après vérification de l'API de segno avec Context7 :
+- [x] 6. Rendu PDF et PNG (`cartes/rendu.py`), après vérification de l'API de segno avec Context7 :
   - mise en page commune au format carte, polices Noto Sans, coupure des noms longs ;
   - routes `moi.pdf` et `moi.png`, 409 si la carte n'est pas valide ;
   - tests : types MIME, `no-store`, le PDF contient le numéro, le prénom et l'adresse de vérification, taille du PNG ;
@@ -47,7 +47,7 @@ unicité) sont écrites en TDD : les tests précèdent le code.
 
 ## Vérification publique
 
-- [ ] 7. Tests puis code de `GET /api/cartes/verification/{code}` :
+- [x] 7. Tests puis code de `GET /api/cartes/verification/{code}` :
   - clés exactes de la réponse, sans nom, pseudonyme ni établissement ;
   - carte non valide sans motif ;
   - code inconnu, mal formé, ou numéro à la place du code : 404 ;
