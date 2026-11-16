@@ -83,7 +83,7 @@ def _textes(etat: EtatCarte) -> Iterator[Texte]:
         yield Texte(MARGE, y, libelle.upper(), NORMALE, 5, GRIS, colonne)
         yield Texte(MARGE, y + 2.7, valeur, GRASSE, 7, ENCRE, colonne)
     yield Texte(
-        LARGEUR - MARGE - QR_COTE, BANDEAU + 3 + QR_COTE + 3.2, "Scanne pour vérifier", NORMALE, 5, GRIS, QR_COTE
+        LARGEUR - MARGE - QR_COTE, BANDEAU + 3 + QR_COTE + 4.6, "Scanne pour vérifier", NORMALE, 5, GRIS, QR_COTE
     )
 
 
@@ -142,13 +142,17 @@ def png(etat: EtatCarte) -> bytes:
         police = ImageFont.truetype(str(FICHIERS_POLICES[t.police]), px(taille * POINT_EN_MM))
         dessin.text((px(t.x), px(t.ligne)), texte, font=police, fill=t.couleur, anchor="ls")
 
-    flux_qr = io.BytesIO()
-    _qr(etat).save(flux_qr, kind="png", scale=10, border=0, dark=ENCRE, light=BLANC)
-    flux_qr.seek(0)
+    # Un facteur entier : des modules tous de la même taille, centrés dans la place du QR.
+    qr = _qr(etat)
     cote = px(QR_COTE)
-    vignette = Image.open(flux_qr).convert("RGB").resize((cote, cote), Image.Resampling.NEAREST)
+    facteur = cote // len(list(qr.matrix))
+    flux_qr = io.BytesIO()
+    qr.save(flux_qr, kind="png", scale=facteur, border=0, dark=ENCRE, light=BLANC)
+    flux_qr.seek(0)
+    vignette = Image.open(flux_qr).convert("RGB")
     x0, y0 = _origine_qr()
-    image.paste(vignette, (px(x0), px(y0)))
+    decalage = (cote - vignette.width) // 2
+    image.paste(vignette, (px(x0) + decalage, px(y0) + decalage))
 
     sortie = io.BytesIO()
     image.save(sortie, format="PNG", optimize=True)

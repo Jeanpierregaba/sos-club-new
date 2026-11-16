@@ -96,45 +96,45 @@ Pour un élève, la fin de l'affiliation ne rend pas la carte non valide : son c
 
 ### Délivrance et numéro
 
-- [ ] Étant donné un nouvel élève, quand son compte est créé, alors il a exactement une carte valide, « Non affilié ».
-- [ ] Étant donné un élève dont l'affiliation est confirmée, alors sa carte affiche son club, sans nouveau numéro.
-- [ ] Étant donné un encadreur en attente de vérification ou sans rattachement actif, alors il n'a pas de carte
+- [x] Étant donné un nouvel élève, quand son compte est créé, alors il a exactement une carte valide, « Non affilié ».
+- [x] Étant donné un élève dont l'affiliation est confirmée, alors sa carte affiche son club, sans nouveau numéro.
+- [x] Étant donné un encadreur en attente de vérification ou sans rattachement actif, alors il n'a pas de carte
       valide ; une fois vérifié et rattaché, il en a une.
-- [ ] Un visiteur ou un collaborateur n'a pas de carte (la page « Ma carte » répond 404).
-- [ ] Deux cartes n'ont jamais le même numéro ni le même code, même sous créations simultanées.
-- [ ] Un numéro n'est jamais réattribué, même après suppression du compte.
-- [ ] Après la migration, chaque élève et chaque encadreur vérifié et rattaché a sa carte.
+- [x] Un visiteur ou un collaborateur n'a pas de carte (la page « Ma carte » répond 404).
+- [x] Deux cartes n'ont jamais le même numéro ni le même code, même sous créations simultanées.
+- [x] Un numéro n'est jamais réattribué, même après suppression du compte.
+- [x] Après la migration, chaque élève et chaque encadreur vérifié et rattaché a sa carte.
 
 ### Statut
 
-- [ ] Un compte suspendu rend la carte non valide ; réactivé, elle redevient valide avec le même numéro.
-- [ ] Un encadreur dont le rattachement est retiré a une carte non valide ; rattaché de nouveau, elle redevient valide.
-- [ ] La fin de l'affiliation d'un élève remet « Non affilié » sans rendre la carte non valide.
-- [ ] Une carte suspendue par l'équipe reste non valide après la réactivation du compte, jusqu'à ce que l'équipe la
+- [x] Un compte suspendu rend la carte non valide ; réactivé, elle redevient valide avec le même numéro.
+- [x] Un encadreur dont le rattachement est retiré a une carte non valide ; rattaché de nouveau, elle redevient valide.
+- [x] La fin de l'affiliation d'un élève remet « Non affilié » sans rendre la carte non valide.
+- [x] Une carte suspendue par l'équipe reste non valide après la réactivation du compte, jusqu'à ce que l'équipe la
       réactive.
 
 ### Espace et téléchargement
 
-- [ ] L'élève et l'encadreur ne voient que leur propre carte.
-- [ ] Le PDF et l'image contiennent le prénom, le nom, le numéro, le club et un QR code qui mène à la page de
+- [x] L'élève et l'encadreur ne voient que leur propre carte.
+- [x] Le PDF et l'image contiennent le prénom, le nom, le numéro, le club et un QR code qui mène à la page de
       vérification de cette carte.
-- [ ] Une carte non valide ne se télécharge pas (409).
+- [x] Une carte non valide ne se télécharge pas (409).
 
 ### Vérification
 
-- [ ] Étant donné un code valide, la page publique affiche le type, le numéro, le club et « Valide », et la réponse ne
+- [x] Étant donné un code valide, la page publique affiche le type, le numéro, le club et « Valide », et la réponse ne
       contient ni nom, ni pseudonyme, ni coordonnée, ni date de naissance.
-- [ ] Étant donné une carte non valide, la page affiche « Non valide », sans motif.
-- [ ] Un code inconnu renvoie « Cette carte n'existe pas ».
-- [ ] La réponse porte `Cache-Control: no-store` et la page `noindex`.
-- [ ] Au-delà du plafond, les vérifications d'une même adresse IP sont refusées (429).
-- [ ] Le numéro imprimé ne permet pas de retrouver une carte : la vérification n'accepte que le code.
+- [x] Étant donné une carte non valide, la page affiche « Non valide », sans motif.
+- [x] Un code inconnu renvoie « Cette carte n'existe pas ».
+- [x] La réponse porte `Cache-Control: no-store` et la page `noindex`.
+- [x] Au-delà du plafond, les vérifications d'une même adresse IP sont refusées (429).
+- [x] Le numéro imprimé ne permet pas de retrouver une carte : la vérification n'accepte que le code.
 
 ### Admin
 
-- [ ] Avec le droit de modifier, l'équipe suspend puis réactive une carte avec un motif ; chaque action est
+- [x] Avec le droit de modifier, l'équipe suspend puis réactive une carte avec un motif ; chaque action est
       journalisée et notifie le titulaire sans nommer le collaborateur.
-- [ ] Sans ce droit, ou avec un motif de moins de 10 caractères, c'est refusé.
+- [x] Sans ce droit, ou avec un motif de moins de 10 caractères, c'est refusé.
 
 ## Cas limites et erreurs
 

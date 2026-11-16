@@ -7,7 +7,7 @@ n'est qu'une défense en profondeur contre les essais en masse.
 import re
 from datetime import UTC, datetime, timedelta
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.cartes.models import FORMAT_CODE, Carte
@@ -29,20 +29,27 @@ async def limiter(db: AsyncSession, adresse_ip: str) -> None:
     parmi les échecs de connexion. La clé est en majuscules : aucune saisie d'identifiant, toujours mise en
     minuscules, ne peut la produire pour bloquer une adresse à distance."""
     cle = empreinte(f"CARTE:{adresse_ip}")
+    maintenant = datetime.now(UTC)
+    # Les lignes de cette clé plus vieilles que la fenêtre ne servent plus : la route publique fait son ménage.
+    await db.execute(
+        delete(TentativeConnexion).where(
+            TentativeConnexion.cle_hash == cle,
+            TentativeConnexion.cree_le <= maintenant - timedelta(minutes=settings.fenetre_essais_minutes),
+        )
+    )
+    nombre = await db.scalar(
+        select(func.count()).select_from(TentativeConnexion).where(TentativeConnexion.cle_hash == cle)
+    )
+    # Une adresse au plafond n'écrit plus rien : elle ne peut pas remplir la table.
+    if (nombre or 0) >= settings.verifications_carte_max_adresse:
+        await db.commit()
+        raise TropDeVerifications
     db.add(TentativeConnexion(cle_hash=cle, adresse_ip=f"carte:{adresse_ip}"[:45]))
     await db.commit()
-    debut = datetime.now(UTC) - timedelta(minutes=settings.fenetre_essais_minutes)
-    nombre = await db.scalar(
-        select(func.count())
-        .select_from(TentativeConnexion)
-        .where(TentativeConnexion.cle_hash == cle, TentativeConnexion.cree_le > debut)
-    )
-    if (nombre or 0) > settings.verifications_carte_max_adresse:
-        raise TropDeVerifications
 
 
 async def verifier(db: AsyncSession, code: str) -> VerificationCarte | None:
-    if not FORME.match(code):
+    if not FORME.fullmatch(code):
         return None
     carte = await db.scalar(select(Carte).where(Carte.code == code))
     if carte is None:

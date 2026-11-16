@@ -78,9 +78,12 @@ unicité) sont écrites en TDD : les tests précèdent le code.
 
 ## Fin
 
-- [ ] 12. Lint, typecheck, tests backend et site. Vérification dans le navigateur :
+- [x] 12. Lint, typecheck, tests backend et site. Vérification dans le navigateur :
   - page publique ;
   - PDF imprimé au format carte, et PNG à la taille d'un téléphone, avec capture jointe ;
   - mise à jour de `TASKS.md`.
-- [ ] Vérifier tous les critères d'acceptation de `spec.md`.
-- [ ] Relecture par le sous-agent `reviewer`.
+  - (2026-11-16 : page publique vérifiée sur ordinateur et téléphone, PNG rendu et contrôlé ; « Ma carte » connecté
+    non vérifiée dans le navigateur, et lecture du QR par un vrai téléphone à faire en préprod.)
+- [x] Vérifier tous les critères d'acceptation de `spec.md`.
+- [x] Relecture par le sous-agent `reviewer` (corrections : message de suspension sans motif, en-têtes du 429,
+  purge et plafond strict du limiteur, `fullmatch` du code, QR à modules entiers, rôle et club dans l'aperçu).

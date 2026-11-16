@@ -316,14 +316,25 @@ def test_sans_carte_la_page_repond_404(
     creer_utilisateur: Callable[..., Utilisateur],
     creer_encadreur: Callable[..., Utilisateur],
 ) -> None:
+    from datetime import UTC, datetime
+
     from app.comptes.models import Role
     from tests.espace_club import connecter
 
-    creer_utilisateur("passant", Role.visiteur, email="passant@exemple.tg", email_confirme_le=None)
+    creer_utilisateur("passant", Role.visiteur, email="passant@exemple.tg", email_confirme_le=datetime.now(UTC))
     creer_encadreur("nouveau", etat=EtatVerification.en_attente)
 
     assert connecter(client, "nouveau").get(MOI).status_code == 404
+    assert connecter(client, "passant").get(MOI).status_code == 404
     assert Navigateur(client).get(MOI).status_code == 401
+
+
+def test_un_collaborateur_na_pas_de_carte(client: TestClient, creer_collaborateur: Callable[..., Any]) -> None:
+    creer_collaborateur("chef", double_auth=True)
+    admin = Navigateur(client)
+    connecter_admin(admin, "chef")  # type: ignore[arg-type]
+
+    assert admin.get(MOI).status_code == 404
 
 
 def test_le_pdf_et_limage_de_la_carte(
@@ -361,23 +372,24 @@ def test_le_rendu_porte_le_nom_le_numero_et_ladresse(
         lambda db: db.execute(update(Utilisateur).where(Utilisateur.id == eleve.id).values(prenom="Ɖɔkɔ", nom="Ŋʋɛ"))
     )
     vue = etat(en_base, eleve.id)
-    vus: list[str] = []
-    adresses: list[str] = []
-    origine = rendu._qr
+    import segno
 
-    def qr_espion(e: service.EtatCarte) -> Any:
-        adresses.append(rendu.adresse_de_verification(e.code))
-        return origine(e)
+    encodes: list[str] = []
+    vrai_make = segno.make
+
+    def make_espion(contenu: str, **options: Any) -> Any:
+        encodes.append(contenu)
+        return vrai_make(contenu, **options)
 
     with pytest.MonkeyPatch.context() as m:
-        m.setattr(rendu, "_qr", qr_espion)
-        textes = [t.texte for t in rendu._textes(vue)]
-        vus.extend(textes)
+        # Ce que le QR encode vraiment, observé à la source.
+        m.setattr(rendu.segno, "make", make_espion)
+        vus = [t.texte for t in rendu._textes(vue)]
         assert rendu.pdf(vue).startswith(b"%PDF")
         rendu.png(vue)
 
     assert "Ɖɔkɔ ŊƲƐ" in vus and vue.numero in vus and "Non affilié" in vus
-    assert adresses == [f"{settings.site_origine.rstrip('/')}/carte/{vue.code}"] * 2
+    assert encodes == [f"{settings.site_origine.rstrip('/')}/carte/{vue.code}"] * 2
 
 
 def test_un_nom_trop_long_est_coupe() -> None:
@@ -450,6 +462,22 @@ def test_lequipe_suspend_puis_reactive_une_carte(
     }
     collaborateur = en_base(lambda db: db.scalar(select(Utilisateur).where(Utilisateur.identifiant == "equipe")))
     assert all(collaborateur.nom not in f"{a.titre}{a.message}" for a in avis)
+    # Le motif interne reste à l'équipe : le titulaire est invité à la contacter.
+    assert all(MOTIF not in f"{a.titre}{a.message}" for a in avis)
+
+
+def test_une_carte_deja_non_valide_suspendue_le_reste_au_retour_du_compte(
+    equipe: Navigateur, creer_eleve: Callable[..., Utilisateur], en_base: Callable[..., Any]
+) -> None:
+    eleve = creer_eleve("ama")
+    statut(en_base, eleve.id, StatutCompte.suspendu)
+
+    reponse = equipe.post(f"{INSCRITS}/{eleve.id}/carte/suspendre", json={"motif": MOTIF})
+    assert reponse.status_code == 200 and reponse.json()["cause"] == "compte_suspendu"
+
+    statut(en_base, eleve.id, StatutCompte.actif)
+    vue = etat(en_base, eleve.id)
+    assert (vue.valide, vue.cause) == (False, "suspendue_par_l_equipe")
 
 
 @pytest.mark.parametrize("motif", ["", "Fraude", "x" * 201])

@@ -64,6 +64,12 @@ export function ApercuCarte({ carte }: { carte: MaCarte }) {
       )}
 
       <dl className="grid max-w-xl gap-3 text-sm sm:grid-cols-2">
+        {carte.valide && (
+          <>
+            <Info terme="Rôle" valeur={ROLES_CARTE[carte.role]} />
+            <Info terme="Club" valeur={carte.club ?? "Non affilié"} />
+          </>
+        )}
         <Info terme="Établissement" valeur={carte.etablissement ?? "—"} />
         <Info terme="Délivrée le" valeur={dateCourte(carte.delivree_le)} />
       </dl>

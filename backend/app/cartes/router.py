@@ -86,7 +86,9 @@ async def verifier(code: str, request: Request, db: Db, response: Response) -> V
         await verification.limiter(db, adresse_ip(request))
     except verification.TropDeVerifications:
         raise HTTPException(
-            status.HTTP_429_TOO_MANY_REQUESTS, "Trop de vérifications depuis ce réseau. Réessaie dans 15 minutes."
+            status.HTTP_429_TOO_MANY_REQUESTS,
+            "Trop de vérifications depuis ce réseau. Réessaie dans 15 minutes.",
+            headers=SANS_CACHE | {"X-Robots-Tag": "noindex"},
         ) from None
     resultat = await verification.verifier(db, code)
     if resultat is None:

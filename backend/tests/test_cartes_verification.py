@@ -88,6 +88,8 @@ def test_un_code_inconnu_mal_forme_ou_un_numero_nouvre_rien(client: TestClient, 
 
     assert reponse.status_code == 404
     assert reponse.json()["detail"] == "Cette carte n'existe pas."
+    assert reponse.headers["cache-control"] == "no-store"
+    assert reponse.headers["x-robots-tag"] == "noindex"
 
 
 def test_le_numero_imprime_ne_permet_pas_de_retrouver_la_carte(
@@ -105,6 +107,14 @@ def test_une_meme_adresse_ip_est_limitee(
     codes = [verifier(client, code).status_code for _ in range(4)]
 
     assert codes == [200, 200, 200, 429]
+    refus = verifier(client, code)
+    assert refus.headers["cache-control"] == "no-store" and refus.headers["x-robots-tag"] == "noindex"
+
+
+def test_un_code_suivi_dun_saut_de_ligne_est_refuse(
+    client: TestClient, membre: Utilisateur, en_base: Callable[..., Any]
+) -> None:
+    assert verifier(client, carte_de(en_base, membre.id).code + "%0A").status_code == 404
 
 
 def test_une_saisie_didentifiant_ne_peut_pas_bloquer_une_adresse_ip(

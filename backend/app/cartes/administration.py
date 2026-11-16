@@ -77,7 +77,7 @@ async def suspendre(db: AsyncSession, acces: Acces, utilisateur_id: UUID, motif:
     )  # fmt: skip
     notifier(
         db, utilisateur_id, "carte_suspendue", "Ta carte a été suspendue par l'équipe des Clubs Santé",
-        f"Motif : {motif}", lien="/ma-carte",
+        "Contacte l'équipe nationale des Clubs Santé pour en savoir plus.", lien="/ma-carte",
     )  # fmt: skip
     await db.commit()
     resultat = await carte_admin(db, utilisateur_id)

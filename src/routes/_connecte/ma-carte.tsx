@@ -59,7 +59,9 @@ function PageMaCarte() {
             <ApercuCarte carte={carte} />
           ) : (
             <p className="max-w-xl rounded-3xl bg-white p-6 font-semibold shadow-card ring-1 ring-border">
-              Ta carte encadreur arrivera quand l'équipe nationale aura vérifié ton compte.
+              {moi.role === "encadreur"
+                ? "Ta carte encadreur arrivera quand l'équipe nationale aura vérifié ton compte."
+                : "Ta carte membre n'est pas encore prête : contacte l'équipe nationale des Clubs Santé."}
             </p>
           )}
         </div>
