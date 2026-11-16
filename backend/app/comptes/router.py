@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Path, Request, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.double_auth import verifier_code
@@ -14,6 +14,7 @@ from app.comptes.schemas import (
     EtapeCode,
     EtapeConfirmation,
     EtatLien,
+    JetonLien,
     Moi,
     MotDePasseEntree,
     NouveauMotDePasse,
@@ -164,19 +165,19 @@ async def mot_de_passe_oublie(
     return ReponseDemandeLien(message=REPONSE_LIEN)
 
 
-@router.get("/mot-de-passe-oublie/{jeton}")
-async def etat_du_lien(jeton: Annotated[str, Path(max_length=100)], response: Response, db: Base) -> EtatLien:
+# Le jeton voyage dans le corps de la requête, jamais dans l'adresse : il finirait dans les journaux d'accès
+# (comme l'activation, spec 015).
+@router.post("/mot-de-passe-oublie/verification")
+async def etat_du_lien(entree: JetonLien, response: Response, db: Base) -> EtatLien:
     response.headers["Cache-Control"] = "no-store"
-    return EtatLien(valide=await oubli.lien_valide(db, jeton))
+    return EtatLien(valide=await oubli.lien_valide(db, entree.jeton))
 
 
-@router.post("/mot-de-passe-oublie/{jeton}", status_code=status.HTTP_204_NO_CONTENT)
-async def choisir_mot_de_passe(
-    jeton: Annotated[str, Path(max_length=100)], entree: NouveauMotDePasse, request: Request, db: Base
-) -> None:
+@router.post("/mot-de-passe-oublie/choix", status_code=status.HTTP_204_NO_CONTENT)
+async def choisir_mot_de_passe(entree: NouveauMotDePasse, request: Request, db: Base) -> None:
     adresse_ip = cle_adresse(request.client.host if request.client else None)
     try:
-        await oubli.choisir(db, jeton, entree.nouveau, adresse_ip)
+        await oubli.choisir(db, entree.jeton, entree.nouveau, adresse_ip)
     except oubli.LienInvalide:
         raise HTTPException(
             status.HTTP_410_GONE, "Ce lien a expiré ou a déjà servi. Demande un nouveau lien."

@@ -33,7 +33,9 @@ sont écrites en TDD : les tests précèdent le code.
 
 ## Fin
 
-- [ ] 10. Lint, typecheck, tests backend et site ; vérification dans le navigateur des pages publiques ;
+- [x] 10. Lint, typecheck, tests backend et site ; vérification dans le navigateur des pages publiques ;
       `TASKS.md`.
-- [ ] Vérifier tous les critères d'acceptation de `spec.md`.
-- [ ] Relecture finale par le sous-agent `reviewer`.
+- [x] Vérifier tous les critères d'acceptation de `spec.md`.
+- [x] Relecture finale par le sous-agent `reviewer` (2026-11-16) : jeton dans le corps des requêtes, jamais dans
+      l'adresse ; limite par adresse IP propre et non déclenchable par une saisie ; motif de 10 caractères vérifié par
+      le site ; dialogue du mot de passe provisoire fermé seulement après « J'ai noté » ; tests des pages ajoutés.

@@ -64,42 +64,42 @@ Santé », sans nom de collaborateur).
    de passe (règles de la spec 001). Un nouveau lien annule le précédent.
 5. Une fois le mot de passe changé, toutes les sessions sont coupées, l'action est journalisée, et la personne est
    invitée à se connecter.
-6. Garde-fous : 3 demandes par adresse et par heure, et la limite de débit par adresse IP des routes de connexion ;
+6. Garde-fous : 3 demandes par adresse et par heure, et 20 demandes par adresse IP sur 15 minutes ;
    le jeton est stocké sous forme d'empreinte, jamais en clair.
 
 ## Critères d'acceptation
 
 ### Par l'encadreur
 
-- [ ] Étant donné un encadreur vérifié et un membre confirmé de son club, quand il réinitialise avec un motif, alors
+- [x] Étant donné un encadreur vérifié et un membre confirmé de son club, quand il réinitialise avec un motif, alors
       il reçoit un mot de passe provisoire qui ouvre une session de l'élève, les anciennes sessions de l'élève sont
       coupées et l'ancien mot de passe ne marche plus.
-- [ ] Le mot de passe provisoire n'apparaît ni au journal, ni dans la notification, ni dans une réponse ultérieure.
-- [ ] Étant donné un élève en attente de confirmation, d'un autre club, suspendu, ou un encadreur, alors la
+- [x] Le mot de passe provisoire n'apparaît ni au journal, ni dans la notification, ni dans une réponse ultérieure.
+- [x] Étant donné un élève en attente de confirmation, d'un autre club, suspendu, ou un encadreur, alors la
       réinitialisation est refusée (404 pour un élève hors du club, comme s'il n'existait pas).
-- [ ] Étant donné un encadreur non vérifié, sans club, ou dont le club n'est pas en service, alors c'est refusé.
-- [ ] Un élève, un visiteur ou un président ne peut pas réinitialiser un autre compte.
-- [ ] Un motif de moins de 10 caractères est refusé.
-- [ ] La 11e réinitialisation d'un encadreur sur 24 heures est refusée (429), même sous requêtes simultanées.
-- [ ] Chaque réinitialisation est journalisée avec l'encadreur, l'élève, le club et le motif.
-- [ ] L'élève reçoit une notification qui nomme l'encadreur ; un bandeau lui conseille de changer son mot de passe
+- [x] Étant donné un encadreur non vérifié, sans club, ou dont le club n'est pas en service, alors c'est refusé.
+- [x] Un élève, un visiteur ou un président ne peut pas réinitialiser un autre compte.
+- [x] Un motif de moins de 10 caractères est refusé.
+- [x] La 11e réinitialisation d'un encadreur sur 24 heures est refusée (429), même sous requêtes simultanées.
+- [x] Chaque réinitialisation est journalisée avec l'encadreur, l'élève, le club et le motif.
+- [x] L'élève reçoit une notification qui nomme l'encadreur ; un bandeau lui conseille de changer son mot de passe
       jusqu'à ce qu'il le fasse.
 
 ### Par l'admin
 
-- [ ] Une réinitialisation par l'admin marque le mot de passe comme provisoire et notifie l'élève, sans nommer le
+- [x] Une réinitialisation par l'admin marque le mot de passe comme provisoire et notifie l'élève, sans nommer le
       collaborateur.
 
 ### Par e-mail
 
-- [ ] Étant donné un encadreur activé ou un visiteur confirmé, quand il demande un lien, alors il reçoit un e-mail
+- [x] Étant donné un encadreur activé ou un visiteur confirmé, quand il demande un lien, alors il reçoit un e-mail
       avec un lien valable 30 minutes.
-- [ ] Étant donné une adresse inconnue, d'un élève, d'un collaborateur, d'un compte suspendu ou d'un visiteur non
+- [x] Étant donné une adresse inconnue, d'un élève, d'un collaborateur, d'un compte suspendu ou d'un visiteur non
       confirmé, alors aucun e-mail n'est envoyé et la réponse est la même que pour un compte réel.
-- [ ] Un lien utilisé, expiré ou remplacé par un plus récent est refusé.
-- [ ] Après le changement, les sessions du compte sont coupées et l'action est journalisée.
-- [ ] La 4e demande pour la même adresse dans l'heure n'envoie rien.
-- [ ] Le jeton n'est stocké qu'en empreinte.
+- [x] Un lien utilisé, expiré ou remplacé par un plus récent est refusé.
+- [x] Après le changement, les sessions du compte sont coupées et l'action est journalisée.
+- [x] La 4e demande pour la même adresse dans l'heure n'envoie rien.
+- [x] Le jeton n'est stocké qu'en empreinte.
 
 ## Cas limites et erreurs
 

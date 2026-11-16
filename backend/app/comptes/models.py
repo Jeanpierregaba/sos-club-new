@@ -89,7 +89,7 @@ class LienMotDePasse(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
     utilisateur_id: Mapped[UUID] = mapped_column(ForeignKey("utilisateur.id", ondelete="CASCADE"), index=True)
     jeton_hash: Mapped[str] = mapped_column(String(64), unique=True)
-    cree_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    cree_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
     expire_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     utilise_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     remplace_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

@@ -126,7 +126,7 @@ export const ACTIONS_JOURNAL: Record<string, string> = {
   ),
   rapports_exportes: "Archive des rapports exportée",
   // Spec 039.
-  lien_mot_de_passe_envoye: "Lien « mot de passe oublié » envoyé",
+  lien_mot_de_passe_envoye: "Lien « mot de passe oublié » préparé pour l'envoi",
   mot_de_passe_choisi: "Mot de passe choisi depuis un lien",
 };
 

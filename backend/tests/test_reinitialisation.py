@@ -3,6 +3,7 @@ comptes), écrite avant le code."""
 
 import asyncio
 from collections.abc import Callable
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
@@ -95,7 +96,9 @@ def test_lencadreur_reinitialise_un_membre_confirme(
     (avis,) = en_base(
         lambda db: db.scalars(select(Notification).where(Notification.utilisateur_id == club["membre"].id))
     ).all()
-    assert "réinitialisé par" in avis.titre and provisoire not in f"{avis.titre}{avis.message}"
+    prof = club["prof"]
+    assert avis.titre == f"Ton mot de passe a été réinitialisé par {prof.prenom} {prof.nom}"
+    assert provisoire not in f"{avis.titre}{avis.message}"
 
 
 def test_changer_son_mot_de_passe_efface_le_marqueur(client: TestClient, club: dict[str, Any]) -> None:
@@ -225,4 +228,29 @@ def test_la_reinitialisation_par_lequipe_marque_et_previent_sans_nommer(
     (avis,) = en_base(
         lambda db: db.scalars(select(Notification).where(Notification.utilisateur_id == club["membre"].id))
     ).all()
-    assert "l'équipe des Clubs Santé" in avis.titre
+    assert avis.titre == "Ton mot de passe a été réinitialisé par l'équipe des Clubs Santé"
+    collaborateur = en_base(lambda db: db.scalar(select(Utilisateur).where(Utilisateur.identifiant == "equipe")))
+    assert collaborateur.nom not in f"{avis.titre}{avis.message}"
+
+
+def test_un_encadreur_sans_club_ou_un_visiteur_ne_reinitialise_rien(
+    client: TestClient,
+    club: dict[str, Any],
+    en_base: Callable[..., Any],
+    creer_utilisateur: Callable[..., Utilisateur],
+) -> None:
+    from app.clubs.models import EtatRattachement, Rattachement
+    from app.comptes.models import Role
+
+    creer_utilisateur("passant", Role.visiteur, email="passant@exemple.tg", email_confirme_le=datetime.now(UTC))
+    assert reinitialiser(connecter(client, "passant"), club["adhesion"].id).status_code == 403
+    en_base(
+        lambda db: db.execute(
+            update(Rattachement)
+            .where(Rattachement.encadreur_id == club["prof"].id)
+            .values(etat=EtatRattachement.retire)
+        )
+    )
+
+    assert reinitialiser(connecter(client, "prof"), club["adhesion"].id).status_code == 404
+    assert journal(en_base) == []

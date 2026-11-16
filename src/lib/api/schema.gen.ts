@@ -109,18 +109,34 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/comptes/mot-de-passe-oublie/{jeton}": {
+    "/api/comptes/mot-de-passe-oublie/verification": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
+        get?: never;
+        put?: never;
         /** Etat Du Lien */
-        get: operations["etat_du_lien_api_comptes_mot_de_passe_oublie__jeton__get"];
+        post: operations["etat_du_lien_api_comptes_mot_de_passe_oublie_verification_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/comptes/mot-de-passe-oublie/choix": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
         put?: never;
         /** Choisir Mot De Passe */
-        post: operations["choisir_mot_de_passe_api_comptes_mot_de_passe_oublie__jeton__post"];
+        post: operations["choisir_mot_de_passe_api_comptes_mot_de_passe_oublie_choix_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6917,6 +6933,11 @@ export interface components {
             /** Jeton */
             jeton: string;
         };
+        /** JetonLien */
+        JetonLien: {
+            /** Jeton */
+            jeton: string;
+        };
         /** LaureatAdmin */
         LaureatAdmin: {
             /**
@@ -7505,6 +7526,8 @@ export interface components {
         };
         /** NouveauMotDePasse */
         NouveauMotDePasse: {
+            /** Jeton */
+            jeton: string;
             /** Nouveau */
             nouveau: string;
         };
@@ -9388,16 +9411,18 @@ export interface operations {
             };
         };
     };
-    etat_du_lien_api_comptes_mot_de_passe_oublie__jeton__get: {
+    etat_du_lien_api_comptes_mot_de_passe_oublie_verification_post: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                jeton: string;
-            };
+            path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JetonLien"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -9419,13 +9444,11 @@ export interface operations {
             };
         };
     };
-    choisir_mot_de_passe_api_comptes_mot_de_passe_oublie__jeton__post: {
+    choisir_mot_de_passe_api_comptes_mot_de_passe_oublie_choix_post: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                jeton: string;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody: {

@@ -23,15 +23,15 @@ export function ReinitialiserMembre({
 }) {
   const [motif, setMotif] = useState(false);
   const [provisoire, setProvisoire] = useState<string | null>(null);
-  const [copie, setCopie] = useState(false);
+  const [copie, setCopie] = useState<"non" | "oui" | "echec">("non");
 
   const copier = async () => {
     if (!provisoire) return;
     try {
       await navigator.clipboard.writeText(provisoire);
-      setCopie(true);
+      setCopie("oui");
     } catch {
-      setCopie(false);
+      setCopie("echec");
     }
   };
 
@@ -52,14 +52,21 @@ export function ReinitialiserMembre({
         titre={`Réinitialiser le mot de passe de ${pseudonyme} ?`}
         description="Son ancien mot de passe ne marchera plus et ses connexions seront fermées. L'élève sera prévenu que c'est toi. Indique pourquoi (10 caractères au moins) : 10 réinitialisations par jour au plus."
         bouton="Réinitialiser"
+        longueurMin={10}
+        longueurMax={200}
         onConfirme={async (texte) => {
           const { mot_de_passe } = await reinitialiserMembre(affiliationId, texte);
-          setCopie(false);
+          setCopie("non");
           setProvisoire(mot_de_passe);
         }}
       />
-      <Dialog open={provisoire !== null} onOpenChange={(o) => !o && setProvisoire(null)}>
-        <DialogContent className="sm:rounded-[2rem]">
+      {/* Le mot de passe ne se réaffiche pas : on ne ferme qu'après l'avoir noté, jamais par un clic à côté. */}
+      <Dialog open={provisoire !== null}>
+        <DialogContent
+          className="sm:rounded-[2rem] [&>button]:hidden"
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle className="text-2xl text-logo-blue">Mot de passe provisoire</DialogTitle>
             <DialogDescription>
@@ -73,10 +80,20 @@ export function ReinitialiserMembre({
           >
             {provisoire}
           </p>
-          <Button variant="outline" onClick={copier} className="rounded-full font-bold">
-            {copie ? <Check className="size-4" /> : <Copy className="size-4" />}
-            {copie ? "Copié" : "Copier"}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={copier} className="rounded-full font-bold">
+              {copie === "oui" ? <Check className="size-4" /> : <Copy className="size-4" />}
+              {copie === "oui" ? "Copié" : "Copier"}
+            </Button>
+            <Button onClick={() => setProvisoire(null)} className="rounded-full font-bold">
+              J'ai noté le mot de passe
+            </Button>
+          </div>
+          {copie === "echec" && (
+            <p role="alert" className="text-sm font-semibold text-logo-red">
+              La copie n'a pas marché : recopie le mot de passe à la main.
+            </p>
+          )}
         </DialogContent>
       </Dialog>
     </>

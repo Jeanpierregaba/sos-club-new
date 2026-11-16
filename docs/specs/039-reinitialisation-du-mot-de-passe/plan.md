@@ -56,8 +56,8 @@ adresse_ip)` ;
     collaborateur de l'admin (rôle `admin`), un compte suspendu ou supprimé.
 - `backend/app/comptes/router.py` et `schemas.py` :
   - `POST /api/comptes/mot-de-passe-oublie` → 202, toujours le même message ;
-  - `GET /api/comptes/mot-de-passe-oublie/{jeton}` → `{valide}` (la page de choix sait si le lien sert encore) ;
-  - `POST /api/comptes/mot-de-passe-oublie/{jeton}` `{nouveau}` → 204 ;
+  - `POST /api/comptes/mot-de-passe-oublie/verification {jeton}` → `{valide}` (la page de choix sait si le lien sert encore) ;
+  - `POST /api/comptes/mot-de-passe-oublie/choix {jeton, nouveau}` `{nouveau}` → 204 ;
   - `Moi.mot_de_passe_provisoire`.
 - `backend/app/clubs/mon_club_sante.py` et `clubs/router.py` : `POST
 /api/clubs/mon-club-sante/affiliations/{affiliation_id}/mot-de-passe` `{motif}` → `{mot_de_passe}`.
@@ -118,8 +118,8 @@ destructive : une colonne nullable et une table neuve.
 | `POST /api/clubs/mon-club-sante/affiliations/{id}/mot-de-passe` | encadreur vérifié du club | réinitialise un membre confirmé ; renvoie le provisoire une fois (`Cache-Control: no-store`) |
 | `POST /api/admin/inscrits/{id}/mot-de-passe` (existant)         | `inscrits:modifier`, 2FA  | inchangé, plus le marqueur et la notification                                                |
 | `POST /api/comptes/mot-de-passe-oublie`                         | tous, limité              | 202 « Si cette adresse correspond à un compte, un lien vient d'y être envoyé. »              |
-| `GET /api/comptes/mot-de-passe-oublie/{jeton}`                  | tous                      | `{valide: bool}`                                                                             |
-| `POST /api/comptes/mot-de-passe-oublie/{jeton}`                 | tous, limité              | change le mot de passe, coupe les sessions ; 410 si le lien n'est plus valide                |
+| `POST /api/comptes/mot-de-passe-oublie/verification {jeton}`    | tous                      | `{valide: bool}`                                                                             |
+| `POST /api/comptes/mot-de-passe-oublie/choix {jeton, nouveau}`  | tous, limité              | change le mot de passe, coupe les sessions ; 410 si le lien n'est plus valide                |
 
 ## Dépendances
 
@@ -189,3 +189,14 @@ En TDD (droits, comptes) :
   (`email_confirme_le` est posé).
 - **SMTP en panne.** La demande répond pareil ; la personne réessaie ou passe par l'équipe. L'échec est loggé sans
   l'adresse.
+
+## Note (relecture du 2026-11-16)
+
+- Le jeton voyage dans le **corps** des requêtes (`/verification`, `/choix`), jamais dans l'adresse de l'API : il
+  finirait dans les journaux d'accès d'uvicorn (même règle que l'activation, spec 015).
+- La limite des demandes de lien est **propre** à ce parcours : 20 par adresse IP sur 15 minutes
+  (`oubli_max_adresse`). Sa clé, en majuscules, ne peut pas être produite par une saisie d'identifiant (toujours en
+  minuscules) ; ses lignes ne comptent pas parmi les échecs de connexion.
+- Le choix du mot de passe n'a pas de limite d'essais : le jeton porte 256 bits, et le hachage ne tourne qu'après la
+  validation du lien.
+- Changer son mot de passe depuis l'espace annule un lien encore ouvert.

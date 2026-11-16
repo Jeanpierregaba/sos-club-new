@@ -78,7 +78,11 @@ class EtatLien(BaseModel):
     valide: bool
 
 
-class NouveauMotDePasse(BaseModel):
+class JetonLien(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    jeton: str = Field(min_length=1, max_length=100)
+
+
+class NouveauMotDePasse(JetonLien):
     nouveau: str = Field(max_length=LONGUEUR_MAX_MOT_DE_PASSE)

@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     essais_max_identifiant: int = 5
     # Une classe peut partager une même adresse réseau : ce seuil reste bien plus haut que par identifiant.
     essais_max_adresse: int = 50
+    # Spec 039 : demandes de lien « mot de passe oublié » par adresse IP, sur la fenêtre des essais.
+    oubli_max_adresse: int = 20
 
     # Espace administrateur (spec 015).
     duree_invitation_heures: int = 72

@@ -73,7 +73,11 @@ def jeton_de(envoi: tuple[str, str]) -> str:
 
 
 def choisir(client: TestClient, jeton: str, nouveau: str = "un-nouveau-secret") -> Any:
-    return Navigateur(client).post(f"{OUBLI}/{jeton}", json={"nouveau": nouveau})
+    return Navigateur(client).post(f"{OUBLI}/choix", json={"jeton": jeton, "nouveau": nouveau})
+
+
+def valide(client: TestClient, jeton: str) -> Any:
+    return Navigateur(client).post(f"{OUBLI}/verification", json={"jeton": jeton}).json()
 
 
 @pytest.mark.parametrize("qui", ["encadreur", "visiteur"])
@@ -123,7 +127,7 @@ def test_le_lien_change_le_mot_de_passe_et_coupe_les_sessions(
     demander(client, "prof@ecole.tg")
     jeton = jeton_de(envois[0])
 
-    assert Navigateur(client).get(f"{OUBLI}/{jeton}").json() == {"valide": True}
+    assert valide(client, jeton) == {"valide": True}
     assert choisir(client, jeton).status_code == 204
 
     assert ouverte.get("/api/comptes/moi").status_code == 401
@@ -132,7 +136,7 @@ def test_le_lien_change_le_mot_de_passe_et_coupe_les_sessions(
     )
     assert nouvelle.status_code == 200 and nouvelle.json()["mot_de_passe_provisoire"] is False
     assert choisir(client, jeton).status_code == 410
-    assert Navigateur(client).get(f"{OUBLI}/{jeton}").json() == {"valide": False}
+    assert valide(client, jeton) == {"valide": False}
     compte = en_base(lambda db: db.get(Utilisateur, comptes["encadreur"].id))
     assert compte.email_confirme_le is not None
     actions = set(en_base(lambda db: db.scalars(select(JournalAudit.action))).all())
@@ -195,12 +199,41 @@ def test_la_quatrieme_demande_de_lheure_nenvoie_rien(
 
 def test_un_jeton_inconnu_est_refuse(client: TestClient, comptes: dict[str, Utilisateur]) -> None:
     assert choisir(client, "x" * 43).status_code == 410
-    assert Navigateur(client).get(f"{OUBLI}/{'x' * 43}").json() == {"valide": False}
+    assert valide(client, "x" * 43) == {"valide": False}
 
 
 def test_une_meme_adresse_ip_est_limitee(client: TestClient, comptes: dict[str, Utilisateur], envois: list) -> None:
     from app.config import settings
 
-    codes = [demander(client, f"inconnu{i}@exemple.tg").status_code for i in range(settings.essais_max_identifiant + 1)]
+    codes = [demander(client, f"inconnu{i}@exemple.tg").status_code for i in range(settings.oubli_max_adresse + 1)]
 
     assert codes[-1] == 429 and set(codes[:-1]) == {202}
+
+
+def test_une_saisie_didentifiant_ne_peut_pas_bloquer_une_adresse_ip(
+    client: TestClient, comptes: dict[str, Utilisateur], envois: list
+) -> None:
+    """Le compteur des demandes de lien n'est pas joignable par une connexion à l'identifiant forgé."""
+    for _ in range(10):
+        Navigateur(client).post("/api/comptes/connexion", json={"identifiant": "OUBLI:testclient", "mot_de_passe": "x"})
+
+    assert demander(client, "prof@ecole.tg").status_code == 202
+    assert len(envois) == 1
+
+
+def test_changer_son_mot_de_passe_annule_un_lien_ouvert(
+    client: TestClient, comptes: dict[str, Utilisateur], envois: list
+) -> None:
+    demander(client, "prof@ecole.tg")
+    session = Navigateur(client)
+    session.post("/api/comptes/connexion", json={"identifiant": "prof", "mot_de_passe": MOT_DE_PASSE})
+    session.post("/api/comptes/mot-de-passe", json={"actuel": MOT_DE_PASSE, "nouveau": "un-autre-secret"})
+
+    assert choisir(client, jeton_de(envois[0])).status_code == 410
+
+
+def test_le_jeton_ne_passe_jamais_dans_ladresse(client: TestClient) -> None:
+    from app.main import app
+
+    chemins = {route.path for route in app.routes if "mot-de-passe-oublie" in getattr(route, "path", "")}
+    assert all("{" not in chemin for chemin in chemins), chemins

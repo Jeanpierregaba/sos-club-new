@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.journal import journaliser
 from app.admin.models import Collaborateur, DoubleAuth, EtapeDoubleAuth
-from app.comptes.models import Role, Session, StatutCompte, TentativeConnexion, Utilisateur
+from app.comptes.models import LienMotDePasse, Role, Session, StatutCompte, TentativeConnexion, Utilisateur
 from app.comptes.motdepasse import doit_rehacher, hacher, verifier, verifier_factice
 from app.config import settings
 
@@ -442,6 +442,16 @@ async def changer_mot_de_passe(
     utilisateur.mot_de_passe_provisoire_le = None
     await db.execute(
         delete(Session).where(Session.utilisateur_id == utilisateur.id, Session.jeton_hash != empreinte(jeton))
+    )
+    # Un lien « mot de passe oublié » encore ouvert ne sert plus (spec 039).
+    await db.execute(
+        update(LienMotDePasse)
+        .where(
+            LienMotDePasse.utilisateur_id == utilisateur.id,
+            LienMotDePasse.utilise_le.is_(None),
+            LienMotDePasse.remplace_le.is_(None),
+        )
+        .values(remplace_le=func.now())
     )
     journaliser(
         db, "mot_de_passe_change", utilisateur, cible_type="utilisateur", cible_id=utilisateur.id,

@@ -1093,7 +1093,8 @@ export const reinitialiserMembre = (affiliationId: string, motif: string) =>
   );
 export const demanderLienMotDePasse = (email: string) =>
   envoyerJson<{ message: string }>("/api/comptes/mot-de-passe-oublie", { email });
+// Le jeton voyage dans le corps de la requête : dans l'adresse, il finirait dans les journaux d'accès.
 export const verifierLienMotDePasse = (jeton: string) =>
-  requeteApi<{ valide: boolean }>(`/api/comptes/mot-de-passe-oublie/${encodeURIComponent(jeton)}`);
+  envoyerJson<{ valide: boolean }>("/api/comptes/mot-de-passe-oublie/verification", { jeton });
 export const choisirMotDePasse = (jeton: string, nouveau: string) =>
-  envoyerJson<void>(`/api/comptes/mot-de-passe-oublie/${encodeURIComponent(jeton)}`, { nouveau });
+  envoyerJson<void>("/api/comptes/mot-de-passe-oublie/choix", { jeton, nouveau });

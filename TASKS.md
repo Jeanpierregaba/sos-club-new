@@ -8,7 +8,6 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] Q4 — Réinitialisation du mot de passe — [spec 039](docs/specs/039-reinitialisation-du-mot-de-passe/spec.md) (spec, plan et tâches validés le 2026-11-16 : par l'encadreur pour les membres confirmés, plafond, motif et avis, changement conseillé, lien par e-mail pour encadreurs et visiteurs)
 - [ ] Quiz santé (922 QCM) jouables depuis la page des jeux, 3 quiz sans compte puis compte visiteur ; correction en vert ou rouge et récapitulatif des erreurs (2026-11-10, ADR-0004 amendé) (spec 031, livré en urgence le 2026-11-09 : spec écrite à rédiger)
 - [ ] Fiches d'inscription : élève, encadreur et visiteur, e-mails (R19 avancé) — [spec 030](docs/specs/030-fiches-d-inscription/spec.md)
 
@@ -77,6 +76,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] Q4 — Réinitialisation du mot de passe — [spec 039](docs/specs/039-reinitialisation-du-mot-de-passe/spec.md) (2026-11-16 : par l'encadreur pour les membres confirmés de son club, motif, 10 par jour, notification et bandeau de l'élève ; par l'équipe avec le même marqueur ; « mot de passe oublié » par e-mail pour les encadreurs activés et les visiteurs confirmés)
 - [x] R12 — Rapports d'activité, rapports mensuels et bilans semestriels (Q22, Q29) — [spec 038](docs/specs/038-rapports-d-activite/spec.md) (2026-11-15 : trois modèles dans le moteur de modération, justificatifs PDF, Word et photos, « reçu / consulté », doublons liés sans point, compte collectif du club au registre, archive admin, CSV sans nom d'élève, PDF des rapports approuvés)
 - [x] R14 — Clôture de semestre et Top 3 (Q21, Q25) — [spec 037](docs/specs/037-cloture-de-semestre-et-top-3/spec.md) (2026-11-15 : gel, contrôle, validation annulable et publication du Top 3, palmarès sur `/hall-of-fame`, distinctions dans l'espace élève ; reste à trancher : le pseudonyme publié à retirer, le club affiché sans choix de l'élève)
 - [x] [036 — Classements et tableaux de bord](docs/specs/036-classements-et-tableaux-de-bord/spec.md) (R13 : page `/hall-of-fame` DRE et national pour élèves, encadreurs et clubs, semestre et historique ; rangs personnels et classement interne privé du club ; registre admin filtrable, corrections motivées et annulations journalisées, nationales, sous double authentification ; seuls les totaux positifs sont classés. Question ouverte : club affiché sans choix de l'élève, voir la spec)

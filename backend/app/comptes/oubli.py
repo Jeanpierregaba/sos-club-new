@@ -11,17 +11,18 @@ import secrets
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
+from email_validator import EmailNotValidError, validate_email
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.journal import journaliser
-from app.comptes.models import LienMotDePasse, Role, StatutCompte, Utilisateur
+from app.comptes.models import LienMotDePasse, Role, StatutCompte, TentativeConnexion, Utilisateur
 from app.comptes.motdepasse import hacher
 from app.comptes.service import (
     LONGUEUR_MAX_MOT_DE_PASSE,
     LONGUEUR_MIN_MOT_DE_PASSE,
     CompteInvalide,
-    _reserver_essai,
+    TropDEssais,
     couper_sessions,
     empreinte,
 )
@@ -59,17 +60,35 @@ async def eligible(db: AsyncSession, utilisateur: Utilisateur) -> bool:
     return False
 
 
+async def _limiter_adresse(db: AsyncSession, adresse_ip: str) -> None:
+    """Une limite propre aux demandes de lien, par adresse IP : une école derrière une seule adresse garde de la
+    marge, et les connexions ne sont pas touchées. La clé est en majuscules : aucune saisie d'identifiant, toujours
+    mise en minuscules, ne peut la produire pour bloquer une adresse à distance."""
+    cle = empreinte(f"OUBLI:{adresse_ip}")
+    # Adresse préfixée et essai « en cours » : ces lignes ne comptent jamais parmi les échecs de connexion.
+    db.add(TentativeConnexion(cle_hash=cle, adresse_ip=f"oubli:{adresse_ip}"[:45]))
+    await db.commit()
+    debut = datetime.now(UTC) - timedelta(minutes=settings.fenetre_essais_minutes)
+    nombre = await db.scalar(
+        select(func.count())
+        .select_from(TentativeConnexion)
+        .where(TentativeConnexion.cle_hash == cle, TentativeConnexion.cree_le > debut)
+    )
+    if (nombre or 0) > settings.oubli_max_adresse:
+        raise TropDEssais
+
+
 async def demander(db: AsyncSession, email: str, adresse_ip: str) -> Envoi | None:
     """Prépare le lien si l'adresse est fiable ; sinon ne fait rien. L'appelant répond toujours la même chose et
     envoie l'e-mail après la réponse."""
-    # Une limite par adresse IP, à part des connexions : une classe qui demande des liens ne bloque pas ses
-    # connexions.
-    await _reserver_essai(db, empreinte(f"oubli:{adresse_ip}"), f"oubli:{adresse_ip}"[:45])
+    await _limiter_adresse(db, adresse_ip)
     maintenant = datetime.now(UTC)
+    try:
+        adresse = validate_email(email.strip(), check_deliverability=False).normalized.lower()
+    except EmailNotValidError:
+        return None
     await db.execute(delete(LienMotDePasse).where(LienMotDePasse.cree_le < maintenant - CONSERVATION))
-    utilisateur = await db.scalar(
-        select(Utilisateur).where(Utilisateur.email == email.strip().lower()).with_for_update()
-    )
+    utilisateur = await db.scalar(select(Utilisateur).where(Utilisateur.email == adresse).with_for_update())
     if utilisateur is None or not await eligible(db, utilisateur):
         await db.commit()
         return None

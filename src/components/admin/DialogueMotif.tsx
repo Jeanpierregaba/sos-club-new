@@ -22,8 +22,13 @@ export function DialogueMotif({
   description,
   bouton,
   danger = false,
+  longueurMin = 3,
+  longueurMax = 500,
   onConfirme,
 }: {
+  // Les bornes du motif attendues par l'API (10 à 200 pour une réinitialisation, spec 039).
+  longueurMin?: number;
+  longueurMax?: number;
   ouvert: boolean;
   onOuvert: (ouvert: boolean) => void;
   titre: string;
@@ -37,8 +42,8 @@ export function DialogueMotif({
   const [enCours, setEnCours] = useState(false);
 
   const confirmer = async () => {
-    if (motif.trim().length < 3) {
-      setErreur("Indique un motif d'au moins 3 caractères.");
+    if (motif.trim().length < longueurMin) {
+      setErreur(`Indique un motif d'au moins ${longueurMin} caractères.`);
       return;
     }
     setErreur(null);
@@ -72,7 +77,7 @@ export function DialogueMotif({
           <Textarea
             value={motif}
             onChange={(e) => setMotif(e.target.value)}
-            maxLength={500}
+            maxLength={longueurMax}
             rows={3}
             className="font-medium"
           />
