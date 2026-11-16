@@ -10,7 +10,7 @@ unicité) sont écrites en TDD : les tests précèdent le code.
   - `docs/SECURITY.md` : code du QR secret, exclu des exports et du journal ; page de vérification publique ;
   - `docs/DESIGN.md` : parcours « Ma carte » et page de vérification ;
   - `docs/PRD.md` : R15 traité par la spec 040.
-- [ ] 2. Migration et modèle :
+- [x] 2. Migration et modèle :
   - table `carte` (numéro et code uniques, `utilisateur_id` unique en `SET NULL`, suspension avec CHECK) ;
   - séquence `carte_numero_seq` ;
   - délivrance aux élèves puis aux encadreurs actifs existants, code en SQL natif ;
@@ -18,13 +18,13 @@ unicité) sont écrites en TDD : les tests précèdent le code.
 
 ## Délivrance et état
 
-- [ ] 3. Tests puis code de `cartes.service.delivrer` et de son branchement :
+- [x] 3. Tests puis code de `cartes.service.delivrer` et de son branchement :
   - une inscription d'élève crée une carte « Non affilié » ;
   - l'activation d'un encadreur crée la sienne, et le seed commun suit les mêmes règles ;
   - idempotente : un second appel ne crée rien ;
   - unicité du numéro et du code sous 20 délivrances simultanées ;
   - format `CS-M-` et `CS-E-`, code de 32 caractères.
-- [ ] 4. Tests puis code de `etat_de` :
+- [x] 4. Tests puis code de `etat_de` :
   - validité, cause, club, rôle et établissement selon le tableau du plan ;
   - affiliation confirmée, puis retirée ;
   - présidence et passation ;

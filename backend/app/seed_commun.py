@@ -20,6 +20,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.catalogue import DROITS_DES_ROLES, SENSIBLES, RoleDepart
 from app.admin.double_auth import regenerer_codes_secours
 from app.admin.models import Collaborateur, DoubleAuth, Permission
+from app.cartes.models import TypeCarte
+from app.cartes.service import delivrer
 from app.clubs import activation
 from app.clubs.affiliations import affilier_eleve, rattacher_encadreur
 from app.clubs.models import ADHESION_EN_COURS, Adhesion, EtatAdhesion
@@ -141,6 +143,7 @@ async def preparer_eleve(
         await db.flush()
     await points.crediter(db, BIENVENUE_ELEVE, utilisateur.id, f"bienvenue:{utilisateur.id}")
     await affilier(db, utilisateur.id, confirmer=confirmer)
+    await delivrer(db, utilisateur.id, TypeCarte.membre)
 
 
 async def preparer_encadreur(
@@ -177,6 +180,7 @@ async def preparer_encadreur(
         encadreur = await db.get(Encadreur, utilisateur.id)
         assert encadreur is not None
         await rattacher_encadreur(db, utilisateur.id, encadreur.etablissement_id, "seed", None)
+        await delivrer(db, utilisateur.id, TypeCarte.encadreur)
 
 
 async def affilier(db: AsyncSession, eleve_id: UUID, *, confirmer: bool) -> None:

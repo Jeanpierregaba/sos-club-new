@@ -159,6 +159,11 @@ async def activer(
     from app.clubs.affiliations import rattacher_encadreur
 
     await rattacher_encadreur(db, utilisateur.id, encadreur.etablissement_id, "encadreur_verifie", acces.utilisateur.id)
+    # Spec 040 : la carte encadreur, valide tant qu'il est rattaché.
+    from app.cartes.models import TypeCarte
+    from app.cartes.service import delivrer
+
+    await delivrer(db, utilisateur.id, TypeCarte.encadreur)
     # Même clé que pour un élève : la bienvenue ne se gagne qu'une fois par compte, quoi qu'il arrive ensuite.
     await points.crediter(
         db, BIENVENUE_ENCADREUR, utilisateur.id, f"bienvenue:{utilisateur.id}", valide_par=acces.utilisateur.id

@@ -17,6 +17,8 @@ from alembic.config import Config
 from fastapi.testclient import TestClient
 
 from alembic import command
+from app.cartes.models import TypeCarte
+from app.cartes.service import delivrer
 from app.comptes.models import Role, Utilisateur
 from app.comptes.motdepasse import hacher
 from app.db import Base
@@ -183,6 +185,9 @@ def creer_eleve(
                     charte_version="test",
                 )
             )
+            await db.flush()
+            # Spec 040 : comme à l'inscription, l'élève a sa carte membre.
+            await delivrer(db, utilisateur.id, TypeCarte.membre)
 
         en_base(inserer)
         return utilisateur
@@ -381,6 +386,10 @@ def creer_encadreur(
                     charte_version="test",
                 )
             )
+            if etat is EtatVerification.actif:
+                await db.flush()
+                # Spec 040 : comme à l'activation, l'encadreur vérifié a sa carte.
+                await delivrer(db, utilisateur.id, TypeCarte.encadreur)
 
         en_base(inserer)
         return utilisateur

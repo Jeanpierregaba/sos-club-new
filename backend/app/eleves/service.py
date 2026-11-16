@@ -96,6 +96,11 @@ async def inscrire(db: AsyncSession, entree: InscriptionEntree, adresse_ip: str)
     from app.clubs.affiliations import affilier_eleve
 
     await affilier_eleve(db, utilisateur.id, etablissement.id)
+    # Spec 040 : la carte membre, « Non affilié » tant que l'affiliation n'est pas confirmée.
+    from app.cartes.models import TypeCarte
+    from app.cartes.service import delivrer
+
+    await delivrer(db, utilisateur.id, TypeCarte.membre)
     await fiche.enregistrer_a_linscription(db, utilisateur.id, entree.fiche)
     await points.crediter(db, BIENVENUE_ELEVE, utilisateur.id, f"bienvenue:{utilisateur.id}")
     journaliser(
