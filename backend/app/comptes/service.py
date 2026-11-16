@@ -439,6 +439,7 @@ async def changer_mot_de_passe(
         raise MotDePasseIncorrect
     await _supprimer_essai(db, essai)
     utilisateur.mot_de_passe_hash = await hacher(nouveau)
+    utilisateur.mot_de_passe_provisoire_le = None
     await db.execute(
         delete(Session).where(Session.utilisateur_id == utilisateur.id, Session.jeton_hash != empreinte(jeton))
     )

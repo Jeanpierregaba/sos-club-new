@@ -569,3 +569,16 @@ class ChiffresCarte(BaseModel):
 class Carte(BaseModel):
     chiffres: ChiffresCarte
     regions: list[CarteRegion]
+
+
+# Réinitialisation du mot de passe d'un membre (spec 039) ------------------------------------------------------
+
+
+class MotifReinitialisation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    motif: Annotated[str, StringConstraints(strip_whitespace=True, min_length=10, max_length=200)]
+
+
+class MotDePasseProvisoire(BaseModel):
+    mot_de_passe: str

@@ -56,9 +56,16 @@ class Utilisateur(Base):
     consentement_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     # Adresse confirmée par un code (spec 030) : exigée des seuls visiteurs, nulle pour les autres profils.
     email_confirme_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Posé par une réinitialisation (encadreur ou équipe, spec 039), effacé dès que la personne choisit son mot de
+    # passe : le site lui conseille alors d'en changer.
+    mot_de_passe_provisoire_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     # Spec 034 : un élève qui a quitté le système scolaire garde ses archives, sans nouvelle récompense d'élève.
     ancien_eleve_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cree_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    @property
+    def mot_de_passe_provisoire(self) -> bool:
+        return self.mot_de_passe_provisoire_le is not None
 
 
 class Session(Base):
@@ -70,6 +77,22 @@ class Session(Base):
     jeton_hash: Mapped[str] = mapped_column(String(64), unique=True)
     cree_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     expire_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+
+
+class LienMotDePasse(Base):
+    """Un lien « mot de passe oublié » (spec 039) : seule l'empreinte du jeton est gardée ; 30 minutes, usage
+    unique, annulé par un lien plus récent."""
+
+    __tablename__ = "lien_mot_de_passe"
+    __table_args__ = (CheckConstraint("utilise_le IS NULL OR remplace_le IS NULL", name="utilise_ou_remplace"),)
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    utilisateur_id: Mapped[UUID] = mapped_column(ForeignKey("utilisateur.id", ondelete="CASCADE"), index=True)
+    jeton_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    cree_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    expire_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    utilise_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    remplace_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class TentativeConnexion(Base):

@@ -4,7 +4,6 @@ Réservées au droit « Inscrits : modifier », au niveau national (contrôlé p
 avec son motif ; le mot de passe provisoire, lui, n'est jamais écrit au journal.
 """
 
-import secrets
 from uuid import UUID
 
 from sqlalchemy import select
@@ -14,14 +13,9 @@ from app.admin.dependances import Acces
 from app.admin.journal import journaliser
 from app.comptes.inscription import Refus, flush
 from app.comptes.models import Role, Utilisateur
-from app.comptes.motdepasse import hacher
-from app.comptes.service import couper_sessions
+from app.comptes.reinitialisation import EQUIPE, reinitialiser
 from app.eleves import pseudonyme
 from app.eleves.models import Eleve
-
-# Sans caractères qui se confondent à l'écrit ou à l'oral : 0 et o, 1, l et i.
-ALPHABET_PROVISOIRE = "abcdefghjkmnpqrstuvwxyz23456789"
-LONGUEUR_PROVISOIRE = 12
 
 
 class Introuvable(Exception):
@@ -70,12 +64,8 @@ async def imposer_pseudonyme(
 async def reinitialiser_mot_de_passe(db: AsyncSession, acces: Acces, utilisateur_id: UUID, motif: str, ip: str) -> str:
     """Renvoie le mot de passe provisoire, à transmettre à l'élève : il n'est montré qu'une fois."""
     utilisateur, _ = await _eleve(db, utilisateur_id)
-    provisoire = "".join(secrets.choice(ALPHABET_PROVISOIRE) for _ in range(LONGUEUR_PROVISOIRE))
-    utilisateur.mot_de_passe_hash = await hacher(provisoire)
-    await couper_sessions(db, utilisateur.id)
-    journaliser(
-        db, "mot_de_passe_reinitialise", acces.utilisateur, cible_type="utilisateur", cible_id=utilisateur.id,
-        details={"motif": motif}, adresse_ip=ip,
-    )  # fmt: skip
+    provisoire = await reinitialiser(
+        db, utilisateur, acces.utilisateur, motif, ip, par=EQUIPE, details={"par": "equipe"}
+    )
     await db.commit()
     return provisoire

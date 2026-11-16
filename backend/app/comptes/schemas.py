@@ -52,6 +52,8 @@ class Moi(BaseModel):
     prenom: str
     nom: str
     role: Role
+    # Spec 039 : après une réinitialisation, le site conseille de choisir son propre mot de passe.
+    mot_de_passe_provisoire: bool = False
 
 
 class MotDePasseEntree(BaseModel):

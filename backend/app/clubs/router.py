@@ -38,6 +38,8 @@ from app.clubs.schemas import (
     MembresDuClub,
     MonClub,
     MonClubSante,
+    MotDePasseProvisoire,
+    MotifReinitialisation,
     PageSuivi,
     Passation,
     PassationAConfirmer,
@@ -159,6 +161,24 @@ async def retirer_affiliation(
         return await mon_club_sante_.retirer(
             db, utilisateur, affiliation_id, entree.motif, entree.version, _adresse(request)
         )
+
+
+@router.post("/mon-club-sante/affiliations/{affiliation_id}/mot-de-passe")
+async def reinitialiser_membre(
+    affiliation_id: UUID,
+    entree: MotifReinitialisation,
+    request: Request,
+    utilisateur: Connecte,
+    db: Base,
+    response: Response,
+) -> MotDePasseProvisoire:
+    """Spec 039 : le mot de passe provisoire d'un membre confirmé, montré une seule fois, jamais gardé en cache."""
+    response.headers["Cache-Control"] = "no-store"
+    with _traduire_refus():
+        provisoire = await mon_club_sante_.reinitialiser_membre(
+            db, utilisateur, affiliation_id, entree.motif, _adresse(request)
+        )
+    return MotDePasseProvisoire(mot_de_passe=provisoire)
 
 
 @router.post("/mon-club-sante/desistements", status_code=status.HTTP_201_CREATED)

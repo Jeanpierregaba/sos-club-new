@@ -5,13 +5,15 @@ les affiliations des élèves, retire un élève, signale le désistement d'un a
 Il ne voit des élèves que le pseudonyme et la classe (décision 4). Pour tout autre compte, le club n'existe pas.
 """
 
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.journal import journaliser
+from app.admin.models import JournalAudit
 from app.clubs import activation
 from app.clubs.adhesions import DEJA_TRAITEE, VIOLATION_UNICITE
 from app.clubs.affiliations import confirmer_affiliation, refuser_affiliation, retirer_affiliation
@@ -40,6 +42,7 @@ from app.clubs.schemas import (
 )
 from app.comptes.inscription import Refus, etablissement_rattache
 from app.comptes.models import StatutCompte, Utilisateur
+from app.comptes.reinitialisation import reinitialiser
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur
 
@@ -322,3 +325,53 @@ async def proposer_president(
     )
     await db.commit()
     return await fiche(db, utilisateur)
+
+
+# Réinitialisation du mot de passe d'un membre (spec 039, Q4) -------------------------------------------------
+
+PLAFOND_REINITIALISATIONS = 10
+FENETRE_REINITIALISATIONS = timedelta(hours=24)
+
+
+async def reinitialiser_membre(
+    db: AsyncSession, utilisateur: Utilisateur, affiliation_id: UUID, motif: str, adresse_ip: str
+) -> str:
+    """Un membre confirmé du club de l'encadreur reçoit un mot de passe provisoire, rendu une seule fois. Au plus 10
+    par encadreur sur 24 heures : un verrou par encadreur fait passer ses requêtes l'une après l'autre."""
+    club = await club_de_l_encadreur(db, utilisateur)
+    if not activation.est_en_service(club):
+        raise Refus("Ton club n'est pas en service : la réinitialisation passe par l'équipe des Clubs Santé.", 403)
+    await db.execute(select(func.pg_advisory_xact_lock(func.hashtext(f"reinitialisation:{utilisateur.id}"))))
+    deja = await db.scalar(
+        select(func.count())
+        .select_from(JournalAudit)
+        .where(
+            JournalAudit.action == "mot_de_passe_reinitialise",
+            JournalAudit.auteur_id == utilisateur.id,
+            JournalAudit.quand > datetime.now(UTC) - FENETRE_REINITIALISATIONS,
+        )
+    )
+    if (deja or 0) >= PLAFOND_REINITIALISATIONS:
+        raise Refus(
+            f"Tu as déjà fait {PLAFOND_REINITIALISATIONS} réinitialisations en 24 heures : pour les suivantes, "
+            "contacte l'équipe des Clubs Santé.",
+            429,
+        )
+    adhesion = await db.scalar(
+        select(Adhesion)
+        .where(Adhesion.id == affiliation_id, Adhesion.club_id == club.id, Adhesion.etat == EtatAdhesion.active)
+        .with_for_update()
+    )
+    if adhesion is None:
+        raise Refus("Ce membre est introuvable.", 404)
+    eleve = await db.get(Utilisateur, adhesion.eleve_id, with_for_update=True)
+    if eleve is None:
+        raise Refus("Ce membre est introuvable.", 404)
+    if eleve.statut is not StatutCompte.actif:
+        raise Refus("Le compte de cet élève est suspendu : l'équipe des Clubs Santé s'en occupe.", 409)
+    provisoire = await reinitialiser(
+        db, eleve, utilisateur, motif, adresse_ip, par=f"{utilisateur.prenom} {utilisateur.nom}".strip(),
+        details={"par": "encadreur", "club": str(club.id)},
+    )  # fmt: skip
+    await db.commit()
+    return provisoire

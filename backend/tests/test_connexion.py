@@ -34,6 +34,7 @@ def test_connexion_avec_identifiant(client: TestClient, creer_utilisateur: Calla
         "prenom": "Jean",
         "nom": "Kodjo",
         "role": "eleve",
+        "mot_de_passe_provisoire": False,
     }
     assert reponse.headers["cache-control"] == "no-store"
 
