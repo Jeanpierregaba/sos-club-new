@@ -8,6 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
+- [ ] R15 — Cartes numériques de l'élève et de l'encadreur, QR code de vérification (Q8, Q30) — [spec 040](docs/specs/040-cartes-numeriques/spec.md) (spec, plan et tâches validés le 2026-11-16)
 - [ ] Quiz santé (922 QCM) jouables depuis la page des jeux, 3 quiz sans compte puis compte visiteur ; correction en vert ou rouge et récapitulatif des erreurs (2026-11-10, ADR-0004 amendé) (spec 031, livré en urgence le 2026-11-09 : spec écrite à rédiger)
 - [ ] Fiches d'inscription : élève, encadreur et visiteur, e-mails (R19 avancé) — [spec 030](docs/specs/030-fiches-d-inscription/spec.md)
 
@@ -48,7 +49,6 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 **Phases 6 à 8 — Après l'ouverture (P1, P2)**
 
-- [ ] R15 — Cartes numériques élève et encadreur, QR code de vérification (Q8, Q30)
 - [ ] R16 — Agenda et invitations (Q22)
 - [ ] R17 — Partage du classement et partages vérifiés (Q23)
 - [ ] R18 — Forums et co-animation, avec un ADR sur les échanges entre élèves (Q26)

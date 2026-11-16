@@ -124,3 +124,12 @@ encadreurs, 21 élèves) se lisent sur des jauges avec `role="progressbar"` dans
 - **Connexion** : « Mot de passe oublié ? » mène à une page qui dit à l'élève de s'adresser à un encadreur de son
   club, et propose aux encadreurs et visiteurs de recevoir un lien par e-mail. Le message de confirmation est le même
   que l'adresse existe ou non.
+
+## Cartes numériques (spec 040)
+
+- **Ma carte** : la carte au format carte bancaire, en couleurs du programme, avec le prénom et le nom, le rôle, le
+  numéro, l'établissement, le club (ou « Non affilié ») et le QR code. Une pastille dit « Valide » (vert) ou
+  « Non valide » (rouge) avec la marche à suivre. Deux boutons : « Télécharger en PDF » et « Télécharger en image ».
+  Un avertissement rappelle que la carte porte ton nom : ne la publie pas sur les réseaux.
+- **Vérification** (`/carte/<code>`, ouverte par le QR) : une seule carte centrée, très lisible sur un téléphone :
+  type, numéro, club, grand statut « Valide » ou « Non valide », heure de la vérification. Aucun nom.
