@@ -113,3 +113,14 @@ encadreurs, 21 élèves) se lisent sur des jauges avec `role="progressbar"` dans
   (rouge) ; un doublon approuvé affiche « Lié à RA-… ».
 - **Admin** : l'aperçu de modération montre les champs, les justificatifs et, en haut, l'alerte de doublon
   probable ; l'archive « Rapports » filtre et exporte.
+
+## Mot de passe (spec 039)
+
+- **Encadreur** : dans « Mon Club Santé », chaque membre confirmé a « Réinitialiser son mot de passe ». Le dialogue
+  demande un motif, puis montre une seule fois le mot de passe provisoire, en gros caractères, avec « Copier » et la
+  consigne de le donner à l'élève en main propre.
+- **Élève** : après une réinitialisation, un bandeau soleil dans son espace conseille de choisir son propre mot de
+  passe ; il n'empêche rien.
+- **Connexion** : « Mot de passe oublié ? » mène à une page qui dit à l'élève de s'adresser à un encadreur de son
+  club, et propose aux encadreurs et visiteurs de recevoir un lien par e-mail. Le message de confirmation est le même
+  que l'adresse existe ou non.

@@ -8,6 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
+- [ ] Q4 — Réinitialisation du mot de passe — [spec 039](docs/specs/039-reinitialisation-du-mot-de-passe/spec.md) (spec, plan et tâches validés le 2026-11-16 : par l'encadreur pour les membres confirmés, plafond, motif et avis, changement conseillé, lien par e-mail pour encadreurs et visiteurs)
 - [ ] Quiz santé (922 QCM) jouables depuis la page des jeux, 3 quiz sans compte puis compte visiteur ; correction en vert ou rouge et récapitulatif des erreurs (2026-11-10, ADR-0004 amendé) (spec 031, livré en urgence le 2026-11-09 : spec écrite à rédiger)
 - [ ] Fiches d'inscription : élève, encadreur et visiteur, e-mails (R19 avancé) — [spec 030](docs/specs/030-fiches-d-inscription/spec.md)
 
@@ -25,7 +26,6 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 - [x] R4 — Clubs et présidence : création par l'élève président, validation, passation, carte des clubs réelle ; amender l'ADR-0003 (Q5, Q6, Q16, Q19)
 - [x] R5 — Affiliations des élèves et rattachements des encadreurs (Q16, Q18)
-- [ ] Q4 — Réinitialisation du mot de passe d'un élève par un encadreur rattaché : spec à part (signalée par la spec 020)
 
 **Phase 2 — Modération et publications (P0, jalon A)**
 
