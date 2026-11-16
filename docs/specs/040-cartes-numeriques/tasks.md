@@ -66,14 +66,14 @@ unicité) sont écrites en TDD : les tests précèdent le code.
 
 ## Site
 
-- [ ] 9. Types de l'API régénérés et fonctions du client. Page « Ma carte » (`/ma-carte`) avec `ApercuCarte` :
+- [x] 9. Types de l'API régénérés et fonctions du client. Page « Ma carte » (`/ma-carte`) avec `ApercuCarte` :
   - aperçu, statut, marche à suivre si elle n'est pas valide ;
   - téléchargements PDF et image, avertissement sur le nom ;
   - encadreur sans rattachement ;
   - entrée de navigation, numéro et lien sur la `CarteMembre` du tableau de bord, raccourci de l'`EspaceEncadreur` ;
   - tests des composants.
-- [ ] 10. Page publique `/carte/$code` (SSR, `noindex`) : valide, non valide, inconnue ; tests.
-- [ ] 11. Bloc carte de la fiche admin (`CarteInscrit`) avec `DialogueMotif` pour suspendre et réactiver, libellés
+- [x] 10. Page publique `/carte/$code` (SSR, `noindex`) : valide, non valide, inconnue ; tests.
+- [x] 11. Bloc carte de la fiche admin (`CarteInscrit`) avec `DialogueMotif` pour suspendre et réactiver, libellés
       du journal dans `src/lib/admin.ts` ; tests.
 
 ## Fin

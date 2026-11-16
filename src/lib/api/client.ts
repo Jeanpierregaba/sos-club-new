@@ -170,6 +170,9 @@ export type PlaceParcours = Schemas["PlaceParcours"];
 export type BadgeParcours = Schemas["BadgeParcours"];
 export type EtatCertificat = Schemas["EtatCertificat"];
 export type VerificationCertificat = Schemas["Verification"];
+export type MaCarte = Schemas["MaCarte"];
+export type VerificationCarte = Schemas["VerificationCarte"];
+export type CarteAdmin = Schemas["CarteAdmin"];
 export type HistoriqueRegles = Schemas["HistoriqueRegles"];
 export type ReglesEntree = Schemas["ReglesEntree"];
 export type ReglesSortie = Schemas["ReglesSortie"];
@@ -906,6 +909,19 @@ export const choisirClubCertificat = (afficher: boolean) =>
   envoyerJson<MaCertification["certificat"]>("/api/certification/club", { afficher }, "PUT");
 export const verifierCertificat = (numero: string) =>
   requeteApi<VerificationCertificat>(`/api/certificats/${encodeURIComponent(numero)}`);
+
+// Cartes numériques (spec 040) ------------------------------------------------------------------------------
+// Les fichiers ne sont servis qu'au titulaire ; la vérification publique n'accepte que le code secret du QR.
+
+export const chargerMaCarte = () => requeteApi<MaCarte>("/api/cartes/moi");
+export const URL_CARTE_PDF = "/api/cartes/moi.pdf";
+export const URL_CARTE_PNG = "/api/cartes/moi.png";
+export const verifierCarte = (code: string) =>
+  requeteApi<VerificationCarte>(`/api/cartes/verification/${encodeURIComponent(code)}`);
+export const suspendreCarte = (utilisateurId: string, motif: string) =>
+  envoyerJson<CarteAdmin>(`/api/admin/inscrits/${utilisateurId}/carte/suspendre`, { motif });
+export const reactiverCarte = (utilisateurId: string, motif: string) =>
+  envoyerJson<CarteAdmin>(`/api/admin/inscrits/${utilisateurId}/carte/reactiver`, { motif });
 
 const GESTION_CERTIFICATION = "/api/admin/certification";
 export const chargerReglesBadges = () =>

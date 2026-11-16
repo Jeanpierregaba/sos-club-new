@@ -4,6 +4,7 @@ import {
   CalendarRange,
   ClipboardList,
   HeartPulse,
+  IdCard,
   LogOut,
   MessageCircle,
   PenLine,
@@ -28,8 +29,11 @@ export function EnTeteEspace({
   monClub = false,
   monClubSante = false,
   rapports = false,
+  carte = false,
   children,
 }: {
+  // « Ma carte » (spec 040) : l'élève, ou l'encadreur vérifié.
+  carte?: boolean;
   // « Rapports » (spec 038) : l'encadreur vérifié d'un club, ou le président.
   rapports?: boolean;
   nom: string;
@@ -86,6 +90,14 @@ export function EnTeteEspace({
               className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
             >
               <Users className="size-4" /> Mon club
+            </Link>
+          )}
+          {carte && (
+            <Link
+              to="/ma-carte"
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
+            >
+              <IdCard className="size-4" /> Ma carte
             </Link>
           )}
           {rapports && (

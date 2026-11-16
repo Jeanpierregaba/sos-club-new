@@ -14,6 +14,7 @@ import { useState } from "react";
 
 import { BadgeStatut } from "@/components/admin/BadgeStatut";
 import { CHAMP_ADMIN, Champ, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
+import { CarteInscrit } from "@/components/admin/CarteInscrit";
 import { DialogueMotif } from "@/components/admin/DialogueMotif";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Button } from "@/components/ui/button";
@@ -118,6 +119,9 @@ function FicheInscrit() {
         <SectionFiche id={inscrit.id} />
       )}
       {inscrit.encadreur && <SectionEncadreur encadreur={inscrit.encadreur} />}
+      {inscrit.carte && (
+        <CarteInscrit utilisateurId={inscrit.id} carte={inscrit.carte} gerable={gerable} />
+      )}
 
       <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-border">
         <h2 className="text-xl text-logo-blue">Historique du compte</h2>

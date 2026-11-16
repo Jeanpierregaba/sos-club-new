@@ -66,6 +66,7 @@ export function EspaceEncadreur({
           monClub={monClubSante !== null && monClubSante.statut !== "en_constitution"}
           monClubSante={monClubSante !== null}
           rapports={espace.etat === "actif" && monClubSante !== null}
+          carte={espace.etat === "actif"}
         >
           {motDePasseChange && <MotDePasseChange />}
           {espace.etat === "en_attente" && <EnAttente espace={espace} />}

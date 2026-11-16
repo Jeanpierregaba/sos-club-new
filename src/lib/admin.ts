@@ -128,6 +128,8 @@ export const ACTIONS_JOURNAL: Record<string, string> = {
   // Spec 039.
   lien_mot_de_passe_envoye: "Lien « mot de passe oublié » préparé pour l'envoi",
   mot_de_passe_choisi: "Mot de passe choisi depuis un lien",
+  carte_suspendue: "Carte suspendue",
+  carte_reactivee: "Carte réactivée",
 };
 
 const formatDate = new Intl.DateTimeFormat("fr-FR", {

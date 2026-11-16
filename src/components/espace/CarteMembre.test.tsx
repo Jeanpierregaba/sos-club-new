@@ -37,3 +37,34 @@ describe("CarteMembre", () => {
     expect(screen.getByText(/tirage au sort/)).toBeInTheDocument();
   });
 });
+
+describe("CarteMembre, carte numérique (spec 040)", () => {
+  it("montre le numéro, le statut et le lien vers « Ma carte »", async () => {
+    const { act } = await import("@testing-library/react");
+    const { createMemoryHistory, createRootRoute, createRouter, RouterProvider } =
+      await import("@tanstack/react-router");
+    const route = createRootRoute({
+      component: () => (
+        <CarteMembre
+          pseudonyme="Ama"
+          club={null}
+          jeux={progression(1)}
+          carte={{ numero: "CS-M-000123", valide: true }}
+        />
+      ),
+    });
+    const router = createRouter({
+      routeTree: route,
+      history: createMemoryHistory({ initialEntries: ["/"] }),
+    });
+    render(<RouterProvider router={router} />);
+    await act(() => router.load());
+
+    expect(screen.getByText("CS-M-000123")).toBeInTheDocument();
+    expect(screen.getByText("Valide")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Voir et télécharger ma carte/ })).toHaveAttribute(
+      "href",
+      "/ma-carte",
+    );
+  });
+});

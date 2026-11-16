@@ -27,6 +27,7 @@ import { Route as Les7AxesRouteImport } from './routes/les-7-axes'
 import { Route as MagazineRouteImport } from './routes/magazine'
 import { Route as MotDePasseOublieRouteImport } from './routes/mot-de-passe-oublie'
 import { Route as ConnecteAdminRouteImport } from './routes/_connecte/admin'
+import { Route as ConnecteMaCarteRouteImport } from './routes/_connecte/ma-carte'
 import { Route as ConnecteMaFicheRouteImport } from './routes/_connecte/ma-fiche'
 import { Route as ConnecteMesCommentairesRouteImport } from './routes/_connecte/mes-commentaires'
 import { Route as ConnecteMonClubSanteRouteImport } from './routes/_connecte/mon-club-sante'
@@ -34,6 +35,7 @@ import { Route as ConnecteMonEspaceRouteImport } from './routes/_connecte/mon-es
 import { Route as ConnecteNotificationsRouteImport } from './routes/_connecte/notifications'
 import { Route as ArticlesIndexRouteImport } from './routes/articles.index'
 import { Route as ArticlesAdresseRouteImport } from './routes/articles.$adresse'
+import { Route as CarteCodeRouteImport } from './routes/carte.$code'
 import { Route as CertificatsNumeroRouteImport } from './routes/certificats.$numero'
 import { Route as ClubsIdRouteImport } from './routes/clubs.$id'
 import { Route as GenieImhotepDescriptionRouteImport } from './routes/genie-imhotep/description'
@@ -182,6 +184,11 @@ const ConnecteAdminRoute = ConnecteAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => ConnecteRoute,
 } as any)
+const ConnecteMaCarteRoute = ConnecteMaCarteRouteImport.update({
+  id: '/ma-carte',
+  path: '/ma-carte',
+  getParentRoute: () => ConnecteRoute,
+} as any)
 const ConnecteMaFicheRoute = ConnecteMaFicheRouteImport.update({
   id: '/ma-fiche',
   path: '/ma-fiche',
@@ -215,6 +222,11 @@ const ArticlesIndexRoute = ArticlesIndexRouteImport.update({
 const ArticlesAdresseRoute = ArticlesAdresseRouteImport.update({
   id: '/articles/$adresse',
   path: '/articles/$adresse',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CarteCodeRoute = CarteCodeRouteImport.update({
+  id: '/carte/$code',
+  path: '/carte/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CertificatsNumeroRoute = CertificatsNumeroRouteImport.update({
@@ -560,12 +572,14 @@ export interface FileRoutesByFullPath {
   '/magazine': typeof MagazineRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/admin': typeof ConnecteAdminRouteWithChildren
+  '/ma-carte': typeof ConnecteMaCarteRoute
   '/ma-fiche': typeof ConnecteMaFicheRoute
   '/mes-commentaires': typeof ConnecteMesCommentairesRoute
   '/mon-club-sante': typeof ConnecteMonClubSanteRoute
   '/mon-espace': typeof ConnecteMonEspaceRoute
   '/notifications': typeof ConnecteNotificationsRoute
   '/articles/$adresse': typeof ArticlesAdresseRoute
+  '/carte/$code': typeof CarteCodeRoute
   '/certificats/$numero': typeof CertificatsNumeroRoute
   '/clubs/$id': typeof ClubsIdRoute
   '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
@@ -643,12 +657,14 @@ export interface FileRoutesByTo {
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
+  '/ma-carte': typeof ConnecteMaCarteRoute
   '/ma-fiche': typeof ConnecteMaFicheRoute
   '/mes-commentaires': typeof ConnecteMesCommentairesRoute
   '/mon-club-sante': typeof ConnecteMonClubSanteRoute
   '/mon-espace': typeof ConnecteMonEspaceRoute
   '/notifications': typeof ConnecteNotificationsRoute
   '/articles/$adresse': typeof ArticlesAdresseRoute
+  '/carte/$code': typeof CarteCodeRoute
   '/certificats/$numero': typeof CertificatsNumeroRoute
   '/clubs/$id': typeof ClubsIdRoute
   '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
@@ -724,12 +740,14 @@ export interface FileRoutesById {
   '/magazine': typeof MagazineRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/_connecte/admin': typeof ConnecteAdminRouteWithChildren
+  '/_connecte/ma-carte': typeof ConnecteMaCarteRoute
   '/_connecte/ma-fiche': typeof ConnecteMaFicheRoute
   '/_connecte/mes-commentaires': typeof ConnecteMesCommentairesRoute
   '/_connecte/mon-club-sante': typeof ConnecteMonClubSanteRoute
   '/_connecte/mon-espace': typeof ConnecteMonEspaceRoute
   '/_connecte/notifications': typeof ConnecteNotificationsRoute
   '/articles/$adresse': typeof ArticlesAdresseRoute
+  '/carte/$code': typeof CarteCodeRoute
   '/certificats/$numero': typeof CertificatsNumeroRoute
   '/clubs/$id': typeof ClubsIdRoute
   '/genie-imhotep/description': typeof GenieImhotepDescriptionRoute
@@ -810,12 +828,14 @@ export interface FileRouteTypes {
     | '/magazine'
     | '/mot-de-passe-oublie'
     | '/admin'
+    | '/ma-carte'
     | '/ma-fiche'
     | '/mes-commentaires'
     | '/mon-club-sante'
     | '/mon-espace'
     | '/notifications'
     | '/articles/$adresse'
+    | '/carte/$code'
     | '/certificats/$numero'
     | '/clubs/$id'
     | '/genie-imhotep/description'
@@ -893,12 +913,14 @@ export interface FileRouteTypes {
     | '/les-7-axes'
     | '/magazine'
     | '/mot-de-passe-oublie'
+    | '/ma-carte'
     | '/ma-fiche'
     | '/mes-commentaires'
     | '/mon-club-sante'
     | '/mon-espace'
     | '/notifications'
     | '/articles/$adresse'
+    | '/carte/$code'
     | '/certificats/$numero'
     | '/clubs/$id'
     | '/genie-imhotep/description'
@@ -973,12 +995,14 @@ export interface FileRouteTypes {
     | '/magazine'
     | '/mot-de-passe-oublie'
     | '/_connecte/admin'
+    | '/_connecte/ma-carte'
     | '/_connecte/ma-fiche'
     | '/_connecte/mes-commentaires'
     | '/_connecte/mon-club-sante'
     | '/_connecte/mon-espace'
     | '/_connecte/notifications'
     | '/articles/$adresse'
+    | '/carte/$code'
     | '/certificats/$numero'
     | '/clubs/$id'
     | '/genie-imhotep/description'
@@ -1059,6 +1083,7 @@ export interface RootRouteChildren {
   MagazineRoute: typeof MagazineRoute
   MotDePasseOublieRoute: typeof MotDePasseOublieRoute
   ArticlesAdresseRoute: typeof ArticlesAdresseRoute
+  CarteCodeRoute: typeof CarteCodeRoute
   CertificatsNumeroRoute: typeof CertificatsNumeroRoute
   ClubsIdRoute: typeof ClubsIdRoute
   GenieImhotepDescriptionRoute: typeof GenieImhotepDescriptionRoute
@@ -1199,6 +1224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteAdminRouteImport
       parentRoute: typeof ConnecteRoute
     }
+    '/_connecte/ma-carte': {
+      id: '/_connecte/ma-carte'
+      path: '/ma-carte'
+      fullPath: '/ma-carte'
+      preLoaderRoute: typeof ConnecteMaCarteRouteImport
+      parentRoute: typeof ConnecteRoute
+    }
     '/_connecte/ma-fiche': {
       id: '/_connecte/ma-fiche'
       path: '/ma-fiche'
@@ -1246,6 +1278,13 @@ declare module '@tanstack/react-router' {
       path: '/articles/$adresse'
       fullPath: '/articles/$adresse'
       preLoaderRoute: typeof ArticlesAdresseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/carte/$code': {
+      id: '/carte/$code'
+      path: '/carte/$code'
+      fullPath: '/carte/$code'
+      preLoaderRoute: typeof CarteCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/certificats/$numero': {
@@ -1803,6 +1842,7 @@ const ConnecteAdminRouteWithChildren = ConnecteAdminRoute._addFileChildren(
 
 interface ConnecteRouteChildren {
   ConnecteAdminRoute: typeof ConnecteAdminRouteWithChildren
+  ConnecteMaCarteRoute: typeof ConnecteMaCarteRoute
   ConnecteMaFicheRoute: typeof ConnecteMaFicheRoute
   ConnecteMesCommentairesRoute: typeof ConnecteMesCommentairesRoute
   ConnecteMonClubSanteRoute: typeof ConnecteMonClubSanteRoute
@@ -1824,6 +1864,7 @@ interface ConnecteRouteChildren {
 
 const ConnecteRouteChildren: ConnecteRouteChildren = {
   ConnecteAdminRoute: ConnecteAdminRouteWithChildren,
+  ConnecteMaCarteRoute: ConnecteMaCarteRoute,
   ConnecteMaFicheRoute: ConnecteMaFicheRoute,
   ConnecteMesCommentairesRoute: ConnecteMesCommentairesRoute,
   ConnecteMonClubSanteRoute: ConnecteMonClubSanteRoute,
@@ -1868,6 +1909,7 @@ const rootRouteChildren: RootRouteChildren = {
   MagazineRoute: MagazineRoute,
   MotDePasseOublieRoute: MotDePasseOublieRoute,
   ArticlesAdresseRoute: ArticlesAdresseRoute,
+  CarteCodeRoute: CarteCodeRoute,
   CertificatsNumeroRoute: CertificatsNumeroRoute,
   ClubsIdRoute: ClubsIdRoute,
   GenieImhotepDescriptionRoute: GenieImhotepDescriptionRoute,

@@ -1,18 +1,22 @@
-import { Crown, Star } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Crown, IdCard, Star } from "lucide-react";
 
-import type { ProgressionJeux } from "@/lib/api/client";
+import type { MaCarte, ProgressionJeux } from "@/lib/api/client";
 import { NIVEAUX_JEUX } from "@/lib/bareme";
 
 // La carte de membre numérique de l'élève (spec 034) : son pseudonyme, son club, ses quiz réussis et ses étoiles.
 // Avec les 4 étoiles, elle passe au statut Gold, qui ouvre l'éligibilité au tirage au sort de fournitures scolaires.
+// Spec 040 : elle montre aussi le numéro et le statut de la carte numérique, avec le lien vers « Ma carte ».
 export function CarteMembre({
   pseudonyme,
   club,
   jeux,
+  carte = null,
 }: {
   pseudonyme: string;
   club: string | null;
   jeux: ProgressionJeux;
+  carte?: Pick<MaCarte, "numero" | "valide"> | null;
 }) {
   const etoiles = new Set(jeux.niveaux.filter((n) => n.etoile).map((n) => n.niveau));
   return (
@@ -71,6 +75,22 @@ export function CarteMembre({
           </div>
         ))}
       </dl>
+      {carte && (
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 pt-4">
+          <p className="text-sm font-semibold">
+            Carte n° <span className="font-mono font-bold">{carte.numero}</span> ·{" "}
+            <span className={carte.valide ? "text-primary" : "text-logo-red"}>
+              {carte.valide ? "Valide" : "Non valide"}
+            </span>
+          </p>
+          <Link
+            to="/ma-carte"
+            className="inline-flex h-10 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue ring-1 ring-border hover:bg-mist"
+          >
+            <IdCard className="size-4" /> Voir et télécharger ma carte
+          </Link>
+        </div>
+      )}
       {jeux.gold && (
         <p className="mt-4 text-sm font-semibold">
           Bravo : tes 4 étoiles te rendent éligible au tirage au sort de fournitures scolaires.
