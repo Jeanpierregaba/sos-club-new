@@ -1,6 +1,6 @@
 # Image de l'API. Elle sert aussi à lancer les migrations et à créer les comptes.
 
-FROM python:3.14-slim
+FROM python:3.15-slim
 COPY --from=ghcr.io/astral-sh/uv:0.13.6 /uv /usr/local/bin/uv
 ENV UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never UV_PROJECT_ENVIRONMENT=/app/.venv
 WORKDIR /app
