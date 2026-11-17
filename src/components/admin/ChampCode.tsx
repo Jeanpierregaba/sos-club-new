@@ -2,19 +2,22 @@ import { REGEXP_ONLY_DIGITS } from "input-otp";
 
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
-// Les 6 chiffres de l'application d'authentification, en grandes cases. `onComplet` part au 6e chiffre.
+// Un code à 6 chiffres en grandes cases (application d'authentification par défaut, ou code reçu par e-mail).
+// `onComplet` part au 6e chiffre.
 export function ChampCode({
   id,
   valeur,
   onChange,
   onComplet,
   desactive = false,
+  libelle = "Code à 6 chiffres de ton application d'authentification",
 }: {
   id: string;
   valeur: string;
   onChange: (valeur: string) => void;
   onComplet?: (valeur: string) => void;
   desactive?: boolean;
+  libelle?: string;
 }) {
   return (
     <InputOTP
@@ -23,7 +26,7 @@ export function ChampCode({
       pattern={REGEXP_ONLY_DIGITS}
       inputMode="numeric"
       autoComplete="one-time-code"
-      aria-label="Code à 6 chiffres de ton application d'authentification"
+      aria-label={libelle}
       value={valeur}
       onChange={onChange}
       {...(onComplet ? { onComplete: onComplet } : {})}

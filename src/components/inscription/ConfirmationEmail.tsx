@@ -105,6 +105,7 @@ export function ConfirmationEmail({
         </label>
         <ChampCode
           id="code-email"
+          libelle="Code à 6 chiffres reçu par e-mail"
           valeur={code}
           onChange={setCode}
           onComplet={(valeur) => void verifier(valeur)}

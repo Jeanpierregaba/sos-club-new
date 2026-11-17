@@ -101,7 +101,7 @@ function Inscription() {
   const atouts = ATOUTS[profil ?? "eleve"];
 
   return (
-    <main className="grid min-h-screen bg-carnet lg:grid-cols-[0.9fr_1.1fr]">
+    <main className="grid min-h-screen grid-cols-[minmax(0,1fr)] bg-carnet lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
       <section className="relative isolate hidden overflow-hidden bg-linear-to-br from-logo-blue to-night p-10 text-white lg:flex lg:flex-col xl:p-14">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-[radial-gradient(oklch(1_0_0/0.14)_1.5px,transparent_1.5px)] bg-size-[22px_22px] [mask-image:linear-gradient(to_bottom,black,transparent_70%)]" />
