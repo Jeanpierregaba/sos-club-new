@@ -133,3 +133,17 @@ encadreurs, 21 élèves) se lisent sur des jauges avec `role="progressbar"` dans
   Un avertissement rappelle que la carte porte ton nom : ne la publie pas sur les réseaux.
 - **Vérification** (`/carte/<code>`, ouverte par le QR) : une seule carte centrée, très lisible sur un téléphone :
   type, numéro, club, grand statut « Valide » ou « Non valide », heure de la vérification. Aucun nom.
+
+## Agenda (spec 041)
+
+- **Agenda public** (`/agenda`) : trois sections (Secrétariat technique permanent, Comité régional, Club Santé),
+  les événements à venir puis les passés. Filtres dans l'adresse : région, club, type, axe. Chaque carte montre la
+  date, l'heure de Lomé, le lieu ou « En ligne », le club, le nombre de participants, et une pastille « Annulé »
+  (rouge) ou « Complet ». Aucun nom d'élève. Page d'un événement (`/agenda/<id>`) ; un membre connecté du club y
+  répond « Je participe », « Peut-être » ou « Je ne peux pas ».
+- **Agenda du club** (« Mon club » → « Agenda du club », encadreurs et président) : événements par état
+  (brouillon, en attente, à corriger, publié, annulé, passé), formulaire en une page, « Soumettre à l'équipe »,
+  « Annuler l'événement » avec motif ; pour un événement publié, la liste des réponses et, après le début, le
+  pointage des présents en cases à cocher.
+- **Mes événements** (espace élève) : les événements à venir de ton club, ta réponse, modifiable jusqu'au début.
+- **Accueil** : les trois prochains événements, ou « Aucun événement à venir pour le moment ».

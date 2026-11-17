@@ -133,7 +133,7 @@ groupe deviendra une ou plusieurs specs dans `docs/specs/`.
 ## Après l'ouverture (P1 et P2 du CDC admin)
 
 - Cartes numériques de l'élève et de l'encadreur avec QR code de vérification.
-- Agenda : propositions d'événements, invitations des membres et réponses.
+- Agenda : propositions d'événements, invitations des membres et réponses (R16, [spec 041](specs/041-agenda-et-invitations/spec.md)).
 - Partage du classement en visuel, republication et partage d'articles avec preuve vérifiée.
 - Forums prémodérés et co-animation entre encadreurs.
 - Comptes visiteurs légers : avancés et livrés par la spec 030 (quiz « jeux » sans points), commentaires restant à faire.

@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-Rien en cours.
+- [ ] R16 — Agenda et invitations (Q22) — [spec 041](docs/specs/041-agenda-et-invitations/spec.md) (spec, plan et tâches validés le 2026-11-17)
 
 ## À faire
 
