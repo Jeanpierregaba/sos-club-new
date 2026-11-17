@@ -60,5 +60,9 @@ authentification, code de confirmation) commencent par leurs tests.
 - [x] 15. Seed de développement : fiches des élèves de démonstration, un visiteur confirmé « [Test] ».
 - [x] 16. Documents : SECURITY.md, PRD (Q8, Q27), ROADMAP (R19), ARCHITECTURE (droits, `courriel`, tables),
       `deploy/README.md` (Brevo : domaine, SPF, DKIM, variables `SMTP_*`).
-- [ ] 17. Vérification : lint, typecheck, tests du site, suite API complète (lancée seule), parcours visiteur et
+- [x] 17. Vérification : lint, typecheck, tests du site, suite API complète (lancée seule), parcours visiteur et
       formulaire élève au navigateur à 375 px et en bureau ; relecture `reviewer` et corrections ; TASKS.md.
+      (2026-11-17 : suite API complète 1742 tests verts la veille, tests ciblés et site verts après corrections ;
+      inscription visiteur et fiche élève vérifiées à 375 px et en bureau. Corrigés : page élargie à 517 px par
+      un fieldset, libellé du code e-mail, discipline absente de la file, aucune limite par IP sur la saisie et
+      le renvoi du code, tests inopérants ou manquants, fiches sans `no-store`.)

@@ -65,9 +65,9 @@ relève de la déclaration IPDCP.
 | `GET /eleves/moi`                                | l'élève                   | + `fiche_complete: bool` pour la bannière                                                                                |
 | `POST /encadreurs/inscription`                   | public                    | `telephone` requis, `discipline`                                                                                         |
 | `GET/PATCH /encadreurs/moi`                      | l'encadreur               | + `discipline`, `region` (nom de la DRE), `ville` (localité)                                                             |
-| `POST /visiteurs/inscription`                    | public                    | crée le compte non confirmé, envoie le code ; `code_de_test` hors production sans SMTP ; 503 en production sans SMTP     |
-| `POST /visiteurs/confirmation`                   | public                    | `{email, code}` → confirme et pose la session                                                                            |
-| `POST /visiteurs/confirmation/renvoi`            | public                    | `{email}` → 204 toujours (ne révèle pas si l'adresse existe)                                                             |
+| `POST /visiteurs/inscription`                    | public                    | crée le compte non confirmé, envoie le code ; `code_de_test` en HTTP local sans SMTP ; 503 en HTTPS sans SMTP            |
+| `POST /visiteurs/confirmation`                   | public                    | `{email, code}` → confirme et pose la session ; 30 saisies par IP et par fenêtre (429)                                   |
+| `POST /visiteurs/confirmation/renvoi`            | public                    | `{email}` → 200 `{code_de_test}` toujours (null hors local), même réponse si l'adresse est inconnue ; limite par IP      |
 | `GET /visiteurs/moi`                             | le visiteur               | profil, parties récentes                                                                                                 |
 | `POST /connexion`                                | public                    | un visiteur non confirmé au bon mot de passe reçoit `{etape: "confirmation", email}` et un nouveau code ; pas de session |
 | `GET /admin/inscrits/{id}/fiche`                 | `fiches_eleves:consulter` | la fiche, journalisée `fiche_eleve_consultee`                                                                            |
@@ -78,8 +78,9 @@ Règles qui changent ailleurs :
 - `quiz.dependances.peut_jouer` : un visiteur confirmé et actif peut jouer ; une nouvelle fonction
   `peut_certifier` (élève ou encadreur actif) protège `/certification`, et `partie.lancer` refuse un quiz du
   parcours certification à un visiteur (403). Les points de fin de partie sont déjà réservés à l'élève.
-- `utilisateur_courant` refuse un compte au courriel non confirmé (cas improbable : aucune session ne s'ouvre
-  avant confirmation, mais la règle tient en un endroit).
+- Aucune session ne s'ouvre avant la confirmation : `connecter` renvoie l'étape « confirmation » et le lien de
+  mot de passe oublié exige une adresse confirmée. `utilisateur_courant` n'ajoute pas de garde (décidé à la
+  relecture du 2026-11-17).
 - Purge : `comptes.purge.purger_regulierement` (une fois par heure, ajoutée au `lifespan`) efface les visiteurs
   non confirmés de plus de 7 jours.
 - Exports : aucun export ne lit `fiche_eleve` ; un test vérifie qu'aucun champ de la fiche n'y apparaît.

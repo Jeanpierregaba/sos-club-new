@@ -69,33 +69,34 @@ badges ni certificat (le PRD reste vrai) ; code à 6 chiffres par e-mail ; régi
 18. Un module commun envoie des e-mails en HTML et en texte brut, avec un gabarit aux couleurs du site (logo,
     titre bicolore, bouton vert, pied de page AIMES-AFRIQUE / SOS Docteur TV). L'invitation des collaborateurs
     et le code du visiteur l'utilisent.
-19. En local ou en préproduction sans SMTP, le code est renvoyé par l'API (`code_de_test`) comme l'est déjà le
-    lien d'invitation ; en production sans SMTP, l'inscription visiteur est refusée (503) plutôt que de créer un
-    compte inutilisable.
+19. En local (HTTP) sans SMTP, le code est renvoyé par l'API (`code_de_test`) comme l'est déjà le lien
+    d'invitation ; dès que le site est en HTTPS (préproduction comprise, publique) et sans SMTP, l'inscription
+    visiteur est refusée (503) plutôt que de créer un compte inutilisable ou d'afficher le code (relecture du
+    2026-11-17).
 20. Aucune adresse, aucun code et aucun contenu d'e-mail n'est écrit dans les journaux.
 
 ## Critères d'acceptation
 
-- [ ] Une inscription élève complète enregistre le compte, le profil et la fiche dans la même transaction ; sans
+- [x] Une inscription élève complète enregistre le compte, le profil et la fiche dans la même transaction ; sans
       sexe, date ou lieu de naissance, responsable (nom + contact), axe ou engagement, elle est refusée (422).
-- [ ] Une date de naissance future ou donnant moins de 8 ans ou plus de 30 ans est refusée.
-- [ ] Un axe inactif ou inconnu, ou plus de 3 axes, est refusé.
-- [ ] Les téléphones de la fiche sont normalisés comme celui de l'encadreur (8 à 15 chiffres, « + » permis).
-- [ ] L'élève lit et corrige sa fiche ; un autre élève, un encadreur ou un visiteur reçoit 403 ou 404.
-- [ ] Un collaborateur sans le droit « fiches élèves : consulter », hors de son périmètre ou sans double
+- [x] Une date de naissance future ou donnant moins de 8 ans ou plus de 30 ans est refusée.
+- [x] Un axe inactif ou inconnu, ou plus de 3 axes, est refusé.
+- [x] Les téléphones de la fiche sont normalisés comme celui de l'encadreur (8 à 15 chiffres, « + » permis).
+- [x] L'élève lit et corrige sa fiche ; un autre élève, un encadreur ou un visiteur reçoit 403 ou 404.
+- [x] Un collaborateur sans le droit « fiches élèves : consulter », hors de son périmètre ou sans double
       authentification ne lit pas la fiche ; une lecture autorisée est journalisée.
-- [ ] Aucune route publique ni aucun export existant ne contient un champ de la fiche.
-- [ ] Un élève existant sans fiche voit l'invitation à la compléter ; sa fiche complétée la fait disparaître.
-- [ ] Une inscription encadreur sans téléphone est refusée ; la discipline est enregistrée et visible dans la file.
-- [ ] La région et la ville affichées pour un encadreur viennent de la DRE et de la localité de l'établissement.
-- [ ] Une inscription visiteur crée un compte non confirmé et envoie un code ; aucun quiz n'est jouable avant.
-- [ ] Le bon code confirme et ouvre la session ; un code expiré, faux 5 fois, ou d'un autre compte est refusé.
-- [ ] Le renvoi d'un code respecte 1 par minute et 5 par heure.
-- [ ] Un visiteur confirmé termine une partie « jeux » sans aucune ligne dans `mouvement_points`, et ne peut ni
+- [x] Aucune route publique ni aucun export existant ne contient un champ de la fiche.
+- [x] Un élève existant sans fiche voit l'invitation à la compléter ; sa fiche complétée la fait disparaître.
+- [x] Une inscription encadreur sans téléphone est refusée ; la discipline est enregistrée et visible dans la file.
+- [x] La région et la ville affichées pour un encadreur viennent de la DRE et de la localité de l'établissement.
+- [x] Une inscription visiteur crée un compte non confirmé et envoie un code ; aucun quiz n'est jouable avant.
+- [x] Le bon code confirme et ouvre la session ; un code expiré, faux 5 fois, ou d'un autre compte est refusé.
+- [x] Le renvoi d'un code respecte 1 par minute et 5 par heure.
+- [x] Un visiteur confirmé termine une partie « jeux » sans aucune ligne dans `mouvement_points`, et ne peut ni
       ouvrir la certification (403) ni demander une affiliation à un club.
-- [ ] Les comptes visiteurs non confirmés de plus de 7 jours sont effacés par la purge.
-- [ ] Inscriptions fermées (`INSCRIPTIONS_OUVERTES` faux) : le formulaire visiteur est fermé comme les autres.
-- [ ] L'e-mail envoyé contient une partie HTML et une partie texte, sans contenu dans les journaux ; en production
+- [x] Les comptes visiteurs non confirmés de plus de 7 jours sont effacés par la purge.
+- [x] Inscriptions fermées (`INSCRIPTIONS_OUVERTES` faux) : le formulaire visiteur est fermé comme les autres.
+- [x] L'e-mail envoyé contient une partie HTML et une partie texte, sans contenu dans les journaux ; en production
       sans SMTP, l'inscription visiteur répond 503 sans créer de compte.
 
 ## Cas limites et erreurs
@@ -124,6 +125,10 @@ badges ni certificat (le PRD reste vrai) ; code à 6 chiffres par e-mail ; régi
 - Choix du fournisseur SMTP : le plan propose, l'utilisateur fournit les accès (jamais dans le dépôt).
 
 ## Questions ouvertes
+
+- Collaborateur de DRE habilité « fiches élèves : consulter » : l'onglet « Fiche d'adhésion » est dans la fiche d'un
+  inscrit, page réservée au niveau national. Il ne lit donc la fiche que par l'API. À trancher : l'accepter, ou lui
+  ouvrir un accès (relecture du 2026-11-17).
 
 - Données réelles : la fiche complète (date et lieu de naissance, parents, professions, contacts) doit figurer dans
   la déclaration à l'IPDCP (Q9) avant toute donnée réelle. SECURITY.md sera mis à jour en conséquence. À confirmer

@@ -38,6 +38,8 @@ class Settings(BaseSettings):
     # Spec 040 : vérifications d'une carte par adresse IP sur la fenêtre des essais (une école derrière une seule
     # adresse en fait peu ; le code de 192 bits rend les essais en masse vains de toute façon).
     verifications_carte_max_adresse: int = 60
+    # Saisies et renvois du code d'un visiteur, par adresse IP et par fenêtre : chaque saisie coûte un Argon2.
+    codes_visiteur_max_adresse: int = 30
 
     # Espace administrateur (spec 015).
     duree_invitation_heures: int = 72

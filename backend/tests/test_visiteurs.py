@@ -17,6 +17,7 @@ from app.visiteurs.models import CodeConfirmation, Visiteur
 from app.visiteurs.service import purger_non_confirmes
 from tests.certification import creer_parcours
 from tests.conftest import moteur_test
+from tests.fiche import fiche
 from tests.quiz import Horloge, creer_quiz, figer_horloge, gains, jouer
 
 INSCRIPTION = "/api/visiteurs/inscription"
@@ -397,9 +398,28 @@ def test_un_visiteur_na_ni_certification_ni_parcours(
 def test_un_visiteur_na_ni_espace_eleve_ni_club_ni_article(client: TestClient, confirme: None) -> None:
     assert client.get("/api/eleves/moi").status_code == 403
     assert client.get("/api/encadreurs/moi").status_code == 403
-    club = "00000000-0000-0000-0000-000000000001"
-    assert client.post(f"/api/clubs/{club}/adhesions", json={}).status_code in (403, 404, 422)
+    assert client.post("/api/clubs/moi/affiliation").status_code == 403
     assert client.get("/api/mes-articles").status_code == 403
+
+
+def test_un_visiteur_na_pas_de_fiche_deleve(client: TestClient, en_base: Callable[..., Any], confirme: None) -> None:
+    assert client.get("/api/eleves/moi/fiche").status_code == 403
+    assert client.put("/api/eleves/moi/fiche", json=fiche() | {"version": None}).status_code == 403
+    assert client.get(f"/api/admin/inscrits/{visiteur(en_base).id}/fiche").status_code in (401, 403)
+
+
+def test_la_saisie_et_le_renvoi_du_code_sont_limites_par_adresse(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, boite: list[Any]
+) -> None:
+    monkeypatch.setattr(settings, "codes_visiteur_max_adresse", 2)
+    entree = {"email": "inconnu@gmail.com", "code": "123456"}
+
+    assert client.post(CONFIRMATION, json=entree).status_code == 400
+    assert client.post(RENVOI, json={"email": "inconnu@gmail.com"}).status_code == 200
+    refus = client.post(CONFIRMATION, json=entree)
+    assert refus.status_code == 429
+    assert "réseau" in refus.json()["detail"]
+    assert client.post(RENVOI, json={"email": "inconnu@gmail.com"}).status_code == 429
 
 
 def test_un_visiteur_suspendu_ne_joue_plus(client: TestClient, en_base: Callable[..., Any], confirme: None) -> None:

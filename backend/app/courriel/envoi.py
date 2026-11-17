@@ -1,7 +1,7 @@
 """Envoi des e-mails par SMTP, avec la bibliothèque standard (spec 015, puis 030 pour le HTML).
 
-Hors production et sans SMTP configuré, rien ne part : l'API renvoie alors le lien ou le code de test
-(`lien_de_test`, `code_de_test`). Aucune adresse ni aucun contenu n'est journalisé.
+En local (HTTP) et sans SMTP configuré, rien ne part : l'API renvoie alors le lien ou le code de test
+(`lien_de_test`, `code_de_test`). En HTTPS, préproduction comprise, rien n'est jamais renvoyé. Aucune adresse ni aucun contenu n'est journalisé.
 """
 
 import asyncio

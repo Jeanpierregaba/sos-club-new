@@ -79,16 +79,18 @@ async def modifier_mon_profil(
 
 
 @router.get("/moi/fiche")
-async def ma_fiche(utilisateur: Connecte, db: Base) -> FicheSortie | None:
+async def ma_fiche(utilisateur: Connecte, db: Base, response: Response) -> FicheSortie | None:
     """La fiche d'adhésion de l'élève (spec 030) ; null s'il ne l'a pas encore remplie."""
+    response.headers["Cache-Control"] = "no-store"
     with _traduire_refus():
         return await fiche.ma_fiche(db, utilisateur)
 
 
 @router.put("/moi/fiche")
 async def corriger_ma_fiche(
-    entree: FicheModification, request: Request, utilisateur: Connecte, db: Base
+    entree: FicheModification, request: Request, response: Response, utilisateur: Connecte, db: Base
 ) -> FicheSortie:
+    response.headers["Cache-Control"] = "no-store"
     with _traduire_refus():
         return await fiche.corriger(db, utilisateur, entree, _adresse(request))
 

@@ -58,6 +58,7 @@ def demande(creer_utilisateur: Callable[..., Utilisateur], en_base: Callable[...
                     utilisateur_id=utilisateur.id,
                     etablissement_id=etablissement_id,
                     fonction=Fonction.enseignant,
+                    discipline="SVT",
                     etat=EtatVerification.en_attente,
                     demande_le=datetime.now(UTC) - timedelta(days=il_y_a),
                     charte_version="test",
@@ -117,6 +118,7 @@ def test_la_file_montre_les_demandes_en_attente_des_plus_anciennes_aux_plus_rece
     premiere = file["demandes"][0]
     assert premiere["email"] == "prof.ancien@ecole.tg"
     assert premiere["fonction"] == "enseignant"
+    assert premiere["discipline"] == "SVT"
     assert premiere["etablissement"]["dre_code"] == "grand-lome"
 
 

@@ -2,7 +2,7 @@
 
 import inspect
 from collections.abc import Callable
-from datetime import date
+from datetime import date, timedelta
 from typing import Any
 
 import pytest
@@ -109,9 +109,20 @@ def test_une_date_de_naissance_hors_des_bornes_est_refusee(
 
 
 def test_une_date_de_naissance_future_est_refusee(client: TestClient, en_base: Callable[..., Any]) -> None:
-    demain = date.today().replace(year=date.today().year + 1).isoformat()
+    demain = (date.today() + timedelta(days=1)).isoformat()
 
     assert client.post(INSCRIPTION, json=formulaire(en_base, fiche=fiche(date_naissance=demain))).status_code == 422
+
+
+@pytest.mark.parametrize("age", [8, 30])
+def test_une_date_de_naissance_aux_bornes_est_acceptee(
+    client: TestClient, en_base: Callable[..., Any], age: int
+) -> None:
+    naissance = date.today().replace(year=date.today().year - age, day=1)
+
+    reponse = client.post(INSCRIPTION, json=formulaire(en_base, fiche=fiche(date_naissance=naissance.isoformat())))
+
+    assert reponse.status_code == 201, reponse.text
 
 
 @pytest.mark.parametrize(
@@ -138,6 +149,9 @@ def test_un_axe_desactive_est_refuse(client: TestClient, en_base: Callable[..., 
 
     assert reponse.status_code == 422
     assert "axe" in reponse.json()["detail"].lower()
+    # Le refus vient du service, après la validation : rien n'est écrit, ni compte ni fiche.
+    assert en_base(lambda db: db.scalar(select(Utilisateur.id))) is None
+    assert fiche_en_base(en_base) is None
 
 
 def test_les_noms_ewe_et_kabiye_sont_acceptes(client: TestClient, en_base: Callable[..., Any]) -> None:
@@ -158,8 +172,10 @@ def test_les_noms_ewe_et_kabiye_sont_acceptes(client: TestClient, en_base: Calla
 def test_leleve_lit_sa_fiche(client: TestClient, en_base: Callable[..., Any]) -> None:
     client.post(INSCRIPTION, json=formulaire(en_base))
 
-    corps = client.get(FICHE).json()
+    reponse = client.get(FICHE)
+    corps = reponse.json()
 
+    assert reponse.headers["cache-control"] == "no-store"
     assert corps["responsable"] == {"nom": "Koffi Mensah", "telephone": "90112233"}
     assert corps["axes"] == ["genie-imhotep", "sante-environnement"]
     assert corps["annee_scolaire"] == service_fiche.annee_scolaire(date.today())
@@ -236,6 +252,7 @@ def test_un_collaborateur_habilite_lit_la_fiche_et_cest_journalise(
 
     assert reponse.status_code == 200
     assert reponse.json()["responsable"]["nom"] == "Koffi Mensah"
+    assert reponse.headers["cache-control"] == "no-store"
     journal = consultations(en_base)
     assert [(j.cible_id, j.perimetre) for j in journal] == [(eleve_id, "grand-lome")]
     # Le journal ne garde jamais le contenu de la fiche.

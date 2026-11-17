@@ -7,6 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.comptes import limite_adresse
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.inscription import InscriptionsFermees, Refus, TropDInscriptions
 from app.comptes.models import Utilisateur
@@ -66,8 +67,20 @@ async def inscription(entree: InscriptionVisiteur, request: Request, db: Base) -
         ) from None
 
 
+TROP_DE_CODES = "Trop de tentatives depuis ce réseau. Réessaie dans un moment."
+
+
+async def _limiter_codes(db: AsyncSession, request: Request) -> None:
+    """Avant toute vérification : une saisie de code lance un Argon2, même pour une adresse e-mail inconnue."""
+    try:
+        await limite_adresse.limiter(db, "CODE-VISITEUR", _adresse(request), settings.codes_visiteur_max_adresse)
+    except limite_adresse.PlafondAtteint:
+        raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, TROP_DE_CODES) from None
+
+
 @router.post("/confirmation")
 async def confirmation(entree: ConfirmationEntree, request: Request, response: Response, db: Base) -> Moi:
+    await _limiter_codes(db, request)
     with _traduire():
         utilisateur = await service.confirmer(db, entree.email, entree.code, _adresse(request))
     # La session valide la transaction : l'adresse confirmée et la session sont écrites ensemble.
@@ -76,7 +89,8 @@ async def confirmation(entree: ConfirmationEntree, request: Request, response: R
 
 
 @router.post("/confirmation/renvoi")
-async def renvoi(entree: RenvoiEntree, db: Base) -> RenvoiSortie:
+async def renvoi(entree: RenvoiEntree, request: Request, db: Base) -> RenvoiSortie:
+    await _limiter_codes(db, request)
     return RenvoiSortie(code_de_test=await service.renvoyer(db, entree.email))
 
 

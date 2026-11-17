@@ -477,8 +477,12 @@ LecteurFiches = Annotated[Acces, Depends(exiger_permission("fiches_eleves", Acti
 
 
 @router.get("/inscrits/{utilisateur_id}/fiche")
-async def voir_fiche_eleve(utilisateur_id: UUID, acces: LecteurFiches, db: Base, request: Request) -> FicheSortie:
+async def voir_fiche_eleve(
+    utilisateur_id: UUID, acces: LecteurFiches, db: Base, request: Request, response: Response
+) -> FicheSortie:
     """La fiche d'adhésion d'un élève (spec 030) : droit sensible, périmètre DRE, chaque lecture journalisée."""
+    # Des données de mineurs : ni le navigateur ni un proxy ne les gardent.
+    response.headers["Cache-Control"] = "no-store"
     try:
         return await fiche_eleve.lire_pour_equipe(db, acces, utilisateur_id, adresse_ip(request))
     except fiche_eleve.Introuvable:

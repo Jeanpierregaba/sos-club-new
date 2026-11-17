@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] Fiches d'inscription : élève, encadreur et visiteur, e-mails (R19 avancé) — [spec 030](docs/specs/030-fiches-d-inscription/spec.md)
+Rien en cours.
 
 ## À faire
 
@@ -74,6 +74,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] Fiches d'inscription : élève, encadreur et visiteur, e-mails (R19 avancé) — [spec 030](docs/specs/030-fiches-d-inscription/spec.md) (close le 2026-11-17 : fiche d'adhésion complète en 4 étapes, lue par l'élève et par l'équipe habilitée sous double authentification, journalisée ; téléphone et discipline de l'encadreur ; compte visiteur confirmé par un code e-mail, 30 saisies par IP, quiz jeux sans points ; gabarit d'e-mail commun ; en HTTPS sans SMTP, 503. À trancher : accès d'un collaborateur de DRE à la fiche depuis l'interface ; la fiche complète doit figurer dans la déclaration à l'IPDCP avant toute donnée réelle)
 - [x] Quiz santé (922 QCM) jouables sans compte — [spec 031](docs/specs/031-quiz-sante-sans-compte/spec.md) (livré en urgence le 2026-11-09 et le 2026-11-10, spec écrite après coup le 2026-11-17 : joueur « invite » reconnu par un cookie à part, 3 quiz d'essai sans points puis compte visiteur, 30 joueurs par IP et par heure, purge à 7 jours ; correction en vert ou rouge et récapitulatif des erreurs pour les jeux, ADR-0004 amendé ; les 34 quiz d'origine sont dépubliés par la spec 034, leurs QCM restent la réserve des 100 défis)
 - [x] R15 — Cartes numériques de l'élève et de l'encadreur, QR code de vérification (Q8, Q30) — [spec 040](docs/specs/040-cartes-numeriques/spec.md) (2026-11-16 : carte membre et carte encadreur délivrées automatiquement, numéros `CS-M-` et `CS-E-` uniques jamais réattribués, validité calculée à chaque lecture ; « Ma carte » en PDF et PNG ; QR vers `/carte/<code>` qui montre type, numéro, club et statut, sans nom, `noindex`, 60 vérifications par IP et par heure ; suspension et réactivation motivées par l'équipe. Suites : photo, renouvellement du code, R17 partage, R22 historique des vérifications ; la carte d'un ancien élève reste valide ; à trancher : club affiché sur la page publique sans choix de l'élève)
 - [x] Q4 — Réinitialisation du mot de passe — [spec 039](docs/specs/039-reinitialisation-du-mot-de-passe/spec.md) (2026-11-16 : par l'encadreur pour les membres confirmés de son club, motif, 10 par jour, notification et bandeau de l'élève ; par l'équipe avec le même marqueur ; « mot de passe oublié » par e-mail pour les encadreurs activés et les visiteurs confirmés)

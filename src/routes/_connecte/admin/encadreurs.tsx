@@ -108,6 +108,9 @@ function Encadreurs() {
                   </p>
                   <p className="font-semibold text-ink">
                     {libelleFonction(d.fonction, d.fonction_precision)}
+                    {d.discipline && (
+                      <span className="font-medium text-muted-foreground"> · {d.discipline}</span>
+                    )}
                   </p>
                   <p className="text-sm font-semibold text-ink">
                     {d.etablissement.nom}

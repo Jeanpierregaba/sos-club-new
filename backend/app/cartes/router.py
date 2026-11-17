@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.dependances import adresse_ip
 from app.cartes import rendu, service, verification
 from app.cartes.schemas import MaCarte, VerificationCarte
+from app.comptes import limite_adresse
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.models import Utilisateur
 from app.db import get_session
@@ -84,7 +85,7 @@ async def ma_carte_png(db: Db, utilisateur: Connecte) -> Response:
 async def verifier(code: str, request: Request, db: Db, response: Response) -> VerificationCarte:
     try:
         await verification.limiter(db, adresse_ip(request))
-    except verification.TropDeVerifications:
+    except limite_adresse.PlafondAtteint:
         raise HTTPException(
             status.HTTP_429_TOO_MANY_REQUESTS,
             "Trop de vérifications depuis ce réseau. Réessaie dans 15 minutes.",
