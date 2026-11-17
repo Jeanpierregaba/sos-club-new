@@ -20,7 +20,7 @@ import {
   VolumeX,
 } from "lucide-react";
 import { ClubsSection } from "@/components/ClubsSection";
-import { chargerDre } from "@/lib/api/client";
+import { chargerDre, chargerProchainsEvenements } from "@/lib/api/client";
 import { AgendaSidebar } from "@/components/AgendaSidebar";
 import { PartenairesSection } from "@/components/PartenairesSection";
 import { GalerieSection } from "@/components/GalerieSection";
@@ -71,8 +71,14 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  // Sans l'API, l'accueil s'affiche quand même : seule la section des clubs disparaît.
-  loader: () => chargerDre().catch(() => []),
+  // Sans l'API, l'accueil s'affiche quand même : la section des clubs disparaît, l'agenda dit qu'il est vide.
+  loader: async () => {
+    const [dre, prochains] = await Promise.all([
+      chargerDre().catch(() => []),
+      chargerProchainsEvenements().catch(() => []),
+    ]);
+    return { dre, prochains };
+  },
   component: Index,
 });
 
@@ -513,6 +519,7 @@ function ObjectifProgramme() {
 
 // Actualités : « C'est toi la star ! » sur deux colonnes (un article à la une, puis trois en ligne), l'agenda en colonne de droite.
 function ActualitesSection() {
+  const { prochains } = Route.useLoaderData();
   return (
     <section id="actualites" className="mx-auto max-w-7xl scroll-mt-16 px-5 pb-12 pt-20">
       <div data-reveal>
@@ -615,7 +622,7 @@ function ActualitesSection() {
           </div>
         </div>
 
-        <AgendaSidebar />
+        <AgendaSidebar evenements={prochains} />
       </div>
     </section>
   );
@@ -676,7 +683,7 @@ const sansSousTitres = (lecteur: HTMLIFrameElement | null) =>
   );
 
 function Index() {
-  const dre = Route.useLoaderData();
+  const { dre } = Route.useLoaderData();
   const [active, setActive] = useState(0);
   const [son, setSon] = useState(false);
   const lecteur = useRef<HTMLIFrameElement>(null);

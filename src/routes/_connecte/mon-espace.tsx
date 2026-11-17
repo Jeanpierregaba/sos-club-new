@@ -312,6 +312,8 @@ function EspaceDeLEleve({
           articles
           monClub={club.club?.president === true || club.affiliation?.etat === "active"}
           rapports={club.club?.president === true}
+          agendaClub={club.club?.president === true}
+          evenements={club.affiliation?.etat === "active" || club.club?.president === true}
           carte
         >
           {motDePasseChange && <MotDePasseChange />}

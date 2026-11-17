@@ -130,6 +130,12 @@ export const ACTIONS_JOURNAL: Record<string, string> = {
   mot_de_passe_choisi: "Mot de passe choisi depuis un lien",
   carte_suspendue: "Carte suspendue",
   carte_reactivee: "Carte réactivée",
+  // Spec 041.
+  evenement_soumis: "Événement soumis",
+  evenement_retire: "Événement repris par son auteur",
+  evenement_cree: "Événement de l'équipe publié",
+  evenement_modifie: "Événement de l'équipe modifié",
+  evenement_annule: "Événement annulé",
 };
 
 const formatDate = new Intl.DateTimeFormat("fr-FR", {

@@ -7,6 +7,7 @@ import { FormulaireRapport } from "@/components/rapports/FormulaireRapport";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import {
   chargerAxes,
+  chargerAgendaDuClub,
   chargerMesRapports,
   chargerRapport,
   chargerSemestresRapport,
@@ -15,6 +16,7 @@ import {
   urlPdfRapport,
   urlPhotoRapport,
 } from "@/lib/api/client";
+import { dateEvenement, depuisLome } from "@/lib/agenda";
 import { dateCourte } from "@/lib/dates";
 import { MODELES } from "@/lib/rapports";
 
@@ -25,16 +27,27 @@ export const Route = createFileRoute("/_connecte/rapports/$id")({
   },
   loader: async ({ params }) => {
     const rapport = await chargerRapport(params.id);
-    if (!rapport.modifiable) return { rapport, axes: [], types: [], semestres: [], activites: [] };
-    const [axes, types, semestres, mes] = await Promise.all([
+    if (!rapport.modifiable)
+      return { rapport, axes: [], types: [], semestres: [], activites: [], evenements: [] };
+    const [axes, types, semestres, mes, agenda] = await Promise.all([
       chargerAxes(),
       chargerTypesActivite(),
       chargerSemestresRapport(),
       // Le mensuel rappelle les rapports d'activité du club, sans les recopier.
       rapport.modele === "mensuel" ? chargerMesRapports().catch(() => null) : null,
+      // Spec 041 : les événements passés et publiés du club, à lier au rapport d'activité.
+      rapport.modele === "activite" ? chargerAgendaDuClub().catch(() => null) : null,
     ]);
     const activites = mes?.rapports.filter((r) => r.modele === "activite" && r.reference) ?? [];
-    return { rapport, axes, types, semestres, activites };
+    const maintenant = Date.now();
+    const evenements = (agenda?.evenements ?? [])
+      .filter((e) => e.publie && !e.annule_le && typeof e.champs["debut"] === "string")
+      .filter((e) => new Date(depuisLome(e.champs["debut"] as string)).getTime() <= maintenant)
+      .map((e) => ({
+        id: e.id,
+        libelle: `${String(e.champs["titre"])} — ${dateEvenement(depuisLome(e.champs["debut"] as string), { day: "numeric", month: "long", year: "numeric" })}`,
+      }));
+    return { rapport, axes, types, semestres, activites, evenements };
   },
   head: () => ({
     meta: [
@@ -53,7 +66,7 @@ const DECISIONS: Record<string, string> = {
 };
 
 function Rapport() {
-  const { rapport, axes, types, semestres, activites } = Route.useLoaderData();
+  const { rapport, axes, types, semestres, activites, evenements } = Route.useLoaderData();
   return (
     <main className="min-h-screen bg-carnet px-4 py-10 sm:px-6">
       <div className="mx-auto max-w-3xl space-y-6">
@@ -119,6 +132,7 @@ function Rapport() {
             types={types}
             semestres={semestres}
             activites={activites}
+            evenements={evenements}
           />
         ) : (
           <section className="space-y-4 rounded-3xl bg-card p-5 shadow-card">

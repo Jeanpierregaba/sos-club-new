@@ -1710,6 +1710,265 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/clubs/moi/agenda": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Agenda Du Club */
+        get: operations["agenda_du_club_api_clubs_moi_agenda_get"];
+        put?: never;
+        /** Creer */
+        post: operations["creer_api_clubs_moi_agenda_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/agenda/{evenement_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire */
+        get: operations["lire_api_clubs_moi_agenda__evenement_id__get"];
+        /** Modifier */
+        put: operations["modifier_api_clubs_moi_agenda__evenement_id__put"];
+        post?: never;
+        /** Supprimer */
+        delete: operations["supprimer_api_clubs_moi_agenda__evenement_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/agenda/{evenement_id}/soumettre": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Soumettre */
+        post: operations["soumettre_api_clubs_moi_agenda__evenement_id__soumettre_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/agenda/{evenement_id}/retirer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retirer */
+        post: operations["retirer_api_clubs_moi_agenda__evenement_id__retirer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/agenda/{evenement_id}/annuler": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Annuler */
+        post: operations["annuler_api_clubs_moi_agenda__evenement_id__annuler_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/agenda/{evenement_id}/reponses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Liste Reponses */
+        get: operations["liste_reponses_api_clubs_moi_agenda__evenement_id__reponses_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/clubs/moi/agenda/{evenement_id}/presences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Presences */
+        put: operations["presences_api_clubs_moi_agenda__evenement_id__presences_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/agenda": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Agenda */
+        get: operations["agenda_api_agenda_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/agenda/prochains": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Prochains */
+        get: operations["prochains_api_agenda_prochains_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/agenda/mes-evenements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mes Evenements */
+        get: operations["mes_evenements_api_agenda_mes_evenements_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/agenda/{evenement_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Evenement */
+        get: operations["evenement_api_agenda__evenement_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/agenda/{evenement_id}/reponse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Repondre */
+        put: operations["repondre_api_agenda__evenement_id__reponse_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/agenda": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister */
+        get: operations["lister_api_admin_agenda_get"];
+        put?: never;
+        /** Creer */
+        post: operations["creer_api_admin_agenda_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/agenda/{evenement_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Modifier */
+        put: operations["modifier_api_admin_agenda__evenement_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/agenda/{evenement_id}/annuler": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Annuler */
+        post: operations["annuler_api_admin_agenda__evenement_id__annuler_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/clubs/moi": {
         parameters: {
             query?: never;
@@ -4229,6 +4488,13 @@ export interface components {
             /** Confirmees */
             confirmees: components["schemas"]["AffiliationDuClub"][];
         };
+        /** AgendaDuClub */
+        AgendaDuClub: {
+            /** Club */
+            club: string;
+            /** Evenements */
+            evenements: components["schemas"]["EvenementDuClub"][];
+        };
         /** AnneeAdmin */
         AnneeAdmin: {
             /**
@@ -4283,6 +4549,11 @@ export interface components {
              */
             fin: string;
         };
+        /** AnnulationEntree */
+        AnnulationEntree: {
+            /** Motif */
+            motif: string;
+        };
         /** AnnulationPoints */
         AnnulationPoints: {
             /** Motif */
@@ -4316,6 +4587,11 @@ export interface components {
              * @default true
              */
             correction_possible: boolean;
+            /**
+             * Decision Possible
+             * @default true
+             */
+            decision_possible: boolean;
             /** Titre */
             titre: string;
             etat: components["schemas"]["EtatContenu"];
@@ -4950,6 +5226,44 @@ export interface components {
              * @default true
              */
             afficher_club: boolean;
+        };
+        /**
+         * ChampsEvenement
+         * @description Les champs d'un événement : la version d'un événement de club (JSONB), ou la saisie de l'équipe.
+         */
+        ChampsEvenement: {
+            /** Titre */
+            titre: string;
+            type: components["schemas"]["TypeEvenement"];
+            /** Axe Code */
+            axe_code?: string | null;
+            /** Objectif */
+            objectif?: string | null;
+            /** Description */
+            description: string;
+            /** Lieu */
+            lieu?: string | null;
+            /**
+             * En Ligne
+             * @default false
+             */
+            en_ligne: boolean;
+            /** Lien */
+            lien?: string | null;
+            /** Public Vise */
+            public_vise?: string | null;
+            /**
+             * Debut
+             * Format: date-time
+             */
+            debut: string;
+            /**
+             * Fin
+             * Format: date-time
+             */
+            fin: string;
+            /** Places */
+            places?: number | null;
         };
         /**
          * ChangementActuel
@@ -6002,6 +6316,11 @@ export interface components {
              * @default true
              */
             correction_possible: boolean;
+            /**
+             * Decision Possible
+             * @default true
+             */
+            decision_possible: boolean;
             /** Titre */
             titre: string;
             etat: components["schemas"]["EtatContenu"];
@@ -6486,6 +6805,47 @@ export interface components {
             /** Motif */
             motif?: string | null;
         };
+        /**
+         * EvenementDuClub
+         * @description Un événement dans l'agenda du club : ce que voient les encadreurs et le président.
+         */
+        EvenementDuClub: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            etat: components["schemas"]["EtatContenu"];
+            /** Version */
+            version: number;
+            /** Auteur */
+            auteur: string;
+            /** De Moi */
+            de_moi: boolean;
+            /** Champs */
+            champs: {
+                [key: string]: unknown;
+            };
+            /** Publie */
+            publie: boolean;
+            /** Annule Le */
+            annule_le: string | null;
+            /** Motif Annulation */
+            motif_annulation: string | null;
+            /** Motif Decision */
+            motif_decision: string | null;
+            /** Participants */
+            participants: number;
+            /** Peut Modifier */
+            peut_modifier: boolean;
+        };
+        /** EvenementEquipeEntree */
+        EvenementEquipeEntree: {
+            niveau: components["schemas"]["NiveauEvenement"];
+            /** Dre Code */
+            dre_code?: string | null;
+            champs: components["schemas"]["ChampsEvenement"];
+        };
         /** EvenementJournal */
         EvenementJournal: {
             /**
@@ -6514,6 +6874,95 @@ export interface components {
             details: {
                 [key: string]: unknown;
             };
+        };
+        /** EvenementLie */
+        EvenementLie: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Titre */
+            titre: string;
+            /**
+             * Debut
+             * Format: date-time
+             */
+            debut: string;
+            /**
+             * Fin
+             * Format: date-time
+             */
+            fin: string;
+            /** Participants */
+            participants: number;
+            /** Presents */
+            presents: number;
+        };
+        /**
+         * EvenementPublic
+         * @description Ce que montre l'agenda public : aucun nom d'élève, seulement le nombre de participants.
+         */
+        EvenementPublic: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            niveau: components["schemas"]["NiveauEvenement"];
+            type: components["schemas"]["TypeEvenement"];
+            /** Axe Code */
+            axe_code: string | null;
+            /** Titre */
+            titre: string;
+            /** Objectif */
+            objectif: string | null;
+            /** Description */
+            description: string;
+            /** Lieu */
+            lieu: string | null;
+            /** En Ligne */
+            en_ligne: boolean;
+            /** Lien */
+            lien: string | null;
+            /** Public Vise */
+            public_vise: string | null;
+            /**
+             * Debut
+             * Format: date-time
+             */
+            debut: string;
+            /**
+             * Fin
+             * Format: date-time
+             */
+            fin: string;
+            /** Places */
+            places: number | null;
+            /** Participants */
+            participants: number;
+            /** Complet */
+            complet: boolean;
+            /** Annule */
+            annule: boolean;
+            /** Motif Annulation */
+            motif_annulation: string | null;
+            /** Dre Code */
+            dre_code: string | null;
+            /** Dre */
+            dre: string | null;
+            /** Club Id */
+            club_id: string | null;
+            /** Club */
+            club: string | null;
+            /** Etablissement */
+            etablissement: string | null;
+            /**
+             * Peut Repondre
+             * @default false
+             */
+            peut_repondre: boolean;
+            ma_reponse?: components["schemas"]["Reponse"] | null;
         };
         /** ExportCree */
         ExportCree: {
@@ -7542,6 +7991,18 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * ModificationEntree
+         * @description Les champs restent bruts ici : le service les valide et nomme le champ fautif dans son message.
+         */
+        ModificationEntree: {
+            /** Version */
+            version: number;
+            /** Champs */
+            champs: {
+                [key: string]: unknown;
+            };
+        };
         /** ModuleCatalogue */
         ModuleCatalogue: {
             /** Id */
@@ -7660,6 +8121,11 @@ export interface components {
          * @enum {string}
          */
         Niveau: "national" | "dre";
+        /**
+         * NiveauEvenement
+         * @enum {string}
+         */
+        NiveauEvenement: "national" | "regional" | "club";
         /** NiveauProgression */
         NiveauProgression: {
             niveau: components["schemas"]["NiveauQuiz"];
@@ -7719,6 +8185,13 @@ export interface components {
          * @enum {string}
          */
         OrdreEnseignement: "public" | "prive_laic" | "prive_catholique" | "prive_protestant" | "prive_islamique" | "communautaire";
+        /** PageAgenda */
+        PageAgenda: {
+            /** Total */
+            total: number;
+            /** Evenements */
+            evenements: components["schemas"]["EvenementPublic"][];
+        };
         /** PageArchive */
         PageArchive: {
             /** Total */
@@ -8109,6 +8582,13 @@ export interface components {
             jeux_quiz: number;
             /** Jeux Etoiles */
             jeux_etoiles: number;
+        };
+        /** PresencesEntree */
+        PresencesEntree: {
+            /** Presences */
+            presences: {
+                [key: string]: boolean;
+            };
         };
         /**
          * PresidentEntree
@@ -8543,6 +9023,7 @@ export interface components {
             modifiable: boolean;
             /** Doublons Probables */
             doublons_probables: string[];
+            evenement?: components["schemas"]["EvenementLie"] | null;
         };
         /** RapportModeration */
         RapportModeration: {
@@ -8695,6 +9176,11 @@ export interface components {
             /** Code De Test */
             code_de_test?: string | null;
         };
+        /**
+         * Reponse
+         * @enum {string}
+         */
+        Reponse: "participe" | "peut_etre" | "non";
         /** ReponseDefi */
         ReponseDefi: {
             /** Choix */
@@ -8705,12 +9191,31 @@ export interface components {
             /** Message */
             message: string;
         };
+        /** ReponseEntree */
+        ReponseEntree: {
+            reponse: components["schemas"]["Reponse"];
+        };
         /** ReponseJoueur */
         ReponseJoueur: {
             /** Rang */
             rang: number;
             /** Choix */
             choix: number;
+        };
+        /** ReponseMembre */
+        ReponseMembre: {
+            /**
+             * Eleve Id
+             * Format: uuid
+             */
+            eleve_id: string;
+            /** Pseudonyme */
+            pseudonyme: string;
+            /** Nom */
+            nom: string;
+            reponse: components["schemas"]["Reponse"] | null;
+            /** Present */
+            present: boolean | null;
         };
         /** ReponseQuelAxe */
         ReponseQuelAxe: {
@@ -8721,6 +9226,23 @@ export interface components {
             id: "A" | "B" | "C" | "D";
             /** Libelle */
             libelle: string;
+        };
+        /** ReponsesEvenement */
+        ReponsesEvenement: {
+            /** Participe */
+            participe: number;
+            /** Peut Etre */
+            peut_etre: number;
+            /** Non */
+            non: number;
+            /** Sans Reponse */
+            sans_reponse: number;
+            /** Presents */
+            presents: number;
+            /** Pointage Ouvert */
+            pointage_ouvert: boolean;
+            /** Membres */
+            membres: components["schemas"]["ReponseMembre"][];
         };
         /**
          * Reseau
@@ -9360,6 +9882,11 @@ export interface components {
          */
         TypeEtablissement: "lycee" | "college" | "complexe" | "autre";
         /**
+         * TypeEvenement
+         * @enum {string}
+         */
+        TypeEvenement: "formation" | "sensibilisation" | "concours" | "assainissement" | "campagne" | "emission" | "reunion" | "autre";
+        /**
          * TypeExport
          * @enum {string}
          */
@@ -9418,6 +9945,11 @@ export interface components {
             identifiant: string;
             /** Mot De Passe */
             mot_de_passe: string;
+        };
+        /** VersionEntree */
+        app__agenda__schemas__VersionEntree: {
+            /** Version */
+            version: number;
         };
         /** VersionEntree */
         app__articles__schemas__VersionEntree: {
@@ -12883,6 +13415,606 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    agenda_du_club_api_clubs_moi_agenda_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgendaDuClub"];
+                };
+            };
+        };
+    };
+    creer_api_clubs_moi_agenda_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementDuClub"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_api_clubs_moi_agenda__evenement_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                evenement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementDuClub"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modifier_api_clubs_moi_agenda__evenement_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                evenement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModificationEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementDuClub"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    supprimer_api_clubs_moi_agenda__evenement_id__delete: {
+        parameters: {
+            query: {
+                version: number;
+            };
+            header?: never;
+            path: {
+                evenement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    soumettre_api_clubs_moi_agenda__evenement_id__soumettre_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                evenement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__agenda__schemas__VersionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementDuClub"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retirer_api_clubs_moi_agenda__evenement_id__retirer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                evenement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__agenda__schemas__VersionEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementDuClub"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    annuler_api_clubs_moi_agenda__evenement_id__annuler_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                evenement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnnulationEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementDuClub"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    liste_reponses_api_clubs_moi_agenda__evenement_id__reponses_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                evenement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReponsesEvenement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    presences_api_clubs_moi_agenda__evenement_id__presences_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                evenement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PresencesEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReponsesEvenement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    agenda_api_agenda_get: {
+        parameters: {
+            query?: {
+                periode?: "a_venir" | "passe";
+                dre?: string | null;
+                club?: string | null;
+                type?: components["schemas"]["TypeEvenement"] | null;
+                axe?: string | null;
+                niveau?: components["schemas"]["NiveauEvenement"] | null;
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageAgenda"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    prochains_api_agenda_prochains_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementPublic"][];
+                };
+            };
+        };
+    };
+    mes_evenements_api_agenda_mes_evenements_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementPublic"][];
+                };
+            };
+        };
+    };
+    evenement_api_agenda__evenement_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                evenement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementPublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    repondre_api_agenda__evenement_id__reponse_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                evenement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReponseEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementPublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lister_api_admin_agenda_get: {
+        parameters: {
+            query?: {
+                periode?: "a_venir" | "passe";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementPublic"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    creer_api_admin_agenda_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EvenementEquipeEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementPublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modifier_api_admin_agenda__evenement_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                evenement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EvenementEquipeEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementPublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    annuler_api_admin_agenda__evenement_id__annuler_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                evenement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnnulationEntree"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvenementPublic"];
+                };
             };
             /** @description Validation Error */
             422: {

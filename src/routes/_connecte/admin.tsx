@@ -10,6 +10,7 @@ import {
 import {
   Award,
   Brain,
+  CalendarDays,
   ClipboardList,
   Download,
   ExternalLink,
@@ -130,6 +131,12 @@ function entrees(admin: AdminMoi): Entree[] {
       i: Flag,
       visible: peut(admin, "clubs", "consulter"),
       compteur: admin.clubs_a_valider ?? 0,
+    },
+    {
+      to: "/admin/agenda",
+      libelle: "Agenda",
+      i: CalendarDays,
+      visible: peut(admin, "agenda", "consulter"),
     },
     {
       to: "/admin/rapports",

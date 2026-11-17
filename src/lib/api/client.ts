@@ -1114,3 +1114,69 @@ export const verifierLienMotDePasse = (jeton: string) =>
   envoyerJson<{ valide: boolean }>("/api/comptes/mot-de-passe-oublie/verification", { jeton });
 export const choisirMotDePasse = (jeton: string, nouveau: string) =>
   envoyerJson<void>("/api/comptes/mot-de-passe-oublie/choix", { jeton, nouveau });
+
+// Spec 041 : l'agenda public, l'agenda du club et les réponses des membres.
+export type EvenementPublic = Schemas["EvenementPublic"];
+export type PageAgenda = Schemas["PageAgenda"];
+export type EvenementDuClub = Schemas["EvenementDuClub"];
+export type AgendaDuClub = Schemas["AgendaDuClub"];
+export type ReponsesEvenement = Schemas["ReponsesEvenement"];
+export type ChampsEvenement = Schemas["ChampsEvenement"];
+export type ReponseAgenda = "participe" | "peut_etre" | "non";
+export type FiltresAgenda = {
+  periode?: "a_venir" | "passe" | undefined;
+  dre?: string | undefined;
+  club?: string | undefined;
+  type?: string | undefined;
+  axe?: string | undefined;
+  niveau?: "national" | "regional" | "club" | undefined;
+};
+
+export const chargerAgenda = (filtres: FiltresAgenda = {}) =>
+  requeteApi<PageAgenda>(avecParametres("/api/agenda", filtres));
+export const chargerProchainsEvenements = () =>
+  requeteApi<EvenementPublic[]>("/api/agenda/prochains");
+export const chargerEvenement = (id: string) =>
+  requeteApi<EvenementPublic>(`/api/agenda/${encodeURIComponent(id)}`);
+export const chargerMesEvenements = () =>
+  requeteApi<EvenementPublic[]>("/api/agenda/mes-evenements");
+export const repondreEvenement = (id: string, reponse: ReponseAgenda) =>
+  envoyerJson<EvenementPublic>(`/api/agenda/${id}/reponse`, { reponse }, "PUT");
+
+export const chargerAgendaDuClub = () => requeteApi<AgendaDuClub>("/api/clubs/moi/agenda");
+export const chargerEvenementDuClub = (id: string) =>
+  requeteApi<EvenementDuClub>(`/api/clubs/moi/agenda/${id}`);
+export const creerEvenement = (champs: Record<string, unknown>) =>
+  envoyerJson<EvenementDuClub>("/api/clubs/moi/agenda", champs);
+export const modifierEvenement = (id: string, version: number, champs: Record<string, unknown>) =>
+  envoyerJson<EvenementDuClub>(`/api/clubs/moi/agenda/${id}`, { version, champs }, "PUT");
+export const soumettreEvenement = (id: string, version: number) =>
+  envoyerJson<EvenementDuClub>(`/api/clubs/moi/agenda/${id}/soumettre`, { version });
+export const retirerEvenement = (id: string, version: number) =>
+  envoyerJson<EvenementDuClub>(`/api/clubs/moi/agenda/${id}/retirer`, { version });
+export const supprimerEvenement = (id: string, version: number) =>
+  requeteApi<void>(`/api/clubs/moi/agenda/${id}?version=${version}`, { method: "DELETE" });
+export const annulerEvenement = (id: string, motif: string) =>
+  envoyerJson<EvenementDuClub>(`/api/clubs/moi/agenda/${id}/annuler`, { motif });
+export const chargerReponsesEvenement = (id: string) =>
+  requeteApi<ReponsesEvenement>(`/api/clubs/moi/agenda/${id}/reponses`);
+export const pointerPresences = (id: string, presences: Record<string, boolean>) =>
+  envoyerJson<ReponsesEvenement>(`/api/clubs/moi/agenda/${id}/presences`, { presences }, "PUT");
+
+export const adminChargerAgenda = (periode: "a_venir" | "passe" = "a_venir") =>
+  requeteApi<EvenementPublic[]>(avecParametres("/api/admin/agenda", { periode }));
+export const adminCreerEvenement = (corps: {
+  niveau: "national" | "regional";
+  dre_code: string | null;
+  champs: Record<string, unknown>;
+}) => envoyerJson<EvenementPublic>("/api/admin/agenda", corps);
+export const adminModifierEvenement = (
+  id: string,
+  corps: {
+    niveau: "national" | "regional";
+    dre_code: string | null;
+    champs: Record<string, unknown>;
+  },
+) => envoyerJson<EvenementPublic>(`/api/admin/agenda/${id}`, corps, "PUT");
+export const adminAnnulerEvenement = (id: string, motif: string) =>
+  envoyerJson<EvenementPublic>(`/api/admin/agenda/${id}/annuler`, { motif });

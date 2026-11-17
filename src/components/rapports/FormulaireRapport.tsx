@@ -39,7 +39,10 @@ export function FormulaireRapport({
   types,
   semestres,
   activites = [],
+  evenements = [],
 }: {
+  // Spec 041 : les événements passés et publiés du club, qu'un rapport d'activité peut documenter.
+  evenements?: { id: string; libelle: string }[];
   // Spec 038 : les rapports d'activité du club, rappelés dans un mensuel pour le mois choisi.
   activites?: RapportResume[];
   rapport: RapportDetail;
@@ -122,6 +125,20 @@ export function FormulaireRapport({
             />
           </Bloc>
         </div>
+      )}
+      {modele === "activite" && evenements.length > 0 && (
+        <Bloc
+          libelle="Événement de l'agenda"
+          id="evenement_id"
+          aide="Facultatif : l'événement que ce rapport documente. Un événement n'est documenté que par un rapport."
+        >
+          <Choix
+            id="evenement_id"
+            valeur={(donnees["evenement_id"] as string | null) ?? null}
+            options={evenements.map((e) => ({ valeur: e.id, libelle: e.libelle }))}
+            onChange={(v) => changer("evenement_id", v)}
+          />
+        </Bloc>
       )}
       {modele === "mensuel" && (
         <Bloc libelle="Mois *" id="mois">

@@ -18,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { TYPES_EVENEMENT, depuisLome, plageEvenement } from "@/lib/agenda";
 import { peut, peutVoirInscrits } from "@/lib/admin";
 import {
   chargerApercuModeration,
@@ -52,7 +53,8 @@ type TypeContenu =
   | "fiche_club"
   | "rapport_activite"
   | "rapport_mensuel"
-  | "bilan_semestriel";
+  | "bilan_semestriel"
+  | "evenement";
 const TYPES: { code: TypeContenu; libelle: string }[] = [
   { code: "article", libelle: "Articles" },
   { code: "actualite", libelle: "Actualités des clubs" },
@@ -62,6 +64,8 @@ const TYPES: { code: TypeContenu; libelle: string }[] = [
   { code: "rapport_activite", libelle: "Rapports d'activité" },
   { code: "rapport_mensuel", libelle: "Rapports mensuels" },
   { code: "bilan_semestriel", libelle: "Bilans semestriels" },
+  // Spec 041 : décidés avec le droit « agenda : approuver ».
+  { code: "evenement", libelle: "Événements de l'agenda" },
 ];
 const BADGES: Partial<Record<string, string>> = {
   commentaire: "Commentaire",
@@ -70,6 +74,7 @@ const BADGES: Partial<Record<string, string>> = {
   rapport_activite: "Rapport d'activité",
   rapport_mensuel: "Rapport mensuel",
   bilan_semestriel: "Bilan semestriel",
+  evenement: "Événement",
 };
 
 const ONGLETS: { etat: Etat; libelle: string }[] = [
@@ -379,6 +384,10 @@ function Apercu({
   const commentaire = apercu?.type === "commentaire";
   // Une proposition de fiche (spec 026) : l'avant est la fiche actuelle du club, l'après la proposition.
   const fiche = apercu?.type === "fiche_club";
+  // Un événement de l'agenda (spec 041) : décider exige aussi le droit de l'agenda ; sans lui, lecture seule.
+  const evenement = apercu?.type === "evenement";
+  const peutDecider = decideur && (apercu?.decision_possible ?? true);
+  const peutRetirer = depublieur && (apercu?.decision_possible ?? true);
   const rapport = apercu?.rapport ?? null;
   // En attente : la version soumise. Sinon : ce qui est en ligne (le modérateur qui dépublie lit ce qui est publié).
   const affichee = enAttente ? soumise : (publiee ?? soumise);
@@ -507,7 +516,7 @@ function Apercu({
                 <BlocRapport
                   rapport={rapport}
                   club={apercu.club?.nom ?? null}
-                  decideur={decideur && enAttente}
+                  decideur={peutDecider && enAttente}
                   onDoublon={(v) => {
                     setDoublonDe(v);
                     setApprobation(true);
@@ -524,6 +533,11 @@ function Apercu({
               <FicheAvantApres
                 avant={apercu.fiche_actuelle}
                 apres={affichee as unknown as { description: string | null; axes: string[] }}
+                libelleAxe={libelleAxe}
+              />
+            ) : evenement ? (
+              <ApercuEvenement
+                champs={affichee as unknown as Record<string, unknown>}
                 libelleAxe={libelleAxe}
               />
             ) : commentaire ? (
@@ -612,7 +626,7 @@ function Apercu({
             )}
 
             <div className="flex flex-wrap gap-2 border-t pt-4">
-              {decideur && enAttente && (
+              {peutDecider && enAttente && (
                 <>
                   <Button
                     className="rounded-full font-bold"
@@ -641,7 +655,7 @@ function Apercu({
                   </Button>
                 </>
               )}
-              {depublieur && apercu.en_ligne && apercu.depublication_possible && (
+              {peutRetirer && apercu.en_ligne && apercu.depublication_possible && (
                 <Button
                   variant="outline"
                   className="rounded-full font-bold text-logo-red"
@@ -671,13 +685,15 @@ function Apercu({
                 ? `Le rapport reste privé : rien n'est publié. ${pointsPrevus(rapport)}`
                 : apercu?.nouvelle_version
                   ? "Cette nouvelle version remplace la version en ligne. Aucun point n'est crédité de nouveau."
-                  : apercu?.type === "fiche_club"
-                    ? "La fiche publique du club prend aussitôt cette description et ces axes."
-                    : apercu?.type === "actualite"
-                      ? "L'actualité est publiée au nom du club, sur sa fiche et dans les articles. Elle ne rapporte pas de points."
-                      : apercu?.type === "commentaire"
-                        ? "Le commentaire apparaît sous l'article. Son auteur reçoit +5 points, dans la limite de 5 commentaires rémunérés par jour."
-                        : "L'article est publié sur le site et l'auteur reçoit ses points."
+                  : apercu?.type === "evenement"
+                    ? "L'événement paraît dans l'agenda public et les membres du club sont invités. Un encadreur auteur reçoit ses points."
+                    : apercu?.type === "fiche_club"
+                      ? "La fiche publique du club prend aussitôt cette description et ces axes."
+                      : apercu?.type === "actualite"
+                        ? "L'actualité est publiée au nom du club, sur sa fiche et dans les articles. Elle ne rapporte pas de points."
+                        : apercu?.type === "commentaire"
+                          ? "Le commentaire apparaît sous l'article. Son auteur reçoit +5 points, dans la limite de 5 commentaires rémunérés par jour."
+                          : "L'article est publié sur le site et l'auteur reçoit ses points."
           }
           bouton="Approuver"
           onEnvoie={async () => {
@@ -817,5 +833,35 @@ function FicheAvantApres({
       {colonne("Fiche actuelle", avant, false)}
       {colonne("Proposition", apres, true)}
     </section>
+  );
+}
+
+// L'aperçu d'un événement de l'agenda (spec 041) : la date à l'heure de Lomé, le lieu ou le lien, le programme.
+function ApercuEvenement({
+  champs,
+  libelleAxe,
+}: {
+  champs: Record<string, unknown>;
+  libelleAxe: (code: string | null | undefined) => string;
+}) {
+  const texte = (cle: string) => (typeof champs[cle] === "string" ? (champs[cle] as string) : null);
+  const debut = texte("debut");
+  const fin = texte("fin");
+  return (
+    <article className="space-y-3 rounded-2xl bg-carnet p-5">
+      <p className="text-sm font-extrabold uppercase text-logo-blue">
+        {TYPES_EVENEMENT[texte("type") ?? ""] ?? texte("type")} · {libelleAxe(texte("axe_code"))}
+      </p>
+      {debut && fin && (
+        <p className="font-bold">{plageEvenement(depuisLome(debut), depuisLome(fin))}</p>
+      )}
+      <p className="font-semibold">
+        {champs["en_ligne"] === true ? `En ligne : ${texte("lien") ?? ""}` : texte("lieu")}
+        {typeof champs["places"] === "number" ? ` · ${champs["places"]} places` : ""}
+        {texte("public_vise") ? ` · ${texte("public_vise")}` : ""}
+      </p>
+      {texte("objectif") && <p className="font-medium">Objectif : {texte("objectif")}</p>}
+      <p className="whitespace-pre-line font-medium text-ink/80">{texte("description")}</p>
+    </article>
   );
 }

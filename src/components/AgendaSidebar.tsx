@@ -1,34 +1,13 @@
+import { Link } from "@tanstack/react-router";
 import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import { retard } from "@/components/SiteMotion";
 import fond from "@/assets/slide-genie.jpg";
-
-const evenements = [
-  {
-    jour: 12,
-    mois: "Oct",
-    tag: "Concours",
-    t: "Concours de production vidéo – Zéro grossesse et IST",
-    lieu: "En ligne",
-  },
-  {
-    jour: 18,
-    mois: "Oct",
-    tag: "Formation",
-    t: "Formation premiers secours pour les clubs",
-    lieu: "Lycée de Kara",
-  },
-  {
-    jour: 25,
-    mois: "Oct",
-    tag: "Émission TV",
-    t: "Enregistrement SOS Docteur TV – Spéciale Jeunes",
-    lieu: "Studio Prof James",
-  },
-];
+import type { EvenementPublic } from "@/lib/api/client";
+import { TYPES_EVENEMENT, dateEvenement } from "@/lib/agenda";
 
 // Colonne de droite de la section Actualités : une photo sur toute la hauteur, teintée en bleu,
 // et les rendez-vous posés dessus sur des cartes de verre. La teinte reste assez dense pour le texte blanc.
-export function AgendaSidebar() {
+export function AgendaSidebar({ evenements }: { evenements: EvenementPublic[] }) {
   return (
     <aside
       id="agenda"
@@ -60,33 +39,42 @@ export function AgendaSidebar() {
         </div>
       </div>
 
-      <ol className="space-y-3">
-        {evenements.map((e, i) => (
-          <li key={e.t} data-reveal style={retard(i + 1)}>
-            <a
-              href="/agenda"
-              className="group flex items-center gap-4 rounded-2xl border border-white/25 bg-white/15 p-3 shadow-[0_8px_24px_-12px] shadow-night/40 backdrop-blur-xl transition duration-300 hover:bg-white/25"
-            >
-              <span className="flex w-14 shrink-0 flex-col items-center rounded-xl bg-white py-2 text-logo-blue shadow-sm">
-                <span className="font-display text-2xl leading-none">{e.jour}</span>
-                <span className="mt-0.5 text-[11px] font-bold uppercase text-logo-red">
-                  {e.mois}
+      {evenements.length === 0 ? (
+        <p className="rounded-2xl border border-white/25 bg-white/15 p-4 text-sm font-semibold backdrop-blur-xl">
+          Aucun événement à venir pour le moment.
+        </p>
+      ) : (
+        <ol className="space-y-3">
+          {evenements.map((e, i) => (
+            <li key={e.id} data-reveal style={retard(i + 1)}>
+              <Link
+                to="/agenda/$id"
+                params={{ id: e.id }}
+                className="group flex items-center gap-4 rounded-2xl border border-white/25 bg-white/15 p-3 shadow-[0_8px_24px_-12px] shadow-night/40 backdrop-blur-xl transition duration-300 hover:bg-white/25"
+              >
+                <span className="flex w-14 shrink-0 flex-col items-center rounded-xl bg-white py-2 text-logo-blue shadow-sm">
+                  <span className="font-display text-2xl leading-none">
+                    {dateEvenement(e.debut, { day: "numeric" })}
+                  </span>
+                  <span className="mt-0.5 text-[11px] font-bold uppercase text-logo-red">
+                    {dateEvenement(e.debut, { month: "short" })}
+                  </span>
                 </span>
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="text-[11px] font-extrabold uppercase tracking-wider text-sun">
-                  {e.tag}
+                <span className="min-w-0 flex-1">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-sun">
+                    {TYPES_EVENEMENT[e.type] ?? e.type}
+                  </span>
+                  <span className="mt-0.5 block font-bold leading-snug">{e.titre}</span>
+                  <span className="mt-1 flex items-center gap-1 text-xs font-medium text-white/80">
+                    <MapPin className="size-3.5 shrink-0" /> {e.en_ligne ? "En ligne" : e.lieu}
+                  </span>
                 </span>
-                <span className="mt-0.5 block font-bold leading-snug">{e.t}</span>
-                <span className="mt-1 flex items-center gap-1 text-xs font-medium text-white/80">
-                  <MapPin className="size-3.5 shrink-0" /> {e.lieu}
-                </span>
-              </span>
-              <ArrowRight className="size-4 shrink-0 text-white/60 transition duration-300 group-hover:translate-x-1 group-hover:text-white" />
-            </a>
-          </li>
-        ))}
-      </ol>
+                <ArrowRight className="size-4 shrink-0 text-white/60 transition duration-300 group-hover:translate-x-1 group-hover:text-white" />
+              </Link>
+            </li>
+          ))}
+        </ol>
+      )}
 
       {/* L'espace restant laisse voir la photo, pour que la colonne descende aussi bas que les articles. */}
       <div className="mt-auto pt-8">

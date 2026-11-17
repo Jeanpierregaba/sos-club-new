@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import {
   Brain,
+  CalendarDays,
   CalendarRange,
   ClipboardList,
   HeartPulse,
@@ -30,8 +31,14 @@ export function EnTeteEspace({
   monClubSante = false,
   rapports = false,
   carte = false,
+  agendaClub = false,
+  evenements = false,
   children,
 }: {
+  // « Agenda du club » (spec 041) : l'encadreur vérifié d'un club, ou le président.
+  agendaClub?: boolean;
+  // « Mes événements » (spec 041) : l'élève membre d'un club.
+  evenements?: boolean;
   // « Ma carte » (spec 040) : l'élève, ou l'encadreur vérifié.
   carte?: boolean;
   // « Rapports » (spec 038) : l'encadreur vérifié d'un club, ou le président.
@@ -106,6 +113,22 @@ export function EnTeteEspace({
               className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
             >
               <ClipboardList className="size-4" /> Rapports
+            </Link>
+          )}
+          {agendaClub && (
+            <Link
+              to="/mon-club/agenda"
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
+            >
+              <CalendarDays className="size-4" /> Agenda du club
+            </Link>
+          )}
+          {evenements && (
+            <Link
+              to="/mes-evenements"
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-sm font-bold text-logo-blue shadow-sm hover:bg-mist"
+            >
+              <CalendarDays className="size-4" /> Mes événements
             </Link>
           )}
           {articles && (
