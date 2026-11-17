@@ -62,6 +62,8 @@ class ElementFile(BaseModel):
     depublication_possible: bool = True
     # Faux pour un type sans décision « à corriger » (un commentaire).
     correction_possible: bool = True
+    # Faux si le type a son propre domaine de droits (l'agenda) et que le collaborateur ne l'a pas : lecture seule.
+    decision_possible: bool = True
     titre: str
     etat: EtatContenu
     axe_code: str | None

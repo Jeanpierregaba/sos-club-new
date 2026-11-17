@@ -16,6 +16,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.exports import purger_regulierement
 from app.admin.router import router as router_admin
 from app.admin.router import router_activation
+from app.agenda.router import router as router_agenda
+from app.agenda.router import router_club as router_agenda_club
+from app.agenda.router_admin import router_admin as router_agenda_admin
 from app.articles.router import router_auteur as router_articles_auteur
 from app.articles.router import router_public as router_articles
 from app.bibliotheque.router import router as router_bibliotheque
@@ -97,6 +100,9 @@ api.include_router(router_eleves)
 api.include_router(router_encadreurs)
 api.include_router(router_encadreurs_admin)
 api.include_router(router_actualites)
+api.include_router(router_agenda_club)
+api.include_router(router_agenda)
+api.include_router(router_agenda_admin)
 api.include_router(router_clubs)
 api.include_router(router_clubs_admin)
 api.include_router(router_jeux)

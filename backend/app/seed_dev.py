@@ -25,6 +25,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.catalogue import LIBELLES_ROLES, RoleDepart
 from app.admin.journal import journaliser
 from app.admin.models import DoubleAuth
+from app.agenda.models import Evenement, NiveauEvenement, Reponse, ReponseEvenement
+from app.agenda.schemas import ChampsEvenement
+from app.agenda.service import copier as copier_evenement
 from app.bibliotheque.models import CategorieRessource, EtatRessource, Ressource
 from app.clubs import activation
 from app.clubs.models import Adhesion, Club, ClubAxe, EtatAdhesion, EtatClub
@@ -372,6 +375,73 @@ async def _preparer_contenus_du_club(db: AsyncSession) -> None:
             contenu.etat = EtatContenu.en_attente
 
 
+async def _preparer_agenda(db: AsyncSession) -> None:
+    """Spec 041 : deux événements publiés et un en attente pour le club de démonstration, un événement national, et la
+    réponse de dev.eleve1. Une fois : rien n'est ajouté si l'agenda contient déjà un événement."""
+    club = await db.scalar(select(Club).where(Club.nom == "Club Santé Tokoin", Club.etat == EtatClub.actif))
+    if club is None or club.president_id is None or await db.scalar(select(Evenement.id).limit(1)):
+        return
+    maintenant = datetime.now(UTC)
+
+    def champs(titre: str, type_evenement: str, jours: int, heure: int) -> dict[str, object]:
+        jour = (maintenant + timedelta(days=jours)).date()
+        debut = datetime(jour.year, jour.month, jour.day, heure, 0)
+        return {
+            "titre": f"[Test] {titre}", "type": type_evenement, "axe_code": "sante-environnement",
+            "objectif": "Contenu de démonstration.", "description": "Événement de démonstration de l'agenda (spec 041).",
+            "lieu": "Cour du lycée", "en_ligne": False, "lien": None, "public_vise": "Membres du club",
+            "debut": debut.isoformat(timespec="minutes"), "fin": (debut + timedelta(hours=2)).isoformat(timespec="minutes"),
+            "places": 30,
+        }  # fmt: skip
+
+    evenements = (
+        (champs("Causerie sur le paludisme", "sensibilisation", 5, 15), True),
+        (champs("Opération salubrité de la cour", "assainissement", 12, 8), True),
+        (champs("Formation aux premiers secours", "formation", 20, 14), False),
+    )
+    for donnees, publie in evenements:
+        contenu = Contenu(
+            id=uuid7(), type="evenement", auteur_id=club.president_id, etat=EtatContenu.brouillon,
+            dre_code="grand-lome", club_id=club.id, soumis_le=maintenant,
+        )  # fmt: skip
+        db.add(contenu)
+        await db.flush()
+        version = VersionContenu(
+            id=uuid7(), contenu_id=contenu.id, numero=1, donnees=donnees,
+            etat=EtatVersion.approuvee if publie else EtatVersion.soumise, soumise_le=maintenant,
+        )  # fmt: skip
+        db.add(version)
+        await db.flush()
+        if not publie:
+            contenu.version_travail_id = version.id
+            contenu.etat = EtatContenu.en_attente
+            continue
+        contenu.publie_le = maintenant
+        contenu.version_publiee_id = version.id
+        contenu.etat = EtatContenu.publie
+        contenu.axe_code = "sante-environnement"
+        db.add(DecisionModeration(contenu_id=contenu.id, version_id=version.id, decision=TypeDecision.approuver))
+        evenement = Evenement(
+            id=contenu.id, contenu_id=contenu.id, niveau=NiveauEvenement.club, club_id=club.id,
+            dre_code="grand-lome", publie=True, cree_par=club.president_id,
+        )  # fmt: skip
+        copier_evenement(evenement, ChampsEvenement.model_validate(donnees))
+        db.add(evenement)
+        await db.flush()
+        eleve = await db.scalar(select(Utilisateur.id).where(Utilisateur.identifiant == "dev.eleve1"))
+        if eleve is not None:
+            db.add(ReponseEvenement(evenement_id=evenement.id, eleve_id=eleve, reponse=Reponse.participe,
+                                    repondu_le=maintenant))  # fmt: skip
+    national = Evenement(niveau=NiveauEvenement.national, publie=True)
+    copier_evenement(
+        national,
+        ChampsEvenement.model_validate(
+            champs("Finale nationale Génie Imhotep", "concours", 30, 9) | {"axe_code": "genie-imhotep", "places": None}
+        ),
+    )
+    db.add(national)
+
+
 async def _preparer_quiz(db: AsyncSession) -> None:
     """Trois quiz de démonstration (spec 027), une fois : un publié (18 questions), un soumis par le gestionnaire
     pédagogique (à publier par un autre compte), un brouillon. Marqués « Contenu de test » : des calculs, aucun
@@ -641,6 +711,7 @@ async def semer(db: AsyncSession) -> list[dict[str, str]]:
     await _preparer_photo(db)
     await _preparer_commentaires(db)
     await _preparer_contenus_du_club(db)
+    await _preparer_agenda(db)
     await _preparer_quiz(db)
     await _preparer_bibliotheque(db)
     await _preparer_certification(db)

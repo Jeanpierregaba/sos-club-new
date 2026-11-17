@@ -11,8 +11,10 @@ from uuid import UUID
 from pydantic import ValidationError
 from sqlalchemy import Uuid, delete, literal, select
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.agenda import reponses as reponses_agenda
 from app.clubs import activation
 from app.clubs.espace import club_gere
 from app.clubs.models import Club
@@ -328,6 +330,7 @@ async def detail(
         ],
         modifiable=lecteur == "auteur" and contenu.etat in (EtatContenu.brouillon, EtatContenu.a_corriger),
         doublons_probables=await doublons_probables(db, contenu, rapport) if rapport.reference else [],
+        evenement=await reponses_agenda.resume_pour_rapport(db, rapport.evenement_id),
     )
 
 
@@ -450,7 +453,15 @@ async def modifier(
     rapport.type_activite = champs.get("type_activite")
     rapport.mois = date.fromisoformat(champs["mois"]) if champs.get("mois") else None
     rapport.semestre_id = UUID(champs["semestre_id"]) if champs.get("semestre_id") else None
-    await db.commit()
+    evenement_id = UUID(champs["evenement_id"]) if champs.get("evenement_id") else None
+    if evenement_id is not None and evenement_id != rapport.evenement_id:
+        await reponses_agenda.lier_au_rapport(db, rapport.club_id, rapport.contenu_id, evenement_id)
+    rapport.evenement_id = evenement_id
+    try:
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        raise Refus("Cet événement est déjà documenté par un autre rapport.", 409) from None
     return await detail(db, utilisateur, contenu, rapport, "auteur")
 
 

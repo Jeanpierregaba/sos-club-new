@@ -145,6 +145,8 @@ EN_SERVICE: frozenset[str] = frozenset(
         "encadreur.bilan_semestriel",
         "club.rapport_activite",
         "club.bilan_semestriel",
+        # Spec 041 : l'événement de club approuvé dans l'agenda.
+        "encadreur.evenement",
     }
 )
 

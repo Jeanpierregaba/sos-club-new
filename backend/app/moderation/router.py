@@ -37,6 +37,10 @@ def _traduire() -> Iterator[None]:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Ce contenu est introuvable.") from None
     except decisions.Interdit:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Tu ne peux pas décider de ton propre contenu.") from None
+    except decisions.SansDroitDuType:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "Tu n'as pas le droit de décider de ce type de contenu."
+        ) from None
     except Refus as refus:
         raise HTTPException(refus.statut, str(refus)) from None
 

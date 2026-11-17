@@ -55,6 +55,15 @@ class TypeContenu:
     motif_min: int = 1
     # Le nombre de contenus de ce type qu'un auteur peut avoir en attente de modération.
     max_en_attente: int = 3
+    # Spec 041 (agenda) -------------------------------------------------------------------------------------------
+    # Un domaine de droits propre au type : décider exige aussi « <domaine> : approuver », retirer du site
+    # « <domaine> : dépublier », en plus des droits de la modération.
+    domaine_droit: str | None = None
+    # Appelée à chaque approbation (première ou révision), dans la transaction de la décision, avec les champs validés
+    # de la version approuvée : un événement de l'agenda y recopie sa version publique.
+    a_chaque_approbation: Callable[[AsyncSession, Contenu, dict[str, Any], bool], Awaitable[None]] | None = None
+    # Appelée quand le contenu est retiré du site, dans la transaction de la décision.
+    au_retrait: Callable[[AsyncSession, Contenu], Awaitable[None]] | None = None
 
 
 TYPES: dict[str, TypeContenu] = {}

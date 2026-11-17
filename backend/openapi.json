@@ -5377,6 +5377,942 @@
         }
       }
     },
+    "/api/clubs/moi/agenda": {
+      "get": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Agenda Du Club",
+        "operationId": "agenda_du_club_api_clubs_moi_agenda_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgendaDuClub"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Creer",
+        "operationId": "creer_api_clubs_moi_agenda_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Champs"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvenementDuClub"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/agenda/{evenement_id}": {
+      "get": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Lire",
+        "operationId": "lire_api_clubs_moi_agenda__evenement_id__get",
+        "parameters": [
+          {
+            "name": "evenement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Evenement Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvenementDuClub"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Modifier",
+        "operationId": "modifier_api_clubs_moi_agenda__evenement_id__put",
+        "parameters": [
+          {
+            "name": "evenement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Evenement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModificationEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvenementDuClub"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Supprimer",
+        "operationId": "supprimer_api_clubs_moi_agenda__evenement_id__delete",
+        "parameters": [
+          {
+            "name": "evenement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Evenement Id"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Version"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/agenda/{evenement_id}/soumettre": {
+      "post": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Soumettre",
+        "operationId": "soumettre_api_clubs_moi_agenda__evenement_id__soumettre_post",
+        "parameters": [
+          {
+            "name": "evenement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Evenement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__agenda__schemas__VersionEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvenementDuClub"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/agenda/{evenement_id}/retirer": {
+      "post": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Retirer",
+        "operationId": "retirer_api_clubs_moi_agenda__evenement_id__retirer_post",
+        "parameters": [
+          {
+            "name": "evenement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Evenement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__agenda__schemas__VersionEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvenementDuClub"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/agenda/{evenement_id}/annuler": {
+      "post": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Annuler",
+        "operationId": "annuler_api_clubs_moi_agenda__evenement_id__annuler_post",
+        "parameters": [
+          {
+            "name": "evenement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Evenement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnulationEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvenementDuClub"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/agenda/{evenement_id}/reponses": {
+      "get": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Liste Reponses",
+        "operationId": "liste_reponses_api_clubs_moi_agenda__evenement_id__reponses_get",
+        "parameters": [
+          {
+            "name": "evenement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Evenement Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReponsesEvenement"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/moi/agenda/{evenement_id}/presences": {
+      "put": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Presences",
+        "operationId": "presences_api_clubs_moi_agenda__evenement_id__presences_put",
+        "parameters": [
+          {
+            "name": "evenement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Evenement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresencesEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReponsesEvenement"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agenda": {
+      "get": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Agenda",
+        "operationId": "agenda_api_agenda_get",
+        "parameters": [
+          {
+            "name": "periode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "a_venir",
+                "passe"
+              ],
+              "type": "string",
+              "default": "a_venir",
+              "title": "Periode"
+            }
+          },
+          {
+            "name": "dre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dre"
+            }
+          },
+          {
+            "name": "club",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Club"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/TypeEvenement"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type"
+            }
+          },
+          {
+            "name": "axe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Axe"
+            }
+          },
+          {
+            "name": "niveau",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/NiveauEvenement"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Niveau"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageAgenda"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agenda/prochains": {
+      "get": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Prochains",
+        "operationId": "prochains_api_agenda_prochains_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EvenementPublic"
+                  },
+                  "type": "array",
+                  "title": "Response Prochains Api Agenda Prochains Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agenda/mes-evenements": {
+      "get": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Mes Evenements",
+        "operationId": "mes_evenements_api_agenda_mes_evenements_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EvenementPublic"
+                  },
+                  "type": "array",
+                  "title": "Response Mes Evenements Api Agenda Mes Evenements Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agenda/{evenement_id}": {
+      "get": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Evenement",
+        "operationId": "evenement_api_agenda__evenement_id__get",
+        "parameters": [
+          {
+            "name": "evenement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Evenement Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvenementPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agenda/{evenement_id}/reponse": {
+      "put": {
+        "tags": [
+          "agenda"
+        ],
+        "summary": "Repondre",
+        "operationId": "repondre_api_agenda__evenement_id__reponse_put",
+        "parameters": [
+          {
+            "name": "evenement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Evenement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReponseEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvenementPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/agenda": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister",
+        "operationId": "lister_api_admin_agenda_get",
+        "parameters": [
+          {
+            "name": "periode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "a_venir",
+                "passe"
+              ],
+              "type": "string",
+              "default": "a_venir",
+              "title": "Periode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EvenementPublic"
+                  },
+                  "title": "Response Lister Api Admin Agenda Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Creer",
+        "operationId": "creer_api_admin_agenda_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvenementEquipeEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvenementPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/agenda/{evenement_id}": {
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Modifier",
+        "operationId": "modifier_api_admin_agenda__evenement_id__put",
+        "parameters": [
+          {
+            "name": "evenement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Evenement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvenementEquipeEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvenementPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/agenda/{evenement_id}/annuler": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Annuler",
+        "operationId": "annuler_api_admin_agenda__evenement_id__annuler_post",
+        "parameters": [
+          {
+            "name": "evenement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Evenement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnulationEntree"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvenementPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clubs/moi": {
       "get": {
         "tags": [
@@ -12718,6 +13654,27 @@
         ],
         "title": "AffiliationsDuClub"
       },
+      "AgendaDuClub": {
+        "properties": {
+          "club": {
+            "type": "string",
+            "title": "Club"
+          },
+          "evenements": {
+            "items": {
+              "$ref": "#/components/schemas/EvenementDuClub"
+            },
+            "type": "array",
+            "title": "Evenements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "club",
+          "evenements"
+        ],
+        "title": "AgendaDuClub"
+      },
       "AnneeAdmin": {
         "properties": {
           "id": {
@@ -12818,6 +13775,22 @@
         ],
         "title": "AnneeResume"
       },
+      "AnnulationEntree": {
+        "properties": {
+          "motif": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 10,
+            "title": "Motif"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "motif"
+        ],
+        "title": "AnnulationEntree"
+      },
       "AnnulationPoints": {
         "properties": {
           "motif": {
@@ -12891,6 +13864,11 @@
           "correction_possible": {
             "type": "boolean",
             "title": "Correction Possible",
+            "default": true
+          },
+          "decision_possible": {
+            "type": "boolean",
+            "title": "Decision Possible",
             "default": true
           },
           "titre": {
@@ -14750,6 +15728,125 @@
         ],
         "title": "ChampsArticle",
         "description": "Les champs d'une version, stockés en JSONB (`version_contenu.donnees`)."
+      },
+      "ChampsEvenement": {
+        "properties": {
+          "titre": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 3,
+            "title": "Titre"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeEvenement"
+          },
+          "axe_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Axe Code"
+          },
+          "objectif": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Objectif"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 10,
+            "title": "Description"
+          },
+          "lieu": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lieu"
+          },
+          "en_ligne": {
+            "type": "boolean",
+            "title": "En Ligne",
+            "default": false
+          },
+          "lien": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lien"
+          },
+          "public_vise": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Vise"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Fin"
+          },
+          "places": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10000.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Places"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "titre",
+          "type",
+          "description",
+          "debut",
+          "fin"
+        ],
+        "title": "ChampsEvenement",
+        "description": "Les champs d'un événement : la version d'un événement de club (JSONB), ou la saisie de l'équipe."
       },
       "ChangementActuel": {
         "properties": {
@@ -17606,6 +18703,11 @@
             "title": "Correction Possible",
             "default": true
           },
+          "decision_possible": {
+            "type": "boolean",
+            "title": "Decision Possible",
+            "default": true
+          },
           "titre": {
             "type": "string",
             "title": "Titre"
@@ -19001,6 +20103,126 @@
         ],
         "title": "EvenementCarte"
       },
+      "EvenementDuClub": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "etat": {
+            "$ref": "#/components/schemas/EtatContenu"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "auteur": {
+            "type": "string",
+            "title": "Auteur"
+          },
+          "de_moi": {
+            "type": "boolean",
+            "title": "De Moi"
+          },
+          "champs": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Champs"
+          },
+          "publie": {
+            "type": "boolean",
+            "title": "Publie"
+          },
+          "annule_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Annule Le"
+          },
+          "motif_annulation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Annulation"
+          },
+          "motif_decision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Decision"
+          },
+          "participants": {
+            "type": "integer",
+            "title": "Participants"
+          },
+          "peut_modifier": {
+            "type": "boolean",
+            "title": "Peut Modifier"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "etat",
+          "version",
+          "auteur",
+          "de_moi",
+          "champs",
+          "publie",
+          "annule_le",
+          "motif_annulation",
+          "motif_decision",
+          "participants",
+          "peut_modifier"
+        ],
+        "title": "EvenementDuClub",
+        "description": "Un événement dans l'agenda du club : ce que voient les encadreurs et le président."
+      },
+      "EvenementEquipeEntree": {
+        "properties": {
+          "niveau": {
+            "$ref": "#/components/schemas/NiveauEvenement"
+          },
+          "dre_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dre Code"
+          },
+          "champs": {
+            "$ref": "#/components/schemas/ChampsEvenement"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "niveau",
+          "champs"
+        ],
+        "title": "EvenementEquipeEntree"
+      },
       "EvenementJournal": {
         "properties": {
           "id": {
@@ -19092,6 +20314,272 @@
           "details"
         ],
         "title": "EvenementJournal"
+      },
+      "EvenementLie": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Fin"
+          },
+          "participants": {
+            "type": "integer",
+            "title": "Participants"
+          },
+          "presents": {
+            "type": "integer",
+            "title": "Presents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "titre",
+          "debut",
+          "fin",
+          "participants",
+          "presents"
+        ],
+        "title": "EvenementLie"
+      },
+      "EvenementPublic": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "niveau": {
+            "$ref": "#/components/schemas/NiveauEvenement"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeEvenement"
+          },
+          "axe_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Axe Code"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "objectif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Objectif"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "lieu": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lieu"
+          },
+          "en_ligne": {
+            "type": "boolean",
+            "title": "En Ligne"
+          },
+          "lien": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lien"
+          },
+          "public_vise": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Vise"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Debut"
+          },
+          "fin": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Fin"
+          },
+          "places": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Places"
+          },
+          "participants": {
+            "type": "integer",
+            "title": "Participants"
+          },
+          "complet": {
+            "type": "boolean",
+            "title": "Complet"
+          },
+          "annule": {
+            "type": "boolean",
+            "title": "Annule"
+          },
+          "motif_annulation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif Annulation"
+          },
+          "dre_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dre Code"
+          },
+          "dre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dre"
+          },
+          "club_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club Id"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club"
+          },
+          "etablissement": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Etablissement"
+          },
+          "peut_repondre": {
+            "type": "boolean",
+            "title": "Peut Repondre",
+            "default": false
+          },
+          "ma_reponse": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Reponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "niveau",
+          "type",
+          "axe_code",
+          "titre",
+          "objectif",
+          "description",
+          "lieu",
+          "en_ligne",
+          "lien",
+          "public_vise",
+          "debut",
+          "fin",
+          "places",
+          "participants",
+          "complet",
+          "annule",
+          "motif_annulation",
+          "dre_code",
+          "dre",
+          "club_id",
+          "club",
+          "etablissement"
+        ],
+        "title": "EvenementPublic",
+        "description": "Ce que montre l'agenda public : aucun nom d'élève, seulement le nombre de participants."
       },
       "ExportCree": {
         "properties": {
@@ -22457,6 +23945,27 @@
         ],
         "title": "Modification"
       },
+      "ModificationEntree": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "champs": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Champs"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version",
+          "champs"
+        ],
+        "title": "ModificationEntree",
+        "description": "Les champs restent bruts ici : le service les valide et nomme le champ fautif dans son message."
+      },
       "ModuleCatalogue": {
         "properties": {
           "id": {
@@ -22818,6 +24327,15 @@
         ],
         "title": "Niveau"
       },
+      "NiveauEvenement": {
+        "type": "string",
+        "enum": [
+          "national",
+          "regional",
+          "club"
+        ],
+        "title": "NiveauEvenement"
+      },
       "NiveauProgression": {
         "properties": {
           "niveau": {
@@ -22970,6 +24488,27 @@
         ],
         "title": "OrdreEnseignement",
         "description": "L'ordre d'enseignement de la liste nationale (spec 035)."
+      },
+      "PageAgenda": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "evenements": {
+            "items": {
+              "$ref": "#/components/schemas/EvenementPublic"
+            },
+            "type": "array",
+            "title": "Evenements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "evenements"
+        ],
+        "title": "PageAgenda"
       },
       "PageArchive": {
         "properties": {
@@ -24098,6 +25637,26 @@
           "jeux_etoiles"
         ],
         "title": "PointsDuClub"
+      },
+      "PresencesEntree": {
+        "properties": {
+          "presences": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "propertyNames": {
+              "format": "uuid"
+            },
+            "type": "object",
+            "title": "Presences"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "presences"
+        ],
+        "title": "PresencesEntree"
       },
       "PresidentEntree": {
         "properties": {
@@ -25574,6 +27133,16 @@
             },
             "type": "array",
             "title": "Doublons Probables"
+          },
+          "evenement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EvenementLie"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -26078,6 +27647,15 @@
         "title": "RenvoiSortie",
         "description": "Même réponse que l'adresse existe ou non."
       },
+      "Reponse": {
+        "type": "string",
+        "enum": [
+          "participe",
+          "peut_etre",
+          "non"
+        ],
+        "title": "Reponse"
+      },
       "ReponseDefi": {
         "properties": {
           "choix": {
@@ -26107,6 +27685,19 @@
         ],
         "title": "ReponseDemandeLien"
       },
+      "ReponseEntree": {
+        "properties": {
+          "reponse": {
+            "$ref": "#/components/schemas/Reponse"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reponse"
+        ],
+        "title": "ReponseEntree"
+      },
       "ReponseJoueur": {
         "properties": {
           "rang": {
@@ -26127,6 +27718,53 @@
           "choix"
         ],
         "title": "ReponseJoueur"
+      },
+      "ReponseMembre": {
+        "properties": {
+          "eleve_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Eleve Id"
+          },
+          "pseudonyme": {
+            "type": "string",
+            "title": "Pseudonyme"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "reponse": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Reponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "present": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Present"
+          }
+        },
+        "type": "object",
+        "required": [
+          "eleve_id",
+          "pseudonyme",
+          "nom",
+          "reponse",
+          "present"
+        ],
+        "title": "ReponseMembre"
       },
       "ReponseQuelAxe": {
         "properties": {
@@ -26151,6 +27789,52 @@
           "libelle"
         ],
         "title": "ReponseQuelAxe"
+      },
+      "ReponsesEvenement": {
+        "properties": {
+          "participe": {
+            "type": "integer",
+            "title": "Participe"
+          },
+          "peut_etre": {
+            "type": "integer",
+            "title": "Peut Etre"
+          },
+          "non": {
+            "type": "integer",
+            "title": "Non"
+          },
+          "sans_reponse": {
+            "type": "integer",
+            "title": "Sans Reponse"
+          },
+          "presents": {
+            "type": "integer",
+            "title": "Presents"
+          },
+          "pointage_ouvert": {
+            "type": "boolean",
+            "title": "Pointage Ouvert"
+          },
+          "membres": {
+            "items": {
+              "$ref": "#/components/schemas/ReponseMembre"
+            },
+            "type": "array",
+            "title": "Membres"
+          }
+        },
+        "type": "object",
+        "required": [
+          "participe",
+          "peut_etre",
+          "non",
+          "sans_reponse",
+          "presents",
+          "pointage_ouvert",
+          "membres"
+        ],
+        "title": "ReponsesEvenement"
       },
       "Reseau": {
         "type": "string",
@@ -27886,6 +29570,20 @@
         ],
         "title": "TypeEtablissement"
       },
+      "TypeEvenement": {
+        "type": "string",
+        "enum": [
+          "formation",
+          "sensibilisation",
+          "concours",
+          "assainissement",
+          "campagne",
+          "emission",
+          "reunion",
+          "autre"
+        ],
+        "title": "TypeEvenement"
+      },
       "TypeExport": {
         "type": "string",
         "enum": [
@@ -28051,6 +29749,20 @@
           "mot_de_passe"
         ],
         "title": "ActivationEntree"
+      },
+      "app__agenda__schemas__VersionEntree": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "VersionEntree"
       },
       "app__articles__schemas__VersionEntree": {
         "properties": {

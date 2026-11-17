@@ -16,6 +16,7 @@ from sqlalchemy import Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
+from app.admin.catalogue import Action
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
 from app.clubs.models import Club, ClubAxe
@@ -56,6 +57,15 @@ LIMITE_FILE = 200
 
 class Interdit(Exception):
     """Un auteur ne décide jamais de son propre contenu."""
+
+
+class SansDroitDuType(Exception):
+    """Le type a son propre domaine de droits (l'agenda, spec 041) et le collaborateur ne l'a pas."""
+
+
+def peut_decider(acces: Acces, type_contenu: str, action: Action = Action.approuver) -> bool:
+    domaine = type_de(type_contenu).domaine_droit
+    return domaine is None or acces.a(domaine, action)
 
 
 _Travail = aliased(VersionContenu)
@@ -119,8 +129,11 @@ def _element(
     adresse_parent: str | None,
     titre_parent: str | None,
     nom_club: str | None,
+    *,
+    decision_possible: bool = True,
 ) -> ElementFile:
     return ElementFile(
+        decision_possible=decision_possible,
         id=contenu.id,
         type=contenu.type,
         club=ClubContenu(id=contenu.club_id, nom=nom_club or "") if contenu.club_id is not None else None,
@@ -181,7 +194,10 @@ async def file_attente(
     # La file dans l'ordre d'arrivée ; les autres listes, les plus récemment modifiés d'abord.
     ordre = Contenu.soumis_le.asc() if etat is EtatContenu.en_attente else Contenu.modifie_le.desc()
     lignes = (await db.execute(requete.order_by(ordre, Contenu.id).limit(LIMITE_FILE))).all()
-    return FileModeration(total=total or 0, contenus=[_element(*ligne) for ligne in lignes])
+    return FileModeration(
+        total=total or 0,
+        contenus=[_element(*ligne, decision_possible=peut_decider(acces, ligne[0].type)) for ligne in lignes],
+    )
 
 
 async def compter_en_attente(db: AsyncSession, acces: Acces) -> int:
@@ -225,7 +241,7 @@ async def apercu(db: AsyncSession, acces: Acces, contenu_id: UUID) -> ApercuMode
     return ApercuModeration(
         fiche_actuelle=fiche_actuelle,
         rapport=await complement(db, contenu, soumise.id) if complement is not None else None,
-        **_element(*ligne).model_dump(),
+        **_element(*ligne, decision_possible=peut_decider(acces, contenu.type)).model_dump(),
         soumise=soumise.donnees if autre else None,
         photos_soumises=[_photo(p, ph) for p, ph in await photos_de(db, soumise.id)] if autre else [],
         photos_publiees=[_photo(p, ph) for p, ph in await photos_de(db, contenu.version_publiee_id)],
@@ -253,10 +269,14 @@ def _photo(placement: VersionPhoto, photo: Photo) -> PhotoModeration:
 # Décisions -----------------------------------------------------------------------------------------------------
 
 
-async def _a_decider(db: AsyncSession, acces: Acces, contenu_id: UUID, version: int) -> Contenu:
+async def _a_decider(
+    db: AsyncSession, acces: Acces, contenu_id: UUID, version: int, action: Action = Action.approuver
+) -> Contenu:
     contenu = await db.get(Contenu, contenu_id, with_for_update=True, populate_existing=True)
     if contenu is None or (not acces.national and contenu.dre_code != acces.collaborateur.perimetre_dre):
         raise Introuvable
+    if not peut_decider(acces, contenu.type, action):
+        raise SansDroitDuType
     if contenu.auteur_id == acces.utilisateur.id:
         raise Interdit
     if contenu.version != version:
@@ -390,6 +410,8 @@ async def approuver(
         await type_contenu.crediter(db, contenu, acces.utilisateur.id)
     elif action and premiere and (type_contenu.points_permis is None or await type_contenu.points_permis(db, contenu)):
         await points.crediter(db, action, auteur.id, f"{contenu.type}:{contenu.id}", valide_par=acces.utilisateur.id)
+    if type_contenu.a_chaque_approbation is not None:
+        await type_contenu.a_chaque_approbation(db, contenu, donnees, premiere)
     if premiere and type_contenu.a_la_publication is not None:
         await type_contenu.a_la_publication(db, contenu)
     titre_avis = (
@@ -440,7 +462,7 @@ async def refuser(db: AsyncSession, acces: Acces, contenu_id: UUID, version: int
 
 
 async def depublier(db: AsyncSession, acces: Acces, contenu_id: UUID, version: int, motif: str, ip: str) -> None:
-    contenu = await _a_decider(db, acces, contenu_id, version)
+    contenu = await _a_decider(db, acces, contenu_id, version, Action.depublier)
     if not type_de(contenu.type).depublication:
         raise Refus("Ce contenu ne se retire pas du site : il a déjà été appliqué.", 409)
     if contenu.version_publiee_id is None:
@@ -465,6 +487,9 @@ async def depublier(db: AsyncSession, acces: Acces, contenu_id: UUID, version: i
             )
     contenu.version_publiee_id = None
     contenu.etat = EtatContenu.depublie
+    retrait = type_de(contenu.type).au_retrait
+    if retrait is not None:
+        await retrait(db, contenu)
     await _consigner(
         db, acces, contenu, publiee, TypeDecision.depublier, motif, ip, f"« {titre} » a été retiré du site", "depublie"
     )

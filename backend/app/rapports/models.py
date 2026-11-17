@@ -80,6 +80,10 @@ class Rapport(Base):
         Index("ix_rapport_activite_du_jour", "club_id", "date_activite", "type_activite"),
         Index("ix_rapport_mois", "club_id", "mois"),
         Index("ix_rapport_semestre", "club_id", "semestre_id"),
+        # Un événement de l'agenda n'est lié qu'à un seul rapport (spec 041) : pas de double crédit.
+        Index(
+            "uq_rapport_evenement_id", "evenement_id", unique=True, postgresql_where=text("evenement_id IS NOT NULL")
+        ),
     )
 
     contenu_id: Mapped[UUID] = mapped_column(ForeignKey("contenu.id", ondelete="CASCADE"), primary_key=True)
@@ -99,6 +103,8 @@ class Rapport(Base):
     # même mois, ou un doublon, n'a rien crédité.
     points_auteur: Mapped[int | None] = mapped_column(Integer)
     points_club: Mapped[int | None] = mapped_column(Integer)
+    # L'événement de l'agenda que ce rapport documente (spec 041), facultatif.
+    evenement_id: Mapped[UUID | None] = mapped_column(ForeignKey("evenement.id", ondelete="RESTRICT"))
 
 
 class TypePiece(StrEnum):

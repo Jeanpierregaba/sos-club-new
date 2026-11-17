@@ -155,6 +155,15 @@ rappel à J+7 et J+14. Sans cette ligne, l'affichage reste juste, mais les rappe
 5 6 * * * cd /opt/sosclub/preprod && docker compose exec -T api python -m app.clubs.echeances >> /opt/sosclub/preprod/echeances.log 2>&1
 ```
 
+**8 ter. Programmer les rappels de l'agenda** (spec 041), dans le même `crontab -e`, chaque matin à 7 h : les
+membres qui participent à un événement du lendemain reçoivent un rappel sur le site. Relancer la commande n'envoie
+rien de plus.
+
+```cron
+0 7 * * * cd /opt/sosclub/prod && docker compose exec -T api python -m app.agenda.rappels >> /opt/sosclub/prod/rappels.log 2>&1
+5 7 * * * cd /opt/sosclub/preprod && docker compose exec -T api python -m app.agenda.rappels >> /opt/sosclub/preprod/rappels.log 2>&1
+```
+
 **9. Brancher l'envoi des e-mails** (spec 030). Sans SMTP, la production refuse l'inscription des visiteurs (leur
 code de confirmation ne pourrait pas partir) et n'envoie ni invitation ni avis aux encadreurs. Fournisseur proposé :
 [Brevo](https://www.brevo.com/), offre gratuite (environ 300 e-mails par jour : vérifie sur sa page tarifs).

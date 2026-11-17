@@ -161,10 +161,33 @@ def test_le_seed_prepare_une_actualite_et_une_proposition_de_fiche(
     en_base(semer)
     en_base(semer)
 
-    lignes = en_base(lambda db: db.execute(select(Contenu.type, Contenu.etat).where(Contenu.club_id.is_not(None))))
+    # Les événements de l'agenda (spec 041) sont aussi des contenus du club : vérifiés par le test suivant.
+    lignes = en_base(
+        lambda db: db.execute(
+            select(Contenu.type, Contenu.etat).where(Contenu.club_id.is_not(None), Contenu.type != "evenement")
+        )
+    )
     assert sorted((t, e.value) for t, e in lignes) == [("actualite", "publie"), ("fiche_club", "en_attente")]
     natures = [a["nature"] for a in client.get("/api/articles").json()["articles"]]
     assert sorted(natures) == ["actualite", "article"]
+
+
+def test_le_seed_prepare_lagenda_une_seule_fois(client: TestClient, en_base: Callable[..., Any]) -> None:
+    from app.agenda.models import Evenement, ReponseEvenement
+    from app.moderation.models import Contenu
+
+    en_base(semer)
+    en_base(semer)
+
+    evenements = en_base(lambda db: db.execute(select(Evenement.niveau, Evenement.publie))).all()
+    assert sorted((n.value, p) for n, p in evenements) == [("club", True), ("club", True), ("national", True)]
+    en_attente = en_base(
+        lambda db: db.scalars(select(Contenu.etat).where(Contenu.type == "evenement", Contenu.etat == "en_attente"))
+    ).all()
+    assert len(en_attente) == 1
+    assert len(en_base(lambda db: db.scalars(select(ReponseEvenement.eleve_id))).all()) == 2
+    titres = [e["titre"] for e in client.get("/api/agenda").json()["evenements"]]
+    assert len(titres) == 3 and all(t.startswith("[Test]") for t in titres)
 
 
 def test_le_seed_prepare_trois_quiz_de_test_une_seule_fois(en_base: Callable[..., Any]) -> None:

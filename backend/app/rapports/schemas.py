@@ -53,6 +53,8 @@ class ChampsActivite(_Champs):
     recommandations: Texte = ""
     participants: Participants = Participants()
     videos: Videos = []
+    # L'événement de l'agenda que ce rapport documente (spec 041), facultatif.
+    evenement_id: UUID | None = None
 
 
 class ChampsMensuel(_Champs):
@@ -194,6 +196,15 @@ class DecisionRapport(BaseModel):
     version: int
 
 
+class EvenementLie(BaseModel):
+    id: UUID
+    titre: str
+    debut: datetime
+    fin: datetime
+    participants: int
+    presents: int
+
+
 class RapportDetail(RapportResume):
     version: int
     donnees: dict[str, object]
@@ -202,6 +213,8 @@ class RapportDetail(RapportResume):
     historique: list[DecisionRapport]
     modifiable: bool
     doublons_probables: list[str]
+    # L'événement de l'agenda lié (spec 041) : titre, dates, participants annoncés et présents pointés.
+    evenement: EvenementLie | None = None
 
 
 class TypeActivite(BaseModel):
