@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.admin.catalogue import Action
 from app.admin.dependances import Acces, adresse_ip, exiger_permission, exiger_super_admin_pour, refuser
 from app.db import get_session
-from app.referentiel import administration, service
+from app.referentiel import administration, fusion, service
 from app.referentiel.models import OrdreEnseignement, StatutEtablissement, TypeEtablissement
 from app.referentiel.normalisation import normaliser
 from app.referentiel.schemas import (
@@ -24,6 +24,7 @@ from app.referentiel.schemas import (
     DreCreation,
     DreModification,
     DrePublique,
+    Ecart,
     EtablissementAdmin,
     EtablissementCreation,
     EtablissementModification,
@@ -31,6 +32,7 @@ from app.referentiel.schemas import (
     IesgAdmin,
     IesgCreation,
     IesgModification,
+    PageDoublons,
     PageEtablissements,
     Remplacement,
     TypeActiviteAdmin,
@@ -158,6 +160,28 @@ async def admin_lister_etablissements(
         prefecture=prefecture,
         importes=importes,
     )
+
+
+# Doublons probables (spec 042) : déclarés avant `/etablissements/{etablissement_id}`.
+
+
+@router_admin.get("/etablissements/doublons")
+async def admin_lister_doublons(
+    acces: Lecteur, db: Base, dre: Annotated[str | None, Query(max_length=30)] = None, ecartees: bool = False
+) -> PageDoublons:
+    return await fusion.lister_doublons(db, acces, dre_code=dre, ecartees=ecartees)
+
+
+@router_admin.post("/etablissements/doublons/ecarter", status_code=status.HTTP_204_NO_CONTENT)
+async def admin_ecarter_doublon(entree: Ecart, request: Request, acces: Modificateur, db: Base) -> None:
+    async with _traduire_refus(db, request, acces, "clubs:modifier"):
+        await fusion.ecarter(db, acces, entree, adresse_ip(request))
+
+
+@router_admin.post("/etablissements/doublons/retablir", status_code=status.HTTP_204_NO_CONTENT)
+async def admin_retablir_doublon(entree: Ecart, request: Request, acces: Modificateur, db: Base) -> None:
+    async with _traduire_refus(db, request, acces, "clubs:modifier"):
+        await fusion.retablir(db, acces, entree, adresse_ip(request))
 
 
 @router_admin.post("/etablissements", status_code=status.HTTP_201_CREATED)

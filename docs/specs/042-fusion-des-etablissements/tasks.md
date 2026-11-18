@@ -25,7 +25,7 @@ comptes et des clubs : c'est une partie critique, écrite en TDD (les tests avan
   - deux DRE différentes ne forment jamais une paire, et chaque paire porte sa raison.
 - [x] 4. Code de `doublons.py` (clé forte, nom proche, prononciation, éléments distinctifs), jusqu'à ce que les tests
       de la tâche 3 passent.
-- [ ] 5. Tests puis code de la liste et des écarts : `lister_doublons`, `ecarter`, `retablir`, et les routes
+- [x] 5. Tests puis code de la liste et des écarts : `lister_doublons`, `ecarter`, `retablir`, et les routes
       `GET /etablissements/doublons`, `POST …/ecarter` et `POST …/retablir`.
   - Seuls les actifs et les proposés sont pris en compte : un absorbé ou un inactif n'apparaît pas.
   - Le collaborateur de DRE ne voit que sa DRE.

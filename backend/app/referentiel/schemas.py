@@ -4,6 +4,7 @@ from uuid import UUID
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field
 
+from app.referentiel.doublons import Raison
 from app.referentiel.models import FORMAT_CODE, OrdreEnseignement, StatutEtablissement, TypeEtablissement
 from app.referentiel.normalisation import nettoyer
 from app.referentiel.regions import RegionScolaire
@@ -132,6 +133,11 @@ class DreAdmin(BaseModel):
     iesg: list[IesgAdmin]
 
 
+class EtablissementLie(BaseModel):
+    id: UUID
+    nom: str
+
+
 class EtablissementAdmin(BaseModel):
     id: UUID
     nom: str
@@ -151,6 +157,8 @@ class EtablissementAdmin(BaseModel):
     # Élèves rattachés (spec 017) : utile pour décider du sort d'un établissement proposé.
     nb_eleves: int
     nb_encadreurs: int = 0
+    # Spec 042 : l'établissement qui a absorbé celui-ci lors d'une fusion.
+    fusionne_dans: EtablissementLie | None = None
 
 
 class PageEtablissements(BaseModel):
@@ -251,6 +259,43 @@ class Remplacement(BaseModel):
 
     version: Version
     cible_id: UUID
+
+
+# Fusion des doublons (spec 042) --------------------------------------------------------------------------------
+
+
+class ClubResume(BaseModel):
+    """Le club vivant d'un établissement, tel que la fusion le traitera."""
+
+    id: UUID
+    nom: str
+    etat: str
+    membres_actifs: int
+
+
+class FicheDoublon(EtablissementAdmin):
+    club: ClubResume | None = None
+
+
+class PaireProbable(BaseModel):
+    a: FicheDoublon
+    b: FicheDoublon
+    # Absente pour une paire écartée que la détection ne retrouve plus (l'un des deux a été renommé).
+    raison: Raison | None
+    ecartee: bool
+
+
+class PageDoublons(BaseModel):
+    paires: list[PaireProbable]
+    # Paires restantes (non écartées) par DRE, sur tout le périmètre du collaborateur.
+    par_dre: dict[str, int]
+
+
+class Ecart(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    a_id: UUID
+    b_id: UUID
 
 
 # Types d'activité des rapports (spec 038) ---------------------------------------------------------------------
