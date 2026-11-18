@@ -529,6 +529,9 @@ async def modifier_etablissement(
     iesg = await _obtenir(db, Iesg, etablissement.iesg_id)
     _dans_perimetre(acces, iesg.dre_code)
     _verifier_version(etablissement, entree.version)
+    if etablissement.fusionne_dans_id is not None:
+        # Spec 042 : ses inscrits et son club sont passés à l'établissement gardé ; le réactiver recréerait le doublon.
+        raise Refus("Cet établissement a été fusionné dans un autre : il ne se modifie plus.", 409)
     changements = _changements(entree, effacables=("localite", "prefecture", "ordre"))
     if changements.get("iesg_id") not in (None, iesg.id):
         iesg = await _iesg_cible(db, acces, changements["iesg_id"])

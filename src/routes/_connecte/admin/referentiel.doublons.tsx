@@ -7,6 +7,7 @@ import { FusionEtablissements } from "@/components/admin/FusionEtablissements";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { peut } from "@/lib/admin";
+import { ETATS_CLUB, ORDRES, pluriel } from "@/lib/fusion";
 import {
   adminDoublons,
   adminEcarterDoublon,
@@ -41,20 +42,19 @@ export const Route = createFileRoute("/_connecte/admin/referentiel/doublons")({
   component: Doublons,
 });
 
-const pluriel = (n: number, mot: string) => `${n} ${mot}${n > 1 ? "s" : ""}`;
-
 function Fiche({ fiche }: { fiche: FicheDoublon }) {
   return (
     <div className="min-w-0">
       <p className="font-extrabold break-words">{fiche.nom}</p>
       <p className="text-xs text-muted-foreground">
-        {fiche.iesg} · {fiche.prefecture ?? "préfecture non renseignée"} ·{" "}
+        {fiche.iesg} · {fiche.prefecture ?? "préfecture non renseignée"}
+        {fiche.ordre && ` · ${ORDRES[fiche.ordre]}`} ·{" "}
         {fiche.import_source ? "liste nationale" : "annuaire"}
         {fiche.statut === "propose" && " · proposé"}
       </p>
       <p className="text-xs font-semibold">
         {pluriel(fiche.nb_eleves, "élève")} · {pluriel(fiche.nb_encadreurs, "encadreur")}
-        {fiche.club && ` · club ${fiche.club.etat.replace("_", " ")}`}
+        {fiche.club && ` · club ${ETATS_CLUB[fiche.club.etat] ?? fiche.club.etat}`}
       </p>
     </div>
   );
@@ -131,7 +131,9 @@ function Doublons() {
         <p className="rounded-3xl border border-dashed p-8 text-center font-semibold text-muted-foreground">
           {filtres.ecartees
             ? "Aucune paire écartée."
-            : `Aucun doublon probable ${filtres.dre || admin.perimetre_dre ? "dans cette DRE" : "pour le moment"}.`}
+            : admin.perimetre_dre
+              ? "Aucun doublon probable dans ta DRE."
+              : `Aucun doublon probable ${filtres.dre ? "dans cette DRE" : "pour le moment"}.`}
         </p>
       ) : (
         <ul className="grid gap-3">
@@ -153,7 +155,8 @@ function Doublons() {
                     <button
                       type="button"
                       onClick={() => setFusion(p)}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground transition hover:bg-primary/90"
+                      aria-label={`Fusionner ${p.a.nom} et ${p.b.nom}`}
+                      className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground transition hover:bg-primary/90"
                     >
                       <Merge className="size-3.5" /> Fusionner
                     </button>
@@ -161,7 +164,8 @@ function Doublons() {
                   <button
                     type="button"
                     onClick={() => void basculer(p)}
-                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ring-1 ring-border transition hover:bg-mist-soft"
+                    aria-label={`${p.ecartee ? "Rétablir" : "Pas un doublon"} : ${p.a.nom} et ${p.b.nom}`}
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ring-1 ring-border transition hover:bg-mist-soft"
                   >
                     {p.ecartee ? (
                       <>

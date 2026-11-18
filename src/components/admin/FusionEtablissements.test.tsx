@@ -135,5 +135,38 @@ describe("FusionEtablissements", () => {
 
     expect((await screen.findByRole("alert")).textContent).toContain("chacun un vrai club");
     expect(screen.queryByRole("status")).toBeNull();
+    expect((screen.getByRole("button", { name: "Fusionner" }) as HTMLButtonElement).disabled).toBe(
+      true,
+    );
+    expect(screen.getByRole("button", { name: /Inverser/ })).toBeTruthy();
+  });
+
+  it("depuis une proposition, garde l'établissement actif malgré le refus du premier aperçu", async () => {
+    const proposition = fiche("0003", "Lycee Tokoin 1", { statut: "propose", nb_eleves: 1 });
+    api.adminApercuFusion.mockImplementation(async (g: string) =>
+      g === proposition.id
+        ? apercu(
+            proposition,
+            ANNUAIRE,
+            "L'établissement gardé doit être actif : inverse les rôles ou réactive-le.",
+          )
+        : apercu(ANNUAIRE, proposition),
+    );
+    await act(async () => {
+      render(
+        <FusionEtablissements
+          depart={{ id: proposition.id, nom: proposition.nom }}
+          autre={{ id: ANNUAIRE.id }}
+          fermer={() => {}}
+          apresFusion={vi.fn()}
+        />,
+      );
+    });
+
+    await screen.findByRole("status");
+    expect(api.adminApercuFusion).toHaveBeenLastCalledWith(ANNUAIRE.id, proposition.id);
+    expect((screen.getByRole("button", { name: "Fusionner" }) as HTMLButtonElement).disabled).toBe(
+      false,
+    );
   });
 });

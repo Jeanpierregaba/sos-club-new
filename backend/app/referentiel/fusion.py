@@ -114,8 +114,7 @@ async def lister_doublons(db: AsyncSession, acces: Acces, *, dre_code: str | Non
         and (perimetre is None or fiches[a].dre_code == perimetre)
         and (dre_code is None or fiches[a].dre_code == dre_code)
     ]  # fmt: skip
-    if ecartees:
-        sortie.sort(key=lambda p: (p.a.dre_code, p.a.iesg, p.a.nom))
+    sortie.sort(key=lambda p: (p.a.dre_code, normaliser(p.a.iesg), normaliser(p.a.nom)))
     return PageDoublons(paires=sortie, par_dre=par_dre)
 
 
@@ -185,15 +184,16 @@ async def retablir(db: AsyncSession, acces: Acces, entree: Ecart, ip: str) -> No
 
 
 async def _deux(
-    db: AsyncSession, acces: Acces, garde_id: UUID, absorbe_id: UUID
+    db: AsyncSession, acces: Acces, garde_id: UUID, absorbe_id: UUID, *, verrouiller: bool = True
 ) -> tuple[Etablissement, Etablissement, str]:
-    """Le gardé et l'absorbé, verrouillés dans l'ordre de leur identifiant (pas d'interblocage entre deux fusions
-    croisées), après les vérifications qui ne dépendent pas des clubs."""
+    """Le gardé et l'absorbé, verrouillés pour une fusion dans l'ordre de leur identifiant (pas d'interblocage entre
+    deux fusions croisées), après les vérifications qui ne dépendent pas des clubs. Le périmètre est vérifié avant
+    tout autre refus."""
     if garde_id == absorbe_id:
         raise Refus("Choisis deux établissements différents.", 422)
     charges: dict[UUID, Etablissement] = {}
     for id_ in sorted((garde_id, absorbe_id)):
-        etablissement = await db.get(Etablissement, id_, with_for_update=True, populate_existing=True)
+        etablissement = await db.get(Etablissement, id_, with_for_update=verrouiller, populate_existing=True)
         if etablissement is None:
             raise Introuvable
         charges[id_] = etablissement
@@ -236,17 +236,18 @@ def _effet(garde: FicheDoublon, absorbe: FicheDoublon) -> str:
 
 
 async def apercu(db: AsyncSession, acces: Acces, garde_id: UUID, absorbe_id: UUID) -> ApercuFusion:
-    """Ce que ferait la fusion, et pourquoi elle serait refusée : les mêmes vérifications, sans rien écrire."""
+    """Ce que ferait la fusion, et pourquoi elle serait refusée : les mêmes vérifications, en lecture seule.
+    Un refus (gardé non actif, autre DRE, deux vrais clubs) est rendu en clair avec les deux fiches, pour que
+    l'écran permette d'inverser les rôles ; seuls le périmètre et un établissement introuvable font échouer."""
+    if garde_id == absorbe_id:
+        raise Refus("Choisis deux établissements différents.", 422)
+    refus = None
     try:
-        await _deux(db, acces, garde_id, absorbe_id)
-        refus = None
-        try:
-            await clubs_a_fusionner(db, absorbe_id, garde_id)
-        except DeuxClubs as erreur:
-            refus = str(erreur)
-        fiches = await _fiches(db, [garde_id, absorbe_id])
-    finally:
-        await db.rollback()
+        await _deux(db, acces, garde_id, absorbe_id, verrouiller=False)
+        await clubs_a_fusionner(db, absorbe_id, garde_id, verrouiller=False)
+    except (Refus, DeuxClubs) as erreur:
+        refus = str(erreur)
+    fiches = await _fiches(db, [garde_id, absorbe_id])
     garde, absorbe = fiches[garde_id], fiches[absorbe_id]
     return ApercuFusion(garde=garde, absorbe=absorbe, effet=_effet(garde, absorbe), refus=refus)
 
@@ -311,14 +312,14 @@ async def fusionner(db: AsyncSession, acces: Acces, garde_id: UUID, entree: Fusi
     garde.prefecture = garde.prefecture or absorbe.prefecture
     garde.ordre = garde.ordre or absorbe.ordre
     await _ecrire(db)
-    clubs = await fusionner_clubs(db, absorbe.id, garde.id, acces.utilisateur, ip)
+    clubs = await fusionner_clubs(db, absorbe.id, garde.id, acces.utilisateur, ip, dre)
 
     journaliser(
         db, "etablissement_fusionne", acces.utilisateur, cible_type="etablissement", cible_id=absorbe.id,
         perimetre=dre,
         details={
             "garde_id": str(garde.id), "avant": avant,
-            "apres": {"nom": garde.nom, "prefecture": garde.prefecture, "ordre": garde.ordre.value if garde.ordre else None},
+            "apres": {"garde": _etat(garde), "absorbe": _etat(absorbe) | {"fusionne_dans_id": str(garde.id)}},
             "eleves": sorted(str(i) for i in eleves), "encadreurs": sorted(str(i) for i in encadreurs), "clubs": clubs,
         },
         adresse_ip=ip,

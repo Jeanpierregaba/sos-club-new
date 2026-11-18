@@ -78,6 +78,9 @@ async def etablissement_actif(db: AsyncSession, etablissement_id: UUID) -> Etabl
             Iesg.actif,
             Dre.actif,
         )
+        # Partagé jusqu'à la fin de l'inscription : une fusion (spec 042) attend qu'elle soit écrite, puis déplace
+        # le nouvel inscrit ; une inscription commencée après la fusion trouve l'établissement inactif.
+        .with_for_update(read=True, of=Etablissement)
     )
     if etablissement is None:
         raise Refus("Cet établissement n'existe pas ou n'est plus actif : choisis-en un autre.")

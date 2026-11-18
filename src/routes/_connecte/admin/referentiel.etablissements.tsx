@@ -12,6 +12,7 @@ import { FusionEtablissements } from "@/components/admin/FusionEtablissements";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Button } from "@/components/ui/button";
 import { peut } from "@/lib/admin";
+import { ORDRES } from "@/lib/fusion";
 import {
   adminCreerEtablissement,
   adminListerDre,
@@ -73,15 +74,6 @@ const PREFECTURES = [
   "Zio",
 ];
 
-// L'ordre d'enseignement de la liste nationale (spec 035).
-const ORDRES: Record<OrdreEnseignement, string> = {
-  public: "Public",
-  prive_laic: "Privé laïc",
-  prive_catholique: "Privé catholique",
-  prive_protestant: "Privé protestant",
-  prive_islamique: "Privé islamique",
-  communautaire: "Communautaire",
-};
 const STATUTS: Record<StatutEtablissement, string> = {
   actif: "Actif",
   inactif: "Désactivé",
@@ -353,13 +345,13 @@ function Etablissements() {
                       <button
                         type="button"
                         onClick={() => setFusion(e)}
-                        aria-label={`Fusionner ${e.nom} avec un autre établissement`}
+                        aria-label={`Fusionner avec… ${e.nom}`}
                         className="mb-1.5 mr-1.5 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ring-1 ring-border transition hover:bg-mist-soft"
                       >
                         <Merge className="size-3.5" /> Fusionner avec…
                       </button>
                     )}
-                  {peut(admin, "clubs", "modifier") && (
+                  {peut(admin, "clubs", "modifier") && !e.fusionne_dans && (
                     <button
                       type="button"
                       onClick={() => setEdition(e)}

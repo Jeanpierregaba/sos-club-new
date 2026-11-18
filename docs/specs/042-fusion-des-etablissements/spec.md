@@ -86,7 +86,8 @@ Dans tous les cas, l'activation du club restant est recalculée (spec 033).
   périmètre du collaborateur. Elle applique les règles de l'analyse :
   - même nom, une fois retirés la ponctuation, les mots « de, du, des, la, le, les » et la différence entre
     chiffres romains et arabes, dans la même DRE ;
-  - nom très proche (une ou deux lettres), dans la même IESG, avec la même famille de sigle (CEG, Lycée, privé…) ;
+  - nom très proche (une ou deux lettres), dans la même DRE, avec la même famille de sigle (CEG, Lycée, privé…) : deux
+    IESG voisines rangent parfois le même établissement (Grand Kpendjal et Mango) ;
   - même prononciation (k/c, ou/u, dj/dz/j, lettres doublées), dans la même DRE.
 - Chaque paire montre les deux établissements (nom, IESG, préfecture, origine, inscrits, club), la raison du
   rapprochement et deux actions :

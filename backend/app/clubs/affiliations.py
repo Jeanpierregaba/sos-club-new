@@ -290,18 +290,18 @@ def _au_dela(club: Club | None) -> bool:
     return club is not None and club.etat is not EtatClub.en_constitution
 
 
-async def clubs_a_fusionner(db: AsyncSession, absorbe_id: UUID, garde_id: UUID) -> tuple[Club | None, Club | None]:
-    """Les clubs vivants de l'absorbé et du gardé, verrouillés. Lève `DeuxClubs` si la fusion est impossible."""
+async def clubs_a_fusionner(
+    db: AsyncSession, absorbe_id: UUID, garde_id: UUID, *, verrouiller: bool = True
+) -> tuple[Club | None, Club | None]:
+    """Les clubs vivants de l'absorbé et du gardé, verrouillés pour une fusion (pas pour un simple aperçu). Lève
+    `DeuxClubs` si la fusion est impossible."""
+    requete = (
+        select(Club)
+        .where(Club.etablissement_id.in_((absorbe_id, garde_id)), Club.etat.in_(CLUB_VIVANT))
+        .order_by(Club.id)
+    )
     clubs = {
-        c.etablissement_id: c
-        for c in (
-            await db.scalars(
-                select(Club)
-                .where(Club.etablissement_id.in_((absorbe_id, garde_id)), Club.etat.in_(CLUB_VIVANT))
-                .order_by(Club.id)
-                .with_for_update()
-            )
-        ).all()
+        c.etablissement_id: c for c in (await db.scalars(requete.with_for_update() if verrouiller else requete)).all()
     }
     absorbe, garde = clubs.get(absorbe_id), clubs.get(garde_id)
     if absorbe is not None and garde is not None and _au_dela(absorbe) and _au_dela(garde):
@@ -309,8 +309,26 @@ async def clubs_a_fusionner(db: AsyncSession, absorbe_id: UUID, garde_id: UUID) 
     return absorbe, garde
 
 
-async def _verser(db: AsyncSession, source: Club, cible: Club, par: Utilisateur, adresse_ip: str | None) -> None:
-    """Les affiliations et rattachements en cours de `source` passent, dans leur état, à `cible` ; `source` est clos."""
+RANG_RATTACHEMENT = {
+    EtatRattachement.en_attente_president: 0,
+    EtatRattachement.en_attente_validation: 1,
+    EtatRattachement.actif: 2,
+}
+
+
+def _retirer_pour_fusion(rattachement: Rattachement, par: Utilisateur) -> None:
+    rattachement.etat = EtatRattachement.retire
+    rattachement.retire_le = datetime.now(UTC)
+    rattachement.retire_par = par.id
+    rattachement.motif_retrait = "Fusion des établissements : un seul rattachement est gardé dans le club restant."
+
+
+async def _verser(
+    db: AsyncSession, source: Club, cible: Club, par: Utilisateur, adresse_ip: str | None, perimetre: str | None
+) -> None:
+    """Les affiliations et rattachements en cours de `source` passent, dans leur état, à `cible` ; `source` est clos.
+    Un encadreur déjà en cours dans les deux clubs n'y garde que son rattachement le plus avancé (index
+    `uq_rattachement_en_cours`). Un élève n'a qu'une affiliation en cours, tous clubs confondus : rien à arbitrer."""
     for adhesion in (
         await db.scalars(
             select(Adhesion)
@@ -319,6 +337,16 @@ async def _verser(db: AsyncSession, source: Club, cible: Club, par: Utilisateur,
         )
     ).all():
         adhesion.club_id = cible.id
+    deja = {
+        r.encadreur_id: r
+        for r in (
+            await db.scalars(
+                select(Rattachement)
+                .where(Rattachement.club_id == cible.id, Rattachement.etat.in_(RATTACHEMENT_EN_COURS))
+                .with_for_update()
+            )
+        ).all()
+    }
     for rattachement in (
         await db.scalars(
             select(Rattachement)
@@ -326,7 +354,19 @@ async def _verser(db: AsyncSession, source: Club, cible: Club, par: Utilisateur,
             .with_for_update()
         )
     ).all():
+        present = deja.get(rattachement.encadreur_id)
+        if present is not None and RANG_RATTACHEMENT[present.etat] >= RANG_RATTACHEMENT[rattachement.etat]:
+            _retirer_pour_fusion(rattachement, par)
+            continue
+        if present is not None:
+            _retirer_pour_fusion(present, par)
+            await db.flush()
         rattachement.club_id = cible.id
+    # Un club déclaré sur le terrain le reste : la mention passe au club qui demeure.
+    if source.declare_terrain and not cible.declare_terrain:
+        cible.declare_terrain = True
+        cible.declare_note = cible.declare_note or source.declare_note
+        cible.declare_le, cible.declare_par = source.declare_le, source.declare_par
     source.etat = EtatClub.refuse
     source.motif_refus = "Établissement fusionné avec un autre du référentiel."
     source.regularisation_jusquau = None
@@ -336,6 +376,7 @@ async def _verser(db: AsyncSession, source: Club, cible: Club, par: Utilisateur,
         par,
         cible_type="club",
         cible_id=source.id,
+        perimetre=perimetre,
         details={"vers": str(cible.id)},
         adresse_ip=adresse_ip,
     )
@@ -343,7 +384,12 @@ async def _verser(db: AsyncSession, source: Club, cible: Club, par: Utilisateur,
 
 
 async def fusionner_clubs(
-    db: AsyncSession, absorbe_id: UUID, garde_id: UUID, par: Utilisateur, adresse_ip: str | None
+    db: AsyncSession,
+    absorbe_id: UUID,
+    garde_id: UUID,
+    par: Utilisateur,
+    adresse_ip: str | None,
+    perimetre: str | None = None,
 ) -> dict[str, str]:
     """Le club de l'absorbé suit le gardé (spec 042), dans la transaction de la fusion, après le déplacement des
     profils. Un club au-delà de « en constitution » est rattaché tel quel au gardé (même identifiant : ses membres,
@@ -356,14 +402,14 @@ async def fusionner_clubs(
     if _au_dela(absorbe):
         resultat = {"action": "rattache", "club_id": str(absorbe.id)}
         if garde is not None:
-            await _verser(db, garde, absorbe, par, adresse_ip)
+            await _verser(db, garde, absorbe, par, adresse_ip, perimetre)
             resultat |= {"action": "rattache_et_clos", "clos_id": str(garde.id)}
         absorbe.etablissement_id = garde_id
         await db.flush()
         await activation.recalculer(db, absorbe.id, "etablissement_fusionne", par.id)
         return resultat
     restant = garde or await activation.club_de(db, garde_id)
-    await _verser(db, absorbe, restant, par, adresse_ip)
+    await _verser(db, absorbe, restant, par, adresse_ip, perimetre)
     await activation.recalculer(db, restant.id, "etablissement_fusionne", par.id)
     return {"action": "clos", "club_id": str(restant.id), "clos_id": str(absorbe.id)}
 

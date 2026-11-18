@@ -25,6 +25,7 @@ export function DialogueFormulaire({
   description,
   bouton,
   danger = false,
+  desactive = false,
   onEnvoie,
   children,
 }: {
@@ -34,6 +35,8 @@ export function DialogueFormulaire({
   description?: ReactNode;
   bouton: string;
   danger?: boolean;
+  // Le bouton d'envoi reste grisé tant que le formulaire ne peut pas aboutir (ex. : fusion refusée d'avance).
+  desactive?: boolean;
   onEnvoie: () => Promise<unknown>;
   children?: ReactNode;
 }) {
@@ -87,7 +90,7 @@ export function DialogueFormulaire({
             </Button>
             <Button
               type="submit"
-              disabled={enCours}
+              disabled={enCours || desactive}
               className={`rounded-full font-bold ${danger ? "bg-logo-red hover:bg-logo-red/90" : ""}`}
             >
               {enCours && <Loader2 className="size-4 animate-spin" />}

@@ -11,16 +11,7 @@ import {
   type ApercuFusion,
   type FicheDoublon,
 } from "@/lib/api/client";
-import { prefereGarder } from "@/lib/fusion";
-
-const ETATS_CLUB: Record<string, string> = {
-  en_constitution: "en constitution",
-  actif: "actif",
-  en_regularisation: "en régularisation",
-  suspendu: "suspendu",
-};
-
-const pluriel = (n: number, mot: string) => `${n} ${mot}${n > 1 ? "s" : ""}`;
+import { ETATS_CLUB, ORDRES, pluriel, prefereGarder } from "@/lib/fusion";
 
 function Fiche({ fiche, role }: { fiche: FicheDoublon; role: "Gardé" | "Absorbé" }) {
   return (
@@ -33,6 +24,7 @@ function Fiche({ fiche, role }: { fiche: FicheDoublon; role: "Gardé" | "Absorb�
       <p className="mt-1 text-base font-extrabold">{fiche.nom}</p>
       <p className="text-muted-foreground">
         {fiche.iesg} · {fiche.prefecture ?? "préfecture non renseignée"}
+        {fiche.ordre && ` · ${ORDRES[fiche.ordre]}`}
       </p>
       <p className="text-muted-foreground">
         {fiche.statut === "propose" ? "Proposé" : fiche.statut === "actif" ? "Actif" : "Désactivé"}
@@ -93,6 +85,7 @@ export function FusionEtablissements({
     if (!roles) return;
     let annule = false;
     setApercu(null);
+    setErreur(null);
     adminApercuFusion(roles[0], roles[1])
       .then((vu) => !annule && setApercu(vu))
       .catch((e: unknown) => !annule && setErreur(e instanceof ErreurApi ? e.message : String(e)));
@@ -111,6 +104,7 @@ export function FusionEtablissements({
       description="Les deux fiches deviennent une seule : rien n'est supprimé, et la fusion est inscrite au journal. Elle ne s'annule pas."
       bouton="Fusionner"
       danger
+      desactive={!apercu || apercu.refus !== null}
       onEnvoie={async () => {
         if (!apercu || !roles) throw new ErreurApi(422, "Choisis l'autre établissement.");
         await adminFusionnerEtablissements(roles[0], {
@@ -145,7 +139,10 @@ export function FusionEtablissements({
           </div>
           <button
             type="button"
-            onClick={() => setRoles([roles[1], roles[0]])}
+            onClick={() => {
+              setRoles([roles[1], roles[0]]);
+              setNom("garde");
+            }}
             className="inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ring-1 ring-border transition hover:bg-mist-soft"
           >
             <ArrowLeftRight className="size-3.5" /> Inverser

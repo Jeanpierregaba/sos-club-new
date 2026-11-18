@@ -320,7 +320,7 @@ def test_la_fusion_reprend_le_nom_choisi_et_complete_prefecture_et_ordre(
     (entree,) = journal(en_base, "etablissement_fusionne")
     assert entree.cible_id == str(absorbe)
     assert entree.details["eleves"] == [str(e) for e in eleves]
-    assert entree.details["apres"]["nom"] == ABSORBE
+    assert entree.details["apres"]["garde"]["nom"] == ABSORBE
     assert "Test" not in str(entree.details)
 
 
@@ -412,3 +412,138 @@ def test_une_proposition_se_fusionne_comme_avant_le_remplacement(
 
     assert reponse.status_code == 200, reponse.text
     assert reponse.json()["nb_eleves"] == 1
+
+
+# Suites de la relecture -------------------------------------------------------------------------------------------
+
+
+def test_lapercu_dune_proposition_gardee_rend_le_refus_avec_les_deux_fiches(
+    national: TestClient, paire: tuple[UUID, UUID], en_base: Callable[..., Any]
+) -> None:
+    from app.referentiel.models import Etablissement, StatutEtablissement
+
+    _, absorbe = paire
+    en_base(
+        lambda db: db.execute(
+            update(Etablissement).where(Etablissement.id == absorbe).values(statut=StatutEtablissement.propose)
+        )
+    )
+
+    vu = apercu(national, ABSORBE, GARDE)
+
+    assert "doit être actif" in vu["refus"]
+    assert (vu["garde"]["nom"], vu["absorbe"]["nom"]) == (ABSORBE, GARDE)
+
+
+def test_lapercu_hors_perimetre_est_refuse(
+    client: TestClient, creer_collaborateur: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    connecter(client, creer_collaborateur, "national", CLUBS, None)
+    absorbe = creer(client, ABSORBE)
+    garde = etablissement(client, GARDE)
+    connecter(client, creer_collaborateur, "kara", LECTURE, "kara")
+
+    assert client.get(f"{ETABLISSEMENTS}/{garde['id']}/fusion/{absorbe['id']}").status_code == 403
+
+
+def test_un_absorbe_ne_se_modifie_ni_ne_se_refusionne(
+    national: TestClient, paire: tuple[UUID, UUID], en_base: Callable[..., Any]
+) -> None:
+    assert fusionner(national, GARDE, ABSORBE).status_code == 200
+    page = national.get(ETABLISSEMENTS, params={"recherche": "Tokoin", "statut": "inactif"}).json()
+    (absorbe,) = [e for e in page["etablissements"] if e["fusionne_dans"]]
+    autre = etablissement(national, "Lycée de Tokoin II")
+
+    reactiver = national.patch(
+        f"{ETABLISSEMENTS}/{absorbe['id']}", json={"version": absorbe["version"], "statut": "actif"}
+    )
+    refusionner = national.post(
+        f"{ETABLISSEMENTS}/{autre['id']}/fusionner",
+        json={"absorbe_id": absorbe["id"], "version_garde": autre["version"], "version_absorbe": absorbe["version"]},
+    )
+
+    assert reactiver.status_code == 409
+    assert refusionner.status_code == 409
+
+
+def test_la_fusion_monte_la_version_des_eleves_et_vide_les_listes_publiques(
+    national: TestClient, paire: tuple[UUID, UUID], en_base: Callable[..., Any]
+) -> None:
+    garde, absorbe = paire
+    (eleve,) = ajouter_eleves(en_base, absorbe, 1)
+    avant = en_base(lambda db: db.get(Eleve, eleve)).version
+
+    assert fusionner(national, GARDE, ABSORBE).status_code == 200
+
+    deplace = en_base(lambda db: db.get(Eleve, eleve))
+    assert (deplace.etablissement_id, deplace.version) == (garde, avant + 1)
+    national.cookies.clear()
+    annuaire = national.get("/api/referentiel/annuaire").json()
+    noms_publics = {e["nom"] for d in annuaire for i in d["iesg"] for e in i["etablissements"]}
+    assert GARDE in noms_publics
+    assert str(absorbe) not in {e["id"] for d in annuaire for i in d["iesg"] for e in i["etablissements"]}
+
+
+def test_un_absorbe_nest_plus_propose_comme_doublon(national: TestClient, paire: tuple[UUID, UUID]) -> None:
+    creer(national, "Lycée Tokoin-I")
+    assert len([p for p in paires(national) if TOKOIN & {p["a"]["nom"], p["b"]["nom"]}]) == 3
+
+    assert fusionner(national, GARDE, ABSORBE).status_code == 200
+
+    restantes = [p for p in paires(national) if {GARDE, ABSORBE, "Lycée Tokoin-I"} & {p["a"]["nom"], p["b"]["nom"]}]
+    assert [{p["a"]["nom"], p["b"]["nom"]} for p in restantes] == [{GARDE, "Lycée Tokoin-I"}]
+
+
+def test_le_journal_ne_garde_que_des_identifiants(
+    national: TestClient, paire: tuple[UUID, UUID], en_base: Callable[..., Any]
+) -> None:
+    ajouter_eleves(en_base, paire[1], 1)
+
+    assert fusionner(national, GARDE, ABSORBE).status_code == 200
+
+    (entree,) = journal(en_base, "etablissement_fusionne")
+    assert set(entree.details) == {"garde_id", "avant", "apres", "eleves", "encadreurs", "clubs"}
+    assert set(entree.details["apres"]["absorbe"]) == {
+        "id", "nom", "statut", "iesg_id", "prefecture", "ordre", "fusionne_dans_id",
+    }  # fmt: skip
+    assert entree.details["apres"]["absorbe"]["statut"] == "inactif"
+
+
+def test_un_encadreur_en_cours_dans_les_deux_clubs_garde_son_rattachement_le_plus_avance(
+    national: TestClient, paire: tuple[UUID, UUID], en_base: Callable[..., Any]
+) -> None:
+    from app.clubs.models import EtatRattachement, Rattachement
+
+    garde, absorbe = paire
+    ajouter_eleves(en_base, garde, 1)
+    club_garde = vivant(en_base, garde)
+    encadreur = ajouter_encadreur(en_base, absorbe)
+
+    async def demander(db: Any) -> None:
+        db.add(Rattachement(encadreur_id=encadreur, club_id=club_garde.id, etat=EtatRattachement.en_attente_validation))
+
+    en_base(demander)
+
+    assert fusionner(national, GARDE, ABSORBE).status_code == 200
+
+    rattachements = en_base(
+        lambda db: db.scalars(select(Rattachement).where(Rattachement.encadreur_id == encadreur))
+    ).all()
+    en_cours = [r for r in rattachements if r.etat is not EtatRattachement.retire]
+    assert [(r.club_id, r.etat) for r in en_cours] == [(club_garde.id, EtatRattachement.actif)]
+
+
+def test_la_mention_declare_sur_le_terrain_passe_au_club_restant(
+    national: TestClient, paire: tuple[UUID, UUID], en_base: Callable[..., Any]
+) -> None:
+    garde, absorbe = paire
+    ajouter_eleves(en_base, absorbe, 1)
+    club = vivant(en_base, absorbe)
+    en_base(
+        lambda db: db.execute(update(Club).where(Club.id == club.id).values(declare_terrain=True, declare_note="Vu"))
+    )
+
+    assert fusionner(national, GARDE, ABSORBE).status_code == 200
+
+    restant = vivant(en_base, garde)
+    assert (restant.declare_terrain, restant.declare_note) == (True, "Vu")
