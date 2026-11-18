@@ -82,7 +82,7 @@ comptes et des clubs : c'est une partie critique, écrite en TDD (les tests avan
   - le filtre « Écartées » ;
   - par paire, « Fusionner » et « Pas un doublon » ou « Rétablir » ;
   - un état vide.
-- [ ] 15. Vérification au navigateur, sur la base locale avec l'annuaire complet, à 375 px et sur bureau :
+- [ ] 15. (À faire : demande une connexion admin dans le navigateur) Vérification au navigateur, sur la base locale avec l'annuaire complet, à 375 px et sur bureau :
   - fusionner une vraie paire, par exemple Lycée de Tokoin I ;
   - écarter Fabienne I et III ;
   - fusionner une proposition ;
@@ -90,7 +90,7 @@ comptes et des clubs : c'est une partie critique, écrite en TDD (les tests avan
 
 ## Clôture
 
-- [ ] 16. Lint, typecheck, tests API complets (une seule suite à la fois), tests et build du site.
-- [ ] 17. Relecture par le sous-agent `reviewer`, puis les corrections.
-- [ ] 18. Cocher les critères d'acceptation, passer la spec dans « Terminé » de `TASKS.md`, et noter les suites
+- [x] 16. Lint, typecheck, tests API complets (une seule suite à la fois), tests et build du site.
+- [x] 17. Relecture par le sous-agent `reviewer`, puis les corrections.
+- [x] 18. Cocher les critères d'acceptation, passer la spec dans « Terminé » de `TASKS.md`, et noter les suites
       (alias de recherche, annulation, fusion de deux vrais clubs).

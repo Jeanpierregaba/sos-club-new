@@ -106,42 +106,42 @@ Dans tous les cas, l'activation du club restant est recalculée (spec 033).
 
 ## Critères d'acceptation
 
-- [ ] Étant donné deux établissements actifs de la même DRE, quand un collaborateur ayant « clubs : modifier » les
+- [x] Étant donné deux établissements actifs de la même DRE, quand un collaborateur ayant « clubs : modifier » les
       fusionne, alors les élèves et les encadreurs de l'absorbé sont rattachés au gardé, l'absorbé devient inactif
       avec un renvoi vers le gardé, et une entrée « etablissement_fusionne » est écrite au journal.
-- [ ] Le gardé prend le nom final choisi. Sa préfecture et son ordre sont conservés s'ils sont remplis, sinon
+- [x] Le gardé prend le nom final choisi. Sa préfecture et son ordre sont conservés s'ils sont remplis, sinon
       complétés par ceux de l'absorbé.
-- [ ] La version des élèves et des encadreurs déplacés augmente : un profil ouvert avant la fusion ne réécrit pas
+- [x] La version des élèves et des encadreurs déplacés augmente : un profil ouvert avant la fusion ne réécrit pas
       l'ancien établissement.
-- [ ] Absorbé sans club vivant : aucun club ne change.
-- [ ] Absorbé avec un club en constitution : ses affiliations et rattachements en cours passent au club du gardé,
+- [x] Absorbé sans club vivant : aucun club ne change.
+- [x] Absorbé avec un club en constitution : ses affiliations et rattachements en cours passent au club du gardé,
       créé au besoin, et son club est clos.
-- [ ] Absorbé avec un club actif, gardé sans club vivant : le même club, au même identifiant, avec ses membres et ses
+- [x] Absorbé avec un club actif, gardé sans club vivant : le même club, au même identifiant, avec ses membres et ses
       points, est rattaché au gardé.
-- [ ] Absorbé avec un club actif, gardé avec un club en constitution : le club actif est rattaché au gardé, le club
+- [x] Absorbé avec un club actif, gardé avec un club en constitution : le club actif est rattaché au gardé, le club
       en constitution est clos et ses affiliations en cours rejoignent le club actif.
-- [ ] Deux clubs au-delà de « en constitution » : refus 409, avec un message qui nomme les deux clubs, et rien ne
+- [x] Deux clubs au-delà de « en constitution » : refus 409, avec un message qui nomme les deux clubs, et rien ne
       change.
-- [ ] Après la fusion, l'absorbé n'apparaît plus dans la recherche d'inscription, l'annuaire public ni la carte des
+- [x] Après la fusion, l'absorbé n'apparaît plus dans la recherche d'inscription, l'annuaire public ni la carte des
       clubs ; le gardé y apparaît sous son nom final.
-- [ ] Refus 422 :
+- [x] Refus 422 :
   - un établissement fusionné avec lui-même ;
   - deux établissements de DRE différentes ;
   - un gardé qui n'est pas actif.
-- [ ] Un collaborateur de DRE ne fusionne que deux établissements de sa DRE (403 sinon). Sans « clubs : modifier »,
+- [x] Un collaborateur de DRE ne fusionne que deux établissements de sa DRE (403 sinon). Sans « clubs : modifier »,
       le refus est 403.
-- [ ] Un collaborateur qui fusionne avec des versions dépassées (l'un des deux a changé entre-temps) reçoit un refus
+- [x] Un collaborateur qui fusionne avec des versions dépassées (l'un des deux a changé entre-temps) reçoit un refus
       409, et rien ne change.
-- [ ] Doublons probables :
+- [x] Doublons probables :
   - les paires « Lycée de Tokoin I » et « Lycée Tokoin I », « CEG Bogou 2 » et « CEG Bogou II », « CEG Warkanbou »
     et « CEG Warkambou » sont proposées ;
   - « CPL La Fabienne I » et « CPL La Fabienne III » ne le sont pas ;
   - deux établissements de DRE différentes ne sont jamais proposés.
-- [ ] Une paire marquée « Pas un doublon » n'est plus proposée et l'écart est journalisé. Son annulation la fait
+- [x] Une paire marquée « Pas un doublon » n'est plus proposée et l'écart est journalisé. Son annulation la fait
       revenir.
-- [ ] Un établissement absorbé ou inactif n'apparaît plus dans les doublons probables.
-- [ ] La liste des doublons d'un collaborateur de DRE ne contient que sa DRE.
-- [ ] Un établissement proposé se fusionne dans un établissement actif, avec le même résultat que l'ancien
+- [x] Un établissement absorbé ou inactif n'apparaît plus dans les doublons probables.
+- [x] La liste des doublons d'un collaborateur de DRE ne contient que sa DRE.
+- [x] Un établissement proposé se fusionne dans un établissement actif, avec le même résultat que l'ancien
       « Remplacer par… ». La route `/remplacer` n'existe plus.
 - [ ] Le site : l'écran de fusion annonce ce qui va changer avant la confirmation, et la page des doublons permet
       de fusionner et d'écarter. Il est utilisable à 375 px de large.
