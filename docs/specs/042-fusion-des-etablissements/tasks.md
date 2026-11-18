@@ -36,7 +36,7 @@ comptes et des clubs : c'est une partie critique, écrite en TDD (les tests avan
 
 ## Fusion
 
-- [ ] 6. Tests des clubs (`fusionner_clubs`), une ligne du tableau de la spec par test :
+- [x] 6. Tests des clubs (`fusionner_clubs`), une ligne du tableau de la spec par test :
   - aucun club ;
   - absorbé en constitution, gardé sans club ;
   - les deux en constitution ;
@@ -44,9 +44,9 @@ comptes et des clubs : c'est une partie critique, écrite en TDD (les tests avan
   - absorbé actif, gardé sans club : le club garde son identifiant et la somme de ses points ;
   - absorbé actif, gardé en constitution ;
   - deux clubs au-delà de « en constitution » : refus 409 et rien ne change.
-- [ ] 7. Code de `fusionner_clubs` dans `clubs/affiliations.py`, qui remplace `remplacer_etablissement`. La tâche est
+- [x] 7. Code de `fusionner_clubs` dans `clubs/affiliations.py`, qui remplace `remplacer_etablissement`. La tâche est
       faite quand les tests de la tâche 6 passent, ainsi que les tests existants de la spec 033.
-- [ ] 8. Tests de `fusionner` et de `apercu` :
+- [x] 8. Tests de `fusionner` et de `apercu` :
   - les élèves et les encadreurs sont déplacés, avec leur version qui monte ;
   - le nom final, puis la préfecture et l'ordre complétés seulement s'ils étaient vides ;
   - l'absorbé devient inactif avec son renvoi, et le journal `etablissement_fusionne` est complet (identifiants, pas
@@ -56,9 +56,9 @@ comptes et des clubs : c'est une partie critique, écrite en TDD (les tests avan
   - refus 409 : version dépassée, nom déjà pris dans l'IESG ;
   - l'absorbé est absent de la recherche d'inscription et de l'annuaire public ;
   - l'aperçu annonce le même effet, et le même refus, sans rien écrire.
-- [ ] 9. Code de `referentiel/fusion.py`, des schémas (`Fusion`, `ApercuFusion`, `ClubResume`,
+- [x] 9. Code de `referentiel/fusion.py`, des schémas (`Fusion`, `ApercuFusion`, `ClubResume`,
       `EtablissementAdmin.fusionne_dans`) et des routes `GET …/fusion/{absorbe_id}` et `POST …/fusionner`.
-- [ ] 10. Retrait du « Remplacer par… » :
+- [x] 10. Retrait du « Remplacer par… » :
   - `remplacer_proposition`, `Remplacement` et la route `/remplacer` disparaissent ;
   - les tests de `test_eleves_admin.py` et `test_encadreurs_admin.py` passent par `/fusionner`, avec le même
     résultat ;

@@ -119,7 +119,7 @@ def test_la_liste_des_etablissements_compte_les_encadreurs(
     assert (lycee["nb_eleves"], lycee["nb_encadreurs"]) == (0, 1)
 
 
-def test_remplacer_une_proposition_deplace_aussi_ses_encadreurs(
+def test_fusionner_une_proposition_deplace_aussi_ses_encadreurs(
     gestionnaire: TestClient, en_base: Callable[..., Any]
 ) -> None:
     iesg = id_de(en_base, Iesg, "IESG Golfe")
@@ -132,18 +132,22 @@ def test_remplacer_une_proposition_deplace_aussi_ses_encadreurs(
     )
     page = gestionnaire.get(ETABLISSEMENTS, params={"recherche": "Lycee Tokoin 1", "statut": "propose"}).json()
     proposition = page["etablissements"][0]
-    cible = id_de(en_base, Etablissement, "Lycée de Tokoin I")
+    page = gestionnaire.get(ETABLISSEMENTS, params={"recherche": "Lycée de Tokoin I"}).json()
+    garde = next(e for e in page["etablissements"] if e["nom"] == "Lycée de Tokoin I")
+    cible = garde["id"]
 
     reponse = gestionnaire.post(
-        f"{ETABLISSEMENTS}/{proposition['id']}/remplacer", json={"version": proposition["version"], "cible_id": cible}
-    )
+        f"{ETABLISSEMENTS}/{cible}/fusionner",
+        json={"absorbe_id": proposition["id"], "version_garde": garde["version"],
+              "version_absorbe": proposition["version"]},
+    )  # fmt: skip
 
     assert reponse.status_code == 200, reponse.text
     assert reponse.json()["nb_encadreurs"] == 1
-    # La version monte : un profil ouvert avant le remplacement ne l'écrase pas.
+    # La version monte : un profil ouvert avant la fusion ne l'écrase pas.
     assert en_base(lambda db: db.scalar(select(Encadreur.version))) == 2
     assert str(en_base(lambda db: db.scalar(select(Encadreur.etablissement_id)))) == cible
     (entree,) = en_base(
-        lambda db: db.scalars(select(JournalAudit).where(JournalAudit.action == "etablissement_remplace"))
+        lambda db: db.scalars(select(JournalAudit).where(JournalAudit.action == "etablissement_fusionne"))
     ).all()
-    assert entree.details["nb_encadreurs"] == 1
+    assert len(entree.details["encadreurs"]) == 1

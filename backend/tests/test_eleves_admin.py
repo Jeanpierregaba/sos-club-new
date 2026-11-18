@@ -205,63 +205,67 @@ def test_accepter_une_proposition(gestionnaire_clubs: TestClient, en_base: Calla
     assert [e["nom"] for e in trouves] == ["CEG des Étoiles"]
 
 
-def test_remplacer_une_proposition_deplace_ses_eleves(
+def fusionner_dans(client: TestClient, garde: dict[str, Any], absorbe: dict[str, Any]) -> Any:
+    """Spec 042 : une proposition se fusionne dans un établissement de la liste (l'ancien « Remplacer par… »)."""
+    return client.post(
+        f"{ETABLISSEMENTS}/{garde['id']}/fusionner",
+        json={"absorbe_id": absorbe["id"], "version_garde": garde["version"], "version_absorbe": absorbe["version"]},
+    )
+
+
+def fiche_de(client: TestClient, nom: str) -> dict[str, Any]:
+    page = client.get(ETABLISSEMENTS, params={"recherche": nom}).json()
+    return next(e for e in page["etablissements"] if e["nom"] == nom)
+
+
+def test_fusionner_une_proposition_deplace_ses_eleves(
     gestionnaire_clubs: TestClient, en_base: Callable[..., Any]
 ) -> None:
     proposer(gestionnaire_clubs, en_base, 1, "Lycee Tokoin 1")
     proposition = la_proposition(gestionnaire_clubs, "Lycee Tokoin 1")
-    cible = id_de(en_base, Etablissement, "Lycée de Tokoin I")
+    cible = fiche_de(gestionnaire_clubs, "Lycée de Tokoin I")
 
-    reponse = gestionnaire_clubs.post(
-        f"{ETABLISSEMENTS}/{proposition['id']}/remplacer", json={"version": proposition["version"], "cible_id": cible}
-    )
+    reponse = fusionner_dans(gestionnaire_clubs, cible, proposition)
 
     assert reponse.status_code == 200, reponse.text
-    assert (reponse.json()["id"], reponse.json()["nb_eleves"]) == (cible, 1)
+    assert (reponse.json()["id"], reponse.json()["nb_eleves"]) == (cible["id"], 1)
     statut = en_base(lambda db: db.scalar(select(Etablissement.statut).where(Etablissement.id == proposition["id"])))
     assert statut.value == "inactif"
-    (entree,) = journal(en_base, "etablissement_remplace")
-    assert entree.details["avant"]["nom"] == "Lycee Tokoin 1"
-    assert entree.details["apres"]["etablissement_id"] == cible
-    assert entree.details["nb_eleves"] == 1
+    (entree,) = journal(en_base, "etablissement_fusionne")
+    assert entree.details["avant"]["absorbe"]["nom"] == "Lycee Tokoin 1"
+    assert entree.details["garde_id"] == cible["id"]
+    assert len(entree.details["eleves"]) == 1
 
 
-def test_on_ne_remplace_quune_proposition_par_un_etablissement_actif(
-    gestionnaire_clubs: TestClient, en_base: Callable[..., Any]
-) -> None:
+def test_on_ne_fusionne_pas_dans_une_proposition(gestionnaire_clubs: TestClient, en_base: Callable[..., Any]) -> None:
     proposer(gestionnaire_clubs, en_base, 1, "CEG des Étoiles")
     proposer(gestionnaire_clubs, en_base, 2, "CEG Lune")
     proposition = la_proposition(gestionnaire_clubs, "CEG des Étoiles")
     autre_proposition = la_proposition(gestionnaire_clubs, "CEG Lune")
-    actif = id_de(en_base, Etablissement, "Lycée de Tokoin I")
-    page = gestionnaire_clubs.get(ETABLISSEMENTS, params={"recherche": "Lycée de Tokoin I"}).json()
-    lycee = page["etablissements"][0]
 
-    vers_proposition = gestionnaire_clubs.post(
-        f"{ETABLISSEMENTS}/{proposition['id']}/remplacer",
-        json={"version": proposition["version"], "cible_id": autre_proposition["id"]},
-    )
-    depuis_actif = gestionnaire_clubs.post(
-        f"{ETABLISSEMENTS}/{lycee['id']}/remplacer", json={"version": lycee["version"], "cible_id": actif}
-    )
-
-    assert (vers_proposition.status_code, depuis_actif.status_code) == (400, 409)
+    assert fusionner_dans(gestionnaire_clubs, autre_proposition, proposition).status_code == 422
 
 
-def test_remplacer_hors_de_son_perimetre_est_refuse(
+def test_fusionner_hors_de_son_perimetre_est_refuse(
     client: TestClient, creer_collaborateur: Callable[..., Any], en_base: Callable[..., Any]
 ) -> None:
     proposer(client, en_base, 1, "CEG des Étoiles")
     creer_collaborateur("kara", droits=CLUBS, perimetre_dre="kara", double_auth=True)
     connecter_admin(client, "kara")
-    proposition_id = id_de(en_base, Etablissement, "CEG des Étoiles")
+    proposition = {"id": id_de(en_base, Etablissement, "CEG des Étoiles"), "version": 1}
+    cible = {"id": id_de(en_base, Etablissement, "Lycée de Tokoin I"), "version": 1}
 
-    reponse = client.post(
-        f"{ETABLISSEMENTS}/{proposition_id}/remplacer",
-        json={"version": 1, "cible_id": id_de(en_base, Etablissement, "Lycée de Tokoin I")},
-    )
+    assert fusionner_dans(client, cible, proposition).status_code == 403
 
-    assert reponse.status_code == 403
+
+def test_lancienne_route_de_remplacement_nexiste_plus(
+    gestionnaire_clubs: TestClient, en_base: Callable[..., Any]
+) -> None:
+    cible = id_de(en_base, Etablissement, "Lycée de Tokoin I")
+
+    reponse = gestionnaire_clubs.post(f"{ETABLISSEMENTS}/{cible}/remplacer", json={"version": 1, "cible_id": cible})
+
+    assert reponse.status_code in (404, 405)
 
 
 def test_un_pseudonyme_impose_ne_reprend_pas_le_nom_complet(

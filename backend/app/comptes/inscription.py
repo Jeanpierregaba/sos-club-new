@@ -102,12 +102,19 @@ async def proposer(db: AsyncSession, iesg_id: UUID, nom: str) -> Etablissement:
             type=TypeEtablissement.autre,
             statut=StatutEtablissement.propose,
         )
-        .on_conflict_do_nothing(index_elements=["iesg_id", "nom_normalise"])
+        # Spec 042 : un établissement fusionné ne réserve plus son nom.
+        .on_conflict_do_nothing(
+            index_elements=["iesg_id", "nom_normalise"], index_where=Etablissement.fusionne_dans_id.is_(None)
+        )
     )
     # Verrouillée : l'admin ne peut pas la remplacer pendant qu'un inscrit s'y rattache.
     existant = await db.scalar(
         select(Etablissement)
-        .where(Etablissement.iesg_id == iesg_id, Etablissement.nom_normalise == normaliser(nom))
+        .where(
+            Etablissement.iesg_id == iesg_id,
+            Etablissement.nom_normalise == normaliser(nom),
+            Etablissement.fusionne_dans_id.is_(None),
+        )
         .with_for_update()
     )
     assert existant is not None

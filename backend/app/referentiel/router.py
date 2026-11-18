@@ -15,6 +15,7 @@ from app.referentiel import administration, fusion, service
 from app.referentiel.models import OrdreEnseignement, StatutEtablissement, TypeEtablissement
 from app.referentiel.normalisation import normaliser
 from app.referentiel.schemas import (
+    ApercuFusion,
     AxeAdmin,
     AxeCreation,
     AxeModification,
@@ -29,12 +30,12 @@ from app.referentiel.schemas import (
     EtablissementCreation,
     EtablissementModification,
     EtablissementTrouve,
+    Fusion,
     IesgAdmin,
     IesgCreation,
     IesgModification,
     PageDoublons,
     PageEtablissements,
-    Remplacement,
     TypeActiviteAdmin,
     TypeActiviteCreation,
     TypeActiviteModification,
@@ -200,12 +201,20 @@ async def admin_modifier_etablissement(
         return await administration.modifier_etablissement(db, acces, etablissement_id, entree, adresse_ip(request))
 
 
-@router_admin.post("/etablissements/{etablissement_id}/remplacer")
-async def admin_remplacer_proposition(
-    etablissement_id: UUID, entree: Remplacement, request: Request, acces: Modificateur, db: Base
+@router_admin.get("/etablissements/{garde_id}/fusion/{absorbe_id}")
+async def admin_apercu_fusion(
+    garde_id: UUID, absorbe_id: UUID, request: Request, acces: Lecteur, db: Base
+) -> ApercuFusion:
+    async with _traduire_refus(db, request, acces, "clubs:consulter"):
+        return await fusion.apercu(db, acces, garde_id, absorbe_id)
+
+
+@router_admin.post("/etablissements/{garde_id}/fusionner")
+async def admin_fusionner_etablissements(
+    garde_id: UUID, entree: Fusion, request: Request, acces: Modificateur, db: Base
 ) -> EtablissementAdmin:
     async with _traduire_refus(db, request, acces, "clubs:modifier"):
-        return await administration.remplacer_proposition(db, acces, etablissement_id, entree, adresse_ip(request))
+        return await fusion.fusionner(db, acces, garde_id, entree, adresse_ip(request))
 
 
 @router_admin.get("/axes")

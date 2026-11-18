@@ -2586,6 +2586,134 @@
         }
       }
     },
+    "/api/admin/referentiel/etablissements/doublons": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Lister Doublons",
+        "operationId": "admin_lister_doublons_api_admin_referentiel_etablissements_doublons_get",
+        "parameters": [
+          {
+            "name": "dre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 30
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dre"
+            }
+          },
+          {
+            "name": "ecartees",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Ecartees"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageDoublons"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/referentiel/etablissements/doublons/ecarter": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Ecarter Doublon",
+        "operationId": "admin_ecarter_doublon_api_admin_referentiel_etablissements_doublons_ecarter_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ecart"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/referentiel/etablissements/doublons/retablir": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Retablir Doublon",
+        "operationId": "admin_retablir_doublon_api_admin_referentiel_etablissements_doublons_retablir_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ecart"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/referentiel/etablissements/{etablissement_id}": {
       "patch": {
         "tags": [
@@ -2639,22 +2767,75 @@
         }
       }
     },
-    "/api/admin/referentiel/etablissements/{etablissement_id}/remplacer": {
-      "post": {
+    "/api/admin/referentiel/etablissements/{garde_id}/fusion/{absorbe_id}": {
+      "get": {
         "tags": [
           "admin"
         ],
-        "summary": "Admin Remplacer Proposition",
-        "operationId": "admin_remplacer_proposition_api_admin_referentiel_etablissements__etablissement_id__remplacer_post",
+        "summary": "Admin Apercu Fusion",
+        "operationId": "admin_apercu_fusion_api_admin_referentiel_etablissements__garde_id__fusion__absorbe_id__get",
         "parameters": [
           {
-            "name": "etablissement_id",
+            "name": "garde_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
               "format": "uuid",
-              "title": "Etablissement Id"
+              "title": "Garde Id"
+            }
+          },
+          {
+            "name": "absorbe_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Absorbe Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApercuFusion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/referentiel/etablissements/{garde_id}/fusionner": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Admin Fusionner Etablissements",
+        "operationId": "admin_fusionner_etablissements_api_admin_referentiel_etablissements__garde_id__fusionner_post",
+        "parameters": [
+          {
+            "name": "garde_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Garde Id"
             }
           }
         ],
@@ -2663,7 +2844,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Remplacement"
+                "$ref": "#/components/schemas/Fusion"
               }
             }
           }
@@ -13825,6 +14006,39 @@
         ],
         "title": "Apercu"
       },
+      "ApercuFusion": {
+        "properties": {
+          "garde": {
+            "$ref": "#/components/schemas/FicheDoublon"
+          },
+          "absorbe": {
+            "$ref": "#/components/schemas/FicheDoublon"
+          },
+          "effet": {
+            "type": "string",
+            "title": "Effet"
+          },
+          "refus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "garde",
+          "absorbe",
+          "effet",
+          "refus"
+        ],
+        "title": "ApercuFusion"
+      },
       "ApercuModeration": {
         "properties": {
           "id": {
@@ -16920,97 +17134,6 @@
         ],
         "title": "ClubRapport"
       },
-      "ClubResume": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "nom": {
-            "type": "string",
-            "title": "Nom"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
-          "etablissement": {
-            "$ref": "#/components/schemas/EtablissementRattache"
-          },
-          "axes": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Axes"
-          },
-          "statut": {
-            "type": "string",
-            "enum": [
-              "en_constitution",
-              "actif",
-              "en_regularisation",
-              "suspendu"
-            ],
-            "title": "Statut"
-          },
-          "actif_le": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Actif Le"
-          },
-          "regularisation_jusquau": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Regularisation Jusquau"
-          },
-          "president": {
-            "type": "boolean",
-            "title": "President"
-          },
-          "version": {
-            "type": "integer",
-            "title": "Version"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "nom",
-          "description",
-          "etablissement",
-          "axes",
-          "statut",
-          "actif_le",
-          "regularisation_jusquau",
-          "president",
-          "version"
-        ],
-        "title": "ClubResume",
-        "description": "Le club de l'établissement de l'élève, vu par lui (spec 033)."
-      },
       "ClubSuivi": {
         "properties": {
           "id": {
@@ -18622,6 +18745,27 @@
         ],
         "title": "DroitsEntree"
       },
+      "Ecart": {
+        "properties": {
+          "a_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "A Id"
+          },
+          "b_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "B Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "a_id",
+          "b_id"
+        ],
+        "title": "Ecart"
+      },
       "EcartActuel": {
         "properties": {
           "top3_different": {
@@ -19097,7 +19241,7 @@
           "club": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/ClubResume"
+                "$ref": "#/components/schemas/app__clubs__schemas__ClubResume"
               },
               {
                 "type": "null"
@@ -19414,6 +19558,16 @@
             "type": "integer",
             "title": "Nb Encadreurs",
             "default": 0
+          },
+          "fusionne_dans": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EtablissementLie"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -19491,6 +19645,25 @@
           "type"
         ],
         "title": "EtablissementCreation"
+      },
+      "EtablissementLie": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom"
+        ],
+        "title": "EtablissementLie"
       },
       "EtablissementModification": {
         "properties": {
@@ -20778,6 +20951,139 @@
         "title": "FicheActuelle",
         "description": "La fiche publique du club au moment de la lecture : l'« avant » d'une proposition de fiche."
       },
+      "FicheDoublon": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeEtablissement"
+          },
+          "localite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Localite"
+          },
+          "statut": {
+            "$ref": "#/components/schemas/StatutEtablissement"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "iesg_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Iesg Id"
+          },
+          "iesg": {
+            "type": "string",
+            "title": "Iesg"
+          },
+          "dre_code": {
+            "type": "string",
+            "title": "Dre Code"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "modifie_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Modifie Le"
+          },
+          "prefecture": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefecture"
+          },
+          "ordre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OrdreEnseignement"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "import_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Import Source"
+          },
+          "nb_eleves": {
+            "type": "integer",
+            "title": "Nb Eleves"
+          },
+          "nb_encadreurs": {
+            "type": "integer",
+            "title": "Nb Encadreurs",
+            "default": 0
+          },
+          "fusionne_dans": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EtablissementLie"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/app__referentiel__schemas__ClubResume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "type",
+          "localite",
+          "statut",
+          "version",
+          "iesg_id",
+          "iesg",
+          "dre_code",
+          "dre",
+          "modifie_le",
+          "nb_eleves"
+        ],
+        "title": "FicheDoublon"
+      },
       "FicheEntree": {
         "properties": {
           "numero_adhesion": {
@@ -21586,6 +21892,43 @@
           "xlsx"
         ],
         "title": "FormatExport"
+      },
+      "Fusion": {
+        "properties": {
+          "absorbe_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Absorbe Id"
+          },
+          "version_garde": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version Garde"
+          },
+          "version_absorbe": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version Absorbe"
+          },
+          "nom": {
+            "type": "string",
+            "enum": [
+              "garde",
+              "absorbe"
+            ],
+            "title": "Nom",
+            "default": "garde"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "absorbe_id",
+          "version_garde",
+          "version_absorbe"
+        ],
+        "title": "Fusion",
+        "description": "Fusionne `absorbe_id` dans l'établissement de la route (le gardé). `nom` : le nom final, celui du gardé ou\ncelui de l'absorbé ; les versions protègent d'une modification faite entre l'aperçu et la confirmation."
       },
       "HTTPValidationError": {
         "properties": {
@@ -24028,7 +24371,7 @@
           "club": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/ClubResume"
+                "$ref": "#/components/schemas/app__clubs__schemas__ClubResume"
               },
               {
                 "type": "null"
@@ -24529,6 +24872,30 @@
         ],
         "title": "PageArchive"
       },
+      "PageDoublons": {
+        "properties": {
+          "paires": {
+            "items": {
+              "$ref": "#/components/schemas/PaireProbable"
+            },
+            "type": "array",
+            "title": "Paires"
+          },
+          "par_dre": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Par Dre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "paires",
+          "par_dre"
+        ],
+        "title": "PageDoublons"
+      },
       "PageEtablissements": {
         "properties": {
           "total": {
@@ -24684,6 +25051,38 @@
           "clubs"
         ],
         "title": "PageSuivi"
+      },
+      "PaireProbable": {
+        "properties": {
+          "a": {
+            "$ref": "#/components/schemas/FicheDoublon"
+          },
+          "b": {
+            "$ref": "#/components/schemas/FicheDoublon"
+          },
+          "raison": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Raison"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ecartee": {
+            "type": "boolean",
+            "title": "Ecartee"
+          }
+        },
+        "type": "object",
+        "required": [
+          "a",
+          "b",
+          "raison",
+          "ecartee"
+        ],
+        "title": "PaireProbable"
       },
       "PalmaresPublic": {
         "properties": {
@@ -26915,6 +27314,15 @@
         ],
         "title": "QuizOuvert"
       },
+      "Raison": {
+        "type": "string",
+        "enum": [
+          "meme_nom",
+          "meme_prononciation",
+          "nom_proche"
+        ],
+        "title": "Raison"
+      },
       "RangPersonnel": {
         "properties": {
           "points": {
@@ -27579,28 +27987,6 @@
           "version"
         ],
         "title": "RejetSignalementEntree"
-      },
-      "Remplacement": {
-        "properties": {
-          "version": {
-            "type": "integer",
-            "minimum": 1.0,
-            "title": "Version"
-          },
-          "cible_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Cible Id"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "version",
-          "cible_id"
-        ],
-        "title": "Remplacement",
-        "description": "Remplace un établissement proposé par un établissement existant : ses élèves y sont rattachés (spec 017)."
       },
       "RenvoiEntree": {
         "properties": {
@@ -29784,6 +30170,97 @@
         "type": "object",
         "title": "ActivationEntree"
       },
+      "app__clubs__schemas__ClubResume": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "etablissement": {
+            "$ref": "#/components/schemas/EtablissementRattache"
+          },
+          "axes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Axes"
+          },
+          "statut": {
+            "type": "string",
+            "enum": [
+              "en_constitution",
+              "actif",
+              "en_regularisation",
+              "suspendu"
+            ],
+            "title": "Statut"
+          },
+          "actif_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actif Le"
+          },
+          "regularisation_jusquau": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regularisation Jusquau"
+          },
+          "president": {
+            "type": "boolean",
+            "title": "President"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "description",
+          "etablissement",
+          "axes",
+          "statut",
+          "actif_le",
+          "regularisation_jusquau",
+          "president",
+          "version"
+        ],
+        "title": "ClubResume",
+        "description": "Le club de l'établissement de l'élève, vu par lui (spec 033)."
+      },
       "app__encadreurs__schemas__ActivationEntree": {
         "properties": {
           "version": {
@@ -29816,6 +30293,36 @@
           "version"
         ],
         "title": "VersionEntree"
+      },
+      "app__referentiel__schemas__ClubResume": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "etat": {
+            "type": "string",
+            "title": "Etat"
+          },
+          "membres_actifs": {
+            "type": "integer",
+            "title": "Membres Actifs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "etat",
+          "membres_actifs"
+        ],
+        "title": "ClubResume",
+        "description": "Le club vivant d'un établissement, tel que la fusion le traitera."
       }
     }
   }

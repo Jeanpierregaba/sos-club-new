@@ -11,7 +11,7 @@ from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel
-from sqlalchemy import func, or_, select, update
+from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.exc import StaleDataError
@@ -43,12 +43,12 @@ from app.referentiel.schemas import (
     DreModification,
     EtablissementAdmin,
     EtablissementCreation,
+    EtablissementLie,
     EtablissementModification,
     IesgAdmin,
     IesgCreation,
     IesgModification,
     PageEtablissements,
-    Remplacement,
     TypeActiviteAdmin,
     TypeActiviteCreation,
     TypeActiviteModification,
@@ -372,8 +372,21 @@ async def _inscrits_par_etablissement(db: AsyncSession, ids: Sequence[UUID]) -> 
     return {i: (eleves.get(i, 0), encadreurs.get(i, 0)) for i in ids}
 
 
+async def _absorbants(db: AsyncSession, etablissements: Sequence[Etablissement]) -> dict[UUID, EtablissementLie]:
+    """Spec 042 : l'établissement qui a absorbé chacun des établissements fusionnés de la liste."""
+    ids = {e.fusionne_dans_id for e in etablissements if e.fusionne_dans_id is not None}
+    if not ids:
+        return {}
+    lignes = (await db.execute(select(Etablissement.id, Etablissement.nom).where(Etablissement.id.in_(ids)))).all()
+    return {i: EtablissementLie(id=i, nom=n) for i, n in lignes}
+
+
 def _etablissement_admin(
-    etablissement: Etablissement, iesg: Iesg, dre: Dre, inscrits: tuple[int, int] = (0, 0)
+    etablissement: Etablissement,
+    iesg: Iesg,
+    dre: Dre,
+    inscrits: tuple[int, int] = (0, 0),
+    absorbants: dict[UUID, EtablissementLie] | None = None,
 ) -> EtablissementAdmin:
     return EtablissementAdmin(
         id=etablissement.id,
@@ -392,6 +405,9 @@ def _etablissement_admin(
         import_source=etablissement.import_source,
         nb_eleves=inscrits[0],
         nb_encadreurs=inscrits[1],
+        fusionne_dans=None
+        if etablissement.fusionne_dans_id is None
+        else (absorbants or {}).get(etablissement.fusionne_dans_id),
     )
 
 
@@ -445,11 +461,12 @@ async def lister_etablissements(
         )
     ).all()
     inscrits = await _inscrits_par_etablissement(db, [ligne[0].id for ligne in lignes])
+    absorbants = await _absorbants(db, [ligne[0] for ligne in lignes])
     return PageEtablissements(
         total=total,
         page=page,
         par_page=par_page,
-        etablissements=[_etablissement_admin(*ligne, inscrits[ligne[0].id]) for ligne in lignes],
+        etablissements=[_etablissement_admin(*ligne, inscrits[ligne[0].id], absorbants) for ligne in lignes],
     )
 
 
@@ -474,7 +491,7 @@ async def _detail_etablissement(db: AsyncSession, etablissement_id: UUID) -> Eta
         )
     ).one()
     inscrits = await _inscrits_par_etablissement(db, [etablissement_id])
-    return _etablissement_admin(*ligne, inscrits[etablissement_id])
+    return _etablissement_admin(*ligne, inscrits[etablissement_id], await _absorbants(db, [ligne[0]]))
 
 
 async def creer_etablissement(
@@ -526,51 +543,6 @@ async def modifier_etablissement(
         _journaliser(db, acces, "etablissement", etablissement.id, iesg.dre_code, avant, apres, ip=ip)
     await db.commit()
     return await _detail_etablissement(db, etablissement.id)
-
-
-async def remplacer_proposition(
-    db: AsyncSession, acces: Acces, etablissement_id: UUID, entree: Remplacement, ip: str
-) -> EtablissementAdmin:
-    """Un établissement proposé à l'inscription existait déjà sous un autre nom : ses élèves et ses encadreurs
-    rejoignent le bon, et la proposition est désactivée. Le journal garde l'un et l'autre."""
-    proposition = await _obtenir(db, Etablissement, etablissement_id)
-    iesg = await _obtenir(db, Iesg, proposition.iesg_id)
-    _dans_perimetre(acces, iesg.dre_code)
-    _verifier_version(proposition, entree.version)
-    if proposition.statut != StatutEtablissement.propose:
-        raise Refus("Seul un établissement proposé peut être remplacé.", 409)
-    cible = await db.get(Etablissement, entree.cible_id, with_for_update=True)
-    if cible is None or cible.id == proposition.id or cible.statut != StatutEtablissement.actif:
-        raise Refus("Choisis un établissement actif de la liste.")
-    iesg_cible = await _obtenir(db, Iesg, cible.iesg_id)
-    _dans_perimetre(acces, iesg_cible.dre_code)
-    deplaces = await db.execute(
-        # La version monte : un profil ouvert avant le remplacement ne l'écrase pas ensuite.
-        update(Eleve)
-        .where(Eleve.etablissement_id == proposition.id)
-        .values(etablissement_id=cible.id, version=Eleve.version + 1)
-    )
-    encadreurs_deplaces = await db.execute(
-        update(Encadreur)
-        .where(Encadreur.etablissement_id == proposition.id)
-        .values(etablissement_id=cible.id, version=Encadreur.version + 1)
-    )
-    proposition.statut = StatutEtablissement.inactif
-    await _ecrire(db)
-    # Spec 033 : le club de la proposition et ses membres rejoignent le club du bon établissement.
-    from app.clubs.affiliations import remplacer_etablissement
-
-    await remplacer_etablissement(db, proposition.id, cible.id, acces.utilisateur, ip)
-    journaliser(
-        db, "etablissement_remplace", acces.utilisateur, cible_type="etablissement", cible_id=proposition.id,
-        perimetre=iesg.dre_code,
-        details={"avant": {"etablissement_id": str(proposition.id), "nom": proposition.nom},
-                 "apres": {"etablissement_id": str(cible.id), "nom": cible.nom}, "nb_eleves": deplaces.rowcount,
-                 "nb_encadreurs": encadreurs_deplaces.rowcount},
-        adresse_ip=ip,
-    )  # fmt: skip
-    await db.commit()
-    return await _detail_etablissement(db, cible.id)
 
 
 # Axes -----------------------------------------------------------------------------------------------------------

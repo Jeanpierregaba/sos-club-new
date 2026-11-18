@@ -252,15 +252,6 @@ class AxeModification(_Entree):
     actif: bool | None = None
 
 
-class Remplacement(BaseModel):
-    """Remplace un établissement proposé par un établissement existant : ses élèves y sont rattachés (spec 017)."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    version: Version
-    cible_id: UUID
-
-
 # Fusion des doublons (spec 042) --------------------------------------------------------------------------------
 
 
@@ -289,6 +280,26 @@ class PageDoublons(BaseModel):
     paires: list[PaireProbable]
     # Paires restantes (non écartées) par DRE, sur tout le périmètre du collaborateur.
     par_dre: dict[str, int]
+
+
+class Fusion(BaseModel):
+    """Fusionne `absorbe_id` dans l'établissement de la route (le gardé). `nom` : le nom final, celui du gardé ou
+    celui de l'absorbé ; les versions protègent d'une modification faite entre l'aperçu et la confirmation."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    absorbe_id: UUID
+    version_garde: Version
+    version_absorbe: Version
+    nom: Literal["garde", "absorbe"] = "garde"
+
+
+class ApercuFusion(BaseModel):
+    garde: FicheDoublon
+    absorbe: FicheDoublon
+    # Ce qui va se passer, en une phrase lisible ; `refus` : pourquoi la fusion est impossible, s'il y a lieu.
+    effet: str
+    refus: str | None
 
 
 class Ecart(BaseModel):

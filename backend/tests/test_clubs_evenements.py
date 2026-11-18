@@ -13,7 +13,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.clubs import activation
-from app.clubs.affiliations import confirmer_affiliation, remplacer_etablissement
+from app.clubs.affiliations import confirmer_affiliation, fusionner_clubs
 from app.clubs.models import Adhesion, Club, ClubStatut, EtatAdhesion, EtatClub
 from app.comptes.models import Utilisateur
 from app.eleves.models import Eleve
@@ -248,7 +248,7 @@ def test_remplacer_un_etablissement_propose_deplace_son_club(
 
     async def remplacer(db: AsyncSession) -> None:
         await db.execute(update(Eleve).where(Eleve.etablissement_id == propose).values(etablissement_id=etab))
-        await remplacer_etablissement(db, propose, etab, await db.get(Utilisateur, auteur.id), None)
+        await fusionner_clubs(db, propose, etab, await db.get(Utilisateur, auteur.id), None)
 
     en_base(remplacer)
 

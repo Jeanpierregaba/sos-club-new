@@ -1,7 +1,8 @@
 """Fusion des établissements (spec 042) : le renvoi d'un établissement absorbé vers celui qui le garde, et les paires
 que l'équipe a jugées distinctes.
 
-Non destructive : une colonne nullable et une table vide. Le retour arrière est refusé dès qu'une fusion a eu lieu,
+Non destructive : une colonne nullable, une table vide, et l'unicité du nom dans l'IESG réservée aux établissements
+non fusionnés. Le retour arrière est refusé dès qu'une fusion a eu lieu,
 car le renvoi serait perdu.
 
 Revision ID: 8224c2108aff
@@ -66,6 +67,15 @@ def upgrade() -> None:
         op.f("ck_etablissement_fusionne_si_inactif"), "etablissement", "fusionne_dans_id IS NULL OR statut = 'inactif'"
     )
     op.create_check_constraint(op.f("ck_etablissement_fusionne_ailleurs"), "etablissement", "fusionne_dans_id <> id")
+    # Un établissement fusionné ne réserve plus son nom : le gardé peut le reprendre.
+    op.drop_constraint("uq_etablissement_iesg_id_nom_normalise", "etablissement", type_="unique")
+    op.create_index(
+        "uq_etablissement_iesg_id_nom_normalise",
+        "etablissement",
+        ["iesg_id", "nom_normalise"],
+        unique=True,
+        postgresql_where=sa.text("fusionne_dans_id IS NULL"),
+    )
 
 
 def downgrade() -> None:
@@ -73,6 +83,8 @@ def downgrade() -> None:
     fusions = op.get_bind().scalar(sa.text("SELECT count(*) FROM etablissement WHERE fusionne_dans_id IS NOT NULL"))
     if fusions:
         raise RuntimeError(f"Retour impossible : {fusions} établissement(s) fusionné(s) perdraient leur renvoi.")
+    op.drop_index("uq_etablissement_iesg_id_nom_normalise", table_name="etablissement")
+    op.create_unique_constraint("uq_etablissement_iesg_id_nom_normalise", "etablissement", ["iesg_id", "nom_normalise"])
     op.drop_constraint(op.f("ck_etablissement_fusionne_ailleurs"), "etablissement", type_="check")
     op.drop_constraint(op.f("ck_etablissement_fusionne_si_inactif"), "etablissement", type_="check")
     op.drop_constraint(op.f("fk_etablissement_fusionne_dans_id_etablissement"), "etablissement", type_="foreignkey")

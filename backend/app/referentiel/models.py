@@ -8,7 +8,7 @@ from datetime import datetime
 from enum import StrEnum
 from uuid import UUID, uuid7
 
-from sqlalchemy import CheckConstraint, DateTime, Enum, ForeignKey, Integer, String, UniqueConstraint, func, text
+from sqlalchemy import CheckConstraint, DateTime, Enum, ForeignKey, Index, Integer, String, UniqueConstraint, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base, Suivi
@@ -83,7 +83,14 @@ class Iesg(Suivi, Base):
 class Etablissement(Suivi, Base):
     __tablename__ = "etablissement"
     __table_args__ = (
-        UniqueConstraint("iesg_id", "nom_normalise"),
+        # Un nom par IESG ; un établissement fusionné ne réserve plus le sien (spec 042), que le gardé peut reprendre.
+        Index(
+            "uq_etablissement_iesg_id_nom_normalise",
+            "iesg_id",
+            "nom_normalise",
+            unique=True,
+            postgresql_where=text("fusionne_dans_id IS NULL"),
+        ),
         # Spec 042 : seul un établissement inactif renvoie vers celui qui l'a absorbé, et jamais vers lui-même.
         CheckConstraint("fusionne_dans_id IS NULL OR statut = 'inactif'", name="fusionne_si_inactif"),
         CheckConstraint("fusionne_dans_id <> id", name="fusionne_ailleurs"),
