@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
-import { Check, ChevronLeft, ChevronRight, Pencil, Plus, Replace, Search } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Merge, Pencil, Plus, Search } from "lucide-react";
 import { useState } from "react";
 
 import {
@@ -8,7 +8,7 @@ import {
   Champ,
   DialogueFormulaire,
 } from "@/components/admin/DialogueFormulaire";
-import { ChoixEtablissement, type EtablissementChoisi } from "@/components/ChoixEtablissement";
+import { FusionEtablissements } from "@/components/admin/FusionEtablissements";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Button } from "@/components/ui/button";
 import { peut } from "@/lib/admin";
@@ -17,8 +17,6 @@ import {
   adminListerDre,
   adminListerEtablissements,
   adminModifierEtablissement,
-  adminRemplacerEtablissement,
-  ErreurApi,
   type DreAdmin,
   type EtablissementAdmin,
   type OrdreEnseignement,
@@ -145,10 +143,9 @@ function Etablissements() {
     naviguer({ search: (avant) => ({ ...avant, ...changement, page: undefined }) });
   const pages = Math.max(1, Math.ceil(page.total / page.par_page));
   const [edition, setEdition] = useState<EtablissementAdmin | "nouveau" | null>(null);
-  const [proposition, setProposition] = useState<{
-    action: "accepter" | "remplacer";
-    etablissement: EtablissementAdmin;
-  } | null>(null);
+  const [proposition, setProposition] = useState<EtablissementAdmin | null>(null);
+  const [fusion, setFusion] = useState<EtablissementAdmin | null>(null);
+  const router = useRouter();
   const iesgDeLaDre = dres.find((d) => d.code === filtres.dre)?.iesg ?? dres.flatMap((d) => d.iesg);
 
   return (
@@ -323,6 +320,11 @@ function Etablissements() {
                       Proposé
                     </span>
                   )}
+                  {e.fusionne_dans && (
+                    <span className="block text-xs font-semibold text-muted-foreground">
+                      Fusionné dans « {e.fusionne_dans.nom} »
+                    </span>
+                  )}
                 </td>
                 <td className="px-4 py-3">{TYPES[e.type]}</td>
                 <td className="px-4 py-3">
@@ -337,23 +339,26 @@ function Etablissements() {
                 <td className="px-4 py-3 text-right font-bold tabular-nums">{e.nb_encadreurs}</td>
                 <td className="px-4 py-3 text-right">
                   {peut(admin, "clubs", "modifier") && e.statut === "propose" && (
-                    <span className="mb-1.5 inline-flex flex-wrap justify-end gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => setProposition({ action: "accepter", etablissement: e })}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground transition hover:bg-primary/90"
-                      >
-                        <Check className="size-3.5" /> Accepter
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setProposition({ action: "remplacer", etablissement: e })}
-                        className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ring-1 ring-border transition hover:bg-mist-soft"
-                      >
-                        <Replace className="size-3.5" /> Remplacer par…
-                      </button>
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setProposition(e)}
+                      className="mb-1.5 mr-1.5 inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground transition hover:bg-primary/90"
+                    >
+                      <Check className="size-3.5" /> Accepter
+                    </button>
                   )}
+                  {peut(admin, "clubs", "modifier") &&
+                    !e.fusionne_dans &&
+                    e.statut !== "inactif" && (
+                      <button
+                        type="button"
+                        onClick={() => setFusion(e)}
+                        aria-label={`Fusionner ${e.nom} avec un autre établissement`}
+                        className="mb-1.5 mr-1.5 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ring-1 ring-border transition hover:bg-mist-soft"
+                      >
+                        <Merge className="size-3.5" /> Fusionner avec…
+                      </button>
+                    )}
                   {peut(admin, "clubs", "modifier") && (
                     <button
                       type="button"
@@ -408,16 +413,14 @@ function Etablissements() {
         </nav>
       )}
 
-      {proposition?.action === "accepter" && (
-        <AccepterProposition
-          etablissement={proposition.etablissement}
-          fermer={() => setProposition(null)}
-        />
+      {proposition && (
+        <AccepterProposition etablissement={proposition} fermer={() => setProposition(null)} />
       )}
-      {proposition?.action === "remplacer" && (
-        <RemplacerProposition
-          etablissement={proposition.etablissement}
-          fermer={() => setProposition(null)}
+      {fusion && (
+        <FusionEtablissements
+          depart={fusion}
+          fermer={() => setFusion(null)}
+          apresFusion={() => router.invalidate()}
         />
       )}
       {edition && (
@@ -635,38 +638,6 @@ function AccepterProposition({
           ))}
         </select>
       </Champ>
-    </DialogueFormulaire>
-  );
-}
-
-function RemplacerProposition({
-  etablissement,
-  fermer,
-}: {
-  etablissement: EtablissementAdmin;
-  fermer: () => void;
-}) {
-  const router = useRouter();
-  const [cible, setCible] = useState<EtablissementChoisi | null>(null);
-  const inscrits = etablissement.nb_eleves + etablissement.nb_encadreurs;
-
-  return (
-    <DialogueFormulaire
-      ouvert
-      onOuvert={(o) => !o && fermer()}
-      titre={`Remplacer « ${etablissement.nom} »`}
-      description={`Cet établissement existe déjà sous un autre nom ? Choisis-le : ${inscrits} inscrit${inscrits > 1 ? "s" : ""} (élèves et encadreurs) y ser${inscrits > 1 ? "ont" : "a"} rattaché${inscrits > 1 ? "s" : ""}, et la proposition sera désactivée.`}
-      bouton="Remplacer"
-      onEnvoie={async () => {
-        if (!cible) throw new ErreurApi(422, "Choisis un établissement de la liste.");
-        await adminRemplacerEtablissement(etablissement.id, {
-          version: etablissement.version,
-          cible_id: cible.id,
-        });
-        await router.invalidate();
-      }}
-    >
-      <ChoixEtablissement valeur={cible} onChoix={setCible} exclure={etablissement.id} />
     </DialogueFormulaire>
   );
 }

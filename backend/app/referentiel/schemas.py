@@ -255,7 +255,7 @@ class AxeModification(_Entree):
 # Fusion des doublons (spec 042) --------------------------------------------------------------------------------
 
 
-class ClubResume(BaseModel):
+class ClubDoublon(BaseModel):
     """Le club vivant d'un établissement, tel que la fusion le traitera."""
 
     id: UUID
@@ -265,7 +265,7 @@ class ClubResume(BaseModel):
 
 
 class FicheDoublon(EtablissementAdmin):
-    club: ClubResume | None = None
+    club: ClubDoublon | None = None
 
 
 class PaireProbable(BaseModel):

@@ -873,6 +873,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/referentiel/etablissements/doublons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Lister Doublons */
+        get: operations["admin_lister_doublons_api_admin_referentiel_etablissements_doublons_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/referentiel/etablissements/doublons/ecarter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admin Ecarter Doublon */
+        post: operations["admin_ecarter_doublon_api_admin_referentiel_etablissements_doublons_ecarter_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/referentiel/etablissements/doublons/retablir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admin Retablir Doublon */
+        post: operations["admin_retablir_doublon_api_admin_referentiel_etablissements_doublons_retablir_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/referentiel/etablissements/{etablissement_id}": {
         parameters: {
             query?: never;
@@ -890,7 +941,24 @@ export interface paths {
         patch: operations["admin_modifier_etablissement_api_admin_referentiel_etablissements__etablissement_id__patch"];
         trace?: never;
     };
-    "/api/admin/referentiel/etablissements/{etablissement_id}/remplacer": {
+    "/api/admin/referentiel/etablissements/{garde_id}/fusion/{absorbe_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Apercu Fusion */
+        get: operations["admin_apercu_fusion_api_admin_referentiel_etablissements__garde_id__fusion__absorbe_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/referentiel/etablissements/{garde_id}/fusionner": {
         parameters: {
             query?: never;
             header?: never;
@@ -899,8 +967,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Admin Remplacer Proposition */
-        post: operations["admin_remplacer_proposition_api_admin_referentiel_etablissements__etablissement_id__remplacer_post"];
+        /** Admin Fusionner Etablissements */
+        post: operations["admin_fusionner_etablissements_api_admin_referentiel_etablissements__garde_id__fusionner_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4566,6 +4634,15 @@ export interface components {
             /** Plafond */
             plafond: number;
         };
+        /** ApercuFusion */
+        ApercuFusion: {
+            garde: components["schemas"]["FicheDoublon"];
+            absorbe: components["schemas"]["FicheDoublon"];
+            /** Effet */
+            effet: string;
+            /** Refus */
+            refus: string | null;
+        };
         /** ApercuModeration */
         ApercuModeration: {
             /**
@@ -5562,6 +5639,23 @@ export interface components {
             /** Nom */
             nom: string;
         };
+        /**
+         * ClubDoublon
+         * @description Le club vivant d'un établissement, tel que la fusion le traitera.
+         */
+        ClubDoublon: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            /** Etat */
+            etat: string;
+            /** Membres Actifs */
+            membres_actifs: number;
+        };
         /** ClubEspace */
         ClubEspace: {
             /**
@@ -6278,6 +6372,19 @@ export interface components {
             /** Motif */
             motif: string;
         };
+        /** Ecart */
+        Ecart: {
+            /**
+             * A Id
+             * Format: uuid
+             */
+            a_id: string;
+            /**
+             * B Id
+             * Format: uuid
+             */
+            b_id: string;
+        };
         /** EcartActuel */
         EcartActuel: {
             /** Top3 Different */
@@ -6565,6 +6672,7 @@ export interface components {
              * @default 0
              */
             nb_encadreurs: number;
+            fusionne_dans?: components["schemas"]["EtablissementLie"] | null;
         };
         /** EtablissementCreation */
         EtablissementCreation: {
@@ -6581,6 +6689,16 @@ export interface components {
             /** Prefecture */
             prefecture?: string | null;
             ordre?: components["schemas"]["OrdreEnseignement"] | null;
+        };
+        /** EtablissementLie */
+        EtablissementLie: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
         };
         /** EtablissementModification */
         EtablissementModification: {
@@ -7037,6 +7155,52 @@ export interface components {
             /** Axes */
             axes: string[];
         };
+        /** FicheDoublon */
+        FicheDoublon: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            type: components["schemas"]["TypeEtablissement"];
+            /** Localite */
+            localite: string | null;
+            statut: components["schemas"]["StatutEtablissement"];
+            /** Version */
+            version: number;
+            /**
+             * Iesg Id
+             * Format: uuid
+             */
+            iesg_id: string;
+            /** Iesg */
+            iesg: string;
+            /** Dre Code */
+            dre_code: string;
+            /** Dre */
+            dre: string;
+            /**
+             * Modifie Le
+             * Format: date-time
+             */
+            modifie_le: string;
+            /** Prefecture */
+            prefecture?: string | null;
+            ordre?: components["schemas"]["OrdreEnseignement"] | null;
+            /** Import Source */
+            import_source?: string | null;
+            /** Nb Eleves */
+            nb_eleves: number;
+            /**
+             * Nb Encadreurs
+             * @default 0
+             */
+            nb_encadreurs: number;
+            fusionne_dans?: components["schemas"]["EtablissementLie"] | null;
+            club?: components["schemas"]["ClubDoublon"] | null;
+        };
         /**
          * FicheEntree
          * @description Une fiche complète : à l'inscription comme à la correction depuis l'espace.
@@ -7234,6 +7398,28 @@ export interface components {
          * @enum {string}
          */
         FormatExport: "csv" | "xlsx";
+        /**
+         * Fusion
+         * @description Fusionne `absorbe_id` dans l'établissement de la route (le gardé). `nom` : le nom final, celui du gardé ou
+         *     celui de l'absorbé ; les versions protègent d'une modification faite entre l'aperçu et la confirmation.
+         */
+        Fusion: {
+            /**
+             * Absorbe Id
+             * Format: uuid
+             */
+            absorbe_id: string;
+            /** Version Garde */
+            version_garde: number;
+            /** Version Absorbe */
+            version_absorbe: number;
+            /**
+             * Nom
+             * @default garde
+             * @enum {string}
+             */
+            nom: "garde" | "absorbe";
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -8201,6 +8387,15 @@ export interface components {
             /** Rapports */
             rapports: components["schemas"]["LigneArchive"][];
         };
+        /** PageDoublons */
+        PageDoublons: {
+            /** Paires */
+            paires: components["schemas"]["PaireProbable"][];
+            /** Par Dre */
+            par_dre: {
+                [key: string]: number;
+            };
+        };
         /** PageEtablissements */
         PageEtablissements: {
             /** Total */
@@ -8255,6 +8450,14 @@ export interface components {
             par_page: number;
             /** Clubs */
             clubs: components["schemas"]["ClubSuivi"][];
+        };
+        /** PaireProbable */
+        PaireProbable: {
+            a: components["schemas"]["FicheDoublon"];
+            b: components["schemas"]["FicheDoublon"];
+            raison: components["schemas"]["Raison"] | null;
+            /** Ecartee */
+            ecartee: boolean;
         };
         /** PalmaresPublic */
         PalmaresPublic: {
@@ -8953,6 +9156,11 @@ export interface components {
             numero: number | null;
             niveau: components["schemas"]["NiveauQuiz"] | null;
         };
+        /**
+         * Raison
+         * @enum {string}
+         */
+        Raison: "meme_nom" | "meme_prononciation" | "nom_proche";
         /** RangPersonnel */
         RangPersonnel: {
             /** Points */
@@ -9147,19 +9355,6 @@ export interface components {
             motif: string;
             /** Version */
             version: number;
-        };
-        /**
-         * Remplacement
-         * @description Remplace un établissement proposé par un établissement existant : ses élèves y sont rattachés (spec 017).
-         */
-        Remplacement: {
-            /** Version */
-            version: number;
-            /**
-             * Cible Id
-             * Format: uuid
-             */
-            cible_id: string;
         };
         /** RenvoiEntree */
         RenvoiEntree: {
@@ -11627,6 +11822,100 @@ export interface operations {
             };
         };
     };
+    admin_lister_doublons_api_admin_referentiel_etablissements_doublons_get: {
+        parameters: {
+            query?: {
+                dre?: string | null;
+                ecartees?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageDoublons"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_ecarter_doublon_api_admin_referentiel_etablissements_doublons_ecarter_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Ecart"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_retablir_doublon_api_admin_referentiel_etablissements_doublons_retablir_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Ecart"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     admin_modifier_etablissement_api_admin_referentiel_etablissements__etablissement_id__patch: {
         parameters: {
             query?: never;
@@ -11662,18 +11951,50 @@ export interface operations {
             };
         };
     };
-    admin_remplacer_proposition_api_admin_referentiel_etablissements__etablissement_id__remplacer_post: {
+    admin_apercu_fusion_api_admin_referentiel_etablissements__garde_id__fusion__absorbe_id__get: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                etablissement_id: string;
+                garde_id: string;
+                absorbe_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApercuFusion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_fusionner_etablissements_api_admin_referentiel_etablissements__garde_id__fusionner_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                garde_id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["Remplacement"];
+                "application/json": components["schemas"]["Fusion"];
             };
         };
         responses: {

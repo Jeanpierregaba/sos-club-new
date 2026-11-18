@@ -89,6 +89,7 @@ import { Route as ConnecteAdminQuizIdRouteImport } from './routes/_connecte/admi
 import { Route as ConnecteAdminQuizParametresRouteImport } from './routes/_connecte/admin/quiz.parametres'
 import { Route as ConnecteAdminReferentielIndexRouteImport } from './routes/_connecte/admin/referentiel.index'
 import { Route as ConnecteAdminReferentielAxesRouteImport } from './routes/_connecte/admin/referentiel.axes'
+import { Route as ConnecteAdminReferentielDoublonsRouteImport } from './routes/_connecte/admin/referentiel.doublons'
 import { Route as ConnecteAdminReferentielEtablissementsRouteImport } from './routes/_connecte/admin/referentiel.etablissements'
 import { Route as ConnecteAdminReferentielTypesActiviteRouteImport } from './routes/_connecte/admin/referentiel.types-activite'
 import { Route as ConnecteCertificationParcoursIndexRouteImport } from './routes/_connecte/certification.parcours.index'
@@ -526,6 +527,12 @@ const ConnecteAdminReferentielAxesRoute =
     path: '/axes',
     getParentRoute: () => ConnecteAdminReferentielRoute,
   } as any)
+const ConnecteAdminReferentielDoublonsRoute =
+  ConnecteAdminReferentielDoublonsRouteImport.update({
+    id: '/doublons',
+    path: '/doublons',
+    getParentRoute: () => ConnecteAdminReferentielRoute,
+  } as any)
 const ConnecteAdminReferentielEtablissementsRoute =
   ConnecteAdminReferentielEtablissementsRouteImport.update({
     id: '/etablissements',
@@ -665,6 +672,7 @@ export interface FileRoutesByFullPath {
   '/admin/quiz/$id': typeof ConnecteAdminQuizIdRoute
   '/admin/quiz/parametres': typeof ConnecteAdminQuizParametresRoute
   '/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
+  '/admin/referentiel/doublons': typeof ConnecteAdminReferentielDoublonsRoute
   '/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
   '/admin/referentiel/types-activite': typeof ConnecteAdminReferentielTypesActiviteRoute
   '/certification/parcours/$place': typeof ConnecteCertificationParcoursPlaceRoute
@@ -751,6 +759,7 @@ export interface FileRoutesByTo {
   '/admin/quiz/$id': typeof ConnecteAdminQuizIdRoute
   '/admin/quiz/parametres': typeof ConnecteAdminQuizParametresRoute
   '/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
+  '/admin/referentiel/doublons': typeof ConnecteAdminReferentielDoublonsRoute
   '/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
   '/admin/referentiel/types-activite': typeof ConnecteAdminReferentielTypesActiviteRoute
   '/certification/parcours/$place': typeof ConnecteCertificationParcoursPlaceRoute
@@ -845,6 +854,7 @@ export interface FileRoutesById {
   '/_connecte/admin/quiz/$id': typeof ConnecteAdminQuizIdRoute
   '/_connecte/admin/quiz/parametres': typeof ConnecteAdminQuizParametresRoute
   '/_connecte/admin/referentiel/axes': typeof ConnecteAdminReferentielAxesRoute
+  '/_connecte/admin/referentiel/doublons': typeof ConnecteAdminReferentielDoublonsRoute
   '/_connecte/admin/referentiel/etablissements': typeof ConnecteAdminReferentielEtablissementsRoute
   '/_connecte/admin/referentiel/types-activite': typeof ConnecteAdminReferentielTypesActiviteRoute
   '/_connecte/certification/parcours/$place': typeof ConnecteCertificationParcoursPlaceRoute
@@ -939,6 +949,7 @@ export interface FileRouteTypes {
     | '/admin/quiz/$id'
     | '/admin/quiz/parametres'
     | '/admin/referentiel/axes'
+    | '/admin/referentiel/doublons'
     | '/admin/referentiel/etablissements'
     | '/admin/referentiel/types-activite'
     | '/certification/parcours/$place'
@@ -1025,6 +1036,7 @@ export interface FileRouteTypes {
     | '/admin/quiz/$id'
     | '/admin/quiz/parametres'
     | '/admin/referentiel/axes'
+    | '/admin/referentiel/doublons'
     | '/admin/referentiel/etablissements'
     | '/admin/referentiel/types-activite'
     | '/certification/parcours/$place'
@@ -1118,6 +1130,7 @@ export interface FileRouteTypes {
     | '/_connecte/admin/quiz/$id'
     | '/_connecte/admin/quiz/parametres'
     | '/_connecte/admin/referentiel/axes'
+    | '/_connecte/admin/referentiel/doublons'
     | '/_connecte/admin/referentiel/etablissements'
     | '/_connecte/admin/referentiel/types-activite'
     | '/_connecte/certification/parcours/$place'
@@ -1733,6 +1746,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteAdminReferentielAxesRouteImport
       parentRoute: typeof ConnecteAdminReferentielRoute
     }
+    '/_connecte/admin/referentiel/doublons': {
+      id: '/_connecte/admin/referentiel/doublons'
+      path: '/doublons'
+      fullPath: '/admin/referentiel/doublons'
+      preLoaderRoute: typeof ConnecteAdminReferentielDoublonsRouteImport
+      parentRoute: typeof ConnecteAdminReferentielRoute
+    }
     '/_connecte/admin/referentiel/etablissements': {
       id: '/_connecte/admin/referentiel/etablissements'
       path: '/etablissements'
@@ -1892,6 +1912,7 @@ const ConnecteAdminQuizRouteWithChildren =
 
 interface ConnecteAdminReferentielRouteChildren {
   ConnecteAdminReferentielAxesRoute: typeof ConnecteAdminReferentielAxesRoute
+  ConnecteAdminReferentielDoublonsRoute: typeof ConnecteAdminReferentielDoublonsRoute
   ConnecteAdminReferentielEtablissementsRoute: typeof ConnecteAdminReferentielEtablissementsRoute
   ConnecteAdminReferentielTypesActiviteRoute: typeof ConnecteAdminReferentielTypesActiviteRoute
   ConnecteAdminReferentielIndexRoute: typeof ConnecteAdminReferentielIndexRoute
@@ -1900,6 +1921,8 @@ interface ConnecteAdminReferentielRouteChildren {
 const ConnecteAdminReferentielRouteChildren: ConnecteAdminReferentielRouteChildren =
   {
     ConnecteAdminReferentielAxesRoute: ConnecteAdminReferentielAxesRoute,
+    ConnecteAdminReferentielDoublonsRoute:
+      ConnecteAdminReferentielDoublonsRoute,
     ConnecteAdminReferentielEtablissementsRoute:
       ConnecteAdminReferentielEtablissementsRoute,
     ConnecteAdminReferentielTypesActiviteRoute:

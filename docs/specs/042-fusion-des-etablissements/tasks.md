@@ -67,17 +67,17 @@ comptes et des clubs : c'est une partie critique, écrite en TDD (les tests avan
 
 ## Site
 
-- [ ] 11. Client et libellés : les fonctions d'API de la fusion et des doublons dans `client.ts`, et
+- [x] 11. Client et libellés : les fonctions d'API de la fusion et des doublons dans `client.ts`, et
       `adminRemplacerEtablissement` retiré ; les libellés du journal dans `lib/admin.ts`.
-- [ ] 12. `FusionEtablissements.tsx` et son test Vitest :
+- [x] 12. `FusionEtablissements.tsx` et son test Vitest :
   - la recherche de l'autre établissement et les fiches côte à côte ;
   - l'inversion des rôles et le choix du nom ;
   - l'annonce de l'effet, le refus affiché avant la confirmation, puis la confirmation.
-- [ ] 13. `referentiel.etablissements.tsx` :
+- [x] 13. `referentiel.etablissements.tsx` :
   - « Fusionner avec… » remplace « Remplacer par… » ;
   - la mention « Fusionné dans … » apparaît sur un absorbé ;
   - un filtre « Fusionnés » est ajouté s'il reste simple.
-- [ ] 14. Page `referentiel.doublons.tsx` et son onglet :
+- [x] 14. Page `referentiel.doublons.tsx` et son onglet :
   - un filtre par DRE, avec le compteur ;
   - le filtre « Écartées » ;
   - par paire, « Fusionner » et « Pas un doublon » ou « Rétablir » ;

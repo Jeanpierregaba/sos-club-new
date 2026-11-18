@@ -13,6 +13,7 @@ export const Route = createFileRoute("/_connecte/admin/referentiel")({
 const ONGLETS = [
   { to: "/admin/referentiel", libelle: "DRE et IESG", exact: true },
   { to: "/admin/referentiel/etablissements", libelle: "Établissements", exact: false },
+  { to: "/admin/referentiel/doublons", libelle: "Doublons probables", exact: false },
   { to: "/admin/referentiel/axes", libelle: "Axes", exact: false },
   { to: "/admin/referentiel/types-activite", libelle: "Types d'activité", exact: false },
 ] as const;

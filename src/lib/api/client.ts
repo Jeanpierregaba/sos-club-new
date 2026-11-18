@@ -46,7 +46,11 @@ export type EtablissementCreation = Schemas["EtablissementCreation"];
 export type EtablissementModification = Schemas["EtablissementModification"];
 export type AxeCreation = Schemas["AxeCreation"];
 export type AxeModification = Schemas["AxeModification"];
-export type Remplacement = Schemas["Remplacement"];
+export type Fusion = Schemas["Fusion"];
+export type ApercuFusion = Schemas["ApercuFusion"];
+export type FicheDoublon = Schemas["FicheDoublon"];
+export type PaireProbable = Schemas["PaireProbable"];
+export type PageDoublons = Schemas["PageDoublons"];
 export type EtatInscription = Schemas["EtatInscription"];
 export type InscriptionEntree = Schemas["InscriptionEntree"];
 export type Classe = Schemas["Classe"];
@@ -393,8 +397,25 @@ export const adminCreerEtablissement = (entree: EtablissementCreation) =>
   envoyerJson<EtablissementAdmin>(`${REFERENTIEL}/etablissements`, entree);
 export const adminModifierEtablissement = (id: string, entree: EtablissementModification) =>
   envoyerJson<EtablissementAdmin>(`${REFERENTIEL}/etablissements/${id}`, entree, "PATCH");
-export const adminRemplacerEtablissement = (id: string, entree: Remplacement) =>
-  envoyerJson<EtablissementAdmin>(`${REFERENTIEL}/etablissements/${id}/remplacer`, entree);
+// Fusion des doublons (spec 042) : l'établissement de la route est le gardé.
+export const adminApercuFusion = (gardeId: string, absorbeId: string) =>
+  requeteApi<ApercuFusion>(`${REFERENTIEL}/etablissements/${gardeId}/fusion/${absorbeId}`);
+export const adminFusionnerEtablissements = (gardeId: string, entree: Fusion) =>
+  envoyerJson<EtablissementAdmin>(`${REFERENTIEL}/etablissements/${gardeId}/fusionner`, entree);
+export const adminDoublons = (filtres: {
+  dre?: string | undefined;
+  ecartees?: boolean | undefined;
+}) =>
+  requeteApi<PageDoublons>(
+    avecParametres(`${REFERENTIEL}/etablissements/doublons`, {
+      dre: filtres.dre,
+      ecartees: filtres.ecartees ? "true" : undefined,
+    }),
+  );
+export const adminEcarterDoublon = (aId: string, bId: string) =>
+  envoyerJson<void>(`${REFERENTIEL}/etablissements/doublons/ecarter`, { a_id: aId, b_id: bId });
+export const adminRetablirDoublon = (aId: string, bId: string) =>
+  envoyerJson<void>(`${REFERENTIEL}/etablissements/doublons/retablir`, { a_id: aId, b_id: bId });
 export const adminListerAxes = () => requeteApi<AxeAdmin[]>(`${REFERENTIEL}/axes`);
 export const adminCreerAxe = (entree: AxeCreation) =>
   envoyerJson<AxeAdmin>(`${REFERENTIEL}/axes`, entree);

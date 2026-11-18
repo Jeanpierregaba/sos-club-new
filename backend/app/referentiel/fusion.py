@@ -33,7 +33,7 @@ from app.referentiel.models import Dre, EcartDoublon, Etablissement, Iesg, Statu
 from app.referentiel.normalisation import normaliser
 from app.referentiel.schemas import (
     ApercuFusion,
-    ClubResume,
+    ClubDoublon,
     Ecart,
     EtablissementAdmin,
     FicheDoublon,
@@ -49,7 +49,7 @@ def _ordonner(a: UUID, b: UUID) -> tuple[UUID, UUID]:
     return (a, b) if a < b else (b, a)
 
 
-async def clubs_vivants(db: AsyncSession, ids: Sequence[UUID]) -> dict[UUID, ClubResume]:
+async def clubs_vivants(db: AsyncSession, ids: Sequence[UUID]) -> dict[UUID, ClubDoublon]:
     """Le club vivant de chaque établissement et son nombre de membres actifs."""
     membres = (
         select(func.count()).where(Adhesion.club_id == Club.id, Adhesion.etat == EtatAdhesion.active).scalar_subquery()
@@ -61,7 +61,7 @@ async def clubs_vivants(db: AsyncSession, ids: Sequence[UUID]) -> dict[UUID, Clu
             )
         )
     ).all()
-    return {e: ClubResume(id=i, nom=n, etat=s.value, membres_actifs=m) for e, i, n, s, m in lignes}
+    return {e: ClubDoublon(id=i, nom=n, etat=s.value, membres_actifs=m) for e, i, n, s, m in lignes}
 
 
 async def _fiches(db: AsyncSession, ids: Sequence[UUID]) -> dict[UUID, FicheDoublon]:
