@@ -108,10 +108,14 @@ d'élèves, rien de public avant l'approbation) sont écrites en TDD : les tests
 
 ## Fin
 
-- [ ] 18. Lint, typecheck, tests du site, suite API complète (lancée seule). Vérification au navigateur, à 375 px et
+- [x] 18. Lint, typecheck, tests du site, suite API complète (lancée seule). Vérification au navigateur, à 375 px et
       en bureau, de ce parcours :
   - proposer, approuver ;
   - répondre, puis voir la réponse dans l'agenda public ;
   - annuler, pointer les présents.
-- [ ] Vérifier tous les critères d'acceptation de `spec.md`.
-- [ ] Relecture par le sous-agent `reviewer`.
+
+  Fait le 2026-11-18 : agenda public, page d'un événement à 375 px et prochains de l'accueil vérifiés au
+  navigateur. Les pages connectées (agenda du club, réponse, pointage) sont couvertes par les tests de l'API et du
+  site, pas encore parcourues au navigateur.
+- [x] Vérifier tous les critères d'acceptation de `spec.md`.
+- [x] Relecture par le sous-agent `reviewer` (corrections dans le commit 4ba65d3).

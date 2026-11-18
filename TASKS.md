@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] R16 — Agenda et invitations (Q22) — [spec 041](docs/specs/041-agenda-et-invitations/spec.md) (spec, plan et tâches validés le 2026-11-17)
+Rien en cours.
 
 ## À faire
 
@@ -47,7 +47,6 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 **Phases 6 à 8 — Après l'ouverture (P1, P2)**
 
-- [ ] R16 — Agenda et invitations (Q22)
 - [ ] R17 — Partage du classement et partages vérifiés (Q23)
 - [ ] R18 — Forums et co-animation, avec un ADR sur les échanges entre élèves (Q26)
 - [ ] R19 — Comptes visiteurs (Q27) : le choix « Particulier / visiteur » est déjà sur `/inscription`, sans formulaire ; le PRD exclut la certification des visiteurs alors que la page l'annonce, à trancher dans la spec
@@ -59,7 +58,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 - [ ] Suites de la spec 033 (cahier des charges « Gestion, activation et suivi des Clubs Santé ») : rapports d'activité adressés aux encadreurs du club (R12 amendé), agenda du club (R16 amendé), année académique et remise à zéro annuelle des points (amende ADR-0004, R13, R14), archives par année ; retrait d'un élève par l'équipe depuis le suivi des clubs ; une future suppression de compte élève ou encadreur devra appeler `recalculer_clubs_du_membre`
 - [ ] Avant la fusion dans `main` : passer la migration `4b93d2491b34` sur une copie de la base de préprod (une DRE au code inconnu la fait échouer) et ajouter la ligne cron des échéances sur le VPS (`deploy/README.md`, étape 8 bis)
 
-- [ ] Suites de la spec 038 (relecture du 2026-11-15) : filtres par club et par date dans la file de modération ; « reçu » calculé sur les encadreurs présents à la soumission (aujourd'hui : ceux du club à la lecture) ; correction motivée visant le compte d'un club au registre ; résumé public d'un rapport avec les pages publiques des clubs (R21) ; lien d'un rapport avec un événement de l'agenda (R16)
+- [ ] Suites de la spec 038 (relecture du 2026-11-15) : filtres par club et par date dans la file de modération ; « reçu » calculé sur les encadreurs présents à la soumission (aujourd'hui : ceux du club à la lecture) ; correction motivée visant le compte d'un club au registre ; résumé public d'un rapport avec les pages publiques des clubs (R21) 
 
 ### Petites tâches
 
@@ -74,6 +73,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 ## Terminé
 
+- [x] R16 — Agenda et invitations (Q22) — [spec 041](docs/specs/041-agenda-et-invitations/spec.md) (close le 2026-11-18 : événements de club proposés par les encadreurs ou le président et publiés par la modération, +30 à l'encadreur auteur ; événements nationaux et régionaux publiés directement par l'équipe, dans son périmètre, journalisés ; invitation des membres actifs, réponses Participe / Peut-être / Non jusqu'au début, places sous verrou, rappel la veille ; pointage des présents après le début ; annulation motivée, motif réservé aux invités ; lien d'un rapport d'activité avec un événement, un seul rapport par événement ; `/agenda` public filtré, sans nom d'élève, heures de Lomé stockées en UTC. Suites : visuel de l'événement ; accès de l'équipe à la liste nominative des réponses depuis l'admin ; parcours connectés à vérifier au navigateur)
 - [x] Fiches d'inscription : élève, encadreur et visiteur, e-mails (R19 avancé) — [spec 030](docs/specs/030-fiches-d-inscription/spec.md) (close le 2026-11-17 : fiche d'adhésion complète en 4 étapes, lue par l'élève et par l'équipe habilitée sous double authentification, journalisée ; téléphone et discipline de l'encadreur ; compte visiteur confirmé par un code e-mail, 30 saisies par IP, quiz jeux sans points ; gabarit d'e-mail commun ; en HTTPS sans SMTP, 503. À trancher : accès d'un collaborateur de DRE à la fiche depuis l'interface ; la fiche complète doit figurer dans la déclaration à l'IPDCP avant toute donnée réelle)
 - [x] Quiz santé (922 QCM) jouables sans compte — [spec 031](docs/specs/031-quiz-sante-sans-compte/spec.md) (livré en urgence le 2026-11-09 et le 2026-11-10, spec écrite après coup le 2026-11-17 : joueur « invite » reconnu par un cookie à part, 3 quiz d'essai sans points puis compte visiteur, 30 joueurs par IP et par heure, purge à 7 jours ; correction en vert ou rouge et récapitulatif des erreurs pour les jeux, ADR-0004 amendé ; les 34 quiz d'origine sont dépubliés par la spec 034, leurs QCM restent la réserve des 100 défis)
 - [x] R15 — Cartes numériques de l'élève et de l'encadreur, QR code de vérification (Q8, Q30) — [spec 040](docs/specs/040-cartes-numeriques/spec.md) (2026-11-16 : carte membre et carte encadreur délivrées automatiquement, numéros `CS-M-` et `CS-E-` uniques jamais réattribués, validité calculée à chaque lecture ; « Ma carte » en PDF et PNG ; QR vers `/carte/<code>` qui montre type, numéro, club et statut, sans nom, `noindex`, 60 vérifications par IP et par heure ; suspension et réactivation motivées par l'équipe. Suites : photo, renouvellement du code, R17 partage, R22 historique des vérifications ; la carte d'un ancien élève reste valide ; à trancher : club affiché sur la page publique sans choix de l'élève)

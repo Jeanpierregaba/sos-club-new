@@ -98,29 +98,29 @@ Décisions de l'utilisateur (2026-11-17) :
 
 ## Critères d'acceptation
 
-- [ ] Un encadreur actif rattaché au club, ou son président, crée un brouillon et le soumet ; un élève qui n'est
+- [x] Un encadreur actif rattaché au club, ou son président, crée un brouillon et le soumet ; un élève qui n'est
       pas président, un encadreur d'un autre club ou non vérifié, ou un visiteur reçoit 403.
-- [ ] Un événement en brouillon, en attente, à corriger ou refusé n'apparaît dans aucune route publique.
-- [ ] La première approbation publie l'événement, crédite +30 à l'encadreur auteur (rien au président) et invite
+- [x] Un événement en brouillon, en attente, à corriger ou refusé n'apparaît dans aucune route publique.
+- [x] La première approbation publie l'événement, crédite +30 à l'encadreur auteur (rien au président) et invite
       chaque membre affilié du club ; une seconde approbation après modification ne crédite rien ni ne réinvite.
-- [ ] Sans « agenda : approuver », on ne décide pas d'un événement ; un auteur ne modère pas le sien ; refus et
+- [x] Sans « agenda : approuver », on ne décide pas d'un événement ; un auteur ne modère pas le sien ; refus et
       correction exigent un motif.
-- [ ] Un collaborateur sans « agenda : créer » ou « agenda : modifier », ou hors de sa DRE pour un événement régional, ne crée ni ne
+- [x] Un collaborateur sans « agenda : créer » ou « agenda : modifier », ou hors de sa DRE pour un événement régional, ne crée ni ne
       modifie un événement national ou régional ; une création autorisée est publiée aussitôt et journalisée.
-- [ ] Un membre invité répond et change sa réponse jusqu'au début ; après le début, la réponse est refusée.
-- [ ] Un non-membre (autre club, visiteur, encadreur) ne peut pas répondre (403).
-- [ ] Avec des places, « Je participe » au-delà de la capacité est refusé (409), y compris sous réponses
+- [x] Un membre invité répond et change sa réponse jusqu'au début ; après le début, la réponse est refusée.
+- [x] Un non-membre (autre club, visiteur, encadreur) ne peut pas répondre (403).
+- [x] Avec des places, « Je participe » au-delà de la capacité est refusé (409), y compris sous réponses
       simultanées.
-- [ ] La liste nominative des réponses n'est lisible que par les encadreurs du club, le président et l'équipe
+- [x] La liste nominative des réponses n'est lisible que par les encadreurs du club, le président et l'équipe
       habilitée ; l'agenda public n'expose que le nombre de participants.
-- [ ] L'annulation exige un motif, garde l'événement marqué « Annulé » et notifie les invités.
-- [ ] La tâche quotidienne envoie un rappel la veille à ceux qui participent, une seule fois même relancée.
-- [ ] Le pointage des présents n'est possible qu'après le début, par un encadreur du club ou le président, et
+- [x] L'annulation exige un motif, garde l'événement marqué « Annulé » et notifie les invités.
+- [x] La tâche quotidienne envoie un rappel la veille à ceux qui participent, une seule fois même relancée.
+- [x] Le pointage des présents n'est possible qu'après le début, par un encadreur du club ou le président, et
       seulement sur des membres du club.
-- [ ] Un rapport se lie à un événement publié de son club ; lier un événement déjà lié, d'un autre club ou non
+- [x] Un rapport se lie à un événement publié de son club ; lier un événement déjà lié, d'un autre club ou non
       publié est refusé.
-- [ ] `/agenda` filtre par région, club, type et axe, et ne contient aucun nom d'élève.
-- [ ] Les heures saisies à Lomé sont stockées en UTC et réaffichées à l'identique.
+- [x] `/agenda` filtre par région, club, type et axe, et ne contient aucun nom d'élève.
+- [x] Les heures saisies à Lomé sont stockées en UTC et réaffichées à l'identique.
 
 ## Cas limites et erreurs
 
