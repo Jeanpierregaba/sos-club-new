@@ -8,7 +8,8 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-Rien en cours.
+- [ ] Fusion des doublons d'établissements — [spec 042](docs/specs/042-fusion-des-etablissements/spec.md)
+  (spec, plan et tâches validés le 2026-11-18 ; [analyse des doublons](docs/analyses/doublons-etablissements.md))
 
 ## À faire
 

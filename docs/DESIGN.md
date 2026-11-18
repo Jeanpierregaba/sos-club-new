@@ -147,3 +147,13 @@ encadreurs, 21 élèves) se lisent sur des jauges avec `role="progressbar"` dans
   pointage des présents en cases à cocher.
 - **Mes événements** (espace élève) : les événements à venir de ton club, ta réponse, modifiable jusqu'au début.
 - **Accueil** : les trois prochains événements, ou « Aucun événement à venir pour le moment ».
+
+## Fusion des établissements (spec 042)
+
+- **Doublons probables** (Référentiel → « Doublons probables ») : les paires par DRE, avec leur compteur, la raison
+  du rapprochement, les inscrits et le club de chaque fiche ; « Fusionner » ou « Pas un doublon », et un filtre
+  « Écartées » pour rétablir une paire. État vide : « Aucun doublon probable dans ta DRE ».
+- **Fusionner** (boîte de dialogue, depuis la liste des établissements ou une paire) : les deux fiches côte à côte,
+  « Inverser » pour choisir le gardé, le choix du nom final, puis une phrase qui annonce l'effet (« 12 élèves et
+  1 encadreur rejoindront … ») avant le bouton « Fusionner ». Un refus (deux clubs actifs) s'affiche avant la
+  confirmation. Un absorbé porte la mention « Fusionné dans … » dans la liste.

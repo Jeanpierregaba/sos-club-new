@@ -173,7 +173,8 @@ Sources : [CDC admin](../../cdc/admin.md) § 4.2 et § 15, [PRD](../../PRD.md) Q
 - **Les clubs eux-mêmes** : création, code unique, président, statut et carte des vrais clubs (R4).
 - **L'établissement proposé par un président** lors de la création de son club, puis validé avec lui : c'est
   le circuit décrit en Q28, il arrive avec R4. R1 prévoit seulement un statut « proposé » qui n'apparaît pas
-  dans les listes publiques.
+  dans les listes publiques. Son remplacement par un établissement existant, et la fusion de deux doublons, sont
+  décrits par la [spec 042](../042-fusion-des-etablissements/spec.md).
 - **Les filtres par DRE, établissement ou club** de l'annuaire des inscrits et des exports : ils arrivent avec
   R2, quand les comptes ont un établissement.
 - **L'import d'un fichier CSV** pour remplacer ou compléter l'annuaire : la saisie dans l'espace admin
