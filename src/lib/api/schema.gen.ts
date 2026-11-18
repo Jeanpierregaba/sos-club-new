@@ -6945,8 +6945,6 @@ export interface components {
             complet: boolean;
             /** Annule */
             annule: boolean;
-            /** Motif Annulation */
-            motif_annulation: string | null;
             /** Dre Code */
             dre_code: string | null;
             /** Dre */

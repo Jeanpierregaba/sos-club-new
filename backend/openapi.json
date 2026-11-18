@@ -20469,17 +20469,6 @@
             "type": "boolean",
             "title": "Annule"
           },
-          "motif_annulation": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Motif Annulation"
-          },
           "dre_code": {
             "anyOf": [
               {
@@ -20571,7 +20560,6 @@
           "participants",
           "complet",
           "annule",
-          "motif_annulation",
           "dre_code",
           "dre",
           "club_id",

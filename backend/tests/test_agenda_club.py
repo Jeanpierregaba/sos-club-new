@@ -5,6 +5,7 @@ Partie critique (droits, points, rien de public avant l'approbation), écrite av
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from typing import Any
+from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
@@ -310,3 +311,62 @@ def test_un_evenement_annule_ne_se_modifie_plus(
 
     assert reponse.status_code == 409
     assert actuel["peut_modifier"] is False
+
+
+# Suites de la relecture -------------------------------------------------------------------------------------
+
+
+def test_un_evenement_devenu_passe_ne_sapprouve_pas(
+    client: TestClient, club: dict[str, Any], creer_collaborateur: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    from app.moderation.models import VersionContenu
+
+    evenement = propose(connecter(client, "prof"))
+    hier = (datetime.now(UTC) - timedelta(days=1)).replace(tzinfo=None)
+
+    async def vieillir(db: Any) -> None:
+        version = await db.scalar(select(VersionContenu).where(VersionContenu.contenu_id == UUID(evenement["id"])))
+        version.donnees = {
+            **version.donnees,
+            "debut": hier.isoformat(timespec="minutes"),
+            "fin": (hier + timedelta(hours=1)).isoformat(timespec="minutes"),
+        }
+
+    en_base(vieillir)
+    equipe = moderateur(client, creer_collaborateur)
+
+    reponse = decider(equipe, evenement["id"], "approuver")
+
+    assert reponse.status_code == 409
+    assert ligne(en_base, evenement["id"]) is None
+    assert [m.action for m in points(en_base, club["prof"])].count("encadreur.evenement") == 0
+
+
+def test_une_revision_en_attente_dun_evenement_annule_ne_se_publie_pas(
+    client: TestClient, club: dict[str, Any], creer_collaborateur: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    evenement = publie(client, creer_collaborateur)
+    prof = connecter(client, "prof")
+    actuel = prof.get(f"{CLUB}/{evenement['id']}").json()
+    modifie = prof.put(
+        f"{CLUB}/{evenement['id']}", json={"version": actuel["version"], "champs": champs(titre="Nouveau titre")}
+    ).json()
+    assert soumettre(prof, modifie).status_code == 200
+    connecter(client, "collegue").post(
+        f"{CLUB}/{evenement['id']}/annuler", json={"motif": "Salle indisponible ce jour"}
+    )
+    equipe = moderateur(client, creer_collaborateur, "equipe-revision")
+
+    assert decider(equipe, evenement["id"], "approuver").status_code == 409
+
+    assert ligne(en_base, evenement["id"]).titre == "Causerie sur le paludisme"
+    assert notifications(en_base, club["membre"], "evenement_modifie") == []
+
+
+def test_un_evenement_de_club_se_soumet_avec_son_axe(client: TestClient, club: dict[str, Any]) -> None:
+    prof = connecter(client, "prof")
+
+    reponse = soumettre(prof, brouillon(prof, axe_code=None))
+
+    assert reponse.status_code == 422
+    assert "axe" in reponse.json()["detail"]

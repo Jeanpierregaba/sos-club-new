@@ -14,9 +14,10 @@ from app.admin.journal import journaliser
 from app.agenda.models import Evenement, NiveauEvenement
 from app.agenda.public import vue_publique
 from app.agenda.schemas import EvenementEquipeEntree, EvenementPublic
-from app.agenda.service import annuler_evenement, copier, verifier_axe
+from app.agenda.service import annuler_evenement, copier, gestionnaires, lien_club, verifier_axe
 from app.comptes.inscription import Refus
 from app.moderation.service import Introuvable
+from app.notifications.service import notifier
 from app.referentiel.models import Dre
 
 
@@ -34,6 +35,8 @@ async def _verifier_niveau(db: AsyncSession, acces: Acces, entree: EvenementEqui
             raise Refus("Cette DRE n'existe pas.", 422)
         if not acces.national and entree.dre_code != acces.collaborateur.perimetre_dre:
             raise Refus("Tu ne gères que les événements de ta DRE.", 403)
+        if not entree.champs.axe_code:
+            raise Refus("Champ « axe_code » : un événement régional a son axe.", 422)
 
 
 async def lister(
@@ -102,5 +105,12 @@ async def annuler(db: AsyncSession, acces: Acces, evenement_id: UUID, motif: str
     if not acces.a("agenda", droit):
         raise Refus("Tu n'as pas le droit d'annuler cet événement.", 403)
     await annuler_evenement(db, evenement, acces.utilisateur, motif, ip, perimetre=evenement.dre_code or "national")
+    if evenement.club_id is not None:
+        # Les encadreurs et le président du club apprennent que l'équipe a annulé leur événement.
+        for gestionnaire in await gestionnaires(db, evenement.club_id):
+            notifier(
+                db, gestionnaire, "evenement_annule", f"Annulé par l'équipe : {evenement.titre}"[:200], motif,
+                lien_club(evenement.id),
+            )  # fmt: skip
     await db.commit()
     return await vue_publique(db, evenement)

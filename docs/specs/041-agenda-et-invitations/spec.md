@@ -29,7 +29,7 @@ Décisions de l'utilisateur (2026-11-17) :
    DRE) ou « club ». Ce sont les trois sections de l'agenda actuel.
 2. Un événement porte : titre, type (formation, sensibilisation, concours, assainissement, campagne, émission,
    réunion, autre), axe (un des 7, facultatif pour le national), objectif, description, date, heure de début et de
-   fin, lieu ou « en ligne » avec lien, public visé, nombre de places facultatif, visuel facultatif (événement de club seulement).
+   fin, lieu ou « en ligne » avec lien, public visé, nombre de places facultatif. Le visuel est reporté (voir « Hors périmètre »).
 3. Les heures sont saisies et affichées à l'heure de Lomé (UTC+0, sans heure d'été), stockées en UTC.
 
 ### Événement d'un club
@@ -51,7 +51,8 @@ Décisions de l'utilisateur (2026-11-17) :
    décision (moteur commun). Un changement de date ou de lieu approuvé est notifié aux invités qui n'ont pas
    répondu « Je ne peux pas ».
 9. L'auteur, un encadreur du club, le président ou l'équipe peut **annuler** un événement publié avec un motif :
-   il reste dans l'agenda, marqué « Annulé », et les invités sont notifiés. Un événement annulé ne se réactive
+   il reste dans l'agenda, marqué « Annulé », et les invités sont notifiés avec le motif. Le motif, écrit sans
+   modération, n'est jamais public (relecture du 2026-11-17). Un événement annulé ne se réactive
    pas ; il se repropose.
 
 ### Événement national ou régional
@@ -83,7 +84,8 @@ Décisions de l'utilisateur (2026-11-17) :
     30 jours après l'événement.
 18. Un rapport d'activité (spec 038) peut être **lié** à un événement publié de son club, passé ou en cours, que
     nul autre rapport n'a déjà lié ; le rapport affiche alors le titre, la date et le nombre de présents. Un
-    événement lié une fois ne peut l'être de nouveau (pas de double crédit).
+    événement lié une fois ne peut l'être de nouveau (pas de double crédit), sauf si ce rapport est refusé : il libère
+    alors l'événement. Le lien est revérifié à la soumission du rapport.
 
 ### Agenda public
 
@@ -125,21 +127,22 @@ Décisions de l'utilisateur (2026-11-17) :
 - **Dates** : fin avant début, ou événement de club soumis dans le passé → refusé (422). Un événement publié
   dont la date est passée reste dans les « passés ».
 - **Club suspendu ou fermé** : on n'y propose plus d'événement ; ses événements publiés à venir restent visibles,
-  l'équipe les annule si besoin.
+  l'équipe les annule si besoin. Le président d'un club suspendu ne gère plus son agenda ; ses encadreurs, oui.
+- **Approbation tardive** : un événement dont le début est passé, ou annulé entre-temps, ne s'approuve pas (409).
 - **Auteur parti** : un encadreur dont le rattachement est retiré, ou un président remplacé, ne modifie plus
   l'événement ni n'y accède. Seul l'auteur modifie un événement ; les autres encadreurs du club et le président en
   place l'annulent, gèrent les réponses et pointent les présents, et reproposent l'événement si une modification
   est nécessaire. Les points déjà crédités restent.
 - **Compte supprimé ou suspendu** : sa réponse ne compte plus dans les totaux.
 - **Concurrence** : deux réponses simultanées sur la dernière place n'en acceptent qu'une.
-- **Visuel** : image JPEG, PNG ou WebP, 5 Mo au plus, ré-encodée sans métadonnées (comme les photos de la
-  spec 024).
 - **Lien « en ligne »** : seulement `https://`, affiché comme lien sortant `rel="noopener noreferrer"`.
 - **Textes** : titres et descriptions en texte brut, jamais interprétés comme du HTML.
 - **Rappels** : un événement annulé ou reporté après l'envoi n'envoie pas de second rappel à la même date.
 
 ## Hors périmètre
 
+- Le visuel d'un événement (photos du moteur, spec 024) : reporté à une suite de la spec 041.
+- La lecture de la liste nominative des réponses depuis l'admin : seuls les gestionnaires du club la lisent.
 - L'export iCal ou Google Agenda, et les rappels par e-mail ou SMS.
 - L'inscription des élèves d'autres clubs ou des visiteurs, et les listes d'attente.
 - La co-organisation par plusieurs clubs.

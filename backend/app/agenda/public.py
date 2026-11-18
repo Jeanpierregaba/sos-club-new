@@ -50,7 +50,6 @@ async def vue_publique(db: AsyncSession, evenement: Evenement, moi: Utilisateur 
         participants=nombre,
         complet=evenement.places is not None and nombre >= evenement.places,
         annule=evenement.annule_le is not None,
-        motif_annulation=evenement.motif_annulation,
         dre_code=evenement.dre_code,
         dre=dre.nom if dre else None,
         club_id=evenement.club_id,

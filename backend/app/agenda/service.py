@@ -222,6 +222,8 @@ async def soumettre(
     champs = ChampsEvenement.model_validate(travail.donnees if travail else {})
     if a_lome(champs.debut) <= datetime.now(UTC):
         raise Refus("Cet événement commence dans le passé : change sa date avant de le soumettre.", 422)
+    if not champs.axe_code:
+        raise Refus("Champ « axe_code » : choisis l'axe de l'événement.", 422)
     await moteur.soumettre(db, contenu, utilisateur, ip)
     for destinataire in await gestionnaires(db, club.id):
         if destinataire != utilisateur.id:
@@ -263,6 +265,12 @@ async def recopier(db: AsyncSession, contenu: Contenu, donnees: dict[str, Any], 
     assert contenu.club_id is not None
     champs = ChampsEvenement.model_validate(donnees)
     evenement = await db.get(Evenement, contenu.id, with_for_update=True)
+    if evenement is not None and evenement.annule_le is not None:
+        raise Refus("Cet événement a été annulé : sa modification ne peut plus être publiée. Refuse-la.", 409)
+    if a_lome(champs.debut) <= datetime.now(UTC):
+        raise Refus(
+            "Cet événement commence dans le passé : demande une correction de sa date plutôt que de l'approuver.", 409
+        )
     avant = (evenement.debut, evenement.fin, evenement.lieu, evenement.lien) if evenement else None
     if evenement is None:
         club = await db.get(Club, contenu.club_id)

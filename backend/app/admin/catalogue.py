@@ -153,6 +153,9 @@ DROITS_DES_ROLES: dict[RoleDepart, set[tuple[str, Action]]] = {
         ("encadreurs", C),
         ("encadreurs", A),
     },
-    RoleDepart.gestionnaire_agenda: _TABLEAU | {("agenda", C), ("agenda", CR), ("agenda", M), ("agenda", S)},
+    # Spec 041 : il décide aussi des événements proposés par les clubs, dans la file de modération.
+    RoleDepart.gestionnaire_agenda: _TABLEAU
+    | {("agenda", C), ("agenda", CR), ("agenda", M), ("agenda", S), ("agenda", A), ("agenda", D)}
+    | {("moderation", C), ("moderation", A)},
     RoleDepart.analyste: _TABLEAU | {("statistiques", C), ("statistiques", E)},
 }

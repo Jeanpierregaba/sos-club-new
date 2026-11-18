@@ -43,7 +43,6 @@ const evenement: EvenementPublic = {
   participants: 1,
   complet: false,
   annule: false,
-  motif_annulation: null,
   dre_code: "grand-lome",
   dre: "Grand Lomé",
   club_id: "0193e0c0-0000-7000-8000-000000000002",

@@ -86,7 +86,15 @@ export function CarteEvenement({
               </>
             )}
           </span>
-          {evenement.club && <span className="text-muted-foreground">{evenement.club}</span>}
+          {evenement.club && evenement.club_id && (
+            <Link
+              to="/agenda"
+              search={{ club: evenement.club_id }}
+              className="text-muted-foreground underline-offset-4 hover:underline"
+            >
+              {evenement.club}
+            </Link>
+          )}
           {evenement.dre && <span className="text-muted-foreground">DRE {evenement.dre}</span>}
           {evenement.niveau === "club" && (
             <span className="flex items-center gap-1.5 text-muted-foreground">

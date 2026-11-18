@@ -459,8 +459,10 @@ async def modifier(
     rapport.evenement_id = evenement_id
     try:
         await db.commit()
-    except IntegrityError:
+    except IntegrityError as erreur:
         await db.rollback()
+        if "uq_rapport_evenement_id" not in str(erreur.orig):
+            raise
         raise Refus("Cet événement est déjà documenté par un autre rapport.", 409) from None
     return await detail(db, utilisateur, contenu, rapport, "auteur")
 
@@ -526,6 +528,9 @@ async def soumettre(
         raise Refus(f"Il manque {', '.join(absents)}.", 422)
     semestre = await db.get(Semestre, rapport.semestre_id) if rapport.semestre_id else None
     _periode_close(rapport.modele, rapport, semestre.fin if semestre else None)
+    if rapport.evenement_id is not None:
+        # Spec 041 : l'événement lié doit être encore publié, du club, et lié à aucun autre rapport en vie.
+        await reponses_agenda.lier_au_rapport(db, rapport.club_id, rapport.contenu_id, rapport.evenement_id)
     if rapport.reference is None:
         numero = await db.scalar(select(SEQUENCES[rapport.modele].next_value()))
         rapport.reference = f"{PREFIXES[rapport.modele]}-{aujourd_hui().year}-{numero:06d}"

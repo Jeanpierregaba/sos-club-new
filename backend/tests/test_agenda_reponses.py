@@ -202,3 +202,21 @@ def test_le_pointage_se_ferme_trente_jours_apres(
     )
 
     assert reponse.status_code == 409
+
+
+def test_la_presidente_pointe_et_le_pointage_ne_rapporte_aucun_point(
+    client: TestClient, club: dict[str, Any], evenement: dict[str, Any], en_base: Callable[..., Any]
+) -> None:
+    from sqlalchemy import func, select
+
+    from app.points.models import MouvementPoints
+
+    avant = en_base(lambda db: db.scalar(select(func.count()).select_from(MouvementPoints)))
+    commencer(en_base, evenement["id"])
+
+    reponse = connecter(client, "presidente").put(
+        f"{CLUB}/{evenement['id']}/presences", json={"presences": {str(club["membre"].id): True}}
+    )
+
+    assert reponse.status_code == 200, reponse.text
+    assert en_base(lambda db: db.scalar(select(func.count()).select_from(MouvementPoints))) == avant

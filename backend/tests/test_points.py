@@ -325,7 +325,7 @@ def test_le_bareme_initial_contient_toute_la_grille(en_base: Callable[..., Any])
 
     # Les actions écrites par une spec livrée : la bienvenue élève (017), encadreur (018), la question du jour (022),
     # les articles (023), les commentaires (025), la certification (029), la spec 034 : quiz par niveau, étoiles et
-    # quiz de certification, puis la correction manuelle (036) et les rapports (038) ; les anciennes parts fixes du club restent,
+    # quiz de certification, puis la correction manuelle (036), les rapports (038) et l'événement approuvé (041) ; les anciennes parts fixes du club restent,
     # désactivées.
     assert en_base(lire) == (
         47,
@@ -353,6 +353,7 @@ def test_le_bareme_initial_contient_toute_la_grille(en_base: Callable[..., Any])
             "encadreur.bilan_semestriel",
             "encadreur.certification",
             "encadreur.commentaire",
+            "encadreur.evenement",
             "encadreur.rapport_activite",
             "encadreur.rapport_mensuel",
         ],

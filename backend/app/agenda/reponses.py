@@ -95,9 +95,11 @@ async def repondre(db: AsyncSession, utilisateur: Utilisateur, evenement_id: UUI
 # Liste des réponses et pointage (gestionnaires du club) -----------------------------------------------------
 
 
-async def _evenement_du_club(db: AsyncSession, utilisateur: Utilisateur, evenement_id: UUID) -> Evenement:
+async def _evenement_du_club(
+    db: AsyncSession, utilisateur: Utilisateur, evenement_id: UUID, *, verrouiller: bool = False
+) -> Evenement:
     contenu = await _du_club(db, utilisateur, evenement_id)
-    evenement = await db.get(Evenement, contenu.id, with_for_update=True, populate_existing=True)
+    evenement = await db.get(Evenement, contenu.id, with_for_update=verrouiller, populate_existing=True)
     if evenement is None or not evenement.publie:
         raise Refus("Cet événement n'est pas publié.", 409)
     return evenement
@@ -149,7 +151,7 @@ async def reponses(db: AsyncSession, utilisateur: Utilisateur, evenement_id: UUI
 async def pointer(
     db: AsyncSession, utilisateur: Utilisateur, evenement_id: UUID, presences: dict[UUID, bool]
 ) -> ReponsesEvenement:
-    evenement = await _evenement_du_club(db, utilisateur, evenement_id)
+    evenement = await _evenement_du_club(db, utilisateur, evenement_id, verrouiller=True)
     assert evenement.club_id is not None
     if not _pointage_ouvert(evenement):
         raise Refus("Le pointage s'ouvre au début de l'événement et se ferme 30 jours après sa fin.", 409)

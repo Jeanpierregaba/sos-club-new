@@ -26,11 +26,23 @@ def anonyme(client: TestClient) -> TestClient:
     return client
 
 
-def test_rien_nest_public_avant_lapprobation(client: TestClient, club: dict[str, Any]) -> None:
-    evenement = propose(connecter(client, "prof"))
+def test_rien_nest_public_avant_lapprobation(
+    client: TestClient, club: dict[str, Any], creer_collaborateur: Callable[..., Any]
+) -> None:
+    from tests.agenda import brouillon, decider, moderateur
+
+    prof = connecter(client, "prof")
+    en_attente = propose(prof)
+    un_brouillon = brouillon(prof)
+    a_corriger = propose(prof, titre="À corriger")
+    refuse = propose(prof, titre="Refusé")
+    equipe = moderateur(client, creer_collaborateur)
+    assert decider(equipe, a_corriger["id"], "corriger", "Précise le lieu exact.").status_code == 200
+    assert decider(equipe, refuse["id"], "refuser", "Hors des activités du club.").status_code == 200
 
     assert anonyme(client).get(AGENDA).json()["evenements"] == []
-    assert client.get(f"{AGENDA}/{evenement['id']}").status_code == 404
+    for evenement in (en_attente, un_brouillon, a_corriger, refuse):
+        assert client.get(f"{AGENDA}/{evenement['id']}").status_code == 404
     assert client.get(f"{AGENDA}/prochains").json() == []
 
 
@@ -103,9 +115,12 @@ def test_un_evenement_annule_reste_visible_et_marque(
     evenement = publie(client, creer_collaborateur)
     connecter(client, "prof").post(f"{CLUB}/{evenement['id']}/annuler", json={"motif": "Examens avancés d'un jour"})
 
-    vu = anonyme(client).get(f"{AGENDA}/{evenement['id']}").json()
+    reponse = anonyme(client).get(f"{AGENDA}/{evenement['id']}")
 
-    assert (vu["annule"], vu["motif_annulation"]) == (True, "Examens avancés d'un jour")
+    # Le motif est écrit sans modération : il n'est jamais public (RULES), seuls les invités le reçoivent.
+    assert reponse.json()["annule"] is True
+    assert "Examens avancés" not in reponse.text
+    assert "Examens avancés" not in client.get(AGENDA).text
     assert client.get(f"{AGENDA}/prochains").json() == []
 
 

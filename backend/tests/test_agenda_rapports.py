@@ -79,3 +79,31 @@ def test_un_evenement_dun_autre_club_non_publie_ou_a_venir_est_refuse(
     assert lier(prof, brouillon(prof), a_venir["id"]).status_code == 422
     assert lier(prof, brouillon(prof), en_attente["id"]).status_code == 422
     assert lier(ailleurs, autre, a_venir["id"]).status_code == 422
+
+
+def test_la_soumission_reverifie_levenement_lie(
+    client: TestClient, evenement: dict[str, Any], en_base: Callable[..., Any]
+) -> None:
+    from tests.test_rapports import soumettre
+
+    prof = connecter(client, "prof")
+    rapport = lier(prof, brouillon(prof), evenement["id"]).json()
+    en_base(lambda db: db.execute(update(Evenement).where(Evenement.id == UUID(evenement["id"])).values(publie=False)))
+
+    assert soumettre(prof, rapport).status_code == 422
+
+
+def test_un_rapport_refuse_libere_son_evenement(
+    client: TestClient, evenement: dict[str, Any], creer_collaborateur: Callable[..., Any]
+) -> None:
+    from tests.agenda import decider, moderateur
+    from tests.test_rapports import soumettre
+
+    prof = connecter(client, "prof")
+    premier = lier(prof, brouillon(prof), evenement["id"]).json()
+    assert soumettre(prof, premier).status_code == 200
+    equipe = moderateur(client, creer_collaborateur, "equipe-rapports")
+    assert decider(equipe, premier["id"], "refuser", "Rapport incomplet, à refaire.").status_code == 200
+    collegue = connecter(client, "collegue")
+
+    assert lier(collegue, brouillon(collegue), evenement["id"]).status_code == 200

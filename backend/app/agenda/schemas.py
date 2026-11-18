@@ -163,8 +163,8 @@ class EvenementPublic(BaseModel):
     places: int | None
     participants: int
     complet: bool
+    # Le motif d'une annulation n'est pas public : il est écrit sans modération (RULES). Les invités le reçoivent.
     annule: bool
-    motif_annulation: str | None
     dre_code: str | None
     dre: str | None
     club_id: UUID | None

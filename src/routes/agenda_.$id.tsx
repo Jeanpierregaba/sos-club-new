@@ -92,9 +92,9 @@ function PageEvenement() {
             {evenement.titre}
           </h1>
 
-          {evenement.annule && evenement.motif_annulation && (
+          {evenement.annule && (
             <p className="mt-5 rounded-2xl bg-logo-red/10 px-4 py-3 font-semibold">
-              Annulé : {evenement.motif_annulation}
+              Cet événement est annulé. Les membres invités ont été prévenus.
             </p>
           )}
 
