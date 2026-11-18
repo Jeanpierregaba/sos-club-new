@@ -4,10 +4,11 @@ Rien ne se supprime : un élément se désactive et reste attaché à tout ce qu
 optimiste : deux collaborateurs qui modifient le même élément ne s'écrasent pas.
 """
 
+from datetime import datetime
 from enum import StrEnum
 from uuid import UUID, uuid7
 
-from sqlalchemy import CheckConstraint, Enum, ForeignKey, Integer, String, UniqueConstraint, text
+from sqlalchemy import CheckConstraint, DateTime, Enum, ForeignKey, Integer, String, UniqueConstraint, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base, Suivi
@@ -81,7 +82,12 @@ class Iesg(Suivi, Base):
 
 class Etablissement(Suivi, Base):
     __tablename__ = "etablissement"
-    __table_args__ = (UniqueConstraint("iesg_id", "nom_normalise"),)
+    __table_args__ = (
+        UniqueConstraint("iesg_id", "nom_normalise"),
+        # Spec 042 : seul un établissement inactif renvoie vers celui qui l'a absorbé, et jamais vers lui-même.
+        CheckConstraint("fusionne_dans_id IS NULL OR statut = 'inactif'", name="fusionne_si_inactif"),
+        CheckConstraint("fusionne_dans_id <> id", name="fusionne_ailleurs"),
+    )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
     # La DRE se déduit de l'IESG : elle n'est jamais saisie à part (Q2).
@@ -98,8 +104,29 @@ class Etablissement(Suivi, Base):
     prefecture: Mapped[str | None] = mapped_column(String(100), index=True)
     ordre: Mapped[OrdreEnseignement | None] = mapped_column(_enum_texte(OrdreEnseignement, "ordre_enseignement"))
     import_source: Mapped[str | None] = mapped_column(String(40), index=True)
+    # Spec 042 : l'établissement qui a absorbé celui-ci lors d'une fusion de doublons.
+    fusionne_dans_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("etablissement.id", ondelete="RESTRICT"), index=True
+    )
 
     __mapper_args__ = {"version_id_col": Suivi.version}  # noqa: RUF012
+
+
+class EcartDoublon(Base):
+    """Une paire d'établissements que l'équipe a jugée distincte (spec 042) : elle n'est plus proposée comme doublon.
+    La paire s'écrit dans un seul sens, le plus petit identifiant d'abord."""
+
+    __tablename__ = "ecart_doublon"
+    __table_args__ = (CheckConstraint("etablissement_a_id < etablissement_b_id", name="paire_ordonnee"),)
+
+    etablissement_a_id: Mapped[UUID] = mapped_column(
+        ForeignKey("etablissement.id", ondelete="RESTRICT"), primary_key=True
+    )
+    etablissement_b_id: Mapped[UUID] = mapped_column(
+        ForeignKey("etablissement.id", ondelete="RESTRICT"), primary_key=True, index=True
+    )
+    ecarte_par: Mapped[UUID | None] = mapped_column(ForeignKey("utilisateur.id", ondelete="SET NULL"))
+    ecarte_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class Axe(Suivi, Base):

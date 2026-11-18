@@ -10,7 +10,7 @@ comptes et des clubs : c'est une partie critique, écrite en TDD (les tests avan
   - l'analyse `docs/analyses/doublons-etablissements.md` commitée avec la spec ;
   - `docs/DESIGN.md` : la page « Doublons probables » et la boîte de dialogue de fusion ;
   - `docs/specs/016-referentiel/spec.md` : un renvoi vers la spec 042 pour le remplacement des propositions.
-- [ ] 2. Migration et modèles :
+- [x] 2. Migration et modèles :
   - la colonne `etablissement.fusionne_dans_id`, avec ses CHECK (inactif seulement, jamais vers soi-même) ;
   - la table `ecart_doublon`, avec sa clé primaire `(a, b)` et le CHECK `a < b` ;
   - le test d'aller-retour, et le retour arrière refusé dès qu'une fusion existe.
