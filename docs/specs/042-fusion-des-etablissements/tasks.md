@@ -17,13 +17,13 @@ comptes et des clubs : c'est une partie critique, écrite en TDD (les tests avan
 
 ## Détection des doublons
 
-- [ ] 3. Tests de `referentiel/doublons.py`, paramétrés et sans base :
+- [x] 3. Tests de `referentiel/doublons.py`, paramétrés et sans base :
   - les paires de l'analyse sont trouvées : Tokoin I, Bogou 2 et II, Warkanbou et Warkambou, Kondokopé en trois
     fiches, Koudjoaré et Koundjoare sous deux IESG, Ossakré et Ossacre ;
   - les faux positifs sont écartés : Fabienne I, III et M, Souverain G/A et G/B, Bassar Est et Ouest,
     Daroul Hikmah I et IV, Jardin et sa version « (Annexe) » ;
   - deux DRE différentes ne forment jamais une paire, et chaque paire porte sa raison.
-- [ ] 4. Code de `doublons.py` (clé forte, nom proche, prononciation, éléments distinctifs), jusqu'à ce que les tests
+- [x] 4. Code de `doublons.py` (clé forte, nom proche, prononciation, éléments distinctifs), jusqu'à ce que les tests
       de la tâche 3 passent.
 - [ ] 5. Tests puis code de la liste et des écarts : `lister_doublons`, `ecarter`, `retablir`, et les routes
       `GET /etablissements/doublons`, `POST …/ecarter` et `POST …/retablir`.
