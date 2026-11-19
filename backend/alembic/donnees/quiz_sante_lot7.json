@@ -1,0 +1,902 @@
+[
+ {
+  "titre": "Quiz Santé des Clubs · Infections sexuellement transmissibles (IST)",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 1 : Infections sexuellement transmissibles (IST) (questions 1 à 6).",
+  "lot": 7,
+  "axe": "sante-sexuelle-evss",
+  "questions": [
+   {
+    "n": 1,
+    "enonce": "Une infection sexuellement transmissible (IST) se transmet principalement :",
+    "choix": [
+     "En serrant la main d'une personne malade",
+     "Lors de rapports sexuels non protégés",
+     "En partageant un repas"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 2,
+    "enonce": "La syphilis, la gonococcie (« chaude-pisse ») et la chlamydiose sont :",
+    "choix": [
+     "Des infections sexuellement transmissibles",
+     "Des maladies héréditaires",
+     "Des maladies de la peau dues au soleil"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 3,
+    "enonce": "Quel moyen protège à la fois des IST et des grossesses ?",
+    "choix": [
+     "La pilule contraceptive",
+     "La toilette intime après le rapport",
+     "Le préservatif"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 4,
+    "enonce": "Une personne atteinte d'une IST :",
+    "choix": [
+     "Peut n'avoir aucun signe visible",
+     "A toujours des signes visibles",
+     "Guérit toujours toute seule"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 5,
+    "enonce": "Lequel de ces signes peut faire penser à une IST ?",
+    "choix": [
+     "Un rhume",
+     "Un écoulement anormal ou une plaie au niveau des organes génitaux",
+     "Un mal de tête après le sport"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 6,
+    "enonce": "Si tu penses avoir une IST, tu dois :",
+    "choix": [
+     "Acheter des médicaments au marché",
+     "Attendre que cela passe",
+     "Consulter rapidement un agent de santé"
+    ],
+    "bonne": 2
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Infection par le VIH",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 2 : Infection par le VIH (questions 7 à 12).",
+  "lot": 7,
+  "axe": "sante-sexuelle-evss",
+  "questions": [
+   {
+    "n": 7,
+    "enonce": "Que signifie le sigle VIH ?",
+    "choix": [
+     "Virus de l'Immunodéficience Humaine",
+     "Virus de l'Infection Hépatique",
+     "Virus de l'Inflammation Humaine"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 8,
+    "enonce": "Le VIH attaque principalement :",
+    "choix": [
+     "Les os",
+     "Les défenses de l'organisme (le système immunitaire)",
+     "Les dents"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 9,
+    "enonce": "Le VIH ne se transmet PAS par :",
+    "choix": [
+     "Le sang contaminé",
+     "Les rapports sexuels non protégés",
+     "Les piqûres de moustique"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 10,
+    "enonce": "Comment savoir si une personne est infectée par le VIH ?",
+    "choix": [
+     "En faisant un test de dépistage",
+     "En regardant son apparence physique",
+     "En mesurant sa température"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 11,
+    "enonce": "Une personne vivant avec le VIH qui prend correctement son traitement antirétroviral :",
+    "choix": [
+     "Guérit définitivement en une semaine",
+     "Peut vivre longtemps et en bonne santé",
+     "N'a plus besoin de voir un médecin"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 12,
+    "enonce": "Une femme enceinte séropositive peut éviter de transmettre le VIH à son bébé :",
+    "choix": [
+     "En accouchant à la maison",
+     "Ce n'est pas possible",
+     "En suivant son traitement pendant la grossesse et l'allaitement"
+    ],
+    "bonne": 2
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Infection par le Virus du Papillome Humain (VPH)",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 3 : Infection par le Virus du Papillome Humain (VPH) (questions 13 à 17).",
+  "lot": 7,
+  "axe": "sante-sexuelle-evss",
+  "questions": [
+   {
+    "n": 13,
+    "enonce": "Le Virus du Papillome Humain (VPH) peut provoquer :",
+    "choix": [
+     "Le paludisme",
+     "Le cancer du col de l'utérus",
+     "La carie dentaire"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 14,
+    "enonce": "Le VPH se transmet surtout :",
+    "choix": [
+     "Par contact sexuel",
+     "Par l'eau de boisson",
+     "Par la nourriture"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 15,
+    "enonce": "Quel est le meilleur moyen de protéger les jeunes filles contre le VPH ?",
+    "choix": [
+     "Les antibiotiques",
+     "La vitamine C",
+     "La vaccination"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 16,
+    "enonce": "À quel âge recommande-t-on de vacciner les filles contre le VPH ?",
+    "choix": [
+     "Entre 9 et 14 ans",
+     "Après 50 ans",
+     "Seulement pendant la grossesse"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 17,
+    "enonce": "Chez la femme adulte, quel examen permet de découvrir tôt les lésions du col de l'utérus ?",
+    "choix": [
+     "La radiographie des poumons",
+     "Le dépistage du cancer du col de l'utérus",
+     "La prise de la tension artérielle"
+    ],
+    "bonne": 1
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Grossesses précoces et non désirées",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 4 : Grossesses précoces et non désirées (questions 18 à 23).",
+  "lot": 7,
+  "axe": "sante-sexuelle-evss",
+  "questions": [
+   {
+    "n": 18,
+    "enonce": "Une grossesse précoce est une grossesse qui survient :",
+    "choix": [
+     "Après 35 ans",
+     "Au premier mois du mariage",
+     "Chez une adolescente"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 19,
+    "enonce": "Une fille peut tomber enceinte :",
+    "choix": [
+     "Dès le premier rapport sexuel non protégé",
+     "Seulement après plusieurs rapports",
+     "Seulement si elle est mariée"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 20,
+    "enonce": "Une conséquence fréquente d'une grossesse précoce est :",
+    "choix": [
+     "L'amélioration des résultats scolaires",
+     "L'abandon de l'école",
+     "Une meilleure santé de la fille"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 21,
+    "enonce": "Une grossesse chez une très jeune fille est dangereuse car :",
+    "choix": [
+     "Son corps n'est pas encore prêt, ce qui augmente les risques à l'accouchement",
+     "Elle mange trop",
+     "Les bébés sont toujours plus gros"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 22,
+    "enonce": "Pour éviter une grossesse non désirée, un adolescent peut :",
+    "choix": [
+     "Boire de l'eau salée après le rapport",
+     "Se laver juste après le rapport",
+     "Retarder ses premiers rapports ou utiliser correctement un moyen de contraception"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 23,
+    "enonce": "Où un adolescent peut-il recevoir des conseils fiables sur la contraception ?",
+    "choix": [
+     "Auprès d'amis sur les réseaux sociaux",
+     "Dans un centre de santé ou un centre d'écoute pour jeunes",
+     "Chez un vendeur de médicaments de rue"
+    ],
+    "bonne": 1
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Violences Basées sur le Genre (VBG)",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 5 : Violences Basées sur le Genre (VBG) (questions 24 à 28).",
+  "lot": 7,
+  "axe": "sante-sexuelle-evss",
+  "questions": [
+   {
+    "n": 24,
+    "enonce": "Une violence basée sur le genre est :",
+    "choix": [
+     "Une violence subie à cause de son sexe ou de son genre",
+     "Une dispute entre deux équipes de football",
+     "Une maladie contagieuse"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 25,
+    "enonce": "Lequel de ces actes est une violence basée sur le genre ?",
+    "choix": [
+     "Faire du sport ensemble",
+     "Aider sa sœur à faire ses devoirs",
+     "Le mariage forcé d'une fille mineure"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 26,
+    "enonce": "Les violences peuvent être :",
+    "choix": [
+     "Seulement physiques",
+     "Physiques, sexuelles, psychologiques ou économiques",
+     "Seulement verbales"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 27,
+    "enonce": "Le harcèlement sexuel à l'école est :",
+    "choix": [
+     "Une forme de violence qu'il faut dénoncer",
+     "Une simple plaisanterie",
+     "Normal entre élèves"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 28,
+    "enonce": "Une victime de violence doit :",
+    "choix": [
+     "Garder le silence",
+     "Se venger",
+     "En parler à une personne de confiance et demander de l'aide"
+    ],
+    "bonne": 2
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Méfaits de la consommation de la drogue",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 6 : Méfaits de la consommation de la drogue (questions 29 à 33).",
+  "lot": 7,
+  "axe": "sante-environnement",
+  "questions": [
+   {
+    "n": 29,
+    "enonce": "Lequel de ces produits est une drogue ?",
+    "choix": [
+     "Le riz",
+     "Le cannabis (chanvre indien)",
+     "Le jus d'orange"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 30,
+    "enonce": "La dépendance à une drogue, c'est :",
+    "choix": [
+     "Ne plus pouvoir se passer du produit",
+     "Être indépendant",
+     "Aimer le sport"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 31,
+    "enonce": "Le tramadol pris sans ordonnance :",
+    "choix": [
+     "Donne de la force sans aucun danger",
+     "Guérit le paludisme",
+     "Peut rendre dépendant et provoquer des troubles graves"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 32,
+    "enonce": "Une conséquence de la consommation de drogue chez les jeunes est :",
+    "choix": [
+     "L'échec scolaire et les troubles mentaux",
+     "Une meilleure mémoire",
+     "Une meilleure santé"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 33,
+    "enonce": "Si un ami te propose de la drogue, tu dois :",
+    "choix": [
+     "Accepter pour faire comme les autres",
+     "Refuser et en parler à un adulte de confiance",
+     "En acheter pour essayer"
+    ],
+    "bonne": 1
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Addictions aux écrans",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 7 : Addictions aux écrans (questions 34 à 38).",
+  "lot": 7,
+  "axe": "sante-environnement",
+  "questions": [
+   {
+    "n": 34,
+    "enonce": "L'addiction aux écrans, c'est :",
+    "choix": [
+     "Avoir un téléphone portable",
+     "Regarder la télévision une heure le week-end",
+     "Ne plus arriver à contrôler le temps passé devant les écrans"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 35,
+    "enonce": "Utiliser son téléphone tard dans la nuit peut provoquer :",
+    "choix": [
+     "Des troubles du sommeil et de la fatigue en classe",
+     "Une meilleure concentration",
+     "Une meilleure vue"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 36,
+    "enonce": "Passer trop de temps devant les écrans peut entraîner :",
+    "choix": [
+     "Une croissance plus rapide",
+     "Une fatigue des yeux, des maux de tête et un manque d'activité physique",
+     "De meilleures notes"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 37,
+    "enonce": "Un bon conseil pour bien dormir est :",
+    "choix": [
+     "Éteindre les écrans au moins une heure avant de dormir",
+     "Dormir avec son téléphone allumé sous l'oreiller",
+     "Regarder des vidéos jusqu'à minuit"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 38,
+    "enonce": "Pour éviter l'addiction aux écrans, il est conseillé de :",
+    "choix": [
+     "Acheter un deuxième téléphone",
+     "Jouer aux jeux vidéo toute la nuit",
+     "Pratiquer des activités sportives, culturelles et en famille"
+    ],
+    "bonne": 2
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Santé mentale",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 8 : Santé mentale (questions 39 à 43).",
+  "lot": 7,
+  "axe": "sante-environnement",
+  "questions": [
+   {
+    "n": 39,
+    "enonce": "La santé mentale, c'est :",
+    "choix": [
+     "Ne jamais être triste",
+     "Un état de bien-être qui permet de faire face au stress, d'apprendre et de bien vivre avec les autres",
+     "Être très intelligent"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 40,
+    "enonce": "Lequel de ces signes peut faire penser à une dépression ?",
+    "choix": [
+     "Une tristesse qui dure, la perte d'intérêt et des troubles du sommeil",
+     "Une bonne humeur permanente",
+     "La faim après le sport"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 41,
+    "enonce": "Une bonne façon de gérer le stress des examens est :",
+    "choix": [
+     "Réviser toute la nuit sans dormir",
+     "Prendre des produits pour rester éveillé",
+     "S'organiser, bien dormir et faire des pauses"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 42,
+    "enonce": "Les troubles mentaux :",
+    "choix": [
+     "Sont des maladies qui se soignent",
+     "Sont toujours dus à un sort",
+     "N'existent pas chez les jeunes"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 43,
+    "enonce": "Si un camarade dit qu'il veut se faire du mal, tu dois :",
+    "choix": [
+     "Te moquer de lui",
+     "Prévenir rapidement un adulte de confiance",
+     "Garder le secret"
+    ],
+    "bonne": 1
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Accidents de la voie publique",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 9 : Accidents de la voie publique (questions 44 à 48).",
+  "lot": 7,
+  "axe": "sport-secourisme",
+  "questions": [
+   {
+    "n": 44,
+    "enonce": "Le port du casque à moto (zémidjan) :",
+    "choix": [
+     "N'est utile que pour le conducteur",
+     "Sert seulement quand il pleut",
+     "Réduit fortement le risque de blessure grave à la tête"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 45,
+    "enonce": "Avant de traverser la route, il faut :",
+    "choix": [
+     "Regarder à gauche, à droite, puis encore à gauche",
+     "Courir sans regarder",
+     "Traverser en lisant ses messages"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 46,
+    "enonce": "Une cause fréquente d'accidents de la route est :",
+    "choix": [
+     "Le respect du code de la route",
+     "L'excès de vitesse et l'alcool au volant",
+     "Le port du casque"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 47,
+    "enonce": "En voiture, la ceinture de sécurité doit être portée :",
+    "choix": [
+     "Par tous les passagers, à chaque trajet",
+     "Seulement pour les longs voyages",
+     "Seulement par le conducteur"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 48,
+    "enonce": "Face à un accident, la première chose à faire est :",
+    "choix": [
+     "Donner à boire au blessé inconscient",
+     "Déplacer brutalement le blessé",
+     "Se protéger, sécuriser les lieux et appeler les secours"
+    ],
+    "bonne": 2
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Paludisme",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 10 : Paludisme (questions 49 à 53).",
+  "lot": 7,
+  "axe": "sante-environnement",
+  "questions": [
+   {
+    "n": 49,
+    "enonce": "Le paludisme est transmis par :",
+    "choix": [
+     "L'eau sale",
+     "La piqûre d'un moustique (anophèle femelle) infecté",
+     "Le contact avec un malade"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 50,
+    "enonce": "Le meilleur moyen de se protéger du paludisme la nuit est :",
+    "choix": [
+     "Dormir sous une moustiquaire imprégnée d'insecticide",
+     "Manger beaucoup de mangues",
+     "Boire beaucoup d'eau"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 51,
+    "enonce": "Le signe le plus fréquent du paludisme est :",
+    "choix": [
+     "La chute des cheveux",
+     "Un bouton sur la langue",
+     "La fièvre"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 52,
+    "enonce": "En cas de fièvre, il faut :",
+    "choix": [
+     "Aller au centre de santé pour faire un test de dépistage",
+     "Prendre n'importe quel médicament",
+     "Attendre une semaine"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 53,
+    "enonce": "Les moustiques se reproduisent dans :",
+    "choix": [
+     "Le sable sec",
+     "Les eaux stagnantes (flaques, vieux pneus, boîtes)",
+     "Les feuilles des arbres"
+    ],
+    "bonne": 1
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Nutrition",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 11 : Nutrition (questions 54 à 58).",
+  "lot": 7,
+  "axe": "sante-environnement",
+  "questions": [
+   {
+    "n": 54,
+    "enonce": "Une alimentation équilibrée, c'est :",
+    "choix": [
+     "Manger seulement du riz",
+     "Boire beaucoup de boissons sucrées",
+     "Manger des aliments variés : céréales, légumes, fruits et protéines"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 55,
+    "enonce": "Lesquels de ces aliments sont riches en protéines ?",
+    "choix": [
+     "Les haricots, le poisson, les œufs et la viande",
+     "Les bonbons et le sucre",
+     "L'huile et la margarine"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 56,
+    "enonce": "Prendre un petit-déjeuner le matin :",
+    "choix": [
+     "N'est pas utile",
+     "Aide à bien se concentrer en classe",
+     "Fait toujours grossir"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 57,
+    "enonce": "Les fruits et les légumes apportent surtout :",
+    "choix": [
+     "Des vitamines et des minéraux",
+     "Des graisses",
+     "De l'alcool"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 58,
+    "enonce": "Pour bien s'hydrater, il faut :",
+    "choix": [
+     "Boire des sodas",
+     "Attendre d'avoir très soif",
+     "Boire régulièrement de l'eau potable"
+    ],
+    "bonne": 2
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Obésité",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 12 : Obésité (questions 59 à 63).",
+  "lot": 7,
+  "axe": "sante-environnement",
+  "questions": [
+   {
+    "n": 59,
+    "enonce": "L'obésité est :",
+    "choix": [
+     "Un signe de bonne santé",
+     "Un excès de graisse dans le corps, dangereux pour la santé",
+     "Une maladie contagieuse"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 60,
+    "enonce": "Une cause fréquente de l'obésité est :",
+    "choix": [
+     "Manger trop gras et trop sucré, et ne pas bouger assez",
+     "Boire trop d'eau",
+     "Manger trop de légumes"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 61,
+    "enonce": "L'obésité augmente le risque de :",
+    "choix": [
+     "Paludisme",
+     "Myopie",
+     "Diabète, hypertension et maladies du cœur"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 62,
+    "enonce": "Combien de temps d'activité physique recommande-t-on aux jeunes ?",
+    "choix": [
+     "10 minutes par mois",
+     "Au moins 60 minutes par jour",
+     "Une fois par an"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 63,
+    "enonce": "Quelle mesure permet de savoir si son poids est normal par rapport à sa taille ?",
+    "choix": [
+     "L'indice de masse corporelle (IMC)",
+     "La température",
+     "La tension artérielle"
+    ],
+    "bonne": 0
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Troubles et baisse de la vision",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 13 : Troubles et baisse de la vision (questions 64 à 68).",
+  "lot": 7,
+  "axe": "sante-environnement",
+  "questions": [
+   {
+    "n": 64,
+    "enonce": "Quel signe peut montrer qu'un élève voit mal ?",
+    "choix": [
+     "Il lit facilement le tableau du fond de la classe",
+     "Il plisse les yeux pour lire le tableau et a souvent mal à la tête",
+     "Il court vite"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 65,
+    "enonce": "La myopie, c'est :",
+    "choix": [
+     "Avoir du mal à voir de loin",
+     "Avoir du mal à distinguer les couleurs",
+     "Avoir mal aux oreilles"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 66,
+    "enonce": "En cas de baisse de la vision, il faut :",
+    "choix": [
+     "Porter les lunettes d'un ami",
+     "Mettre du citron dans les yeux",
+     "Consulter un spécialiste des yeux"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 67,
+    "enonce": "Pour protéger ses yeux, il faut :",
+    "choix": [
+     "Éviter de lire dans le noir et limiter le temps d'écran",
+     "Regarder le soleil en face",
+     "Se frotter souvent les yeux"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 68,
+    "enonce": "Pour éviter de transmettre une conjonctivite (« yeux rouges »), il faut :",
+    "choix": [
+     "Mettre des produits traditionnels dans les yeux",
+     "Se laver les mains et ne pas partager sa serviette",
+     "Se frotter les yeux"
+    ],
+    "bonne": 1
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Baisse de l'audition",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 14 : Baisse de l'audition (questions 69 à 73).",
+  "lot": 7,
+  "axe": "sante-environnement",
+  "questions": [
+   {
+    "n": 69,
+    "enonce": "Une cause fréquente de baisse de l'audition chez les jeunes est :",
+    "choix": [
+     "Lire beaucoup de livres",
+     "Manger des fruits",
+     "Écouter de la musique trop fort avec des écouteurs"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 70,
+    "enonce": "Quel signe peut montrer qu'une personne entend mal ?",
+    "choix": [
+     "Elle fait souvent répéter les autres et monte le son de la télévision",
+     "Elle dort bien",
+     "Elle mange beaucoup"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 71,
+    "enonce": "Pour nettoyer ses oreilles, il faut :",
+    "choix": [
+     "Enfoncer un bâton ou une épingle",
+     "Nettoyer seulement l'extérieur, sans rien enfoncer dans le conduit",
+     "Verser de l'huile chaude"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 72,
+    "enonce": "Une infection de l'oreille (otite) mal soignée peut :",
+    "choix": [
+     "Entraîner une baisse de l'audition",
+     "Améliorer l'ouïe",
+     "Guérir la myopie"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 73,
+    "enonce": "Pour protéger ses oreilles avec des écouteurs, il faut :",
+    "choix": [
+     "Mettre le volume au maximum toute la journée",
+     "Dormir avec les écouteurs",
+     "Baisser le volume et faire des pauses régulières"
+    ],
+    "bonne": 2
+   }
+  ]
+ },
+ {
+  "titre": "Quiz Santé des Clubs · Affections bucco-dentaires",
+  "description": "Lot 7 — Quiz Santé des Clubs · thématique 15 : Affections bucco-dentaires (questions 74 à 78).",
+  "lot": 7,
+  "axe": "sante-environnement",
+  "questions": [
+   {
+    "n": 74,
+    "enonce": "Combien de fois par jour faut-il se brosser les dents ?",
+    "choix": [
+     "Une fois par semaine",
+     "Au moins deux fois par jour, matin et soir",
+     "Seulement avant une fête"
+    ],
+    "bonne": 1
+   },
+   {
+    "n": 75,
+    "enonce": "La carie dentaire est surtout causée par :",
+    "choix": [
+     "Le sucre et le manque d'hygiène de la bouche",
+     "L'eau",
+     "Le sel"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 76,
+    "enonce": "Combien de temps doit durer un brossage des dents ?",
+    "choix": [
+     "10 secondes",
+     "10 minutes",
+     "Environ 2 minutes"
+    ],
+    "bonne": 2
+   },
+   {
+    "n": 77,
+    "enonce": "Le fluor contenu dans le dentifrice sert à :",
+    "choix": [
+     "Renforcer les dents contre les caries",
+     "Parfumer la bouche seulement",
+     "Blanchir la peau"
+    ],
+    "bonne": 0
+   },
+   {
+    "n": 78,
+    "enonce": "Des gencives qui saignent pendant le brossage :",
+    "choix": [
+     "C'est normal, il faut arrêter de se brosser",
+     "C'est signe d'inflammation : il faut bien se brosser et consulter un dentiste",
+     "C'est un signe de bonne santé"
+    ],
+    "bonne": 1
+   }
+  ]
+ }
+]

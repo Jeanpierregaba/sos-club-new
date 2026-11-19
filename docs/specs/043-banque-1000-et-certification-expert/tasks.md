@@ -12,10 +12,10 @@ suivi touchent la certification (partie critique, `docs/TESTING.md`) : leurs tes
 
 ## Banque de 1 000 questions
 
-- [ ] 2. Tests de `app/quiz/import_docx.py` sur un petit document construit dans le test : thématiques, numéros,
+- [x] 2. Tests de `app/quiz/import_docx.py` sur un petit document construit dans le test : thématiques, numéros,
       3 propositions, réponse en gras ; refus de deux réponses en gras, d'aucune, ou d'un nombre de propositions
       différent de 3.
-- [ ] 3. Code de `import_docx.py` et de sa commande, jusqu'à ce que les tests passent. Générer
+- [x] 3. Code de `import_docx.py` et de sa commande, jusqu'à ce que les tests passent. Générer
       `backend/alembic/donnees/quiz_sante_lot7.json` depuis le document (78 QCM, 15 thématiques, axe de chaque
       thématique selon la spec). Test sur le JSON commité : 78 QCM, numéros 1 à 78, axes connus, aucun énoncé
       déjà présent dans `quiz_sante.json`.
