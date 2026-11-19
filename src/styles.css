@@ -460,6 +460,51 @@
     animation: trait-axe 5s ease-in-out infinite;
   }
 }
+/* « Rejoindre le club » (navbar) : un reflet qui traverse le bouton toutes les 4 s, et un halo vert qui respire. */
+@utility btn-brille {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow: 0 0 0 0 oklch(from var(--primary) l c h / 0.55);
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -20% auto -20% -60%;
+    z-index: -1;
+    width: 45%;
+    transform: skewX(-20deg);
+    background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.55), transparent);
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    animation: halo-vert 2.6s ease-out infinite;
+    &::after {
+      animation: reflet 4s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes reflet {
+  0%,
+  55% {
+    left: -60%;
+  }
+  85%,
+  100% {
+    left: 120%;
+  }
+}
+
+@keyframes halo-vert {
+  0% {
+    box-shadow: 0 0 0 0 oklch(from var(--primary) l c h / 0.55);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 10px oklch(from var(--primary) l c h / 0);
+  }
+}
+
 @keyframes trait-axe {
   0% {
     stroke-dashoffset: 1;

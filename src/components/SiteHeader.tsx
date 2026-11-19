@@ -80,7 +80,7 @@ export function SiteHeader() {
   const join = moi ? null : (
     <Link
       to="/inscription"
-      className="btn-fx whitespace-nowrap rounded-full bg-primary px-5 py-2.5 text-center text-sm font-bold text-primary-foreground"
+      className="btn-fx btn-brille whitespace-nowrap rounded-full bg-primary px-5 py-2.5 text-center text-sm font-bold text-primary-foreground"
     >
       Rejoindre le club
     </Link>

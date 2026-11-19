@@ -2,9 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { BarChart3, Gamepad2, MessageCircleQuestion, Trophy } from "lucide-react";
 
-import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
-import mascotteMedias from "@/assets/mascotte-medias.webp";
-import { chargerPodiumClubs, type ClubPodium } from "@/lib/api/client";
+import {
+  chargerClassementPublic,
+  chargerPodiumClubs,
+  type ClassementPersonnesPublic,
+  type ClubPodium,
+} from "@/lib/api/client";
 
 const MEDAILLES = [
   "bg-linear-to-br from-sun to-[oklch(0.75_0.16_75)] text-ink",
@@ -17,12 +20,27 @@ const LIGNES = [
   "bg-white/70 text-ink",
 ];
 
-// Le podium de l'accueil (spec 021, spec 034) : les trois lycées dont le Club Santé a le plus de points. Un club reçoit la
-// moitié de chaque gain de ses élèves (« 2,5 » possible) ; tant que personne n'a de points, la carte annonce le classement.
+// Le podium de l'accueil (spec 021, spec 034) : les trois lycées dont le Club Santé a le plus de points (un club reçoit la
+// moitié de chaque gain de ses élèves, « 2,5 » possible), et les trois meilleurs élèves du classement national du
+// semestre, par leur seul pseudonyme (RULES). Tant que personne n'a de points, chaque carte annonce le classement.
 export function PodiumClubs() {
   const { data: podium = [] } = useQuery({
     queryKey: ["podium-clubs"],
     queryFn: chargerPodiumClubs,
+    retry: false,
+    staleTime: 5 * 60_000,
+  });
+  const { data: eleves = [] } = useQuery({
+    queryKey: ["podium-eleves"],
+    queryFn: async () => {
+      const classement = await chargerClassementPublic({
+        categorie: "eleves",
+        niveau: "national",
+        periode: "semestre",
+        par_page: 3,
+      });
+      return (classement as ClassementPersonnesPublic).lignes.slice(0, 3);
+    },
     retry: false,
     staleTime: 5 * 60_000,
   });
@@ -46,23 +64,7 @@ export function PodiumClubs() {
         className="absolute -bottom-40 right-0 -z-10 size-[32rem] rounded-full bg-grape/40 blur-3xl motion-safe:animate-derive"
       />
 
-      <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 lg:grid-cols-[auto_minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-8">
-        {/* La mascotte de l'axe Génie Imhotep, en pied, sur un halo bleu. */}
-        <div className="relative mx-auto lg:self-end">
-          <span
-            aria-hidden
-            className="absolute bottom-6 left-1/2 aspect-square w-[115%] -translate-x-1/2 rounded-full bg-sky/35 blur-sm"
-          />
-          <img
-            src={mascotteImhotep}
-            alt="La mascotte de l’axe Génie Imhotep"
-            width={1414}
-            height={2000}
-            loading="lazy"
-            className="relative h-64 w-auto drop-shadow-[0_25px_35px_rgba(0,0,0,0.45)] lg:h-[24rem]"
-          />
-        </div>
-
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-12">
         <div data-reveal="left" className="relative text-center lg:text-left">
           <p className="inline-flex items-center gap-2 rounded-full border-2 border-sun/80 px-4 py-1.5 text-sm font-extrabold uppercase tracking-wide">
             <Gamepad2 aria-hidden className="size-5 text-sun" /> Jeux & classement
@@ -86,38 +88,89 @@ export function PodiumClubs() {
               texte="Fais progresser ton club"
             />
           </div>
-          <Link
-            to="/jeux"
-            className="btn-fx mt-8 inline-flex rounded-full bg-sun px-10 py-4 text-lg font-extrabold text-ink shadow-lg shadow-sun/20"
-          >
-            Découvrir les jeux
-          </Link>
+          <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
+            <Link
+              to="/jeux"
+              className="btn-fx inline-flex rounded-full bg-sun px-8 py-4 text-lg font-extrabold text-ink shadow-lg shadow-sun/20"
+            >
+              Découvrir les jeux
+            </Link>
+            <Link
+              to="/hall-of-fame"
+              className="btn-fx inline-flex rounded-full border-2 border-white/80 px-8 py-4 text-lg font-extrabold text-white hover:bg-white hover:text-ink"
+            >
+              Découvrir le classement
+            </Link>
+          </div>
         </div>
 
-        {/* La mascotte de l'axe Production TV & médias, accoudée au-dessus du podium. */}
-        <div data-reveal="right" className="relative mx-auto w-full max-w-md pt-40 sm:pt-44">
-          <img
-            src={mascotteMedias}
-            alt="La mascotte de l’axe Production TV & médias"
-            width={1414}
-            height={2000}
-            loading="lazy"
-            className="absolute right-0 top-0 z-10 h-56 w-auto drop-shadow-[0_20px_30px_rgba(0,0,0,0.45)] sm:-right-4 sm:h-60"
-          />
-          <div className="relative rounded-[2rem] bg-white/10 p-6 ring-1 ring-white/25 backdrop-blur-md md:p-8">
-            <Trophy aria-hidden className="mx-auto size-10 text-sun drop-shadow" />
-            <p className="mt-2 text-center font-display text-3xl">Top 3 des lycées</p>
-            {podium.length > 0 ? <Classement podium={podium} /> : <BientotLa />}
-          </div>
+        <div data-reveal="right" className="mx-auto flex w-full min-w-0 max-w-md flex-col gap-5">
+          <CarteTop3 titre="Top 3 des lycées">
+            {podium.length > 0 ? (
+              <Classement podium={podium} />
+            ) : (
+              <BientotLa texte="Les points des Clubs Santé s’afficheront ici : ton lycée peut prendre la première place." />
+            )}
+          </CarteTop3>
+          <CarteTop3 titre="Top 3 des élèves">
+            {eleves.length > 0 ? (
+              <ClassementEleves eleves={eleves} />
+            ) : (
+              <BientotLa texte="Les meilleurs élèves du semestre s’afficheront ici : joue aux quiz pour y figurer." />
+            )}
+          </CarteTop3>
         </div>
       </div>
     </section>
   );
 }
 
+function CarteTop3({ titre, children }: { titre: string; children: React.ReactNode }) {
+  return (
+    <div className="relative rounded-[2rem] bg-white/10 p-5 ring-1 ring-white/25 backdrop-blur-md md:p-6">
+      <p className="flex items-center justify-center gap-2 text-center font-display text-2xl md:text-3xl">
+        <Trophy aria-hidden className="size-7 text-sun drop-shadow" /> {titre}
+      </p>
+      {children}
+    </div>
+  );
+}
+
+type LigneEleve = ClassementPersonnesPublic["lignes"][number];
+
+function ClassementEleves({ eleves }: { eleves: LigneEleve[] }) {
+  return (
+    <ol className="mt-4 space-y-2.5" aria-label="Top 3 des élèves">
+      {eleves.map((eleve, i) => (
+        <li
+          key={`${eleve.rang}-${eleve.nom}`}
+          className={`flex items-center gap-4 rounded-2xl px-4 py-3 shadow-lg ${LIGNES[i]}`}
+        >
+          <span
+            aria-hidden
+            className={`inline-flex size-11 shrink-0 items-center justify-center rounded-full font-display text-xl ring-2 ring-white/70 ${MEDAILLES[i]}`}
+          >
+            {eleve.rang}
+          </span>
+          <span className="sr-only">{`${eleve.rang}${eleve.rang === 1 ? "er" : "e"}`}</span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate font-extrabold">{eleve.nom}</span>
+            <span className="block truncate text-sm font-medium opacity-75">
+              {eleve.club ? `${eleve.club} · ${eleve.dre}` : eleve.dre}
+            </span>
+          </span>
+          <span className="shrink-0 font-display text-xl">
+            {eleve.points.toLocaleString("fr-FR")} <span className="text-sm">pts</span>
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function Classement({ podium }: { podium: ClubPodium[] }) {
   return (
-    <ol className="mt-4 space-y-2.5">
+    <ol className="mt-4 space-y-2.5" aria-label="Top 3 des lycées">
       {podium.map((club, i) => (
         <li
           key={club.id}
@@ -145,7 +198,7 @@ function Classement({ podium }: { podium: ClubPodium[] }) {
   );
 }
 
-function BientotLa() {
+function BientotLa({ texte }: { texte: string }) {
   return (
     <div className="mt-4 space-y-2.5">
       {[1, 2, 3].map((rang, i) => (
@@ -164,9 +217,7 @@ function BientotLa() {
         </div>
       ))}
       <p className="pt-2 text-center font-bold">Le classement arrive bientôt&#8239;!</p>
-      <p className="text-center text-sm font-medium text-white/75">
-        Les points des Clubs Santé s’afficheront ici : ton lycée peut prendre la première place.
-      </p>
+      <p className="text-center text-sm font-medium text-white/75">{texte}</p>
     </div>
   );
 }

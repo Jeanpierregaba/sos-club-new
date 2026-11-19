@@ -5,13 +5,13 @@ import {
   createRouter,
   RouterProvider,
 } from "@tanstack/react-router";
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PodiumClubs } from "./PodiumClubs";
 import type { ClubPodium } from "@/lib/api/client";
 
-const api = vi.hoisted(() => ({ chargerPodiumClubs: vi.fn() }));
+const api = vi.hoisted(() => ({ chargerPodiumClubs: vi.fn(), chargerClassementPublic: vi.fn() }));
 vi.mock("@/lib/api/client", async (original) => ({
   ...(await original<typeof import("@/lib/api/client")>()),
   ...api,
@@ -44,7 +44,22 @@ const club = (rang: number, nom: string, points: number): ClubPodium => ({
   points,
 });
 
-beforeEach(() => vi.clearAllMocks());
+const eleves = (lignes: { rang: number; nom: string; points: number }[]) => ({
+  categorie: "eleves",
+  niveau: "national",
+  dre: null,
+  periode: "semestre",
+  semestre: null,
+  page: 1,
+  par_page: 3,
+  total: lignes.length,
+  lignes: lignes.map((l) => ({ ...l, club: "Club Tokoin", dre: "Grand Lomé" })),
+});
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  api.chargerClassementPublic.mockResolvedValue(eleves([]));
+});
 
 describe("PodiumClubs", () => {
   it("montre les trois clubs avec leurs points et un lien vers les jeux", async () => {
@@ -55,7 +70,8 @@ describe("PodiumClubs", () => {
     ]);
     await afficher();
 
-    const lignes = await screen.findAllByRole("listitem");
+    const lycees = await screen.findByRole("list", { name: "Top 3 des lycées" });
+    const lignes = within(lycees).getAllByRole("listitem");
     expect(lignes).toHaveLength(3);
     expect(lignes[0]).toHaveTextContent("Lycée 1");
     expect(lignes[0]).toHaveTextContent("Club Tokoin");
@@ -65,20 +81,50 @@ describe("PodiumClubs", () => {
       "href",
       "/jeux",
     );
+    expect(screen.getByRole("link", { name: "Découvrir le classement" })).toHaveAttribute(
+      "href",
+      "/hall-of-fame",
+    );
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  });
+
+  it("montre les trois meilleurs élèves par leur pseudonyme", async () => {
+    api.chargerPodiumClubs.mockResolvedValue([]);
+    api.chargerClassementPublic.mockResolvedValue(
+      eleves([
+        { rang: 1, nom: "Ama du Golfe", points: 900 },
+        { rang: 2, nom: "Kofi", points: 700 },
+        { rang: 3, nom: "Yawa", points: 650 },
+      ]),
+    );
+    await afficher();
+
+    const top = await screen.findByRole("list", { name: "Top 3 des élèves" });
+    const lignes = within(top).getAllByRole("listitem");
+    expect(lignes).toHaveLength(3);
+    expect(lignes[0]).toHaveTextContent("Ama du Golfe");
+    expect(lignes[0]).toHaveTextContent("Club Tokoin · Grand Lomé");
+    expect(api.chargerClassementPublic).toHaveBeenCalledWith({
+      categorie: "eleves",
+      niveau: "national",
+      periode: "semestre",
+      par_page: 3,
+    });
   });
 
   it("annonce le classement tant qu'aucun club n'a de points", async () => {
     api.chargerPodiumClubs.mockResolvedValue([]);
     await afficher();
 
-    expect(screen.getByText("Le classement arrive bientôt !")).toBeInTheDocument();
+    expect(screen.getAllByText("Le classement arrive bientôt !")).toHaveLength(2);
     expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
   });
 
   it("garde l'état vide si l'API ne répond pas", async () => {
     api.chargerPodiumClubs.mockRejectedValue(new Error("hors ligne"));
+    api.chargerClassementPublic.mockRejectedValue(new Error("hors ligne"));
     await afficher();
 
-    expect(screen.getByText("Le classement arrive bientôt !")).toBeInTheDocument();
+    expect(screen.getAllByText("Le classement arrive bientôt !")).toHaveLength(2);
   });
 });
