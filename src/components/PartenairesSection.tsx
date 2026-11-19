@@ -1,15 +1,48 @@
-// Emplacements à remplacer par les vrais logos. Le défilement n'est continu que si une liste dépasse la largeur de l'écran : répéter les logos s'il y en a peu.
-const partenaires = Array.from({ length: 8 }, (_, i) => `Logo partenaire ${i + 1}`);
+import clubSante from "@/assets/partenaires/club-sante-sos-docteur-tv.webp";
+import ministereAdministration from "@/assets/partenaires/ministere-administration-territoriale.webp";
+import ministereEducation from "@/assets/partenaires/ministere-education-nationale.webp";
+import ministereSante from "@/assets/partenaires/ministere-sante.webp";
+import ministereSolidarites from "@/assets/partenaires/ministere-solidarites.webp";
+import unfpa from "@/assets/partenaires/unfpa.svg";
+
+const PARTENAIRES = [
+  { src: clubSante, nom: "Club Santé SOS Docteur TV" },
+  { src: ministereEducation, nom: "Ministère de l'Éducation nationale" },
+  {
+    src: ministereSante,
+    nom: "Ministère de la Santé, de l'Hygiène publique, de la Couverture sanitaire universelle et des Assurances",
+  },
+  {
+    src: ministereSolidarites,
+    nom: "Ministère des Solidarités, du Genre, de la Famille et de la Protection de l'enfance",
+  },
+  {
+    src: ministereAdministration,
+    nom: "Ministère de l'Administration territoriale, de la Gouvernance locale et des Affaires culturelles",
+  },
+  { src: unfpa, nom: "UNFPA, Fonds des Nations unies pour la population" },
+];
+
+// Le défilement n'est continu que si une liste dépasse la largeur de l'écran : les logos sont répétés deux fois.
+const partenaires = [...PARTENAIRES, ...PARTENAIRES];
 
 function Logos({ masque = false }: { masque?: boolean }) {
   return (
     <ul aria-hidden={masque || undefined} className="flex shrink-0 gap-6 pr-6">
-      {partenaires.map((p) => (
+      {partenaires.map((p, i) => (
         <li
-          key={p}
-          className="flex h-24 w-48 items-center justify-center rounded-2xl border bg-card px-4 text-center text-sm font-bold text-muted-foreground shadow-sm transition duration-300 hover:scale-105 hover:border-primary hover:text-logo-blue"
+          key={`${p.nom}-${i}`}
+          aria-hidden={(!masque && i >= PARTENAIRES.length) || undefined}
+          className="flex h-40 w-56 items-center justify-center rounded-2xl border bg-white p-2 shadow-sm transition duration-300 hover:scale-105 hover:border-primary"
         >
-          {p}
+          <img
+            src={p.src}
+            alt={p.nom}
+            title={p.nom}
+            loading="lazy"
+            decoding="async"
+            className="max-h-full max-w-full object-contain"
+          />
         </li>
       ))}
     </ul>
