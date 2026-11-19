@@ -29,12 +29,15 @@ import {
   MESSAGE_INDISPONIBLE,
   type ApercuModeration,
   type ModeleRapport,
+  type ReseauPartage,
   type RapportModeration,
   urlDocumentModeration,
   urlPhotoModeration,
   type EtatContenu as Etat,
 } from "@/lib/api/client";
 import { dateCourte } from "@/lib/dates";
+import { nomDuReseau } from "@/lib/partages";
+import { ApercuPartage } from "@/components/partages/ApercuPartage";
 import { MODELES } from "@/lib/rapports";
 
 type Recherche = {
@@ -57,7 +60,8 @@ type TypeContenu =
   | "rapport_activite"
   | "rapport_mensuel"
   | "bilan_semestriel"
-  | "evenement";
+  | "evenement"
+  | "partage";
 const TYPES: { code: TypeContenu; libelle: string }[] = [
   { code: "article", libelle: "Articles" },
   { code: "actualite", libelle: "Actualités des clubs" },
@@ -69,6 +73,8 @@ const TYPES: { code: TypeContenu; libelle: string }[] = [
   { code: "bilan_semestriel", libelle: "Bilans semestriels" },
   // Spec 041 : décidés avec le droit « agenda : approuver ».
   { code: "evenement", libelle: "Événements de l'agenda" },
+  // Spec 044 : décidés avec le droit « partages : approuver ».
+  { code: "partage", libelle: "Partages déclarés" },
 ];
 const BADGES: Partial<Record<string, string>> = {
   commentaire: "Commentaire",
@@ -78,6 +84,7 @@ const BADGES: Partial<Record<string, string>> = {
   rapport_mensuel: "Rapport mensuel",
   bilan_semestriel: "Bilan semestriel",
   evenement: "Événement",
+  partage: "Partage",
 };
 
 const ONGLETS: { etat: Etat; libelle: string }[] = [
@@ -428,6 +435,8 @@ function Apercu({
   const fiche = apercu?.type === "fiche_club";
   // Un événement de l'agenda (spec 041) : décider exige aussi le droit de l'agenda ; sans lui, lecture seule.
   const evenement = apercu?.type === "evenement";
+  // Un partage déclaré (spec 044) : le modérateur ouvre lui-même le lien de la publication.
+  const partage = apercu?.type === "partage";
   const peutDecider = decideur && (apercu?.decision_possible ?? true);
   const peutRetirer = depublieur && (apercu?.decision_possible ?? true);
   const rapport = apercu?.rapport ?? null;
@@ -460,11 +469,13 @@ function Apercu({
           <DialogTitle className="pr-6 text-2xl text-logo-blue">
             {commentaire
               ? "Commentaire"
-              : fiche
-                ? `Fiche du ${apercu?.club?.nom ?? "club"}`
-                : rapport
-                  ? affichee?.["titre"] || MODELES[rapport.modele as ModeleRapport].libelle
-                  : (affichee?.["titre"] ?? "Aperçu")}
+              : partage
+                ? `${affichee?.["nature"] === "partage" ? "Partage" : "Republication"} sur ${nomDuReseau((affichee?.["reseau"] ?? "facebook") as ReseauPartage)}`
+                : fiche
+                  ? `Fiche du ${apercu?.club?.nom ?? "club"}`
+                  : rapport
+                    ? affichee?.["titre"] || MODELES[rapport.modele as ModeleRapport].libelle
+                    : (affichee?.["titre"] ?? "Aperçu")}
           </DialogTitle>
           <DialogDescription>
             {apercu
@@ -582,6 +593,8 @@ function Apercu({
                 champs={affichee as unknown as Record<string, unknown>}
                 libelleAxe={libelleAxe}
               />
+            ) : partage ? (
+              <ApercuPartage champs={affichee} />
             ) : commentaire ? (
               <p className="whitespace-pre-line break-words rounded-2xl bg-carnet p-5 text-ink">
                 {affichee["texte"]}
@@ -733,9 +746,13 @@ function Apercu({
                       ? "La fiche publique du club prend aussitôt cette description et ces axes."
                       : apercu?.type === "actualite"
                         ? "L'actualité est publiée au nom du club, sur sa fiche et dans les articles. Elle ne rapporte pas de points."
-                        : apercu?.type === "commentaire"
-                          ? "Le commentaire apparaît sous l'article. Son auteur reçoit +5 points, dans la limite de 5 commentaires rémunérés par jour."
-                          : "L'article est publié sur le site et l'auteur reçoit ses points."
+                        : apercu?.type === "partage"
+                          ? affichee?.["nature"] === "partage"
+                            ? "Le partage est validé : l'autrice ou l'auteur de l'article reçoit +50 points pour ce réseau. Rien n'est publié."
+                            : "La republication est validée : son auteur reçoit +10 points pour cet article. Rien n'est publié."
+                          : apercu?.type === "commentaire"
+                            ? "Le commentaire apparaît sous l'article. Son auteur reçoit +5 points, dans la limite de 5 commentaires rémunérés par jour."
+                            : "L'article est publié sur le site et l'auteur reçoit ses points."
           }
           bouton="Approuver"
           onEnvoie={async () => {

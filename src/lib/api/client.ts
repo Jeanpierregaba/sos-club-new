@@ -751,7 +751,10 @@ export type MesPartages = Schemas["MesPartages"];
 export type EtatPartagesArticle = Schemas["EtatPartagesArticle"];
 
 export const declarerPartage = (adresse: string, reseau: ReseauPartage, lien: string) =>
-  envoyerJson<PartageAuteur>(`/api/articles/${encodeURIComponent(adresse)}/partages`, { reseau, lien });
+  envoyerJson<PartageAuteur>(`/api/articles/${encodeURIComponent(adresse)}/partages`, {
+    reseau,
+    lien,
+  });
 export const chargerEtatPartages = (adresse: string) =>
   requeteApi<EtatPartagesArticle>(`/api/articles/${encodeURIComponent(adresse)}/partages/moi`);
 export const chargerMesPartages = () => requeteApi<MesPartages>("/api/partages/moi");
