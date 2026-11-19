@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-Rien en cours.
+- [ ] [044 — Partages : carte de classement et partages d'articles vérifiés (R17)](docs/specs/044-partages/spec.md) : spec, plan et tâches validés le 2026-11-19 ; implémentation en cours ([tâches](docs/specs/044-partages/tasks.md))
 
 ## À faire
 
