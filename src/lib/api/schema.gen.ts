@@ -4383,6 +4383,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/certification/suivi/candidats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lister Candidats */
+        get: operations["lister_candidats_api_admin_certification_suivi_candidats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/certification/suivi/statistiques": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Statistiques Certification */
+        get: operations["statistiques_certification_api_admin_certification_suivi_statistiques_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/certification/suivi/candidats/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Exporter Candidats */
+        post: operations["exporter_candidats_api_admin_certification_suivi_candidats_export_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -4914,6 +4965,15 @@ export interface components {
             /** Description */
             description: string;
         };
+        /** BadgeCompte */
+        BadgeCompte: {
+            /** Rang */
+            rang: number;
+            /** Nom */
+            nom: string;
+            /** Nombre */
+            nombre: number;
+        };
         /** BadgeGestion */
         BadgeGestion: {
             /** Titulaire */
@@ -5084,6 +5144,52 @@ export interface components {
             ecarte_le: string | null;
             /** Ecarte Par */
             ecarte_par: string | null;
+        };
+        /** CandidatCertification */
+        CandidatCertification: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
+            /** Pseudonyme */
+            pseudonyme: string | null;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "eleve" | "encadreur";
+            /** Ancien Eleve */
+            ancien_eleve: boolean;
+            club: components["schemas"]["ClubCandidat"] | null;
+            /** Etablissement */
+            etablissement: string | null;
+            /** Dre */
+            dre: string | null;
+            /** Places Validees */
+            places_validees: number;
+            /** Badges */
+            badges: number[];
+            /** Place En Cours */
+            place_en_cours: number | null;
+            /** Tentatives Place */
+            tentatives_place: number;
+            /** Tentatives */
+            tentatives: number;
+            /**
+             * Debut
+             * Format: date-time
+             */
+            debut: string;
+            /**
+             * Derniere Activite
+             * Format: date-time
+             */
+            derniere_activite: string;
+            /** Certificat */
+            certificat: string | null;
         };
         /** Carte */
         Carte: {
@@ -5611,6 +5717,16 @@ export interface components {
             etat: "ouvert" | "gele" | "valide" | "publie";
             /** Publie Le */
             publie_le: string | null;
+        };
+        /** ClubCandidat */
+        ClubCandidat: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nom */
+            nom: string;
         };
         /**
          * ClubClasse
@@ -7080,6 +7196,12 @@ export interface components {
             peut_repondre: boolean;
             ma_reponse?: components["schemas"]["Reponse"] | null;
         };
+        /** ExportCandidats */
+        ExportCandidats: {
+            filtres?: components["schemas"]["FiltresCandidats"];
+            /** Finalite */
+            finalite: string;
+        };
         /** ExportCree */
         ExportCree: {
             export: components["schemas"]["ExportResume"];
@@ -7376,6 +7498,19 @@ export interface components {
             total: number;
             /** Passations */
             passations: components["schemas"]["Passation"][];
+        };
+        /** FiltresCandidats */
+        FiltresCandidats: {
+            /** Dre */
+            dre?: string | null;
+            /** Club Id */
+            club_id?: string | null;
+            /** Role */
+            role?: ("eleve" | "encadreur") | null;
+            /** Etat */
+            etat?: ("en_cours" | "inactif" | "certifie") | null;
+            /** Recherche */
+            recherche?: string | null;
         };
         /** FiltresInscrits */
         FiltresInscrits: {
@@ -7884,6 +8019,34 @@ export interface components {
             /** Points */
             points: number;
         };
+        /** LigneDre */
+        LigneDre: {
+            /** Code */
+            code: string;
+            /** Dre */
+            dre: string;
+            /** Candidats */
+            candidats: number;
+            /** Badges */
+            badges: number;
+            /** Certifies */
+            certifies: number;
+        };
+        /** LigneEntonnoir */
+        LigneEntonnoir: {
+            /** Place */
+            place: number;
+            /** Quiz Publie */
+            quiz_publie: boolean;
+            /** Tentes */
+            tentes: number;
+            /** Reussis */
+            reussis: number;
+            /** Taux Reussite */
+            taux_reussite: number | null;
+            /** Tentatives Avant Reussite */
+            tentatives_avant_reussite: number | null;
+        };
         /** LigneJournalClub */
         LigneJournalClub: {
             /** Ancien */
@@ -8002,6 +8165,18 @@ export interface components {
             est_correction: boolean;
             /** Annulee */
             annulee: boolean;
+        };
+        /** LigneSemaine */
+        LigneSemaine: {
+            /**
+             * Debut
+             * Format: date
+             */
+            debut: string;
+            /** Candidats */
+            candidats: number;
+            /** Certifies */
+            certifies: number;
         };
         /** ListeBadges */
         ListeBadges: {
@@ -8386,6 +8561,13 @@ export interface components {
             par_page: number;
             /** Rapports */
             rapports: components["schemas"]["LigneArchive"][];
+        };
+        /** PageCandidats */
+        PageCandidats: {
+            /** Total */
+            total: number;
+            /** Candidats */
+            candidats: components["schemas"]["CandidatCertification"][];
         };
         /** PageDoublons */
         PageDoublons: {
@@ -9901,6 +10083,16 @@ export interface components {
          * @enum {string}
          */
         SousCompte: "quiz" | "etoiles";
+        /** StatistiquesCertification */
+        StatistiquesCertification: {
+            totaux: components["schemas"]["TotauxCertification"];
+            /** Entonnoir */
+            entonnoir: components["schemas"]["LigneEntonnoir"][];
+            /** Par Dre */
+            par_dre: components["schemas"]["LigneDre"][];
+            /** Par Semaine */
+            par_semaine: components["schemas"]["LigneSemaine"][];
+        };
         /**
          * StatutCompte
          * @enum {string}
@@ -10018,6 +10210,17 @@ export interface components {
             /** Initiale */
             initiale: string;
             fonction: components["schemas"]["Fonction"];
+        };
+        /** TotauxCertification */
+        TotauxCertification: {
+            /** Candidats */
+            candidats: number;
+            /** Actifs 30 Jours */
+            actifs_30_jours: number;
+            /** Certifies */
+            certifies: number;
+            /** Badges */
+            badges: components["schemas"]["BadgeCompte"][];
         };
         /** TypeActivite */
         TypeActivite: {
@@ -18964,6 +19167,96 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CertificatGestion"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lister_candidats_api_admin_certification_suivi_candidats_get: {
+        parameters: {
+            query?: {
+                dre?: string | null;
+                club_id?: string | null;
+                role?: ("eleve" | "encadreur") | null;
+                etat?: ("en_cours" | "inactif" | "certifie") | null;
+                recherche?: string | null;
+                page?: number;
+                par_page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageCandidats"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    statistiques_certification_api_admin_certification_suivi_statistiques_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatistiquesCertification"];
+                };
+            };
+        };
+    };
+    exporter_candidats_api_admin_certification_suivi_candidats_export_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExportCandidats"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": unknown;
                 };
             };
             /** @description Validation Error */

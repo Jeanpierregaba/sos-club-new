@@ -74,6 +74,7 @@ import { Route as ConnecteAdminBibliothequeIdRouteImport } from './routes/_conne
 import { Route as ConnecteAdminCertificationIndexRouteImport } from './routes/_connecte/admin/certification.index'
 import { Route as ConnecteAdminCertificationBadgesRouteImport } from './routes/_connecte/admin/certification.badges'
 import { Route as ConnecteAdminCertificationParametresRouteImport } from './routes/_connecte/admin/certification.parametres'
+import { Route as ConnecteAdminCertificationSuiviRouteImport } from './routes/_connecte/admin/certification.suivi'
 import { Route as ConnecteAdminCollaborateursIndexRouteImport } from './routes/_connecte/admin/collaborateurs.index'
 import { Route as ConnecteAdminCollaborateursIdRouteImport } from './routes/_connecte/admin/collaborateurs.$id'
 import { Route as ConnecteAdminInscritsIndexRouteImport } from './routes/_connecte/admin/inscrits.index'
@@ -441,6 +442,12 @@ const ConnecteAdminCertificationParametresRoute =
     path: '/parametres',
     getParentRoute: () => ConnecteAdminCertificationRoute,
   } as any)
+const ConnecteAdminCertificationSuiviRoute =
+  ConnecteAdminCertificationSuiviRouteImport.update({
+    id: '/suivi',
+    path: '/suivi',
+    getParentRoute: () => ConnecteAdminCertificationRoute,
+  } as any)
 const ConnecteAdminCollaborateursIndexRoute =
   ConnecteAdminCollaborateursIndexRouteImport.update({
     id: '/collaborateurs/',
@@ -662,6 +669,7 @@ export interface FileRoutesByFullPath {
   '/admin/bibliotheque/$id': typeof ConnecteAdminBibliothequeIdRoute
   '/admin/certification/badges': typeof ConnecteAdminCertificationBadgesRoute
   '/admin/certification/parametres': typeof ConnecteAdminCertificationParametresRoute
+  '/admin/certification/suivi': typeof ConnecteAdminCertificationSuiviRoute
   '/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
   '/admin/points/annees': typeof ConnecteAdminPointsAnneesRoute
@@ -749,6 +757,7 @@ export interface FileRoutesByTo {
   '/admin/bibliotheque/$id': typeof ConnecteAdminBibliothequeIdRoute
   '/admin/certification/badges': typeof ConnecteAdminCertificationBadgesRoute
   '/admin/certification/parametres': typeof ConnecteAdminCertificationParametresRoute
+  '/admin/certification/suivi': typeof ConnecteAdminCertificationSuiviRoute
   '/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
   '/admin/points/annees': typeof ConnecteAdminPointsAnneesRoute
@@ -844,6 +853,7 @@ export interface FileRoutesById {
   '/_connecte/admin/bibliotheque/$id': typeof ConnecteAdminBibliothequeIdRoute
   '/_connecte/admin/certification/badges': typeof ConnecteAdminCertificationBadgesRoute
   '/_connecte/admin/certification/parametres': typeof ConnecteAdminCertificationParametresRoute
+  '/_connecte/admin/certification/suivi': typeof ConnecteAdminCertificationSuiviRoute
   '/_connecte/admin/collaborateurs/$id': typeof ConnecteAdminCollaborateursIdRoute
   '/_connecte/admin/inscrits/$id': typeof ConnecteAdminInscritsIdRoute
   '/_connecte/admin/points/annees': typeof ConnecteAdminPointsAnneesRoute
@@ -939,6 +949,7 @@ export interface FileRouteTypes {
     | '/admin/bibliotheque/$id'
     | '/admin/certification/badges'
     | '/admin/certification/parametres'
+    | '/admin/certification/suivi'
     | '/admin/collaborateurs/$id'
     | '/admin/inscrits/$id'
     | '/admin/points/annees'
@@ -1026,6 +1037,7 @@ export interface FileRouteTypes {
     | '/admin/bibliotheque/$id'
     | '/admin/certification/badges'
     | '/admin/certification/parametres'
+    | '/admin/certification/suivi'
     | '/admin/collaborateurs/$id'
     | '/admin/inscrits/$id'
     | '/admin/points/annees'
@@ -1120,6 +1132,7 @@ export interface FileRouteTypes {
     | '/_connecte/admin/bibliotheque/$id'
     | '/_connecte/admin/certification/badges'
     | '/_connecte/admin/certification/parametres'
+    | '/_connecte/admin/certification/suivi'
     | '/_connecte/admin/collaborateurs/$id'
     | '/_connecte/admin/inscrits/$id'
     | '/_connecte/admin/points/annees'
@@ -1641,6 +1654,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnecteAdminCertificationParametresRouteImport
       parentRoute: typeof ConnecteAdminCertificationRoute
     }
+    '/_connecte/admin/certification/suivi': {
+      id: '/_connecte/admin/certification/suivi'
+      path: '/suivi'
+      fullPath: '/admin/certification/suivi'
+      preLoaderRoute: typeof ConnecteAdminCertificationSuiviRouteImport
+      parentRoute: typeof ConnecteAdminCertificationRoute
+    }
     '/_connecte/admin/collaborateurs/': {
       id: '/_connecte/admin/collaborateurs/'
       path: '/collaborateurs'
@@ -1852,6 +1872,7 @@ const ConnecteAdminBibliothequeRouteWithChildren =
 interface ConnecteAdminCertificationRouteChildren {
   ConnecteAdminCertificationBadgesRoute: typeof ConnecteAdminCertificationBadgesRoute
   ConnecteAdminCertificationParametresRoute: typeof ConnecteAdminCertificationParametresRoute
+  ConnecteAdminCertificationSuiviRoute: typeof ConnecteAdminCertificationSuiviRoute
   ConnecteAdminCertificationIndexRoute: typeof ConnecteAdminCertificationIndexRoute
 }
 
@@ -1861,6 +1882,7 @@ const ConnecteAdminCertificationRouteChildren: ConnecteAdminCertificationRouteCh
       ConnecteAdminCertificationBadgesRoute,
     ConnecteAdminCertificationParametresRoute:
       ConnecteAdminCertificationParametresRoute,
+    ConnecteAdminCertificationSuiviRoute: ConnecteAdminCertificationSuiviRoute,
     ConnecteAdminCertificationIndexRoute: ConnecteAdminCertificationIndexRoute,
   }
 

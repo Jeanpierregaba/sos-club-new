@@ -13438,6 +13438,211 @@
         }
       }
     },
+    "/api/admin/certification/suivi/candidats": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lister Candidats",
+        "operationId": "lister_candidats_api_admin_certification_suivi_candidats_get",
+        "parameters": [
+          {
+            "name": "dre",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dre"
+            }
+          },
+          {
+            "name": "club_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Club Id"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "eleve",
+                    "encadreur"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Role"
+            }
+          },
+          {
+            "name": "etat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "en_cours",
+                    "inactif",
+                    "certifie"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Etat"
+            }
+          },
+          {
+            "name": "recherche",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Recherche"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "par_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Par Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageCandidats"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/certification/suivi/statistiques": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Statistiques Certification",
+        "operationId": "statistiques_certification_api_admin_certification_suivi_statistiques_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatistiquesCertification"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/certification/suivi/candidats/export": {
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Exporter Candidats",
+        "operationId": "exporter_candidats_api_admin_certification_suivi_candidats_export_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportCandidats"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/csv": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -14869,6 +15074,29 @@
         ],
         "title": "AxePublic"
       },
+      "BadgeCompte": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "nombre": {
+            "type": "integer",
+            "title": "Nombre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rang",
+          "nom",
+          "nombre"
+        ],
+        "title": "BadgeCompte"
+      },
       "BadgeGestion": {
         "properties": {
           "titulaire": {
@@ -15311,6 +15539,145 @@
           "ecarte_par"
         ],
         "title": "CandidatAdmin"
+      },
+      "CandidatCertification": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "pseudonyme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudonyme"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "eleve",
+              "encadreur"
+            ],
+            "title": "Role"
+          },
+          "ancien_eleve": {
+            "type": "boolean",
+            "title": "Ancien Eleve"
+          },
+          "club": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClubCandidat"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "etablissement": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Etablissement"
+          },
+          "dre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dre"
+          },
+          "places_validees": {
+            "type": "integer",
+            "title": "Places Validees"
+          },
+          "badges": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Badges"
+          },
+          "place_en_cours": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Place En Cours"
+          },
+          "tentatives_place": {
+            "type": "integer",
+            "title": "Tentatives Place"
+          },
+          "tentatives": {
+            "type": "integer",
+            "title": "Tentatives"
+          },
+          "debut": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Debut"
+          },
+          "derniere_activite": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Derniere Activite"
+          },
+          "certificat": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Certificat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom",
+          "pseudonyme",
+          "role",
+          "ancien_eleve",
+          "club",
+          "etablissement",
+          "dre",
+          "places_validees",
+          "badges",
+          "place_en_cours",
+          "tentatives_place",
+          "tentatives",
+          "debut",
+          "derniere_activite",
+          "certificat"
+        ],
+        "title": "CandidatCertification"
       },
       "Carte": {
         "properties": {
@@ -16807,6 +17174,25 @@
           "publie_le"
         ],
         "title": "ClotureResume"
+      },
+      "ClubCandidat": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nom"
+        ],
+        "title": "ClubCandidat"
       },
       "ClubClasse": {
         "properties": {
@@ -20863,6 +21249,25 @@
         "title": "EvenementPublic",
         "description": "Ce que montre l'agenda public : aucun nom d'élève, seulement le nombre de participants."
       },
+      "ExportCandidats": {
+        "properties": {
+          "filtres": {
+            "$ref": "#/components/schemas/FiltresCandidats"
+          },
+          "finalite": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 5,
+            "title": "Finalite"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "finalite"
+        ],
+        "title": "ExportCandidats"
+      },
       "ExportCree": {
         "properties": {
           "export": {
@@ -21932,6 +22337,79 @@
           "passations"
         ],
         "title": "FilePassations"
+      },
+      "FiltresCandidats": {
+        "properties": {
+          "dre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dre"
+          },
+          "club_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Club Id"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "eleve",
+                  "encadreur"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          },
+          "etat": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "en_cours",
+                  "inactif",
+                  "certifie"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Etat"
+          },
+          "recherche": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recherche"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "FiltresCandidats"
       },
       "FiltresInscrits": {
         "properties": {
@@ -23527,6 +24005,91 @@
         ],
         "title": "LigneClubPublic"
       },
+      "LigneDre": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "dre": {
+            "type": "string",
+            "title": "Dre"
+          },
+          "candidats": {
+            "type": "integer",
+            "title": "Candidats"
+          },
+          "badges": {
+            "type": "integer",
+            "title": "Badges"
+          },
+          "certifies": {
+            "type": "integer",
+            "title": "Certifies"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "dre",
+          "candidats",
+          "badges",
+          "certifies"
+        ],
+        "title": "LigneDre"
+      },
+      "LigneEntonnoir": {
+        "properties": {
+          "place": {
+            "type": "integer",
+            "title": "Place"
+          },
+          "quiz_publie": {
+            "type": "boolean",
+            "title": "Quiz Publie"
+          },
+          "tentes": {
+            "type": "integer",
+            "title": "Tentes"
+          },
+          "reussis": {
+            "type": "integer",
+            "title": "Reussis"
+          },
+          "taux_reussite": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Taux Reussite"
+          },
+          "tentatives_avant_reussite": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tentatives Avant Reussite"
+          }
+        },
+        "type": "object",
+        "required": [
+          "place",
+          "quiz_publie",
+          "tentes",
+          "reussis",
+          "taux_reussite",
+          "tentatives_avant_reussite"
+        ],
+        "title": "LigneEntonnoir"
+      },
       "LigneJournalClub": {
         "properties": {
           "ancien": {
@@ -23915,6 +24478,30 @@
           "annulee"
         ],
         "title": "LigneRegistre"
+      },
+      "LigneSemaine": {
+        "properties": {
+          "debut": {
+            "type": "string",
+            "format": "date",
+            "title": "Debut"
+          },
+          "candidats": {
+            "type": "integer",
+            "title": "Candidats"
+          },
+          "certifies": {
+            "type": "integer",
+            "title": "Certifies"
+          }
+        },
+        "type": "object",
+        "required": [
+          "debut",
+          "candidats",
+          "certifies"
+        ],
+        "title": "LigneSemaine"
       },
       "ListeBadges": {
         "properties": {
@@ -24992,6 +25579,27 @@
           "rapports"
         ],
         "title": "PageArchive"
+      },
+      "PageCandidats": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "candidats": {
+            "items": {
+              "$ref": "#/components/schemas/CandidatCertification"
+            },
+            "type": "array",
+            "title": "Candidats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "candidats"
+        ],
+        "title": "PageCandidats"
       },
       "PageDoublons": {
         "properties": {
@@ -29529,6 +30137,42 @@
         "title": "SousCompte",
         "description": "Les Jeux se décomptent en deux : points des quiz et points des étoiles (spec 034)."
       },
+      "StatistiquesCertification": {
+        "properties": {
+          "totaux": {
+            "$ref": "#/components/schemas/TotauxCertification"
+          },
+          "entonnoir": {
+            "items": {
+              "$ref": "#/components/schemas/LigneEntonnoir"
+            },
+            "type": "array",
+            "title": "Entonnoir"
+          },
+          "par_dre": {
+            "items": {
+              "$ref": "#/components/schemas/LigneDre"
+            },
+            "type": "array",
+            "title": "Par Dre"
+          },
+          "par_semaine": {
+            "items": {
+              "$ref": "#/components/schemas/LigneSemaine"
+            },
+            "type": "array",
+            "title": "Par Semaine"
+          }
+        },
+        "type": "object",
+        "required": [
+          "totaux",
+          "entonnoir",
+          "par_dre",
+          "par_semaine"
+        ],
+        "title": "StatistiquesCertification"
+      },
       "StatutCompte": {
         "type": "string",
         "enum": [
@@ -29896,6 +30540,37 @@
           "fonction"
         ],
         "title": "TitulaireEncadreur"
+      },
+      "TotauxCertification": {
+        "properties": {
+          "candidats": {
+            "type": "integer",
+            "title": "Candidats"
+          },
+          "actifs_30_jours": {
+            "type": "integer",
+            "title": "Actifs 30 Jours"
+          },
+          "certifies": {
+            "type": "integer",
+            "title": "Certifies"
+          },
+          "badges": {
+            "items": {
+              "$ref": "#/components/schemas/BadgeCompte"
+            },
+            "type": "array",
+            "title": "Badges"
+          }
+        },
+        "type": "object",
+        "required": [
+          "candidats",
+          "actifs_30_jours",
+          "certifies",
+          "badges"
+        ],
+        "title": "TotauxCertification"
       },
       "TypeActivite": {
         "properties": {

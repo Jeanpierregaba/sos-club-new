@@ -183,6 +183,10 @@ export type ReglesSortie = Schemas["ReglesSortie"];
 export type CertificatGestion = Schemas["CertificatGestion"];
 export type ListeCertificats = Schemas["ListeCertificats"];
 export type ListeBadges = Schemas["ListeBadges"];
+export type FiltresCandidats = Schemas["FiltresCandidats"];
+export type CandidatCertification = Schemas["CandidatCertification"];
+export type PageCandidats = Schemas["PageCandidats"];
+export type StatistiquesCertification = Schemas["StatistiquesCertification"];
 export type CategorieRessource = Schemas["CategorieRessource"];
 export type EtatRessource = Schemas["EtatRessource"];
 export type RessourcePublique = Schemas["RessourcePublique"];
@@ -957,6 +961,39 @@ export const revoquerCertificat = (id: string, motif: string) =>
   envoyerJson<CertificatGestion>(`${GESTION_CERTIFICATION}/certificats/${id}/revoquer`, { motif });
 export const reemettreCertificat = (id: string) =>
   envoyerJson<CertificatGestion>(`${GESTION_CERTIFICATION}/certificats/${id}/reemettre`);
+// Suivi des certifications (spec 043) : candidats, chiffres et export nominatif (national, motivé).
+export type FiltresCandidatsSuivi = {
+  [Cle in keyof FiltresCandidats]?: NonNullable<FiltresCandidats[Cle]> | undefined;
+};
+export const chargerCandidatsCertification = (
+  filtres: FiltresCandidatsSuivi & { page?: number | undefined; par_page?: number | undefined },
+) => requeteApi<PageCandidats>(avecParametres(`${GESTION_CERTIFICATION}/suivi/candidats`, filtres));
+export const chargerStatistiquesCertification = () =>
+  requeteApi<StatistiquesCertification>(`${GESTION_CERTIFICATION}/suivi/statistiques`);
+export async function exporterCandidatsCertification(
+  filtres: FiltresCandidatsSuivi,
+  finalite: string,
+): Promise<Blob> {
+  let reponse: Response;
+  try {
+    reponse = await envoyer(`${GESTION_CERTIFICATION}/suivi/candidats/export`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filtres, finalite }),
+    });
+  } catch {
+    throw new ErreurApi(0, MESSAGE_INDISPONIBLE);
+  }
+  if (!reponse.ok) {
+    const corps = (await reponse.json().catch(() => null)) as { detail?: unknown } | null;
+    const detail = typeof corps?.detail === "string" ? corps.detail : null;
+    throw new ErreurApi(
+      reponse.status,
+      detail ?? (reponse.status === 422 ? MESSAGE_SAISIE : MESSAGE_INDISPONIBLE),
+    );
+  }
+  return reponse.blob();
+}
 
 // Bibliothèque (spec 028) --------------------------------------------------------------------------------
 // Publique : liste, PDF (lire ou télécharger) et couvertures, sans connexion. Gestion : espace admin.

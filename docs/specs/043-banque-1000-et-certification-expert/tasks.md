@@ -77,9 +77,9 @@ suivi touchent la certification (partie critique, `docs/TESTING.md`) : leurs tes
 
 ## Site
 
-- [ ] 12. Types de l'API (`export_openapi` puis `api:types`), appels dans `src/lib/api/client.ts` et libellé du
+- [x] 12. Types de l'API (`export_openapi` puis `api:types`), appels dans `src/lib/api/client.ts` et libellé du
       journal dans `src/lib/admin.ts`.
-- [ ] 13. Composant `SuiviCertification` (tuiles, entonnoir, tableau par DRE, graphique par semaine avec Recharts)
+- [x] 13. Composant `SuiviCertification` (tuiles, entonnoir, tableau par DRE, graphique par semaine avec Recharts)
       et son test : chiffres affichés, état vide.
 - [ ] 14. Page `/admin/certification/suivi` et onglet « Suivi » :
   - filtres, recherche et pagination ;

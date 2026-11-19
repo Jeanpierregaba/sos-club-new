@@ -88,6 +88,7 @@ export const ACTIONS_JOURNAL: Record<string, string> = {
   club_fusionne: "Club fusionné",
   doublon_ecarte: "Doublon écarté",
   doublon_retabli: "Doublon rétabli",
+  export_suivi_certification: "Export du suivi des certifications",
   inscription_encadreur: "Inscription d'un encadreur",
   profil_encadreur_modifie: "Profil d'encadreur modifié",
   encadreur_active: "Encadreur activé",

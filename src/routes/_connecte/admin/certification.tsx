@@ -16,6 +16,7 @@ const ONGLETS = [
   { to: "/admin/certification", libelle: "Certificats", exact: true },
   { to: "/admin/certification/badges", libelle: "Badges", exact: false },
   { to: "/admin/certification/parametres", libelle: "Paramètres du parcours", exact: false },
+  { to: "/admin/certification/suivi", libelle: "Suivi", exact: false },
 ] as const;
 
 function Certification() {
@@ -30,7 +31,8 @@ function Certification() {
         >
           banque de quiz
         </Link>
-        . Ici : les certificats délivrés, les règles des badges et les paramètres des parties.
+        . Ici : les certificats délivrés, les règles des badges, les paramètres des parties et le
+        suivi des candidats.
       </EnTeteAdmin>
       <nav aria-label="Parties de la certification" className="flex flex-wrap gap-2">
         {ONGLETS.map((o) => (
