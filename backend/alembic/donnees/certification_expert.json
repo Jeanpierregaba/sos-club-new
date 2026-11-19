@@ -1,0 +1,2362 @@
+[
+ {
+  "place": 1,
+  "badge": "Ambassadeur Santé Junior",
+  "axe": "production-tv-medias",
+  "titre": "Génie Imhotep 1 — Ambassadeur Santé Junior (1/4)",
+  "questions": [
+   {
+    "enonce": "Que valorise l'émission « Girls Impact » ?",
+    "choix": [
+     "La mode et la beauté",
+     "Le leadership féminin et l'égalité entre filles et garçons",
+     "Le sport féminin uniquement"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Combien de jeux compte chaque saison de Génie Imhotep ?",
+    "choix": [
+     "6",
+     "10",
+     "12"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Quelle est la vision d'AIMES-AFRIQUE ?",
+    "choix": [
+     "Un hôpital dans chaque village",
+     "L'Afrique sans maladie en 2030",
+     "Santé et Éducation pour tous en Afrique"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Quels sont les deux grands volets d'intervention d'AIMES-AFRIQUE ?",
+    "choix": [
+     "Agriculture et commerce",
+     "Sport et musique",
+     "Santé et Éducation"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Où se trouve le siège d'AIMES-AFRIQUE ?",
+    "choix": [
+     "À Vogan",
+     "À Adidogomé",
+     "À Adidoadin"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Quelle clinique le Dr KODOM dirige-t-il ?",
+    "choix": [
+     "Le CHU Sylvanus Olympio",
+     "Le CHR de Kara",
+     "La Clinique Internationale Dr KODOM à Lomé"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "Dans quelle catégorie le Dr KODOM a-t-il été primé par la JCI ?",
+    "choix": [
+     "Sport et loisirs",
+     "Musique et culture",
+     "Leadership, Humanitaire et Volontariat"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "Qu'est-ce que le CDC Afrique ?",
+    "choix": [
+     "L'Agence panafricaine de prévention et de contrôle des maladies",
+     "Une banque africaine de développement",
+     "Une fédération sportive africaine"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "Quel statut AIMES-AFRIQUE a-t-elle obtenu en 2013 auprès des Nations unies ?",
+    "choix": [
+     "Membre permanent du Conseil de sécurité",
+     "Agence spécialisée de l'ONU",
+     "Le statut consultatif auprès du Conseil économique et social (ECOSOC)"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "Qui est le promoteur de SOS DOCTEUR TV ?",
+    "choix": [
+     "Dr Moïse FIADJOE",
+     "Dr BARROUET",
+     "Dr Michel KODOM"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "lot 1"
+   }
+  ]
+ },
+ {
+  "place": 2,
+  "badge": "Ambassadeur Santé Junior",
+  "axe": "production-tv-medias",
+  "titre": "Génie Imhotep 2 — Ambassadeur Santé Junior (2/4)",
+  "questions": [
+   {
+    "enonce": "Que diffuse l'émission « La Minute Santé » ?",
+    "choix": [
+     "Des messages courts et pratiques de prévention",
+     "Des films de longue durée",
+     "Des publicités de médicaments"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "À partir de quelle heure passe l'émission Génie Imhotep ?",
+    "choix": [
+     "8 h",
+     "10 h",
+     "15 h"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Quelle expression fait partie de la mission d'AIMES-AFRIQUE ?",
+    "choix": [
+     "Amener l'hôpital vers les populations démunies",
+     "Construire des universités privées",
+     "Vendre des médicaments à bas prix"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Que signifie PEEMU-SCO ?",
+    "choix": [
+     "Programme d'Excellence et d'Émulation en Milieu Scolaire",
+     "Plan d'Entraide des Élèves en Milieu Urbain",
+     "Programme d'Éducation des Enfants en Milieu Scolaire"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Quel prix AIMES-AFRIQUE a-t-elle reçu du CACIT en 2018 ?",
+    "choix": [
+     "Meilleure ONG environnementale",
+     "Meilleure ONG dans la promotion du droit à la santé",
+     "Meilleure ONG sportive"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "En plus de la médecine, le Dr KODOM est diplômé en :",
+    "choix": [
+     "Droit des affaires",
+     "Journalisme médical",
+     "Génie civil"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "En quelles années le Dr KODOM a-t-il été élu « Personnalité de l'année du Togo » ?",
+    "choix": [
+     "2015 et 2017",
+     "2018 et 2021",
+     "2020 et 2024"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "En plus de la médecine interne, dans quel autre domaine le Dr KODOM est-il spécialiste ?",
+    "choix": [
+     "Les maladies infectieuses",
+     "L'ophtalmologie",
+     "La chirurgie cardiaque"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "AIMES-AFRIQUE est présentée comme la première ONG internationale africaine spécialisée dans :",
+    "choix": [
+     "Les activités médico-chirurgicales humanitaires",
+     "La construction de routes",
+     "L'organisation de compétitions sportives"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "En quelle année SOS DOCTEUR TV a-t-elle été lancée ?",
+    "choix": [
+     "2015",
+     "2020",
+     "2024"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 1"
+   }
+  ]
+ },
+ {
+  "place": 3,
+  "badge": "Ambassadeur Santé Junior",
+  "axe": "production-tv-medias",
+  "titre": "Génie Imhotep 3 — Ambassadeur Santé Junior (3/4)",
+  "questions": [
+   {
+    "enonce": "Combien d'émissions composent le programme « Télé des ados en bonne santé » ?",
+    "choix": [
+     "3",
+     "6",
+     "12"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Qui peut demander à participer à l'émission Génie Imhotep ?",
+    "choix": [
+     "Uniquement les écoles de Lomé",
+     "Toutes les écoles qui ont un club santé",
+     "Uniquement les universités"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Que signifie le sigle AIMES-AFRIQUE ?",
+    "choix": [
+     "Association des Infirmiers et Médecins pour l'Entraide Sociale en Afrique",
+     "Association Internationale des Médecins pour la promotion de l'Éducation et de la Santé en Afrique",
+     "Alliance Internationale pour la Médecine et la Santé en Afrique"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Quelle chaîne de télévision AIMES-AFRIQUE a-t-elle lancée ?",
+    "choix": [
+     "AIMES TV",
+     "SOS DOCTEUR TV",
+     "Santé Plus TV"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Quel est le nom du jeu de culture générale en santé porté par AIMES-AFRIQUE ?",
+    "choix": [
+     "Génie en herbe Santé",
+     "Questions pour un docteur",
+     "Académie Génie Imhotep"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Quelle fonction le Dr KODOM occupe-t-il à AIMES-AFRIQUE ?",
+    "choix": [
+     "Trésorier",
+     "Président Fondateur",
+     "Secrétaire général"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "De quels clubs le Dr KODOM est-il l'initiateur ?",
+    "choix": [
+     "Les Clubs Santé SOS DOCTEUR TV",
+     "Les clubs de football scolaires",
+     "Les clubs de lecture"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "Quel surnom donne-t-on au Dr KODOM pour son engagement auprès des plus démunis ?",
+    "choix": [
+     "« Le médecin des pauvres »",
+     "« Le docteur des rois »",
+     "« Le médecin volant »"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "Comment AIMES-AFRIQUE « amène-t-elle l'hôpital vers les populations » ?",
+    "choix": [
+     "En construisant des immeubles de bureaux",
+     "En organisant des missions médico-chirurgicales dans les zones rurales",
+     "En vendant des assurances"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "Quelle est la date du lancement officiel de SOS DOCTEUR TV ?",
+    "choix": [
+     "29 juillet 2020",
+     "29 août 2020",
+     "29 septembre 2020"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 1"
+   }
+  ]
+ },
+ {
+  "place": 4,
+  "badge": "Ambassadeur Santé Junior",
+  "axe": "production-tv-medias",
+  "titre": "Génie Imhotep 4 — Ambassadeur Santé Junior (4/4)",
+  "questions": [
+   {
+    "enonce": "Quel jour l'émission du jeu Génie Imhotep passe-t-elle sur SOS DOCTEUR TV ?",
+    "choix": [
+     "Mercredi",
+     "Dimanche",
+     "Samedi"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "À quel rythme les saisons du jeu Génie Imhotep sont-elles organisées sur SOS DOCTEUR TV ?",
+    "choix": [
+     "Chaque semaine",
+     "Chaque trimestre",
+     "Chaque année"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "En quelle année AIMES-AFRIQUE a-t-elle été créée ?",
+    "choix": [
+     "2002",
+     "2005",
+     "2010"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Quel est le but d'AIMES-AFRIQUE ?",
+    "choix": [
+     "Former des médecins à l'étranger",
+     "Cultiver le sens de la responsabilité sociale et du volontariat pour promouvoir la santé et l'éducation",
+     "Organiser des compétitions sportives"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Quelle est la spécialité médicale du Dr KODOM ?",
+    "choix": [
+     "La pédiatrie",
+     "La chirurgie dentaire",
+     "La médecine interne"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 8"
+   },
+   {
+    "enonce": "Quelle fonction le Dr KODOM occupe-t-il à SOS DOCTEUR TV ?",
+    "choix": [
+     "Directeur Général",
+     "Présentateur météo",
+     "Cameraman"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "De quel ordre national le Dr KODOM a-t-il été décoré ?",
+    "choix": [
+     "La Légion d'honneur",
+     "L'Ordre du Mono",
+     "L'Ordre du Lion"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "De quelle institution le Dr KODOM est-il devenu membre du Conseil d'Administration en juin 2024 ?",
+    "choix": [
+     "La FIFA",
+     "L'UNESCO",
+     "Le CDC Afrique de l'Union africaine"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "Qu'est-ce que SOS DOCTEUR TV ?",
+    "choix": [
+     "Une chaîne sportive",
+     "La première chaîne de télévision panafricaine thématique 100 % santé",
+     "Une chaîne musicale"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 1"
+   },
+   {
+    "enonce": "Quelle ONG a lancé SOS DOCTEUR TV ?",
+    "choix": [
+     "AIMES-AFRIQUE",
+     "Médecins Sans Frontières",
+     "La Croix-Rouge"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 1"
+   }
+  ]
+ },
+ {
+  "place": 5,
+  "badge": "Pair Éducateur Santé et Citoyenneté",
+  "axe": "genie-imhotep",
+  "titre": "Génie Imhotep 5 — Pair Éducateur Santé et Citoyenneté (1/4)",
+  "questions": [
+   {
+    "enonce": "Qu'est-ce que le panafricanisme ?",
+    "choix": [
+     "L'idée d'unité et de solidarité entre les peuples africains",
+     "Une maladie tropicale",
+     "Un sport africain"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Quel est le slogan de Génie Imhotep ?",
+    "choix": [
+     "Le savoir, c'est la santé",
+     "Qui veut gagner des points",
+     "Génie Imhotep, c'est ici et maintenant"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Lequel de ces métiers Imhotep n'exerçait-il PAS ?",
+    "choix": [
+     "Médecin",
+     "Architecte",
+     "Aviateur"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Dans la charte graphique de Génie Imhotep, que symbolise le doré ?",
+    "choix": [
+     "Le savoir comme une richesse précieuse",
+     "L'argent",
+     "Le soleil"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Dans le jeu Génie Imhotep, qui est l'« interne » ?",
+    "choix": [
+     "Le présentateur qui lit les questions",
+     "Le capitaine d'équipe",
+     "Un supporter"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Quelle est la mission des Clubs Santé SOS DOCTEUR TV ?",
+    "choix": [
+     "Vendre des médicaments dans les écoles",
+     "L'excellence et l'émulation en milieu scolaire et universitaire",
+     "Remplacer les infirmeries scolaires"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Laquelle de ces valeurs fait partie des valeurs des Clubs Santé ?",
+    "choix": [
+     "La compétition à tout prix",
+     "La richesse",
+     "L'émulation"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Dans quel cadre les Clubs Santé ont-ils été créés ?",
+    "choix": [
+     "Le Programme d'Excellence et d'Émulation en Milieu Scolaire (PEEMU-SCO) d'AIMES-AFRIQUE",
+     "Le programme national de vaccination",
+     "Le programme des cantines scolaires"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Comment se fait l'adhésion au Club Santé ?",
+    "choix": [
+     "Elle est obligatoire pour tous",
+     "Elle se fait par tirage au sort",
+     "Elle est libre et volontaire"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Sur quoi porte l'axe 1 du Club Santé ?",
+    "choix": [
+     "L'Académie Génie Imhotep, jeu de culture générale en santé publique",
+     "Les activités sportives",
+     "Les bourses d'excellence"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 2"
+   }
+  ]
+ },
+ {
+  "place": 6,
+  "badge": "Pair Éducateur Santé et Citoyenneté",
+  "axe": "genie-imhotep",
+  "titre": "Génie Imhotep 6 — Pair Éducateur Santé et Citoyenneté (2/4)",
+  "questions": [
+   {
+    "enonce": "Combien de Directions Régionales de l'Éducation (DRE) compte le Togo ?",
+    "choix": [
+     "5",
+     "7",
+     "18"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Que signifie UTAPE ?",
+    "choix": [
+     "Union Togolaise des Associations des Parents d'Élèves",
+     "Union des Travailleurs Agricoles et Pêcheurs",
+     "Unité Technique d'Appui aux Petites Entreprises"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Imhotep a vécu :",
+    "choix": [
+     "Après Hippocrate",
+     "Des milliers d'années avant Hippocrate",
+     "À la même époque qu'Hippocrate"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Dans la charte graphique de Génie Imhotep, que symbolise le blanc ?",
+    "choix": [
+     "Le froid",
+     "Le deuil",
+     "La pureté et la santé parfaite"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Dans le jeu Génie Imhotep, qu'est-ce que le « staff » ?",
+    "choix": [
+     "Le public",
+     "Les joueurs remplaçants",
+     "Le jury"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Comment se joue la rubrique « État de choc » ?",
+    "choix": [
+     "Comme les éclairs : l'équipe qui buzze en premier répond",
+     "Un joueur seul répond à 5 questions",
+     "On associe deux listes"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Quelles sont les valeurs des Clubs Santé ?",
+    "choix": [
+     "Excellence, Émulation, Engagement, Innovation et Leadership",
+     "Éthique, Professionnalisme, Solidarité",
+     "Paix, Travail, Progrès"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Quel ministère a délivré la note de service autorisant la création des Clubs Santé dans les établissements ?",
+    "choix": [
+     "Le Ministère des Sports",
+     "Le Ministère de la Communication",
+     "Le Ministère chargé de l'Éducation"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Combien d'élèves au maximum un Club Santé peut-il compter ?",
+    "choix": [
+     "50",
+     "100",
+     "Le nombre n'est pas limité"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Combien de filles au minimum doit compter le bureau d'un Club Santé ?",
+    "choix": [
+     "5",
+     "11",
+     "15"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 2"
+   }
+  ]
+ },
+ {
+  "place": 7,
+  "badge": "Pair Éducateur Santé et Citoyenneté",
+  "axe": "genie-imhotep",
+  "titre": "Génie Imhotep 7 — Pair Éducateur Santé et Citoyenneté (3/4)",
+  "questions": [
+   {
+    "enonce": "Combien d'établissements secondaires compte le Togo selon la cartographie des Clubs Santé ?",
+    "choix": [
+     "1 010",
+     "2 500",
+     "3 110"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Qu'ont composé les élèves des Clubs Santé pour les clubs et pour Génie Imhotep ?",
+    "choix": [
+     "Un drapeau",
+     "Un hymne",
+     "Un roman"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Qui était Imhotep ?",
+    "choix": [
+     "Un grand savant égyptien de l'Antiquité",
+     "Un roi du Mali",
+     "Un médecin grec"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Dans le jeu Génie Imhotep, comment appelle-t-on chaque équipe ?",
+    "choix": [
+     "Une salle",
+     "Un bloc",
+     "Un service"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Comment appelle-t-on les cris d'encouragement des supporters dans Génie Imhotep ?",
+    "choix": [
+     "Les cris de joie",
+     "Les cris de génie",
+     "Les cris du bloc"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Combien de points perd une équipe qui buzze avant la fin de la question et donne une mauvaise réponse dans « État de choc » ?",
+    "choix": [
+     "5 points",
+     "10 points",
+     "20 points"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Quel est le slogan des Clubs Santé SOS DOCTEUR TV ?",
+    "choix": [
+     "La santé, c'est la vie",
+     "Un élève, un docteur",
+     "Ensemble pour une génération de jeunes en bonne santé, responsable et épanouie"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Qui peut adhérer au Club Santé d'un collège ou d'un lycée ?",
+    "choix": [
+     "Uniquement les meilleurs élèves",
+     "Tout élève régulièrement inscrit",
+     "Uniquement les élèves de terminale"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Le Club Santé est ouvert :",
+    "choix": [
+     "Uniquement aux filles",
+     "Aux garçons et aux filles, avec un encouragement à l'enrôlement des filles",
+     "Uniquement aux garçons"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Combien de garçons au maximum peut compter le bureau d'un Club Santé ?",
+    "choix": [
+     "10",
+     "11",
+     "15"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 2"
+   }
+  ]
+ },
+ {
+  "place": 8,
+  "badge": "Pair Éducateur Santé et Citoyenneté",
+  "axe": "genie-imhotep",
+  "titre": "Génie Imhotep 8 — Pair Éducateur Santé et Citoyenneté (4/4)",
+  "questions": [
+   {
+    "enonce": "Quel rôle les parents d'élèves peuvent-ils jouer pour les Clubs Santé ?",
+    "choix": [
+     "Interdire aux enfants d'y adhérer",
+     "Remplacer les enseignants encadreurs",
+     "Relayer les messages de santé à la maison et dialoguer avec leurs enfants"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Qu'est-ce que l'Académie Génie Imhotep ?",
+    "choix": [
+     "Une école de médecine",
+     "Un jeu de culture générale en santé publique dans les collèges et lycées",
+     "Un hôpital pour enfants"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Sous le règne de quel pharaon Imhotep a-t-il vécu ?",
+    "choix": [
+     "Ramsès II",
+     "Djoser",
+     "Toutânkhamon"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Dans la charte graphique de Génie Imhotep, que symbolise le vert ?",
+    "choix": [
+     "La tristesse",
+     "Le progrès",
+     "La guerre"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Combien de points de jury peuvent être accordés à chaque équipe en fin de match ?",
+    "choix": [
+     "De 0 à 50 points",
+     "De 0 à 10 points",
+     "De 0 à 100 points"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 16"
+   },
+   {
+    "enonce": "Quelle est la vision des Clubs Santé SOS DOCTEUR TV ?",
+    "choix": [
+     "Une jeunesse en bonne santé, responsable et épanouie",
+     "Un médecin dans chaque école",
+     "Zéro maladie à l'école"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Quel est le but des Clubs Santé SOS DOCTEUR TV ?",
+    "choix": [
+     "Cultiver la responsabilité sociale, le leadership transformationnel et le volontariat",
+     "Préparer les élèves au baccalauréat",
+     "Organiser des fêtes de fin d'année"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Qui est l'initiateur des Clubs Santé SOS DOCTEUR TV ?",
+    "choix": [
+     "Le Ministre de la Santé",
+     "Le Dr KODOM Serge Michel",
+     "Le Directeur régional de l'éducation"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Combien de personnes compose obligatoirement le bureau d'un Club Santé ?",
+    "choix": [
+     "7",
+     "11",
+     "21"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "lot 2"
+   },
+   {
+    "enonce": "Combien d'axes stratégiques (commissions) compte un Club Santé ?",
+    "choix": [
+     "5",
+     "7",
+     "10"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "lot 2"
+   }
+  ]
+ },
+ {
+  "place": 9,
+  "badge": "Sentinelle de la Prévention",
+  "axe": "sante-environnement",
+  "titre": "Génie Imhotep 9 — Sentinelle de la Prévention (1/4)",
+  "questions": [
+   {
+    "enonce": "Quel médicament antidouleur est souvent détourné et consommé comme drogue par des jeunes en Afrique de l'Ouest ?",
+    "choix": [
+     "Le paracétamol",
+     "La vitamine C",
+     "Le tramadol"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 34"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale de la maladie d'Alzheimer ?",
+    "choix": [
+     "21 mars",
+     "21 septembre",
+     "21 décembre"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 76"
+   },
+   {
+    "enonce": "La maladie d'Alzheimer touche surtout :",
+    "choix": [
+     "Les muscles",
+     "La peau",
+     "La mémoire"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 76"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée internationale des langues des signes ?",
+    "choix": [
+     "23 mars",
+     "23 juin",
+     "23 septembre"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 76"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale de la contraception ?",
+    "choix": [
+     "26 septembre",
+     "26 juin",
+     "26 décembre"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 76"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale contre la poliomyélite ?",
+    "choix": [
+     "24 octobre",
+     "24 mars",
+     "24 août"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 83"
+   },
+   {
+    "enonce": "La date du 24 octobre honore Jonas Salk, qui a mis au point :",
+    "choix": [
+     "Le vaccin contre la rage",
+     "La pénicilline",
+     "Le premier vaccin contre la poliomyélite"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 83"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale de l'AVC ?",
+    "choix": [
+     "29 avril",
+     "29 octobre",
+     "29 décembre"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 83"
+   },
+   {
+    "enonce": "Que signifie AVC ?",
+    "choix": [
+     "Attaque Virale du Cœur",
+     "Accident Vasculaire Cérébral",
+     "Anomalie des Vaisseaux Cardiaques"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 83"
+   },
+   {
+    "enonce": "Qu'est-ce que la santé mentale ?",
+    "choix": [
+     "Un état de bien-être qui permet de faire face au stress, d'apprendre et de vivre avec les autres",
+     "Le fait de ne jamais être triste",
+     "Le fait d'être très intelligent"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 34"
+   }
+  ]
+ },
+ {
+  "place": 10,
+  "badge": "Sentinelle de la Prévention",
+  "axe": "sante-environnement",
+  "titre": "Génie Imhotep 10 — Sentinelle de la Prévention (2/4)",
+  "questions": [
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale des premiers secours ?",
+    "choix": [
+     "Le 1er septembre",
+     "Le dernier dimanche d'août",
+     "Le 2e samedi de septembre"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 76"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale de la sécurité des patients ?",
+    "choix": [
+     "17 septembre",
+     "17 mars",
+     "17 juin"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 76"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale contre le cancer du sein ?",
+    "choix": [
+     "19 janvier",
+     "19 octobre",
+     "19 novembre"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 83"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale de l'ostéoporose ?",
+    "choix": [
+     "20 avril",
+     "20 juin",
+     "20 octobre"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 83"
+   },
+   {
+    "enonce": "Qu'est-ce que l'ostéoporose ?",
+    "choix": [
+     "Une fragilité des os qui se cassent plus facilement",
+     "Une maladie des dents",
+     "Une infection des oreilles"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 83"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale du bégaiement ?",
+    "choix": [
+     "22 mars",
+     "22 octobre",
+     "22 décembre"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 83"
+   },
+   {
+    "enonce": "Pourquoi faut-il éviter les écrans juste avant de dormir ?",
+    "choix": [
+     "Parce que la lumière des écrans retarde l'endormissement",
+     "Parce qu'ils consomment trop d'électricité",
+     "Parce qu'ils font grossir"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 34"
+   },
+   {
+    "enonce": "Les paris sportifs et jeux d'argent peuvent-ils créer une dépendance ?",
+    "choix": [
+     "Oui",
+     "Non, jamais",
+     "Seulement chez les adultes riches"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 34"
+   },
+   {
+    "enonce": "Le tabac est-il autorisé dans les établissements scolaires ?",
+    "choix": [
+     "Oui, dans la cour",
+     "Non",
+     "Oui, pendant les récréations"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 34"
+   },
+   {
+    "enonce": "Quelle journée mondiale sensibilise contre le tabac ?",
+    "choix": [
+     "Le 1er décembre",
+     "Le 14 novembre",
+     "Le 31 mai"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 34"
+   }
+  ]
+ },
+ {
+  "place": 11,
+  "badge": "Sentinelle de la Prévention",
+  "axe": "sante-environnement",
+  "titre": "Génie Imhotep 11 — Sentinelle de la Prévention (3/4)",
+  "questions": [
+   {
+    "enonce": "Que commémore la Journée mondiale de l'alimentation ?",
+    "choix": [
+     "La création de la FAO en 1945",
+     "La fin de la famine en Afrique",
+     "La découverte des vitamines"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 83"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale de la colonne vertébrale ?",
+    "choix": [
+     "16 février",
+     "16 mai",
+     "16 octobre"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 83"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale de la ménopause ?",
+    "choix": [
+     "18 octobre",
+     "18 avril",
+     "18 juillet"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 83"
+   },
+   {
+    "enonce": "Pourquoi la pression du groupe pousse-t-elle certains jeunes à consommer des drogues ?",
+    "choix": [
+     "Parce que les drogues sont bonnes pour la santé",
+     "Par peur d'être rejetés ou pour se faire accepter",
+     "Parce que c'est obligatoire"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 34"
+   },
+   {
+    "enonce": "Partager une seringue entre consommateurs de drogues peut transmettre :",
+    "choix": [
+     "Le VIH et les hépatites",
+     "Le paludisme",
+     "La carie"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 34"
+   },
+   {
+    "enonce": "La cigarette électronique (vapoteuse) est-elle recommandée aux adolescents ?",
+    "choix": [
+     "Oui, c'est sans nicotine",
+     "Non, elle contient souvent de la nicotine et crée une dépendance",
+     "Oui, pour mieux respirer"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 34"
+   },
+   {
+    "enonce": "Passer trop de temps devant les écrans peut provoquer :",
+    "choix": [
+     "Une meilleure vue",
+     "Un sommeil plus profond",
+     "Des troubles du sommeil, de la fatigue et une baisse de concentration"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 34"
+   },
+   {
+    "enonce": "Pendant « Juin vert », on se mobilise contre quel cancer ?",
+    "choix": [
+     "Le cancer du poumon",
+     "Le cancer du col de l'utérus",
+     "Le cancer de la prostate"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 76"
+   },
+   {
+    "enonce": "Quel vaccin aide à prévenir le cancer du col de l'utérus ?",
+    "choix": [
+     "Le BCG",
+     "Le vaccin contre la rougeole",
+     "Le vaccin contre le papillomavirus (HPV)"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 76"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale de l'environnement ?",
+    "choix": [
+     "5 juin",
+     "5 août",
+     "5 novembre"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 76"
+   }
+  ]
+ },
+ {
+  "place": 12,
+  "badge": "Sentinelle de la Prévention",
+  "axe": "sante-environnement",
+  "titre": "Génie Imhotep 12 — Sentinelle de la Prévention (4/4)",
+  "questions": [
+   {
+    "enonce": "Le cannabis est-il sans danger pour les jeunes ?",
+    "choix": [
+     "Oui, c'est une plante naturelle",
+     "Non, il peut nuire à la mémoire, à la concentration et à la santé mentale",
+     "Oui, en petite quantité"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 34"
+   },
+   {
+    "enonce": "Qu'est-ce qu'un stupéfiant ?",
+    "choix": [
+     "Un produit de beauté",
+     "Une substance psychoactive dont la consommation peut entraîner une toxicomanie",
+     "Un aliment énergétique"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 34"
+   },
+   {
+    "enonce": "Comment appelle-t-on la dépendance à la drogue ?",
+    "choix": [
+     "La toxicomanie",
+     "La mélomanie",
+     "La kleptomanie"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 34"
+   },
+   {
+    "enonce": "Quelle est la meilleure réaction si un ami te propose de la drogue ?",
+    "choix": [
+     "Accepter pour lui faire plaisir",
+     "Essayer une seule fois",
+     "Refuser fermement et en parler à un adulte de confiance"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 34"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale contre la rage ?",
+    "choix": [
+     "28 mars",
+     "28 septembre",
+     "28 décembre"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 76"
+   },
+   {
+    "enonce": "Que rappelle la date du 28 septembre pour la rage ?",
+    "choix": [
+     "La mort de Louis Pasteur, qui a mis au point le vaccin contre la rage",
+     "La naissance de Robert Koch",
+     "La création de l'OMS"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 76"
+   },
+   {
+    "enonce": "Comment la rage se transmet-elle le plus souvent à l'homme ?",
+    "choix": [
+     "Par l'eau sale",
+     "Par l'air",
+     "Par la morsure d'un animal enragé, souvent un chien"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 76"
+   },
+   {
+    "enonce": "Quand célèbre-t-on la Journée mondiale du cœur ?",
+    "choix": [
+     "29 septembre",
+     "29 février",
+     "29 mai"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 76"
+   },
+   {
+    "enonce": "Le 29 octobre, on célèbre aussi la Journée mondiale :",
+    "choix": [
+     "Du psoriasis",
+     "De la vue",
+     "Du diabète"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 83"
+   },
+   {
+    "enonce": "Que célèbre-t-on le 1er décembre ?",
+    "choix": [
+     "La Journée mondiale du diabète",
+     "La Journée mondiale de lutte contre le SIDA",
+     "La Journée mondiale de la santé"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 83"
+   }
+  ]
+ },
+ {
+  "place": 13,
+  "badge": "Champion de la Santé et EVSS",
+  "axe": "sante-sexuelle-evss",
+  "titre": "Génie Imhotep 13 — Champion de la Santé et EVSS (1/4)",
+  "questions": [
+   {
+    "enonce": "Comment appelle-t-on l'absence de règles chez une femme en âge d'en avoir ?",
+    "choix": [
+     "La dysménorrhée",
+     "La ménarche",
+     "L'aménorrhée"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Quel numéro vert gratuit peut-on appeler au Togo pour signaler une violence contre un enfant ?",
+    "choix": [
+     "Le 1011",
+     "Le 117",
+     "Le 8200"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Toutes les combien d'heures environ faut-il changer sa serviette hygiénique ?",
+    "choix": [
+     "Toutes les 4 à 6 heures environ",
+     "Une fois par jour",
+     "Une fois par semaine"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Vers qui un chef d'établissement doit-il transmettre un dossier de viol avéré ?",
+    "choix": [
+     "Vers les parents de l'agresseur",
+     "Vers le chef du quartier",
+     "Vers le Procureur de la République"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Comment appelle-t-on l'ensemble des bonnes bactéries du vagin qui protègent contre les infections ?",
+    "choix": [
+     "La flore vaginale",
+     "La flore intestinale",
+     "Les globules blancs"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Quel terme désigne le passage de l'enfance à l'âge adulte sur le plan juridique ?",
+    "choix": [
+     "La puberté",
+     "La majorité",
+     "L'adolescence"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "« Les filles sont moins bonnes en maths » : comment appelle-t-on ce genre d'idée toute faite ?",
+    "choix": [
+     "Une vérité scientifique",
+     "Un stéréotype de genre",
+     "Un proverbe"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Quelle sanction peut interdire définitivement à un enseignant fautif d'exercer ?",
+    "choix": [
+     "Un avertissement",
+     "Une mutation",
+     "La radiation"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Comment appelle-t-on la discrimination ou le mépris fondé sur le sexe ?",
+    "choix": [
+     "Le racisme",
+     "Le sexisme",
+     "Le civisme"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Qu'est-ce qu'une ONG ?",
+    "choix": [
+     "Une Organisation Nationale du Gouvernement",
+     "Une Organisation Non Gouvernementale, à but non lucratif",
+     "Une entreprise privée"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 60"
+   }
+  ]
+ },
+ {
+  "place": 14,
+  "badge": "Champion de la Santé et EVSS",
+  "axe": "sante-sexuelle-evss",
+  "titre": "Génie Imhotep 14 — Champion de la Santé et EVSS (2/4)",
+  "questions": [
+   {
+    "enonce": "Quel est le symbole mondial de la lutte contre le SIDA ?",
+    "choix": [
+     "La croix verte",
+     "Le ruban rouge",
+     "Le cœur bleu"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Comment appelle-t-on le malaise ou la fatigue que certaines filles ressentent juste avant les règles ?",
+    "choix": [
+     "Le paludisme",
+     "Le syndrome prémenstruel",
+     "La ménopause"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Quel service s'occupe de l'enquête en cas de crime commis sur un mineur ?",
+    "choix": [
+     "Les pompiers",
+     "La Brigade pour mineurs",
+     "La douane"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Chez la fille, dans quel sens faut-il s'essuyer après être allée aux toilettes ?",
+    "choix": [
+     "De l'arrière vers l'avant",
+     "De l'avant vers l'arrière",
+     "Le sens n'a pas d'importance"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Comment appelle-t-on le secret que doit garder le personnel de santé sur ses patients ?",
+    "choix": [
+     "Le secret médical",
+     "Le secret défense",
+     "Le secret de famille"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Quel est l'objectif principal de l'EVSS ?",
+    "choix": [
+     "Préparer les élèves aux compétitions sportives",
+     "Aider les jeunes à adopter des comportements responsables grâce aux valeurs et à la connaissance de la santé sexuelle",
+     "Remplacer les cours de mathématiques"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Pourquoi est-il interdit de divulguer le nom d'une victime mineure ?",
+    "choix": [
+     "Pour cacher le crime",
+     "Pour protéger sa vie privée et sa dignité",
+     "Parce qu'elle est coupable"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Quel terme désigne le fait de traiter filles et garçons de façon juste, selon leurs besoins particuliers ?",
+    "choix": [
+     "L'égalité",
+     "La discrimination",
+     "L'équité"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Comment appelle-t-on le retour à l'école d'une élève victime, après une agression ?",
+    "choix": [
+     "L'exclusion",
+     "La réintégration scolaire",
+     "Le redoublement"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Quel terme désigne le fait de donner aux filles les moyens de prendre leur vie en main ?",
+    "choix": [
+     "La soumission",
+     "L'autonomisation (empowerment)",
+     "La dépendance"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 50"
+   }
+  ]
+ },
+ {
+  "place": 15,
+  "badge": "Champion de la Santé et EVSS",
+  "axe": "sante-sexuelle-evss",
+  "titre": "Génie Imhotep 15 — Champion de la Santé et EVSS (3/4)",
+  "questions": [
+   {
+    "enonce": "Comment appelle-t-on des règles très douloureuses ?",
+    "choix": [
+     "La dysménorrhée",
+     "L'aménorrhée",
+     "La ménopause"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "En quelle année le Togo a-t-il adopté la loi portant protection des apprenants contre les violences à caractère sexuel ?",
+    "choix": [
+     "2012",
+     "2018",
+     "2022"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Quelle protection est utilisée par les filles pour absorber le sang des règles ?",
+    "choix": [
+     "Un pansement",
+     "Une serviette hygiénique",
+     "Du coton sec uniquement"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Quel document médical, établi par un médecin, atteste des traces de violence ?",
+    "choix": [
+     "Le carnet de vaccination",
+     "Le certificat médical de constatation",
+     "L'ordonnance"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Avoir ses règles à l'école est :",
+    "choix": [
+     "Une honte à cacher",
+     "Un phénomène naturel qui mérite respect et soutien",
+     "Une maladie contagieuse"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Comment appelle-t-on une personne âgée de moins de 18 ans aux yeux de la loi ?",
+    "choix": [
+     "Un adulte",
+     "Un majeur",
+     "Un mineur"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Quel terme désigne les rôles et comportements que la société attribue aux hommes et aux femmes ?",
+    "choix": [
+     "Le sexe",
+     "L'hérédité",
+     "Le genre"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Comment appelle-t-on la somme d'argent qu'un tribunal oblige l'agresseur à verser à la victime ?",
+    "choix": [
+     "Les dommages et intérêts",
+     "L'amende scolaire",
+     "La bourse"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Quel terme désigne la représentation équilibrée d'hommes et de femmes dans une assemblée ?",
+    "choix": [
+     "La parité",
+     "La majorité",
+     "L'unanimité"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Quelle obligation impose aux fonctionnaires de signaler au procureur un crime dont ils ont connaissance dans leur travail ?",
+    "choix": [
+     "L'obligation de dénonciation",
+     "L'obligation de réserve",
+     "L'obligation scolaire"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 60"
+   }
+  ]
+ },
+ {
+  "place": 16,
+  "badge": "Champion de la Santé et EVSS",
+  "axe": "sante-sexuelle-evss",
+  "titre": "Génie Imhotep 16 — Champion de la Santé et EVSS (4/4)",
+  "questions": [
+   {
+    "enonce": "Dans la prévention des IST, que signifie l'approche « ABC » ?",
+    "choix": [
+     "Aller, Boire, Courir",
+     "Abstinence, Bonne fidélité, Condom (préservatif)",
+     "Analyse, Bilan, Consultation"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Comment appelle-t-on l'arrêt définitif des règles chez la femme, vers 50 ans ?",
+    "choix": [
+     "L'andropause",
+     "La puberté",
+     "La ménopause"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Comment s'appelle le chatbot WhatsApp qui permet de dénoncer des cas de violences basées sur le genre au Togo ?",
+    "choix": [
+     "Afi",
+     "Akofa",
+     "Ama"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Quelle habitude aide à prévenir les infections des parties génitales ?",
+    "choix": [
+     "Ne jamais se laver pendant les règles",
+     "La toilette intime régulière à l'eau propre",
+     "Utiliser des produits très parfumés"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Quel principe veut que l'intérêt de l'enfant passe avant tout dans les décisions qui le concernent ?",
+    "choix": [
+     "La majorité",
+     "L'intérêt supérieur de l'enfant",
+     "L'autorité parentale absolue"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Quel terme désigne les caractéristiques biologiques qui distinguent les hommes des femmes ?",
+    "choix": [
+     "Le sexe",
+     "Le genre",
+     "La culture"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Comment appelle-t-on l'infraction commise par quelqu'un qui voit une personne en danger et ne l'aide pas ?",
+    "choix": [
+     "La non-assistance à personne en danger",
+     "Le vol",
+     "La diffamation"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Quel terme désigne le fait que filles et garçons ont les mêmes droits et les mêmes chances ?",
+    "choix": [
+     "L'égalité de genre",
+     "La parité",
+     "La hiérarchie"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 50"
+   },
+   {
+    "enonce": "Quel est le message principal de la lutte nationale contre les violences sexuelles en milieu scolaire ?",
+    "choix": [
+     "« Chacun pour soi »",
+     "« Le silence est d'or »",
+     "« Zéro tolérance »"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 60"
+   },
+   {
+    "enonce": "Quand les tâches ménagères sont toujours confiées aux filles et jamais aux garçons, on parle de :",
+    "choix": [
+     "Répartition équitable",
+     "Solidarité familiale",
+     "Division sexuelle du travail"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 50"
+   }
+  ]
+ },
+ {
+  "place": 17,
+  "badge": "Maître Génie Imhotep",
+  "axe": "sport-secourisme",
+  "titre": "Génie Imhotep 17 — Maître Génie Imhotep (1/4)",
+  "questions": [
+   {
+    "enonce": "Quel spécialiste soigne les maladies du cœur ?",
+    "choix": [
+     "Le néphrologue",
+     "Le cardiologue",
+     "L'ORL"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 95"
+   },
+   {
+    "enonce": "Comment appelle-t-on une maladie présente en permanence dans une région ?",
+    "choix": [
+     "Une pandémie",
+     "Une épidémie",
+     "Une endémie"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 99"
+   },
+   {
+    "enonce": "Comment appelle-t-on une maladie transmise de l'animal à l'homme ?",
+    "choix": [
+     "Une maladie héréditaire",
+     "Une zoonose",
+     "Une maladie chronique"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 99"
+   },
+   {
+    "enonce": "Laquelle de ces maladies est une zoonose ?",
+    "choix": [
+     "Le diabète",
+     "La rage",
+     "L'asthme"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 99"
+   },
+   {
+    "enonce": "Quel animal transmet la fièvre de Lassa ?",
+    "choix": [
+     "Le chien",
+     "Le moustique",
+     "Le rat"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 99"
+   },
+   {
+    "enonce": "Pourquoi est-il important de déclarer les naissances et les décès ?",
+    "choix": [
+     "Pour produire des statistiques utiles à la planification de la santé",
+     "Pour payer des impôts",
+     "Ce n'est pas important"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 100"
+   },
+   {
+    "enonce": "Qu'est-ce qu'un déterminant de la santé ?",
+    "choix": [
+     "Un médicament",
+     "Un facteur qui influence l'état de santé (alimentation, eau, éducation, revenu, environnement…)",
+     "Un examen médical"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 100"
+   },
+   {
+    "enonce": "Que signifie ODD ?",
+    "choix": [
+     "Organisation des Docteurs Diplômés",
+     "Office de Distribution des Denrées",
+     "Objectifs de Développement Durable"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 100"
+   },
+   {
+    "enonce": "Quel est le slogan des Clubs Santé SOS DOCTEUR TV, à retenir pour conclure ?",
+    "choix": [
+     "Ensemble pour une génération de jeunes en bonne santé, responsable et épanouie",
+     "Votre santé et bien-être, notre priorité",
+     "Génie Imhotep, c'est ici et maintenant"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 100"
+   },
+   {
+    "enonce": "Qui a décrit la circulation du sang dans le corps ?",
+    "choix": [
+     "William Harvey",
+     "Robert Koch",
+     "Edward Jenner"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 95"
+   }
+  ]
+ },
+ {
+  "place": 18,
+  "badge": "Maître Génie Imhotep",
+  "axe": "sport-secourisme",
+  "titre": "Génie Imhotep 18 — Maître Génie Imhotep (2/4)",
+  "questions": [
+   {
+    "enonce": "Quelle ONG médicale internationale intervient dans les zones de guerre et d'épidémies ?",
+    "choix": [
+     "La FIFA",
+     "Médecins Sans Frontières (MSF)",
+     "Amnesty International"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 99"
+   },
+   {
+    "enonce": "Quelle est la différence entre une épidémie et une pandémie ?",
+    "choix": [
+     "Une pandémie est une épidémie qui s'étend à plusieurs continents",
+     "Une épidémie touche le monde entier",
+     "Ce sont deux synonymes"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 99"
+   },
+   {
+    "enonce": "Quelle est la principale mesure pour éviter le choléra dans une communauté ?",
+    "choix": [
+     "Porter un masque",
+     "Boire de l'eau potable et respecter l'hygiène des mains et des aliments",
+     "Dormir sous moustiquaire"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 100"
+   },
+   {
+    "enonce": "Comment peut-on lutter contre la prolifération des moustiques dans un quartier ?",
+    "choix": [
+     "En supprimant les eaux stagnantes et en assainissant le cadre de vie",
+     "En plantant des fleurs",
+     "En construisant des murs"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 100"
+   },
+   {
+    "enonce": "Qu'est-ce que la promotion de la santé ?",
+    "choix": [
+     "La publicité pour les médicaments",
+     "Le processus qui permet aux populations d'améliorer leur propre santé",
+     "La vente de produits de santé"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 100"
+   },
+   {
+    "enonce": "Que signifie IEC dans les campagnes de santé ?",
+    "choix": [
+     "Institut d'Études Cliniques",
+     "Intervention d'Extrême Chirurgie",
+     "Information, Éducation et Communication"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 100"
+   },
+   {
+    "enonce": "Qui a découvert les groupes sanguins ?",
+    "choix": [
+     "Karl Landsteiner",
+     "Frederick Banting",
+     "William Harvey"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 95"
+   },
+   {
+    "enonce": "Qui a co-découvert l'insuline ?",
+    "choix": [
+     "Jonas Salk",
+     "Frederick Banting",
+     "Marie Curie"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 95"
+   },
+   {
+    "enonce": "Qui a découvert les rayons X ?",
+    "choix": [
+     "Wilhelm Röntgen",
+     "Albert Einstein",
+     "Isaac Newton"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 95"
+   },
+   {
+    "enonce": "Que signifie PEV ?",
+    "choix": [
+     "Programme Élargi de Vaccination",
+     "Plan d'Éducation à la Vie",
+     "Programme d'Entretien des Villages"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 100"
+   }
+  ]
+ },
+ {
+  "place": 19,
+  "badge": "Maître Génie Imhotep",
+  "axe": "sport-secourisme",
+  "titre": "Génie Imhotep 19 — Maître Génie Imhotep (3/4)",
+  "questions": [
+   {
+    "enonce": "Qu'est-ce que la surveillance épidémiologique ?",
+    "choix": [
+     "Le suivi continu des maladies pour détecter rapidement les épidémies",
+     "La surveillance des examens",
+     "La garde des hôpitaux"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 100"
+   },
+   {
+    "enonce": "Comment appelle-t-on l'augmentation soudaine et inhabituelle du nombre de cas d'une maladie dans une région ?",
+    "choix": [
+     "Une endémie",
+     "Une épidémie",
+     "Une vaccination"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 100"
+   },
+   {
+    "enonce": "Quelle organisation mondiale déclare une « urgence de santé publique de portée internationale » ?",
+    "choix": [
+     "L'UNICEF",
+     "L'OMS",
+     "La FAO"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 100"
+   },
+   {
+    "enonce": "Comment s'appelle le serment que prêtent les médecins ?",
+    "choix": [
+     "Le serment de Pasteur",
+     "Le serment de Genève uniquement",
+     "Le serment d'Hippocrate"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 95"
+   },
+   {
+    "enonce": "Qui a découvert la pénicilline, le premier antibiotique ?",
+    "choix": [
+     "Alexander Fleming",
+     "Robert Koch",
+     "Edward Jenner"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 95"
+   },
+   {
+    "enonce": "En quelle année la pénicilline a-t-elle été découverte ?",
+    "choix": [
+     "1828",
+     "1928",
+     "1978"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 95"
+   },
+   {
+    "enonce": "Qui a découvert le bacille responsable de la tuberculose ?",
+    "choix": [
+     "Louis Pasteur",
+     "Robert Koch",
+     "Alexandre Yersin"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 95"
+   },
+   {
+    "enonce": "Qu'est-ce qu'un « cas contact » ?",
+    "choix": [
+     "Une personne vaccinée",
+     "Un médecin",
+     "Une personne qui a été en contact proche avec un malade contagieux"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 99"
+   },
+   {
+    "enonce": "Qu'est-ce qu'un vaccin ?",
+    "choix": [
+     "Un médicament qui guérit toutes les maladies",
+     "Un produit qui apprend au corps à se défendre contre une maladie",
+     "Une vitamine"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 100"
+   },
+   {
+    "enonce": "Quelle scientifique, deux fois prix Nobel, a travaillé sur la radioactivité ?",
+    "choix": [
+     "Florence Nightingale",
+     "Marie Curie",
+     "Rosalind Franklin"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 95"
+   }
+  ]
+ },
+ {
+  "place": 20,
+  "badge": "Maître Génie Imhotep",
+  "axe": "sport-secourisme",
+  "titre": "Génie Imhotep 20 — Maître Génie Imhotep (4/4)",
+  "questions": [
+   {
+    "enonce": "Quel spécialiste soigne les maladies des oreilles, du nez et de la gorge ?",
+    "choix": [
+     "Le cardiologue",
+     "Le pédiatre",
+     "L'ORL (oto-rhino-laryngologiste)"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 95"
+   },
+   {
+    "enonce": "Qu'est-ce que la médecine interne, spécialité du Dr KODOM ?",
+    "choix": [
+     "La spécialité qui prend en charge les maladies des organes internes de l'adulte dans leur ensemble",
+     "La chirurgie des os",
+     "La médecine des animaux"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 95"
+   },
+   {
+    "enonce": "Où forme-t-on les médecins au Togo ?",
+    "choix": [
+     "Au lycée technique",
+     "À la Faculté des Sciences de la Santé de l'Université de Lomé, notamment",
+     "À l'École normale des instituteurs"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 95"
+   },
+   {
+    "enonce": "Qui est considéré comme le « père de la médecine » ?",
+    "choix": [
+     "Louis Pasteur",
+     "Hippocrate",
+     "Molière"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 95"
+   },
+   {
+    "enonce": "Quel animal est considéré comme un réservoir naturel de nombreux coronavirus ?",
+    "choix": [
+     "La chauve-souris",
+     "La vache",
+     "Le poulet"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 99"
+   },
+   {
+    "enonce": "Comment appelle-t-on un animal (souvent un insecte) qui transmet une maladie ?",
+    "choix": [
+     "Un vecteur",
+     "Un hôte définitif",
+     "Un antidote"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 99"
+   },
+   {
+    "enonce": "Comment appelle-t-on la période entre la contamination et l'apparition des premiers signes ?",
+    "choix": [
+     "La convalescence",
+     "La période d'incubation",
+     "La rémission"
+    ],
+    "bonne": 1,
+    "explication": "",
+    "origine": "défi n° 99"
+   },
+   {
+    "enonce": "Comment appelle-t-on la mise à l'écart de personnes ayant pu être exposées à une maladie contagieuse ?",
+    "choix": [
+     "La quarantaine",
+     "La vaccination",
+     "L'hospitalisation de jour"
+    ],
+    "bonne": 0,
+    "explication": "",
+    "origine": "défi n° 99"
+   },
+   {
+    "enonce": "Qui a inventé le stéthoscope ?",
+    "choix": [
+     "Hippocrate",
+     "Pasteur",
+     "René Laennec"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 95"
+   },
+   {
+    "enonce": "Quel document permet de suivre les vaccins reçus par un enfant ?",
+    "choix": [
+     "Le bulletin scolaire",
+     "L'acte de naissance",
+     "Le carnet de vaccination (carnet de santé)"
+    ],
+    "bonne": 2,
+    "explication": "",
+    "origine": "défi n° 100"
+   }
+  ]
+ }
+]

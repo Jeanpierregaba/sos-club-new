@@ -22,14 +22,14 @@ suivi touchent la certification (partie critique, `docs/TESTING.md`) : leurs tes
 
 ## Sélection expert
 
-- [ ] 4. Thématiques de la certification dans `certification/regles.py` : l'axe et les lots de chaque badge.
+- [x] 4. Thématiques de la certification dans `certification/regles.py` : l'axe et les lots de chaque badge.
       Tests de `selectionner(banque, defis)`, fonction pure, sur une banque fabriquée :
   - les défis Expert d'abord, à parts égales entre eux ;
   - le complément pris dans le même lot, dans l'ordre du document ;
   - aucun doublon par énoncé normalisé, y compris entre deux thématiques ;
   - 4 places de 10 par thématique, chacune mêlant défis Expert et complément ;
   - refus quand un axe a moins de 40 questions.
-- [ ] 5. Code de `certification/selection_expert.py`, puis de sa commande, qui lit la base et écrit le JSON.
+- [x] 5. Code de `certification/selection_expert.py`, puis de sa commande, qui lit la base et écrit le JSON.
       Générer `backend/alembic/donnees/certification_expert.json` depuis la base locale. Test sur le JSON commité :
       200 énoncés distincts, 10 par place, bonne réponse dans les choix, axe conforme à la thématique.
 

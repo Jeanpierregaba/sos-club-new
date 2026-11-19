@@ -1,6 +1,8 @@
 """Règles des badges (spec 029, Q24) : la version la plus haute est en cours ; un badge garde la version avec
 laquelle il a été délivré."""
 
+from dataclasses import dataclass
+
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,6 +18,25 @@ NOMS_PAR_DEFAUT = [
     "Maître Génie Imhotep",
 ]
 PALIERS_PAR_DEFAUT = [4, 8, 12, 16, 20]
+
+
+@dataclass(frozen=True)
+class Thematique:
+    """Une thématique du parcours (spec 043) : son badge, l'axe de ses quiz et les lots de la banque où elle puise."""
+
+    badge: str
+    axe: str
+    lots: tuple[int, ...]
+
+
+# Dans l'ordre des badges : places 1 à 4, 5 à 8, etc.
+THEMATIQUES: tuple[Thematique, ...] = (
+    Thematique(NOMS_PAR_DEFAUT[0], "production-tv-medias", (1,)),  # AIMES-AFRIQUE et SOS Docteur TV
+    Thematique(NOMS_PAR_DEFAUT[1], "genie-imhotep", (2,)),  # Club Santé et Académie Génie Imhotep
+    Thematique(NOMS_PAR_DEFAUT[2], "sante-environnement", (3, 5)),  # journées mondiales, hygiène
+    Thematique(NOMS_PAR_DEFAUT[3], "sante-sexuelle-evss", (4,)),  # santé sexuelle (EVSS)
+    Thematique(NOMS_PAR_DEFAUT[4], "sport-secourisme", (6,)),  # secourisme et santé publique pratique
+)
 
 
 async def en_cours(db: AsyncSession) -> ReglesBadges:
