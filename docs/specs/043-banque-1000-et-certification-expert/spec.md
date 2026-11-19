@@ -108,32 +108,32 @@ Un collaborateur de DRE ne voit que sa DRE.
 
 ## Critères d'acceptation
 
-- [ ] Après la migration, la banque compte 1 000 QCM : 922 du Jeu Quiz Santé et 78 du nouveau document, en 15 quiz
+- [x] Après la migration, la banque compte 1 000 QCM : 922 du Jeu Quiz Santé et 78 du nouveau document, en 15 quiz
       dépubliés du lot 7.
-- [ ] Chaque QCM du lot 7 a 3 propositions, et sa bonne réponse est celle mise en gras dans le document. Le fichier
+- [x] Chaque QCM du lot 7 a 3 propositions, et sa bonne réponse est celle mise en gras dans le document. Le fichier
       de données en contient exactement 78.
-- [ ] Relancer la migration sur une base qui a déjà le lot 7 ne crée ni ne modifie rien.
-- [ ] Les places 1 à 20 ont chacune un quiz de certification publié, de 10 questions.
-- [ ] Les 200 questions sont toutes différentes. Chacune vient de la banque, et de l'axe de sa thématique.
-- [ ] Les places 9 à 20 n'ont que des questions des réserves des défis Expert. Les places 1 à 8 en ont 20 par
+- [x] Relancer la migration sur une base qui a déjà le lot 7 ne crée ni ne modifie rien.
+- [x] Les places 1 à 20 ont chacune un quiz de certification publié, de 10 questions.
+- [x] Les 200 questions sont toutes différentes. Chacune vient de la banque, et de l'axe de sa thématique.
+- [x] Les places 9 à 20 n'ont que des questions des réserves des défis Expert. Les places 1 à 8 en ont 20 par
       thématique, complétées par le même lot.
-- [ ] Un quiz de test qui occupait une place est dépublié. Un vrai quiz publié sur une place reste en place, et
+- [x] Un quiz de test qui occupait une place est dépublié. Un vrai quiz publié sur une place reste en place, et
       cette place n'est pas remplie.
-- [ ] Un élève joue la place 1, réussit à 10/10 et gagne +50 ; la place 2 s'ouvre.
-- [ ] Le suivi liste un élève dès sa première partie de certification, avec ses places validées, sa place en
+- [x] Un élève joue la place 1, réussit à 10/10 et gagne +50 ; la place 2 s'ouvre.
+- [x] Le suivi liste un élève dès sa première partie de certification, avec ses places validées, sa place en
       cours, ses tentatives et sa dernière activité.
-- [ ] Les filtres (DRE, club, rôle, état) et la recherche réduisent la liste. L'export CSV reprend les mêmes
+- [x] Les filtres (DRE, club, rôle, état) et la recherche réduisent la liste. L'export CSV reprend les mêmes
       colonnes et les mêmes filtres ; il est refusé (403) sans le droit « inscrits : exporter » ou hors du périmètre
       national, et chaque export est journalisé avec sa finalité.
-- [ ] Un collaborateur de DRE, ou national sans double authentification, voit le pseudonyme des élèves, jamais
+- [x] Un collaborateur de DRE, ou national sans double authentification, voit le pseudonyme des élèves, jamais
       leur nom, ni dans le suivi ni dans les listes des certificats et des badges.
-- [ ] Un collaborateur de DRE ne voit que les candidats et les chiffres de sa DRE ; sans le droit de consulter
+- [x] Un collaborateur de DRE ne voit que les candidats et les chiffres de sa DRE ; sans le droit de consulter
       les quiz, il reçoit un refus 403.
-- [ ] L'entonnoir donne, pour chaque place, les candidats arrivés, ceux qui ont réussi, le taux de réussite et la
+- [x] L'entonnoir donne, pour chaque place, les candidats arrivés, ceux qui ont réussi, le taux de réussite et la
       moyenne de tentatives avant la réussite.
-- [ ] Les chiffres comptent les candidats, les actifs sur 30 jours, les badges par badge et les certifiés, au
+- [x] Les chiffres comptent les candidats, les actifs sur 30 jours, les badges par badge et les certifiés, au
       total, par DRE et par semaine.
-- [ ] Les joueurs sans compte et les parties d'essai des collaborateurs n'apparaissent pas dans le suivi.
+- [x] Les joueurs sans compte et les parties d'essai des collaborateurs n'apparaissent pas dans le suivi.
 - [ ] Le site : la page « Suivi » est utilisable à 375 px de large.
 
 ## Cas limites et erreurs

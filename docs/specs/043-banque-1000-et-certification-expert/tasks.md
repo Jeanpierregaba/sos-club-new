@@ -81,7 +81,7 @@ suivi touchent la certification (partie critique, `docs/TESTING.md`) : leurs tes
       journal dans `src/lib/admin.ts`.
 - [x] 13. Composant `SuiviCertification` (tuiles, entonnoir, tableau par DRE, graphique par semaine avec Recharts)
       et son test : chiffres affichés, état vide.
-- [ ] 14. Page `/admin/certification/suivi` et onglet « Suivi » :
+- [x] 14. Page `/admin/certification/suivi` et onglet « Suivi » :
   - filtres, recherche et pagination ;
   - tableau sur bureau, cartes à 375 px ;
   - bouton « Exporter » réservé au national avec le droit, avec une boîte qui demande la finalité ;
@@ -91,7 +91,7 @@ suivi touchent la certification (partie critique, `docs/TESTING.md`) : leurs tes
 
 ## Clôture
 
-- [ ] 16. Vérifier tous les critères d'acceptation de `spec.md` ; lint, typecheck et tests (API complète et site).
-- [ ] 17. Relecture par le sous-agent `reviewer`, puis corrections.
-- [ ] 18. `TASKS.md` (spec 043 dans « Terminé », relecture du JSON par l'équipe nationale dans les suites) et
+- [x] 16. Vérifier tous les critères d'acceptation de `spec.md` ; lint, typecheck et tests (API complète et site).
+- [x] 17. Relecture par le sous-agent `reviewer`, puis corrections.
+- [x] 18. `TASKS.md` (spec 043 dans « Terminé », relecture du JSON par l'équipe nationale dans les suites) et
       cases cochées.
