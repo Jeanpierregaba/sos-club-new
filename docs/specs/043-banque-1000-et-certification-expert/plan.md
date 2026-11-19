@@ -104,8 +104,10 @@ collaborateur (DRE de l'établissement de l'élève ou de l'encadreur, comme `cl
     pseudonyme d'un élève sinon), `role`, `ancien_eleve`, `club`, `etablissement`, `dre`, `places_validees`,
     `badges` (rangs), `place_en_cours` (nulle si certifié), `tentatives_place`, `tentatives`, `debut`,
     `derniere_activite` et `certificat` (numéro du certificat valide, ou nul).
+  - Le nom d'un élève n'est rendu qu'à un collaborateur national avec la double authentification active
+    (`suivi.voit_les_noms`) ; `/certificats` et `/badges` suivent la même règle et le périmètre DRE (relecture).
   - **Inactif** : pas certifié, et aucune activité depuis 30 jours.
-- `GET /statistiques?dre=` renvoie `StatistiquesCertification` :
+- `GET /statistiques` (périmètre du collaborateur) renvoie `StatistiquesCertification` :
   - `totaux` : candidats, actifs sur 30 jours, certifiés, et badges par rang (avec leur nom) ;
   - `entonnoir` : 20 lignes, chacune avec `place`, `quiz_publie`, `tentes`, `reussis`, `taux_reussite`
     (tentatives réussies sur tentatives terminées) et `tentatives_avant_reussite` (moyenne, nulle sans réussite) ;
@@ -117,7 +119,8 @@ collaborateur (DRE de l'établissement de l'élève ou de l'encadreur, comme `cl
   - Droit `inscrits : exporter` et périmètre national (`exiger_permission(..., national=True)`) ; sinon 403.
   - Renvoie un CSV au séparateur `;`, avec les cellules neutralisées comme dans `admin/exports.py`
     (`neutraliser`).
-  - Limité à 5 000 lignes : au-delà, 422 « Trop de candidats : précise les filtres. ».
+  - Limité comme les autres exports (`settings.export_lignes_max`) : au-delà, 422 « Trop de candidats : précise
+    les filtres. ».
   - Journal : `export_suivi_certification`, avec la finalité, les filtres et le nombre de lignes.
   - Un POST plutôt qu'un GET : la finalité n'a pas sa place dans l'URL.
 

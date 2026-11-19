@@ -87,8 +87,11 @@ Un collaborateur de DRE ne voit que sa DRE.
   - certifié ou non, avec le numéro du certificat.
 - Filtres : DRE, club, rôle, état (en cours, inactif depuis 30 jours, certifié). Recherche par nom.
 - La liste est paginée et triée par dernière activité.
-- Un collaborateur national voit le nom et le prénom des élèves ; un collaborateur de DRE ne voit que leur
-  pseudonyme, comme dans le suivi des clubs. Les encadreurs sont nommés pour tous.
+- Le nom et le prénom d'un élève ne sont montrés, et cherchables, qu'à un collaborateur national dont la double
+  authentification est active, comme les autres lectures nominatives sensibles. Les autres voient son pseudonyme,
+  comme dans le suivi des clubs. Les encadreurs sont nommés pour tous.
+- La même règle et le même périmètre DRE valent pour les listes des certificats et des badges délivrés de
+  l'onglet Certification : un collaborateur de DRE n'y voit que sa DRE.
 - L'export CSV de la liste est réservé, comme l'export des inscrits, aux collaborateurs nationaux qui ont le droit
   « inscrits : exporter ». Il demande une finalité et il est inscrit au journal.
 
@@ -122,7 +125,8 @@ Un collaborateur de DRE ne voit que sa DRE.
 - [ ] Les filtres (DRE, club, rôle, état) et la recherche réduisent la liste. L'export CSV reprend les mêmes
       colonnes et les mêmes filtres ; il est refusé (403) sans le droit « inscrits : exporter » ou hors du périmètre
       national, et chaque export est journalisé avec sa finalité.
-- [ ] Un collaborateur de DRE voit le pseudonyme des élèves, jamais leur nom.
+- [ ] Un collaborateur de DRE, ou national sans double authentification, voit le pseudonyme des élèves, jamais
+      leur nom, ni dans le suivi ni dans les listes des certificats et des badges.
 - [ ] Un collaborateur de DRE ne voit que les candidats et les chiffres de sa DRE ; sans le droit de consulter
       les quiz, il reçoit un refus 403.
 - [ ] L'entonnoir donne, pour chaque place, les candidats arrivés, ceux qui ont réussi, le taux de réussite et la
@@ -148,7 +152,7 @@ Un collaborateur de DRE ne voit que sa DRE.
   quiz a ses propres questions, que l'équipe corrige dans l'éditeur des quiz.
 - **Base sans la banque** (celle des tests) : la migration ne crée ni le lot 7 ni les quiz de certification.
 - **Grand nombre de candidats** : la liste reste paginée et l'export CSV est limité comme les autres exports du back
-  office.
+  office (`export_lignes_max`).
 
 ## Hors périmètre
 

@@ -33,6 +33,7 @@ function Section({ titre, children }: { titre: string; children: React.ReactNode
 export function SuiviCertification({ stats }: { stats: StatistiquesCertification }) {
   const { totaux, entonnoir, par_dre, par_semaine } = stats;
   const plusTentes = Math.max(1, ...entonnoir.map((e) => e.tentes));
+  const sansDre = totaux.candidats - par_dre.reduce((s, d) => s + d.candidats, 0);
   const plusSemaine = Math.max(1, ...par_semaine.map((s) => Math.max(s.candidats, s.certifies)));
 
   return (
@@ -123,6 +124,11 @@ export function SuiviCertification({ stats }: { stats: StatistiquesCertification
                   ))}
                 </tbody>
               </table>
+              {sansDre > 0 && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Et {nombre(sansDre)} candidat{sansDre > 1 ? "s" : ""} sans établissement rattaché.
+                </p>
+              )}
             </div>
           )}
         </Section>

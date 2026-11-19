@@ -19,6 +19,8 @@ from xml.etree import ElementTree as ET
 
 W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 NB_CHOIX = 3
+# Après les questions, le document donne la grille des réponses pour l'animateur ou le jury.
+FIN = "Grille des réponses"
 
 # Le document « Quiz Santé – 78 questions » des Clubs Santé (2026-11-19) : l'axe de chacune de ses 15 thématiques.
 AXES_LOT7: dict[int, str] = {
@@ -84,6 +86,8 @@ def _paragraphes(contenu: bytes) -> list[tuple[str, bool]]:
 def lire(contenu: bytes) -> list[Theme]:
     themes: list[Theme] = []
     for texte, gras in _paragraphes(contenu):
+        if texte.startswith(FIN):
+            break  # la grille des réponses de l'animateur : elle redit le gras, contrôlée à part
         if m := _THEME.match(texte):
             themes.append(Theme(int(m[1]), _propre(m[2])))
         elif not themes:
@@ -95,9 +99,14 @@ def lire(contenu: bytes) -> list[Theme]:
             if gras:
                 question.en_gras.append(len(question.choix))
             question.choix.append(_propre(m[2]))
+        else:
+            # Un énoncé sur deux paragraphes, une note : rien ne se perd sans qu'on le sache.
+            raise Incoherence(f"Paragraphe non reconnu dans « {themes[-1].titre} » : « {texte[:80]} ».")
 
     attendu = 1
     for theme in themes:
+        if not theme.questions:
+            raise Incoherence(f"La thématique « {theme.titre} » n'a aucune question.")
         for q in theme.questions:
             if q.n != attendu:
                 raise Incoherence(f"Question {q.n} : numéro inattendu, la question {attendu} était attendue.")

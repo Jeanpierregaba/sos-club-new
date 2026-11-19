@@ -38,6 +38,7 @@ from app.certification.schemas import (
 from app.clubs.models import Adhesion, Club, EtatAdhesion, EtatRattachement, Rattachement
 from app.comptes.inscription import Refus
 from app.comptes.models import Role, Utilisateur
+from app.config import settings
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur
 from app.quiz.models import PARCOURS_CERTIFICATION, PLACES, EtatQuiz, Quiz, TentativeQuiz
@@ -45,11 +46,39 @@ from app.referentiel.models import Dre, Etablissement, Iesg
 
 INACTIF = timedelta(days=30)
 SEMAINES = 12
-LIMITE_EXPORT = 5000
 ENTETES = [
     "Nom", "Pseudonyme", "Rôle", "Club", "Établissement", "DRE", "Places validées", "Badges", "Place en cours",
     "Tentatives sur la place", "Tentatives", "Début", "Dernière activité", "Certificat",
 ]  # fmt: skip
+
+
+def voit_les_noms(acces: Acces) -> bool:
+    """Le nom réel d'un élève (souvent mineur) : seulement pour un collaborateur national dont la double
+    authentification est active, comme les autres lectures nominatives sensibles (RULES, catalogue des droits).
+    Les autres voient son pseudonyme ; un encadreur reste nommé."""
+    return acces.national and acces.double_auth_active
+
+
+def nom_affiche(acces: Acces, role: Role | str, prenom: str, nom: str, pseudonyme: str | None) -> str:
+    if Role(role) is not Role.eleve or voit_les_noms(acces):
+        return f"{prenom} {nom}"
+    return pseudonyme or "Élève"
+
+
+def comptes_de_la_dre(code: str) -> Any:
+    """Les élèves et les encadreurs dont l'établissement est dans la DRE."""
+
+    def du_lieu(colonne_id: Any, colonne_lieu: Any) -> Select:
+        return (
+            select(colonne_id)
+            .join(Etablissement, Etablissement.id == colonne_lieu)
+            .join(Iesg, Iesg.id == Etablissement.iesg_id)
+            .where(Iesg.dre_code == code)
+        )
+
+    return du_lieu(Eleve.utilisateur_id, Eleve.etablissement_id).union(
+        du_lieu(Encadreur.utilisateur_id, Encadreur.etablissement_id)
+    )
 
 
 def _tentatives() -> Select:
@@ -169,19 +198,21 @@ def _filtrer(requete: Select, acces: Acces, filtres: FiltresCandidats, instant: 
     elif filtres.etat == "en_cours":
         requete = requete.where(c.certificat.is_(None), c.derniere >= instant - INACTIF)
     if filtres.recherche:
-        motif = f"%{filtres.recherche}%"
+        # Les jokers de LIKE sont échappés : « 100% » cherche « 100% », pas tout.
+        echappe = filtres.recherche.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        motif = f"%{echappe}%"
         nom_complet = func.concat(c.prenom, " ", c.nom)
-        # Hors du national, le nom réel d'un élève n'est ni montré ni cherchable : seulement son pseudonyme.
-        nom_cherchable = (
-            nom_complet.ilike(motif) if acces.national else and_(c.role == Role.encadreur, nom_complet.ilike(motif))
-        )
-        requete = requete.where(or_(c.pseudonyme.ilike(motif), nom_cherchable))
+        # Le nom réel d'un élève n'est cherchable que par ceux qui peuvent le voir ; sinon, son pseudonyme seulement.
+        nom_cherchable = nom_complet.ilike(motif, escape="\\")
+        if not voit_les_noms(acces):
+            nom_cherchable = and_(c.role == Role.encadreur, nom_cherchable)
+        requete = requete.where(or_(c.pseudonyme.ilike(motif, escape="\\"), nom_cherchable))
     return requete
 
 
 def _candidat(ligne: Any, acces: Acces) -> CandidatCertification:
     eleve = ligne.role is Role.eleve
-    nom = f"{ligne.prenom} {ligne.nom}" if acces.national or not eleve else (ligne.pseudonyme or "Élève")
+    nom = nom_affiche(acces, ligne.role, ligne.prenom, ligne.nom, ligne.pseudonyme)
     return CandidatCertification(
         id=ligne.uid,
         nom=nom,
@@ -390,11 +421,13 @@ def _date(valeur: datetime) -> str:
 async def exporter(
     db: AsyncSession, acces: Acces, filtres: FiltresCandidats, finalite: str, ip: str
 ) -> tuple[bytes, int]:
-    """Le CSV des candidats filtrés, journalisé avec sa finalité. Refusé au-delà de `LIMITE_EXPORT` lignes."""
+    """Le CSV des candidats filtrés, journalisé avec sa finalité. Refusé au-delà de la limite des exports."""
     requete = _trier(_filtrer(_candidats(acces), acces, filtres, datetime.now(UTC)))
-    lignes = (await db.execute(requete.limit(LIMITE_EXPORT + 1))).all()
-    if len(lignes) > LIMITE_EXPORT:
-        raise Refus(f"Trop de candidats (plus de {LIMITE_EXPORT}) : précise les filtres.")
+    # La même limite que les autres exports du back office.
+    limite = settings.export_lignes_max
+    lignes = (await db.execute(requete.limit(limite + 1))).all()
+    if len(lignes) > limite:
+        raise Refus(f"Trop de candidats (plus de {limite}) : précise les filtres.")
     tampon = io.StringIO()
     ecrivain = csv.writer(tampon, delimiter=";")
     ecrivain.writerow(ENTETES)

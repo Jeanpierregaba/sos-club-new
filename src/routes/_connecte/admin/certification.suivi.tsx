@@ -67,6 +67,8 @@ function Etat({ c }: { c: CandidatCertification }) {
         Certifié · {c.certificat}
       </span>
     );
+  if (c.place_en_cours === null)
+    return <span className="text-xs font-semibold">Parcours terminé, sans certificat valide</span>;
   return (
     <span className="text-xs font-semibold">
       Place {c.place_en_cours} · {c.tentatives_place} tentative{c.tentatives_place > 1 ? "s" : ""}
@@ -278,7 +280,8 @@ function Suivi() {
             lien.href = URL.createObjectURL(fichier);
             lien.download = "suivi-certification.csv";
             lien.click();
-            URL.revokeObjectURL(lien.href);
+            // Libérée plus tard : certains navigateurs lisent l'adresse après le clic.
+            setTimeout(() => URL.revokeObjectURL(lien.href), 60_000);
             setFinalite("");
           }}
         >

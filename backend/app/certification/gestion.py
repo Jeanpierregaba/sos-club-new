@@ -22,8 +22,10 @@ from app.certification.schemas import (
     ReglesEntree,
     ReglesSortie,
 )
+from app.certification.suivi import comptes_de_la_dre, nom_affiche
 from app.clubs.models import Club
 from app.comptes.models import Utilisateur
+from app.eleves.models import Eleve
 from app.notifications.service import notifier
 from app.points import service as points
 from app.points.models import MouvementPoints
@@ -78,15 +80,23 @@ async def changer_regles(db: AsyncSession, acces: Acces, entree: ReglesEntree, i
 
 
 async def lister_certificats(
-    db: AsyncSession, etat: EtatCertificat | None = None, certificat_id: UUID | None = None
+    db: AsyncSession,
+    etat: EtatCertificat | None = None,
+    certificat_id: UUID | None = None,
+    acces: Acces | None = None,
 ) -> ListeCertificats:
+    """Sans `acces` (réponse d'une révocation ou d'une réémission), le nom figé est rendu. Avec, un collaborateur de
+    DRE ne voit que sa DRE, et le nom d'un élève suit la règle du suivi (spec 043)."""
     remplace = aliased(Certificat)
     requete = (
-        select(Certificat, Club.nom, remplace.numero)
+        select(Certificat, Club.nom, remplace.numero, Eleve.pseudonyme)
         .outerjoin(Club, Club.id == Certificat.club_id)
         .outerjoin(remplace, remplace.id == Certificat.remplace_id)
+        .outerjoin(Eleve, Eleve.utilisateur_id == Certificat.utilisateur_id)
         .order_by(Certificat.delivre_le.desc())
     )
+    if acces is not None and not acces.national:
+        requete = requete.where(Certificat.utilisateur_id.in_(comptes_de_la_dre(acces.collaborateur.perimetre_dre)))
     if etat is not None:
         requete = requete.where(Certificat.etat == etat)
     if certificat_id is not None:
@@ -99,7 +109,11 @@ async def lister_certificats(
                 numero=c.numero,
                 etat=c.etat,
                 role=c.role,
-                titulaire=f"{c.titulaire_prenom} {c.titulaire_nom}",
+                titulaire=(
+                    nom_affiche(acces, c.role, c.titulaire_prenom, c.titulaire_nom, pseudonyme)
+                    if acces is not None
+                    else f"{c.titulaire_prenom} {c.titulaire_nom}"
+                ),
                 utilisateur_id=c.utilisateur_id,
                 club=club,
                 delivre_le=c.delivre_le,
@@ -107,24 +121,32 @@ async def lister_certificats(
                 decide_le=c.decide_le,
                 remplace_numero=numero,
             )
-            for c, club, numero in (await db.execute(requete)).all()
+            for c, club, numero, pseudonyme in (await db.execute(requete)).all()
         ]
     )
 
 
-async def lister_badges(db: AsyncSession) -> ListeBadges:
-    lignes = await db.execute(
-        select(BadgeObtenu, Utilisateur.prenom, Utilisateur.nom, Utilisateur.role)
+async def lister_badges(db: AsyncSession, acces: Acces) -> ListeBadges:
+    requete = (
+        select(BadgeObtenu, Utilisateur.prenom, Utilisateur.nom, Utilisateur.role, Eleve.pseudonyme)
         .join(Utilisateur, Utilisateur.id == BadgeObtenu.utilisateur_id)
+        .outerjoin(Eleve, Eleve.utilisateur_id == BadgeObtenu.utilisateur_id)
         .order_by(BadgeObtenu.obtenu_le.desc(), BadgeObtenu.rang.desc())
         .limit(LIMITE_BADGES)
     )
+    if not acces.national:
+        requete = requete.where(BadgeObtenu.utilisateur_id.in_(comptes_de_la_dre(acces.collaborateur.perimetre_dre)))
+    lignes = await db.execute(requete)
     return ListeBadges(
         badges=[
             BadgeGestion(
-                titulaire=f"{prenom} {nom}", role=role.value, nom=b.nom, palier=b.palier, obtenu_le=b.obtenu_le
+                titulaire=nom_affiche(acces, role, prenom, nom, pseudonyme),
+                role=role.value,
+                nom=b.nom,
+                palier=b.palier,
+                obtenu_le=b.obtenu_le,
             )
-            for b, prenom, nom, role in lignes.all()
+            for b, prenom, nom, role, pseudonyme in lignes.all()
         ]
     )
 

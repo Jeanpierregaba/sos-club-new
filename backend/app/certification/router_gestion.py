@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response,
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.catalogue import Action
-from app.admin.dependances import Acces, adresse_ip, exiger_permission
+from app.admin.dependances import Acces, adresse_ip, exiger_permission, refuser
 from app.certification import gestion, suivi
 from app.certification.models import EtatCertificat
 from app.certification.schemas import (
@@ -63,13 +63,13 @@ async def changer_regles(entree: ReglesEntree, request: Request, db: Db, acces: 
 
 
 @router_gestion.get("/certificats")
-async def lister_certificats(db: Db, _: Lecteur, etat: EtatCertificat | None = None) -> ListeCertificats:
-    return await gestion.lister_certificats(db, etat)
+async def lister_certificats(db: Db, acces: Lecteur, etat: EtatCertificat | None = None) -> ListeCertificats:
+    return await gestion.lister_certificats(db, etat, acces=acces)
 
 
 @router_gestion.get("/badges")
-async def lister_badges(db: Db, _: Lecteur) -> ListeBadges:
-    return await gestion.lister_badges(db)
+async def lister_badges(db: Db, acces: Lecteur) -> ListeBadges:
+    return await gestion.lister_badges(db, acces)
 
 
 @router_gestion.post("/certificats/{certificat_id}/revoquer")
@@ -123,7 +123,7 @@ async def statistiques_certification(db: Db, acces: Lecteur) -> StatistiquesCert
 @router_gestion.post("/suivi/candidats/export", response_class=Response, responses={200: {"content": {"text/csv": {}}}})
 async def exporter_candidats(entree: ExportCandidats, request: Request, db: Db, acces: Exportateur) -> Response:
     if not acces.a("quiz", Action.consulter):
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Tu n'as pas accès au suivi des certifications.")
+        await refuser(db, request, acces, "quiz:consulter")
     try:
         contenu, _ = await suivi.exporter(db, acces, entree.filtres, entree.finalite, adresse_ip(request))
     except suivi.Refus as e:

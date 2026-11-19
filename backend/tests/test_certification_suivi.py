@@ -2,7 +2,7 @@
 semaine, export nominatif national. Écrit avant le code."""
 
 from collections.abc import Callable, Iterable
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 import pytest
@@ -16,6 +16,7 @@ from app.quiz import parametres
 from app.quiz.models import EtatTentative, Quiz, TentativeQuiz
 from tests.certification import acquerir, creer_parcours, mettre_a_jour
 from tests.conftest import connecter_admin
+from tests.quiz import DEBUT
 
 SUIVI = "/api/admin/certification/suivi"
 LECTURE = {("quiz", "consulter")}
@@ -307,24 +308,31 @@ def test_l_entonnoir_des_20_places(
     en_base: Callable[..., Any],
     parcours: dict[int, Quiz],
 ) -> None:
-    ama, kofi = creer_eleve("ama", "Ama"), creer_eleve("kofi", "Kofi")
-    # Ama : 2 échecs puis la réussite de la place 1 ; Kofi : 3 échecs sur la place 1.
-    jouer(en_base, ama, parcours[1], nombre=2, quand=MAINTENANT - timedelta(days=3))
+    ama, yao, kofi = creer_eleve("ama", "Ama"), creer_eleve("yao", "Yao"), creer_eleve("kofi", "Kofi")
+    # Ama : 2 échecs puis la réussite de la place 1 (acquerir date la réussite à DEBUT), soit 3 tentatives ;
+    # Yao : réussite du premier coup ; Kofi : 3 échecs.
+    jouer(en_base, ama, parcours[1], nombre=2, quand=DEBUT - timedelta(days=3))
     valider(en_base, ama, parcours, [1])
+    valider(en_base, yao, parcours, [1])
     jouer(en_base, kofi, parcours[1], nombre=3)
     # Plus de quiz publié sur la place 20.
     en_base(lambda db: db.execute(update(Quiz).where(Quiz.id == parcours[20].id).values(etat="depublie")))
 
     entonnoir = {e["place"]: e for e in national.get(f"{SUIVI}/statistiques").json()["entonnoir"]}
 
-    assert (entonnoir[1]["tentes"], entonnoir[1]["reussis"]) == (2, 1)
-    # 1 tentative réussie sur 6 terminées.
-    assert entonnoir[1]["taux_reussite"] == pytest.approx(1 / 6)
-    # Ama a réussi à sa troisième tentative (acquerir date sa réussite au début du parcours de test : DEBUT).
-    assert entonnoir[1]["tentatives_avant_reussite"] is not None
+    assert (entonnoir[1]["tentes"], entonnoir[1]["reussis"]) == (3, 2)
+    # 2 tentatives réussies sur 7 terminées.
+    assert entonnoir[1]["taux_reussite"] == pytest.approx(2 / 7)
+    # (3 + 1) / 2 tentatives jusqu'à la réussite.
+    assert entonnoir[1]["tentatives_avant_reussite"] == pytest.approx(2.0)
     assert (entonnoir[2]["tentes"], entonnoir[2]["reussis"]) == (0, 0)
+    assert entonnoir[2]["tentatives_avant_reussite"] is None
     assert entonnoir[2]["quiz_publie"] is True
     assert entonnoir[20]["quiz_publie"] is False
+
+
+def _lundi(jour: date) -> str:
+    return (jour - timedelta(days=jour.weekday())).isoformat()
 
 
 def test_les_totaux_par_dre_et_par_semaine(
@@ -337,7 +345,8 @@ def test_les_totaux_par_dre_et_par_semaine(
     valider(en_base, ama, parcours, range(1, 21))
     jouer(en_base, ama, parcours[20])
     kofi = creer_eleve("kofi", "Kofi", dre="kara")
-    jouer(en_base, kofi, parcours[1], quand=MAINTENANT - timedelta(days=40))
+    il_y_a_40_jours = MAINTENANT - timedelta(days=40)
+    jouer(en_base, kofi, parcours[1], quand=il_y_a_40_jours)
 
     stats = national.get(f"{SUIVI}/statistiques").json()
 
@@ -349,10 +358,73 @@ def test_les_totaux_par_dre_et_par_semaine(
         "Grand Lomé": (1, 5, 1),
         "Kara": (1, 0, 0),
     }
-    semaines = stats["par_semaine"]
+    semaines = {s["debut"]: (s["candidats"], s["certifies"]) for s in stats["par_semaine"]}
     assert len(semaines) == 12
-    assert semaines[-1]["debut"] <= MAINTENANT.date().isoformat()
-    assert sum(s["candidats"] for s in semaines) >= 1
+    assert list(semaines)[-1] == _lundi(MAINTENANT.date())
+    # Ama a commencé à DEBUT (sa première tentative) et a été certifiée cette semaine ; Kofi il y a 40 jours.
+    attendu: dict[str, list[int]] = {jour: [0, 0] for jour in semaines}
+    for jour, colonne in ((DEBUT.date(), 0), (il_y_a_40_jours.date(), 0), (MAINTENANT.date(), 1)):
+        if _lundi(jour) in attendu:
+            attendu[_lundi(jour)][colonne] += 1
+    assert semaines == {jour: tuple(n) for jour, n in attendu.items()}
+
+
+def test_le_perimetre_dre_s_applique_aux_chiffres(
+    client: TestClient,
+    creer_collaborateur: Callable[..., Any],
+    creer_eleve: Callable[..., Utilisateur],
+    en_base: Callable[..., Any],
+    parcours: dict[int, Quiz],
+) -> None:
+    valider(en_base, creer_eleve("ama", "Ama"), parcours, range(1, 5))
+    valider(en_base, creer_eleve("kofi", "Kofi", dre="kara"), parcours, range(1, 9))
+    creer_collaborateur("dre", droits=LECTURE, perimetre_dre="grand-lome")
+    connecter_admin(client, "dre")
+
+    stats = client.get(f"{SUIVI}/statistiques").json()
+
+    assert stats["entonnoir"][0]["tentes"] == 1
+    assert stats["entonnoir"][4]["tentes"] == 0
+    assert [b["nombre"] for b in stats["totaux"]["badges"]] == [1, 0, 0, 0, 0]
+    assert sum(s["candidats"] for s in stats["par_semaine"]) <= 1
+
+
+def test_un_national_sans_double_authentification_voit_les_pseudonymes(
+    client: TestClient,
+    creer_collaborateur: Callable[..., Any],
+    creer_eleve: Callable[..., Utilisateur],
+    creer_encadreur: Callable[..., Utilisateur],
+    en_base: Callable[..., Any],
+    parcours: dict[int, Quiz],
+) -> None:
+    jouer(en_base, creer_eleve("ama", "Ama du Golfe"), parcours[1])
+    jouer(en_base, creer_encadreur("kofi"), parcours[1])
+    creer_collaborateur("lecteur", droits=LECTURE)
+    connecter_admin(client, "lecteur")
+
+    noms = {c["role"]: c["nom"] for c in lire(client)["candidats"]}
+    assert noms == {"eleve": "Ama du Golfe", "encadreur": "Jean Kodjo"}
+    assert [c["role"] for c in lire(client, recherche="Kodjo")["candidats"]] == ["encadreur"]
+
+
+def test_certificats_et_badges_suivent_le_perimetre_et_la_regle_des_noms(
+    client: TestClient,
+    creer_collaborateur: Callable[..., Any],
+    creer_eleve: Callable[..., Utilisateur],
+    en_base: Callable[..., Any],
+    parcours: dict[int, Quiz],
+) -> None:
+    ama = creer_eleve("ama", "Ama du Golfe")
+    valider(en_base, ama, parcours, range(1, 21))
+    valider(en_base, creer_eleve("kofi", "Kofi de Kara", dre="kara"), parcours, range(1, 21))
+    creer_collaborateur("dre", droits=LECTURE, perimetre_dre="grand-lome")
+    connecter_admin(client, "dre")
+
+    certificats = client.get("/api/admin/certification/certificats").json()["certificats"]
+    assert [(c["utilisateur_id"], c["titulaire"]) for c in certificats] == [(str(ama.id), "Ama du Golfe")]
+    badges = client.get("/api/admin/certification/badges").json()["badges"]
+    assert {b["titulaire"] for b in badges} == {"Ama du Golfe"}
+    assert len(badges) == 5
 
 
 # L'export ---------------------------------------------------------------------------------------------------------
@@ -418,12 +490,24 @@ def test_l_export_est_limite(
     parcours: dict[int, Quiz],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from app.certification import suivi
+    from app.config import settings
 
-    monkeypatch.setattr(suivi, "LIMITE_EXPORT", 1)
+    monkeypatch.setattr(settings, "export_lignes_max", 1)
     for i in range(2):
         jouer(en_base, creer_eleve(f"eleve{i}", f"Élève {i}"), parcours[1])
 
     reponse = national.post(f"{SUIVI}/candidats/export", json={"filtres": {}, "finalite": "Relance des candidats"})
     assert reponse.status_code == 422
     assert "précise les filtres" in reponse.json()["detail"]
+
+
+def test_l_export_demande_la_double_authentification(
+    client: TestClient, creer_collaborateur: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    creer_collaborateur("chef", droits=EXPORT)
+    connecter_admin(client, "chef")
+
+    reponse = client.post(f"{SUIVI}/candidats/export", json={"filtres": {}, "finalite": "Relance des candidats"})
+
+    assert reponse.status_code == 403
+    assert journal_export(en_base) == []

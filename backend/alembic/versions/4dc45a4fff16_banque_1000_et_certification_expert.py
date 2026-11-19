@@ -131,6 +131,16 @@ def upgrade() -> None:
             ),
             {"place": place["place"]},
         ).all()
+        # Un vrai quiz soumis sur cette place ne pourra plus être approuvé (une place, un quiz publié) : on le signale.
+        for attente in connexion.execute(
+            sa.text(
+                "SELECT titre FROM quiz WHERE parcours = 'certification' AND place = :place AND etat = 'soumis' "
+                "AND NOT contenu_de_test"
+            ),
+            {"place": place["place"]},
+        ).scalars():
+            journal.warning("Place %s : « %s » est soumis ; il faudra dépublier le quiz expert pour l'approuver.",
+                            place["place"], attente)  # fmt: skip
         reel = next((o for o in occupants if not o.contenu_de_test), None)
         if reel is not None:
             journal.warning("Place %s laissée à « %s » : déjà occupée par un vrai quiz.", place["place"], reel.titre)

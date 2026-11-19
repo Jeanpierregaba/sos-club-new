@@ -107,3 +107,21 @@ def test_le_lot_7_commite() -> None:
     banque = json.loads((DONNEES / "quiz_sante.json").read_text(encoding="utf-8"))
     titres = {quiz["titre"] for quiz in banque}
     assert not titres & {theme["titre"] for theme in lot}
+
+
+def test_refuse_un_paragraphe_non_reconnu_ou_une_thematique_vide() -> None:
+    with pytest.raises(Incoherence, match="non reconnu"):
+        lire(_docx(_paragraphe("Thème 1 – IST", gras=True), *_question(1, 0), _paragraphe("suite de l'énoncé")))
+    with pytest.raises(Incoherence, match="aucune question"):
+        lire(_docx(_paragraphe("Thème 1 – IST", gras=True), _paragraphe("Thème 2 – VIH", gras=True), *_question(1, 0)))
+
+
+def test_la_grille_des_reponses_de_l_animateur_termine_la_lecture() -> None:
+    document = _docx(
+        _paragraphe("Thème 1 – IST", gras=True),
+        *_question(1, 2),
+        _paragraphe("Grille des réponses (pour l'animateur ou le jury)", gras=True),
+        _paragraphe("1"),
+        _paragraphe("c"),
+    )
+    assert [q.bonne for q in lire(document)[0].questions] == [2]
