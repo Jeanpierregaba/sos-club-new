@@ -5,7 +5,7 @@ utilisateur, de nom complet ni de contact ; le routeur choisit le schéma qui ex
 """
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from uuid import UUID
 
@@ -19,6 +19,7 @@ from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur, EtatVerification
 from app.points.bareme import ACTION_CORRECTION
+from app.points.carte_classement import CarteClassement, Vue
 from app.points.models import MouvementPoints, Semestre
 from app.points.service import semestre_en_cours
 from app.referentiel.models import Dre, Etablissement, Iesg
@@ -641,6 +642,71 @@ async def classement_personnel(db: AsyncSession, utilisateur: Utilisateur) -> Cl
         semestre_en_cours=semestre,
         semestre=await _rang_personnel(db, utilisateur, categorie, club, Periode.semestre, semestre),
         historique=await _rang_personnel(db, utilisateur, categorie, club, Periode.historique, semestre),
+    )
+
+
+# La carte « Partager mon classement » (spec 044) ------------------------------------------------------------
+
+
+class NonClasse(Exception):
+    """Aucun point dans cette vue : pas de rang à montrer."""
+
+
+class SansSemestre(Exception):
+    """Pas de semestre en cours : seule la vue historique existe."""
+
+
+async def carte_personnelle(db: AsyncSession, utilisateur: Utilisateur, vue: Vue, periode: Periode) -> CarteClassement:
+    """Le rang de la personne dans la vue choisie, avec les mêmes bases que `/hall-of-fame` et « Mon espace »."""
+    if utilisateur.role is Role.eleve:
+        categorie = Categorie.eleves
+    elif utilisateur.role is Role.encadreur:
+        categorie = Categorie.encadreurs
+    else:
+        raise HorsClassement
+    semestre = await semestre_en_cours(db)
+    if periode is Periode.semestre and semestre is None:
+        raise SansSemestre
+    club = await _club_de(db, utilisateur)
+    dre_code = await _dre_code_de(db, utilisateur)
+    points_par_utilisateur = _points_par_utilisateur(periode, semestre)
+    if vue is Vue.club:
+        if club is None:
+            raise HorsDuClub
+        base = (
+            _base_club_eleves(_points_du_club(periode, semestre, club.id), club.id, periode)
+            if categorie is Categorie.eleves
+            else _base_club_encadreurs(points_par_utilisateur, club.id)
+        )
+    else:
+        perimetre = dre_code if vue is Vue.dre else None
+        if vue is Vue.dre and perimetre is None:
+            raise NonClasse
+        base = (
+            _base_eleves(points_par_utilisateur, periode, perimetre)
+            if categorie is Categorie.eleves
+            else _base_encadreurs(points_par_utilisateur, perimetre)
+        )
+    rang = await _rang_dans(db, base, utilisateur.id)
+    if rang is None:
+        raise NonClasse
+    sous = base.subquery()
+    points_vue = await db.scalar(select(sous.c.points).where(sous.c.utilisateur_id == utilisateur.id))
+    if categorie is Categorie.eleves:
+        nom = await db.scalar(select(Eleve.pseudonyme).where(Eleve.utilisateur_id == utilisateur.id)) or ""
+    else:
+        nom = _nom_encadreur(utilisateur.prenom, utilisateur.nom)
+    return CarteClassement(
+        nom=nom,
+        niveau=vue.value,
+        dre=await db.scalar(select(Dre.nom).where(Dre.code == dre_code)) if dre_code else None,
+        club=club.nom if club else None,
+        periode=periode.value,
+        semestre=semestre.libelle if periode is Periode.semestre and semestre else None,
+        rang=rang,
+        classes=await _compter(db, base),
+        points=int(points_vue or 0),
+        le=datetime.now(UTC),
     )
 
 

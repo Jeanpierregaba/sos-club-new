@@ -1438,6 +1438,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/classements/moi/carte.png": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ma Carte De Classement */
+        get: operations["ma_carte_de_classement_api_classements_moi_carte_png_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/classements/mon-club/rang": {
         parameters: {
             query?: never;
@@ -3232,6 +3249,57 @@ export interface paths {
         post?: never;
         /** Retirer */
         delete: operations["retirer_api_mes_commentaires__contenu_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/articles/{adresse}/partages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Declarer */
+        post: operations["declarer_api_articles__adresse__partages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/articles/{adresse}/partages/moi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Etat Article */
+        get: operations["etat_article_api_articles__adresse__partages_moi_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/partages/moi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mes Partages */
+        get: operations["mes_partages_api_partages_moi_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -6263,6 +6331,12 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** DeclarationPartage */
+        DeclarationPartage: {
+            reseau: components["schemas"]["ReseauPartage"];
+            /** Lien */
+            lien: string;
+        };
         /** DecompteCertification */
         DecompteCertification: {
             /** Quiz Valides */
@@ -6988,6 +7062,21 @@ export interface components {
         EtatLien: {
             /** Valide */
             valide: boolean;
+        };
+        /**
+         * EtatPartagesArticle
+         * @description Ce que la personne connectée peut encore déclarer sur un article.
+         */
+        EtatPartagesArticle: {
+            /**
+             * Nature
+             * @enum {string}
+             */
+            nature: "republication" | "partage";
+            /** Reseaux Declares */
+            reseaux_declares: components["schemas"]["ReseauPartage"][];
+            /** Restantes Aujourdhui */
+            restantes_aujourdhui: number;
         };
         /** EtatPartie */
         EtatPartie: {
@@ -8345,6 +8434,11 @@ export interface components {
             /** Commentaires */
             commentaires: components["schemas"]["CommentaireAuteur"][];
         };
+        /** MesPartages */
+        MesPartages: {
+            /** Partages */
+            partages: components["schemas"]["PartageAuteur"][];
+        };
         /** MesRapports */
         MesRapports: {
             /** Rapports */
@@ -8733,6 +8827,43 @@ export interface components {
             adresse: string | null;
             /** Titre */
             titre: string;
+        };
+        /**
+         * PartageAuteur
+         * @description Une déclaration, vue par son auteur : jamais publique.
+         */
+        PartageAuteur: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Article Titre */
+            article_titre: string;
+            /** Article Adresse */
+            article_adresse: string | null;
+            reseau: components["schemas"]["ReseauPartage"];
+            /** Lien */
+            lien: string;
+            /**
+             * Nature
+             * @enum {string}
+             */
+            nature: "republication" | "partage";
+            /**
+             * Etat
+             * @enum {string}
+             */
+            etat: "en_attente" | "approuve" | "refuse";
+            /** Motif */
+            motif: string | null;
+            /** Points */
+            points: number | null;
+            /**
+             * Declare Le
+             * Format: date-time
+             */
+            declare_le: string;
         };
         /**
          * PartieQuelAxe
@@ -9656,6 +9787,11 @@ export interface components {
          */
         Reseau: "facebook" | "tiktok" | "instagram" | "autre";
         /**
+         * ReseauPartage
+         * @enum {string}
+         */
+        ReseauPartage: "facebook" | "instagram" | "tiktok" | "linkedin";
+        /**
          * Responsable
          * @description Le parent ou tuteur responsable : il remplace la signature de la fiche papier.
          */
@@ -10364,6 +10500,11 @@ export interface components {
              */
             verifiee_le: string;
         };
+        /**
+         * Vue
+         * @enum {string}
+         */
+        Vue: "national" | "dre" | "club";
         /** ActivationEntree */
         app__admin__schemas__ActivationEntree: {
             /** Jeton */
@@ -13182,6 +13323,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClassementPersonnel"];
+                };
+            };
+        };
+    };
+    ma_carte_de_classement_api_classements_moi_carte_png_get: {
+        parameters: {
+            query?: {
+                niveau?: components["schemas"]["Vue"];
+                periode?: components["schemas"]["Periode"];
+                club?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -16705,6 +16879,92 @@ export interface operations {
             };
         };
     };
+    declarer_api_articles__adresse__partages_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                adresse: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeclarationPartage"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartageAuteur"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    etat_article_api_articles__adresse__partages_moi_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                adresse: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatPartagesArticle"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mes_partages_api_partages_moi_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MesPartages"];
+                };
+            };
+        };
+    };
     file_moderation_api_admin_moderation_get: {
         parameters: {
             query?: {
@@ -16713,6 +16973,9 @@ export interface operations {
                 axe?: string | null;
                 dre?: string | null;
                 profil?: ("eleve" | "encadreur") | null;
+                club?: string | null;
+                du?: string | null;
+                au?: string | null;
             };
             header?: never;
             path?: never;

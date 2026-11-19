@@ -29,7 +29,7 @@ from app.partages.schemas import (
     MesPartages,
     Nature,
     PartageAuteur,
-    Reseau,
+    ReseauPartage,
 )
 from app.points import service as points
 from app.points.models import MouvementPoints
@@ -38,24 +38,24 @@ TYPE = "partage"
 PAR_JOUR = 3
 LIMITE_MIENS = 200
 # Les domaines de chaque réseau ; un sous-domaine en fait partie (www., m., vm.…).
-DOMAINES: dict[Reseau, tuple[str, ...]] = {
-    Reseau.facebook: ("facebook.com", "fb.com", "fb.watch"),
-    Reseau.instagram: ("instagram.com",),
-    Reseau.tiktok: ("tiktok.com",),
-    Reseau.linkedin: ("linkedin.com", "lnkd.in"),
+DOMAINES: dict[ReseauPartage, tuple[str, ...]] = {
+    ReseauPartage.facebook: ("facebook.com", "fb.com", "fb.watch"),
+    ReseauPartage.instagram: ("instagram.com",),
+    ReseauPartage.tiktok: ("tiktok.com",),
+    ReseauPartage.linkedin: ("linkedin.com", "lnkd.in"),
 }
 NOMS = {
-    Reseau.facebook: "Facebook",
-    Reseau.instagram: "Instagram",
-    Reseau.tiktok: "TikTok",
-    Reseau.linkedin: "LinkedIn",
+    ReseauPartage.facebook: "Facebook",
+    ReseauPartage.instagram: "Instagram",
+    ReseauPartage.tiktok: "TikTok",
+    ReseauPartage.linkedin: "LinkedIn",
 }
 # Une déclaration « vivante » : en attente ou approuvée. Un refus libère le réseau, l'article et le lien.
 VIVANTS = (EtatContenu.en_attente, EtatContenu.publie)
 ETATS = {EtatContenu.en_attente: "en_attente", EtatContenu.publie: "approuve", EtatContenu.refuse: "refuse"}
 
 
-def verifier_lien(reseau: Reseau, lien: str) -> str:
+def verifier_lien(reseau: ReseauPartage, lien: str) -> str:
     """Le lien d'une publication du réseau choisi, en https. Il n'est jamais visité : seul son texte est contrôlé."""
     lien = lien.strip()
     if len(lien) > LIEN_MAX:
@@ -72,7 +72,7 @@ def verifier_lien(reseau: Reseau, lien: str) -> str:
     return lien
 
 
-def cle_points(nature: Nature, article_id: UUID, auteur_id: UUID, reseau: Reseau) -> str:
+def cle_points(nature: Nature, article_id: UUID, auteur_id: UUID, reseau: ReseauPartage) -> str:
     """La clé du registre : une ligne au plus par article et par personne (et par réseau pour un partage)."""
     if nature == "partage":
         return f"partage:{article_id}:{auteur_id}:{reseau.value}"
@@ -81,7 +81,7 @@ def cle_points(nature: Nature, article_id: UUID, auteur_id: UUID, reseau: Reseau
 
 def _titre(donnees: dict[str, Any]) -> str:
     nature = "Partage" if donnees["nature"] == "partage" else "Republication"
-    return f"{nature} sur {NOMS[Reseau(donnees['reseau'])]}"
+    return f"{nature} sur {NOMS[ReseauPartage(donnees['reseau'])]}"
 
 
 async def _crediter(db: AsyncSession, contenu: Contenu, valide_par: UUID) -> None:
@@ -150,7 +150,7 @@ def _nature(article: Contenu, auteur: Utilisateur) -> Nature:
     return "partage" if article.auteur_id == auteur.id else "republication"
 
 
-async def _reseaux_declares(db: AsyncSession, article_id: UUID, auteur_id: UUID) -> list[Reseau]:
+async def _reseaux_declares(db: AsyncSession, article_id: UUID, auteur_id: UUID) -> list[ReseauPartage]:
     reseaux = await db.scalars(
         select(VersionContenu.donnees["reseau"].astext)
         .join(Contenu, Contenu.id == VersionContenu.contenu_id)
@@ -161,7 +161,7 @@ async def _reseaux_declares(db: AsyncSession, article_id: UUID, auteur_id: UUID)
             Contenu.etat.in_(VIVANTS),
         )
     )
-    return sorted({Reseau(r) for r in reseaux.all()}, key=list(Reseau).index)
+    return sorted({ReseauPartage(r) for r in reseaux.all()}, key=list(ReseauPartage).index)
 
 
 # Déclaration ---------------------------------------------------------------------------------------------------
@@ -177,7 +177,7 @@ async def etat_article(db: AsyncSession, auteur: Utilisateur, adresse: str) -> E
 
 
 async def declarer(
-    db: AsyncSession, auteur: Utilisateur, adresse: str, reseau: Reseau, lien: str, adresse_ip: str
+    db: AsyncSession, auteur: Utilisateur, adresse: str, reseau: ReseauPartage, lien: str, adresse_ip: str
 ) -> PartageAuteur:
     lien = verifier_lien(reseau, lien)
     article = await _article_publie(db, adresse)
@@ -248,7 +248,7 @@ async def _miens(db: AsyncSession, auteur_id: UUID, contenu_id: UUID | None = No
         requete = requete.where(Contenu.id == contenu_id)
     lignes = (await db.execute(requete.order_by(Contenu.cree_le.desc(), Contenu.id.desc()).limit(LIMITE_MIENS))).all()
     cles = {
-        cle_points(v.donnees["nature"], c.parent_id, auteur_id, Reseau(v.donnees["reseau"])): c.id
+        cle_points(v.donnees["nature"], c.parent_id, auteur_id, ReseauPartage(v.donnees["reseau"])): c.id
         for c, v, *_ in lignes
         if c.etat is EtatContenu.publie
     }
@@ -266,7 +266,7 @@ async def _miens(db: AsyncSession, auteur_id: UUID, contenu_id: UUID | None = No
             article_titre=titre or "",
             # Le lien vers l'article seulement s'il est en ligne : sinon la page serait introuvable.
             article_adresse=adresse if en_ligne else None,
-            reseau=Reseau(version.donnees["reseau"]),
+            reseau=ReseauPartage(version.donnees["reseau"]),
             lien=str(version.donnees["lien"]),
             nature=version.donnees["nature"],
             etat=ETATS[contenu.etat],  # type: ignore[arg-type]

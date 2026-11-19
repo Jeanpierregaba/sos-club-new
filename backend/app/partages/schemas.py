@@ -8,7 +8,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
-class Reseau(StrEnum):
+class ReseauPartage(StrEnum):
     facebook = "facebook"
     instagram = "instagram"
     tiktok = "tiktok"
@@ -22,7 +22,7 @@ LIEN_MAX = 500
 class ChampsPartage(BaseModel):
     """La version unique d'une déclaration, dans le moteur de modération."""
 
-    reseau: Reseau
+    reseau: ReseauPartage
     lien: str
     nature: Nature
 
@@ -30,7 +30,7 @@ class ChampsPartage(BaseModel):
 class DeclarationPartage(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    reseau: Reseau
+    reseau: ReseauPartage
     lien: str = Field(max_length=LIEN_MAX + 50)
 
     @field_validator("lien")
@@ -45,7 +45,7 @@ class PartageAuteur(BaseModel):
     id: UUID
     article_titre: str
     article_adresse: str | None
-    reseau: Reseau
+    reseau: ReseauPartage
     lien: str
     nature: Nature
     etat: Literal["en_attente", "approuve", "refuse"]
@@ -62,5 +62,5 @@ class EtatPartagesArticle(BaseModel):
     """Ce que la personne connectée peut encore déclarer sur un article."""
 
     nature: Nature
-    reseaux_declares: list[Reseau]
+    reseaux_declares: list[ReseauPartage]
     restantes_aujourdhui: int

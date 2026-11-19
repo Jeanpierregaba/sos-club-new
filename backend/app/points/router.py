@@ -13,10 +13,13 @@ from app.admin.catalogue import Action
 from app.admin.dependances import Acces, adresse_ip, exiger_permission
 from app.clubs import activation
 from app.clubs.models import Club
+from app.comptes import limite_adresse
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.models import Role, Utilisateur
+from app.config import settings
 from app.db import get_session
-from app.points import administration, annees, classements, clotures, registre
+from app.points import administration, annees, carte_classement, classements, clotures, registre
+from app.points.carte_classement import Vue
 from app.points.schemas import (
     AnnulationPoints,
     BeneficiairePoints,
@@ -360,6 +363,45 @@ async def mon_classement(
             status.HTTP_403_FORBIDDEN, "Les classements personnels sont réservés aux élèves et aux encadreurs."
         ) from None
     return _classement_personnel(resultat, await clotures.distinctions_de(db, moi.id))
+
+
+@router_classements.get("/moi/carte.png", response_class=Response, responses={200: {"content": {"image/png": {}}}})
+async def ma_carte_de_classement(
+    moi: Annotated[Utilisateur, Depends(utilisateur_courant)],
+    db: Base,
+    niveau: Annotated[Vue, Query()] = Vue.national,
+    periode: PeriodePublique = classements.Periode.semestre,
+    club: Annotated[bool, Query()] = False,
+) -> Response:
+    if moi.role not in (Role.eleve, Role.encadreur):
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "Le partage du classement est réservé aux élèves et aux encadreurs."
+        )
+    try:
+        carte = await classements.carte_personnelle(db, moi, niveau, periode)
+    except classements.SansSemestre:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "Aucun semestre en cours : choisis le classement historique."
+        ) from None
+    except classements.HorsDuClub:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Tu n'es rattaché à aucun club.") from None
+    except classements.NonClasse:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Tu n'es pas encore classé dans cette vue.") from None
+    # Après les contrôles : une demande refusée ne consomme rien. Valide la transaction (lecture seule ici).
+    try:
+        await limite_adresse.limiter(db, "CARTECLASSEMENT", str(moi.id), settings.cartes_classement_max)
+    except limite_adresse.PlafondAtteint:
+        raise HTTPException(
+            status.HTTP_429_TOO_MANY_REQUESTS, "Trop de cartes d'un coup : réessaie un peu plus tard."
+        ) from None
+    return Response(
+        carte_classement.png(carte, afficher_club=club),
+        media_type="image/png",
+        headers={
+            "Cache-Control": "no-store",
+            "Content-Disposition": 'attachment; filename="mon-classement-clubs-sante.png"',
+        },
+    )
 
 
 @router_classements.get("/mon-club/rang", response_model=RangClub)

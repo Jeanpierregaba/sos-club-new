@@ -4440,6 +4440,63 @@
         }
       }
     },
+    "/api/classements/moi/carte.png": {
+      "get": {
+        "tags": [
+          "classements"
+        ],
+        "summary": "Ma Carte De Classement",
+        "operationId": "ma_carte_de_classement_api_classements_moi_carte_png_get",
+        "parameters": [
+          {
+            "name": "niveau",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Vue",
+              "default": "national"
+            }
+          },
+          {
+            "name": "periode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Periode",
+              "default": "semestre"
+            }
+          },
+          {
+            "name": "club",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Club"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "image/png": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/classements/mon-club/rang": {
       "get": {
         "tags": [
@@ -9537,6 +9594,121 @@
         }
       }
     },
+    "/api/articles/{adresse}/partages": {
+      "post": {
+        "tags": [
+          "partages"
+        ],
+        "summary": "Declarer",
+        "operationId": "declarer_api_articles__adresse__partages_post",
+        "parameters": [
+          {
+            "name": "adresse",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Adresse"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeclarationPartage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartageAuteur"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/articles/{adresse}/partages/moi": {
+      "get": {
+        "tags": [
+          "partages"
+        ],
+        "summary": "Etat Article",
+        "operationId": "etat_article_api_articles__adresse__partages_moi_get",
+        "parameters": [
+          {
+            "name": "adresse",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Adresse"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatPartagesArticle"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/partages/moi": {
+      "get": {
+        "tags": [
+          "partages"
+        ],
+        "summary": "Mes Partages",
+        "operationId": "mes_partages_api_partages_moi_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MesPartages"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/moderation": {
       "get": {
         "tags": [
@@ -9620,6 +9792,57 @@
                 }
               ],
               "title": "Profil"
+            }
+          },
+          {
+            "name": "club",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Club"
+            }
+          },
+          {
+            "name": "du",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Du"
+            }
+          },
+          {
+            "name": "au",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Au"
             }
           }
         ],
@@ -18561,6 +18784,25 @@
         ],
         "title": "DecisionSignalementEntree"
       },
+      "DeclarationPartage": {
+        "properties": {
+          "reseau": {
+            "$ref": "#/components/schemas/ReseauPartage"
+          },
+          "lien": {
+            "type": "string",
+            "maxLength": 550,
+            "title": "Lien"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reseau",
+          "lien"
+        ],
+        "title": "DeclarationPartage"
+      },
       "DecompteCertification": {
         "properties": {
           "quiz_valides": {
@@ -20626,6 +20868,37 @@
           "valide"
         ],
         "title": "EtatLien"
+      },
+      "EtatPartagesArticle": {
+        "properties": {
+          "nature": {
+            "type": "string",
+            "enum": [
+              "republication",
+              "partage"
+            ],
+            "title": "Nature"
+          },
+          "reseaux_declares": {
+            "items": {
+              "$ref": "#/components/schemas/ReseauPartage"
+            },
+            "type": "array",
+            "title": "Reseaux Declares"
+          },
+          "restantes_aujourdhui": {
+            "type": "integer",
+            "title": "Restantes Aujourdhui"
+          }
+        },
+        "type": "object",
+        "required": [
+          "nature",
+          "reseaux_declares",
+          "restantes_aujourdhui"
+        ],
+        "title": "EtatPartagesArticle",
+        "description": "Ce que la personne connectée peut encore déclarer sur un article."
       },
       "EtatPartie": {
         "properties": {
@@ -24941,6 +25214,22 @@
         ],
         "title": "MesCommentaires"
       },
+      "MesPartages": {
+        "properties": {
+          "partages": {
+            "items": {
+              "$ref": "#/components/schemas/PartageAuteur"
+            },
+            "type": "array",
+            "title": "Partages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "partages"
+        ],
+        "title": "MesPartages"
+      },
       "MesRapports": {
         "properties": {
           "rapports": {
@@ -26079,6 +26368,96 @@
         ],
         "title": "ParentContenu",
         "description": "L'article d'un commentaire (spec 025) : le modérateur juge le commentaire dans son contexte."
+      },
+      "PartageAuteur": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "article_titre": {
+            "type": "string",
+            "title": "Article Titre"
+          },
+          "article_adresse": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Article Adresse"
+          },
+          "reseau": {
+            "$ref": "#/components/schemas/ReseauPartage"
+          },
+          "lien": {
+            "type": "string",
+            "title": "Lien"
+          },
+          "nature": {
+            "type": "string",
+            "enum": [
+              "republication",
+              "partage"
+            ],
+            "title": "Nature"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "en_attente",
+              "approuve",
+              "refuse"
+            ],
+            "title": "Etat"
+          },
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          },
+          "points": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points"
+          },
+          "declare_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Declare Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "article_titre",
+          "article_adresse",
+          "reseau",
+          "lien",
+          "nature",
+          "etat",
+          "motif",
+          "points",
+          "declare_le"
+        ],
+        "title": "PartageAuteur",
+        "description": "Une déclaration, vue par son auteur : jamais publique."
       },
       "PartieQuelAxe": {
         "properties": {
@@ -29024,6 +29403,16 @@
         ],
         "title": "Reseau"
       },
+      "ReseauPartage": {
+        "type": "string",
+        "enum": [
+          "facebook",
+          "instagram",
+          "tiktok",
+          "linkedin"
+        ],
+        "title": "ReseauPartage"
+      },
       "Responsable": {
         "properties": {
           "nom": {
@@ -30965,6 +31354,15 @@
         ],
         "title": "VerificationCarte",
         "description": "La page publique du QR (Q30) : le type, le numéro, le club et le statut. Rien d'autre, jamais."
+      },
+      "Vue": {
+        "type": "string",
+        "enum": [
+          "national",
+          "dre",
+          "club"
+        ],
+        "title": "Vue"
       },
       "app__admin__schemas__ActivationEntree": {
         "properties": {
