@@ -61,6 +61,8 @@ MODULES: dict[str, tuple[str, bool, tuple[Action, ...]]] = {
     "points": ("Points et classements", True, (C, M)),
     # Vérification des encadreurs (spec 018) : un collaborateur de DRE ne voit que les demandes de sa DRE.
     "encadreurs": ("Encadreurs à vérifier", True, (C, A)),
+    # Partages d'articles vérifiés (spec 044) : décider exige aussi la modération, dans son périmètre.
+    "partages": ("Partages vérifiés", True, (C, A)),
     "recompenses": ("Récompenses", False, (C, A)),
     "cartes": ("Cartes et QR codes", False, (C, M)),
     "notifications": ("Notifications et assistance", False, (C, M)),

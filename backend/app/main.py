@@ -45,6 +45,8 @@ from app.jeux.router_quiz import router as router_jeux_quiz
 from app.moderation.photos import purger_regulierement as purger_photos_regulierement
 from app.moderation.router import router_admin as router_moderation_admin
 from app.notifications.router import router as router_notifications
+from app.partages.router import router as router_partages
+from app.partages.router import router_article as router_partages_article
 from app.points.router import router as router_points
 from app.points.router import router_admin as router_points_admin
 from app.points.router import router_classements, router_palmares
@@ -113,6 +115,8 @@ api.include_router(router_articles_auteur)
 api.include_router(router_articles)
 api.include_router(router_commentaires)
 api.include_router(router_commentaires_auteur)
+api.include_router(router_partages_article)
+api.include_router(router_partages)
 api.include_router(router_moderation_admin)
 api.include_router(router_quiz)
 api.include_router(router_quiz_banque)
