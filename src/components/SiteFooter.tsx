@@ -1,15 +1,5 @@
 import { useState, type FormEvent } from "react";
-import {
-  Facebook,
-  Globe,
-  Instagram,
-  Linkedin,
-  MapPin,
-  Phone,
-  Send,
-  Tv,
-  Youtube,
-} from "lucide-react";
+import { Facebook, Instagram, Linkedin, MapPin, Phone, Send, Tv, Youtube } from "lucide-react";
 import { retard } from "@/components/SiteMotion";
 import { TikTokIcon } from "@/components/TikTokIcon";
 
@@ -147,15 +137,6 @@ export function SiteFooter() {
                   className="flex items-center gap-2 transition hover:text-white"
                 >
                   <Phone className="h-4 w-4 shrink-0 text-primary" /> +228 22 22 45 45
-                </a>
-              </li>
-              <li>
-                <a
-                  href={SITE}
-                  {...externe(SITE)}
-                  className="flex items-center gap-2 underline underline-offset-4 transition hover:text-white"
-                >
-                  <Globe className="h-4 w-4 shrink-0 text-primary" /> www.sos-docteur.tv
                 </a>
               </li>
             </ul>
