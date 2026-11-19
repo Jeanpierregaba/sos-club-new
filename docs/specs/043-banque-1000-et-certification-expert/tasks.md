@@ -49,7 +49,7 @@ suivi touchent la certification (partie critique, `docs/TESTING.md`) : leurs tes
 
 ## Suivi
 
-- [ ] 8. Tests de `certification/suivi.py` et de `GET /admin/certification/suivi/candidats` :
+- [x] 8. Tests de `certification/suivi.py` et de `GET /admin/certification/suivi/candidats` :
   - un candidat apparaît dès sa première tentative, avec ses places, sa place en cours, ses tentatives, son début
     et sa dernière activité ;
   - les parties d'essai et les joueurs sans compte sont exclus ;
@@ -58,8 +58,8 @@ suivi touchent la certification (partie critique, `docs/TESTING.md`) : leurs tes
   - un ancien élève est marqué ;
   - le périmètre DRE s'applique, avec le pseudonyme au lieu du nom ;
   - 403 sans `quiz : consulter`.
-- [ ] 9. Code de la liste des candidats, de ses schémas et de sa route, jusqu'à ce que les tests passent.
-- [ ] 10. Tests puis code de `GET /admin/certification/suivi/statistiques` :
+- [x] 9. Code de la liste des candidats, de ses schémas et de sa route, jusqu'à ce que les tests passent.
+- [x] 10. Tests puis code de `GET /admin/certification/suivi/statistiques` :
   - totaux : candidats, actifs sur 30 jours, badges par rang, certifiés ;
   - entonnoir des 20 places : tentés, réussis, taux de réussite, tentatives moyennes avant réussite, place sans
     quiz publié ;
@@ -67,7 +67,7 @@ suivi touchent la certification (partie critique, `docs/TESTING.md`) : leurs tes
   - 12 semaines, dont les semaines vides ;
   - périmètre DRE ;
   - aucun candidat.
-- [ ] 11. Tests puis code de `POST /admin/certification/suivi/candidats/export` :
+- [x] 11. Tests puis code de `POST /admin/certification/suivi/candidats/export` :
   - 403 sans `inscrits : exporter` ou hors du périmètre national ;
   - finalité obligatoire ;
   - mêmes filtres et colonnes que la liste ;

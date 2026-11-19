@@ -1,7 +1,7 @@
 """Schémas de la certification (spec 029) : « Ma certification » du joueur, la vérification publique et la
 gestion par l'équipe."""
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Annotated, Literal, Self
 from uuid import UUID
 
@@ -166,3 +166,102 @@ class Motif(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     motif: Annotated[str, StringConstraints(strip_whitespace=True, min_length=3, max_length=500)]
+
+
+# Le suivi des certifications par l'équipe (spec 043) ---------------------------------------------------------------
+
+EtatCandidat = Literal["en_cours", "inactif", "certifie"]
+RoleCandidat = Literal["eleve", "encadreur"]
+
+
+class FiltresCandidats(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    dre: str | None = None
+    club_id: UUID | None = None
+    role: RoleCandidat | None = None
+    etat: EtatCandidat | None = None
+    recherche: Annotated[str, StringConstraints(strip_whitespace=True, max_length=100)] | None = None
+
+
+class ClubCandidat(BaseModel):
+    id: UUID
+    nom: str
+
+
+class CandidatCertification(BaseModel):
+    id: UUID
+    # Prénom et nom pour un collaborateur national ou un encadreur ; le pseudonyme d'un élève sinon (RULES).
+    nom: str
+    pseudonyme: str | None
+    role: RoleCandidat
+    ancien_eleve: bool
+    club: ClubCandidat | None
+    etablissement: str | None
+    dre: str | None
+    places_validees: int
+    badges: list[int]
+    # Nulle une fois les 20 places validées.
+    place_en_cours: int | None
+    tentatives_place: int
+    tentatives: int
+    debut: datetime
+    derniere_activite: datetime
+    certificat: str | None
+
+
+class PageCandidats(BaseModel):
+    total: int
+    candidats: list[CandidatCertification]
+
+
+class BadgeCompte(BaseModel):
+    rang: int
+    nom: str
+    nombre: int
+
+
+class TotauxCertification(BaseModel):
+    candidats: int
+    actifs_30_jours: int
+    certifies: int
+    badges: list[BadgeCompte]
+
+
+class LigneEntonnoir(BaseModel):
+    place: int
+    quiz_publie: bool
+    tentes: int
+    reussis: int
+    # Tentatives réussies sur tentatives terminées ; nul sans tentative terminée.
+    taux_reussite: float | None
+    # Nombre moyen de tentatives jusqu'à la réussite, réussite comprise ; nul sans réussite.
+    tentatives_avant_reussite: float | None
+
+
+class LigneDre(BaseModel):
+    code: str
+    dre: str
+    candidats: int
+    badges: int
+    certifies: int
+
+
+class LigneSemaine(BaseModel):
+    debut: date
+    candidats: int
+    certifies: int
+
+
+class StatistiquesCertification(BaseModel):
+    totaux: TotauxCertification
+    entonnoir: list[LigneEntonnoir]
+    par_dre: list[LigneDre]
+    par_semaine: list[LigneSemaine]
+
+
+class ExportCandidats(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    filtres: FiltresCandidats = Field(default_factory=FiltresCandidats)
+    finalite: Annotated[str, StringConstraints(strip_whitespace=True, min_length=5, max_length=300)]
