@@ -461,6 +461,7 @@ export type ClassementPublic = ClassementPersonnesPublic | ClassementClubsPublic
 export type ClassementPersonnel = Schemas["ClassementPersonnel"];
 export type RangPersonnel = Schemas["RangPersonnel"];
 export type ClassementClubInterne = Schemas["ClassementClubInterne"];
+export type RangClub = Schemas["RangClub"];
 export type ClassementPersonnesAdmin = Schemas["ClassementPersonnesAdmin"];
 export type ClassementClubsAdmin = Schemas["ClassementClubsAdmin"];
 export type ClassementClubAdminInterne = Schemas["ClassementClubAdminInterne"];
@@ -491,6 +492,7 @@ export const chargerClassementMonClub = (filtres: {
   page?: number;
   par_page?: number;
 }) => requeteApi<ClassementClubInterne>(avecParametres("/api/classements/mon-club", filtres));
+export const chargerRangMonClub = () => requeteApi<RangClub>("/api/classements/mon-club/rang");
 
 export type FiltresRegistre = {
   semestre_id?: string | undefined;

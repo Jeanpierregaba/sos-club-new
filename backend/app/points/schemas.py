@@ -183,6 +183,18 @@ class RangPersonnel(BaseModel):
     classe: bool
 
 
+class RangClub(BaseModel):
+    """Le rang du club de l'utilisateur au classement des clubs du semestre en cours (page « Mon club »)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    club: ClubClasse
+    semestre: SemestrePublic | None
+    points: float
+    rang_dre: int | None
+    rang_national: int | None
+
+
 class ClassementPersonnel(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

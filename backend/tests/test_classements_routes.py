@@ -20,6 +20,7 @@ pytestmark = pytest.mark.usefixtures("annuaire")
 PUBLIC = "/api/classements"
 MOI = "/api/classements/moi"
 MON_CLUB = "/api/classements/mon-club"
+RANG_CLUB = "/api/classements/mon-club/rang"
 ADMIN = "/api/admin/points/classements"
 LECTEUR = {("tableau_de_bord", "consulter"), ("points", "consulter")}
 
@@ -176,6 +177,34 @@ def test_le_classement_dun_club_exige_une_connexion(client: TestClient, reseau: 
 
 def test_un_classement_interne_de_clubs_est_refuse(client: TestClient, reseau: dict[str, Any]) -> None:
     assert connecter(client, "kofi").get(MON_CLUB, params={"categorie": "clubs"}).status_code == 422
+
+
+# Rang du club (page « Mon club ») ------------------------------------------------------------------------------
+
+
+def test_un_membre_voit_le_rang_de_son_club(client: TestClient, reseau: dict[str, Any]) -> None:
+    for qui in ("kofi", "ama", "prof"):
+        corps = connecter(client, qui).get(RANG_CLUB).json()
+
+        assert corps["club"]["nom"] == "Club Santé Tokoin"
+        assert corps["semestre"]["libelle"] == "Semestre en cours"
+        assert (corps["points"], corps["rang_dre"], corps["rang_national"]) == (200.0, 1, 1)
+
+
+def test_un_club_suspendu_na_plus_de_rang(
+    client: TestClient, reseau: dict[str, Any], en_base: Callable[..., Any]
+) -> None:
+    etat_club(en_base, reseau["club"].id, EtatClub.suspendu)
+
+    corps = connecter(client, "kofi").get(RANG_CLUB).json()
+
+    assert corps["points"] == 200.0
+    assert (corps["rang_dre"], corps["rang_national"]) == (None, None)
+
+
+def test_le_rang_du_club_exige_un_club_et_une_connexion(client: TestClient, reseau: dict[str, Any]) -> None:
+    assert client.get(RANG_CLUB).status_code == 401
+    assert connecter(client, "yao").get(RANG_CLUB).status_code == 404
 
 
 # Rangs personnels ----------------------------------------------------------------------------------------------

@@ -10,22 +10,17 @@ from app.admin.catalogue import Action
 from app.admin.dependances import Acces
 from app.admin.models import Collaborateur, Export, Invitation, JournalAudit
 from app.admin.schemas import EvenementJournal, Indicateur, TableauDeBord
+from app.certification.models import BadgeObtenu, Certificat, EtatCertificat
 from app.clubs.activation import en_service
 from app.clubs.models import Club
 from app.clubs.verification import compter_en_attente as compter_clubs_en_attente
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.encadreurs.verification import compter_en_attente as compter_encadreurs_en_attente
 from app.moderation.decisions import compter_en_attente as compter_contenus_en_attente
+from app.moderation.models import Contenu, EtatContenu
 from app.points.service import semestre_en_cours
+from app.quiz.models import EtatTentative, TentativeQuiz
 from app.referentiel.models import Dre, Etablissement, StatutEtablissement
-
-# Indicateurs du CDC qui dépendent de modules à venir : affichés sans valeur.
-A_VENIR = [
-    ("contenus_en_attente", "Contenus en attente de validation", "Modération"),
-    ("quiz_joues", "Quiz joués", "Quiz et certification"),
-    ("certifications", "Certifications obtenues", "Quiz et certification"),
-    ("badges", "Badges délivrés", "Points et classements"),
-]
 
 
 async def calculer(db: AsyncSession, acces: Acces) -> TableauDeBord:
@@ -77,6 +72,20 @@ async def calculer(db: AsyncSession, acces: Acces) -> TableauDeBord:
         select(func.count()).select_from(Etablissement).where(Etablissement.statut == StatutEtablissement.actif)
     )
     clubs_actifs = await db.scalar(select(func.count()).select_from(Club).where(en_service()))
+    # Des chiffres nationaux, sans donnée personnelle : la file elle-même reste soumise à ses droits.
+    contenus_en_attente = await db.scalar(
+        select(func.count()).select_from(Contenu).where(Contenu.etat == EtatContenu.en_attente)
+    )
+    # Les parties de test des collaborateurs ne comptent pas.
+    quiz_joues = await db.scalar(
+        select(func.count())
+        .select_from(TentativeQuiz)
+        .where(TentativeQuiz.etat == EtatTentative.terminee, TentativeQuiz.essai.is_(False))
+    )
+    certifications = await db.scalar(
+        select(func.count()).select_from(Certificat).where(Certificat.etat == EtatCertificat.valide)
+    )
+    badges = await db.scalar(select(func.count()).select_from(BadgeObtenu))
 
     indicateurs = [
         Indicateur(id="collaborateurs_actifs", libelle="Collaborateurs actifs", valeur=collaborateurs_actifs or 0),
@@ -85,7 +94,13 @@ async def calculer(db: AsyncSession, acces: Acces) -> TableauDeBord:
         Indicateur(id="clubs_actifs", libelle="Clubs actifs", valeur=clubs_actifs or 0),
         Indicateur(id="invitations_en_attente", libelle="Invitations en attente", valeur=invitations_en_attente or 0),
         Indicateur(id="exports_du_mois", libelle="Exports ce mois-ci", valeur=exports_du_mois or 0),
-    ] + [Indicateur(id=i, libelle=libelle, valeur=None, disponible_avec=module) for i, libelle, module in A_VENIR]
+        Indicateur(
+            id="contenus_en_attente", libelle="Contenus en attente de validation", valeur=contenus_en_attente or 0
+        ),
+        Indicateur(id="quiz_joues", libelle="Quiz joués", valeur=quiz_joues or 0),
+        Indicateur(id="certifications", libelle="Certificats valides", valeur=certifications or 0),
+        Indicateur(id="badges", libelle="Badges délivrés", valeur=badges or 0),
+    ]
 
     semestre = await semestre_en_cours(db)
 

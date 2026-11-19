@@ -12,9 +12,11 @@ import {
   chargerEspaceClub,
   chargerMonClub,
   chargerMonClubSante,
+  chargerRangMonClub,
   ErreurApi,
   type AxePublic,
   type EspaceClub,
+  type RangClub,
 } from "@/lib/api/client";
 import { STATUTS_CLUB } from "@/lib/clubs";
 import { dateCourte } from "@/lib/dates";
@@ -45,16 +47,18 @@ export const Route = createFileRoute("/_connecte/mon-club/")({
   loaderDeps: ({ search }) => search,
   loader: async ({ context, deps }) => {
     const clubId = await clubVise(context.moi.role, deps.club);
-    if (!clubId) return { espace: null, axes: [] };
+    if (!clubId) return { espace: null, axes: [], rang: null };
     try {
-      const [espace, axes] = await Promise.all([
+      const [espace, axes, rang] = await Promise.all([
         chargerEspaceClub(clubId),
         chargerAxes().catch(() => []),
+        // Le rang du club du lecteur : sans lui (API, club d'un autre), la carte le dit sans bloquer la page.
+        chargerRangMonClub().catch(() => null),
       ]);
-      return { espace, axes };
+      return { espace, axes, rang: rang?.club.id === clubId ? rang : null };
     } catch (e) {
       // Plus membre, ou un club qui n'est pas le sien : la page le dit simplement.
-      if (e instanceof ErreurApi && e.statut === 404) return { espace: null, axes: [] };
+      if (e instanceof ErreurApi && e.statut === 404) return { espace: null, axes: [], rang: null };
       throw e;
     }
   },
@@ -69,7 +73,7 @@ export const Route = createFileRoute("/_connecte/mon-club/")({
 });
 
 function MonClub() {
-  const { espace, axes } = Route.useLoaderData();
+  const { espace, axes, rang } = Route.useLoaderData();
   const router = useRouter();
   const rafraichir = () => router.invalidate();
 
@@ -83,7 +87,7 @@ function MonClub() {
           <ArrowLeft className="size-4" /> Mon espace
         </Link>
         {espace ? (
-          <Espace espace={espace} axes={axes} onRafraichir={rafraichir} />
+          <Espace espace={espace} axes={axes} rang={rang} onRafraichir={rafraichir} />
         ) : (
           <div className="rounded-3xl bg-card p-8 text-center shadow-card">
             <p className="font-semibold">Aucun club à afficher.</p>
@@ -100,10 +104,12 @@ function MonClub() {
 function Espace({
   espace,
   axes,
+  rang,
   onRafraichir,
 }: {
   espace: EspaceClub;
   axes: AxePublic[];
+  rang: RangClub | null;
   onRafraichir: () => Promise<unknown>;
 }) {
   // Un club suspendu (spec 033) ne publie plus : le président garde son titre mais ne gère plus rien.
@@ -176,10 +182,7 @@ function Espace({
           valeur={indicateurs.actualites}
           libelle="actualités publiées"
         />
-        <li className="rounded-3xl bg-card p-4 shadow-card">
-          <Trophy className="size-5 text-logo-blue" />
-          <p className="mt-2 text-sm text-muted-foreground">Points et rang du club : bientôt</p>
-        </li>
+        <PointsEtRang rang={rang} />
       </ul>
 
       <section className="space-y-4 rounded-3xl bg-card p-5 shadow-card sm:p-7">
@@ -253,6 +256,36 @@ function Espace({
       )}
       {espace.role === "president" && <ClassementDuClub />}
     </>
+  );
+}
+
+// Les points du club sur le semestre en cours et son rang au classement des clubs (`/hall-of-fame`).
+function PointsEtRang({ rang }: { rang: RangClub | null }) {
+  const points = rang?.semestre
+    ? rang.points.toLocaleString("fr-FR", { maximumFractionDigits: 1 })
+    : null;
+  let detail = "Indisponible pour le moment";
+  if (rang && !rang.semestre) detail = "Aucun semestre en cours";
+  else if (rang?.rang_national)
+    detail = `${rang.rang_national}ᵉ au national${rang.rang_dre ? ` · ${rang.rang_dre}ᵉ en DRE` : ""}`;
+  else if (rang) detail = "Pas encore classé ce semestre";
+  return (
+    <li className="rounded-3xl bg-card p-4 shadow-card">
+      <span className="text-logo-blue">
+        <Trophy className="size-5" />
+      </span>
+      {points !== null && <p className="mt-2 font-display text-3xl text-ink">{points}</p>}
+      <p className="text-sm text-muted-foreground">
+        {points !== null && "points ce semestre · "}
+        {rang?.rang_national ? (
+          <Link to="/hall-of-fame" className="font-bold text-logo-blue hover:underline">
+            {detail}
+          </Link>
+        ) : (
+          detail
+        )}
+      </p>
+    </li>
   );
 }
 

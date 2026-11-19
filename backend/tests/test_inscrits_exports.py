@@ -231,4 +231,8 @@ def test_tableau_de_bord_sur_les_vraies_donnees(
     assert indicateurs["collaborateurs_actifs"]["valeur"] == 1
     assert indicateurs["clubs_actifs"]["valeur"] == 0
     assert indicateurs["clubs_actifs"]["disponible_avec"] is None
+    # Plus aucun indicateur « à venir » : chacun est calculé sur les vraies données.
+    assert all(i["disponible_avec"] is None and i["valeur"] is not None for i in indicateurs.values())
+    for cle in ("contenus_en_attente", "quiz_joues", "certifications", "badges"):
+        assert indicateurs[cle]["valeur"] == 0
     assert datetime.fromisoformat(corps["calcule_le"]) <= datetime.now(UTC)

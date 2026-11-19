@@ -644,6 +644,52 @@ async def classement_personnel(db: AsyncSession, utilisateur: Utilisateur) -> Cl
     )
 
 
+# Le rang du club, pour ses membres et ses encadreurs ----------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class RangDuClub:
+    club: Club
+    semestre: Semestre | None
+    # Les points du club sur le semestre en cours : la moitié des gains de ses élèves (ADR-0012).
+    points: float
+    rang_dre: int | None
+    rang_national: int | None
+
+
+async def _rang_club_dans(db: AsyncSession, base: Select, club_id: UUID) -> int | None:
+    sous = base.subquery()
+    classe = select(sous.c.club_id, func.rank().over(order_by=sous.c.demi_points.desc()).label("rang")).subquery()
+    rang = await db.scalar(select(classe.c.rang).where(classe.c.club_id == club_id))
+    return int(rang) if rang is not None else None
+
+
+async def rang_du_club(db: AsyncSession, club: Club) -> RangDuClub:
+    """Le rang du club au classement public des clubs du semestre en cours, dans sa DRE et au national. Un club
+    hors service ou sans point n'est pas classé, comme sur `/hall-of-fame`."""
+    semestre = await semestre_en_cours(db)
+    if semestre is None:
+        return RangDuClub(club=club, semestre=None, points=0, rang_dre=None, rang_national=None)
+    demi = await db.scalar(
+        select(func.coalesce(func.sum(MouvementPoints.demi_points_club), 0)).where(
+            MouvementPoints.club_id == club.id, MouvementPoints.semestre_id == semestre.id
+        )
+    )
+    dre_code = await db.scalar(
+        select(Iesg.dre_code)
+        .join(Etablissement, Etablissement.iesg_id == Iesg.id)
+        .where(Etablissement.id == club.etablissement_id)
+    )
+    periode = Periode.semestre
+    return RangDuClub(
+        club=club,
+        semestre=semestre,
+        points=int(demi or 0) / 2,
+        rang_dre=await _rang_club_dans(db, _base_clubs(periode, semestre, dre_code), club.id) if dre_code else None,
+        rang_national=await _rang_club_dans(db, _base_clubs(periode, semestre, None), club.id),
+    )
+
+
 # Photo de fin de semestre (spec 037) ---------------------------------------------------------------------------
 
 

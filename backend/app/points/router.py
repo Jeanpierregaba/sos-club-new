@@ -43,6 +43,7 @@ from app.points.schemas import (
     MotifCloture,
     PageRegistre,
     PalmaresPublic,
+    RangClub,
     SemestreAdmin,
     SemestreCreation,
     SemestreModification,
@@ -359,6 +360,24 @@ async def mon_classement(
             status.HTTP_403_FORBIDDEN, "Les classements personnels sont réservés aux élèves et aux encadreurs."
         ) from None
     return _classement_personnel(resultat, await clotures.distinctions_de(db, moi.id))
+
+
+@router_classements.get("/mon-club/rang", response_model=RangClub)
+async def rang_de_mon_club(moi: Annotated[Utilisateur, Depends(utilisateur_courant)], db: Base) -> RangClub:
+    if moi.role not in (Role.eleve, Role.encadreur):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Tu n'as pas accès à cette page.")
+    try:
+        club = await classements.club_du_lecteur(db, moi)
+    except classements.HorsDuClub:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Tu n'es rattaché à aucun club.") from None
+    rang = await classements.rang_du_club(db, club)
+    return RangClub(
+        club=ClubClasse(id=club.id, nom=club.nom),
+        semestre=_semestre_public(rang.semestre),
+        points=rang.points,
+        rang_dre=rang.rang_dre,
+        rang_national=rang.rang_national,
+    )
 
 
 @router_classements.get("/mon-club", response_model=ClassementClubInterne)

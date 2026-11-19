@@ -51,7 +51,8 @@ MODULES: dict[str, tuple[str, bool, tuple[Action, ...]]] = {
     # La file des clubs et des passations arrive avec la spec 019 ; le droit `clubs` existait déjà.
     "clubs": ("Clubs et DRE", True, (C, CR, M, A)),
     "contenus": ("Contenus et rubriques", False, (C, CR, M, S, A, D)),
-    "agenda": ("Agenda et campagnes", False, (C, CR, M, S, A, D)),
+    # Agenda (spec 041) : événements nationaux et régionaux, décisions sur ceux des clubs. Les campagnes viendront avec R21.
+    "agenda": ("Agenda et campagnes", True, (C, CR, M, S, A, D)),
     # Archive des rapports (spec 038) : les décisions passent par la modération ; ici, lire et exporter.
     "rapports": ("Rapports d'activités", True, (C, E)),
     "quiz": ("Quiz et certification", True, (C, CR, M, S, A, D)),

@@ -4,6 +4,7 @@ la signature est celle du club, aucun point n'est crédité, et la passation tra
 Écrits avant le code : rien de public sans modération, droits dans l'API (docs/RULES.md, docs/TESTING.md)."""
 
 from collections.abc import Callable
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import pytest
@@ -228,3 +229,24 @@ def decider_et_adresse(club: dict[str, Any], contenu_id: str) -> str:
     # Avant l'approbation, aucune adresse n'existe : rien à lire publiquement.
     assert club["admin"].get(f"/api/admin/moderation/{contenu_id}").json()["adresse"] is None
     return str(decider(club["admin"], contenu_id, "approuver").json()["adresse"])
+
+
+def test_la_file_se_filtre_par_club_et_par_date_de_soumission(club: dict[str, Any]) -> None:
+    """Suite de la spec 038 : retrouver les contenus d'un club, et ceux soumis sur une période."""
+    soumis = soumettre(club)
+    admin = club["admin"]
+    aujourdhui = datetime.now(UTC).date()
+
+    def file(**params: Any) -> list[str]:
+        reponse = admin.get("/api/admin/moderation", params=params)
+        assert reponse.status_code == 200, reponse.text
+        return [c["id"] for c in reponse.json()["contenus"]]
+
+    assert file(club="lycée") == [soumis["id"]]
+    assert file(club="Tokoin") == []
+    assert file(club="%") == []  # un joker saisi n'est pas un joker
+    assert file(du=aujourdhui.isoformat(), au=aujourdhui.isoformat()) == [soumis["id"]]
+    assert file(du=(aujourdhui + timedelta(days=1)).isoformat()) == []
+    assert file(au=(aujourdhui - timedelta(days=1)).isoformat()) == []
+    inverse = {"du": aujourdhui.isoformat(), "au": (aujourdhui - timedelta(days=1)).isoformat()}
+    assert admin.get("/api/admin/moderation", params=inverse).status_code == 422

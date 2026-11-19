@@ -1438,6 +1438,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/classements/mon-club/rang": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Rang De Mon Club */
+        get: operations["rang_de_mon_club_api_classements_mon_club_rang_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/classements/mon-club": {
         parameters: {
             query?: never;
@@ -9343,6 +9360,20 @@ export interface components {
          * @enum {string}
          */
         Raison: "meme_nom" | "meme_prononciation" | "nom_proche";
+        /**
+         * RangClub
+         * @description Le rang du club de l'utilisateur au classement des clubs du semestre en cours (page « Mon club »).
+         */
+        RangClub: {
+            club: components["schemas"]["ClubClasse"];
+            semestre: components["schemas"]["SemestrePublic"] | null;
+            /** Points */
+            points: number;
+            /** Rang Dre */
+            rang_dre: number | null;
+            /** Rang National */
+            rang_national: number | null;
+        };
         /** RangPersonnel */
         RangPersonnel: {
             /** Points */
@@ -13151,6 +13182,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClassementPersonnel"];
+                };
+            };
+        };
+    };
+    rang_de_mon_club_api_classements_mon_club_rang_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RangClub"];
                 };
             };
         };

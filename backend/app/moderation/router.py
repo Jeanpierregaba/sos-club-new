@@ -2,10 +2,11 @@
 
 from collections.abc import Iterator
 from contextlib import contextmanager
+from datetime import date
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.catalogue import Action
@@ -54,10 +55,24 @@ async def file_moderation(
     axe: str | None = None,
     dre: str | None = None,
     profil: Literal["eleve", "encadreur"] | None = None,
+    club: Annotated[str | None, Query(max_length=100)] = None,
+    du: date | None = None,
+    au: date | None = None,
 ) -> FileModeration:
+    if du and au and du > au:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "La date de début suit la date de fin.")
     with _traduire():
         return await decisions.file_attente(
-            db, acces, etat, type=type, axe=axe, dre=dre, profil=Role(profil) if profil else None
+            db,
+            acces,
+            etat,
+            type=type,
+            axe=axe,
+            dre=dre,
+            profil=Role(profil) if profil else None,
+            club=club,
+            du=du,
+            au=au,
         )
 
 

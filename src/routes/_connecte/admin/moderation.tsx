@@ -43,6 +43,9 @@ type Recherche = {
   axe?: string | undefined;
   profil?: "eleve" | "encadreur" | undefined;
   dre?: string | undefined;
+  club?: string | undefined;
+  du?: string | undefined;
+  au?: string | undefined;
 };
 type Decision = "corriger" | "refuser" | "depublier";
 // Les types du moteur de modération (specs 023, 025 et 026).
@@ -121,12 +124,20 @@ export const Route = createFileRoute("/_connecte/admin/moderation")({
     const profil =
       search["profil"] === "eleve" || search["profil"] === "encadreur" ? search["profil"] : null;
     const type = TYPES.find((t) => t.code === search["type"])?.code ?? null;
+    const club = typeof search["club"] === "string" ? search["club"].slice(0, 100) : null;
+    const jour = (v: unknown) =>
+      typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null;
+    const du = jour(search["du"]);
+    const au = jour(search["au"]);
     return {
       ...(etat && etat !== "en_attente" ? { etat: etat as Etat } : {}),
       ...(type ? { type } : {}),
       ...(axe ? { axe } : {}),
       ...(profil ? { profil } : {}),
       ...(dre ? { dre } : {}),
+      ...(club ? { club } : {}),
+      ...(du ? { du } : {}),
+      ...(au ? { au } : {}),
     };
   },
   beforeLoad: ({ context }) => {
@@ -141,6 +152,9 @@ export const Route = createFileRoute("/_connecte/admin/moderation")({
         axe: deps.axe,
         profil: deps.profil,
         dre: deps.dre,
+        club: deps.club,
+        du: deps.du,
+        au: deps.au,
       }),
       chargerAxes().catch(() => []),
     ]);
@@ -259,6 +273,34 @@ function Moderation() {
             ))}
           </select>
         )}
+        <FiltreClub
+          valeur={recherche.club ?? ""}
+          onChange={(club) => void navigate({ search: { ...recherche, club: club || undefined } })}
+        />
+        <label className="flex items-center gap-2 text-sm font-semibold">
+          Soumis du
+          <input
+            type="date"
+            aria-label="Soumis à partir du"
+            value={recherche.du ?? ""}
+            max={recherche.au}
+            onChange={(e) =>
+              void navigate({ search: { ...recherche, du: e.target.value || undefined } })
+            }
+            className="h-10 rounded-full border bg-white px-4 text-sm font-semibold"
+          />
+          au
+          <input
+            type="date"
+            aria-label="Soumis jusqu'au"
+            value={recherche.au ?? ""}
+            min={recherche.du}
+            onChange={(e) =>
+              void navigate({ search: { ...recherche, au: e.target.value || undefined } })
+            }
+            className="h-10 rounded-full border bg-white px-4 text-sm font-semibold"
+          />
+        </label>
       </div>
 
       {file.contenus.length === 0 ? (
@@ -863,5 +905,27 @@ function ApercuEvenement({
       {texte("objectif") && <p className="font-medium">Objectif : {texte("objectif")}</p>}
       <p className="whitespace-pre-line font-medium text-ink/80">{texte("description")}</p>
     </article>
+  );
+}
+
+// Le nom du club, ou une partie : la recherche part quand la saisie s'arrête, pour ne pas recharger à chaque lettre.
+function FiltreClub({ valeur, onChange }: { valeur: string; onChange: (club: string) => void }) {
+  const [saisie, setSaisie] = useState(valeur);
+  useEffect(() => setSaisie(valeur), [valeur]);
+  useEffect(() => {
+    if (saisie.trim() === valeur) return;
+    const minuterie = setTimeout(() => onChange(saisie.trim()), 400);
+    return () => clearTimeout(minuterie);
+  }, [saisie, valeur, onChange]);
+  return (
+    <input
+      type="search"
+      aria-label="Filtrer par club"
+      placeholder="Nom du club"
+      maxLength={100}
+      value={saisie}
+      onChange={(e) => setSaisie(e.target.value)}
+      className="h-10 w-48 rounded-full border bg-white px-4 text-sm font-semibold"
+    />
   );
 }

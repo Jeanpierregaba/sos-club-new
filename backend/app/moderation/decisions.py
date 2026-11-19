@@ -8,7 +8,7 @@ contenu inexistant. Un auteur ne décide jamais de son propre contenu.
 
 import re
 import unicodedata
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -171,6 +171,9 @@ async def file_attente(
     axe: str | None = None,
     dre: str | None = None,
     profil: Role | None = None,
+    club: str | None = None,
+    du: date | None = None,
+    au: date | None = None,
 ) -> FileModeration:
     if etat is EtatContenu.brouillon:
         # Un brouillon est un travail privé de l'auteur : il n'entre jamais dans la file.
@@ -190,6 +193,14 @@ async def file_attente(
         requete = requete.where(Contenu.dre_code == dre)
     if profil:
         requete = requete.where(Utilisateur.role == profil)
+    if club and club.strip():
+        # Le nom du club, ou une partie : les jokers saisis sont pris tels quels.
+        requete = requete.where(Club.nom.icontains(club.strip(), autoescape=True))
+    # Les dates de soumission sont lues en UTC, l'heure de Lomé.
+    if du:
+        requete = requete.where(Contenu.soumis_le >= datetime.combine(du, time.min, UTC))
+    if au:
+        requete = requete.where(Contenu.soumis_le < datetime.combine(au + timedelta(days=1), time.min, UTC))
     total = await db.scalar(select(func.count()).select_from(requete.with_only_columns(Contenu.id).subquery()))
     # La file dans l'ordre d'arrivée ; les autres listes, les plus récemment modifiés d'abord.
     ordre = Contenu.soumis_le.asc() if etat is EtatContenu.en_attente else Contenu.modifie_le.desc()

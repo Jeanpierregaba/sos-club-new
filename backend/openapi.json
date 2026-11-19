@@ -4440,6 +4440,27 @@
         }
       }
     },
+    "/api/classements/mon-club/rang": {
+      "get": {
+        "tags": [
+          "classements"
+        ],
+        "summary": "Rang De Mon Club",
+        "operationId": "rang_de_mon_club_api_classements_mon_club_rang_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RangClub"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/classements/mon-club": {
       "get": {
         "tags": [
@@ -28051,6 +28072,60 @@
           "nom_proche"
         ],
         "title": "Raison"
+      },
+      "RangClub": {
+        "properties": {
+          "club": {
+            "$ref": "#/components/schemas/ClubClasse"
+          },
+          "semestre": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SemestrePublic"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "points": {
+            "type": "number",
+            "title": "Points"
+          },
+          "rang_dre": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rang Dre"
+          },
+          "rang_national": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rang National"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "club",
+          "semestre",
+          "points",
+          "rang_dre",
+          "rang_national"
+        ],
+        "title": "RangClub",
+        "description": "Le rang du club de l'utilisateur au classement des clubs du semestre en cours (page « Mon club »)."
       },
       "RangPersonnel": {
         "properties": {
