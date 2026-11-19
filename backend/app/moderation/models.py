@@ -71,8 +71,8 @@ class Contenu(Suivi, Base):
             f"(type IN ('actualite', 'fiche_club', 'evenement', {RAPPORTS})) = (club_id IS NOT NULL)",
             name="contenu_du_club",
         ),
-        # Un commentaire, et lui seul, a un contenu parent : son article.
-        CheckConstraint("(type = 'commentaire') = (parent_id IS NOT NULL)", name="commentaire_a_un_parent"),
+        # Un commentaire (spec 025) ou un partage (spec 044), et eux seuls, ont un contenu parent : leur article.
+        CheckConstraint("(type IN ('commentaire', 'partage')) = (parent_id IS NOT NULL)", name="contenu_a_un_parent"),
         # Un contenu refusé, dépublié ou retiré n'a plus de version en ligne ; un contenu « publié » en a toujours une.
         CheckConstraint(
             "version_publiee_id IS NULL OR etat NOT IN ('refuse', 'depublie', 'retire')", name="hors_ligne_si_retire"
@@ -131,7 +131,15 @@ class Contenu(Suivi, Base):
 
 class VersionContenu(Base):
     __tablename__ = "version_contenu"
-    __table_args__ = (UniqueConstraint("contenu_id", "numero"),)
+    __table_args__ = (
+        UniqueConstraint("contenu_id", "numero"),
+        # Le lien d'une déclaration de partage (spec 044) : un même lien ne sert qu'à une déclaration vivante.
+        Index(
+            "ix_version_contenu_lien_partage",
+            text("(donnees ->> 'lien')"),
+            postgresql_where=text("donnees ? 'lien' AND etat <> 'travail'"),
+        ),
+    )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
     contenu_id: Mapped[UUID] = mapped_column(ForeignKey("contenu.id", ondelete="CASCADE"))
