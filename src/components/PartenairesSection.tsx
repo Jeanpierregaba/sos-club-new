@@ -1,3 +1,4 @@
+import aimesAfrique from "@/assets/partenaires/aimes-afrique.webp";
 import clubSante from "@/assets/partenaires/club-sante-sos-docteur-tv.webp";
 import ministereAdministration from "@/assets/partenaires/ministere-administration-territoriale.webp";
 import ministereEducation from "@/assets/partenaires/ministere-education-nationale.webp";
@@ -7,6 +8,7 @@ import unfpa from "@/assets/partenaires/unfpa.svg";
 
 const PARTENAIRES = [
   { src: clubSante, nom: "Club Santé SOS Docteur TV" },
+  { src: aimesAfrique, nom: "AIMES-AFRIQUE, Santé et éducation pour tous en Afrique" },
   { src: ministereEducation, nom: "Ministère de l'Éducation nationale" },
   {
     src: ministereSante,
