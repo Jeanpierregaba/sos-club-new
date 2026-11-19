@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion } from "@/components/SiteMotion";
 import { DecorAnime } from "@/components/DecorAnime";
-import { axes, photos, type NumeroAxe } from "@/lib/galerie";
+import { axes, COORDINATION, eventail, photos, type Categorie } from "@/lib/galerie";
 
 export const Route = createFileRoute("/galerie")({
   head: () => ({
@@ -25,15 +25,22 @@ export const Route = createFileRoute("/galerie")({
 
 // Trois photos posées en éventail dans la bannière.
 const collage = [
-  { p: photos[1], c: "-rotate-6 left-0 top-6" },
-  { p: photos[6], c: "rotate-3 left-[22%] top-0 z-10" },
-  { p: photos[2], c: "rotate-6 right-0 top-10" },
+  { p: eventail[0], c: "-rotate-6 left-0 top-6" },
+  { p: eventail[1], c: "rotate-3 left-[22%] top-0 z-10" },
+  { p: eventail[2], c: "rotate-6 right-0 top-10" },
 ];
 
+// Les filtres : chaque axe d'intervention, puis la coordination nationale.
+const filtres: { cle: Categorie; court: string; nom: string }[] = [
+  ...axes.map((a) => ({ cle: a.n, court: `Axe ${a.n}`, nom: a.nom })),
+  { cle: "coordination", court: "Coordination", nom: COORDINATION },
+];
+const nomDe = (c: Categorie) => filtres.find((f) => f.cle === c);
+
 function Galerie() {
-  const [axe, setAxe] = useState<NumeroAxe | null>(null);
+  const [axe, setAxe] = useState<Categorie | null>(null);
   const [ouverte, setOuverte] = useState<number | null>(null);
-  const liste = photos.filter((p) => !axe || p.axe === axe);
+  const liste = photos.filter((p) => axe === null || p.categorie === axe);
   const photo = ouverte === null ? undefined : liste[ouverte];
   const aller = (pas: number) =>
     setOuverte((i) => (i === null ? i : (i + pas + liste.length) % liste.length));
@@ -106,15 +113,15 @@ function Galerie() {
       {/* Mur de photos en colonnes, filtrable par axe d'intervention ; un clic ouvre la visionneuse. */}
       <section className="mx-auto max-w-7xl px-5 py-16">
         <div data-reveal className="flex flex-wrap gap-2">
-          {[null, ...axes].map((a) => {
-            const n = a?.n ?? null;
+          {[null, ...filtres].map((f) => {
+            const n = f?.cle ?? null;
             return (
               <button
                 key={n ?? "tous"}
                 type="button"
                 aria-pressed={axe === n}
-                aria-label={a ? `Axe ${a.n} : ${a.nom}` : undefined}
-                title={a?.nom}
+                aria-label={f && f.cle !== "coordination" ? `${f.court} : ${f.nom}` : undefined}
+                title={f?.nom}
                 onClick={() => setAxe(n)}
                 className={`rounded-full px-4 py-2 text-sm font-bold transition active:scale-95 ${
                   axe === n
@@ -122,14 +129,14 @@ function Galerie() {
                     : "bg-white ring-1 ring-border hover:ring-logo-blue/40"
                 }`}
               >
-                {a ? `Axe ${a.n}` : "Toutes"}
+                {f ? f.court : "Toutes"}
               </button>
             );
           })}
         </div>
         {axe !== null && (
           <p className="mt-4 text-sm font-bold text-muted-foreground">
-            Axe {axe} : {axes[axe - 1]?.nom}
+            {axe === "coordination" ? COORDINATION : `Axe ${axe} : ${nomDe(axe)?.nom}`}
           </p>
         )}
         {liste.length === 0 && (
@@ -183,7 +190,7 @@ function Galerie() {
             <figcaption className="mt-4 flex items-center justify-between gap-4 text-white">
               <span className="font-semibold">
                 <span className="mr-2 rounded-full bg-sun px-2.5 py-0.5 text-xs font-extrabold uppercase text-ink">
-                  Axe {photo.axe}
+                  {nomDe(photo.categorie)?.court}
                 </span>
                 {photo.alt}
               </span>
