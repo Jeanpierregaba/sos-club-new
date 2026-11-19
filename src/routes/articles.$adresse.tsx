@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { Commentaires } from "@/components/articles/Commentaires";
 import { Couverture, Galerie } from "@/components/articles/Galerie";
 import { TexteArticle } from "@/components/articles/TexteArticle";
+import { PartagerArticle } from "@/components/partages/PartagerArticle";
 import { FilAriane } from "@/components/FilAriane";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -87,7 +88,11 @@ function Article() {
         )}
         <TexteArticle texte={article.texte} />
         <Galerie adresse={article.adresse} photos={article.photos} />
-        {/* Les commentaires portent sur les articles personnels (spec 025), pas sur les actualités d'un club. */}
+        {/* Le partage vérifié (spec 044) et les commentaires portent sur les articles personnels, pas sur les
+            actualités d'un club. */}
+        {article.nature === "article" && (
+          <PartagerArticle adresse={article.adresse} titre={article.titre} />
+        )}
         {article.nature === "article" && <Commentaires adresse={article.adresse} />}
         <Link
           to="/articles"

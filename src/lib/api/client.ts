@@ -743,6 +743,50 @@ export const chargerMesCommentaires = (article?: string) =>
 export const retirerCommentaire = (id: string) =>
   envoyerJson<void>(`/api/mes-commentaires/${id}`, undefined, "DELETE");
 
+// Partages d'articles vérifiés (spec 044) -----------------------------------------------------------------------
+
+export type ReseauPartage = Schemas["ReseauPartage"];
+export type PartageAuteur = Schemas["PartageAuteur"];
+export type MesPartages = Schemas["MesPartages"];
+export type EtatPartagesArticle = Schemas["EtatPartagesArticle"];
+
+export const declarerPartage = (adresse: string, reseau: ReseauPartage, lien: string) =>
+  envoyerJson<PartageAuteur>(`/api/articles/${encodeURIComponent(adresse)}/partages`, { reseau, lien });
+export const chargerEtatPartages = (adresse: string) =>
+  requeteApi<EtatPartagesArticle>(`/api/articles/${encodeURIComponent(adresse)}/partages/moi`);
+export const chargerMesPartages = () => requeteApi<MesPartages>("/api/partages/moi");
+
+export type VueCarteClassement = "national" | "dre" | "club";
+export type OptionsCarteClassement = {
+  niveau: VueCarteClassement;
+  periode: PeriodeClassement;
+  club: boolean;
+};
+// La carte « Partager mon classement » : une image PNG produite par l'API pour la personne connectée.
+export async function chargerCarteClassement(options: OptionsCarteClassement): Promise<Blob> {
+  let reponse: Response;
+  try {
+    reponse = await envoyer(
+      avecParametres("/api/classements/moi/carte.png", {
+        niveau: options.niveau,
+        periode: options.periode,
+        club: options.club ? 1 : 0,
+      }),
+      {},
+    );
+  } catch {
+    throw new ErreurApi(0, MESSAGE_INDISPONIBLE);
+  }
+  if (!reponse.ok) {
+    const corps = (await reponse.json().catch(() => null)) as { detail?: unknown } | null;
+    throw new ErreurApi(
+      reponse.status,
+      typeof corps?.detail === "string" ? corps.detail : MESSAGE_INDISPONIBLE,
+    );
+  }
+  return reponse.blob();
+}
+
 const MODERATION = "/api/admin/moderation";
 export const chargerFileModeration = (filtres: Record<string, string | undefined> = {}) =>
   requeteApi<FileModeration>(avecParametres(MODERATION, filtres));
