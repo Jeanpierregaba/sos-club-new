@@ -7,6 +7,7 @@ import { ChoixEtablissement, type EtablissementChoisi } from "@/components/Choix
 import { ResumeClubSante } from "@/components/clubs/MonClubSante";
 import { AFaireRapports } from "@/components/rapports/AFaireRapports";
 import { ClassementDuClub, RangsPersonnels } from "@/components/espace/MesClassements";
+import { MesPartages } from "@/components/partages/MesPartages";
 import { PointsClub } from "@/components/espace/TableauAnnuel";
 import {
   CartesPoints,
@@ -88,6 +89,7 @@ export function EspaceEncadreur({
         {rapports && <AFaireRapports rapports={rapports} />}
         {espace.etat === "actif" && espace.points && <CartesPoints points={espace.points} />}
         {classement && <RangsPersonnels classement={classement} />}
+        <MesPartages />
         {pointsClub && <PointsClub points={pointsClub} />}
         {espace.etat === "actif" && monClubSante && <ClassementDuClub />}
 

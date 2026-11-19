@@ -3,6 +3,7 @@ import { Award, Lock, Medal } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Choix, ListeClassement, Pagination } from "@/components/classements/TableauClassement";
+import { PartagerClassement } from "@/components/espace/PartagerClassement";
 import { Button } from "@/components/ui/button";
 import {
   chargerClassementMonClub,
@@ -66,12 +67,15 @@ export function RangsPersonnels({ classement }: { classement: ClassementPersonne
           </ul>
         </div>
       )}
-      <Link
-        to="/hall-of-fame"
-        className="mt-4 inline-flex text-sm font-bold text-primary underline-offset-4 hover:underline"
-      >
-        Voir les classements complets
-      </Link>
+      <div className="mt-4 flex flex-wrap items-center gap-4">
+        {(classement.semestre.classe || classement.historique.classe) && <PartagerClassement />}
+        <Link
+          to="/hall-of-fame"
+          className="inline-flex text-sm font-bold text-primary underline-offset-4 hover:underline"
+        >
+          Voir les classements complets
+        </Link>
+      </div>
     </section>
   );
 }

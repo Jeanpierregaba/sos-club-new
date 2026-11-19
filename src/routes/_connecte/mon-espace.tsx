@@ -17,6 +17,7 @@ import {
 import { BandeauMotDePasse } from "@/components/espace/BandeauMotDePasse";
 import { CarteMembre } from "@/components/espace/CarteMembre";
 import { ClassementDuClub, RangsPersonnels } from "@/components/espace/MesClassements";
+import { MesPartages } from "@/components/partages/MesPartages";
 import { PointsClub, TableauAnnuel } from "@/components/espace/TableauAnnuel";
 import { EspaceEncadreur } from "@/components/espace/EspaceEncadreur";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
@@ -351,6 +352,7 @@ function EspaceDeLEleve({
 
         <CartesPoints points={points} />
         {classement && <RangsPersonnels classement={classement} />}
+        <MesPartages />
 
         {gamification && (
           <CarteMembre

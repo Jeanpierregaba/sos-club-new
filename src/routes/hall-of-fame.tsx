@@ -8,6 +8,7 @@ import {
   Podium,
 } from "@/components/classements/TableauClassement";
 import { Palmares } from "@/components/classements/Palmares";
+import { PartagerClassement } from "@/components/espace/PartagerClassement";
 import { FilAriane } from "@/components/FilAriane";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -21,6 +22,7 @@ import {
   type CategorieClassement,
   type PeriodeClassement,
 } from "@/lib/api/client";
+import { useMoi } from "@/hooks/use-moi";
 import { CATEGORIES, estCategorie, estPeriode, PERIODES, sousTitre } from "@/lib/classements";
 import { dateCourte } from "@/lib/dates";
 
@@ -147,6 +149,7 @@ function HallOfFame() {
                 ? `${classement.semestre.libelle}, du ${dateCourte(classement.semestre.debut)} au ${dateCourte(classement.semestre.fin)}`
                 : "Aucun semestre en cours"}
             </p>
+            <PartagerSiConnecte />
           </div>
         </div>
       </section>
@@ -245,4 +248,11 @@ function HallOfFame() {
       <SiteFooter />
     </div>
   );
+}
+
+// Un élève ou un encadreur connecté partage sa propre carte (spec 044) ; la boîte dit s'il n'est pas encore classé.
+function PartagerSiConnecte() {
+  const { data: moi } = useMoi();
+  if (moi?.role !== "eleve" && moi?.role !== "encadreur") return null;
+  return <PartagerClassement className="mt-6 bg-white" />;
 }
