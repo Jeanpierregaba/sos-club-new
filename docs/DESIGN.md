@@ -157,3 +157,14 @@ encadreurs, 21 élèves) se lisent sur des jauges avec `role="progressbar"` dans
   « Inverser » pour choisir le gardé, le choix du nom final, puis une phrase qui annonce l'effet (« 12 élèves et
   1 encadreur rejoindront … ») avant le bouton « Fusionner ». Un refus (deux clubs actifs) s'affiche avant la
   confirmation. Un absorbé porte la mention « Fusionné dans … » dans la liste.
+
+## Suivi de la certification (spec 043)
+
+- **Suivi** (Admin → Certification → « Suivi ») : en tête, des tuiles (candidats, actifs sur 30 jours, certifiés,
+  badges par badge) ; l'entonnoir des 20 places en barres horizontales (tentés, réussis, taux, tentatives moyennes) ;
+  un tableau par DRE et un graphique des 12 dernières semaines (nouveaux candidats, nouveaux certifiés).
+- **Candidats** : filtres DRE, club, rôle et état (en cours, inactif depuis 30 jours, certifié), recherche, pagination ;
+  tableau sur bureau, cartes à 375 px (nom ou pseudonyme, club, places sur 20, badges, place en cours, dernière
+  activité). Un collaborateur de DRE voit le pseudonyme des élèves.
+- **Exporter** : réservé au national qui a le droit d'exporter les inscrits ; une boîte demande la finalité.
+- État vide : « Personne n'a encore commencé la certification ».

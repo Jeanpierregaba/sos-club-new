@@ -109,6 +109,9 @@ groupe deviendra une ou plusieurs specs dans `docs/specs/`.
 - [ ] Le parcours Génie Imhotep compte 20 quiz obligatoires en 5 thématiques, réussis à 10/10, et des
       fascicules ; sa réussite donne un certificat vérifiable, 5 badges et le bonus de certification, une
       seule fois (spec 034).
+- [ ] La banque compte 1 000 QCM (922 du Jeu Quiz Santé, 78 du Quiz Santé des Clubs) ; les 20 quiz de la
+      certification, de niveau expert, y puisent 200 questions distinctes, et l'équipe suit les candidats dans
+      le back office (spec 043).
 
 **Rapports d'activités**
 

@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-Rien en cours.
+- [ ] [043 — Banque de 1 000 questions, certification de niveau expert et suivi des candidats](docs/specs/043-banque-1000-et-certification-expert/spec.md) (spec, plan et tâches validés le 2026-11-19)
 
 ## À faire
 
