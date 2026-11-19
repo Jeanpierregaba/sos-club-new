@@ -78,6 +78,8 @@ SENSIBLES: frozenset[tuple[str, Action]] = frozenset(
         ("contenus", A),
         ("contenus", D),
         ("agenda", A),
+        # Un partage montre le lien d'une publication, souvent le profil d'un mineur (spec 044).
+        ("partages", A),
         ("agenda", D),
         ("inscrits", M),
         ("inscrits", E),

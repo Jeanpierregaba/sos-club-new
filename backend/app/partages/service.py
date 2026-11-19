@@ -31,6 +31,7 @@ from app.partages.schemas import (
     PartageAuteur,
     Reseau,
 )
+from app.points import service as points
 from app.points.models import MouvementPoints
 
 TYPE = "partage"
@@ -83,6 +84,22 @@ def _titre(donnees: dict[str, Any]) -> str:
     return f"{nature} sur {NOMS[Reseau(donnees['reseau'])]}"
 
 
+async def _crediter(db: AsyncSession, contenu: Contenu, valide_par: UUID) -> None:
+    """À la première approbation : +10 (republication) ou +50 (partage) au barème actuel, sous une clé propre à
+    l'article, à la personne et au réseau. Un article retiré du site entre-temps rend l'approbation impossible."""
+    article = await db.get(Contenu, contenu.parent_id) if contenu.parent_id else None
+    if article is None or article.version_publiee_id is None:
+        raise Refus("L'article n'est plus en ligne : refuse ce partage.", 409)
+    auteur = await db.get(Utilisateur, contenu.auteur_id)
+    version = await db.get(VersionContenu, contenu.version_publiee_id)
+    assert auteur is not None and version is not None
+    champs = ChampsPartage.model_validate(version.donnees)
+    action = f"{auteur.role.value}.{champs.nature}"
+    await points.crediter(
+        db, action, auteur.id, cle_points(champs.nature, article.id, auteur.id, champs.reseau), valide_par=valide_par
+    )
+
+
 PARTAGE = enregistrer(
     TypeContenu(
         code=TYPE,
@@ -97,6 +114,7 @@ PARTAGE = enregistrer(
         avis_approbation="est validé",
         domaine_droit="partages",
         max_en_attente=PAR_JOUR,
+        crediter=_crediter,
     )
 )
 
