@@ -35,7 +35,7 @@ suivi touchent la certification (partie critique, `docs/TESTING.md`) : leurs tes
 
 ## Migration
 
-- [ ] 6. Tests de la migration `banque_1000_et_certification_expert`, sur une base de test avec une petite banque
+- [x] 6. Tests de la migration `banque_1000_et_certification_expert`, sur une base de test avec une petite banque
       fabriquée :
   - le lot 7 est chargé en 15 quiz dépubliés ;
   - 20 quiz de certification publiés, de 10 questions ;
@@ -43,7 +43,7 @@ suivi touchent la certification (partie critique, `docs/TESTING.md`) : leurs tes
   - une seconde exécution ne change rien ;
   - retour arrière ;
   - aucun effet sans banque.
-- [ ] 7. Code de la migration jusqu'à ce que les tests passent. L'appliquer sur la base locale et vérifier : 1 000
+- [x] 7. Code de la migration jusqu'à ce que les tests passent. L'appliquer sur la base locale et vérifier : 1 000
       QCM dans la banque, places 1 à 20 remplies, quiz « [Test] » dépubliés. Test de bout en bout : un élève
       réussit la place 1 à 10/10, gagne +50, et la place 2 s'ouvre.
 
