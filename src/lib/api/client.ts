@@ -24,6 +24,8 @@ export type ModificationInscrit = Schemas["ModificationInscrit"];
 export type PointsInscrit = Schemas["PointsInscrit"];
 export type QuizInscrit = Schemas["QuizInscrit"];
 export type TentativeAdmin = Schemas["TentativeAdmin"];
+export type DetailTentative = Schemas["DetailTentative"];
+export type QuestionTentative = Schemas["QuestionTentative"];
 export type CertificationInscrit = Schemas["CertificationInscrit"];
 export type PageContenusInscrit = Schemas["PageContenusInscrit"];
 export type EvenementJournal = Schemas["EvenementJournal"];
@@ -383,6 +385,8 @@ export const chargerQuizInscrit = (
   id: string,
   filtres: Record<string, string | number | undefined>,
 ) => requeteApi<QuizInscrit>(avecParametres(`/api/admin/inscrits/${id}/quiz`, filtres));
+export const chargerTentativeInscrit = (id: string, tentativeId: string) =>
+  requeteApi<DetailTentative>(`/api/admin/inscrits/${id}/tentatives/${tentativeId}`);
 export const chargerCertificationInscrit = (id: string) =>
   requeteApi<CertificationInscrit>(`/api/admin/inscrits/${id}/certification`);
 export const chargerContenusInscrit = (

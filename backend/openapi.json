@@ -1582,6 +1582,59 @@
         }
       }
     },
+    "/api/admin/inscrits/{utilisateur_id}/tentatives/{tentative_id}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Tentative Inscrit",
+        "operationId": "tentative_inscrit_api_admin_inscrits__utilisateur_id__tentatives__tentative_id__get",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          },
+          {
+            "name": "tentative_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tentative Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailTentative"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/inscrits/{utilisateur_id}/certification": {
       "get": {
         "tags": [
@@ -15722,6 +15775,25 @@
             "type": "string",
             "format": "date-time",
             "title": "Obtenu Le"
+          },
+          "temps_s": {
+            "type": "integer",
+            "title": "Temps S"
+          },
+          "temps_cumule_s": {
+            "type": "integer",
+            "title": "Temps Cumule S"
+          },
+          "duree_calendaire_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duree Calendaire S"
           }
         },
         "type": "object",
@@ -15729,7 +15801,10 @@
           "rang",
           "nom",
           "palier",
-          "obtenu_le"
+          "obtenu_le",
+          "temps_s",
+          "temps_cumule_s",
+          "duree_calendaire_s"
         ],
         "title": "BadgeAdmin"
       },
@@ -16835,6 +16910,21 @@
               }
             ],
             "title": "Decide Le"
+          },
+          "temps_cumule_s": {
+            "type": "integer",
+            "title": "Temps Cumule S"
+          },
+          "duree_calendaire_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duree Calendaire S"
           }
         },
         "type": "object",
@@ -16844,7 +16934,9 @@
           "delivre_le",
           "titulaire",
           "motif",
-          "decide_le"
+          "decide_le",
+          "temps_cumule_s",
+          "duree_calendaire_s"
         ],
         "title": "CertificatAdmin"
       },
@@ -19693,6 +19785,31 @@
           "motif"
         ],
         "title": "DesistementEntree"
+      },
+      "DetailTentative": {
+        "properties": {
+          "tentative": {
+            "$ref": "#/components/schemas/TentativeAdmin"
+          },
+          "temps_imparti_s": {
+            "type": "number",
+            "title": "Temps Imparti S"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionTentative"
+            },
+            "type": "array",
+            "title": "Questions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tentative",
+          "temps_imparti_s",
+          "questions"
+        ],
+        "title": "DetailTentative"
       },
       "Distinction": {
         "properties": {
@@ -27829,13 +27946,23 @@
               }
             ],
             "title": "Quiz Titre"
+          },
+          "temps_s": {
+            "type": "integer",
+            "title": "Temps S"
+          },
+          "tentatives": {
+            "type": "integer",
+            "title": "Tentatives"
           }
         },
         "type": "object",
         "required": [
           "place",
           "reussie_le",
-          "quiz_titre"
+          "quiz_titre",
+          "temps_s",
+          "tentatives"
         ],
         "title": "PlaceAdmin"
       },
@@ -28708,6 +28835,61 @@
         ],
         "title": "QuestionQuelAxe"
       },
+      "QuestionTentative": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "enonce": {
+            "type": "string",
+            "title": "Enonce"
+          },
+          "etat": {
+            "type": "string",
+            "enum": [
+              "juste",
+              "fausse",
+              "temps_ecoule",
+              "non_posee",
+              "en_cours"
+            ],
+            "title": "Etat"
+          },
+          "reponse": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reponse"
+          },
+          "secondes": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secondes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rang",
+          "enonce",
+          "etat",
+          "reponse",
+          "secondes"
+        ],
+        "title": "QuestionTentative",
+        "description": "Une question d'une tentative vue par l'équipe (spec 046). Jamais la bonne réponse : elle relève de la banque."
+      },
       "QuizBanque": {
         "properties": {
           "id": {
@@ -29419,6 +29601,29 @@
           "points": {
             "type": "integer",
             "title": "Points"
+          },
+          "temps_premiere_reussite_s": {
+            "type": "integer",
+            "title": "Temps Premiere Reussite S"
+          },
+          "moyenne_nationale_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Moyenne Nationale S"
+          },
+          "reussites_nationales": {
+            "type": "integer",
+            "title": "Reussites Nationales"
+          },
+          "tres_rapide": {
+            "type": "boolean",
+            "title": "Tres Rapide"
           }
         },
         "type": "object",
@@ -29433,7 +29638,11 @@
           "meilleur_score",
           "nb_questions",
           "reussites",
-          "points"
+          "points",
+          "temps_premiere_reussite_s",
+          "moyenne_nationale_s",
+          "reussites_nationales",
+          "tres_rapide"
         ],
         "title": "QuizValide"
       },
@@ -31040,6 +31249,14 @@
           "points": {
             "type": "integer",
             "title": "Points"
+          },
+          "temps_total_s": {
+            "type": "integer",
+            "title": "Temps Total S"
+          },
+          "temps_moyen_s": {
+            "type": "integer",
+            "title": "Temps Moyen S"
           }
         },
         "type": "object",
@@ -31047,7 +31264,9 @@
           "quiz_valides",
           "tentatives",
           "echecs",
-          "points"
+          "points",
+          "temps_total_s",
+          "temps_moyen_s"
         ],
         "title": "ResumeQuiz"
       },
@@ -32048,15 +32267,12 @@
             "title": "Reussie"
           },
           "duree_s": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "type": "integer",
             "title": "Duree S"
+          },
+          "abandonnee": {
+            "type": "boolean",
+            "title": "Abandonnee"
           },
           "points": {
             "anyOf": [
@@ -32086,6 +32302,7 @@
           "nb_questions",
           "reussie",
           "duree_s",
+          "abandonnee",
           "points"
         ],
         "title": "TentativeAdmin"

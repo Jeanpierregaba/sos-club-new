@@ -160,6 +160,24 @@ const formatDateHeure = new Intl.DateTimeFormat("fr-FR", {
 });
 
 // En UTC, l'heure du Togo : le rendu serveur et le navigateur affichent le même texte.
+// Spec 046 : une durée en secondes, lisible d'un coup d'œil (« 45 s », « 1 min 05 s », « 2 h 10 min », « 3 j 4 h »).
+export function dureeLisible(secondes: number | null | undefined): string {
+  if (secondes == null) return "—";
+  if (secondes < 60) {
+    const arrondi = Math.round(secondes * 10) / 10;
+    return `${String(arrondi).replace(".", ",")} s`;
+  }
+  const total = Math.round(secondes);
+  const jours = Math.floor(total / 86400);
+  const heures = Math.floor((total % 86400) / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const reste = total % 60;
+  if (jours > 0) return heures ? `${jours} j ${heures} h` : `${jours} j`;
+  if (heures > 0)
+    return minutes ? `${heures} h ${String(minutes).padStart(2, "0")} min` : `${heures} h`;
+  return `${minutes} min ${String(reste).padStart(2, "0")} s`;
+}
+
 export const dateCourte = (iso: string | null | undefined) =>
   iso ? formatDate.format(new Date(iso)) : "—";
 export const dateHeure = (iso: string | null | undefined) =>

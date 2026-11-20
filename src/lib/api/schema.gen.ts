@@ -559,6 +559,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/inscrits/{utilisateur_id}/tentatives/{tentative_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tentative Inscrit */
+        get: operations["tentative_inscrit_api_admin_inscrits__utilisateur_id__tentatives__tentative_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/inscrits/{utilisateur_id}/certification": {
         parameters: {
             query?: never;
@@ -5155,6 +5172,12 @@ export interface components {
              * Format: date-time
              */
             obtenu_le: string;
+            /** Temps S */
+            temps_s: number;
+            /** Temps Cumule S */
+            temps_cumule_s: number;
+            /** Duree Calendaire S */
+            duree_calendaire_s: number | null;
         };
         /** BadgeCompte */
         BadgeCompte: {
@@ -5551,6 +5574,10 @@ export interface components {
             motif: string | null;
             /** Decide Le */
             decide_le: string | null;
+            /** Temps Cumule S */
+            temps_cumule_s: number;
+            /** Duree Calendaire S */
+            duree_calendaire_s: number | null;
         };
         /** CertificatGestion */
         CertificatGestion: {
@@ -6612,6 +6639,14 @@ export interface components {
             encadreur_id: string;
             /** Motif */
             motif: string;
+        };
+        /** DetailTentative */
+        DetailTentative: {
+            tentative: components["schemas"]["TentativeAdmin"];
+            /** Temps Imparti S */
+            temps_imparti_s: number;
+            /** Questions */
+            questions: components["schemas"]["QuestionTentative"][];
         };
         /** Distinction */
         Distinction: {
@@ -9305,6 +9340,10 @@ export interface components {
             reussie_le: string | null;
             /** Quiz Titre */
             quiz_titre: string | null;
+            /** Temps S */
+            temps_s: number;
+            /** Tentatives */
+            tentatives: number;
         };
         /** PlaceParcours */
         PlaceParcours: {
@@ -9556,6 +9595,25 @@ export interface components {
             /** Reponses */
             reponses: components["schemas"]["ReponseQuelAxe"][];
         };
+        /**
+         * QuestionTentative
+         * @description Une question d'une tentative vue par l'équipe (spec 046). Jamais la bonne réponse : elle relève de la banque.
+         */
+        QuestionTentative: {
+            /** Rang */
+            rang: number;
+            /** Enonce */
+            enonce: string;
+            /**
+             * Etat
+             * @enum {string}
+             */
+            etat: "juste" | "fausse" | "temps_ecoule" | "non_posee" | "en_cours";
+            /** Reponse */
+            reponse: string | null;
+            /** Secondes */
+            secondes: number | null;
+        };
         /** QuizBanque */
         QuizBanque: {
             /**
@@ -9769,6 +9827,14 @@ export interface components {
             reussites: number;
             /** Points */
             points: number;
+            /** Temps Premiere Reussite S */
+            temps_premiere_reussite_s: number;
+            /** Moyenne Nationale S */
+            moyenne_nationale_s: number | null;
+            /** Reussites Nationales */
+            reussites_nationales: number;
+            /** Tres Rapide */
+            tres_rapide: boolean;
         };
         /**
          * Raison
@@ -10282,6 +10348,10 @@ export interface components {
             echecs: number;
             /** Points */
             points: number;
+            /** Temps Total S */
+            temps_total_s: number;
+            /** Temps Moyen S */
+            temps_moyen_s: number;
         };
         /**
          * Role
@@ -10682,7 +10752,9 @@ export interface components {
             /** Reussie */
             reussie: boolean | null;
             /** Duree S */
-            duree_s: number | null;
+            duree_s: number;
+            /** Abandonnee */
+            abandonnee: boolean;
             /** Points */
             points: number | null;
         };
@@ -11927,6 +11999,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["QuizInscrit"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tentative_inscrit_api_admin_inscrits__utilisateur_id__tentatives__tentative_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                utilisateur_id: string;
+                tentative_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailTentative"];
                 };
             };
             /** @description Validation Error */

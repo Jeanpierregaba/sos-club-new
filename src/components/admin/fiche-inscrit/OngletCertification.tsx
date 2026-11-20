@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 
-import { dateCourte } from "@/lib/admin";
+import { dateCourte, dureeLisible } from "@/lib/admin";
 import { chargerCertificationInscrit } from "@/lib/api/client";
 
 import { Bloc, Chargement, Chiffres, Pastille, Vide } from "./commun";
@@ -13,7 +13,7 @@ const ETATS = {
   remplace: { libelle: "Remplacé", ton: "gris" },
 } as const;
 
-// Spec 045 : progression sur les 20 places, badges et certificats.
+// Spec 045 : progression sur les 20 places, badges et certificats. Spec 046 : temps de jeu et durées.
 export function OngletCertification({
   id,
   identifiant,
@@ -33,6 +33,8 @@ export function OngletCertification({
     );
 
   const reussies = donnees.places.filter((p) => p.reussie_le).length;
+  const jouees = donnees.places.filter((p) => p.tentatives > 0 || p.reussie_le);
+  const tempsTotal = donnees.places.reduce((somme, p) => somme + p.temps_s, 0);
   return (
     <div className="space-y-6">
       <Bloc
@@ -54,6 +56,7 @@ export function OngletCertification({
             ["Places réussies", `${reussies} / ${donnees.places.length}`],
             ["Badges", donnees.badges.length],
             ["Certificats", donnees.certificats.length],
+            ["Temps de jeu", dureeLisible(tempsTotal)],
           ]}
         />
         <ol className="mt-5 grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-10">
@@ -71,20 +74,23 @@ export function OngletCertification({
             </li>
           ))}
         </ol>
-        {reussies > 0 && (
+        {jouees.length > 0 && (
           <ol className="mt-4 divide-y text-sm">
-            {donnees.places
-              .filter((p) => p.reussie_le)
-              .map((p) => (
-                <li key={p.place} className="flex justify-between gap-4 py-2">
-                  <span>
-                    <span className="font-bold">Place {p.place}</span> · {p.quiz_titre}
+            {jouees.map((p) => (
+              <li key={p.place} className="flex justify-between gap-4 py-2">
+                <span>
+                  <span className="font-bold">Place {p.place}</span>
+                  {p.quiz_titre && ` · ${p.quiz_titre}`}
+                  <span className="block text-muted-foreground">
+                    {p.tentatives} tentative{p.tentatives > 1 ? "s" : ""} · temps de jeu{" "}
+                    {dureeLisible(p.temps_s)}
                   </span>
-                  <span className="shrink-0 text-muted-foreground">
-                    {p.reussie_le && dateCourte(p.reussie_le)}
-                  </span>
-                </li>
-              ))}
+                </span>
+                <span className="shrink-0 text-muted-foreground">
+                  {p.reussie_le ? dateCourte(p.reussie_le) : "Pas encore réussie"}
+                </span>
+              </li>
+            ))}
           </ol>
         )}
       </Bloc>
@@ -97,8 +103,15 @@ export function OngletCertification({
             {donnees.badges.map((b) => (
               <li key={b.rang} className="rounded-2xl bg-sun/20 px-4 py-3 text-sm">
                 <span className="block font-extrabold">{b.nom}</span>
-                <span className="text-muted-foreground">
+                <span className="block text-muted-foreground">
                   {b.palier} places · {dateCourte(b.obtenu_le)}
+                </span>
+                <span className="block text-muted-foreground">
+                  Temps de jeu {dureeLisible(b.temps_s)} (cumul {dureeLisible(b.temps_cumule_s)})
+                </span>
+                <span className="block text-muted-foreground">
+                  En {dureeLisible(b.duree_calendaire_s)}{" "}
+                  {b.rang === 1 ? "depuis la première tentative" : "depuis le badge précédent"}
                 </span>
               </li>
             ))}
@@ -124,6 +137,10 @@ export function OngletCertification({
                   </span>
                   <span className="block text-muted-foreground">
                     Délivré le {dateCourte(c.delivre_le)} au nom de {c.titulaire}
+                  </span>
+                  <span className="block text-muted-foreground">
+                    Temps de jeu {dureeLisible(c.temps_cumule_s)} · obtenu en{" "}
+                    {dureeLisible(c.duree_calendaire_s)} depuis la première tentative
                   </span>
                   {c.motif && (
                     <span className="block text-muted-foreground">
