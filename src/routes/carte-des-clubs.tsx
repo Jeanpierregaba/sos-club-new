@@ -11,11 +11,10 @@ import {
   chargerCarteClubs,
   type Carte,
   type CarteEtablissement,
-  type RegionScolaire,
   type TypeEtablissement,
 } from "@/lib/api/client";
 import { chercher, compterParType, indexer } from "@/lib/carte-des-clubs";
-import { LIBELLE_SANS_CLUB, REGIONS_SCOLAIRES, STATUTS_CARTE } from "@/lib/clubs";
+import { LIBELLE_SANS_CLUB, STATUTS_CARTE } from "@/lib/clubs";
 import { DRE_PAR_DEFAUT, dessins, regions } from "@/lib/togo-dre";
 import mascottesEquipe from "@/assets/mascottes-equipe.webp";
 
@@ -54,18 +53,23 @@ const ORDRE_TYPES = Object.keys(types) as TypeEtablissement[];
 
 const APERCU = 30;
 
-// Les statuts des établissements, la région et les clubs actifs de chaque DRE, lus dans la carte de l'API.
+type EtatFiltre = "tous" | "actif" | "en_constitution";
+const ETATS: { v: EtatFiltre; t: string }[] = [
+  { v: "tous", t: "Tous les établissements" },
+  { v: "actif", t: "Club actif" },
+  { v: "en_constitution", t: "Club en constitution" },
+];
+
+// Les statuts des établissements et les clubs actifs de chaque DRE, lus dans la carte de l'API.
 function lireCarte(carte: Carte | null) {
   const statuts = new Map<string, CarteEtablissement>();
-  const regionDe = new Map<string, RegionScolaire>();
   const actifsDe = new Map<string, number>();
   for (const region of carte?.regions ?? [])
     for (const dre of region.dres) {
-      regionDe.set(dre.code, region.code as RegionScolaire);
       actifsDe.set(dre.code, dre.nb_actifs);
       for (const iesg of dre.iesg) for (const e of iesg.etablissements) statuts.set(e.id, e);
     }
-  return { statuts, regionDe, actifsDe };
+  return { statuts, actifsDe };
 }
 
 function StatutEtablissement({ statut }: { statut: CarteEtablissement | undefined }) {
@@ -98,9 +102,8 @@ function StatutEtablissement({ statut }: { statut: CarteEtablissement | undefine
 function CarteDesClubs() {
   const { annuaire, carte } = Route.useLoaderData();
   const toutes = useMemo(() => regions(annuaire ?? []), [annuaire]);
-  const { statuts, regionDe, actifsDe } = useMemo(() => lireCarte(carte), [carte]);
-  const [region, setRegion] = useState<RegionScolaire | null>(null);
-  const dres = region ? toutes.filter((r) => regionDe.get(r.code) === region) : toutes;
+  const { statuts, actifsDe } = useMemo(() => lireCarte(carte), [carte]);
+  const dres = toutes;
   const index = useMemo(() => indexer(toutes), [toutes]);
   const totalEtablissements = toutes.reduce((n, r) => n + r.nb_etablissements, 0);
   // Les trois chiffres du cahier des charges (spec 033), tous calculés par l'API ; sans elle, aucun chiffre.
@@ -117,6 +120,9 @@ function CarteDesClubs() {
   const [type, setType] = useState<TypeEtablissement | null>(null);
   const [toutVoir, setToutVoir] = useState(false);
   const [recherche, setRecherche] = useState("");
+  // Dans la DRE affichée : la recherche par nom (toutes ses IESG) et l'état du club.
+  const [rechercheDre, setRechercheDre] = useState("");
+  const [etat, setEtat] = useState<EtatFiltre>("tous");
 
   const dre = dres.find((r) => r.code === code) ?? dres[0];
   const iesg = dre?.iesg.find((i) => i.id === iesgId) ?? dre?.iesg[0];
@@ -128,13 +134,23 @@ function CarteDesClubs() {
     setType(null);
     setToutVoir(false);
     setRecherche("");
+    setRechercheDre("");
   };
 
   // Amène sous les yeux la colonne où s'affichent la région choisie ou les résultats d'une recherche lancée dans la bannière.
   const montrerExplorateur = () =>
     document.getElementById("explorateur")?.scrollIntoView({ behavior: "smooth" });
 
-  const liste = iesg?.etablissements ?? [];
+  const qDre = rechercheDre.trim();
+  const rechercheDansDre = qDre.replace(/\s/g, "").length >= 2;
+  const trouvesDansDre = useMemo(
+    () =>
+      rechercheDansDre && dre ? chercher(index, qDre).filter((e) => e.dre.code === dre.code) : [],
+    [index, qDre, rechercheDansDre, dre],
+  );
+  const liste = (rechercheDansDre ? trouvesDansDre : (iesg?.etablissements ?? [])).filter(
+    (e) => etat === "tous" || statuts.get(e.id)?.statut === etat,
+  );
   const filtres = compterParType(liste, ORDRE_TYPES);
   const affiches = liste.filter((e) => !type || e.type === type);
   const visibles = toutVoir ? affiches : affiches.slice(0, APERCU);
@@ -259,30 +275,6 @@ function CarteDesClubs() {
           data-reveal="left"
           className="grid grid-cols-[6.5rem_1fr] items-center gap-5 self-start rounded-[2rem] border bg-white p-5 sm:grid-cols-[8rem_1fr] lg:sticky lg:top-24 lg:grid-cols-1"
         >
-          <div role="group" aria-label="Régions" className="col-span-full flex flex-wrap gap-1.5">
-            {[{ code: null, nom: "Toutes" }, ...REGIONS_SCOLAIRES].map((r) => {
-              const on = region === r.code;
-              return (
-                <button
-                  key={r.code ?? "toutes"}
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => {
-                    setRegion(r.code);
-                    const premiere = r.code
-                      ? toutes.find((d) => regionDe.get(d.code) === r.code)
-                      : undefined;
-                    if (premiere) choisir(premiere.code);
-                  }}
-                  className={`rounded-full px-3 py-1 text-xs font-bold transition ${
-                    on ? "bg-logo-blue text-white" : "bg-mist-soft text-ink hover:bg-mist"
-                  }`}
-                >
-                  {r.nom}
-                </button>
-              );
-            })}
-          </div>
           <svg
             viewBox="0 0 250 640"
             aria-hidden
@@ -457,6 +449,41 @@ function CarteDesClubs() {
                 })}
               </div>
 
+              <div className="relative mt-6 max-w-xl">
+                <Search
+                  aria-hidden
+                  className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                />
+                <input
+                  type="search"
+                  value={rechercheDre}
+                  onChange={(e) => {
+                    setRechercheDre(e.target.value);
+                    setToutVoir(false);
+                  }}
+                  placeholder={`Cherche un établissement de la DRE ${dre.nom}…`}
+                  aria-label={`Rechercher un établissement de la DRE ${dre.nom} par son nom`}
+                  className="h-11 w-full rounded-full border-2 border-border bg-mist-soft pl-11 pr-11 text-sm font-semibold outline-none transition placeholder:font-medium placeholder:text-muted-foreground focus:border-logo-blue focus:bg-white"
+                />
+                {rechercheDre && (
+                  <button
+                    type="button"
+                    onClick={() => setRechercheDre("")}
+                    aria-label="Effacer la recherche"
+                    className="absolute right-2 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition hover:bg-mist hover:text-ink"
+                  >
+                    <X className="size-4" />
+                  </button>
+                )}
+              </div>
+              {rechercheDansDre && (
+                <p aria-live="polite" className="mt-3 text-sm font-semibold text-muted-foreground">
+                  {trouvesDansDre.length === 0
+                    ? `Aucun établissement de la DRE ${dre.nom} ne correspond à « ${qDre} ».`
+                    : `Résultats dans toutes les IESG de la DRE ${dre.nom}.`}
+                </p>
+              )}
+
               <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-bold">
                 {[{ t: null, n: liste.length }, ...filtres].map((f) => {
                   const on = type === f.t;
@@ -480,6 +507,24 @@ function CarteDesClubs() {
                     </button>
                   );
                 })}
+                <label className="ml-auto flex items-center gap-2 text-muted-foreground">
+                  <span className="sr-only">État du club</span>
+                  <select
+                    value={etat}
+                    onChange={(e) => {
+                      setEtat(e.target.value as EtatFiltre);
+                      setType(null);
+                      setToutVoir(false);
+                    }}
+                    className="h-10 rounded-full border-2 border-border bg-white px-4 text-sm font-bold text-ink outline-none transition focus:border-logo-blue"
+                  >
+                    {ETATS.map((o) => (
+                      <option key={o.v} value={o.v}>
+                        {o.t}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               </div>
 
               <ol className="mt-4 grid border-t sm:grid-cols-2 sm:gap-x-8 xl:grid-cols-3">
@@ -508,6 +553,15 @@ function CarteDesClubs() {
                   );
                 })}
               </ol>
+              {affiches.length === 0 && !(rechercheDansDre && trouvesDansDre.length === 0) && (
+                <p role="status" className="mt-4 text-sm font-semibold text-muted-foreground">
+                  {etat === "actif"
+                    ? "Aucun club actif ici pour l’instant."
+                    : etat === "en_constitution"
+                      ? "Aucun club en constitution ici pour l’instant."
+                      : "Aucun établissement ici."}
+                </p>
+              )}
               {affiches.length > APERCU && (
                 <button
                   type="button"
