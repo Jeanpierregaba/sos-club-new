@@ -46,6 +46,8 @@ class FiltresRegistre:
     club_id: UUID | None = None
     correction: bool | None = None
     recherche: str | None = None
+    # Spec 045 : les lignes d'une seule personne, pour sa fiche.
+    utilisateur_id: UUID | None = None
 
 
 def _motif(motif: str) -> str:
@@ -91,6 +93,8 @@ def _requete_registre(filtres: FiltresRegistre) -> Select:
         .outerjoin(Club, Club.id == MouvementPoints.club_id)
         .outerjoin(auteur, auteur.id == MouvementPoints.valide_par)
     )
+    if filtres.utilisateur_id is not None:
+        requete = requete.where(MouvementPoints.utilisateur_id == filtres.utilisateur_id)
     if filtres.semestre_id is not None:
         requete = requete.where(MouvementPoints.semestre_id == filtres.semestre_id)
     if filtres.annee_id is not None:

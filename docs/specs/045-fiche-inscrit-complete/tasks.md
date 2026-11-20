@@ -11,13 +11,13 @@ Dans l'ordre d'exécution, chacune testable et committable seule. Les droits et 
   périmée, compte admin, droits.
 - [x] 3. Modification : schéma `ModificationInscrit`, `modification_inscrit.py`, route `PATCH`, `version` dans le
   détail, action au journal et à l'historique.
-- [ ] 4. Points : filtre `utilisateur_id` du registre, route `/points`, tests (pagination, filtre semestre, lignes
+- [x] 4. Points : filtre `utilisateur_id` du registre, route `/points`, tests (pagination, filtre semestre, lignes
   d'autres comptes exclues, corrections).
-- [ ] 5. Quiz : `parcours_inscrit.quiz`, route `/quiz`, tests (validés, tentatives, essai, en cours, filtres, résumé,
+- [x] 5. Quiz : `parcours_inscrit.quiz`, route `/quiz`, tests (validés, tentatives, essai, en cours, filtres, résumé,
   aucune réponse). Vérifier l'index sur `tentative_quiz.joueur_id`.
-- [ ] 6. Certification : `parcours_inscrit.certification`, route, tests (progression, badges, certificats, vide).
-- [ ] 7. Contenus : `parcours_inscrit.contenus`, route, tests (liste, filtres, autres auteurs exclus).
-- [ ] 8. Droits de toutes les nouvelles routes (consulter, modifier, DRE, élève, encadreur, non connecté) et
+- [x] 6. Certification : `parcours_inscrit.certification`, route, tests (progression, badges, certificats, vide).
+- [x] 7. Contenus : `parcours_inscrit.contenus`, route, tests (liste, filtres, autres auteurs exclus).
+- [x] 8. Droits de toutes les nouvelles routes (consulter, modifier, DRE, élève, encadreur, non connecté) et
   `no-store`.
 
 ## Site

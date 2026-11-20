@@ -12,7 +12,7 @@ from app.comptes.champs import Requis100, Telephone, Texte100
 from app.comptes.models import Role, StatutCompte
 from app.eleves.models import Classe
 from app.encadreurs.models import EtatVerification, Fonction
-from app.points.schemas import ResumePoints
+from app.points.schemas import PageRegistre, ResumePoints
 from app.referentiel.schemas import EtablissementRattache
 
 Motif = Field(min_length=3, max_length=500)
@@ -358,3 +358,114 @@ class TableauDeBord(BaseModel):
     # Contenus en attente de modération dans le périmètre (spec 023).
     contenus_a_moderer: int | None = None
     derniers_evenements: list[EvenementJournal] | None
+
+
+# Fiche complète d'un inscrit (spec 045) ----------------------------------------------------------------------
+
+
+class TotauxInscrit(BaseModel):
+    semestre: str | None
+    points_semestre: int
+    total: int
+
+
+class PointsInscrit(BaseModel):
+    totaux: TotauxInscrit
+    registre: PageRegistre
+
+
+class ResumeQuiz(BaseModel):
+    quiz_valides: int
+    tentatives: int
+    echecs: int
+    points: int
+
+
+class QuizValide(BaseModel):
+    quiz_id: UUID
+    titre: str
+    axe: str
+    parcours: str
+    place: int | None
+    niveau: str | None
+    premiere_reussite: datetime
+    meilleur_score: int
+    nb_questions: int
+    reussites: int
+    points: int
+
+
+class TentativeAdmin(BaseModel):
+    id: UUID
+    quiz_titre: str
+    axe: str
+    parcours: str
+    place: int | None
+    niveau: str | None
+    commencee_le: datetime
+    terminee_le: datetime | None
+    etat: str
+    essai: bool
+    score: int | None
+    nb_questions: int
+    reussie: bool | None
+    duree_s: int | None
+    points: int | None
+
+
+class PageTentatives(BaseModel):
+    total: int
+    page: int
+    par_page: int
+    tentatives: list[TentativeAdmin]
+
+
+class QuizInscrit(BaseModel):
+    resume: ResumeQuiz
+    valides: list[QuizValide]
+    tentatives: PageTentatives
+
+
+class PlaceAdmin(BaseModel):
+    place: int
+    reussie_le: datetime | None
+    quiz_titre: str | None
+
+
+class BadgeAdmin(BaseModel):
+    rang: int
+    nom: str
+    palier: int
+    obtenu_le: datetime
+
+
+class CertificatAdmin(BaseModel):
+    numero: str
+    etat: str
+    delivre_le: datetime
+    titulaire: str
+    motif: str | None
+    decide_le: datetime | None
+
+
+class CertificationInscrit(BaseModel):
+    places: list[PlaceAdmin]
+    badges: list[BadgeAdmin]
+    certificats: list[CertificatAdmin]
+
+
+class ContenuAdmin(BaseModel):
+    id: UUID
+    type: str
+    type_libelle: str
+    titre: str
+    etat: str
+    cree_le: datetime
+    publie_le: datetime | None
+
+
+class PageContenusInscrit(BaseModel):
+    total: int
+    page: int
+    par_page: int
+    contenus: list[ContenuAdmin]

@@ -1,13 +1,21 @@
 from collections.abc import Awaitable, Callable
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.admin import collaborateurs, double_auth, exports, inscrits, modification_inscrit, tableau_de_bord
+from app.admin import (
+    collaborateurs,
+    double_auth,
+    exports,
+    inscrits,
+    modification_inscrit,
+    parcours_inscrit,
+    tableau_de_bord,
+)
 from app.admin.catalogue import DROITS_DES_ROLES, LIBELLES_ACTIONS, LIBELLES_ROLES, MODULES, SENSIBLES, Action
 from app.admin.dependances import (
     MESSAGE_DOUBLE_AUTH,
@@ -25,6 +33,7 @@ from app.admin.schemas import (
     AdminMoi,
     Apercu,
     Catalogue,
+    CertificationInscrit,
     CodeSaisi,
     CodesSecours,
     CollaborateurDetail,
@@ -45,9 +54,12 @@ from app.admin.schemas import (
     ModuleCatalogue,
     MotDePasseProvisoire,
     MotifEntree,
+    PageContenusInscrit,
     PageInscrits,
     PageJournal,
+    PointsInscrit,
     PseudonymeEntree,
+    QuizInscrit,
     RoleCatalogue,
     TableauDeBord,
 )
@@ -70,6 +82,7 @@ from app.eleves import fiche as fiche_eleve
 from app.eleves.schemas_fiche import FicheSortie
 from app.encadreurs.verification import compter_en_attente as compter_encadreurs_en_attente
 from app.moderation.decisions import compter_en_attente as compter_contenus_en_attente
+from app.moderation.models import EtatContenu
 from app.referentiel.models import Dre
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -439,6 +452,77 @@ async def modifier_inscrit(
     except modification_inscrit.Refus as refus:
         raise HTTPException(refus.statut, str(refus)) from None
     return await inscrits.detail(db, utilisateur_id)
+
+
+# Spec 045 : la fiche complète, en lecture. Des données de mineurs : ni le navigateur ni un proxy ne les gardent.
+
+
+def _sans_cache(response: Response) -> None:
+    response.headers["Cache-Control"] = "no-store"
+
+
+INSCRIT_INTROUVABLE = HTTPException(status.HTTP_404_NOT_FOUND, "Compte introuvable.")
+
+
+@router.get("/inscrits/{utilisateur_id}/points")
+async def points_inscrit(
+    utilisateur_id: UUID,
+    _: LecteurInscrits,
+    db: Base,
+    response: Response,
+    semestre_id: UUID | None = None,
+    page: Annotated[int, Query(ge=1)] = 1,
+) -> PointsInscrit:
+    _sans_cache(response)
+    try:
+        return await parcours_inscrit.points_de(db, utilisateur_id, semestre_id, page)
+    except parcours_inscrit.Introuvable:
+        raise INSCRIT_INTROUVABLE from None
+
+
+@router.get("/inscrits/{utilisateur_id}/quiz")
+async def quiz_inscrit(
+    utilisateur_id: UUID,
+    _: LecteurInscrits,
+    db: Base,
+    response: Response,
+    parcours: Literal["jeux", "certification"] | None = None,
+    resultat: Literal["reussies", "echouees"] | None = None,
+    page: Annotated[int, Query(ge=1)] = 1,
+) -> QuizInscrit:
+    _sans_cache(response)
+    try:
+        return await parcours_inscrit.quiz_de(db, utilisateur_id, parcours, resultat, page)
+    except parcours_inscrit.Introuvable:
+        raise INSCRIT_INTROUVABLE from None
+
+
+@router.get("/inscrits/{utilisateur_id}/certification")
+async def certification_inscrit(
+    utilisateur_id: UUID, _: LecteurInscrits, db: Base, response: Response
+) -> CertificationInscrit:
+    _sans_cache(response)
+    try:
+        return await parcours_inscrit.certification_de(db, utilisateur_id)
+    except parcours_inscrit.Introuvable:
+        raise INSCRIT_INTROUVABLE from None
+
+
+@router.get("/inscrits/{utilisateur_id}/contenus")
+async def contenus_inscrit(
+    utilisateur_id: UUID,
+    _: LecteurInscrits,
+    db: Base,
+    response: Response,
+    type: Annotated[str | None, Query(max_length=30)] = None,
+    etat: EtatContenu | None = None,
+    page: Annotated[int, Query(ge=1)] = 1,
+) -> PageContenusInscrit:
+    _sans_cache(response)
+    try:
+        return await parcours_inscrit.contenus_de(db, utilisateur_id, type, etat, page)
+    except parcours_inscrit.Introuvable:
+        raise INSCRIT_INTROUVABLE from None
 
 
 async def _statut_inscrit(
