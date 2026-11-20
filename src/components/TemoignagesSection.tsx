@@ -2,22 +2,39 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import mascotte from "@/assets/mascotte-leadership.webp";
 
-// Emplacements à remplacer par de vrais témoignages, avec l'accord de leurs auteurs.
-const temoignages = [
+type Temoignage = {
+  // La phrase affichée en grand ; la suite se déplie avec « Lire la suite ».
+  t: string;
+  suite?: string[];
+  // Un élève n'apparaît que par son prénom et l'initiale de son nom (docs/RULES.md).
+  nom: string;
+  role: string;
+};
+
+// Témoignages publiés avec l'accord de leurs auteurs.
+const temoignages: Temoignage[] = [
   {
-    t: "Texte du témoignage à venir.",
-    nom: "Prénom Nom",
-    role: "Élève, Club Santé de l’établissement",
+    t: "Depuis mon intégration au Club Santé SOS Dr TV de mon établissement, j'ai beaucoup appris sur la santé, le respect de soi et des autres.",
+    suite: [
+      "Grâce aux différentes activités de sensibilisation, j'ai acquis des connaissances sur la santé sexuelle et reproductive, les relations interpersonnelles saines, la lutte contre les violences et la prévention des grossesses précoces.",
+      "Le Club Santé m'a également permis de développer mon sens des responsabilités, ma confiance en moi et mon esprit d'équipe.",
+      "Aujourd'hui, je suis capable de partager les bonnes informations avec mes camarades, mes frères, mes sœurs et même au sein de ma communauté.",
+      "Je tiens à remercier tout particulièrement le Docteur KODOM Serge Michel, initiateur des Clubs Santé SOS Dr TV, ainsi que tous les encadreurs, pour leur engagement, leur accompagnement et leurs précieux conseils.",
+      "Je souhaite vivement que ces activités se poursuivent et touchent davantage d'élèves, car elles contribuent à notre épanouissement et à la construction d'une génération de jeunes responsables, bien informés et en bonne santé.",
+    ],
+    nom: "Ayiman N.",
+    role: "Président du Club Santé SOS Dr TV, Lycée Tandjouaré",
   },
-  { t: "Texte du témoignage à venir.", nom: "Prénom Nom", role: "Encadreur pédagogique" },
-  { t: "Texte du témoignage à venir.", nom: "Prénom Nom", role: "Pair éducateur" },
 ];
 
 export function TemoignagesSection() {
   const [actif, setActif] = useState(0);
+  const [deplie, setDeplie] = useState(false);
   const x = temoignages[actif];
-  const aller = (pas: number) =>
+  const aller = (pas: number) => {
+    setDeplie(false);
     setActif((a) => (a + pas + temoignages.length) % temoignages.length);
+  };
 
   return (
     <section id="temoignages" className="scroll-mt-16 overflow-hidden bg-mist-soft py-20">
@@ -62,29 +79,53 @@ export function TemoignagesSection() {
             <blockquote className="flex-1 font-display text-3xl leading-tight text-logo-blue md:text-4xl">
               {x?.t}
             </blockquote>
+            {x?.suite && (
+              <div className="mt-5">
+                <div
+                  id={`temoignage-suite-${actif}`}
+                  hidden={!deplie}
+                  className="space-y-3 text-base text-foreground/80"
+                >
+                  {x.suite.map((paragraphe) => (
+                    <p key={paragraphe}>{paragraphe}</p>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  aria-expanded={deplie}
+                  aria-controls={`temoignage-suite-${actif}`}
+                  onClick={() => setDeplie((d) => !d)}
+                  className="mt-3 text-sm font-extrabold text-primary underline-offset-4 hover:underline"
+                >
+                  {deplie ? "Réduire" : "Lire la suite"}
+                </button>
+              </div>
+            )}
             <figcaption className="mt-6">
               <span className="block text-lg font-extrabold">{x?.nom}</span>
               <span className="block text-sm font-medium text-muted-foreground">{x?.role}</span>
             </figcaption>
           </div>
-          <div className="mt-6 flex gap-2">
-            <button
-              type="button"
-              aria-label="Témoignage précédent"
-              onClick={() => aller(-1)}
-              className="btn-fx flex h-11 w-11 items-center justify-center rounded-full border bg-card text-logo-blue"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-              type="button"
-              aria-label="Témoignage suivant"
-              onClick={() => aller(1)}
-              className="btn-fx flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
+          {temoignages.length > 1 && (
+            <div className="mt-6 flex gap-2">
+              <button
+                type="button"
+                aria-label="Témoignage précédent"
+                onClick={() => aller(-1)}
+                className="btn-fx flex h-11 w-11 items-center justify-center rounded-full border bg-card text-logo-blue"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                aria-label="Témoignage suivant"
+                onClick={() => aller(1)}
+                className="btn-fx flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          )}
         </figure>
       </div>
     </section>
