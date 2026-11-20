@@ -16,10 +16,12 @@ from app.admin.schemas import (
     CertificatAdmin,
     CertificationInscrit,
     ContenuAdmin,
+    DetailTentative,
     PageContenusInscrit,
     PageTentatives,
     PlaceAdmin,
     PointsInscrit,
+    QuestionTentative,
     QuizInscrit,
     QuizValide,
     ResumeQuiz,
@@ -35,7 +37,7 @@ from app.points import registre
 from app.points import service as points
 from app.points.models import MouvementPoints, Semestre
 from app.points.schemas import LigneRegistre, PageRegistre
-from app.quiz.models import PLACES, EtatTentative, ParametresQuiz, Quiz, TentativeQuiz
+from app.quiz.models import PLACES, EtatTentative, ParametresQuiz, QuestionQuiz, Quiz, ReponseQuiz, TentativeQuiz
 from app.quiz.partie import INACTIVITE
 from app.referentiel.models import Axe
 
@@ -267,6 +269,48 @@ def _tentative(rangee: Any) -> TentativeAdmin:
         abandonnee=abandonnee,
         points=rangee.points,
     )
+
+
+async def tentative_de(db: AsyncSession, utilisateur_id: UUID, tentative_id: UUID) -> DetailTentative:
+    """Les questions d'une tentative de l'inscrit, dans l'ordre, avec le temps mis sur chacune."""
+    await verifier(db, utilisateur_id)
+    rangee = (await db.execute(_tentatives_de(utilisateur_id).where(TentativeQuiz.id == tentative_id))).first()
+    if rangee is None:
+        raise Introuvable
+    tentative: TentativeQuiz = rangee.TentativeQuiz
+    temps_ms = await db.scalar(select(ParametresQuiz.temps_ms).where(ParametresQuiz.id == tentative.parametres_id))
+    imparti = (temps_ms or 0) / 1000
+    lignes = await db.execute(
+        select(ReponseQuiz, QuestionQuiz.enonce, QuestionQuiz.choix)
+        .join(QuestionQuiz, QuestionQuiz.id == ReponseQuiz.question_id)
+        .where(ReponseQuiz.tentative_id == tentative.id)
+        .order_by(ReponseQuiz.rang)
+    )
+    return DetailTentative(
+        tentative=_tentative(rangee),
+        temps_imparti_s=imparti,
+        questions=[_question(r.ReponseQuiz, r.enonce, r.choix, tentative, imparti) for r in lignes.all()],
+    )
+
+
+def _question(
+    ligne: ReponseQuiz, enonce: str, choix: list[str], tentative: TentativeQuiz, imparti: float
+) -> QuestionTentative:
+    if ligne.envoyee_le is None:
+        return QuestionTentative(rang=ligne.rang, enonce=enonce, etat="non_posee", reponse=None, secondes=None)
+    if ligne.choix is not None:
+        # Aux jeux, la question suivante est envoyée après la pause de correction : son heure d'envoi peut dépasser
+        # légèrement celle de la réponse, d'où la borne à 0.
+        fin = ligne.repondue_le or ligne.envoyee_le
+        secondes = round(max(0.0, (fin - ligne.envoyee_le).total_seconds()), 1)
+        return QuestionTentative(
+            rang=ligne.rang, enonce=enonce, etat="juste" if ligne.correcte else "fausse",
+            reponse=choix[ligne.choix] if ligne.choix < len(choix) else None, secondes=secondes,
+        )  # fmt: skip
+    if ligne.correcte is None and tentative.etat is EtatTentative.en_cours:
+        return QuestionTentative(rang=ligne.rang, enonce=enonce, etat="en_cours", reponse=None, secondes=None)
+    # Pas de réponse dans le temps imparti (ou réponse arrivée trop tard) : la question vaut le temps imparti.
+    return QuestionTentative(rang=ligne.rang, enonce=enonce, etat="temps_ecoule", reponse=None, secondes=imparti)
 
 
 # Certification ------------------------------------------------------------------------------------------------

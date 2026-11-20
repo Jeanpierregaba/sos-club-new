@@ -437,6 +437,22 @@ class PageTentatives(BaseModel):
     tentatives: list[TentativeAdmin]
 
 
+class QuestionTentative(BaseModel):
+    """Une question d'une tentative vue par l'équipe (spec 046). Jamais la bonne réponse : elle relève de la banque."""
+
+    rang: int
+    enonce: str
+    etat: Literal["juste", "fausse", "temps_ecoule", "non_posee", "en_cours"]
+    reponse: str | None
+    secondes: float | None
+
+
+class DetailTentative(BaseModel):
+    tentative: TentativeAdmin
+    temps_imparti_s: float
+    questions: list[QuestionTentative]
+
+
 class QuizInscrit(BaseModel):
     resume: ResumeQuiz
     valides: list[QuizValide]

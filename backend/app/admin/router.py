@@ -38,6 +38,7 @@ from app.admin.schemas import (
     CodesSecours,
     CollaborateurDetail,
     CollaborateurResume,
+    DetailTentative,
     Droit,
     DroitsEntree,
     Enrolement,
@@ -495,6 +496,17 @@ async def quiz_inscrit(
         return await parcours_inscrit.quiz_de(db, utilisateur_id, parcours, resultat, page)
     except parcours_inscrit.Introuvable:
         raise INSCRIT_INTROUVABLE from None
+
+
+@router.get("/inscrits/{utilisateur_id}/tentatives/{tentative_id}")
+async def tentative_inscrit(
+    utilisateur_id: UUID, tentative_id: UUID, _: LecteurInscrits, db: Base, response: Response
+) -> DetailTentative:
+    _sans_cache(response)
+    try:
+        return await parcours_inscrit.tentative_de(db, utilisateur_id, tentative_id)
+    except parcours_inscrit.Introuvable:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Tentative introuvable.") from None
 
 
 @router.get("/inscrits/{utilisateur_id}/certification")
