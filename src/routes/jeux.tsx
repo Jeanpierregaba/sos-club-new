@@ -37,7 +37,7 @@ export const Route = createFileRoute("/jeux")({
       {
         name: "description",
         content:
-          "L'arène de gamification des Clubs Santé : 100 quiz officiels en 6 pôles, 922 questions, des points et un classement national.",
+          "L'arène de gamification des Clubs Santé : 100 quiz officiels en 6 pôles, 1 000 questions, des points et un classement national.",
       },
       { property: "og:title", content: "Joue, apprends & deviens champion de la santé" },
     ],
@@ -54,7 +54,7 @@ const totalQuiz = poles.reduce((n, p) => n + p.quiz.length, 0);
 // Spec 034 : 10 000 points de quiz et 6 000 points d'étoiles au plus, pour l'élève ; la moitié pour son club.
 const chiffres = [
   { n: totalQuiz, t: "Quiz défis" },
-  { n: 922, t: "Questions" },
+  { n: 1000, t: "Questions" },
   { n: NIVEAUX_JEUX.length, t: "Niveaux, 4 étoiles" },
   { n: points(MAX_POINTS_QUIZ + MAX_POINTS_ETOILES), t: "Points à gagner" },
   { n: poles.length, t: "Pôles santé" },
@@ -159,7 +159,7 @@ function Jeux() {
                 <span className="block text-primary">de la santé</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg font-medium text-white/80">
-                Relève les 100 quiz officiels issus du référentiel des 922 QCM des Clubs Santé SOS
+                Relève les 100 quiz officiels issus du référentiel des 1 000 QCM des Clubs Santé SOS
                 Docteur TV ! Accumule des points, hisse ton établissement au sommet du classement
                 DRE et national, et décroche ta certification.
               </p>
@@ -229,8 +229,8 @@ function Jeux() {
           vert="de gamification"
         >
           {catalogue
-            ? `Chaque quiz tire ${catalogue.nb_questions} questions des 922 QCM officiels. Chrono de ${catalogue.temps_ms / 1000} s par question, et ${catalogue.seuil}/${catalogue.nb_questions} minimum pour valider !`
-            : "Chaque quiz tire ses questions des 922 QCM officiels, avec un chrono par question."}{" "}
+            ? `Chaque quiz tire ${catalogue.nb_questions} questions des 1 000 QCM officiels. Chrono de ${catalogue.temps_ms / 1000} s par question, et ${catalogue.seuil}/${catalogue.nb_questions} minimum pour valider !`
+            : "Chaque quiz tire ses questions des 1 000 QCM officiels, avec un chrono par question."}{" "}
           Réussis tous les quiz d’un niveau pour décrocher son étoile, et les 4 étoiles pour ta
           carte Gold.
         </EnTete>

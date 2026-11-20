@@ -1,7 +1,7 @@
 import { NIVEAUX_JEUX, type NiveauJeux } from "@/lib/bareme";
 
 // Catalogue des 100 quiz de gamification, repris du parcours officiel publié par la coordination nationale.
-// Chaque quiz compte 10 questions tirées du référentiel des 922 QCM. Le nombre qui suit chaque titre est la
+// Chaque quiz compte 10 questions tirées du référentiel des 1 000 QCM. Le nombre qui suit chaque titre est la
 // cotation du parcours officiel : elle classe les niveaux (spec 034) : les 40 moins cotés en Débutant, puis 30
 // Intermédiaire, 20 Avancé et 10 Expert. L'API garde le niveau appliqué, que l'équipe peut changer.
 // Les questions elles-mêmes restent côté API : le serveur seul arbitre les quiz (ADR-0004).
@@ -13,7 +13,7 @@ export type Pole = {
   d: string;
   themes: string[];
   couleur: string;
-  // Le lot du Jeu Quiz Santé (document officiel des 922 QCM) dont les défis du pôle tirent leurs questions.
+  // Le lot du Jeu Quiz Santé (document officiel des 1 000 QCM) dont les défis du pôle tirent leurs questions.
   lot: number;
   quiz: [titre: string, cotation: number][];
 };
