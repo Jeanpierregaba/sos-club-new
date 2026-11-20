@@ -166,6 +166,8 @@ function Inscrits() {
                 // Spec 045 : toute la ligne ouvre la fiche ; le lien du nom reste le chemin au clavier.
                 onClick={(e) => {
                   if ((e.target as HTMLElement).closest("a")) return;
+                  // Sélectionner du texte dans la ligne (un e-mail à copier) n'ouvre pas la fiche.
+                  if (window.getSelection()?.toString()) return;
                   void naviguer({ to: "/admin/inscrits/$id", params: { id: i.id } });
                 }}
                 className="cursor-pointer border-t hover:bg-mist-soft/60"

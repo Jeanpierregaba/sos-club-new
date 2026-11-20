@@ -31,6 +31,7 @@ type Recherche = {
   au?: string | undefined;
   action?: string | undefined;
   club_id?: string | undefined;
+  utilisateur_id?: string | undefined;
   page?: number | undefined;
 };
 
@@ -54,6 +55,9 @@ export const Route = createFileRoute("/_connecte/admin/points/registre")({
       ...(JOUR.test(texte("au") ?? "") ? { au: texte("au") } : {}),
       ...(texte("action") ? { action: texte("action") } : {}),
       ...(UUID.test(texte("club_id") ?? "") ? { club_id: texte("club_id") } : {}),
+      ...(UUID.test(texte("utilisateur_id") ?? "")
+        ? { utilisateur_id: texte("utilisateur_id") }
+        : {}),
       ...(Number.isInteger(page) && page > 1 ? { page } : {}),
     };
   },
@@ -107,6 +111,18 @@ function Registre() {
         Chaque ligne est un gain, une annulation ou une correction. Aucune ligne ne se modifie : une
         erreur se corrige par une nouvelle ligne motivée, écrite au journal d'audit.
       </p>
+      {recherche.utilisateur_id && (
+        <p className="flex flex-wrap items-center gap-3 rounded-2xl bg-sun/20 px-4 py-3 text-sm font-semibold">
+          Lignes d'un seul inscrit, ouvert depuis sa fiche.
+          <button
+            type="button"
+            onClick={() => void filtrer({ utilisateur_id: undefined })}
+            className="font-bold text-logo-blue hover:underline"
+          >
+            Voir tout le registre
+          </button>
+        </p>
+      )}
 
       <div className="flex flex-wrap items-end gap-3 rounded-3xl bg-white p-4 ring-1 ring-border">
         <form

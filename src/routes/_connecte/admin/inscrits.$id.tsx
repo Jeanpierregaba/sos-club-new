@@ -84,8 +84,9 @@ function FicheInscrit() {
   const suspendu = inscrit.statut === "suspendu";
   const gerable = peut(admin, "inscrits", "modifier") && inscrit.role !== "admin";
   const national = admin.perimetre_dre === null;
-  const modifiable =
-    gerable && national && (inscrit.role === "eleve" || inscrit.role === "encadreur");
+  // Spec 045 : seuls un élève ou un encadreur ont des onglets et se modifient ici.
+  const inscritSuivi = inscrit.role === "eleve" || inscrit.role === "encadreur";
+  const modifiable = gerable && national && inscritSuivi;
 
   const champs: [string, string][] = [
     ["Identifiant", inscrit.identifiant],
@@ -148,7 +149,7 @@ function FicheInscrit() {
         </dl>
       </section>
 
-      {inscrit.role !== "admin" && (
+      {inscritSuivi && (
         <div
           role="tablist"
           aria-label="Sections de la fiche"
@@ -197,8 +198,7 @@ function FicheInscrit() {
         {onglet === "points" && (
           <OngletPoints
             id={inscrit.id}
-            identifiant={inscrit.identifiant}
-            peutCorriger={peut(admin, "points", "consulter") && national}
+            peutCorriger={peut(admin, "points", "modifier") && national}
           />
         )}
         {onglet === "quiz" && <OngletQuiz id={inscrit.id} />}
@@ -210,7 +210,7 @@ function FicheInscrit() {
           />
         )}
         {onglet === "contenus" && <OngletContenus id={inscrit.id} />}
-        {(onglet === "historique" || inscrit.role === "admin") && <Historique inscrit={inscrit} />}
+        {(onglet === "historique" || !inscritSuivi) && <Historique inscrit={inscrit} />}
       </div>
 
       <DialogueMotif

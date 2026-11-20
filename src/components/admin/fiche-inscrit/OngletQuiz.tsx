@@ -3,7 +3,16 @@ import { useState } from "react";
 import { dateCourte, dateHeure } from "@/lib/admin";
 import { chargerQuizInscrit, type TentativeAdmin } from "@/lib/api/client";
 
-import { Bloc, Chargement, Chiffres, Liste, Pagination, Pastille, Vide } from "./commun";
+import {
+  Bloc,
+  Chargement,
+  Chiffres,
+  Liste,
+  Pagination,
+  Rafraichissement,
+  Pastille,
+  Vide,
+} from "./commun";
 import { useChargement } from "./useChargement";
 
 const NIVEAUX: Record<string, string> = {
@@ -40,7 +49,7 @@ export function OngletQuiz({ id }: { id: string }) {
   const [parcours, setParcours] = useState("");
   const [resultat, setResultat] = useState("");
   const [page, setPage] = useState(1);
-  const { donnees, erreur } = useChargement(
+  const { donnees, erreur, enCours } = useChargement(
     () =>
       chargerQuizInscrit(id, {
         parcours: parcours || undefined,
@@ -70,7 +79,8 @@ export function OngletQuiz({ id }: { id: string }) {
           ]}
         />
         <p className="mt-2 text-xs font-medium text-muted-foreground">
-          Tentatives terminées, hors essais.
+          Tentatives terminées, hors essais. Les points sont ceux du gain initial : une correction
+          ultérieure apparaît dans l'onglet Points.
         </p>
         {valides.length === 0 ? (
           <div className="mt-4">
@@ -146,43 +156,45 @@ export function OngletQuiz({ id }: { id: string }) {
             ]}
           />
         </div>
-        {tentatives.tentatives.length === 0 ? (
-          <div className="mt-4">
-            <Vide>Aucune tentative.</Vide>
-          </div>
-        ) : (
-          <ol className="mt-4 divide-y text-sm">
-            {tentatives.tentatives.map((t) => (
-              <li key={t.id} className="flex items-start justify-between gap-4 py-3">
-                <span className="min-w-0">
-                  <span className="flex flex-wrap items-center gap-2 font-bold">
-                    {t.quiz_titre}
-                    <Resultat t={t} />
-                    {t.essai && <Pastille>Essai</Pastille>}
+        <Rafraichissement erreur={erreur} enCours={enCours}>
+          {tentatives.tentatives.length === 0 ? (
+            <div className="mt-4">
+              <Vide>Aucune tentative.</Vide>
+            </div>
+          ) : (
+            <ol className="mt-4 divide-y text-sm">
+              {tentatives.tentatives.map((t) => (
+                <li key={t.id} className="flex items-start justify-between gap-4 py-3">
+                  <span className="min-w-0">
+                    <span className="flex flex-wrap items-center gap-2 font-bold">
+                      {t.quiz_titre}
+                      <Resultat t={t} />
+                      {t.essai && <Pastille>Essai</Pastille>}
+                    </span>
+                    <span className="block text-muted-foreground">
+                      {repere(t)} · {dateHeure(t.commencee_le)} · durée {duree(t.duree_s)}
+                    </span>
                   </span>
-                  <span className="block text-muted-foreground">
-                    {repere(t)} · {dateHeure(t.commencee_le)} · durée {duree(t.duree_s)}
+                  <span className="shrink-0 text-right tabular-nums">
+                    <span className="block font-bold">
+                      {t.score ?? "—"} / {t.nb_questions}
+                    </span>
+                    {t.points != null && (
+                      <span className="block font-extrabold text-primary">+{t.points}</span>
+                    )}
                   </span>
-                </span>
-                <span className="shrink-0 text-right tabular-nums">
-                  <span className="block font-bold">
-                    {t.score ?? "—"} / {t.nb_questions}
-                  </span>
-                  {t.points != null && (
-                    <span className="block font-extrabold text-primary">+{t.points}</span>
-                  )}
-                </span>
-              </li>
-            ))}
-          </ol>
-        )}
-        <Pagination
-          page={tentatives.page}
-          parPage={tentatives.par_page}
-          total={tentatives.total}
-          unite={["tentative", "tentatives"]}
-          onPage={setPage}
-        />
+                </li>
+              ))}
+            </ol>
+          )}
+          <Pagination
+            page={tentatives.page}
+            parPage={tentatives.par_page}
+            total={tentatives.total}
+            unite={["tentative", "tentatives"]}
+            onPage={setPage}
+          />
+        </Rafraichissement>
       </Bloc>
     </div>
   );

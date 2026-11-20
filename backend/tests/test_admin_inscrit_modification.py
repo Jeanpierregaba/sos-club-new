@@ -305,3 +305,105 @@ def test_lencadreur_garde_son_profil_apres_modification(
 
     profil = en_base(lambda db: db.get(Encadreur, encadreur.id))
     assert profil.etat.value == "actif"
+
+
+# Après relecture ----------------------------------------------------------------------------------------------
+
+
+def test_un_email_change_nest_plus_confirme_et_son_empreinte_est_journalisee(
+    gestionnaire: TestClient, creer_encadreur: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    import hashlib
+    from datetime import UTC, datetime
+
+    encadreur = creer_encadreur()
+
+    async def confirmer(db: Any) -> None:
+        (await db.get(Utilisateur, encadreur.id)).email_confirme_le = datetime.now(UTC)
+
+    en_base(confirmer)
+
+    reponse = modifier(gestionnaire, encadreur.id, email="  Nouveau@Ecole.tg ")
+
+    assert reponse.status_code == 200, reponse.text
+    utilisateur = en_base(lambda db: db.get(Utilisateur, encadreur.id))
+    assert (utilisateur.email, utilisateur.email_confirme_le) == ("nouveau@ecole.tg", None)
+    (entree,) = journal(en_base)
+    assert entree.details["email_empreinte"] == hashlib.sha256(b"nouveau@ecole.tg").hexdigest()
+    assert "nouveau@ecole.tg" not in str(entree.details)
+
+
+def test_un_visiteur_ne_se_modifie_pas_ici(gestionnaire: TestClient, creer_utilisateur: Callable[..., Any]) -> None:
+    visiteur = creer_utilisateur("curieux", Role.visiteur, email="curieux@exemple.tg")
+
+    reponse = gestionnaire.patch(f"{INSCRITS}/{visiteur.id}", json={"motif": MOTIF, "version": None, "nom": "X"})
+
+    assert reponse.status_code == 409
+
+
+def test_un_invite_est_introuvable(gestionnaire: TestClient, creer_utilisateur: Callable[..., Any]) -> None:
+    invite = creer_utilisateur("invite1", Role.invite)
+
+    reponse = gestionnaire.patch(f"{INSCRITS}/{invite.id}", json={"motif": MOTIF, "version": None, "nom": "X"})
+
+    assert reponse.status_code == 404
+
+
+def test_quitter_la_fonction_autre_efface_la_precision(
+    gestionnaire: TestClient, creer_encadreur: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    encadreur = creer_encadreur()
+    assert (
+        modifier(gestionnaire, encadreur.id, fonction="autre", fonction_precision="Bibliothécaire").status_code == 200
+    )
+
+    reponse = modifier(gestionnaire, encadreur.id, fonction="sante")
+
+    assert reponse.status_code == 200, reponse.text
+    assert (reponse.json()["encadreur"]["fonction"], reponse.json()["encadreur"]["fonction_precision"]) == (
+        "sante", None,
+    )  # fmt: skip
+    entree = journal(en_base)[-1]
+    assert entree.details["avant"] == {"fonction": "autre", "fonction_precision": "Bibliothécaire"}
+
+
+def test_un_champ_invalide_bloque_tous_les_autres(
+    gestionnaire: TestClient, creer_eleve: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    eleve = creer_eleve()
+
+    reponse = modifier(gestionnaire, eleve.id, prenom="Afi", classe="tle", email="pas-un-email")
+
+    assert reponse.status_code == 422
+    utilisateur = en_base(lambda db: db.get(Utilisateur, eleve.id))
+    assert utilisateur.prenom == "Jean"
+    assert en_base(lambda db: db.get(Eleve, eleve.id)).classe is Classe.seconde
+
+
+def test_un_compte_suspendu_reste_modifiable(
+    gestionnaire: TestClient, creer_eleve: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    from app.comptes.models import StatutCompte
+
+    eleve = creer_eleve()
+
+    async def suspendre(db: Any) -> None:
+        (await db.get(Utilisateur, eleve.id)).statut = StatutCompte.suspendu
+
+    en_base(suspendre)
+
+    assert modifier(gestionnaire, eleve.id, nom="Ayivi").status_code == 200
+
+
+def test_un_encadreur_connecte_ne_modifie_pas_un_inscrit(
+    client: TestClient, creer_eleve: Callable[..., Any], creer_encadreur: Callable[..., Any]
+) -> None:
+    from tests.conftest import MOT_DE_PASSE
+
+    eleve = creer_eleve()
+    creer_encadreur()
+    client.post("/api/comptes/connexion", json={"identifiant": "encadreur1", "mot_de_passe": MOT_DE_PASSE})
+
+    reponse = client.patch(f"{INSCRITS}/{eleve.id}", json={"motif": MOTIF, "version": 1, "nom": "Ayivi"})
+
+    assert reponse.status_code in (401, 403)

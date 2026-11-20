@@ -27,8 +27,9 @@ Dans l'ordre d'exécution, chacune testable et committable seule. Les droits et 
 - [x] 11. Fiche en onglets, onglet dans l'URL ; sections existantes déplacées sans changement.
 - [x] 12. Dialogue de modification et ses tests Vitest.
 - [x] 13. Onglets Points, Quiz, Certification et Contenus, avec leurs états vides.
-- [ ] 14. Vérification au navigateur (375 px et ordinateur) sur la base de dev.
+- [ ] 14. Vérification au navigateur (375 px et ordinateur) sur la base de dev. **Reste à faire** : la fiche
+  demande une connexion admin, que l'agent ne peut pas ouvrir.
 
 ## Clôture
 
-- [ ] 15. Lint, typecheck, tests ; relecture par le sous-agent `reviewer` ; critères cochés ; `TASKS.md` à jour.
+- [x] 15. Lint, typecheck, tests ; relecture par le sous-agent `reviewer` ; critères cochés ; `TASKS.md` à jour.

@@ -319,3 +319,66 @@ def test_un_eleve_ou_un_visiteur_sont_refuses(client: TestClient, creer_eleve: C
     assert client.get(f"{INSCRITS}/{autre.id}/{route}").status_code in (401, 403)
     client.post("/api/comptes/connexion", json={"identifiant": "eleve1", "mot_de_passe": MOT_DE_PASSE})
     assert client.get(f"{INSCRITS}/{eleve.id}/{route}").status_code in (401, 403)
+
+
+# Après relecture ----------------------------------------------------------------------------------------------
+
+
+def test_un_visiteur_na_pas_de_fiche_dinscrit(lecteur: TestClient, creer_utilisateur: Callable[..., Any]) -> None:
+    from app.comptes.models import Role
+
+    visiteur = creer_utilisateur("curieux", Role.visiteur, email="curieux@exemple.tg")
+
+    for route in ROUTES:
+        assert lecteur.get(f"{INSCRITS}/{visiteur.id}/{route}").status_code == 404
+
+
+def test_les_lignes_du_compte_collectif_dun_club_sont_exclues(
+    lecteur: TestClient, creer_eleve: Callable[..., Any], creer_club: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    eleve = creer_eleve()
+    point(en_base, eleve.id, 7, "a-moi")
+
+    async def ligne_du_club(db: AsyncSession) -> None:
+        from sqlalchemy import select
+
+        from app.clubs.models import Club
+
+        club_id = await db.scalar(select(Club.id).limit(1))
+        db.add(
+            MouvementPoints(
+                utilisateur_id=None, club_id=club_id, action="club.bienvenue_eleve", montant=5, demi_points_club=10,
+                cle="club-seul",
+            )
+        )  # fmt: skip
+
+    creer_club(creer_eleve("eleve3", affiche="Pseudo Président"))
+    en_base(ligne_du_club)
+
+    lignes = lecteur.get(f"{INSCRITS}/{eleve.id}/points").json()["registre"]["lignes"]
+
+    assert [ligne["cle"] for ligne in lignes] == ["a-moi"]
+
+
+def test_les_tentatives_sont_paginees_par_25(
+    lecteur: TestClient, creer_eleve: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    eleve = creer_eleve()
+    quiz = creer_quiz(en_base, titre="Hygiène", niveau="debutant", numero=1)
+    for minute in range(27):
+        tentative(en_base, eleve.id, quiz, reussie=False, decalage=minute)
+
+    page2 = lecteur.get(f"{INSCRITS}/{eleve.id}/quiz", params={"page": 2}).json()["tentatives"]
+
+    assert (page2["total"], len(page2["tentatives"])) == (27, 2)
+
+
+def test_un_encadreur_connecte_est_refuse(
+    client: TestClient, creer_eleve: Callable[..., Any], creer_encadreur: Callable[..., Any]
+) -> None:
+    eleve = creer_eleve()
+    creer_encadreur()
+    client.post("/api/comptes/connexion", json={"identifiant": "encadreur1", "mot_de_passe": MOT_DE_PASSE})
+
+    for route in ROUTES:
+        assert client.get(f"{INSCRITS}/{eleve.id}/{route}").status_code in (401, 403)

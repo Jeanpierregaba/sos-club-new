@@ -46,9 +46,9 @@ class Introuvable(Exception):
 
 
 async def verifier(db: AsyncSession, utilisateur_id: UUID) -> Utilisateur:
-    """Un élève ou un encadreur : un collaborateur ou un joueur sans compte n'a pas de fiche d'inscrit."""
+    """Un élève ou un encadreur : ni un collaborateur, ni un visiteur, ni un joueur sans compte (spec 045)."""
     utilisateur = await db.get(Utilisateur, utilisateur_id)
-    if utilisateur is None or utilisateur.role in (Role.admin, Role.invite):
+    if utilisateur is None or utilisateur.role not in (Role.eleve, Role.encadreur):
         raise Introuvable
     return utilisateur
 
@@ -64,9 +64,7 @@ async def points_de(db: AsyncSession, utilisateur_id: UUID, semestre_id: UUID | 
     semestres = await db.execute(
         select(Semestre.id, Semestre.libelle)
         .where(
-            Semestre.id.in_(
-                select(MouvementPoints.semestre_id).where(MouvementPoints.utilisateur_id == utilisateur_id)
-            )
+            Semestre.id.in_(select(MouvementPoints.semestre_id).where(MouvementPoints.utilisateur_id == utilisateur_id))
         )
         .order_by(Semestre.debut.desc())
     )

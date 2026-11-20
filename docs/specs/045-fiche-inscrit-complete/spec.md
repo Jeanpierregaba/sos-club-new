@@ -67,8 +67,9 @@ Le pseudonyme garde son action à part (« Imposer un pseudonyme », spec 017). 
 2. Chaque ligne porte : la date, le motif (libellé du barème), les points, la part du club, le semestre, le club
    bénéficiaire, et pour une correction ou une annulation son motif et son auteur. Une ligne annulée est marquée.
 3. Un filtre choisit un semestre ou « Tout l'historique ».
-4. Un lien « Corriger dans le registre » ouvre le registre de l'équipe (spec 036) filtré sur cette personne, pour un
-   collaborateur qui a le droit d'y corriger.
+4. Un lien « Corriger dans le registre » ouvre le registre de l'équipe (spec 036) filtré sur cette seule personne
+   (par son identifiant technique, pas par une recherche de texte), pour un collaborateur national qui a
+   `points:modifier`.
 
 ### D. Quiz
 
@@ -95,72 +96,73 @@ Le pseudonyme garde son action à part (« Imposer un pseudonyme », spec 017). 
    événement, rapport, commentaire, partage…), titre ou début du texte, état de modération, date de création et de
    publication.
 2. Un filtre par type et par état.
-3. Un lien ouvre l'élément dans la file de modération quand le collaborateur peut le voir.
+3. Pas de lien vers la file de modération : elle ne s'ouvre pas sur un élément précis. Écart noté à la relecture
+   (2026-11-20), à reprendre si la file reçoit un lien direct.
 
 ## Critères d'acceptation
 
 ### Accès
 
-- [ ] **Lecture.** Étant donné un collaborateur national avec `inscrits:consulter`, alors il lit les points, les quiz,
+- [x] **Lecture.** Étant donné un collaborateur national avec `inscrits:consulter`, alors il lit les points, les quiz,
       la certification et les contenus d'un élève ou d'un encadreur.
-- [ ] **Refus.** Un collaborateur sans `inscrits:consulter`, un collaborateur de DRE, un élève, un encadreur et un
+- [x] **Refus.** Un collaborateur sans `inscrits:consulter`, un collaborateur de DRE, un élève, un encadreur et un
       visiteur non connecté sont refusés sur chaque nouvelle route.
-- [ ] **Modification réservée.** Un collaborateur avec `inscrits:consulter` mais sans `inscrits:modifier` ne peut
+- [x] **Modification réservée.** Un collaborateur avec `inscrits:consulter` mais sans `inscrits:modifier` ne peut
       pas modifier : la route est refusée et le bouton n'apparaît pas.
-- [ ] **Pas de collaborateur.** La modification d'un compte de collaborateur est refusée.
-- [ ] **Pas de cache.** Les réponses portent `Cache-Control: no-store`.
+- [x] **Pas de collaborateur.** La modification d'un compte de collaborateur est refusée.
+- [x] **Pas de cache.** Les réponses portent `Cache-Control: no-store`.
 
 ### Modification
 
-- [ ] **Identité.** Étant donné un élève, quand l'équipe change son prénom, son nom et sa classe avec un motif, alors
+- [x] **Identité.** Étant donné un élève, quand l'équipe change son prénom, son nom et sa classe avec un motif, alors
       ils sont enregistrés et l'historique montre « Profil modifié par l'équipe » avec le motif.
-- [ ] **Encadreur.** Étant donné un encadreur, quand l'équipe change sa fonction, sa discipline et sa commune, alors
+- [x] **Encadreur.** Étant donné un encadreur, quand l'équipe change sa fonction, sa discipline et sa commune, alors
       elles sont enregistrées.
-- [ ] **Règles.** Un prénom vide, un e-mail invalide, un e-mail déjà pris par un autre compte, un téléphone invalide,
+- [x] **Règles.** Un prénom vide, un e-mail invalide, un e-mail déjà pris par un autre compte, un téléphone invalide,
       un encadreur sans e-mail, sans téléphone ou sans commune, une fonction « autre » sans précision, et un motif de
       moins de 10 caractères sont refusés avec un message clair. Rien n'est enregistré.
-- [ ] **Champs hors profil.** Une classe envoyée pour un encadreur, ou une fonction pour un élève, est refusée.
-- [ ] **Rien à changer.** Une modification sans aucun changement est refusée (« Rien n'a changé. ») et n'écrit rien
+- [x] **Champs hors profil.** Une classe envoyée pour un encadreur, ou une fonction pour un élève, est refusée.
+- [x] **Rien à changer.** Une modification sans aucun changement est refusée (« Rien n'a changé. ») et n'écrit rien
       au journal.
-- [ ] **Journal sans donnée en clair.** L'entrée du journal ne contient ni l'e-mail, ni le téléphone, ni le prénom,
+- [x] **Journal sans donnée en clair.** L'entrée du journal ne contient ni l'e-mail, ni le téléphone, ni le prénom,
       ni le nom, anciens ou nouveaux.
-- [ ] **Concurrence.** Étant donné une version périmée, alors la modification est refusée (409) et rien n'est écrit.
+- [x] **Concurrence.** Étant donné une version périmée, alors la modification est refusée (409) et rien n'est écrit.
 
 ### Points
 
-- [ ] **Registre complet.** Étant donné un élève avec 60 lignes, alors la page 1 en montre 50 et la page 2 en montre
+- [x] **Registre complet.** Étant donné un élève avec 60 lignes, alors la page 1 en montre 50 et la page 2 en montre
       10, les plus récentes d'abord.
-- [ ] **Filtre semestre.** Le filtre ne garde que les lignes du semestre choisi.
-- [ ] **Seulement les siennes.** Aucune ligne d'un autre inscrit ni du compte collectif d'un club n'apparaît.
-- [ ] **Corrections.** Une correction et une annulation apparaissent avec leur motif ; la ligne annulée est marquée.
+- [x] **Filtre semestre.** Le filtre ne garde que les lignes du semestre choisi.
+- [x] **Seulement les siennes.** Aucune ligne d'un autre inscrit ni du compte collectif d'un club n'apparaît.
+- [x] **Corrections.** Une correction et une annulation apparaissent avec leur motif ; la ligne annulée est marquée.
 
 ### Quiz
 
-- [ ] **Quiz validés.** Étant donné un élève qui a échoué puis réussi un quiz, puis réussi un autre, alors la liste
+- [x] **Quiz validés.** Étant donné un élève qui a échoué puis réussi un quiz, puis réussi un autre, alors la liste
       des quiz validés en compte 2, avec la date de première réussite et le meilleur score.
-- [ ] **Tentatives.** Toutes les tentatives apparaissent, y compris les échecs, les essais et une tentative en cours,
+- [x] **Tentatives.** Toutes les tentatives apparaissent, y compris les échecs, les essais et une tentative en cours,
       chacune marquée.
-- [ ] **Filtres.** Les filtres par parcours et par résultat s'appliquent.
-- [ ] **Résumé.** Le nombre de quiz validés, de tentatives, d'échecs et les points des quiz correspondent aux données.
-- [ ] **Pas de réponses.** Aucune question ni réponse n'est renvoyée.
+- [x] **Filtres.** Les filtres par parcours et par résultat s'appliquent.
+- [x] **Résumé.** Le nombre de quiz validés, de tentatives, d'échecs et les points des quiz correspondent aux données.
+- [x] **Pas de réponses.** Aucune question ni réponse n'est renvoyée.
 
 ### Certification
 
-- [ ] **Progression.** Étant donné un élève qui a réussi les places 1 à 3, alors les 20 places sont renvoyées, dont 3
+- [x] **Progression.** Étant donné un élève qui a réussi les places 1 à 3, alors les 20 places sont renvoyées, dont 3
       réussies avec leur date.
-- [ ] **Badges et certificats.** Les badges obtenus et les certificats (valide, révoqué avec son motif) apparaissent.
-- [ ] **Sans parcours.** Une personne qui n'a rien joué obtient 20 places non réussies, aucun badge, aucun
+- [x] **Badges et certificats.** Les badges obtenus et les certificats (valide, révoqué avec son motif) apparaissent.
+- [x] **Sans parcours.** Une personne qui n'a rien joué obtient 20 places non réussies, aucun badge, aucun
       certificat.
 
 ### Contenus
 
-- [ ] **Liste.** Les contenus de la personne apparaissent avec leur type, leur titre et leur état, y compris les
+- [x] **Liste.** Les contenus de la personne apparaissent avec leur type, leur titre et leur état, y compris les
       brouillons et les refusés. Aucun contenu d'un autre auteur.
-- [ ] **Filtres.** Les filtres par type et par état s'appliquent.
+- [x] **Filtres.** Les filtres par type et par état s'appliquent.
 
 ### Liste
 
-- [ ] **Ligne cliquable.** Un clic n'importe où sur la ligne d'un inscrit ouvre sa fiche ; le lien du nom reste
+- [x] **Ligne cliquable.** Un clic n'importe où sur la ligne d'un inscrit ouvre sa fiche ; le lien du nom reste
       accessible au clavier.
 
 ## Cas limites et erreurs
@@ -169,7 +171,14 @@ Le pseudonyme garde son action à part (« Imposer un pseudonyme », spec 017). 
 - **Nom changé après un certificat** : le certificat déjà délivré garde le nom de sa délivrance (spec 029). Pour le
   corriger, l'équipe le révoque et le fait délivrer de nouveau, comme aujourd'hui. L'onglet Certification le rappelle.
 - **E-mail retiré d'un élève** : accepté (l'e-mail d'un élève est facultatif). Retiré d'un encadreur : refusé.
-- **E-mail changé** : aucun e-mail n'est envoyé ; les sessions de la personne restent ouvertes.
+- **E-mail changé** : aucun e-mail n'est envoyé ; les sessions de la personne restent ouvertes. L'adresse n'est
+  plus considérée comme confirmée (`email_confirme_le` remis à vide). Le journal garde l'empreinte SHA-256 de la
+  nouvelle adresse, sans l'adresse en clair : on peut vérifier après coup vers quelle adresse un compte a été dirigé.
+- **Visiteur, invité, collaborateur** : pas de fiche d'inscrit modifiable ni d'onglets. La modification d'un visiteur
+  ou d'un collaborateur est refusée (409), celle d'un invité est introuvable (404) ; les routes de lecture renvoient
+  404 pour eux.
+- **Points des quiz** : le résumé et les quiz validés donnent le montant du gain initial ; une annulation ou une
+  correction ultérieure apparaît dans l'onglet Points.
 - **Compte suspendu ou ancien élève** : la fiche reste lisible et modifiable.
 - **Élève sans tentative, sans contenu, sans point** : chaque onglet montre un état vide clair.
 - **Quiz supprimé ou archivé** : la tentative garde son titre.

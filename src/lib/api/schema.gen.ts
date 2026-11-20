@@ -13399,6 +13399,7 @@ export interface operations {
                 club_id?: string | null;
                 correction?: boolean | null;
                 recherche?: string | null;
+                utilisateur_id?: string | null;
                 page?: number;
                 par_page?: number;
             };

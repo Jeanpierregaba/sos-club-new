@@ -159,3 +159,27 @@ export function Pastille({
     </span>
   );
 }
+
+// Une page suivante ou un filtre qui échoue : l'ancienne liste reste, grisée, sous le message d'erreur.
+export function Rafraichissement({
+  erreur,
+  enCours,
+  children,
+}: {
+  erreur: string | null;
+  enCours: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <>
+      {erreur && (
+        <p role="alert" className="mt-4 text-sm font-semibold text-destructive">
+          {erreur}
+        </p>
+      )}
+      <div aria-busy={enCours} className={enCours || erreur ? "opacity-50" : undefined}>
+        {children}
+      </div>
+    </>
+  );
+}

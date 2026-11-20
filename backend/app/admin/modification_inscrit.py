@@ -9,14 +9,14 @@ from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm.exc import StaleDataError
 
 from app.admin.dependances import Acces
 from app.admin.journal import journaliser
 from app.admin.schemas import ModificationInscrit
 from app.comptes.models import Role, Utilisateur
-from app.comptes.service import CompteInvalide, _valider_email
+from app.comptes.service import CompteInvalide, _valider_email, empreinte
 from app.eleves.models import Eleve
 from app.encadreurs.models import Encadreur, Fonction
 
@@ -24,6 +24,9 @@ MESSAGE_VERSION = "Ce profil a changé entre-temps. Recharge la page."
 IDENTITE = ("prenom", "nom", "email", "telephone")
 CHAMPS_ELEVE = ("classe",)
 CHAMPS_ENCADREUR = ("fonction", "fonction_precision", "discipline", "commune")
+# Seuls les élèves et les encadreurs ont une fiche d'inscrit modifiable (spec 045).
+ROLES_MODIFIABLES = (Role.eleve, Role.encadreur)
+VIOLATION_UNICITE = "23505"
 
 
 class Introuvable(Exception):
@@ -46,6 +49,8 @@ async def modifier(db: AsyncSession, acces: Acces, utilisateur_id: UUID, entree:
         raise Introuvable
     if utilisateur.role is Role.admin:
         raise Refus("Un collaborateur se gère depuis l'écran des collaborateurs.", 409)
+    if utilisateur.role not in ROLES_MODIFIABLES:
+        raise Refus("Seuls un élève ou un encadreur se modifient ici.", 409)
     envoyes = entree.model_fields_set - {"motif", "version"}
 
     eleve = await db.get(Eleve, utilisateur.id, with_for_update=True)
@@ -59,6 +64,7 @@ async def modifier(db: AsyncSession, acces: Acces, utilisateur_id: UUID, entree:
         raise Refus(MESSAGE_VERSION, 409)
 
     changes: list[str] = []
+    traces: dict[str, Any] = {}
     avant: dict[str, Any] = {}
     apres: dict[str, Any] = {}
     est_encadreur = utilisateur.role is Role.encadreur
@@ -81,7 +87,7 @@ async def modifier(db: AsyncSession, acces: Acces, utilisateur_id: UUID, entree:
 
     if "email" in envoyes:
         try:
-            email = _valider_email(entree.email, utilisateur.role)
+            email = _valider_email((entree.email or "").strip() or None, utilisateur.role)
         except CompteInvalide as erreur:
             raise Refus(str(erreur)) from None
         if email != utilisateur.email:
@@ -90,7 +96,12 @@ async def modifier(db: AsyncSession, acces: Acces, utilisateur_id: UUID, entree:
             ):
                 raise Refus("Cet email est déjà pris.", 409)
             utilisateur.email = email
+            # Une adresse changée par l'équipe n'a pas été vérifiée par son titulaire.
+            utilisateur.email_confirme_le = None
             changes.append("email")
+            # L'adresse n'entre pas au journal en clair, mais son empreinte permet de vérifier après coup vers quelle
+            # adresse un compte a été dirigé (prise de compte par « mot de passe oublié »).
+            traces["email_empreinte"] = empreinte(email) if email else None
 
     if eleve is not None and "classe" in envoyes:
         if entree.classe is None:
@@ -108,14 +119,18 @@ async def modifier(db: AsyncSession, acces: Acces, utilisateur_id: UUID, entree:
     if profil is not None:
         # Le verrou optimiste ne voit que les colonnes du profil : l'identité seule doit aussi faire monter la version.
         profil.modifie_le = datetime.now(UTC)
+    # Le profil est lu FOR UPDATE et sa version comparée plus haut : seule l'unicité de l'e-mail peut encore échouer,
+    # quand deux enregistrements prennent la même adresse au même instant.
     try:
         await db.flush()
-    except StaleDataError:
+    except IntegrityError as erreur:
         await db.rollback()
-        raise Refus(MESSAGE_VERSION, 409) from None
+        if getattr(erreur.orig, "sqlstate", None) == VIOLATION_UNICITE:
+            raise Refus("Cet email est déjà pris.", 409) from None
+        raise
     journaliser(
         db, "profil_modifie_par_equipe", acces.utilisateur, cible_type="utilisateur", cible_id=utilisateur.id,
-        details={"motif": entree.motif, "champs": changes, "avant": avant, "apres": apres}, adresse_ip=ip,
+        details={"motif": entree.motif, "champs": changes, "avant": avant, "apres": apres} | traces, adresse_ip=ip,
     )  # fmt: skip
     await db.commit()
 
@@ -145,7 +160,7 @@ def _modifier_encadreur(
     if ancien == nouveau:
         return
     for champ, valeur in nouveau.items():
-        avant[champ], apres[champ] = _valeur(ancien[champ]), _valeur(valeur)
         if ancien[champ] != valeur:
+            avant[champ], apres[champ] = _valeur(ancien[champ]), _valeur(valeur)
             setattr(encadreur, champ, valeur)
             changes.append(champ)

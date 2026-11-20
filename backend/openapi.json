@@ -4082,6 +4082,23 @@
             }
           },
           {
+            "name": "utilisateur_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Utilisateur Id"
+            }
+          },
+          {
             "name": "page",
             "in": "query",
             "required": false,

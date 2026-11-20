@@ -532,6 +532,8 @@ export type FiltresRegistre = {
   club_id?: string | undefined;
   correction?: "true" | "false" | undefined;
   recherche?: string | undefined;
+  // Spec 045 : les lignes d'une seule personne, depuis sa fiche d'inscrit.
+  utilisateur_id?: string | undefined;
   page?: number | undefined;
   par_page?: number | undefined;
 };

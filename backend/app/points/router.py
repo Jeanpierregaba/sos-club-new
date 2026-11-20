@@ -524,6 +524,8 @@ async def lister_registre(
     club_id: UUID | None = None,
     correction: bool | None = None,
     recherche: Annotated[str | None, Query(max_length=100)] = None,
+    # Spec 045 : les lignes d'une seule personne, depuis sa fiche d'inscrit.
+    utilisateur_id: UUID | None = None,
     page: Page = 1,
     par_page: ParPage = 50,
 ) -> PageRegistre:
@@ -541,6 +543,7 @@ async def lister_registre(
         club_id=club_id,
         correction=correction,
         recherche=recherche,
+        utilisateur_id=utilisateur_id,
     )
     resultat = await registre.lister(db, filtres, page, par_page)
     return PageRegistre(
