@@ -10,7 +10,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.quiz.models import EtatTentative, QuestionQuiz, Quiz, ReponseQuiz, TentativeQuiz
+from app.certification.models import BadgeObtenu, Certificat, EtatCertificat, PlaceReussie
+from app.quiz.models import EtatQuiz, EtatTentative, QuestionQuiz, Quiz, ReponseQuiz, TentativeQuiz
+from tests.certification import creer_parcours
 from tests.conftest import connecter_admin
 from tests.quiz import DEBUT, creer_quiz
 from tests.test_admin_inscrit_parcours import INSCRITS, LECTURE, tentative
@@ -213,3 +215,84 @@ def test_le_detail_exige_le_droit_national(
     connecter_admin(client, "sans")
 
     assert client.get(f"{INSCRITS}/{eleve.id}/tentatives/{essai.id}").status_code == 403
+
+
+# Certification ------------------------------------------------------------------------------------------------
+
+
+def reussir(en_base: Callable[..., Any], joueur_id: Any, place: int, essai: TentativeQuiz) -> None:
+    async def inserer(db: AsyncSession) -> None:
+        db.add(
+            PlaceReussie(
+                utilisateur_id=joueur_id, place=place, quiz_id=essai.quiz_id, tentative_id=essai.id,
+                reussie_le=essai.terminee_le,
+            )
+        )  # fmt: skip
+
+    en_base(inserer)
+
+
+def test_les_temps_des_places_des_badges_et_du_certificat(
+    lecteur: TestClient, creer_eleve: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    eleve = creer_eleve()
+    parcours = creer_parcours(en_base, places=[1, 2, 3])
+    ancien = creer_quiz(en_base, titre="Place 2 retirée", place=2, etat=EtatQuiz.depublie)
+    # Place 1 : un échec puis la réussite comptent, pas la partie rejouée après ni l'essai de l'équipe.
+    tentative(en_base, eleve.id, parcours[1], reussie=False, duree=30, decalage=0)
+    reussie = tentative(en_base, eleve.id, parcours[1], reussie=True, duree=40, decalage=10)
+    reussir(en_base, eleve.id, 1, reussie)
+    tentative(en_base, eleve.id, parcours[1], reussie=True, duree=50, decalage=20)
+    tentative(en_base, eleve.id, parcours[1], reussie=True, duree=999, decalage=21, essai=True)
+    # Place 2 : les tentatives sur le quiz qui l'occupait avant comptent aussi. Pas encore réussie.
+    tentative(en_base, eleve.id, ancien, reussie=False, duree=20, decalage=30)
+    tentative(en_base, eleve.id, parcours[2], reussie=False, duree=5, decalage=35)
+    # Les jeux n'entrent pas dans la certification.
+    tentative(en_base, eleve.id, creer_quiz(en_base, niveau="debutant", numero=1), reussie=True, duree=500)
+
+    async def decerner(db: AsyncSession) -> None:
+        for rang, minutes in ((1, 15), (2, 60)):
+            db.add(
+                BadgeObtenu(
+                    utilisateur_id=eleve.id, rang=rang, nom=f"Badge {rang}", palier=rang, regles_version=1,
+                    obtenu_le=DEBUT + timedelta(minutes=minutes),
+                )
+            )  # fmt: skip
+        db.add(
+            Certificat(
+                numero="GI-AAAA-BBBB-CCCC", utilisateur_id=eleve.id, role="eleve", titulaire_prenom="Jean",
+                titulaire_nom="Kodjo", etat=EtatCertificat.valide, delivre_le=DEBUT + timedelta(minutes=60),
+            )
+        )  # fmt: skip
+
+    en_base(decerner)
+
+    donnees = lecteur.get(f"{INSCRITS}/{eleve.id}/certification").json()
+
+    places = {p["place"]: (p["temps_s"], p["tentatives"]) for p in donnees["places"]}
+    assert places[1] == (70, 2)
+    assert places[2] == (25, 2)
+    assert places[3] == (0, 0)
+    badges = [(b["rang"], b["temps_s"], b["temps_cumule_s"], b["duree_calendaire_s"]) for b in donnees["badges"]]
+    # Badge 1 : 30 + 40 s avant la 15e minute ; badge 2 : 50 + 20 + 5 s ensuite. Le premier part de la première
+    # tentative de certification, le second du badge précédent.
+    assert badges == [(1, 70, 70, 15 * 60), (2, 75, 145, 45 * 60)]
+    (certificat,) = donnees["certificats"]
+    assert (certificat["temps_cumule_s"], certificat["duree_calendaire_s"]) == (145, 3600)
+
+
+def test_un_badge_sans_tentative_retrouvee(
+    lecteur: TestClient, creer_eleve: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    eleve = creer_eleve()
+
+    async def decerner(db: AsyncSession) -> None:
+        db.add(BadgeObtenu(utilisateur_id=eleve.id, rang=1, nom="Ancien", palier=3, regles_version=1, obtenu_le=DEBUT))
+
+    en_base(decerner)
+
+    donnees = lecteur.get(f"{INSCRITS}/{eleve.id}/certification").json()
+
+    (badge,) = donnees["badges"]
+    assert (badge["temps_s"], badge["temps_cumule_s"], badge["duree_calendaire_s"]) == (0, 0, None)
+    assert all((p["temps_s"], p["tentatives"]) == (0, 0) for p in donnees["places"])

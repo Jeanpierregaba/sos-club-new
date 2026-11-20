@@ -463,6 +463,9 @@ class PlaceAdmin(BaseModel):
     place: int
     reussie_le: datetime | None
     quiz_titre: str | None
+    # Spec 046 : temps de jeu et tentatives sur cette place, jusqu'à la réussite incluse.
+    temps_s: int
+    tentatives: int
 
 
 class BadgeAdmin(BaseModel):
@@ -470,6 +473,10 @@ class BadgeAdmin(BaseModel):
     nom: str
     palier: int
     obtenu_le: datetime
+    # Spec 046 : temps de jeu depuis le badge précédent, cumulé depuis le début, et durée calendaire.
+    temps_s: int
+    temps_cumule_s: int
+    duree_calendaire_s: int | None
 
 
 class CertificatAdmin(BaseModel):
@@ -479,6 +486,8 @@ class CertificatAdmin(BaseModel):
     titulaire: str
     motif: str | None
     decide_le: datetime | None
+    temps_cumule_s: int
+    duree_calendaire_s: int | None
 
 
 class CertificationInscrit(BaseModel):

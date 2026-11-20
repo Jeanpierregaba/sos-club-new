@@ -4,12 +4,14 @@ Chaque liste est paginée en SQL. Les temps (spec 046) sont des agrégats SQL : 
 son début à sa dernière activité, car une partie abandonnée n'est close qu'au retour du joueur.
 """
 
+from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Numeric, Select, and_, case, func, select
+from sqlalchemy import ColumnElement, Numeric, Select, and_, case, func, or_, select
 from sqlalchemy.dialects.postgresql import ARRAY, aggregate_order_by
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from app.admin.schemas import (
     BadgeAdmin,
@@ -37,7 +39,16 @@ from app.points import registre
 from app.points import service as points
 from app.points.models import MouvementPoints, Semestre
 from app.points.schemas import LigneRegistre, PageRegistre
-from app.quiz.models import PLACES, EtatTentative, ParametresQuiz, QuestionQuiz, Quiz, ReponseQuiz, TentativeQuiz
+from app.quiz.models import (
+    PARCOURS_CERTIFICATION,
+    PLACES,
+    EtatTentative,
+    ParametresQuiz,
+    QuestionQuiz,
+    Quiz,
+    ReponseQuiz,
+    TentativeQuiz,
+)
 from app.quiz.partie import INACTIVITE
 from app.referentiel.models import Axe
 
@@ -328,23 +339,49 @@ async def certification_de(db: AsyncSession, utilisateur_id: UUID) -> Certificat
             )
         ).all()
     }
+    temps_places = await _temps_des_places(db, utilisateur_id)
     places = [
         PlaceAdmin(
             place=place,
             reussie_le=reussies[place].reussie_le if place in reussies else None,
             quiz_titre=reussies[place].titre if place in reussies else None,
+            temps_s=temps_places.get(place, (0, 0))[0],
+            tentatives=temps_places.get(place, (0, 0))[1],
         )
         for place in range(1, PLACES + 1)
     ]
-    badges = await db.scalars(
-        select(BadgeObtenu).where(BadgeObtenu.utilisateur_id == utilisateur_id).order_by(BadgeObtenu.rang)
+    premiere = await db.scalar(
+        select(func.min(TentativeQuiz.commencee_le))
+        .join(Quiz, Quiz.id == TentativeQuiz.quiz_id)
+        .where(*_certification(utilisateur_id))
     )
+
+    badges: list[BadgeAdmin] = []
+    precedent: datetime | None = None
+    for b in (
+        await db.scalars(
+            select(BadgeObtenu)
+            .where(BadgeObtenu.utilisateur_id == utilisateur_id)
+            .order_by(BadgeObtenu.obtenu_le, BadgeObtenu.rang)
+        )
+    ).all():
+        badges.append(
+            BadgeAdmin(
+                rang=b.rang, nom=b.nom, palier=b.palier, obtenu_le=b.obtenu_le,
+                temps_s=await _temps_certification(db, utilisateur_id, precedent, b.obtenu_le),
+                temps_cumule_s=await _temps_certification(db, utilisateur_id, None, b.obtenu_le),
+                duree_calendaire_s=_ecart(precedent or premiere, b.obtenu_le),
+            )
+        )  # fmt: skip
+        precedent = b.obtenu_le
+    badges.sort(key=lambda badge: badge.rang)
+
     certificats = await db.scalars(
         select(Certificat).where(Certificat.utilisateur_id == utilisateur_id).order_by(Certificat.delivre_le.desc())
     )
     return CertificationInscrit(
         places=places,
-        badges=[BadgeAdmin(rang=b.rang, nom=b.nom, palier=b.palier, obtenu_le=b.obtenu_le) for b in badges.all()],
+        badges=badges,
         certificats=[
             CertificatAdmin(
                 numero=c.numero,
@@ -353,10 +390,61 @@ async def certification_de(db: AsyncSession, utilisateur_id: UUID) -> Certificat
                 titulaire=f"{c.titulaire_prenom} {c.titulaire_nom}",
                 motif=c.motif,
                 decide_le=c.decide_le,
+                temps_cumule_s=await _temps_certification(db, utilisateur_id, None, c.delivre_le),
+                duree_calendaire_s=_ecart(premiere, c.delivre_le),
             )
             for c in certificats.all()
         ],
     )
+
+
+def _certification(utilisateur_id: UUID) -> tuple[ColumnElement[bool], ...]:
+    """Les tentatives de certification de l'inscrit, hors essais (à joindre à Quiz)."""
+    return (
+        TentativeQuiz.joueur_id == utilisateur_id,
+        TentativeQuiz.essai.is_(False),
+        Quiz.parcours == PARCOURS_CERTIFICATION,
+    )
+
+
+async def _temps_des_places(db: AsyncSession, utilisateur_id: UUID) -> dict[int, tuple[int, int]]:
+    """Temps de jeu et nombre de tentatives par place, sur tous les quiz qui l'ont occupée, jusqu'à la tentative
+    réussie incluse : ce qui est rejoué après ne compte pas pour la place."""
+    reussite = aliased(TentativeQuiz)
+    rangees = await db.execute(
+        select(Quiz.place, func.coalesce(func.sum(TEMPS_DE_JEU), 0), func.count())
+        .select_from(TentativeQuiz)
+        .join(Quiz, Quiz.id == TentativeQuiz.quiz_id)
+        .outerjoin(
+            PlaceReussie, and_(PlaceReussie.utilisateur_id == TentativeQuiz.joueur_id, PlaceReussie.place == Quiz.place)
+        )
+        .outerjoin(reussite, reussite.id == PlaceReussie.tentative_id)
+        .where(
+            *_certification(utilisateur_id),
+            Quiz.place.is_not(None),
+            or_(reussite.id.is_(None), TentativeQuiz.commencee_le <= reussite.commencee_le),
+        )
+        .group_by(Quiz.place)
+    )
+    return {r[0]: (round(r[1]), r[2]) for r in rangees.all()}
+
+
+async def _temps_certification(db: AsyncSession, utilisateur_id: UUID, apres: datetime | None, jusqua: datetime) -> int:
+    """Temps de jeu des tentatives de certification commencées dans ]apres ; jusqua]."""
+    requete = (
+        select(func.coalesce(func.sum(TEMPS_DE_JEU), 0))
+        .join(Quiz, Quiz.id == TentativeQuiz.quiz_id)
+        .where(*_certification(utilisateur_id), TentativeQuiz.commencee_le <= jusqua)
+    )
+    if apres is not None:
+        requete = requete.where(TentativeQuiz.commencee_le > apres)
+    return round(await db.scalar(requete) or 0)
+
+
+def _ecart(debut: datetime | None, fin: datetime) -> int | None:
+    if debut is None or debut > fin:
+        return None
+    return round((fin - debut).total_seconds())
 
 
 # Contenus -----------------------------------------------------------------------------------------------------

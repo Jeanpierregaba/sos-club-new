@@ -219,7 +219,8 @@ def test_la_progression_les_badges_et_les_certificats(
     reussies = [p for p in donnees["places"] if p["reussie_le"]]
     assert [p["place"] for p in reussies] == [1, 2, 3]
     assert reussies[0]["quiz_titre"] == "Place 1"
-    assert donnees["badges"] == [{"rang": 1, "nom": "Éclaireur", "palier": 3, "obtenu_le": "2026-11-09T10:00:00Z"}]
+    (badge,) = donnees["badges"]
+    assert badge.items() >= {"rang": 1, "nom": "Éclaireur", "palier": 3, "obtenu_le": "2026-11-09T10:00:00Z"}.items()
     (certificat,) = donnees["certificats"]
     assert (certificat["etat"], certificat["motif"], certificat["titulaire"]) == (
         "revoque", "Fraude constatée", "Jean Kodjo",
