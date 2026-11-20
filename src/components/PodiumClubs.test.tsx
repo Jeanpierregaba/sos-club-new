@@ -5,13 +5,15 @@ import {
   createRouter,
   RouterProvider,
 } from "@tanstack/react-router";
-import { act, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PodiumClubs } from "./PodiumClubs";
-import type { ClubPodium } from "@/lib/api/client";
 
-const api = vi.hoisted(() => ({ chargerPodiumClubs: vi.fn(), chargerClassementPublic: vi.fn() }));
+const api = vi.hoisted(() => ({
+  chargerChiffresAccueil: vi.fn(),
+  chargerClassementPublic: vi.fn(),
+}));
 vi.mock("@/lib/api/client", async (original) => ({
   ...(await original<typeof import("@/lib/api/client")>()),
   ...api,
@@ -35,96 +37,133 @@ async function afficher() {
   await act(async () => {});
 }
 
-const club = (rang: number, nom: string, points: number): ClubPodium => ({
+const page = (categorie: string, periode: string, lignes: object[]) => ({
+  categorie,
+  niveau: "national",
+  dre: null,
+  periode,
+  semestre: periode === "semestre" ? { id: "s1", libelle: "Semestre 1 2026-2027" } : null,
+  page: 1,
+  par_page: 5,
+  total: lignes.length,
+  lignes,
+});
+
+const eleve = (rang: number, nom: string, points: number) => ({
   rang,
-  id: `club-${rang}`,
+  nom,
+  points,
+  club: "Club Tokoin",
+  dre: "Grand Lomé",
+});
+const club = (rang: number, nom: string, points: number) => ({
+  rang,
+  club_id: `club-${rang}`,
   nom,
   etablissement: `Lycée ${rang}`,
   dre: "Grand Lomé",
   points,
 });
 
-const eleves = (lignes: { rang: number; nom: string; points: number }[]) => ({
-  categorie: "eleves",
-  niveau: "national",
-  dre: null,
-  periode: "semestre",
-  semestre: null,
-  page: 1,
-  par_page: 3,
-  total: lignes.length,
-  lignes: lignes.map((l) => ({ ...l, club: "Club Tokoin", dre: "Grand Lomé" })),
-});
+type Filtres = { categorie: string; periode: string };
+function classements(reponses: Record<string, object[]>) {
+  api.chargerClassementPublic.mockImplementation(async (f: Filtres) =>
+    page(f.categorie, f.periode, reponses[`${f.categorie}/${f.periode}`] ?? []),
+  );
+}
 
 beforeEach(() => {
   vi.clearAllMocks();
-  api.chargerClassementPublic.mockResolvedValue(eleves([]));
+  // Animations réduites : les compteurs affichent tout de suite leur valeur.
+  vi.stubGlobal("matchMedia", (requete: string) => ({ matches: true, media: requete }));
+  api.chargerChiffresAccueil.mockResolvedValue({ eleves: 0, clubs: 0, quiz: 0, points: 0 });
+  classements({});
 });
 
 describe("PodiumClubs", () => {
-  it("montre les trois clubs avec leurs points et un lien vers les jeux", async () => {
-    api.chargerPodiumClubs.mockResolvedValue([
-      club(1, "Club Tokoin", 15800),
-      club(2, "Club Kpalimé", 12450),
-      club(3, "Club Kara", 10200),
-    ]);
+  it("montre le Top 5 des élèves du semestre par leur pseudonyme, et les liens", async () => {
+    classements({
+      "eleves/semestre": [
+        eleve(1, "Ama du Golfe", 900),
+        eleve(2, "Kofi", 700),
+        eleve(3, "Yawa", 650),
+        eleve(4, "Edem", 400),
+        eleve(5, "Afi", 300),
+      ],
+    });
     await afficher();
 
-    const lycees = await screen.findByRole("list", { name: "Top 3 des lycées" });
-    const lignes = within(lycees).getAllByRole("listitem");
-    expect(lignes).toHaveLength(3);
-    expect(lignes[0]).toHaveTextContent("Lycée 1");
-    expect(lignes[0]).toHaveTextContent("Club Tokoin");
-    expect(lignes[0]).toHaveTextContent(/15\s800\s*pts/);
-    expect(screen.getByRole("link", { name: /Lycée 1/ })).toHaveAttribute("href", "/clubs/club-1");
-    expect(screen.getByRole("link", { name: /Découvrir les jeux/ })).toHaveAttribute(
-      "href",
-      "/jeux",
-    );
-    expect(screen.getByRole("link", { name: "Découvrir le classement" })).toHaveAttribute(
-      "href",
-      "/hall-of-fame",
-    );
-    expect(screen.queryByRole("img")).not.toBeInTheDocument();
-  });
-
-  it("montre les trois meilleurs élèves par leur pseudonyme", async () => {
-    api.chargerPodiumClubs.mockResolvedValue([]);
-    api.chargerClassementPublic.mockResolvedValue(
-      eleves([
-        { rang: 1, nom: "Ama du Golfe", points: 900 },
-        { rang: 2, nom: "Kofi", points: 700 },
-        { rang: 3, nom: "Yawa", points: 650 },
-      ]),
-    );
-    await afficher();
-
-    const top = await screen.findByRole("list", { name: "Top 3 des élèves" });
+    const top = await screen.findByRole("list", { name: "Top 5 des élèves" });
     const lignes = within(top).getAllByRole("listitem");
-    expect(lignes).toHaveLength(3);
+    expect(lignes).toHaveLength(5);
     expect(lignes[0]).toHaveTextContent("Ama du Golfe");
     expect(lignes[0]).toHaveTextContent("Club Tokoin · Grand Lomé");
+    expect(lignes[0]).toHaveTextContent(/900\s*pts/);
+    expect(screen.getByText(/Top 5 – Semestre 1 2026-2027/)).toBeInTheDocument();
     expect(api.chargerClassementPublic).toHaveBeenCalledWith({
       categorie: "eleves",
       niveau: "national",
       periode: "semestre",
-      par_page: 3,
+      par_page: 5,
     });
+    expect(screen.getByRole("link", { name: /Découvrir les jeux/ })).toHaveAttribute(
+      "href",
+      "/jeux",
+    );
+    expect(screen.getByRole("link", { name: /Découvrir le classement/ })).toHaveAttribute(
+      "href",
+      "/hall-of-fame",
+    );
+    expect(screen.getByRole("link", { name: /Voir tout le classement/ })).toHaveAttribute(
+      "href",
+      "/hall-of-fame",
+    );
   });
 
-  it("annonce le classement tant qu'aucun club n'a de points", async () => {
-    api.chargerPodiumClubs.mockResolvedValue([]);
+  it("passe au Top 5 des clubs, avec un lien vers chaque club", async () => {
+    classements({ "clubs/semestre": [club(1, "Club Tokoin", 15800), club(2, "Club Kara", 900)] });
     await afficher();
 
-    expect(screen.getAllByText("Le classement arrive bientôt !")).toHaveLength(2);
-    expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: /Clubs/ }));
+    const top = await screen.findByRole("list", { name: "Top 5 des clubs" });
+    const lignes = within(top).getAllByRole("listitem");
+    expect(lignes).toHaveLength(2);
+    expect(lignes[0]).toHaveTextContent("Lycée 1");
+    expect(lignes[0]).toHaveTextContent(/15\s800\s*pts/);
+    expect(screen.getByRole("link", { name: /Lycée 1/ })).toHaveAttribute("href", "/clubs/club-1");
+    expect(screen.getByRole("tab", { name: /Clubs/ })).toHaveAttribute("aria-selected", "true");
   });
 
-  it("garde l'état vide si l'API ne répond pas", async () => {
-    api.chargerPodiumClubs.mockRejectedValue(new Error("hors ligne"));
+  it("montre le classement depuis le début quand le semestre n'a pas encore de points", async () => {
+    classements({ "eleves/historique": [eleve(1, "Ama du Golfe", 50)] });
+    await afficher();
+
+    expect(await screen.findByRole("list", { name: "Top 5 des élèves" })).toHaveTextContent(
+      "Ama du Golfe",
+    );
+    expect(screen.getByText(/Top 5 – Depuis le début/)).toBeInTheDocument();
+  });
+
+  it("montre les chiffres du programme", async () => {
+    api.chargerChiffresAccueil.mockResolvedValue({
+      eleves: 12480,
+      clubs: 423,
+      quiz: 96320,
+      points: 148360,
+    });
+    await afficher();
+
+    const chiffres = await screen.findByRole("list", { name: "Le programme en chiffres" });
+    expect(chiffres).toHaveTextContent(/12 480\s*Élèves inscrits/);
+    expect(chiffres).toHaveTextContent(/423\s*Clubs Santé/);
+  });
+
+  it("annonce le classement tant que personne n'a de points, ou si l'API ne répond pas", async () => {
+    api.chargerChiffresAccueil.mockRejectedValue(new Error("hors ligne"));
     api.chargerClassementPublic.mockRejectedValue(new Error("hors ligne"));
     await afficher();
 
-    expect(screen.getAllByText("Le classement arrive bientôt !")).toHaveLength(2);
+    expect(await screen.findByText("Le classement arrive bientôt !")).toBeInTheDocument();
+    expect(screen.queryByRole("listitem", { name: /pts/ })).not.toBeInTheDocument();
   });
 });

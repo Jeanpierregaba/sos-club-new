@@ -135,6 +135,17 @@ class LigneClubPublic(BaseModel):
     points: float
 
 
+class ChiffresPublics(BaseModel):
+    """Les chiffres de l'accueil : élèves actifs, clubs en service, quiz terminés, points gagnés."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    eleves: int
+    clubs: int
+    quiz: int
+    points: int
+
+
 class ClassementPersonnesPublic(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

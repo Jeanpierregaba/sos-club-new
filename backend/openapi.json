@@ -4311,6 +4311,28 @@
         }
       }
     },
+    "/api/classements/chiffres": {
+      "get": {
+        "tags": [
+          "classements"
+        ],
+        "summary": "Chiffres Publics",
+        "description": "Les chiffres nationaux de l'accueil, sans donnée personnelle.",
+        "operationId": "chiffres_publics_api_classements_chiffres_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChiffresPublics"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/classements": {
       "get": {
         "tags": [
@@ -16756,6 +16778,36 @@
           "clubs_actifs"
         ],
         "title": "ChiffresCarte"
+      },
+      "ChiffresPublics": {
+        "properties": {
+          "eleves": {
+            "type": "integer",
+            "title": "Eleves"
+          },
+          "clubs": {
+            "type": "integer",
+            "title": "Clubs"
+          },
+          "quiz": {
+            "type": "integer",
+            "title": "Quiz"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "eleves",
+          "clubs",
+          "quiz",
+          "points"
+        ],
+        "title": "ChiffresPublics",
+        "description": "Les chiffres de l'accueil : élèves actifs, clubs en service, quiz terminés, points gagnés."
       },
       "ChoixClub": {
         "properties": {

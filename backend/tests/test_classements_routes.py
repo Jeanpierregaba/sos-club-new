@@ -304,3 +304,15 @@ def test_la_vue_admin_exige_la_double_authentification_et_le_perimetre_national(
     de_dre = Navigateur(client)
     connecter_admin(de_dre, "kara")  # type: ignore[arg-type]
     assert de_dre.get(ADMIN).status_code == 403
+
+
+# Chiffres de l'accueil -----------------------------------------------------------------------------------------
+
+
+def test_les_chiffres_de_laccueil_sont_des_totaux_sans_donnee_personnelle(
+    client: TestClient, reseau: dict[str, Any]
+) -> None:
+    corps = client.get("/api/classements/chiffres").json()
+
+    # Trois élèves actifs ; les points des personnes (300 + 100 + 200 + 50), sans la part du club.
+    assert corps == {"eleves": 3, "clubs": 1, "quiz": 0, "points": 650}

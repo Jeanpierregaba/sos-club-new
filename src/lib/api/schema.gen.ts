@@ -1404,6 +1404,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/classements/chiffres": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Chiffres Publics
+         * @description Les chiffres nationaux de l'accueil, sans donnée personnelle.
+         */
+        get: operations["chiffres_publics_api_classements_chiffres_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/classements": {
         parameters: {
             query?: never;
@@ -5566,6 +5586,20 @@ export interface components {
             clubs: number;
             /** Clubs Actifs */
             clubs_actifs: number;
+        };
+        /**
+         * ChiffresPublics
+         * @description Les chiffres de l'accueil : élèves actifs, clubs en service, quiz terminés, points gagnés.
+         */
+        ChiffresPublics: {
+            /** Eleves */
+            eleves: number;
+            /** Clubs */
+            clubs: number;
+            /** Quiz */
+            quiz: number;
+            /** Points */
+            points: number;
         };
         /** ChoixClub */
         ChoixClub: {
@@ -13277,6 +13311,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PointsDuClub"];
+                };
+            };
+        };
+    };
+    chiffres_publics_api_classements_chiffres_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChiffresPublics"];
                 };
             };
         };

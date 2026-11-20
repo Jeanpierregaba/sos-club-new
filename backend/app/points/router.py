@@ -18,11 +18,12 @@ from app.comptes.dependances import utilisateur_courant
 from app.comptes.models import Role, Utilisateur
 from app.config import settings
 from app.db import get_session
-from app.points import administration, annees, carte_classement, classements, clotures, registre
+from app.points import administration, annees, carte_classement, chiffres, classements, clotures, registre
 from app.points.carte_classement import Vue
 from app.points.schemas import (
     AnnulationPoints,
     BeneficiairePoints,
+    ChiffresPublics,
     ClassementClubAdminInterne,
     ClassementClubInterne,
     ClassementClubsAdmin,
@@ -323,6 +324,12 @@ def _classement_personnel(
         semestre=RangPersonnelSchema(**resultat.semestre.__dict__),
         historique=RangPersonnelSchema(**resultat.historique.__dict__),
     )
+
+
+@router_classements.get("/chiffres")
+async def chiffres_publics(db: Base) -> ChiffresPublics:
+    """Les chiffres nationaux de l'accueil, sans donnée personnelle."""
+    return await chiffres.chiffres(db)
 
 
 @router_classements.get("", response_model=ClassementPersonnesPublic | ClassementClubsPublic)

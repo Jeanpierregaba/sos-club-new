@@ -485,6 +485,10 @@ export type FiltresClassement = {
 
 export const chargerClassementPublic = (filtres: FiltresClassement) =>
   requeteApi<ClassementPublic>(avecParametres("/api/classements", filtres));
+// Les chiffres nationaux de l'accueil (section « Jeux & classement »).
+export type ChiffresPublics = Schemas["ChiffresPublics"];
+export const chargerChiffresAccueil = () =>
+  requeteApi<ChiffresPublics>("/api/classements/chiffres");
 export const chargerMonClassement = () => requeteApi<ClassementPersonnel>("/api/classements/moi");
 export const chargerClassementMonClub = (filtres: {
   categorie?: "eleves" | "encadreurs";
