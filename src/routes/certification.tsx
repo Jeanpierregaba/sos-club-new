@@ -24,7 +24,7 @@ import { FilAriane } from "@/components/FilAriane";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion, retard } from "@/components/SiteMotion";
-import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
+import mascottesEquipe from "@/assets/mascottes-equipe.webp";
 import { BADGES_CERTIFICATION, BAREME, points, QUIZ_CERTIFICATION } from "@/lib/bareme";
 
 export const Route = createFileRoute("/certification")({
@@ -174,101 +174,6 @@ const badges: {
   },
 ];
 
-// L'anneau des 20 quiz : un segment par quiz, qui s'allume à tour de rôle ; au centre, le certificat.
-// Chaque badge est posé sur l'anneau à l'endroit où il se débloque (après le 4e, 8e, 12e, 16e et 20e quiz).
-const RAYON = 130;
-const TOUR = 2 * Math.PI * RAYON;
-const SEGMENT = TOUR / QUIZ_CERTIFICATION;
-// La place d'un badge, en % du cadre de 300 : l'anneau part du haut et tourne dans le sens des aiguilles.
-const placeBadge = (apres: number) => {
-  const angle = (apres / QUIZ_CERTIFICATION) * 2 * Math.PI;
-  const rayon = (RAYON / 300) * 100;
-  return { left: `${50 + rayon * Math.sin(angle)}%`, top: `${50 - rayon * Math.cos(angle)}%` };
-};
-
-function AnneauCertification() {
-  return (
-    <div
-      data-reveal="zoom"
-      role="img"
-      aria-label="Les 20 quiz forment un anneau autour du certificat officiel ; 5 badges se débloquent en chemin."
-      className="relative mx-auto size-[19rem] sm:size-[24rem] lg:size-[27rem]"
-    >
-      <svg viewBox="0 0 300 300" className="absolute inset-0 size-full -rotate-90">
-        <circle
-          cx="150"
-          cy="150"
-          r={RAYON}
-          fill="none"
-          stroke="rgb(255 255 255 / 0.08)"
-          strokeWidth="16"
-        />
-        {Array.from({ length: QUIZ_CERTIFICATION }, (_, i) => (
-          <circle
-            key={i}
-            cx="150"
-            cy="150"
-            r={RAYON}
-            fill="none"
-            stroke="var(--sun)"
-            strokeWidth="16"
-            strokeLinecap="round"
-            strokeDasharray={`${SEGMENT - 9} ${TOUR - SEGMENT + 9}`}
-            strokeDashoffset={-i * SEGMENT - 4.5}
-            className="motion-safe:animate-allume"
-            style={{ animationDelay: `${i * 0.21}s` }}
-          />
-        ))}
-      </svg>
-
-      {/* Le certificat, au centre de l'anneau. */}
-      <div className="absolute inset-[18%] flex flex-col items-center justify-center rounded-full bg-linear-to-br from-white to-mist text-center text-ink shadow-[0_0_60px_-10px_rgb(255_210_80/0.6)] ring-8 ring-white/10">
-        <span className="inline-flex size-16 items-center justify-center rounded-full bg-linear-to-br from-sun to-tangerine text-white shadow-card ring-4 ring-sun/30 motion-safe:animate-float sm:size-20">
-          <Award className="size-8 sm:size-10" />
-        </span>
-        <p className="mt-3 text-[10px] font-extrabold uppercase tracking-[0.2em] text-logo-red sm:text-xs">
-          Certificat officiel
-        </p>
-        <p className="font-display text-xl leading-tight text-logo-blue sm:text-2xl">
-          Génie Imhotep
-        </p>
-        <p className="mt-1 font-display text-3xl tabular-nums text-primary sm:text-4xl">
-          {QUIZ_CERTIFICATION} / {QUIZ_CERTIFICATION}
-        </p>
-        <p className="text-[11px] font-bold text-muted-foreground">quiz obligatoires réussis</p>
-      </div>
-
-      {/* Les 5 badges, posés sur l'anneau. */}
-      {badges.map((p, i) => (
-        <span
-          key={p.n}
-          title={`Badge ${p.n} · ${p.metal}`}
-          style={placeBadge(p.apres)}
-          className="absolute -translate-x-1/2 -translate-y-1/2"
-        >
-          <span
-            style={{ animationDelay: `${-i * 1.2}s` }}
-            className={`flex size-14 items-center justify-center rounded-full bg-linear-to-br text-white shadow-card ring-4 ring-night motion-safe:animate-float sm:size-16 ${p.fond}`}
-          >
-            <p.i className="size-6 sm:size-7" />
-          </span>
-          <span className="absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded-full bg-night px-2 py-0.5 ring-1 ring-white/20 text-[10px] font-extrabold uppercase tracking-wide text-white/80">
-            {p.apres} quiz
-          </span>
-        </span>
-      ))}
-
-      <img
-        src={mascotteImhotep}
-        alt=""
-        width={1414}
-        height={2000}
-        className="absolute -bottom-6 -left-4 w-20 -rotate-6 drop-shadow-xl sm:-left-10 sm:w-28"
-      />
-    </div>
-  );
-}
-
 function Certification() {
   const [etape, setEtape] = useState(0);
   const e = etapes[etape] ?? etapes[0]!;
@@ -278,50 +183,42 @@ function Certification() {
       <SiteMotion />
       <SiteHeader />
 
-      {/* Bannière « cérémonie » : nuit et or. À droite, l'anneau des 20 quiz s'allume segment après segment
-          autour du certificat, et les 5 badges sont posés là où ils se débloquent (4, 8, 12, 16, 20). */}
-      <section className="relative isolate overflow-hidden bg-night text-white">
+      {/* Bannière claire : le défi et la cagnotte à gauche ; à droite, les sept mascottes et le certificat avec ses
+          5 badges. */}
+      <section className="relative isolate overflow-hidden bg-linear-to-br from-[color-mix(in_oklch,var(--sky)_16%,white)] via-white to-[color-mix(in_oklch,var(--sun)_30%,white)]">
         <div
           aria-hidden
-          className="absolute left-1/2 top-[85%] -z-10 size-[56rem] -translate-x-1/2 -translate-y-1/2 bg-[repeating-conic-gradient(rgb(255_210_80/0.08)_0deg_5deg,transparent_5deg_15deg)] [mask-image:radial-gradient(circle,black_15%,transparent_65%)] motion-safe:animate-[spin_140s_linear_infinite] lg:left-[74%] lg:top-1/2"
+          className="absolute -right-24 top-1/2 -z-10 size-[36rem] -translate-y-1/2 rounded-full bg-sun/35 motion-safe:animate-respire"
         />
         <div
           aria-hidden
-          className="absolute -left-32 top-1/3 -z-10 size-96 rounded-full bg-grape/40 blur-3xl motion-safe:animate-derive"
+          className="absolute -right-10 top-1/2 -z-10 size-[46rem] -translate-y-1/2 rounded-full border-2 border-dashed border-tangerine/30 motion-safe:animate-[spin_70s_linear_infinite]"
         />
         <div
           aria-hidden
-          className="absolute left-1/2 top-[85%] -z-10 size-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sun/25 blur-3xl lg:left-[74%] lg:top-1/2"
+          className="absolute -left-32 top-1/4 -z-10 size-96 rounded-full bg-sky/15 blur-3xl motion-safe:animate-derive"
         />
-        <DecorAnime />
+        <DecorAnime ton="clair" />
 
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-8 md:pt-12 lg:grid-cols-[1.1fr_1fr]">
-          <div>
-            <FilAriane rubrique="Gamification" page="Certification" clair />
+        <div className="mx-auto grid max-w-7xl items-end gap-8 px-5 pt-8 md:pt-12 lg:grid-cols-[1.15fr_1fr]">
+          <div className="pb-14 lg:pb-24">
+            <FilAriane rubrique="Gamification" page="Certification" />
             <div data-reveal="left" className="pt-10 lg:pt-14">
-              <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-extrabold uppercase tracking-widest text-sun ring-1 ring-white/15">
-                <Sparkles className="size-4" /> Certification Académie Génie Imhotep
+              <p className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-xs font-extrabold uppercase tracking-widest text-logo-red shadow-sm ring-1 ring-border">
+                <Sparkles className="size-4 text-tangerine" /> Certification Académie Génie Imhotep
               </p>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block">Obtiens ta</span>
-                <span className="block text-sun">certification</span>
+                <span className="block text-logo-blue">Obtiens ta</span>
+                <span className="block text-primary">certification</span>
               </h1>
-              {/* Le ticket de la cagnotte, avec sa perforation. */}
-              <p className="relative mt-6 inline-flex -rotate-2 items-center gap-3 rounded-2xl bg-logo-red py-3 pl-4 pr-6 shadow-card">
-                <span
-                  aria-hidden
-                  className="absolute -left-2 top-1/2 size-4 -translate-y-1/2 rounded-full bg-night"
-                />
-                <span
-                  aria-hidden
-                  className="absolute -right-2 top-1/2 size-4 -translate-y-1/2 rounded-full bg-night"
-                />
+              {/* Le ticket de la cagnotte. */}
+              <p className="mt-6 inline-flex -rotate-2 items-center gap-3 rounded-2xl bg-logo-red py-3 pl-4 pr-6 text-white shadow-card">
                 <Trophy aria-hidden className="size-7 shrink-0 text-sun" />
                 <span className="border-l-2 border-dashed border-white/40 pl-3 font-display text-xl leading-tight md:text-2xl">
                   & gagne jusqu’à <span className="text-sun">1 million FCFA</span> !
                 </span>
               </p>
-              <p className="mt-6 max-w-xl text-lg font-medium text-white/80">
+              <p className="mt-6 max-w-xl text-lg font-medium text-ink/75">
                 Élèves, collégiens, lycéens et visiteurs engagés : relève le défi des 20 quiz santé,
                 décroche ton certificat officiel Génie Imhotep et tes badges, et tente de remporter
                 des lots exceptionnels !
@@ -330,9 +227,9 @@ function Certification() {
                 {atouts.map((a) => (
                   <li
                     key={a.sur}
-                    className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold ring-1 ring-white/15 backdrop-blur-sm"
+                    className="rounded-full bg-white/85 px-4 py-2 text-sm font-bold shadow-sm ring-1 ring-border backdrop-blur-sm"
                   >
-                    <span className="text-white/60">{a.sur} · </span>
+                    <span className="text-muted-foreground">{a.sur} · </span>
                     {a.t}
                   </li>
                 ))}
@@ -347,7 +244,7 @@ function Certification() {
                 </a>
                 <a
                   href="/connexion"
-                  className="btn-fx rounded-full border-2 border-white px-7 py-3 text-[15px] font-bold hover:bg-white hover:text-ink"
+                  className="btn-fx rounded-full border-2 border-logo-blue px-7 py-3 text-[15px] font-bold text-logo-blue hover:bg-logo-blue hover:text-white"
                 >
                   Se connecter
                 </a>
@@ -355,7 +252,40 @@ function Certification() {
             </div>
           </div>
 
-          <AnneauCertification />
+          <div data-reveal="right" className="relative mx-auto w-full max-w-md self-end">
+            <img
+              src={mascottesEquipe}
+              alt="Les sept mascottes des Clubs Santé, en polo du club : trophée, trousse de secours, plante, mégaphone, micro"
+              width={1122}
+              height={1402}
+              className="w-full drop-shadow-2xl"
+            />
+            {/* Le certificat et ses 5 badges, posés devant les mascottes. */}
+            <div className="absolute bottom-6 left-1/2 w-[17rem] -translate-x-1/2 rounded-3xl bg-white/95 p-4 text-center shadow-card ring-1 ring-border backdrop-blur sm:bottom-10 lg:-left-10 lg:translate-x-0">
+              <p className="flex items-center justify-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-logo-red">
+                <Award aria-hidden className="size-4 text-tangerine" /> Certificat officiel
+              </p>
+              <p className="font-display text-xl leading-tight text-logo-blue">
+                {QUIZ_CERTIFICATION} quiz · 5 badges
+              </p>
+              <ul
+                className="mt-3 flex justify-center gap-1.5"
+                aria-label="Les 5 badges du parcours"
+              >
+                {badges.map((b, i) => (
+                  <li key={b.n} title={b.t}>
+                    <span
+                      style={{ animationDelay: `${-i * 1.2}s` }}
+                      className={`flex size-10 items-center justify-center rounded-full bg-linear-to-br text-white shadow-card ring-2 ring-white motion-safe:animate-float ${b.fond}`}
+                    >
+                      <b.i aria-hidden className="size-5" />
+                    </span>
+                    <span className="sr-only">{b.t}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 
