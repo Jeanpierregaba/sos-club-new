@@ -9,6 +9,7 @@ import {
 } from "@/components/classements/TableauClassement";
 import { Palmares } from "@/components/classements/Palmares";
 import { PartagerClassement } from "@/components/espace/PartagerClassement";
+import { DecorAnime } from "@/components/DecorAnime";
 import { FilAriane } from "@/components/FilAriane";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -25,6 +26,7 @@ import {
 import { useMoi } from "@/hooks/use-moi";
 import { CATEGORIES, estCategorie, estPeriode, PERIODES, sousTitre } from "@/lib/classements";
 import { dateCourte } from "@/lib/dates";
+import mascottesTrophees from "@/assets/mascottes-trophees.webp";
 
 const PAR_PAGE = 50;
 
@@ -127,30 +129,45 @@ function HallOfFame() {
       <SiteMotion />
       <SiteHeader />
 
-      <section className="relative isolate overflow-hidden bg-[color-mix(in_oklch,var(--sun)_20%,white)]">
-        <div className="mx-auto max-w-7xl px-4 pb-12 pt-8 sm:px-5 md:pt-12">
-          <FilAriane rubrique="Gamification" page="Classements" />
-          <div data-reveal="left" className="pt-10">
-            <p className="flex items-center gap-3 text-sm font-extrabold uppercase tracking-widest text-logo-red">
-              <span className="h-1 w-8 rounded-full bg-primary" />
-              Hall of Fame des Clubs Santé
-            </p>
-            <h1 className="mt-4 text-5xl leading-[0.95] md:text-7xl">
-              <span className="block text-logo-blue">Les classements</span>
-              <span className="block text-primary">du réseau</span>
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg font-medium text-ink/75">
-              Élèves, encadreurs et Clubs Santé, au niveau national ou dans ta DRE. Chaque point
-              vient d'une action vérifiée : quiz réussis, articles publiés, commentaires approuvés.
-            </p>
-            <p className="mt-4 flex items-center gap-2 text-sm font-bold text-logo-blue">
-              <CalendarRange aria-hidden className="size-4" />
-              {classement.semestre
-                ? `${classement.semestre.libelle}, du ${dateCourte(classement.semestre.debut)} au ${dateCourte(classement.semestre.fin)}`
-                : "Aucun semestre en cours"}
-            </p>
-            <PartagerSiConnecte />
+      {/* Bannière claire : le titre et la période à gauche ; à droite, les mascottes aux trophées sur le podium du
+          classement affiché (les trois premiers, sur la première page). */}
+      <section className="relative isolate overflow-hidden bg-linear-to-br from-[color-mix(in_oklch,var(--sun)_26%,white)] via-white to-[color-mix(in_oklch,var(--sky)_18%,white)]">
+        <div
+          aria-hidden
+          className="absolute -right-24 top-1/2 -z-10 size-[34rem] -translate-y-1/2 rounded-full bg-sun/35 motion-safe:animate-respire"
+        />
+        <div
+          aria-hidden
+          className="absolute -right-10 top-1/2 -z-10 size-[44rem] -translate-y-1/2 bg-[repeating-conic-gradient(color-mix(in_oklch,var(--sun)_45%,transparent)_0deg_5deg,transparent_5deg_15deg)] [mask-image:radial-gradient(circle,black_20%,transparent_65%)] motion-safe:animate-[spin_140s_linear_infinite]"
+        />
+        <DecorAnime ton="clair" />
+        <div className="mx-auto grid max-w-7xl items-end gap-8 px-4 pt-8 sm:px-5 md:pt-12 lg:grid-cols-[1.2fr_1fr]">
+          <div className="pb-12 lg:pb-20">
+            <FilAriane rubrique="Gamification" page="Classements" />
+            <div data-reveal="left" className="pt-10">
+              <p className="flex items-center gap-3 text-sm font-extrabold uppercase tracking-widest text-logo-red">
+                <span className="h-1 w-8 rounded-full bg-primary" />
+                Hall of Fame des Clubs Santé
+              </p>
+              <h1 className="mt-4 text-5xl leading-[0.95] md:text-7xl">
+                <span className="block text-logo-blue">Les classements</span>
+                <span className="block text-primary">du réseau</span>
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg font-medium text-ink/75">
+                Élèves, encadreurs et Clubs Santé, au niveau national ou dans ta DRE. Chaque point
+                vient d'une action vérifiée : quiz réussis, articles publiés, commentaires
+                approuvés.
+              </p>
+              <p className="mt-4 flex items-center gap-2 text-sm font-bold text-logo-blue">
+                <CalendarRange aria-hidden className="size-4" />
+                {classement.semestre
+                  ? `${classement.semestre.libelle}, du ${dateCourte(classement.semestre.debut)} au ${dateCourte(classement.semestre.fin)}`
+                  : "Aucun semestre en cours"}
+              </p>
+              <PartagerSiConnecte />
+            </div>
           </div>
+          <PodiumHero lignes={page === 1 ? lignes.slice(0, 3) : []} />
         </div>
       </section>
 
@@ -251,6 +268,62 @@ function HallOfFame() {
 }
 
 // Un élève ou un encadreur connecté partage sa propre carte (spec 044) ; la boîte dit s'il n'est pas encore classé.
+type LigneHero = { cle: string; rang: number; nom: string; points: number };
+
+// Le podium du hero : 2e, 1er, 3e, avec les mascottes aux trophées au-dessus. Sans classement, les marches restent
+// numérotées.
+const MARCHES = [
+  {
+    place: 1,
+    hauteur: "h-20 sm:h-24",
+    fond: "from-[oklch(0.85_0.02_257)] to-[oklch(0.68_0.03_257)]",
+  },
+  { place: 0, hauteur: "h-28 sm:h-32", fond: "from-sun to-tangerine" },
+  {
+    place: 2,
+    hauteur: "h-16 sm:h-20",
+    fond: "from-[oklch(0.72_0.13_55)] to-[oklch(0.58_0.13_45)]",
+  },
+];
+
+function PodiumHero({ lignes }: { lignes: LigneHero[] }) {
+  return (
+    <div data-reveal="right" className="relative mx-auto w-full max-w-xs self-end sm:max-w-md">
+      <img
+        src={mascottesTrophees}
+        alt="Les mascottes des Clubs Santé, trophées en main"
+        width={1122}
+        height={1402}
+        className="relative z-10 mx-auto -mb-6 w-3/4 drop-shadow-2xl"
+      />
+      <ol className="relative z-20 grid grid-cols-3 items-end gap-2" aria-label="Le podium">
+        {MARCHES.map(({ place, hauteur, fond }) => {
+          const ligne = lignes[place];
+          return (
+            <li key={place} className="min-w-0 text-center">
+              {ligne && (
+                <p className="mb-1.5 px-1">
+                  <span className="block truncate text-sm font-extrabold text-ink">
+                    {ligne.nom}
+                  </span>
+                  <span className="block text-xs font-bold text-logo-blue">
+                    {ligne.points.toLocaleString("fr-FR")} pts
+                  </span>
+                </p>
+              )}
+              <span
+                className={`flex ${hauteur} items-start justify-center rounded-t-2xl bg-linear-to-b pt-2 font-display text-3xl text-white shadow-card ${fond}`}
+              >
+                {ligne?.rang ?? place + 1}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
+
 function PartagerSiConnecte() {
   const { data: moi } = useMoi();
   if (moi?.role !== "eleve" && moi?.role !== "encadreur") return null;
