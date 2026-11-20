@@ -398,6 +398,7 @@ function SectionEncadreur({ encadreur }: { encadreur: ProfilEncadreurAdmin }) {
     ["Vérification", LIBELLES_VERIFICATION[encadreur.etat]],
     ["Fonction", libelleFonction(encadreur.fonction, encadreur.fonction_precision)],
     ["Discipline", encadreur.discipline ?? "—"],
+    ["Commune", encadreur.commune ?? "—"],
     ["Ville", encadreur.etablissement.localite ?? "—"],
     [
       "Établissement",

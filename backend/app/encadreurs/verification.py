@@ -67,6 +67,7 @@ def _demande(
         fonction=encadreur.fonction,
         fonction_precision=encadreur.fonction_precision,
         discipline=encadreur.discipline,
+        commune=encadreur.commune,
         etablissement=EtablissementRattache(
             id=etablissement.id,
             nom=etablissement.nom,

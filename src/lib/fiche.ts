@@ -53,7 +53,7 @@ export const schemaFiche = z
   .object({
     numeroAdhesion: texte(30),
     prefecture: texte(100),
-    commune: texte(100),
+    commune: requis(100, "Indique ta commune."),
     canton: texte(100),
     sexe: z.string().min(1, "Choisis une réponse."),
     dateNaissance: z
@@ -130,7 +130,7 @@ export function ficheVersApi(v: ValeursFiche): FicheEntree {
   return {
     numero_adhesion: ouNul(v.numeroAdhesion),
     prefecture: ouNul(v.prefecture),
-    commune: ouNul(v.commune),
+    commune: v.commune.trim(),
     canton: ouNul(v.canton),
     sexe: v.sexe as Sexe,
     date_naissance: v.dateNaissance,

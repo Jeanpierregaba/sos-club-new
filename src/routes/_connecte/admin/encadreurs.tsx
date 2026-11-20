@@ -121,6 +121,7 @@ function Encadreurs() {
                     )}
                     <span className="block font-medium text-muted-foreground">
                       {d.etablissement.iesg} · {d.etablissement.dre}
+                      {d.commune && <> · Commune : {d.commune}</>}
                     </span>
                   </p>
                   <p className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-sm font-semibold">

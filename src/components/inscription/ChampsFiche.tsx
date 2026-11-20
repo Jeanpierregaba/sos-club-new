@@ -85,7 +85,7 @@ export function SectionLieu() {
       />
       <div className="grid gap-5 sm:grid-cols-3">
         <Texte name="fiche.prefecture" libelle="Préfecture" optionnel />
-        <Texte name="fiche.commune" libelle="Commune" optionnel />
+        <Texte name="fiche.commune" libelle="Commune" />
         <Texte name="fiche.canton" libelle="Canton" optionnel />
       </div>
     </fieldset>

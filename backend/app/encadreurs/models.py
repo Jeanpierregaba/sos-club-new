@@ -50,6 +50,8 @@ class Encadreur(Suivi, Base):
     fonction_precision: Mapped[str | None] = mapped_column(String(100))
     # Discipline ou spécialité (spec 030), facultative.
     discipline: Mapped[str | None] = mapped_column(String(100))
+    # Commune de l'encadreur, obligatoire à l'inscription depuis le 2026-11-20 ; nulle pour les comptes plus anciens.
+    commune: Mapped[str | None] = mapped_column(String(100))
     etat: Mapped[EtatVerification] = mapped_column(
         _enum_texte(EtatVerification, "etat_verification"), default=EtatVerification.en_attente
     )

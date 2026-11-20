@@ -21,6 +21,7 @@ const valide: ValeursFiche = {
   sexe: "feminin",
   dateNaissance: ilYa(16),
   lieuNaissance: "Lomé",
+  commune: "Golfe 1",
   responsableNom: "Koffi Mensah",
   responsableTelephone: "90 11 22 33",
   axes: ["genie-imhotep"],
@@ -37,10 +38,11 @@ describe("fiche d'adhésion", () => {
     expect(erreurs(valide)).toEqual([]);
   });
 
-  it("exige le sexe, la naissance, le responsable, un axe et l'engagement", () => {
+  it("exige le sexe, la naissance, la commune, le responsable, un axe et l'engagement", () => {
     expect(erreurs(FICHE_VIDE).sort()).toEqual(
       [
         "axes",
+        "commune",
         "dateNaissance",
         "engagement",
         "lieuNaissance",
@@ -94,7 +96,7 @@ describe("fiche d'adhésion", () => {
       annee_scolaire: "2026-2027",
       numero_adhesion: null,
       prefecture: "Golfe",
-      commune: null,
+      commune: "Golfe 1",
       canton: null,
       sexe: "masculin",
       date_naissance: "2010-03-14",

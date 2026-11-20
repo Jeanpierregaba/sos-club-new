@@ -203,6 +203,7 @@ async def _profil_encadreur(db: AsyncSession, utilisateur_id: UUID) -> ProfilEnc
         fonction=encadreur.fonction,
         fonction_precision=encadreur.fonction_precision,
         discipline=encadreur.discipline,
+        commune=encadreur.commune,
         charte_version=encadreur.charte_version,
         etablissement=await etablissement_rattache(db, encadreur.etablissement_id),
         etat=encadreur.etat,

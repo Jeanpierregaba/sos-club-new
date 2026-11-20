@@ -35,7 +35,7 @@ def id_de(en_base: Callable[..., Any], modele: Any, nom: str) -> str:
 def inscrire(navigateur: Any, en_base: Callable[..., Any], numero: int, **champs: Any) -> dict[str, Any]:
     corps = {
         "prenom": "Kossi", "nom": "Agbeko", "email": f"prof{numero}@ecole.tg", "telephone": "+228 90 12 34 56",
-        "identifiant": f"prof{numero}", "mot_de_passe": MOT_DE_PASSE, "fonction": "enseignant", "charte": True,
+        "identifiant": f"prof{numero}", "mot_de_passe": MOT_DE_PASSE, "fonction": "enseignant", "commune": "Golfe 1", "charte": True,
         "consentement": True, "etablissement_id": id_de(en_base, Etablissement, "Lycée de Tokoin I"),
     } | champs  # fmt: skip
     reponse = navigateur.post("/api/encadreurs/inscription", json=corps)

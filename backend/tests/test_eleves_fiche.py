@@ -83,6 +83,8 @@ def test_sans_fiche_linscription_est_refusee_et_rien_nest_ecrit(
         {"engagement": False},
         {"reseaux": ["facebook", "autre"], "reseau_autre": None},
         {"reseaux": ["snapchat"]},
+        {"commune": None},
+        {"commune": "   "},
         {"telephone": "12"},
         {"pere": {"nom": "Koffi", "profession": None, "telephone": "abc"}},
         {"parcours": [{"annee": "2025", "etablissement": "CEG Bè", "iesg": None}]},

@@ -18972,6 +18972,17 @@
             ],
             "title": "Discipline"
           },
+          "commune": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commune"
+          },
           "etablissement": {
             "$ref": "#/components/schemas/EtablissementRattache"
           },
@@ -20103,6 +20114,17 @@
             ],
             "title": "Discipline"
           },
+          "commune": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commune"
+          },
           "email": {
             "anyOf": [
               {
@@ -20152,6 +20174,7 @@
           "fonction",
           "fonction_precision",
           "discipline",
+          "commune",
           "email",
           "telephone",
           "etablissement",
@@ -21943,15 +21966,8 @@
             "title": "Prefecture"
           },
           "commune": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 100
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "type": "string",
+            "maxLength": 100,
             "title": "Commune"
           },
           "canton": {
@@ -22061,6 +22077,7 @@
         "additionalProperties": false,
         "type": "object",
         "required": [
+          "commune",
           "sexe",
           "date_naissance",
           "lieu_naissance",
@@ -22098,15 +22115,8 @@
             "title": "Prefecture"
           },
           "commune": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 100
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "type": "string",
+            "maxLength": 100,
             "title": "Commune"
           },
           "canton": {
@@ -22228,6 +22238,7 @@
         "additionalProperties": false,
         "type": "object",
         "required": [
+          "commune",
           "sexe",
           "date_naissance",
           "lieu_naissance",
@@ -23237,6 +23248,11 @@
             ],
             "title": "Discipline"
           },
+          "commune": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Commune"
+          },
           "charte": {
             "type": "boolean",
             "const": true,
@@ -23280,6 +23296,7 @@
           "identifiant",
           "mot_de_passe",
           "fonction",
+          "commune",
           "charte",
           "consentement"
         ],
@@ -27280,6 +27297,17 @@
               }
             ],
             "title": "Discipline"
+          },
+          "commune": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commune"
           },
           "charte_version": {
             "type": "string",

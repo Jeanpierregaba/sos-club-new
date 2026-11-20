@@ -35,6 +35,7 @@ def formulaire(en_base: Callable[..., Any], **champs: Any) -> dict[str, Any]:
         "identifiant": "kossi.agbeko",
         "mot_de_passe": "un-mot-de-passe",
         "fonction": "enseignant",
+        "commune": "Golfe 1",
         "charte": True,
         "consentement": True,
         "etablissement_id": etablissement_id(en_base),
@@ -71,6 +72,7 @@ def test_une_inscription_cree_un_compte_en_attente_sans_points(client: TestClien
         Fonction.enseignant,
         settings.version_charte,
     )
+    assert encadreur.commune == "Golfe 1"
     assert compter(en_base, MouvementPoints) == 0
     (entree,) = en_base(
         lambda db: db.scalars(select(JournalAudit).where(JournalAudit.action == "inscription_encadreur"))
@@ -143,6 +145,14 @@ def test_le_role_et_letat_ne_se_choisissent_pas(client: TestClient, en_base: Cal
 
 
 # Fonction --------------------------------------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("commune", [None, "", "   "])
+def test_la_commune_est_obligatoire(client: TestClient, en_base: Callable[..., Any], commune: str | None) -> None:
+    corps = formulaire(en_base, commune=commune)
+    assert client.post(INSCRIPTION, json=corps).status_code == 422
+    corps.pop("commune")
+    assert client.post(INSCRIPTION, json=corps).status_code == 422
 
 
 def test_la_fonction_autre_exige_une_precision(client: TestClient, en_base: Callable[..., Any]) -> None:

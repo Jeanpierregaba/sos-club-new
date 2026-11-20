@@ -71,7 +71,7 @@ class FicheEntree(BaseModel):
 
     numero_adhesion: Texte30 = None
     prefecture: Texte100 = None
-    commune: Texte100 = None
+    commune: Requis100
     canton: Texte100 = None
     sexe: Sexe
     date_naissance: date

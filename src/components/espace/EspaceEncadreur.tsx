@@ -130,6 +130,7 @@ export function EspaceEncadreur({
               />
               <Info terme="Région (DRE)" valeur={espace.etablissement.dre} />
               <Info terme="Ville du lycée" valeur={espace.etablissement.localite ?? "—"} />
+              <Info terme="Commune" valeur={espace.commune ?? "—"} />
               <Info terme="Discipline" valeur={espace.discipline ?? "—"} />
               <Info terme="Email" valeur={espace.email ?? "Aucun"} />
               <Info terme="Téléphone" valeur={espace.telephone ?? "Aucun"} />

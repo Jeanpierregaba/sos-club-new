@@ -6401,6 +6401,8 @@ export interface components {
             fonction_precision: string | null;
             /** Discipline */
             discipline: string | null;
+            /** Commune */
+            commune?: string | null;
             etablissement: components["schemas"]["EtablissementRattache"];
             etat: components["schemas"]["EtatVerification"];
             /**
@@ -6810,6 +6812,8 @@ export interface components {
             fonction_precision: string | null;
             /** Discipline */
             discipline: string | null;
+            /** Commune */
+            commune: string | null;
             /** Email */
             email: string | null;
             /** Telephone */
@@ -7441,7 +7445,7 @@ export interface components {
             /** Prefecture */
             prefecture?: string | null;
             /** Commune */
-            commune?: string | null;
+            commune: string;
             /** Canton */
             canton?: string | null;
             sexe: components["schemas"]["Sexe"];
@@ -7478,7 +7482,7 @@ export interface components {
             /** Prefecture */
             prefecture?: string | null;
             /** Commune */
-            commune?: string | null;
+            commune: string;
             /** Canton */
             canton?: string | null;
             sexe: components["schemas"]["Sexe"];
@@ -7791,6 +7795,8 @@ export interface components {
             fonction_precision?: string | null;
             /** Discipline */
             discipline?: string | null;
+            /** Commune */
+            commune: string;
             /**
              * Charte
              * @constant
@@ -9154,6 +9160,8 @@ export interface components {
             fonction_precision: string | null;
             /** Discipline */
             discipline?: string | null;
+            /** Commune */
+            commune?: string | null;
             /** Charte Version */
             charte_version: string;
             etablissement: components["schemas"]["EtablissementRattache"];

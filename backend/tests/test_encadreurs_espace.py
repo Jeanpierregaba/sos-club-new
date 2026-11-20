@@ -40,7 +40,7 @@ def encadreur(client: TestClient, en_base: Callable[..., Any]) -> dict[str, Any]
     """Un encadreur inscrit et connecté, en attente."""
     corps = {
         "prenom": "Kossi", "nom": "Agbeko", "email": "kossi@ecole.tg", "telephone": "90123456",
-        "identifiant": "kossi.agbeko", "mot_de_passe": MOT_DE_PASSE, "fonction": "enseignant", "charte": True,
+        "identifiant": "kossi.agbeko", "mot_de_passe": MOT_DE_PASSE, "fonction": "enseignant", "commune": "Golfe 1", "charte": True,
         "consentement": True, "etablissement_id": etablissement_id(en_base),
     }  # fmt: skip
     reponse = client.post("/api/encadreurs/inscription", json=corps)

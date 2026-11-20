@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field, model_validator
 
-from app.comptes.champs import Telephone, TelephoneObligatoire, Texte100
+from app.comptes.champs import Requis100, Telephone, TelephoneObligatoire, Texte100
 from app.comptes.service import LONGUEUR_MAX_MOT_DE_PASSE
 from app.encadreurs.models import EtatVerification, Fonction
 from app.points.schemas import ResumePoints
@@ -44,6 +44,7 @@ class InscriptionEncadreur(BaseModel):
     fonction: Fonction
     fonction_precision: Precision = None
     discipline: Texte100 = None
+    commune: Requis100
     # Les deux cases du formulaire : vérifiées ici, pas seulement par le site.
     charte: Literal[True]
     consentement: Literal[True]
@@ -69,6 +70,7 @@ class EspaceEncadreur(BaseModel):
     fonction: Fonction
     fonction_precision: str | None
     discipline: str | None
+    commune: str | None
     email: str | None
     telephone: str | None
     etablissement: EtablissementRattache
@@ -105,6 +107,7 @@ class DemandeEncadreur(BaseModel):
     fonction: Fonction
     fonction_precision: str | None
     discipline: str | None
+    commune: str | None = None
     etablissement: EtablissementRattache
     etat: EtatVerification
     demande_le: datetime

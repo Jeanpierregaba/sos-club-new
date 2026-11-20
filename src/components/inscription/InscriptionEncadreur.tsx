@@ -54,6 +54,11 @@ const schema = z
       .refine((v) => normaliserTelephone(v) !== "", "Indique ton téléphone ou ton WhatsApp.")
       .refine(telephoneValide, "De 8 à 15 chiffres, avec « + » au début si besoin."),
     discipline: z.string().trim().max(100, "Cette discipline est trop longue."),
+    commune: z
+      .string()
+      .trim()
+      .min(1, "Indique ta commune.")
+      .max(100, "Ce nom de commune est trop long."),
     fonction: z.string().min(1, "Choisis ta fonction."),
     precision: z.string().trim().max(100, "Cette précision est trop longue."),
     identifiant: z
@@ -107,6 +112,7 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
       fonction: "",
       precision: "",
       discipline: "",
+      commune: "",
       identifiant: "",
       motDePasse: "",
       charte: false,
@@ -132,6 +138,7 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
           fonction: v.fonction as Fonction,
           fonction_precision: v.fonction === "autre" ? v.precision : null,
           discipline: v.discipline || null,
+          commune: v.commune,
           charte: true,
           consentement: true,
           ...corpsEtablissement(etablissement),
@@ -274,6 +281,25 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
             </div>
           </dl>
         )}
+        <FormField
+          control={form.control}
+          name="commune"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Ta commune</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  maxLength={100}
+                  placeholder="ex. : Golfe 1"
+                  autoComplete="address-level2"
+                  className={CHAMP}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <fieldset className="space-y-5">
           <legend className="mb-4 text-lg font-bold text-logo-blue">Pour te joindre</legend>
