@@ -37,6 +37,7 @@ HISTORIQUE = [
     "inscrit_reactive",
     "inscription_eleve",
     "profil_eleve_modifie",
+    "profil_modifie_par_equipe",
     "pseudonyme_impose",
     "mot_de_passe_change",
     "mot_de_passe_reinitialise",
@@ -169,7 +170,16 @@ async def detail(db: AsyncSession, utilisateur_id: UUID) -> InscritDetail:
         eleve=profil,
         encadreur=await _profil_encadreur(db, utilisateur.id),
         carte=await carte_admin(db, utilisateur.id),
+        version=await _version_du_profil(db, utilisateur.id, eleve),
     )
+
+
+async def _version_du_profil(db: AsyncSession, utilisateur_id: UUID, eleve: Eleve | None) -> int | None:
+    """Spec 045 : la version du profil, pour le verrou optimiste de la modification par l'équipe."""
+    if eleve is not None:
+        return eleve.version
+    encadreur = await db.get(Encadreur, utilisateur_id)
+    return encadreur.version if encadreur else None
 
 
 async def _club_de(db: AsyncSession, utilisateur_id: UUID) -> ClubInscrit | None:

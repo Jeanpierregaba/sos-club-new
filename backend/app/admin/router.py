@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response,
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.admin import collaborateurs, double_auth, exports, inscrits, tableau_de_bord
+from app.admin import collaborateurs, double_auth, exports, inscrits, modification_inscrit, tableau_de_bord
 from app.admin.catalogue import DROITS_DES_ROLES, LIBELLES_ACTIONS, LIBELLES_ROLES, MODULES, SENSIBLES, Action
 from app.admin.dependances import (
     MESSAGE_DOUBLE_AUTH,
@@ -41,6 +41,7 @@ from app.admin.schemas import (
     InvitationCree,
     InvitationEntree,
     JetonEntree,
+    ModificationInscrit,
     ModuleCatalogue,
     MotDePasseProvisoire,
     MotifEntree,
@@ -418,6 +419,26 @@ async def voir_inscrit(utilisateur_id: UUID, _: LecteurInscrits, db: Base) -> In
         return await inscrits.detail(db, utilisateur_id)
     except inscrits.Introuvable:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Compte introuvable.") from None
+
+
+@router.patch("/inscrits/{utilisateur_id}")
+async def modifier_inscrit(
+    utilisateur_id: UUID,
+    entree: ModificationInscrit,
+    acces: GestionnaireInscrits,
+    db: Base,
+    request: Request,
+    response: Response,
+) -> InscritDetail:
+    """Spec 045 : identité et profil d'un élève ou d'un encadreur, avec un motif journalisé."""
+    response.headers["Cache-Control"] = "no-store"
+    try:
+        await modification_inscrit.modifier(db, acces, utilisateur_id, entree, adresse_ip(request))
+    except modification_inscrit.Introuvable:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Compte introuvable.") from None
+    except modification_inscrit.Refus as refus:
+        raise HTTPException(refus.statut, str(refus)) from None
+    return await inscrits.detail(db, utilisateur_id)
 
 
 async def _statut_inscrit(

@@ -6,10 +6,10 @@ Dans l'ordre d'exécution, chacune testable et committable seule. Les droits et 
 ## API
 
 - [x] 1. Documents : `TASKS.md` (spec 045 en cours).
-- [ ] 2. Tests de la modification (`test_admin_inscrit_modification.py`), écrits avant le code : identité, profil
+- [x] 2. Tests de la modification (`test_admin_inscrit_modification.py`), écrits avant le code : identité, profil
   élève, profil encadreur, règles, champs hors profil, rien à changer, journal sans donnée en clair, version
   périmée, compte admin, droits.
-- [ ] 3. Modification : schéma `ModificationInscrit`, `modification_inscrit.py`, route `PATCH`, `version` dans le
+- [x] 3. Modification : schéma `ModificationInscrit`, `modification_inscrit.py`, route `PATCH`, `version` dans le
   détail, action au journal et à l'historique.
 - [ ] 4. Points : filtre `utilisateur_id` du registre, route `/points`, tests (pagination, filtre semestre, lignes
   d'autres comptes exclues, corrections).

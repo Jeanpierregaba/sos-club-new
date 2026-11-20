@@ -1,13 +1,14 @@
 from datetime import datetime
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field
 
 from app.admin.catalogue import Action, RoleDepart
 from app.admin.models import FormatExport, StatutExport, TypeExport
 from app.cartes.schemas import CarteAdmin
 from app.clubs.models import EtatClub
+from app.comptes.champs import Requis100, Telephone, Texte100
 from app.comptes.models import Role, StatutCompte
 from app.eleves.models import Classe
 from app.encadreurs.models import EtatVerification, Fonction
@@ -235,6 +236,34 @@ class InscritDetail(Inscrit):
     encadreur: ProfilEncadreurAdmin | None = None
     # Spec 040 : la carte numérique de l'élève ou de l'encadreur, sans le code du QR.
     carte: CarteAdmin | None = None
+    # Spec 045 : la version du profil d'élève ou d'encadreur, renvoyée par une modification (verrou optimiste).
+    version: int | None = None
+
+
+def _motif_long(valeur: str) -> str:
+    propre = " ".join(valeur.split())
+    if len(propre) < 10:
+        raise ValueError("Indique un motif d'au moins 10 caractères")
+    return propre
+
+
+class ModificationInscrit(BaseModel):
+    """Spec 045 : seuls les champs envoyés changent. Les règles sont celles de l'inscription."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    motif: Annotated[str, Field(max_length=500), AfterValidator(_motif_long)]
+    version: int | None
+    prenom: Requis100 | None = None
+    nom: Requis100 | None = None
+    # Vide pour retirer l'e-mail d'un élève ; validé et normalisé par le service, comme à l'inscription.
+    email: str | None = Field(default=None, max_length=254)
+    telephone: Telephone = None
+    classe: Classe | None = None
+    fonction: Fonction | None = None
+    fonction_precision: Texte100 = None
+    discipline: Texte100 = None
+    commune: Texte100 = None
 
 
 class PseudonymeEntree(BaseModel):
