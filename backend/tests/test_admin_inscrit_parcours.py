@@ -80,6 +80,7 @@ def test_le_filtre_semestre_et_les_corrections(
     tout = lecteur.get(f"{INSCRITS}/{eleve.id}/points").json()
 
     assert {ligne["cle"] for ligne in filtre["registre"]["lignes"]} == {"dans", "annulation"}
+    assert tout["semestres"] == [{"id": str(semestre.id), "libelle": "S1"}]
     par_cle = {ligne["cle"]: ligne for ligne in tout["registre"]["lignes"]}
     assert par_cle["dans"]["annulee"] is True
     assert par_cle["annulation"]["motif"] == "Doublon constaté"

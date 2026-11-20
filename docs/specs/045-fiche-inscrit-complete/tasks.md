@@ -22,11 +22,11 @@ Dans l'ordre d'exécution, chacune testable et committable seule. Les droits et 
 
 ## Site
 
-- [ ] 9. Types de l'API régénérés, fonctions du client.
-- [ ] 10. Liste : ligne entière cliquable.
-- [ ] 11. Fiche en onglets, onglet dans l'URL ; sections existantes déplacées sans changement.
-- [ ] 12. Dialogue de modification et ses tests Vitest.
-- [ ] 13. Onglets Points, Quiz, Certification et Contenus, avec leurs états vides.
+- [x] 9. Types de l'API régénérés, fonctions du client.
+- [x] 10. Liste : ligne entière cliquable.
+- [x] 11. Fiche en onglets, onglet dans l'URL ; sections existantes déplacées sans changement.
+- [x] 12. Dialogue de modification et ses tests Vitest.
+- [x] 13. Onglets Points, Quiz, Certification et Contenus, avec leurs états vides.
 - [ ] 14. Vérification au navigateur (375 px et ordinateur) sur la base de dev.
 
 ## Clôture

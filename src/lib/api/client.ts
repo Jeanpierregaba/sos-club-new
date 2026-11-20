@@ -20,6 +20,12 @@ export type ActivationInfo = Schemas["ActivationInfo"];
 export type Enrolement = Schemas["Enrolement"];
 export type PageInscrits = Schemas["PageInscrits"];
 export type InscritDetail = Schemas["InscritDetail"];
+export type ModificationInscrit = Schemas["ModificationInscrit"];
+export type PointsInscrit = Schemas["PointsInscrit"];
+export type QuizInscrit = Schemas["QuizInscrit"];
+export type TentativeAdmin = Schemas["TentativeAdmin"];
+export type CertificationInscrit = Schemas["CertificationInscrit"];
+export type PageContenusInscrit = Schemas["PageContenusInscrit"];
 export type EvenementJournal = Schemas["EvenementJournal"];
 export type PageJournal = Schemas["PageJournal"];
 export type ExportEntree = Schemas["ExportEntree"];
@@ -365,6 +371,24 @@ export const apercuExport = (entree: ExportEntree) =>
 export const creerExport = (entree: ExportEntree) =>
   envoyerJson<ExportCree>("/api/admin/exports", entree);
 export const historiqueExports = () => requeteApi<ExportResume[]>("/api/admin/exports");
+
+// Spec 045 : la fiche complète d'un inscrit.
+export const modifierInscrit = (id: string, entree: ModificationInscrit) =>
+  envoyerJson<InscritDetail>(`/api/admin/inscrits/${id}`, entree, "PATCH");
+export const chargerPointsInscrit = (
+  id: string,
+  filtres: Record<string, string | number | undefined>,
+) => requeteApi<PointsInscrit>(avecParametres(`/api/admin/inscrits/${id}/points`, filtres));
+export const chargerQuizInscrit = (
+  id: string,
+  filtres: Record<string, string | number | undefined>,
+) => requeteApi<QuizInscrit>(avecParametres(`/api/admin/inscrits/${id}/quiz`, filtres));
+export const chargerCertificationInscrit = (id: string) =>
+  requeteApi<CertificationInscrit>(`/api/admin/inscrits/${id}/certification`);
+export const chargerContenusInscrit = (
+  id: string,
+  filtres: Record<string, string | number | undefined>,
+) => requeteApi<PageContenusInscrit>(avecParametres(`/api/admin/inscrits/${id}/contenus`, filtres));
 
 export const imposerPseudonyme = (id: string, pseudonyme: string, motif: string) =>
   envoyerJson<InscritDetail>(`/api/admin/inscrits/${id}/pseudonyme`, { pseudonyme, motif });

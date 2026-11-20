@@ -369,8 +369,15 @@ class TotauxInscrit(BaseModel):
     total: int
 
 
+class SemestreInscrit(BaseModel):
+    id: UUID
+    libelle: str
+
+
 class PointsInscrit(BaseModel):
     totaux: TotauxInscrit
+    # Les semestres où la personne a des lignes, du plus récent au plus ancien : le choix du filtre.
+    semestres: list[SemestreInscrit]
     registre: PageRegistre
 
 

@@ -161,7 +161,15 @@ function Inscrits() {
           </thead>
           <tbody>
             {page.inscrits.map((i) => (
-              <tr key={i.id} className="border-t hover:bg-mist-soft/60">
+              <tr
+                key={i.id}
+                // Spec 045 : toute la ligne ouvre la fiche ; le lien du nom reste le chemin au clavier.
+                onClick={(e) => {
+                  if ((e.target as HTMLElement).closest("a")) return;
+                  void naviguer({ to: "/admin/inscrits/$id", params: { id: i.id } });
+                }}
+                className="cursor-pointer border-t hover:bg-mist-soft/60"
+              >
                 <td className="px-4 py-3 font-bold">
                   <Link
                     to="/admin/inscrits/$id"

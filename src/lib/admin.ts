@@ -77,6 +77,7 @@ export const ACTIONS_JOURNAL: Record<string, string> = {
   fiche_eleve_modifiee: "Fiche d'adhésion modifiée par l'élève",
   fiche_eleve_consultee: "Fiche d'adhésion consultée",
   profil_eleve_modifie: "Profil d'élève modifié",
+  profil_modifie_par_equipe: "Profil modifié par l'équipe",
   pseudonyme_impose: "Pseudonyme imposé",
   mot_de_passe_change: "Mot de passe changé",
   mot_de_passe_reinitialise: "Mot de passe réinitialisé",

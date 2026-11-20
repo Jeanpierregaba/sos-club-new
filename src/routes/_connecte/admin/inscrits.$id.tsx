@@ -7,6 +7,7 @@ import {
   KeyRound,
   Loader2,
   Pause,
+  Pencil,
   Play,
   UserPen,
 } from "lucide-react";
@@ -16,6 +17,11 @@ import { BadgeStatut } from "@/components/admin/BadgeStatut";
 import { CHAMP_ADMIN, Champ, DialogueFormulaire } from "@/components/admin/DialogueFormulaire";
 import { CarteInscrit } from "@/components/admin/CarteInscrit";
 import { DialogueMotif } from "@/components/admin/DialogueMotif";
+import { DialogueModification } from "@/components/admin/fiche-inscrit/DialogueModification";
+import { OngletCertification } from "@/components/admin/fiche-inscrit/OngletCertification";
+import { OngletContenus } from "@/components/admin/fiche-inscrit/OngletContenus";
+import { OngletPoints } from "@/components/admin/fiche-inscrit/OngletPoints";
+import { OngletQuiz } from "@/components/admin/fiche-inscrit/OngletQuiz";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,17 +41,32 @@ import {
   type FicheSortie,
   changerStatutInscrit,
   imposerPseudonyme,
+  modifierInscrit,
   reinitialiserMotDePasse,
   type InscritDetail,
   type ProfilEleveAdmin,
   type ProfilEncadreurAdmin,
-  type ResumePoints,
   adminPasserAncienEleve,
 } from "@/lib/api/client";
 import { libelleClasse } from "@/lib/classes";
 import { LIBELLES_VERIFICATION, libelleFonction } from "@/lib/fonctions";
 
+const ONGLETS = [
+  { cle: "profil", libelle: "Profil" },
+  { cle: "points", libelle: "Points" },
+  { cle: "quiz", libelle: "Quiz" },
+  { cle: "certification", libelle: "Certification" },
+  { cle: "contenus", libelle: "Contenus" },
+  { cle: "historique", libelle: "Historique" },
+] as const;
+type Onglet = (typeof ONGLETS)[number]["cle"];
+
 export const Route = createFileRoute("/_connecte/admin/inscrits/$id")({
+  // Spec 045 : l'onglet ouvert est dans l'adresse, pour revenir au même endroit.
+  validateSearch: (search: Record<string, unknown>): { onglet?: Onglet } => {
+    const onglet = ONGLETS.find((o) => o.cle === search["onglet"])?.cle;
+    return onglet && onglet !== "profil" ? { onglet } : {};
+  },
   loader: ({ params }) => chargerInscrit(params.id),
   gcTime: 0,
   errorComponent: ServiceIndisponible,
@@ -55,10 +76,16 @@ export const Route = createFileRoute("/_connecte/admin/inscrits/$id")({
 function FicheInscrit() {
   const { admin } = Route.useRouteContext();
   const inscrit = Route.useLoaderData();
+  const { onglet = "profil" } = Route.useSearch();
+  const naviguer = Route.useNavigate();
   const router = useRouter();
   const [dialogue, setDialogue] = useState(false);
+  const [modifier, setModifier] = useState(false);
   const suspendu = inscrit.statut === "suspendu";
   const gerable = peut(admin, "inscrits", "modifier") && inscrit.role !== "admin";
+  const national = admin.perimetre_dre === null;
+  const modifiable =
+    gerable && national && (inscrit.role === "eleve" || inscrit.role === "encadreur");
 
   const champs: [string, string][] = [
     ["Identifiant", inscrit.identifiant],
@@ -91,16 +118,23 @@ function FicheInscrit() {
               <BadgeStatut statut={inscrit.statut} />
             </div>
           </div>
-          {gerable && inscrit.statut !== "revoque" && (
-            <Button
-              variant="outline"
-              onClick={() => setDialogue(true)}
-              className="rounded-full font-bold"
-            >
-              {suspendu ? <Play className="size-4" /> : <Pause className="size-4" />}
-              {suspendu ? "Réactiver" : "Suspendre"}
-            </Button>
-          )}
+          <div className="flex flex-wrap gap-2">
+            {modifiable && (
+              <Button onClick={() => setModifier(true)} className="rounded-full font-bold">
+                <Pencil className="size-4" /> Modifier
+              </Button>
+            )}
+            {gerable && inscrit.statut !== "revoque" && (
+              <Button
+                variant="outline"
+                onClick={() => setDialogue(true)}
+                className="rounded-full font-bold"
+              >
+                {suspendu ? <Play className="size-4" /> : <Pause className="size-4" />}
+                {suspendu ? "Réactiver" : "Suspendre"}
+              </Button>
+            )}
+          </div>
         </div>
         <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {champs.map(([libelle, valeur]) => (
@@ -114,36 +148,70 @@ function FicheInscrit() {
         </dl>
       </section>
 
-      {inscrit.eleve && <SectionEleve inscrit={inscrit} eleve={inscrit.eleve} gerable={gerable} />}
-      {inscrit.eleve && peut(admin, "fiches_eleves", "consulter") && (
-        <SectionFiche id={inscrit.id} />
-      )}
-      {inscrit.encadreur && <SectionEncadreur encadreur={inscrit.encadreur} />}
-      {inscrit.carte && (
-        <CarteInscrit utilisateurId={inscrit.id} carte={inscrit.carte} gerable={gerable} />
+      {inscrit.role !== "admin" && (
+        <div
+          role="tablist"
+          aria-label="Sections de la fiche"
+          className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0"
+        >
+          {ONGLETS.map((o) => (
+            <button
+              key={o.cle}
+              type="button"
+              role="tab"
+              aria-selected={onglet === o.cle}
+              onClick={() =>
+                void naviguer({
+                  search: o.cle === "profil" ? {} : { onglet: o.cle },
+                  replace: true,
+                  resetScroll: false,
+                })
+              }
+              className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold transition-colors ${
+                onglet === o.cle
+                  ? "bg-logo-blue text-white"
+                  : "bg-white text-logo-blue ring-1 ring-border hover:ring-night/30"
+              }`}
+            >
+              {o.libelle}
+            </button>
+          ))}
+        </div>
       )}
 
-      <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-border">
-        <h2 className="text-xl text-logo-blue">Historique du compte</h2>
-        {inscrit.historique.length === 0 ? (
-          <p className="mt-2 text-sm font-medium text-muted-foreground">Aucun événement.</p>
-        ) : (
-          <ol className="mt-3 divide-y">
-            {inscrit.historique.map((e) => (
-              <li key={e.id} className="py-3 text-sm">
-                <p className="font-bold">
-                  {ACTIONS_JOURNAL[e.action] ?? e.action}
-                  <span className="font-medium text-muted-foreground"> · {dateHeure(e.quand)}</span>
-                </p>
-                <p className="text-muted-foreground">
-                  Par {e.auteur_libelle ?? "—"}
-                  {e.details["motif"] ? ` · Motif : ${String(e.details["motif"])}` : ""}
-                </p>
-              </li>
-            ))}
-          </ol>
+      <div role="tabpanel">
+        {onglet === "profil" && (
+          <div className="space-y-6">
+            {inscrit.eleve && (
+              <SectionEleve inscrit={inscrit} eleve={inscrit.eleve} gerable={gerable} />
+            )}
+            {inscrit.eleve && peut(admin, "fiches_eleves", "consulter") && (
+              <SectionFiche id={inscrit.id} />
+            )}
+            {inscrit.encadreur && <SectionEncadreur encadreur={inscrit.encadreur} />}
+            {inscrit.carte && (
+              <CarteInscrit utilisateurId={inscrit.id} carte={inscrit.carte} gerable={gerable} />
+            )}
+          </div>
         )}
-      </section>
+        {onglet === "points" && (
+          <OngletPoints
+            id={inscrit.id}
+            identifiant={inscrit.identifiant}
+            peutCorriger={peut(admin, "points", "consulter") && national}
+          />
+        )}
+        {onglet === "quiz" && <OngletQuiz id={inscrit.id} />}
+        {onglet === "certification" && (
+          <OngletCertification
+            id={inscrit.id}
+            identifiant={inscrit.identifiant}
+            peutSuivre={peut(admin, "certification", "consulter")}
+          />
+        )}
+        {onglet === "contenus" && <OngletContenus id={inscrit.id} />}
+        {(onglet === "historique" || inscrit.role === "admin") && <Historique inscrit={inscrit} />}
+      </div>
 
       <DialogueMotif
         ouvert={dialogue}
@@ -161,9 +229,63 @@ function FicheInscrit() {
           await router.invalidate();
         }}
       />
+      {modifier && (
+        <DialogueModification
+          inscrit={inscrit}
+          fermer={() => setModifier(false)}
+          envoyer={async (entree) => {
+            await modifierInscrit(inscrit.id, entree);
+            await router.invalidate();
+          }}
+        />
+      )}
     </div>
   );
 }
+
+function Historique({ inscrit }: { inscrit: InscritDetail }) {
+  return (
+    <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-border">
+      <h2 className="text-xl text-logo-blue">Historique du compte</h2>
+      {inscrit.historique.length === 0 ? (
+        <p className="mt-2 text-sm font-medium text-muted-foreground">Aucun événement.</p>
+      ) : (
+        <ol className="mt-3 divide-y">
+          {inscrit.historique.map((e) => (
+            <li key={e.id} className="py-3 text-sm">
+              <p className="font-bold">
+                {ACTIONS_JOURNAL[e.action] ?? e.action}
+                <span className="font-medium text-muted-foreground"> · {dateHeure(e.quand)}</span>
+              </p>
+              <p className="text-muted-foreground">
+                Par {e.auteur_libelle ?? "—"}
+                {e.details["motif"] ? ` · Motif : ${String(e.details["motif"])}` : ""}
+              </p>
+              {Array.isArray(e.details["champs"]) && (
+                <p className="text-muted-foreground">
+                  Champs changés : {(e.details["champs"] as string[]).map(libelleChamp).join(", ")}
+                </p>
+              )}
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+  );
+}
+
+const CHAMPS_MODIFIES: Record<string, string> = {
+  prenom: "prénom",
+  nom: "nom",
+  email: "e-mail",
+  telephone: "téléphone",
+  classe: "classe",
+  fonction: "fonction",
+  fonction_precision: "précision de la fonction",
+  discipline: "discipline",
+  commune: "commune",
+};
+const libelleChamp = (champ: string) => CHAMPS_MODIFIES[champ] ?? champ;
 
 // Profil d'élève (spec 017) : pseudonyme, établissement et registre des points.
 function SectionEleve({
@@ -253,7 +375,6 @@ function SectionEleve({
           </div>
         ))}
       </dl>
-      <RegistrePoints points={points} />
 
       {pseudonyme && (
         <DialoguePseudonyme
@@ -362,35 +483,6 @@ function DialoguePseudonyme({
   );
 }
 
-function RegistrePoints({ points }: { points: ResumePoints }) {
-  return (
-    <>
-      <h3 className="mt-8 text-sm font-extrabold uppercase tracking-wider text-muted-foreground">
-        Registre des points
-      </h3>
-      {points.lignes.length === 0 ? (
-        <p className="mt-2 text-sm font-medium text-muted-foreground">Aucune ligne.</p>
-      ) : (
-        <ol className="mt-2 divide-y text-sm">
-          {points.lignes.map((ligne, rang) => (
-            <li key={rang} className="flex items-center justify-between gap-4 py-2.5">
-              <span className="min-w-0">
-                <span className="font-bold">{ligne.libelle}</span>
-                <span className="block text-muted-foreground">
-                  {dateHeure(ligne.cree_le)} · {ligne.semestre ?? "hors semestre"}
-                </span>
-              </span>
-              <span className="shrink-0 font-extrabold tabular-nums text-primary">
-                {ligne.montant > 0 ? `+${ligne.montant}` : ligne.montant}
-              </span>
-            </li>
-          ))}
-        </ol>
-      )}
-    </>
-  );
-}
-
 // Profil d'encadreur (spec 018) : fonction, établissement, vérification et registre des points.
 function SectionEncadreur({ encadreur }: { encadreur: ProfilEncadreurAdmin }) {
   const { admin } = Route.useRouteContext();
@@ -454,7 +546,6 @@ function SectionEncadreur({ encadreur }: { encadreur: ProfilEncadreurAdmin }) {
           </div>
         ))}
       </dl>
-      <RegistrePoints points={encadreur.points} />
     </section>
   );
 }

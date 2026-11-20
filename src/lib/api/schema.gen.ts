@@ -518,6 +518,78 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Modifier Inscrit
+         * @description Spec 045 : identité et profil d'un élève ou d'un encadreur, avec un motif journalisé.
+         */
+        patch: operations["modifier_inscrit_api_admin_inscrits__utilisateur_id__patch"];
+        trace?: never;
+    };
+    "/api/admin/inscrits/{utilisateur_id}/points": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Points Inscrit */
+        get: operations["points_inscrit_api_admin_inscrits__utilisateur_id__points_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/inscrits/{utilisateur_id}/quiz": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Quiz Inscrit */
+        get: operations["quiz_inscrit_api_admin_inscrits__utilisateur_id__quiz_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/inscrits/{utilisateur_id}/certification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Certification Inscrit */
+        get: operations["certification_inscrit_api_admin_inscrits__utilisateur_id__certification_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/inscrits/{utilisateur_id}/contenus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Contenus Inscrit */
+        get: operations["contenus_inscrit_api_admin_inscrits__utilisateur_id__contenus_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
         patch?: never;
         trace?: never;
     };
@@ -5070,6 +5142,20 @@ export interface components {
             /** Description */
             description: string;
         };
+        /** BadgeAdmin */
+        BadgeAdmin: {
+            /** Rang */
+            rang: number;
+            /** Nom */
+            nom: string;
+            /** Palier */
+            palier: number;
+            /**
+             * Obtenu Le
+             * Format: date-time
+             */
+            obtenu_le: string;
+        };
         /** BadgeCompte */
         BadgeCompte: {
             /** Rang */
@@ -5448,6 +5534,24 @@ export interface components {
          * @enum {string}
          */
         CategorieRessource: "magazine" | "guide" | "fiche" | "affiche" | "fascicule";
+        /** CertificatAdmin */
+        CertificatAdmin: {
+            /** Numero */
+            numero: string;
+            /** Etat */
+            etat: string;
+            /**
+             * Delivre Le
+             * Format: date-time
+             */
+            delivre_le: string;
+            /** Titulaire */
+            titulaire: string;
+            /** Motif */
+            motif: string | null;
+            /** Decide Le */
+            decide_le: string | null;
+        };
         /** CertificatGestion */
         CertificatGestion: {
             /**
@@ -5495,6 +5599,15 @@ export interface components {
             club: string | null;
             /** Afficher Club */
             afficher_club: boolean;
+        };
+        /** CertificationInscrit */
+        CertificationInscrit: {
+            /** Places */
+            places: components["schemas"]["PlaceAdmin"][];
+            /** Badges */
+            badges: components["schemas"]["BadgeAdmin"][];
+            /** Certificats */
+            certificats: components["schemas"]["CertificatAdmin"][];
         };
         /**
          * ChampsArticle
@@ -6260,6 +6373,29 @@ export interface components {
             identifiant: string;
             /** Mot De Passe */
             mot_de_passe: string;
+        };
+        /** ContenuAdmin */
+        ContenuAdmin: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Type */
+            type: string;
+            /** Type Libelle */
+            type_libelle: string;
+            /** Titre */
+            titre: string;
+            /** Etat */
+            etat: string;
+            /**
+             * Cree Le
+             * Format: date-time
+             */
+            cree_le: string;
+            /** Publie Le */
+            publie_le: string | null;
         };
         /** CorrectionDefi */
         CorrectionDefi: {
@@ -7962,6 +8098,8 @@ export interface components {
             eleve?: components["schemas"]["ProfilEleveAdmin"] | null;
             encadreur?: components["schemas"]["ProfilEncadreurAdmin"] | null;
             carte?: components["schemas"]["CarteAdmin"] | null;
+            /** Version */
+            version?: number | null;
         };
         /** InvitationCree */
         InvitationCree: {
@@ -8515,6 +8653,32 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * ModificationInscrit
+         * @description Spec 045 : seuls les champs envoyés changent. Les règles sont celles de l'inscription.
+         */
+        ModificationInscrit: {
+            /** Motif */
+            motif: string;
+            /** Version */
+            version: number | null;
+            /** Prenom */
+            prenom?: string | null;
+            /** Nom */
+            nom?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Telephone */
+            telephone?: string | null;
+            classe?: components["schemas"]["Classe"] | null;
+            fonction?: components["schemas"]["Fonction"] | null;
+            /** Fonction Precision */
+            fonction_precision?: string | null;
+            /** Discipline */
+            discipline?: string | null;
+            /** Commune */
+            commune?: string | null;
+        };
         /** ModuleCatalogue */
         ModuleCatalogue: {
             /** Id */
@@ -8722,6 +8886,17 @@ export interface components {
             /** Candidats */
             candidats: components["schemas"]["CandidatCertification"][];
         };
+        /** PageContenusInscrit */
+        PageContenusInscrit: {
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Par Page */
+            par_page: number;
+            /** Contenus */
+            contenus: components["schemas"]["ContenuAdmin"][];
+        };
         /** PageDoublons */
         PageDoublons: {
             /** Paires */
@@ -8785,6 +8960,17 @@ export interface components {
             par_page: number;
             /** Clubs */
             clubs: components["schemas"]["ClubSuivi"][];
+        };
+        /** PageTentatives */
+        PageTentatives: {
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Par Page */
+            par_page: number;
+            /** Tentatives */
+            tentatives: components["schemas"]["TentativeAdmin"][];
         };
         /** PaireProbable */
         PaireProbable: {
@@ -9111,6 +9297,15 @@ export interface components {
             /** Legende */
             legende: string | null;
         };
+        /** PlaceAdmin */
+        PlaceAdmin: {
+            /** Place */
+            place: number;
+            /** Reussie Le */
+            reussie_le: string | null;
+            /** Quiz Titre */
+            quiz_titre: string | null;
+        };
         /** PlaceParcours */
         PlaceParcours: {
             /** Place */
@@ -9155,6 +9350,13 @@ export interface components {
             jeux_quiz: number;
             /** Jeux Etoiles */
             jeux_etoiles: number;
+        };
+        /** PointsInscrit */
+        PointsInscrit: {
+            totaux: components["schemas"]["TotauxInscrit"];
+            /** Semestres */
+            semestres: components["schemas"]["SemestreInscrit"][];
+            registre: components["schemas"]["PageRegistre"];
         };
         /** PresencesEntree */
         PresencesEntree: {
@@ -9485,6 +9687,13 @@ export interface components {
             ressource_id?: string | null;
             niveau?: components["schemas"]["NiveauQuiz"] | null;
         };
+        /** QuizInscrit */
+        QuizInscrit: {
+            resume: components["schemas"]["ResumeQuiz"];
+            /** Valides */
+            valides: components["schemas"]["QuizValide"][];
+            tentatives: components["schemas"]["PageTentatives"];
+        };
         /** QuizJoueur */
         QuizJoueur: {
             /**
@@ -9529,6 +9738,37 @@ export interface components {
             /** Numero */
             numero: number | null;
             niveau: components["schemas"]["NiveauQuiz"] | null;
+        };
+        /** QuizValide */
+        QuizValide: {
+            /**
+             * Quiz Id
+             * Format: uuid
+             */
+            quiz_id: string;
+            /** Titre */
+            titre: string;
+            /** Axe */
+            axe: string;
+            /** Parcours */
+            parcours: string;
+            /** Place */
+            place: number | null;
+            /** Niveau */
+            niveau: string | null;
+            /**
+             * Premiere Reussite
+             * Format: date-time
+             */
+            premiere_reussite: string;
+            /** Meilleur Score */
+            meilleur_score: number;
+            /** Nb Questions */
+            nb_questions: number;
+            /** Reussites */
+            reussites: number;
+            /** Points */
+            points: number;
         };
         /**
          * Raison
@@ -10032,6 +10272,17 @@ export interface components {
             /** Lignes */
             lignes: components["schemas"]["LignePoints"][];
         };
+        /** ResumeQuiz */
+        ResumeQuiz: {
+            /** Quiz Valides */
+            quiz_valides: number;
+            /** Tentatives */
+            tentatives: number;
+            /** Echecs */
+            echecs: number;
+            /** Points */
+            points: number;
+        };
         /**
          * Role
          * @enum {string}
@@ -10111,6 +10362,16 @@ export interface components {
              * Format: date
              */
             fin: string;
+        };
+        /** SemestreInscrit */
+        SemestreInscrit: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Libelle */
+            libelle: string;
         };
         /** SemestreModification */
         SemestreModification: {
@@ -10386,6 +10647,45 @@ export interface components {
             /** Ancien Eleve */
             ancien_eleve: boolean;
         };
+        /** TentativeAdmin */
+        TentativeAdmin: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Quiz Titre */
+            quiz_titre: string;
+            /** Axe */
+            axe: string;
+            /** Parcours */
+            parcours: string;
+            /** Place */
+            place: number | null;
+            /** Niveau */
+            niveau: string | null;
+            /**
+             * Commencee Le
+             * Format: date-time
+             */
+            commencee_le: string;
+            /** Terminee Le */
+            terminee_le: string | null;
+            /** Etat */
+            etat: string;
+            /** Essai */
+            essai: boolean;
+            /** Score */
+            score: number | null;
+            /** Nb Questions */
+            nb_questions: number;
+            /** Reussie */
+            reussie: boolean | null;
+            /** Duree S */
+            duree_s: number | null;
+            /** Points */
+            points: number | null;
+        };
         /** TerrainEntree */
         TerrainEntree: {
             /** Declare */
@@ -10432,6 +10732,15 @@ export interface components {
             certifies: number;
             /** Badges */
             badges: components["schemas"]["BadgeCompte"][];
+        };
+        /** TotauxInscrit */
+        TotauxInscrit: {
+            /** Semestre */
+            semestre: string | null;
+            /** Points Semestre */
+            points_semestre: number;
+            /** Total */
+            total: number;
         };
         /** TypeActivite */
         TypeActivite: {
@@ -11514,6 +11823,176 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InscritDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modifier_inscrit_api_admin_inscrits__utilisateur_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModificationInscrit"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InscritDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    points_inscrit_api_admin_inscrits__utilisateur_id__points_get: {
+        parameters: {
+            query?: {
+                semestre_id?: string | null;
+                page?: number;
+            };
+            header?: never;
+            path: {
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PointsInscrit"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quiz_inscrit_api_admin_inscrits__utilisateur_id__quiz_get: {
+        parameters: {
+            query?: {
+                parcours?: ("jeux" | "certification") | null;
+                resultat?: ("reussies" | "echouees") | null;
+                page?: number;
+            };
+            header?: never;
+            path: {
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizInscrit"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    certification_inscrit_api_admin_inscrits__utilisateur_id__certification_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificationInscrit"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    contenus_inscrit_api_admin_inscrits__utilisateur_id__contenus_get: {
+        parameters: {
+            query?: {
+                type?: string | null;
+                etat?: components["schemas"]["EtatContenu"] | null;
+                page?: number;
+            };
+            header?: never;
+            path: {
+                utilisateur_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageContenusInscrit"];
                 };
             };
             /** @description Validation Error */

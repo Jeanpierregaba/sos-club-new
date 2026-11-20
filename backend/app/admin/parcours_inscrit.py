@@ -21,6 +21,7 @@ from app.admin.schemas import (
     QuizInscrit,
     QuizValide,
     ResumeQuiz,
+    SemestreInscrit,
     TentativeAdmin,
     TotauxInscrit,
 )
@@ -30,7 +31,7 @@ from app.moderation.models import Contenu, EtatContenu, VersionContenu
 from app.moderation.types import TYPES
 from app.points import registre
 from app.points import service as points
-from app.points.models import MouvementPoints
+from app.points.models import MouvementPoints, Semestre
 from app.points.schemas import LigneRegistre, PageRegistre
 from app.quiz.models import PLACES, EtatTentative, ParametresQuiz, Quiz, TentativeQuiz
 from app.referentiel.models import Axe
@@ -60,12 +61,22 @@ async def points_de(db: AsyncSession, utilisateur_id: UUID, semestre_id: UUID | 
     calcul = await points.totaux(db, utilisateur_id)
     filtres = registre.FiltresRegistre(utilisateur_id=utilisateur_id, semestre_id=semestre_id)
     resultat = await registre.lister(db, filtres, page, PAR_PAGE_POINTS)
+    semestres = await db.execute(
+        select(Semestre.id, Semestre.libelle)
+        .where(
+            Semestre.id.in_(
+                select(MouvementPoints.semestre_id).where(MouvementPoints.utilisateur_id == utilisateur_id)
+            )
+        )
+        .order_by(Semestre.debut.desc())
+    )
     return PointsInscrit(
         totaux=TotauxInscrit(
             semestre=calcul.semestre.libelle if calcul.semestre else None,
             points_semestre=calcul.points_semestre,
             total=calcul.total,
         ),
+        semestres=[SemestreInscrit(id=r.id, libelle=r.libelle) for r in semestres.all()],
         registre=PageRegistre(
             total=resultat.total,
             page=page,

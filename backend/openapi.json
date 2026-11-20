@@ -1363,6 +1363,353 @@
             }
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Modifier Inscrit",
+        "description": "Spec 045 : identité et profil d'un élève ou d'un encadreur, avec un motif journalisé.",
+        "operationId": "modifier_inscrit_api_admin_inscrits__utilisateur_id__patch",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModificationInscrit"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscritDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/inscrits/{utilisateur_id}/points": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Points Inscrit",
+        "operationId": "points_inscrit_api_admin_inscrits__utilisateur_id__points_get",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          },
+          {
+            "name": "semestre_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Semestre Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointsInscrit"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/inscrits/{utilisateur_id}/quiz": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Quiz Inscrit",
+        "operationId": "quiz_inscrit_api_admin_inscrits__utilisateur_id__quiz_get",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          },
+          {
+            "name": "parcours",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "jeux",
+                    "certification"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Parcours"
+            }
+          },
+          {
+            "name": "resultat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "reussies",
+                    "echouees"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resultat"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizInscrit"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/inscrits/{utilisateur_id}/certification": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Certification Inscrit",
+        "operationId": "certification_inscrit_api_admin_inscrits__utilisateur_id__certification_get",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificationInscrit"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/inscrits/{utilisateur_id}/contenus": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Contenus Inscrit",
+        "operationId": "contenus_inscrit_api_admin_inscrits__utilisateur_id__contenus_get",
+        "parameters": [
+          {
+            "name": "utilisateur_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Utilisateur Id"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 30
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type"
+            }
+          },
+          {
+            "name": "etat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EtatContenu"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Etat"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageContenusInscrit"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/admin/inscrits/{utilisateur_id}/suspendre": {
@@ -15340,6 +15687,35 @@
         ],
         "title": "AxePublic"
       },
+      "BadgeAdmin": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "palier": {
+            "type": "integer",
+            "title": "Palier"
+          },
+          "obtenu_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Obtenu Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rang",
+          "nom",
+          "palier",
+          "obtenu_le"
+        ],
+        "title": "BadgeAdmin"
+      },
       "BadgeCompte": {
         "properties": {
           "rang": {
@@ -16401,6 +16777,60 @@
         ],
         "title": "CategorieRessource"
       },
+      "CertificatAdmin": {
+        "properties": {
+          "numero": {
+            "type": "string",
+            "title": "Numero"
+          },
+          "etat": {
+            "type": "string",
+            "title": "Etat"
+          },
+          "delivre_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Delivre Le"
+          },
+          "titulaire": {
+            "type": "string",
+            "title": "Titulaire"
+          },
+          "motif": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motif"
+          },
+          "decide_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decide Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "numero",
+          "etat",
+          "delivre_le",
+          "titulaire",
+          "motif",
+          "decide_le"
+        ],
+        "title": "CertificatAdmin"
+      },
       "CertificatGestion": {
         "properties": {
           "id": {
@@ -16534,6 +16964,38 @@
           "afficher_club"
         ],
         "title": "CertificatJoueur"
+      },
+      "CertificationInscrit": {
+        "properties": {
+          "places": {
+            "items": {
+              "$ref": "#/components/schemas/PlaceAdmin"
+            },
+            "type": "array",
+            "title": "Places"
+          },
+          "badges": {
+            "items": {
+              "$ref": "#/components/schemas/BadgeAdmin"
+            },
+            "type": "array",
+            "title": "Badges"
+          },
+          "certificats": {
+            "items": {
+              "$ref": "#/components/schemas/CertificatAdmin"
+            },
+            "type": "array",
+            "title": "Certificats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "places",
+          "badges",
+          "certificats"
+        ],
+        "title": "CertificationInscrit"
       },
       "ChampsArticle": {
         "properties": {
@@ -18584,6 +19046,59 @@
           "mot_de_passe"
         ],
         "title": "ConnexionEntree"
+      },
+      "ContenuAdmin": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "type_libelle": {
+            "type": "string",
+            "title": "Type Libelle"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "etat": {
+            "type": "string",
+            "title": "Etat"
+          },
+          "cree_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Cree Le"
+          },
+          "publie_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publie Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "type_libelle",
+          "titre",
+          "etat",
+          "cree_le",
+          "publie_le"
+        ],
+        "title": "ContenuAdmin"
       },
       "CorrectionDefi": {
         "properties": {
@@ -23716,6 +24231,17 @@
                 "type": "null"
               }
             ]
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
           }
         },
         "type": "object",
@@ -25396,6 +25922,138 @@
         "title": "ModificationEntree",
         "description": "Les champs restent bruts ici : le service les valide et nomme le champ fautif dans son message."
       },
+      "ModificationInscrit": {
+        "properties": {
+          "motif": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Motif"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "prenom": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prenom"
+          },
+          "nom": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nom"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 254
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "telephone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Telephone"
+          },
+          "classe": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Classe"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fonction": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Fonction"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fonction_precision": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fonction Precision"
+          },
+          "discipline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discipline"
+          },
+          "commune": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commune"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "motif",
+          "version"
+        ],
+        "title": "ModificationInscrit",
+        "description": "Spec 045 : seuls les champs envoyés changent. Les règles sont celles de l'inscription."
+      },
       "ModuleCatalogue": {
         "properties": {
           "id": {
@@ -25992,6 +26650,37 @@
         ],
         "title": "PageCandidats"
       },
+      "PageContenusInscrit": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "contenus": {
+            "items": {
+              "$ref": "#/components/schemas/ContenuAdmin"
+            },
+            "type": "array",
+            "title": "Contenus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "page",
+          "par_page",
+          "contenus"
+        ],
+        "title": "PageContenusInscrit"
+      },
       "PageDoublons": {
         "properties": {
           "paires": {
@@ -26171,6 +26860,37 @@
           "clubs"
         ],
         "title": "PageSuivi"
+      },
+      "PageTentatives": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "par_page": {
+            "type": "integer",
+            "title": "Par Page"
+          },
+          "tentatives": {
+            "items": {
+              "$ref": "#/components/schemas/TentativeAdmin"
+            },
+            "type": "array",
+            "title": "Tentatives"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "page",
+          "par_page",
+          "tentatives"
+        ],
+        "title": "PageTentatives"
       },
       "PaireProbable": {
         "properties": {
@@ -27064,6 +27784,44 @@
         ],
         "title": "PhotoRapport"
       },
+      "PlaceAdmin": {
+        "properties": {
+          "place": {
+            "type": "integer",
+            "title": "Place"
+          },
+          "reussie_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reussie Le"
+          },
+          "quiz_titre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quiz Titre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "place",
+          "reussie_le",
+          "quiz_titre"
+        ],
+        "title": "PlaceAdmin"
+      },
       "PlaceParcours": {
         "properties": {
           "place": {
@@ -27234,6 +27992,30 @@
           "jeux_etoiles"
         ],
         "title": "PointsDuClub"
+      },
+      "PointsInscrit": {
+        "properties": {
+          "totaux": {
+            "$ref": "#/components/schemas/TotauxInscrit"
+          },
+          "semestres": {
+            "items": {
+              "$ref": "#/components/schemas/SemestreInscrit"
+            },
+            "type": "array",
+            "title": "Semestres"
+          },
+          "registre": {
+            "$ref": "#/components/schemas/PageRegistre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "totaux",
+          "semestres",
+          "registre"
+        ],
+        "title": "PointsInscrit"
       },
       "PresencesEntree": {
         "properties": {
@@ -28390,6 +29172,30 @@
         ],
         "title": "QuizEntree"
       },
+      "QuizInscrit": {
+        "properties": {
+          "resume": {
+            "$ref": "#/components/schemas/ResumeQuiz"
+          },
+          "valides": {
+            "items": {
+              "$ref": "#/components/schemas/QuizValide"
+            },
+            "type": "array",
+            "title": "Valides"
+          },
+          "tentatives": {
+            "$ref": "#/components/schemas/PageTentatives"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resume",
+          "valides",
+          "tentatives"
+        ],
+        "title": "QuizInscrit"
+      },
       "QuizJoueur": {
         "properties": {
           "id": {
@@ -28534,6 +29340,85 @@
           "niveau"
         ],
         "title": "QuizOuvert"
+      },
+      "QuizValide": {
+        "properties": {
+          "quiz_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Quiz Id"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "axe": {
+            "type": "string",
+            "title": "Axe"
+          },
+          "parcours": {
+            "type": "string",
+            "title": "Parcours"
+          },
+          "place": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Place"
+          },
+          "niveau": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Niveau"
+          },
+          "premiere_reussite": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Premiere Reussite"
+          },
+          "meilleur_score": {
+            "type": "integer",
+            "title": "Meilleur Score"
+          },
+          "nb_questions": {
+            "type": "integer",
+            "title": "Nb Questions"
+          },
+          "reussites": {
+            "type": "integer",
+            "title": "Reussites"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "quiz_id",
+          "titre",
+          "axe",
+          "parcours",
+          "place",
+          "niveau",
+          "premiere_reussite",
+          "meilleur_score",
+          "nb_questions",
+          "reussites",
+          "points"
+        ],
+        "title": "QuizValide"
       },
       "Raison": {
         "type": "string",
@@ -30121,6 +31006,34 @@
         ],
         "title": "ResumePoints"
       },
+      "ResumeQuiz": {
+        "properties": {
+          "quiz_valides": {
+            "type": "integer",
+            "title": "Quiz Valides"
+          },
+          "tentatives": {
+            "type": "integer",
+            "title": "Tentatives"
+          },
+          "echecs": {
+            "type": "integer",
+            "title": "Echecs"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "quiz_valides",
+          "tentatives",
+          "echecs",
+          "points"
+        ],
+        "title": "ResumeQuiz"
+      },
       "Role": {
         "type": "string",
         "enum": [
@@ -30272,6 +31185,25 @@
           "fin"
         ],
         "title": "SemestreCreation"
+      },
+      "SemestreInscrit": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "libelle"
+        ],
+        "title": "SemestreInscrit"
       },
       "SemestreModification": {
         "properties": {
@@ -31006,6 +31938,141 @@
         ],
         "title": "TableauGamification"
       },
+      "TentativeAdmin": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "quiz_titre": {
+            "type": "string",
+            "title": "Quiz Titre"
+          },
+          "axe": {
+            "type": "string",
+            "title": "Axe"
+          },
+          "parcours": {
+            "type": "string",
+            "title": "Parcours"
+          },
+          "place": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Place"
+          },
+          "niveau": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Niveau"
+          },
+          "commencee_le": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Commencee Le"
+          },
+          "terminee_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Terminee Le"
+          },
+          "etat": {
+            "type": "string",
+            "title": "Etat"
+          },
+          "essai": {
+            "type": "boolean",
+            "title": "Essai"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "nb_questions": {
+            "type": "integer",
+            "title": "Nb Questions"
+          },
+          "reussie": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reussie"
+          },
+          "duree_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duree S"
+          },
+          "points": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "quiz_titre",
+          "axe",
+          "parcours",
+          "place",
+          "niveau",
+          "commencee_le",
+          "terminee_le",
+          "etat",
+          "essai",
+          "score",
+          "nb_questions",
+          "reussie",
+          "duree_s",
+          "points"
+        ],
+        "title": "TentativeAdmin"
+      },
       "TerrainEntree": {
         "properties": {
           "declare": {
@@ -31127,6 +32194,36 @@
           "badges"
         ],
         "title": "TotauxCertification"
+      },
+      "TotauxInscrit": {
+        "properties": {
+          "semestre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Semestre"
+          },
+          "points_semestre": {
+            "type": "integer",
+            "title": "Points Semestre"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "semestre",
+          "points_semestre",
+          "total"
+        ],
+        "title": "TotauxInscrit"
       },
       "TypeActivite": {
         "properties": {
