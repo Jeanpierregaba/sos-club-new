@@ -5178,6 +5178,8 @@ export interface components {
             temps_cumule_s: number;
             /** Duree Calendaire S */
             duree_calendaire_s: number | null;
+            /** Depuis Badge Precedent */
+            depuis_badge_precedent: boolean;
         };
         /** BadgeCompte */
         BadgeCompte: {
@@ -5629,6 +5631,8 @@ export interface components {
         };
         /** CertificationInscrit */
         CertificationInscrit: {
+            /** Temps Total S */
+            temps_total_s: number;
             /** Places */
             places: components["schemas"]["PlaceAdmin"][];
             /** Badges */
@@ -9831,8 +9835,8 @@ export interface components {
             temps_premiere_reussite_s: number;
             /** Moyenne Nationale S */
             moyenne_nationale_s: number | null;
-            /** Reussites Nationales */
-            reussites_nationales: number;
+            /** Joueurs Nationaux */
+            joueurs_nationaux: number;
             /** Tres Rapide */
             tres_rapide: boolean;
         };

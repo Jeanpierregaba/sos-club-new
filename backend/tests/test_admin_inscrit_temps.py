@@ -49,9 +49,12 @@ def test_une_partie_abandonnee_compte_jusqua_sa_derniere_activite(
     assert donnees["resume"]["temps_moyen_s"] == 90
 
 
-def test_une_tentative_en_cours_compte_jusqua_maintenant_sa_derniere_activite(
-    lecteur: TestClient, creer_eleve: Callable[..., Any], en_base: Callable[..., Any]
+def test_une_tentative_en_cours_compte_jusqua_sa_derniere_activite(
+    lecteur: TestClient, creer_eleve: Callable[..., Any], en_base: Callable[..., Any], monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    from app.quiz import horloge
+
+    monkeypatch.setattr(horloge, "maintenant", lambda: DEBUT + timedelta(minutes=2))
     eleve = creer_eleve()
     quiz = creer_quiz(en_base, niveau="debutant", numero=1)
     tentative(en_base, eleve.id, quiz, reussie=None, duree=45, etat=EtatTentative.en_cours)
@@ -77,6 +80,8 @@ def test_la_moyenne_nationale_et_la_pastille_tres_rapide(
         # Ni les échecs, ni les essais des autres n'entrent dans la moyenne.
         tentative(en_base, autre.id, quiz, reussie=False, duree=5, decalage=1)
         tentative(en_base, autre.id, quiz, reussie=True, duree=5, decalage=2, essai=True)
+        # Seule la première réussite de chaque joueur compte : un rejeu rapide ne fait pas baisser la moyenne.
+        tentative(en_base, autre.id, quiz, reussie=True, duree=10, decalage=3)
     # La première réussite de l'inscrit compte, pas la suivante ; ses tentatives restent hors de la moyenne.
     tentative(en_base, eleve.id, quiz, reussie=True, duree=40, decalage=10)
     tentative(en_base, eleve.id, quiz, reussie=True, duree=500, decalage=20)
@@ -85,7 +90,7 @@ def test_la_moyenne_nationale_et_la_pastille_tres_rapide(
 
     assert valide["temps_premiere_reussite_s"] == 40
     assert valide["moyenne_nationale_s"] == 100
-    assert valide["reussites_nationales"] == 5
+    assert valide["joueurs_nationaux"] == 5
     assert valide["tres_rapide"] is True
 
 
@@ -101,8 +106,39 @@ def test_sous_cinq_reussites_la_moyenne_nationale_est_absente(
     (valide,) = lecteur.get(f"{INSCRITS}/{eleve.id}/quiz").json()["valides"]
 
     assert valide["moyenne_nationale_s"] is None
-    assert valide["reussites_nationales"] == 4
+    assert valide["joueurs_nationaux"] == 4
     assert valide["tres_rapide"] is False
+
+
+def test_cinq_reussites_dun_seul_joueur_ne_font_pas_une_moyenne(
+    lecteur: TestClient, creer_eleve: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    eleve = creer_eleve()
+    (autre,) = autres_joueurs(creer_eleve, 1)
+    quiz = creer_quiz(en_base, titre="Hygiène", niveau="debutant", numero=1)
+    for rang in range(5):
+        tentative(en_base, autre.id, quiz, reussie=True, duree=100, decalage=rang)
+    tentative(en_base, eleve.id, quiz, reussie=True, duree=10, decalage=10)
+
+    (valide,) = lecteur.get(f"{INSCRITS}/{eleve.id}/quiz").json()["valides"]
+
+    assert (valide["moyenne_nationale_s"], valide["joueurs_nationaux"]) == (None, 1)
+
+
+def test_une_partie_restee_en_cours_sans_activite_est_abandonnee(
+    lecteur: TestClient, creer_eleve: Callable[..., Any], en_base: Callable[..., Any]
+) -> None:
+    eleve = creer_eleve()
+    quiz = creer_quiz(en_base, questions=2, niveau="debutant", numero=1)
+    # DEBUT est passé de plus de 10 minutes : le joueur n'est jamais revenu.
+    essai = tentative(en_base, eleve.id, quiz, reussie=None, duree=8, etat=EtatTentative.en_cours)
+    repondre(en_base, essai, quiz, [(0, 3, 0, True), (5, None, None, None)])
+
+    (ligne,) = lecteur.get(f"{INSCRITS}/{eleve.id}/quiz").json()["tentatives"]["tentatives"]
+    questions = lecteur.get(f"{INSCRITS}/{eleve.id}/tentatives/{essai.id}").json()["questions"]
+
+    assert (ligne["etat"], ligne["abandonnee"]) == ("en_cours", True)
+    assert [q["etat"] for q in questions] == ["juste", "temps_ecoule"]
 
 
 def test_un_temps_proche_de_la_moyenne_nest_pas_tres_rapide(
@@ -151,6 +187,7 @@ def test_le_detail_dune_tentative_question_par_question(
     eleve = creer_eleve()
     quiz = creer_quiz(en_base, questions=5, niveau="debutant", numero=1)
     essai = tentative(en_base, eleve.id, quiz, reussie=False, score=1, duree=60)
+    # Rang 3 : temps écoulé sans réponse ; rang 4 : réponse arrivée trop tard (repondue_le posé, choix nul).
     repondre(
         en_base, essai, quiz,
         [(0, 4.24, 0, True), (5, 12, 1, False), (13, None, None, False), (40, 70, None, False), (None, None, None, None)],
@@ -178,8 +215,11 @@ def test_le_detail_dune_tentative_question_par_question(
 
 
 def test_une_question_affichee_en_cours_de_partie(
-    lecteur: TestClient, creer_eleve: Callable[..., Any], en_base: Callable[..., Any]
+    lecteur: TestClient, creer_eleve: Callable[..., Any], en_base: Callable[..., Any], monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    from app.quiz import horloge
+
+    monkeypatch.setattr(horloge, "maintenant", lambda: DEBUT + timedelta(minutes=2))
     eleve = creer_eleve()
     quiz = creer_quiz(en_base, questions=2, niveau="debutant", numero=1)
     essai = tentative(en_base, eleve.id, quiz, reussie=None, etat=EtatTentative.en_cours)
@@ -277,17 +317,26 @@ def test_les_temps_des_places_des_badges_et_du_certificat(
     # Badge 1 : 30 + 40 s avant la 15e minute ; badge 2 : 50 + 20 + 5 s ensuite. Le premier part de la première
     # tentative de certification, le second du badge précédent.
     assert badges == [(1, 70, 70, 15 * 60), (2, 75, 145, 45 * 60)]
+    assert [b["depuis_badge_precedent"] for b in donnees["badges"]] == [False, True]
+    # Le total compte aussi la partie rejouée après la réussite de la place 1 (50 s).
+    assert donnees["temps_total_s"] == 145
     (certificat,) = donnees["certificats"]
     assert (certificat["temps_cumule_s"], certificat["duree_calendaire_s"]) == (145, 3600)
 
 
-def test_un_badge_sans_tentative_retrouvee(
+def test_un_badge_et_un_certificat_sans_tentative_retrouvee(
     lecteur: TestClient, creer_eleve: Callable[..., Any], en_base: Callable[..., Any]
 ) -> None:
     eleve = creer_eleve()
 
     async def decerner(db: AsyncSession) -> None:
         db.add(BadgeObtenu(utilisateur_id=eleve.id, rang=1, nom="Ancien", palier=3, regles_version=1, obtenu_le=DEBUT))
+        db.add(
+            Certificat(
+                numero="GI-AAAA-BBBB-DDDD", utilisateur_id=eleve.id, role="eleve", titulaire_prenom="Jean",
+                titulaire_nom="Kodjo", etat=EtatCertificat.valide, delivre_le=DEBUT,
+            )
+        )  # fmt: skip
 
     en_base(decerner)
 
@@ -295,4 +344,8 @@ def test_un_badge_sans_tentative_retrouvee(
 
     (badge,) = donnees["badges"]
     assert (badge["temps_s"], badge["temps_cumule_s"], badge["duree_calendaire_s"]) == (0, 0, None)
+    assert badge["depuis_badge_precedent"] is False
+    (certificat,) = donnees["certificats"]
+    assert (certificat["temps_cumule_s"], certificat["duree_calendaire_s"]) == (0, None)
+    assert donnees["temps_total_s"] == 0
     assert all((p["temps_s"], p["tentatives"]) == (0, 0) for p in donnees["places"])

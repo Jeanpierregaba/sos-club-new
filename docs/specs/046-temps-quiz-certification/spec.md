@@ -26,8 +26,11 @@ tentative, ainsi que l'heure d'affichage et de réponse de chaque question.
   - *Durée calendaire* : du badge précédent (ou de la première tentative de certification) à l'obtention.
 - **Certificat** : temps de jeu cumulé et durée calendaire de la première tentative de certification à sa
   délivrance.
-- **Moyenne nationale d'un quiz** : temps de jeu moyen des tentatives réussies des **autres** joueurs (hors essais)
-  sur ce quiz, avec leur nombre. Affichée seulement à partir de 5 tentatives réussies d'autres joueurs.
+- **Moyenne nationale d'un quiz** : temps de jeu moyen de la **première réussite** de chaque **autre** joueur (hors
+  essais) sur ce quiz, avec le nombre de joueurs. On compare ainsi première réussite à première réussite, sans les
+  rejeux plus rapides. Affichée seulement à partir de 5 joueurs distincts.
+- **Partie abandonnée** : close plus de 10 minutes après sa dernière activité, ou restée en cours sans activité depuis
+  plus de 10 minutes.
 
 ## Comportement attendu
 
@@ -49,38 +52,42 @@ tentative, ainsi que l'heure d'affichage et de réponse de chaque question.
    - Chaque place réussie montre son temps de jeu et son nombre de tentatives.
    - Chaque badge montre son temps de jeu (depuis le badge précédent et cumulé) et sa durée calendaire.
    - Chaque certificat montre le temps de jeu cumulé et la durée calendaire jusqu'à sa délivrance.
+   - Le résumé montre le temps de jeu total de la certification, rejeux compris.
 
 ## Critères d'acceptation
 
-- [ ] Étant donné une tentative close 3 jours après sa dernière activité, quand l'équipe ouvre l'onglet Quiz, alors
+- [x] Étant donné une tentative close 3 jours après sa dernière activité, quand l'équipe ouvre l'onglet Quiz, alors
       son temps de jeu vaut `derniere_activite − commencee_le` et elle est marquée « abandonnée ».
-- [ ] Le résumé des quiz donne le temps de jeu total et moyen des tentatives terminées hors essais.
-- [ ] Étant donné 5 réussites d'autres joueurs sur un quiz, la moyenne nationale s'affiche avec leur nombre. Avec 4
-      réussites, elle est absente (`null`).
-- [ ] Les tentatives de l'inscrit lui-même et les essais n'entrent pas dans la moyenne nationale.
-- [ ] Une première réussite en moins de la moitié de la moyenne est marquée « Très rapide ».
-- [ ] `GET /api/admin/inscrits/{id}/tentatives/{tentative_id}` renvoie les questions dans l'ordre, avec :
+- [x] Le résumé des quiz donne le temps de jeu total et moyen des tentatives terminées hors essais.
+- [x] Étant donné 5 autres joueurs ayant réussi un quiz, la moyenne de leurs premières réussites s'affiche avec leur
+      nombre. Avec 4 joueurs, ou 5 réussites d'un seul joueur, elle est absente (`null`).
+- [x] Les tentatives de l'inscrit lui-même et les essais n'entrent pas dans la moyenne nationale.
+- [x] Une première réussite en moins de la moitié de la moyenne est marquée « Très rapide ».
+- [x] `GET /api/admin/inscrits/{id}/tentatives/{tentative_id}` renvoie les questions dans l'ordre, avec :
   - le temps en secondes ;
-  - les états « juste », « fausse », « temps écoulé » et « non posée » ;
+  - les états « juste », « fausse », « temps écoulé », « non posée » et « en cours » (question affichée d'une partie
+    encore active) ;
   - la réponse choisie dans le texte de la question ;
   - jamais la bonne réponse.
-- [ ] Une tentative d'un autre joueur demandée sous la fiche d'un inscrit → 404.
-- [ ] Le temps de jeu d'une place cumule les tentatives sur son quiz jusqu'à la réussite incluse, et non celles
+- [x] Une tentative d'un autre joueur demandée sous la fiche d'un inscrit → 404.
+- [x] Le temps de jeu d'une place cumule les tentatives sur son quiz jusqu'à la réussite incluse, et non celles
       d'après.
-- [ ] Le temps de jeu d'un badge cumule les tentatives de certification entre le badge précédent et son obtention.
+- [x] Le temps de jeu d'un badge cumule les tentatives de certification entre le badge précédent et son obtention.
       Sa durée calendaire part du badge précédent, ou de la première tentative de certification pour le premier.
-- [ ] Un certificat montre le temps de jeu cumulé et la durée calendaire jusqu'à sa délivrance.
-- [ ] Sans le droit `inscrits:consulter` national → 403 sur la nouvelle route.
-- [ ] Le site affiche les durées en « 1 min 05 s », « 2 h 10 min » ou « 3 j 4 h », et le panneau de détail.
+- [x] Un certificat montre le temps de jeu cumulé et la durée calendaire jusqu'à sa délivrance.
+- [x] Sans le droit `inscrits:consulter` national → 403 sur la nouvelle route.
+- [x] Le site affiche les durées en « 1 min 05 s », « 2 h 10 min » ou « 3 j 4 h », et le panneau de détail.
 
 ## Cas limites et erreurs
 
-- **Tentative en cours** : temps de jeu jusqu'à la dernière activité, marquée « en cours ».
+- **Tentative en cours** : temps de jeu jusqu'à la dernière activité, marquée « en cours ». Sans activité depuis plus
+  de 10 minutes, elle est marquée « abandonnée » et sa question affichée compte en « temps écoulé ».
 - **Question affichée après une pause de correction** (`envoyee_le` dans le futur au moment de l'envoi) : le temps
   compté part de `envoyee_le`. Il n'est jamais négatif : on le borne à 0.
 - **Quiz remplacé à une place** : la place compte les tentatives sur tous les quiz qui ont occupé cette place, pas
   seulement le dernier.
-- **Badge obtenu sans tentative retrouvée** (données anciennes) : temps de jeu 0, durée calendaire absente.
+- **Badge ou certificat sans tentative retrouvée** (données anciennes) : temps de jeu 0, durée calendaire absente
+  (ligne masquée sur le site).
 - **Inscrit sans tentative** : résumé à 0, aucun quiz validé, places, badges et certificats sans temps.
 - **Certificat remplacé ou révoqué** : les temps se calculent de la même façon, d'après sa date de délivrance.
 - **Volume** : moyennes et cumuls calculés en SQL (agrégats), jamais toutes les tentatives en mémoire.

@@ -181,6 +181,14 @@ class TentativeQuiz(Base):
             postgresql_where=text("etat = 'en_cours'"),
         ),
         Index("ix_tentative_quiz_joueur_quiz_jour", "joueur_id", "quiz_id", "jour"),
+        # Moyenne nationale d'un quiz (spec 046) : premières réussites de chaque joueur.
+        Index(
+            "ix_tentative_quiz_reussites",
+            "quiz_id",
+            "joueur_id",
+            "terminee_le",
+            postgresql_where=text("etat = 'terminee' AND reussie AND NOT essai"),
+        ),
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)

@@ -404,9 +404,9 @@ class QuizValide(BaseModel):
     reussites: int
     points: int
     temps_premiere_reussite_s: int
-    # Moyenne des réussites des autres joueurs, absente sous le seuil d'effectif (spec 046).
+    # Moyenne des premières réussites des autres joueurs, absente sous le seuil de joueurs (spec 046).
     moyenne_nationale_s: int | None
-    reussites_nationales: int
+    joueurs_nationaux: int
     tres_rapide: bool
 
 
@@ -477,6 +477,8 @@ class BadgeAdmin(BaseModel):
     temps_s: int
     temps_cumule_s: int
     duree_calendaire_s: int | None
+    # La durée calendaire part du badge précédent, sinon de la première tentative de certification.
+    depuis_badge_precedent: bool
 
 
 class CertificatAdmin(BaseModel):
@@ -491,6 +493,8 @@ class CertificatAdmin(BaseModel):
 
 
 class CertificationInscrit(BaseModel):
+    # Spec 046 : temps de jeu de toutes les tentatives de certification, rejeux compris.
+    temps_total_s: int
     places: list[PlaceAdmin]
     badges: list[BadgeAdmin]
     certificats: list[CertificatAdmin]

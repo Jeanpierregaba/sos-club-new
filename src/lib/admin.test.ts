@@ -7,6 +7,7 @@ describe("dureeLisible", () => {
     expect(dureeLisible(45)).toBe("45 s");
     expect(dureeLisible(4.2)).toBe("4,2 s");
     expect(dureeLisible(0)).toBe("0 s");
+    expect(dureeLisible(59.96)).toBe("1 min 00 s");
   });
 
   it("passe aux minutes, aux heures puis aux jours", () => {

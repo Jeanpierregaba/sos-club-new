@@ -34,7 +34,6 @@ export function OngletCertification({
 
   const reussies = donnees.places.filter((p) => p.reussie_le).length;
   const jouees = donnees.places.filter((p) => p.tentatives > 0 || p.reussie_le);
-  const tempsTotal = donnees.places.reduce((somme, p) => somme + p.temps_s, 0);
   return (
     <div className="space-y-6">
       <Bloc
@@ -56,7 +55,7 @@ export function OngletCertification({
             ["Places réussies", `${reussies} / ${donnees.places.length}`],
             ["Badges", donnees.badges.length],
             ["Certificats", donnees.certificats.length],
-            ["Temps de jeu", dureeLisible(tempsTotal)],
+            ["Temps de jeu", dureeLisible(donnees.temps_total_s)],
           ]}
         />
         <ol className="mt-5 grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-10">
@@ -109,10 +108,14 @@ export function OngletCertification({
                 <span className="block text-muted-foreground">
                   Temps de jeu {dureeLisible(b.temps_s)} (cumul {dureeLisible(b.temps_cumule_s)})
                 </span>
-                <span className="block text-muted-foreground">
-                  En {dureeLisible(b.duree_calendaire_s)}{" "}
-                  {b.rang === 1 ? "depuis la première tentative" : "depuis le badge précédent"}
-                </span>
+                {b.duree_calendaire_s != null && (
+                  <span className="block text-muted-foreground">
+                    En {dureeLisible(b.duree_calendaire_s)}{" "}
+                    {b.depuis_badge_precedent
+                      ? "depuis le badge précédent"
+                      : "depuis la première tentative"}
+                  </span>
+                )}
               </li>
             ))}
           </ul>
@@ -139,8 +142,9 @@ export function OngletCertification({
                     Délivré le {dateCourte(c.delivre_le)} au nom de {c.titulaire}
                   </span>
                   <span className="block text-muted-foreground">
-                    Temps de jeu {dureeLisible(c.temps_cumule_s)} · obtenu en{" "}
-                    {dureeLisible(c.duree_calendaire_s)} depuis la première tentative
+                    Temps de jeu {dureeLisible(c.temps_cumule_s)}
+                    {c.duree_calendaire_s != null &&
+                      ` · obtenu en ${dureeLisible(c.duree_calendaire_s)} depuis la première tentative`}
                   </span>
                   {c.motif && (
                     <span className="block text-muted-foreground">

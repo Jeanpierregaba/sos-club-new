@@ -30,7 +30,7 @@ const repere = (q: { parcours: string; place: number | null; niveau: string | nu
     : `Jeux${q.niveau ? ` · ${NIVEAUX[q.niveau] ?? q.niveau}` : ""}`;
 
 function Resultat({ t }: { t: TentativeAdmin }) {
-  if (t.etat !== "terminee") return <Pastille ton="or">En cours</Pastille>;
+  if (t.etat !== "terminee") return t.abandonnee ? null : <Pastille ton="or">En cours</Pastille>;
   return t.reussie ? (
     <Pastille ton="vert">Réussie</Pastille>
   ) : (
@@ -79,8 +79,8 @@ export function OngletQuiz({ id }: { id: string }) {
         <p className="mt-2 text-xs font-medium text-muted-foreground">
           Tentatives terminées, hors essais. Les points sont ceux du gain initial : une correction
           ultérieure apparaît dans l'onglet Points. Le temps de jeu va du début d'une partie à la
-          dernière action du joueur ; la moyenne compare aux réussites des autres joueurs (5 au
-          moins).
+          dernière action du joueur ; la moyenne compare à la première réussite des autres joueurs
+          (5 joueurs au moins).
         </p>
         {valides.length === 0 ? (
           <div className="mt-4">
@@ -124,7 +124,7 @@ export function OngletQuiz({ id }: { id: string }) {
                       </span>
                       <span className="block text-xs text-muted-foreground">
                         {q.moyenne_nationale_s != null
-                          ? `Moyenne : ${dureeLisible(q.moyenne_nationale_s)} (${q.reussites_nationales} réussites)`
+                          ? `Moyenne : ${dureeLisible(q.moyenne_nationale_s)} (${q.joueurs_nationaux} joueurs)`
                           : "Moyenne : trop peu de réussites"}
                       </span>
                     </td>

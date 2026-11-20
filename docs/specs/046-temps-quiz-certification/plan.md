@@ -57,12 +57,9 @@ filtrés) sur `tentative_quiz` et `reponse_quiz`. Une expression unique `temps_d
 
 ## Données
 
-Aucune modification du schéma. Les index existants suffisent :
-- l'index de `tentative_quiz` sur le joueur ;
-- l'index de `reponse_quiz` sur la tentative.
-
-À vérifier pendant l'implémentation : un index sur `tentative_quiz(quiz_id)`, utile à la moyenne nationale. S'il
-manque, on en propose un par migration, sans destruction.
+Aucune nouvelle table ni colonne. Une migration sans destruction, `e4a7c2d9b6f1`, ajoute l'index partiel
+`ix_tentative_quiz_reussites` sur `tentative_quiz (quiz_id, joueur_id, terminee_le)`, limité aux réussites terminées
+hors essais. Il sert la moyenne nationale ; sans lui, chaque ouverture de l'onglet Quiz parcourait toute la table.
 
 ## API / interfaces
 

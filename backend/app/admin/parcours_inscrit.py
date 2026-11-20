@@ -4,12 +4,13 @@ Chaque liste est paginée en SQL. Les temps (spec 046) sont des agrégats SQL : 
 son début à sa dernière activité, car une partie abandonnée n'est close qu'au retour du joueur.
 """
 
+from bisect import bisect_right
 from datetime import datetime
 from typing import Any
 from uuid import UUID
 
 from sqlalchemy import ColumnElement, Numeric, Select, and_, case, func, or_, select
-from sqlalchemy.dialects.postgresql import ARRAY, aggregate_order_by
+from sqlalchemy.dialects.postgresql import ARRAY, aggregate_order_by, distinct_on
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
@@ -39,6 +40,7 @@ from app.points import registre
 from app.points import service as points
 from app.points.models import MouvementPoints, Semestre
 from app.points.schemas import LigneRegistre, PageRegistre
+from app.quiz import horloge
 from app.quiz.models import (
     PARCOURS_CERTIFICATION,
     PLACES,
@@ -119,6 +121,7 @@ def _tentatives_de(utilisateur_id: UUID) -> Select[Any]:
             Quiz.niveau,
             Axe.libelle.label("axe"),
             ParametresQuiz.nb_questions,
+            ParametresQuiz.temps_ms,
             MouvementPoints.montant.label("points"),
         )
         .join(Quiz, Quiz.id == TentativeQuiz.quiz_id)
@@ -213,11 +216,13 @@ async def quiz_de(
 
 
 async def _moyennes_nationales(db: AsyncSession, utilisateur_id: UUID, quiz_ids: list[UUID]) -> dict[UUID, Any]:
-    """Temps de jeu moyen des réussites des autres joueurs, hors essais, sur chaque quiz demandé."""
+    """Temps de jeu moyen de la première réussite de chaque autre joueur, hors essais, sur chaque quiz demandé :
+    on compare à la première réussite de l'inscrit, sans les rejeux plus rapides. L'effectif compte des joueurs."""
     if not quiz_ids:
         return {}
-    rangees = await db.execute(
-        select(TentativeQuiz.quiz_id, func.avg(TEMPS_DE_JEU), func.count())
+    premieres = (
+        select(TentativeQuiz.quiz_id, TEMPS_DE_JEU.label("temps"))
+        .ext(distinct_on(TentativeQuiz.quiz_id, TentativeQuiz.joueur_id))
         .where(
             TentativeQuiz.quiz_id.in_(quiz_ids),
             TentativeQuiz.joueur_id != utilisateur_id,
@@ -225,7 +230,11 @@ async def _moyennes_nationales(db: AsyncSession, utilisateur_id: UUID, quiz_ids:
             TentativeQuiz.etat == EtatTentative.terminee,
             TentativeQuiz.reussie.is_(True),
         )
-        .group_by(TentativeQuiz.quiz_id)
+        .order_by(TentativeQuiz.quiz_id, TentativeQuiz.joueur_id, TentativeQuiz.terminee_le)
+        .subquery()
+    )
+    rangees = await db.execute(
+        select(premieres.c.quiz_id, func.avg(premieres.c.temps), func.count()).group_by(premieres.c.quiz_id)
     )
     return {r[0]: r for r in rangees.all()}
 
@@ -248,7 +257,7 @@ def _valide(r: Any, national: Any) -> QuizValide:
         points=r[10],
         temps_premiere_reussite_s=temps,
         moyenne_nationale_s=moyenne,
-        reussites_nationales=effectif,
+        joueurs_nationaux=effectif,
         tres_rapide=moyenne is not None and temps < moyenne * FRACTION_TRES_RAPIDE,
     )
 
@@ -257,11 +266,17 @@ def _valeur(valeur: Any) -> Any:
     return getattr(valeur, "value", valeur)
 
 
+def _abandonnee(tentative: TentativeQuiz) -> bool:
+    """Close au retour du joueur longtemps après sa dernière action, ou restée en cours sans activité : la partie
+    a été quittée."""
+    fin = tentative.terminee_le or horloge.maintenant()
+    return fin - tentative.derniere_activite > INACTIVITE
+
+
 def _tentative(rangee: Any) -> TentativeAdmin:
     tentative: TentativeQuiz = rangee.TentativeQuiz
     duree = max(0, round((tentative.derniere_activite - tentative.commencee_le).total_seconds()))
-    # Close au retour du joueur, longtemps après sa dernière action : la partie avait été quittée.
-    abandonnee = tentative.terminee_le is not None and tentative.terminee_le - tentative.derniere_activite > INACTIVITE
+    abandonnee = _abandonnee(tentative)
     return TentativeAdmin(
         id=tentative.id,
         quiz_titre=rangee.titre,
@@ -289,8 +304,8 @@ async def tentative_de(db: AsyncSession, utilisateur_id: UUID, tentative_id: UUI
     if rangee is None:
         raise Introuvable
     tentative: TentativeQuiz = rangee.TentativeQuiz
-    temps_ms = await db.scalar(select(ParametresQuiz.temps_ms).where(ParametresQuiz.id == tentative.parametres_id))
-    imparti = (temps_ms or 0) / 1000
+    imparti = rangee.temps_ms / 1000
+    abandonnee = _abandonnee(tentative)
     lignes = await db.execute(
         select(ReponseQuiz, QuestionQuiz.enonce, QuestionQuiz.choix)
         .join(QuestionQuiz, QuestionQuiz.id == ReponseQuiz.question_id)
@@ -300,12 +315,12 @@ async def tentative_de(db: AsyncSession, utilisateur_id: UUID, tentative_id: UUI
     return DetailTentative(
         tentative=_tentative(rangee),
         temps_imparti_s=imparti,
-        questions=[_question(r.ReponseQuiz, r.enonce, r.choix, tentative, imparti) for r in lignes.all()],
+        questions=[_question(r.ReponseQuiz, r.enonce, r.choix, tentative, imparti, abandonnee) for r in lignes.all()],
     )
 
 
 def _question(
-    ligne: ReponseQuiz, enonce: str, choix: list[str], tentative: TentativeQuiz, imparti: float
+    ligne: ReponseQuiz, enonce: str, choix: list[str], tentative: TentativeQuiz, imparti: float, abandonnee: bool
 ) -> QuestionTentative:
     if ligne.envoyee_le is None:
         return QuestionTentative(rang=ligne.rang, enonce=enonce, etat="non_posee", reponse=None, secondes=None)
@@ -318,7 +333,7 @@ def _question(
             rang=ligne.rang, enonce=enonce, etat="juste" if ligne.correcte else "fausse",
             reponse=choix[ligne.choix] if ligne.choix < len(choix) else None, secondes=secondes,
         )  # fmt: skip
-    if ligne.correcte is None and tentative.etat is EtatTentative.en_cours:
+    if ligne.correcte is None and tentative.etat is EtatTentative.en_cours and not abandonnee:
         return QuestionTentative(rang=ligne.rang, enonce=enonce, etat="en_cours", reponse=None, secondes=None)
     # Pas de réponse dans le temps imparti (ou réponse arrivée trop tard) : la question vaut le temps imparti.
     return QuestionTentative(rang=ligne.rang, enonce=enonce, etat="temps_ecoule", reponse=None, secondes=imparti)
@@ -350,11 +365,8 @@ async def certification_de(db: AsyncSession, utilisateur_id: UUID) -> Certificat
         )
         for place in range(1, PLACES + 1)
     ]
-    premiere = await db.scalar(
-        select(func.min(TentativeQuiz.commencee_le))
-        .join(Quiz, Quiz.id == TentativeQuiz.quiz_id)
-        .where(*_certification(utilisateur_id))
-    )
+    cumul = await _cumul_certification(db, utilisateur_id)
+    premiere = cumul.premiere
 
     badges: list[BadgeAdmin] = []
     precedent: datetime | None = None
@@ -368,9 +380,10 @@ async def certification_de(db: AsyncSession, utilisateur_id: UUID) -> Certificat
         badges.append(
             BadgeAdmin(
                 rang=b.rang, nom=b.nom, palier=b.palier, obtenu_le=b.obtenu_le,
-                temps_s=await _temps_certification(db, utilisateur_id, precedent, b.obtenu_le),
-                temps_cumule_s=await _temps_certification(db, utilisateur_id, None, b.obtenu_le),
+                temps_s=cumul.jusqua(b.obtenu_le) - (cumul.jusqua(precedent) if precedent else 0),
+                temps_cumule_s=cumul.jusqua(b.obtenu_le),
                 duree_calendaire_s=_ecart(precedent or premiere, b.obtenu_le),
+                depuis_badge_precedent=precedent is not None,
             )
         )  # fmt: skip
         precedent = b.obtenu_le
@@ -380,6 +393,7 @@ async def certification_de(db: AsyncSession, utilisateur_id: UUID) -> Certificat
         select(Certificat).where(Certificat.utilisateur_id == utilisateur_id).order_by(Certificat.delivre_le.desc())
     )
     return CertificationInscrit(
+        temps_total_s=cumul.total,
         places=places,
         badges=badges,
         certificats=[
@@ -390,7 +404,7 @@ async def certification_de(db: AsyncSession, utilisateur_id: UUID) -> Certificat
                 titulaire=f"{c.titulaire_prenom} {c.titulaire_nom}",
                 motif=c.motif,
                 decide_le=c.decide_le,
-                temps_cumule_s=await _temps_certification(db, utilisateur_id, None, c.delivre_le),
+                temps_cumule_s=cumul.jusqua(c.delivre_le),
                 duree_calendaire_s=_ecart(premiere, c.delivre_le),
             )
             for c in certificats.all()
@@ -429,16 +443,34 @@ async def _temps_des_places(db: AsyncSession, utilisateur_id: UUID) -> dict[int,
     return {r[0]: (round(r[1]), r[2]) for r in rangees.all()}
 
 
-async def _temps_certification(db: AsyncSession, utilisateur_id: UUID, apres: datetime | None, jusqua: datetime) -> int:
-    """Temps de jeu des tentatives de certification commencées dans ]apres ; jusqua]."""
-    requete = (
-        select(func.coalesce(func.sum(TEMPS_DE_JEU), 0))
+class _Cumul:
+    """Temps de jeu cumulé des tentatives de certification, par date de début : une seule requête pour tous les
+    badges et certificats."""
+
+    def __init__(self, lignes: list[tuple[datetime, float]]) -> None:
+        self.debuts = [debut for debut, _ in lignes]
+        self.sommes: list[float] = []
+        total = 0.0
+        for _, temps in lignes:
+            total += temps
+            self.sommes.append(total)
+        self.premiere = self.debuts[0] if self.debuts else None
+        self.total = round(total)
+
+    def jusqua(self, instant: datetime) -> int:
+        """Temps des tentatives commencées au plus tard à cet instant."""
+        rang = bisect_right(self.debuts, instant)
+        return round(self.sommes[rang - 1]) if rang else 0
+
+
+async def _cumul_certification(db: AsyncSession, utilisateur_id: UUID) -> _Cumul:
+    rangees = await db.execute(
+        select(TentativeQuiz.commencee_le, TEMPS_DE_JEU)
         .join(Quiz, Quiz.id == TentativeQuiz.quiz_id)
-        .where(*_certification(utilisateur_id), TentativeQuiz.commencee_le <= jusqua)
+        .where(*_certification(utilisateur_id))
+        .order_by(TentativeQuiz.commencee_le)
     )
-    if apres is not None:
-        requete = requete.where(TentativeQuiz.commencee_le > apres)
-    return round(await db.scalar(requete) or 0)
+    return _Cumul([(r[0], float(r[1])) for r in rangees.all()])
 
 
 def _ecart(debut: datetime | None, fin: datetime) -> int | None:

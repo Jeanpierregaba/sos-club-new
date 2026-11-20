@@ -15794,6 +15794,10 @@
               }
             ],
             "title": "Duree Calendaire S"
+          },
+          "depuis_badge_precedent": {
+            "type": "boolean",
+            "title": "Depuis Badge Precedent"
           }
         },
         "type": "object",
@@ -15804,7 +15808,8 @@
           "obtenu_le",
           "temps_s",
           "temps_cumule_s",
-          "duree_calendaire_s"
+          "duree_calendaire_s",
+          "depuis_badge_precedent"
         ],
         "title": "BadgeAdmin"
       },
@@ -17076,6 +17081,10 @@
       },
       "CertificationInscrit": {
         "properties": {
+          "temps_total_s": {
+            "type": "integer",
+            "title": "Temps Total S"
+          },
           "places": {
             "items": {
               "$ref": "#/components/schemas/PlaceAdmin"
@@ -17100,6 +17109,7 @@
         },
         "type": "object",
         "required": [
+          "temps_total_s",
           "places",
           "badges",
           "certificats"
@@ -29617,9 +29627,9 @@
             ],
             "title": "Moyenne Nationale S"
           },
-          "reussites_nationales": {
+          "joueurs_nationaux": {
             "type": "integer",
-            "title": "Reussites Nationales"
+            "title": "Joueurs Nationaux"
           },
           "tres_rapide": {
             "type": "boolean",
@@ -29641,7 +29651,7 @@
           "points",
           "temps_premiere_reussite_s",
           "moyenne_nationale_s",
-          "reussites_nationales",
+          "joueurs_nationaux",
           "tres_rapide"
         ],
         "title": "QuizValide"
