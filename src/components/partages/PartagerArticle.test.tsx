@@ -32,6 +32,7 @@ const libre: EtatPartagesArticle = {
   nature: "partage",
   reseaux_declares: [],
   restantes_aujourdhui: 3,
+  points: 50,
 };
 const declare: PartageAuteur = {
   id: "p1",
@@ -108,6 +109,7 @@ describe("PartagerArticle", () => {
       nature: "republication",
       reseaux_declares: ["instagram"],
       restantes_aujourdhui: 2,
+      points: 10,
     });
     await afficher();
 
@@ -121,7 +123,7 @@ describe("PartagerArticle", () => {
     api.chargerEtatPartages.mockResolvedValue({ ...libre, restantes_aujourdhui: 0 });
     await afficher();
 
-    expect(await screen.findByText(/3 déclarations du jour/)).toBeInTheDocument();
+    expect(await screen.findByText(/3 par jour, et 3 en attente/)).toBeInTheDocument();
   });
 
   it("montre le refus de l'API", async () => {

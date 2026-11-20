@@ -5,7 +5,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PartagerClassement } from "./PartagerClassement";
 import { ErreurApi, type ClassementPersonnel } from "@/lib/api/client";
 
-const api = vi.hoisted(() => ({ chargerMonClassement: vi.fn(), chargerCarteClassement: vi.fn() }));
+const api = vi.hoisted(() => ({
+  chargerMonClassement: vi.fn(),
+  chargerCarteClassement: vi.fn(),
+}));
 vi.mock("@/lib/api/client", async (original) => ({
   ...(await original<typeof import("@/lib/api/client")>()),
   ...api,

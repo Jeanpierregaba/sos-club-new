@@ -32,7 +32,13 @@ const VUES: { code: VueCarteClassement; libelle: string }[] = [
 
 // « Partager mon classement » (spec 044) : une carte image produite par l'API, sans nom ni coordonnées. Le club
 // n'y figure que si la personne coche la case. Le partage natif du téléphone, sinon le téléchargement.
-export function PartagerClassement({ className }: { className?: string }) {
+export function PartagerClassement({
+  className,
+  encadreur = false,
+}: {
+  className?: string;
+  encadreur?: boolean;
+}) {
   const [ouvert, setOuvert] = useState(false);
   return (
     <Dialog open={ouvert} onOpenChange={setOuvert}>
@@ -45,8 +51,9 @@ export function PartagerClassement({ className }: { className?: string }) {
         <DialogHeader>
           <DialogTitle className="text-2xl text-logo-blue">Partager mon classement</DialogTitle>
           <DialogDescription>
-            Ta carte montre ton pseudonyme, ton rang et tes points, jamais ton nom ni ton
-            établissement. Partager ne rapporte pas de points.
+            Ta carte montre {encadreur ? "ton prénom et l'initiale de ton nom" : "ton pseudonyme"},
+            ton rang et tes points, jamais ton nom complet ni ton établissement. Partager ne
+            rapporte pas de points.
           </DialogDescription>
         </DialogHeader>
         {ouvert && <Choix />}

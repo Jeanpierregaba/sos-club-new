@@ -7077,6 +7077,8 @@ export interface components {
             reseaux_declares: components["schemas"]["ReseauPartage"][];
             /** Restantes Aujourdhui */
             restantes_aujourdhui: number;
+            /** Points */
+            points: number | null;
         };
         /** EtatPartie */
         EtatPartie: {

@@ -68,7 +68,9 @@ export function RangsPersonnels({ classement }: { classement: ClassementPersonne
         </div>
       )}
       <div className="mt-4 flex flex-wrap items-center gap-4">
-        {(classement.semestre.classe || classement.historique.classe) && <PartagerClassement />}
+        {(classement.semestre.classe || classement.historique.classe) && (
+          <PartagerClassement encadreur={classement.categorie === "encadreurs"} />
+        )}
         <Link
           to="/hall-of-fame"
           className="inline-flex text-sm font-bold text-primary underline-offset-4 hover:underline"

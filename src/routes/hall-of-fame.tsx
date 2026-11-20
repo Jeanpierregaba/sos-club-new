@@ -254,5 +254,5 @@ function HallOfFame() {
 function PartagerSiConnecte() {
   const { data: moi } = useMoi();
   if (moi?.role !== "eleve" && moi?.role !== "encadreur") return null;
-  return <PartagerClassement className="mt-6 bg-white" />;
+  return <PartagerClassement className="mt-6 bg-white" encadreur={moi.role === "encadreur"} />;
 }

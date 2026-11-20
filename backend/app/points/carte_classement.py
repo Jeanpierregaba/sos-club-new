@@ -11,6 +11,7 @@ import io
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
+from pathlib import Path
 from urllib.parse import urlsplit
 
 from PIL import Image, ImageDraw, ImageFont
@@ -26,6 +27,8 @@ BLEU, BLEU_NUIT, VERT, ROUGE, SOLEIL, ENCRE, GRIS, BLANC = (
 NORMALE = POLICES / "NotoSans-Regular.ttf"
 GRASSE = POLICES / "NotoSans-Bold.ttf"
 PROGRAMME = "Clubs Santé SOS Docteur TV"
+# Le logo du programme (tiré de `src/assets/logo.webp`), 600 px de large, sur fond transparent.
+LOGO = Path(__file__).parent / "ressources" / "logo.png"
 
 
 class Vue(StrEnum):
@@ -119,11 +122,17 @@ def png(carte: CarteClassement, *, afficher_club: bool) -> bytes:
 
     image = Image.new("RGB", (LARGEUR, HAUTEUR), BLANC)
     dessin = ImageDraw.Draw(image)
-    # Bandeau du programme, carte centrale, liseré rouge : la charte de la carte numérique (spec 040).
-    dessin.rectangle((0, 0, LARGEUR, 230), fill=BLEU)
+    # Le logo sur une pastille blanche dans le bandeau, la carte centrale, le liseré rouge : la charte de la carte
+    # numérique (spec 040).
+    dessin.rectangle((0, 0, LARGEUR, 250), fill=BLEU)
     dessin.rectangle((0, HAUTEUR - 24, LARGEUR, HAUTEUR), fill=ROUGE)
-    _centre(dessin, 120, programme.upper(), GRASSE, 52, BLANC)
-    _centre(dessin, 185, titre, NORMALE, 40, SOLEIL)
+    with Image.open(LOGO) as source:
+        logo = source.convert("RGBA")
+    logo.thumbnail((520, 100))
+    pastille = (LARGEUR // 2 - logo.width // 2 - 36, 40, LARGEUR // 2 + logo.width // 2 + 36, 40 + logo.height + 36)
+    dessin.rounded_rectangle(pastille, radius=40, fill=BLANC)
+    image.paste(logo, (LARGEUR // 2 - logo.width // 2, 58), logo)
+    _centre(dessin, 222, titre, GRASSE, 44, SOLEIL)
 
     dessin.rounded_rectangle((MARGE - 20, 290, LARGEUR - MARGE + 20, 1090), radius=48, fill=BLEU_NUIT)
     _centre(dessin, 400, nom, GRASSE, 64, BLANC)
@@ -135,8 +144,9 @@ def png(carte: CarteClassement, *, afficher_club: bool) -> bytes:
     if club:
         _centre(dessin, 1045, club[0], NORMALE, 34, BLANC)
 
-    _centre(dessin, 1170, mention, NORMALE, 36, GRIS)
-    _centre(dessin, 1250, site, GRASSE, 38, BLEU)
+    _centre(dessin, 1155, mention, NORMALE, 34, GRIS)
+    _centre(dessin, 1220, programme, GRASSE, 38, BLEU)
+    _centre(dessin, 1280, site, NORMALE, 32, GRIS)
 
     sortie = io.BytesIO()
     image.save(sortie, format="PNG", optimize=True)

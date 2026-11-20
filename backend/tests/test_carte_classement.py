@@ -107,9 +107,12 @@ def _image(reponse: Any) -> Image.Image:
 
 
 def test_un_eleve_obtient_sa_carte_png(client: TestClient, reseau: dict[str, Any]) -> None:
-    image = _image(connecter(client, "kofi").get(CARTE))
+    image = _image(connecter(client, "kofi").get(CARTE)).convert("RGB")
 
     assert image.size == (1080, 1350)
+    # Le logo est posé sur une pastille blanche au milieu du bandeau bleu.
+    assert image.getpixel((540, 48)) == (255, 255, 255)
+    assert image.getpixel((20, 20)) != (255, 255, 255)
 
 
 @pytest.mark.parametrize("niveau", ["national", "dre", "club"])

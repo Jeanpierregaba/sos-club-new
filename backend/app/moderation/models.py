@@ -136,8 +136,8 @@ class VersionContenu(Base):
         # Le lien d'une déclaration de partage (spec 044) : un même lien ne sert qu'à une déclaration vivante.
         Index(
             "ix_version_contenu_lien_partage",
-            text("(donnees ->> 'lien')"),
-            postgresql_where=text("donnees ? 'lien' AND etat <> 'travail'"),
+            text("(donnees ->> 'cle_lien')"),
+            postgresql_where=text("donnees ? 'cle_lien' AND etat <> 'travail'"),
         ),
     )
 

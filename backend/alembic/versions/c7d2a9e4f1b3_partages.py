@@ -21,18 +21,17 @@ branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 
+# Rejouable : certains tests marquent une révision antérieure puis remontent à la tête.
 def upgrade() -> None:
-    op.drop_constraint(op.f("ck_contenu_commentaire_a_un_parent"), "contenu", type_="check")
-    op.create_check_constraint(
-        op.f("ck_contenu_contenu_a_un_parent"),
-        "contenu",
-        "(type IN ('commentaire', 'partage')) = (parent_id IS NOT NULL)",
+    op.execute("ALTER TABLE contenu DROP CONSTRAINT IF EXISTS ck_contenu_commentaire_a_un_parent")
+    op.execute("ALTER TABLE contenu DROP CONSTRAINT IF EXISTS ck_contenu_contenu_a_un_parent")
+    op.execute(
+        "ALTER TABLE contenu ADD CONSTRAINT ck_contenu_contenu_a_un_parent "
+        "CHECK ((type IN ('commentaire', 'partage')) = (parent_id IS NOT NULL))"
     )
-    op.create_index(
-        "ix_version_contenu_lien_partage",
-        "version_contenu",
-        [sa.text("(donnees ->> 'lien')")],
-        postgresql_where=sa.text("donnees ? 'lien' AND etat <> 'travail'"),
+    op.execute(
+        "CREATE INDEX IF NOT EXISTS ix_version_contenu_lien_partage ON version_contenu ((donnees ->> 'cle_lien')) "
+        "WHERE donnees ? 'cle_lien' AND etat <> 'travail'"
     )
 
 
@@ -40,8 +39,10 @@ def downgrade() -> None:
     # On ne supprime rien : un retour arrière avec des partages enregistrés est refusé.
     if op.get_bind().execute(sa.text("SELECT 1 FROM contenu WHERE type = 'partage' LIMIT 1")).first() is not None:
         raise RuntimeError("Des partages sont enregistrés : le retour arrière les rendrait invalides.")
-    op.drop_index("ix_version_contenu_lien_partage", table_name="version_contenu")
-    op.drop_constraint(op.f("ck_contenu_contenu_a_un_parent"), "contenu", type_="check")
-    op.create_check_constraint(
-        op.f("ck_contenu_commentaire_a_un_parent"), "contenu", "(type = 'commentaire') = (parent_id IS NOT NULL)"
+    op.execute("DROP INDEX IF EXISTS ix_version_contenu_lien_partage")
+    op.execute("ALTER TABLE contenu DROP CONSTRAINT IF EXISTS ck_contenu_contenu_a_un_parent")
+    op.execute("ALTER TABLE contenu DROP CONSTRAINT IF EXISTS ck_contenu_commentaire_a_un_parent")
+    op.execute(
+        "ALTER TABLE contenu ADD CONSTRAINT ck_contenu_commentaire_a_un_parent "
+        "CHECK ((type = 'commentaire') = (parent_id IS NOT NULL))"
     )

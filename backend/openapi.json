@@ -20889,13 +20889,25 @@
           "restantes_aujourdhui": {
             "type": "integer",
             "title": "Restantes Aujourdhui"
+          },
+          "points": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points"
           }
         },
         "type": "object",
         "required": [
           "nature",
           "reseaux_declares",
-          "restantes_aujourdhui"
+          "restantes_aujourdhui",
+          "points"
         ],
         "title": "EtatPartagesArticle",
         "description": "Ce que la personne connectée peut encore déclarer sur un article."

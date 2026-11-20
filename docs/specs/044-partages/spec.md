@@ -141,6 +141,14 @@ Le parcours :
   refusée tant que le compte est suspendu ; le modérateur attend ou refuse.
 - **Élève qui change de club.** La part du club va au club du moment de l'approbation (ADR-0012).
 - **Lien qui ne s'ouvre plus** (publication supprimée, compte privé). Le modérateur refuse avec un motif.
+- **Plafond des déclarations en attente.** Comme pour tout contenu du moteur, 3 déclarations au plus attendent leur
+  vérification à la fois : au-delà, la personne attend une décision, même un autre jour. La page de l'article le dit.
+- **Même publication sous une autre écriture.** `www.` ou `m.`, « / » final, ancre ou paramètres de suivi (`utm_…`,
+  `fbclid`…) ne changent pas la publication : le contrôle du lien déjà utilisé compare le lien ainsi réduit. Un lien
+  court (`fb.watch`, `vm.tiktok.com`, `lnkd.in`) et le lien long d'une même publication restent distincts : le
+  modérateur en est le dernier contrôle.
+- **Lien d'un bouton de partage** (`facebook.com/sharer…`, `linkedin.com/sharing…`) ou page d'accueil d'un réseau :
+  refusé, ce n'est pas une publication.
 - **Lien très long, ou avec des paramètres de suivi.** 500 caractères au plus. Le lien est gardé tel que saisi,
   sans espaces autour.
 - **Navigateur sans partage natif.** Seul le téléchargement de l'image est proposé.

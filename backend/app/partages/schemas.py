@@ -24,6 +24,9 @@ class ChampsPartage(BaseModel):
 
     reseau: ReseauPartage
     lien: str
+    # Le lien réduit à ce qui désigne la publication (hôte sans « www. », sans paramètres de suivi ni « / » final) :
+    # c'est lui qui ne sert qu'une fois.
+    cle_lien: str
     nature: Nature
 
 
@@ -64,3 +67,5 @@ class EtatPartagesArticle(BaseModel):
     nature: Nature
     reseaux_declares: list[ReseauPartage]
     restantes_aujourdhui: int
+    # Le montant actuel du barème pour cette déclaration ; nul si l'action est désactivée.
+    points: int | None

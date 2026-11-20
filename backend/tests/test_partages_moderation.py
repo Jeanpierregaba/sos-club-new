@@ -188,3 +188,23 @@ def test_le_lien_nest_jamais_public(client: TestClient, scene: Any) -> None:
     ]
 
     assert all(partage["lien"] not in page and "facebook.com" not in page for page in pages)
+
+
+def test_mes_partages_tient_compte_dune_annulation_au_registre(scene: Any, en_base: Callable[..., Any]) -> None:
+    from app.points.models import MouvementPoints
+
+    partage = declare(scene["nav_lecteur"], scene["adresse"], "facebook")
+    decider(scene["admin"], partage["id"], "approuver")
+    gain = _partages(en_base, scene["lecteur"])[0]
+
+    async def annuler(db: Any) -> None:
+        db.add(
+            MouvementPoints(
+                utilisateur_id=gain.utilisateur_id, action="admin.correction", montant=-gain.montant,
+                cle=f"annulation:{gain.id}", annule_id=gain.id, motif="Publication supprimée.",
+            )
+        )  # fmt: skip
+
+    en_base(annuler)
+
+    assert scene["nav_lecteur"].get(PARTAGES_MOI).json()["partages"][0]["points"] == 0

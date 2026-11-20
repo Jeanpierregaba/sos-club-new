@@ -7,7 +7,7 @@ from tests.commentaires import MODERATION
 from tests.conftest import Navigateur, connecter_admin
 
 PARTAGES_MOI = "/api/partages/moi"
-DECIDER_PARTAGES = {("partages", "consulter"), ("partages", "approuver")}
+DECIDER_PARTAGES = {("partages", "approuver")}
 LIENS = {
     "facebook": "https://www.facebook.com/ama.golfe/posts/123456789",
     "instagram": "https://www.instagram.com/p/C0deP4rt4ge/",

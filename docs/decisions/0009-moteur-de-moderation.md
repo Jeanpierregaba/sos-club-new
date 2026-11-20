@@ -82,3 +82,13 @@ ces types. Le moteur gagne deux réglages : `avis_approbation` (« Ton rapport �
 « comme doublon » d'un rapport du même club, qui enregistre le lien et laisse `points_permis` refuser tout crédit.
 Ce qui est propre aux rapports (référence, club, date, mois, semestre, doublon) vit dans la table `rapport`, une
 ligne par contenu. Leur auteur reste l'auteur historique : la passation de présidence ne les transfère pas.
+
+## Note (2026-11-19, spec 044)
+
+Un type privé de plus : `partage`, la déclaration du partage d'un article sur un réseau social. Comme un commentaire,
+il a l'article pour parent (la contrainte devient `contenu_a_un_parent`) et s'envoie en une fois, sans brouillon.
+Il ne se corrige ni ne se retire du site : il n'est jamais publié, seulement validé. Décider exige aussi le droit
+`partages : approuver` (`domaine_droit`). Le crédit passe par `crediter`, qui choisit l'action selon la nature
+(republication ou partage de son propre article) et une clé par article, personne et réseau ; il refuse
+l'approbation si l'article a été retiré du site. Un index partiel sur `donnees ->> 'cle_lien'` sert au contrôle des
+publications déjà déclarées.

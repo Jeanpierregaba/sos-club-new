@@ -15,8 +15,6 @@ import {
 } from "@/lib/api/client";
 import { RESEAUX } from "@/lib/partages";
 
-// Les montants du barème (spec 022) : +10 pour relayer l'article d'un autre, +50 par réseau pour le sien.
-const POINTS = { republication: 10, partage: 50 } as const;
 const CONFIRMATION =
   "Merci ! Ton partage sera vérifié par l'équipe ; tes points arrivent à la validation.";
 
@@ -121,7 +119,7 @@ function Declaration({ adresse }: { adresse: string }) {
       </p>
     );
   }
-  const { nature, reseaux_declares: declares, restantes_aujourdhui: restantes } = etat.data;
+  const { nature, reseaux_declares: declares, restantes_aujourdhui: restantes, points } = etat.data;
   const republicationFaite = nature === "republication" && declares.length > 0;
   const libres = RESEAUX.filter((r) => !declares.includes(r.code));
   const erreur =
@@ -136,8 +134,8 @@ function Declaration({ adresse }: { adresse: string }) {
       <h3 className="font-display text-lg text-ink">J'ai partagé cet article</h3>
       <p className="mt-1 text-sm text-muted-foreground">
         {nature === "partage"
-          ? `C'est ton article : +${POINTS.partage} points par réseau, une fois chacun, après vérification.`
-          : `Relaie-le sur un réseau : +${POINTS.republication} points une fois, après vérification.`}{" "}
+          ? `C'est ton article : ${points ? `+${points} points` : "des points"} par réseau, une fois chacun, après vérification.`
+          : `Relaie-le sur un réseau : ${points ? `+${points} points` : "des points"} une fois, après vérification.`}{" "}
         Colle le lien de ta publication : un simple clic sur un bouton ne suffit pas.
       </p>
       {confirme && (
@@ -155,7 +153,8 @@ function Declaration({ adresse }: { adresse: string }) {
         </p>
       ) : restantes === 0 ? (
         <p className="mt-3 text-sm font-semibold">
-          Tu as atteint les 3 déclarations du jour : reviens demain.
+          Tu as atteint le nombre de déclarations possibles pour l'instant : 3 par jour, et 3 en
+          attente de vérification à la fois. Reviens plus tard.
         </p>
       ) : (
         <form

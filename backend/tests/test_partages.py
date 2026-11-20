@@ -10,7 +10,7 @@ from typing import Any
 import pytest
 from alembic.config import Config
 from fastapi.testclient import TestClient
-from sqlalchemy import func, select, update
+from sqlalchemy import func, select, text, update
 
 from alembic import command
 from app.comptes.models import Role, StatutCompte, Utilisateur
@@ -68,10 +68,12 @@ def test_letat_de_larticle_pour_la_personne(scene: Any) -> None:
     assert etat["nature"] == "partage"
     assert etat["reseaux_declares"] == ["facebook"]
     assert etat["restantes_aujourdhui"] == 2
+    assert etat["points"] == 50
     assert etat_article(scene["lecteur"], scene["adresse"]).json() == {
         "nature": "republication",
         "reseaux_declares": [],
         "restantes_aujourdhui": 3,
+        "points": 10,
     }
 
 
@@ -112,6 +114,11 @@ def test_un_article_depublie_ne_se_declare_plus(scene: Any) -> None:
         ("linkedin", "https://www.linkedin.com/" + "a" * 500),
         ("tiktok", "https://"),
         ("tiktok", "pas un lien"),
+        ("facebook", "https://www.facebook.com/sharer/sharer.php?u=https://clubsante.tg/articles/x"),
+        ("linkedin", "https://www.linkedin.com/sharing/share-offsite/?url=https://clubsante.tg"),
+        ("facebook", "https://www.facebook.com/"),
+        ("facebook", "https://www.facebook.com/ama/posts/1\nhttps://autre"),
+        ("instagram", "https://www.instagram.com/p/abc def/"),
         ("whatsapp", "https://wa.me/22890000000"),
     ],
 )
@@ -134,6 +141,45 @@ def test_les_liens_des_reseaux_sont_acceptes(scene: Any, reseau: str, lien: str)
     partage = declare(scene["lecteur"], scene["adresse"], reseau, lien)
 
     assert partage["lien"] == lien.strip()
+
+
+@pytest.mark.parametrize(
+    "variante",
+    [
+        "https://facebook.com/ama.golfe/posts/123456789",
+        "https://m.facebook.com/ama.golfe/posts/123456789/",
+        "https://www.facebook.com/ama.golfe/posts/123456789?utm_source=wa&fbclid=abc",
+        "https://www.facebook.com/ama.golfe/posts/123456789#commentaires",
+    ],
+)
+def test_une_autre_ecriture_du_meme_lien_est_refusee(scene: Any, variante: str) -> None:
+    declare(scene["lecteur"], scene["adresse"], "facebook")
+
+    assert declarer(scene["redactrice"], scene["adresse"], "facebook", variante).status_code == 409
+
+
+def test_deux_publications_facebook_distinctes_par_leur_identifiant(scene: Any) -> None:
+    declare(scene["lecteur"], scene["adresse"], "facebook", "https://www.facebook.com/story.php?story_fbid=1&id=9")
+
+    autre = declare(
+        scene["redactrice"], scene["adresse"], "facebook", "https://www.facebook.com/story.php?story_fbid=2&id=9"
+    )
+
+    assert autre["etat"] == "en_attente"
+
+
+def test_trois_declarations_en_attente_ferment_le_formulaire(scene: Any, en_base: Callable[..., Any]) -> None:
+    for reseau in ("facebook", "instagram", "tiktok"):
+        declare(scene["redactrice"], scene["adresse"], reseau)
+    # Le lendemain, le plafond du jour repart, mais les trois déclarations attendent toujours leur vérification.
+    en_base(
+        lambda db: db.execute(
+            update(Contenu).where(Contenu.type == "partage").values(cree_le=func.now() - text("interval '1 day'"))
+        )
+    )
+
+    assert etat_article(scene["redactrice"], scene["adresse"]).json()["restantes_aujourdhui"] == 0
+    assert declarer(scene["redactrice"], scene["adresse"], "linkedin").status_code == 409
 
 
 def test_un_lien_deja_declare_est_refuse_meme_par_une_autre_personne(scene: Any) -> None:

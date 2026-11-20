@@ -9,7 +9,7 @@ par jour UTC (l'heure de Lomé), refusées comprises.
 
 from datetime import UTC, datetime
 from typing import Any
-from urllib.parse import urlsplit
+from urllib.parse import parse_qsl, urlencode, urlsplit
 from uuid import UUID
 
 from sqlalchemy import func, select, text
@@ -32,7 +32,7 @@ from app.partages.schemas import (
     ReseauPartage,
 )
 from app.points import service as points
-from app.points.models import MouvementPoints
+from app.points.models import LigneBareme, MouvementPoints
 
 TYPE = "partage"
 PAR_JOUR = 3
@@ -55,11 +55,20 @@ VIVANTS = (EtatContenu.en_attente, EtatContenu.publie)
 ETATS = {EtatContenu.en_attente: "en_attente", EtatContenu.publie: "approuve", EtatContenu.refuse: "refuse"}
 
 
+# Les paramètres qui désignent une publication Facebook ; tous les autres (suivi, partage) sont retirés de la clé.
+PARAMETRES_FACEBOOK = frozenset({"story_fbid", "fbid", "id", "v", "set"})
+# Les adresses des boutons de partage eux-mêmes, et non d'une publication.
+CHEMINS_DE_PARTAGE = ("/sharer", "/share.php", "/dialog", "/sharing", "/shareArticle", "/share")
+_SOUS_DOMAINES = ("www.", "m.", "mobile.", "web.")
+
+
 def verifier_lien(reseau: ReseauPartage, lien: str) -> str:
     """Le lien d'une publication du réseau choisi, en https. Il n'est jamais visité : seul son texte est contrôlé."""
     lien = lien.strip()
     if len(lien) > LIEN_MAX:
         raise Refus(f"Le lien fait plus de {LIEN_MAX} caractères.", 422)
+    if any(c.isspace() or ord(c) < 32 or ord(c) == 127 for c in lien):
+        raise Refus("Le lien ne doit contenir ni espace ni retour à la ligne.", 422)
     try:
         morceaux = urlsplit(lien)
     except ValueError:
@@ -69,7 +78,28 @@ def verifier_lien(reseau: ReseauPartage, lien: str) -> str:
         raise Refus("Colle le lien complet de ta publication, qui commence par https://.", 422)
     if not any(hote == domaine or hote.endswith(f".{domaine}") for domaine in DOMAINES[reseau]):
         raise Refus(f"Ce lien n'est pas une publication {NOMS[reseau]}.", 422)
+    chemin = morceaux.path.rstrip("/")
+    if not chemin or any(chemin.lower().startswith(c.lower()) for c in CHEMINS_DE_PARTAGE):
+        raise Refus("Colle le lien de ta publication elle-même, pas celui d'un bouton de partage.", 422)
     return lien
+
+
+def cle_lien(lien: str) -> str:
+    """Ce qui désigne la publication : deux écritures du même lien (www., « / » final, paramètres de suivi, ancre)
+    donnent la même clé. À appeler sur un lien vérifié."""
+    morceaux = urlsplit(lien)
+    hote = (morceaux.hostname or "").lower().rstrip(".")
+    for prefixe in _SOUS_DOMAINES:
+        if hote.startswith(prefixe):
+            hote = hote[len(prefixe) :]
+            break
+    gardes = sorted(
+        (nom, valeur)
+        for nom, valeur in parse_qsl(morceaux.query)
+        if hote.endswith(("facebook.com", "fb.com")) and nom in PARAMETRES_FACEBOOK
+    )
+    requete = f"?{urlencode(gardes)}" if gardes else ""
+    return f"{hote}{morceaux.path.rstrip('/').lower()}{requete}"
 
 
 def cle_points(nature: Nature, article_id: UUID, auteur_id: UUID, reseau: ReseauPartage) -> str:
@@ -167,12 +197,28 @@ async def _reseaux_declares(db: AsyncSession, article_id: UUID, auteur_id: UUID)
 # Déclaration ---------------------------------------------------------------------------------------------------
 
 
+async def _en_attente(db: AsyncSession, auteur_id: UUID) -> int:
+    return int(
+        await db.scalar(
+            select(func.count())
+            .select_from(Contenu)
+            .where(Contenu.auteur_id == auteur_id, Contenu.type == TYPE, Contenu.etat == EtatContenu.en_attente)
+        )
+        or 0
+    )
+
+
 async def etat_article(db: AsyncSession, auteur: Utilisateur, adresse: str) -> EtatPartagesArticle:
     article = await _article_publie(db, adresse)
+    nature = _nature(article, auteur)
+    # Deux plafonds : 3 déclarations par jour, et 3 en attente de vérification à la fois.
+    restantes = min(PAR_JOUR - await _du_jour(db, auteur.id), PAR_JOUR - await _en_attente(db, auteur.id))
+    ligne = await db.get(LigneBareme, f"{auteur.role.value}.{nature}")
     return EtatPartagesArticle(
-        nature=_nature(article, auteur),
+        nature=nature,
         reseaux_declares=await _reseaux_declares(db, article.id, auteur.id),
-        restantes_aujourdhui=max(0, PAR_JOUR - await _du_jour(db, auteur.id)),
+        restantes_aujourdhui=max(0, restantes),
+        points=ligne.montant if ligne is not None and ligne.actif and ligne.montant > 0 else None,
     )
 
 
@@ -191,23 +237,24 @@ async def declarer(
         raise Refus(f"Tu as déjà déclaré le partage de cet article sur {NOMS[reseau]}.", 409)
     if nature == "republication" and declares:
         raise Refus("Tu as déjà déclaré la republication de cet article.", 409)
-    # Sous un verrou propre au lien : deux personnes ne déclarent pas la même publication en même temps.
-    await db.execute(text("SELECT pg_advisory_xact_lock(hashtextextended(:lien, 44))"), {"lien": lien})
+    # Sous un verrou propre à la publication : deux personnes ne la déclarent pas en même temps.
+    cle = cle_lien(lien)
+    await db.execute(text("SELECT pg_advisory_xact_lock(hashtextextended(:cle, 44))"), {"cle": cle})
+    # Les expressions de l'index partiel `ix_version_contenu_lien_partage`, écrites telles quelles pour qu'il serve.
     deja = await db.scalar(
         select(VersionContenu.id)
         .join(Contenu, Contenu.id == VersionContenu.contenu_id)
         .where(
-            VersionContenu.donnees.has_key("lien"),
-            VersionContenu.etat != EtatVersion.travail,
-            VersionContenu.donnees["lien"].astext == lien,
+            text("version_contenu.donnees ? 'cle_lien' AND version_contenu.etat <> 'travail'"),
+            text("(version_contenu.donnees ->> 'cle_lien') = :cle").bindparams(cle=cle),
             Contenu.type == TYPE,
             Contenu.etat.in_(VIVANTS),
         )
         .limit(1)
     )
     if deja is not None:
-        raise Refus("Ce lien a déjà été déclaré.", 409)
-    donnees = ChampsPartage(reseau=reseau, lien=lien, nature=nature).model_dump(mode="json")
+        raise Refus("Cette publication a déjà été déclarée.", 409)
+    donnees = ChampsPartage(reseau=reseau, lien=lien, cle_lien=cle, nature=nature).model_dump(mode="json")
     contenu = await moteur.creer(db, auteur, TYPE, donnees, parent_id=article.id)
     await moteur.soumettre(db, contenu, auteur, adresse_ip)
     await db.commit()
@@ -254,12 +301,14 @@ async def _miens(db: AsyncSession, auteur_id: UUID, contenu_id: UUID | None = No
     }
     montants: dict[UUID, int] = {}
     if cles:
-        for cle, montant in await db.execute(
-            select(MouvementPoints.cle, MouvementPoints.montant).where(
-                MouvementPoints.utilisateur_id == auteur_id, MouvementPoints.cle.in_(list(cles))
-            )
+        # Le gain, moins une éventuelle annulation motivée au registre (spec 036).
+        annulation = aliased(MouvementPoints)
+        for cle, montant, annule in await db.execute(
+            select(MouvementPoints.cle, MouvementPoints.montant, func.coalesce(annulation.montant, 0))
+            .outerjoin(annulation, annulation.annule_id == MouvementPoints.id)
+            .where(MouvementPoints.utilisateur_id == auteur_id, MouvementPoints.cle.in_(list(cles)))
         ):
-            montants[cles[cle]] = montant
+            montants[cles[cle]] = montant + int(annule)
     return [
         PartageAuteur(
             id=contenu.id,

@@ -62,7 +62,8 @@ MODULES: dict[str, tuple[str, bool, tuple[Action, ...]]] = {
     # Vérification des encadreurs (spec 018) : un collaborateur de DRE ne voit que les demandes de sa DRE.
     "encadreurs": ("Encadreurs à vérifier", True, (C, A)),
     # Partages d'articles vérifiés (spec 044) : décider exige aussi la modération, dans son périmètre.
-    "partages": ("Partages vérifiés", True, (C, A)),
+    # La file elle-même se lit avec « modération : consulter » : ce module ne porte que la décision.
+    "partages": ("Partages vérifiés", True, (A,)),
     "recompenses": ("Récompenses", False, (C, A)),
     "cartes": ("Cartes et QR codes", False, (C, M)),
     "notifications": ("Notifications et assistance", False, (C, M)),
@@ -141,7 +142,7 @@ _PREPARER_BIBLIOTHEQUE = {("bibliotheque", C), ("bibliotheque", CR), ("bibliothe
 DROITS_DES_ROLES: dict[RoleDepart, set[tuple[str, Action]]] = {
     RoleDepart.admin_national: tous_les_droits(),
     RoleDepart.moderateur: _TABLEAU
-    | {("moderation", C), ("moderation", A), ("moderation", D), ("contenus", C), ("rapports", C)},
+    | {("moderation", C), ("moderation", A), ("moderation", D), ("contenus", C), ("rapports", C), ("partages", A)},
     RoleDepart.gestionnaire_contenus: _TABLEAU
     | {("contenus", C), ("contenus", CR), ("contenus", M), ("contenus", S)}
     | _PREPARER_BIBLIOTHEQUE,

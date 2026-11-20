@@ -377,6 +377,13 @@ async def ma_carte_de_classement(
         raise HTTPException(
             status.HTTP_403_FORBIDDEN, "Le partage du classement est réservé aux élèves et aux encadreurs."
         )
+    # Avant le calcul : chaque demande compte, refusée ou non, car toutes relisent le classement entier.
+    try:
+        await limite_adresse.limiter(db, "CARTECLASSEMENT", str(moi.id), settings.cartes_classement_max)
+    except limite_adresse.PlafondAtteint:
+        raise HTTPException(
+            status.HTTP_429_TOO_MANY_REQUESTS, "Trop de cartes d'un coup : réessaie un peu plus tard."
+        ) from None
     try:
         carte = await classements.carte_personnelle(db, moi, niveau, periode)
     except classements.SansSemestre:
@@ -387,13 +394,6 @@ async def ma_carte_de_classement(
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Tu n'es rattaché à aucun club.") from None
     except classements.NonClasse:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Tu n'es pas encore classé dans cette vue.") from None
-    # Après les contrôles : une demande refusée ne consomme rien. Valide la transaction (lecture seule ici).
-    try:
-        await limite_adresse.limiter(db, "CARTECLASSEMENT", str(moi.id), settings.cartes_classement_max)
-    except limite_adresse.PlafondAtteint:
-        raise HTTPException(
-            status.HTTP_429_TOO_MANY_REQUESTS, "Trop de cartes d'un coup : réessaie un peu plus tard."
-        ) from None
     return Response(
         carte_classement.png(carte, afficher_club=club),
         media_type="image/png",
