@@ -124,37 +124,32 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-4 border-t border-white/10 py-8 md:flex-row md:items-end md:justify-between">
-          <div className="min-w-0">
-            <h2 className="text-lg uppercase tracking-wide text-primary">AIMES-AFRIQUE</h2>
-            <ul className="mt-2 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/70">
-              <li className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 shrink-0 text-primary" /> Lomé, Quartier Adidoadin, Togo
-              </li>
-              <li>
-                <a
-                  href="tel:+22822224545"
-                  className="flex items-center gap-2 transition hover:text-white"
-                >
-                  <Phone className="h-4 w-4 shrink-0 text-primary" /> +228 22 22 45 45
-                </a>
-              </li>
-            </ul>
+        {/* Une seule ligne sur grand écran (xl) : AIMES-AFRIQUE à gauche, le copyright au milieu, IBDA STUDIO à droite. */}
+        <div className="mt-14 grid gap-4 border-t border-white/10 py-6 text-center text-sm text-white/70 xl:grid-cols-[auto_minmax(0,1fr)_auto] xl:items-center xl:gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 xl:justify-start">
+            <span className="font-display uppercase tracking-wide text-primary">AIMES-AFRIQUE</span>
+            <span className="flex items-center gap-1.5">
+              <MapPin className="h-4 w-4 shrink-0 text-primary" /> Lomé, Quartier Adidoadin, Togo
+            </span>
+            <a
+              href="tel:+22822224545"
+              className="flex items-center gap-1.5 transition hover:text-white"
+            >
+              <Phone className="h-4 w-4 shrink-0 text-primary" /> +228 22 22 45 45
+            </a>
           </div>
-          <p className="text-sm text-white/70 md:shrink-0 md:text-right">
-            © 2026 Club Santé SOS Docteur TV. Tous droits réservés.
+          <p>© 2026 Club Santé SOS Docteur TV. Tous droits réservés.</p>
+          <p className="xl:text-right">
+            Powered by{" "}
+            <a
+              href={IBDA}
+              {...externe(IBDA)}
+              className="font-bold text-white underline-offset-4 transition hover:underline"
+            >
+              IBDA STUDIO
+            </a>
           </p>
         </div>
-        <p className="border-t border-white/10 py-5 text-center text-sm text-white/70">
-          Powered by{" "}
-          <a
-            href={IBDA}
-            {...externe(IBDA)}
-            className="font-bold text-white underline-offset-4 transition hover:underline"
-          >
-            IBDA STUDIO
-          </a>
-        </p>
       </div>
     </footer>
   );
