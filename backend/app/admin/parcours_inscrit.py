@@ -1,12 +1,14 @@
 """Fiche complète d'un inscrit (spec 045), en lecture seule : points, quiz, certification et contenus.
 
-Chaque liste est paginée en SQL. Les questions et les réponses d'une tentative ne sortent jamais d'ici.
+Chaque liste est paginée en SQL. Les temps (spec 046) sont des agrégats SQL : le temps de jeu d'une tentative va de
+son début à sa dernière activité, car une partie abandonnée n'est close qu'au retour du joueur.
 """
 
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Select, and_, case, func, select
+from sqlalchemy import Numeric, Select, and_, case, func, select
+from sqlalchemy.dialects.postgresql import ARRAY, aggregate_order_by
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.schemas import (
@@ -34,11 +36,18 @@ from app.points import service as points
 from app.points.models import MouvementPoints, Semestre
 from app.points.schemas import LigneRegistre, PageRegistre
 from app.quiz.models import PLACES, EtatTentative, ParametresQuiz, Quiz, TentativeQuiz
+from app.quiz.partie import INACTIVITE
 from app.referentiel.models import Axe
 
 PAR_PAGE_POINTS = 50
 PAR_PAGE = 25
 LONGUEUR_EXTRAIT = 80
+# Repères de la spec 046 : la moyenne des autres joueurs ne s'affiche qu'à partir de cet effectif, et une première
+# réussite en moins de cette fraction de la moyenne est marquée « Très rapide ».
+EFFECTIF_MOYENNE = 5
+FRACTION_TRES_RAPIDE = 0.5
+
+TEMPS_DE_JEU = func.greatest(func.extract("epoch", TentativeQuiz.derniere_activite - TentativeQuiz.commencee_le), 0)
 
 
 class Introuvable(Exception):
@@ -123,6 +132,8 @@ async def quiz_de(
                 func.count(),
                 func.count().filter(TentativeQuiz.reussie.is_(False)),
                 func.coalesce(func.sum(MouvementPoints.montant), 0),
+                func.coalesce(func.sum(TEMPS_DE_JEU), 0),
+                func.coalesce(func.avg(TEMPS_DE_JEU), 0),
             )
             .select_from(TentativeQuiz)
             .outerjoin(MouvementPoints, MouvementPoints.id == TentativeQuiz.mouvement_id)
@@ -144,6 +155,7 @@ async def quiz_de(
             func.max(ParametresQuiz.nb_questions),
             func.count(),
             func.coalesce(func.sum(MouvementPoints.montant), 0),
+            func.array_agg(aggregate_order_by(TEMPS_DE_JEU, TentativeQuiz.terminee_le), type_=ARRAY(Numeric))[1],
         )
         .select_from(TentativeQuiz)
         .join(Quiz, Quiz.id == TentativeQuiz.quiz_id)
@@ -154,6 +166,8 @@ async def quiz_de(
         .group_by(Quiz.id, Axe.libelle)
         .order_by(func.min(TentativeQuiz.terminee_le).desc())
     )
+    valides_rangees = valides.all()
+    moyennes = await _moyennes_nationales(db, utilisateur_id, [r[0] for r in valides_rangees])
 
     requete = _tentatives_de(utilisateur_id)
     if parcours:
@@ -170,26 +184,59 @@ async def quiz_de(
     )
 
     return QuizInscrit(
-        resume=ResumeQuiz(quiz_valides=resume[0], tentatives=resume[1], echecs=resume[2], points=resume[3]),
-        valides=[
-            QuizValide(
-                quiz_id=r[0],
-                titre=r[1],
-                axe=r[2],
-                parcours=r[3],
-                place=r[4],
-                niveau=_valeur(r[5]),
-                premiere_reussite=r[6],
-                meilleur_score=r[7] or 0,
-                nb_questions=r[8],
-                reussites=r[9],
-                points=r[10],
-            )
-            for r in valides.all()
-        ],
+        resume=ResumeQuiz(
+            quiz_valides=resume[0],
+            tentatives=resume[1],
+            echecs=resume[2],
+            points=resume[3],
+            temps_total_s=round(resume[4]),
+            temps_moyen_s=round(resume[5]),
+        ),
+        valides=[_valide(r, moyennes.get(r[0])) for r in valides_rangees],
         tentatives=PageTentatives(
             total=total, page=page, par_page=PAR_PAGE, tentatives=[_tentative(r) for r in rangees.all()]
         ),
+    )
+
+
+async def _moyennes_nationales(db: AsyncSession, utilisateur_id: UUID, quiz_ids: list[UUID]) -> dict[UUID, Any]:
+    """Temps de jeu moyen des réussites des autres joueurs, hors essais, sur chaque quiz demandé."""
+    if not quiz_ids:
+        return {}
+    rangees = await db.execute(
+        select(TentativeQuiz.quiz_id, func.avg(TEMPS_DE_JEU), func.count())
+        .where(
+            TentativeQuiz.quiz_id.in_(quiz_ids),
+            TentativeQuiz.joueur_id != utilisateur_id,
+            TentativeQuiz.essai.is_(False),
+            TentativeQuiz.etat == EtatTentative.terminee,
+            TentativeQuiz.reussie.is_(True),
+        )
+        .group_by(TentativeQuiz.quiz_id)
+    )
+    return {r[0]: r for r in rangees.all()}
+
+
+def _valide(r: Any, national: Any) -> QuizValide:
+    temps = round(r[11] or 0)
+    effectif = national[2] if national is not None else 0
+    moyenne = round(national[1]) if national is not None and effectif >= EFFECTIF_MOYENNE else None
+    return QuizValide(
+        quiz_id=r[0],
+        titre=r[1],
+        axe=r[2],
+        parcours=r[3],
+        place=r[4],
+        niveau=_valeur(r[5]),
+        premiere_reussite=r[6],
+        meilleur_score=r[7] or 0,
+        nb_questions=r[8],
+        reussites=r[9],
+        points=r[10],
+        temps_premiere_reussite_s=temps,
+        moyenne_nationale_s=moyenne,
+        reussites_nationales=effectif,
+        tres_rapide=moyenne is not None and temps < moyenne * FRACTION_TRES_RAPIDE,
     )
 
 
@@ -199,9 +246,9 @@ def _valeur(valeur: Any) -> Any:
 
 def _tentative(rangee: Any) -> TentativeAdmin:
     tentative: TentativeQuiz = rangee.TentativeQuiz
-    duree = None
-    if tentative.terminee_le is not None:
-        duree = int((tentative.terminee_le - tentative.commencee_le).total_seconds())
+    duree = max(0, round((tentative.derniere_activite - tentative.commencee_le).total_seconds()))
+    # Close au retour du joueur, longtemps après sa dernière action : la partie avait été quittée.
+    abandonnee = tentative.terminee_le is not None and tentative.terminee_le - tentative.derniere_activite > INACTIVITE
     return TentativeAdmin(
         id=tentative.id,
         quiz_titre=rangee.titre,
@@ -217,6 +264,7 @@ def _tentative(rangee: Any) -> TentativeAdmin:
         nb_questions=rangee.nb_questions,
         reussie=tentative.reussie,
         duree_s=duree,
+        abandonnee=abandonnee,
         points=rangee.points,
     )
 

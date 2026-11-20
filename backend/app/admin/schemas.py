@@ -386,6 +386,9 @@ class ResumeQuiz(BaseModel):
     tentatives: int
     echecs: int
     points: int
+    # Spec 046 : temps de jeu des tentatives terminées hors essais, en secondes.
+    temps_total_s: int
+    temps_moyen_s: int
 
 
 class QuizValide(BaseModel):
@@ -400,6 +403,11 @@ class QuizValide(BaseModel):
     nb_questions: int
     reussites: int
     points: int
+    temps_premiere_reussite_s: int
+    # Moyenne des réussites des autres joueurs, absente sous le seuil d'effectif (spec 046).
+    moyenne_nationale_s: int | None
+    reussites_nationales: int
+    tres_rapide: bool
 
 
 class TentativeAdmin(BaseModel):
@@ -416,7 +424,9 @@ class TentativeAdmin(BaseModel):
     score: int | None
     nb_questions: int
     reussie: bool | None
-    duree_s: int | None
+    # Temps de jeu : du début à la dernière activité (spec 046).
+    duree_s: int
+    abandonnee: bool
     points: int | None
 
 

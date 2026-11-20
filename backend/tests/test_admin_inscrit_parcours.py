@@ -93,9 +93,11 @@ def test_le_filtre_semestre_et_les_corrections(
 def tentative(
     en_base: Callable[..., Any], joueur_id: UUID, quiz: Quiz, *, reussie: bool | None, score: int | None = 10,
     essai: bool = False, decalage: int = 0, points: int | None = None,
-    etat: EtatTentative = EtatTentative.terminee,
-) -> None:  # fmt: skip
-    async def inserer(db: AsyncSession) -> None:
+    etat: EtatTentative = EtatTentative.terminee, duree: int = 90, cloture: int = 0,
+) -> TentativeQuiz:  # fmt: skip
+    """Une tentative jouée `duree` secondes, close `cloture` secondes après sa dernière activité (abandon)."""
+
+    async def inserer(db: AsyncSession) -> TentativeQuiz:
         p = await parametres.en_cours(db, quiz.parcours)
         mouvement_id = None
         if points is not None:
@@ -106,17 +108,18 @@ def tentative(
             await db.flush()
             mouvement_id = mouvement.id
         debut = DEBUT + timedelta(minutes=decalage)
-        db.add(
-            TentativeQuiz(
-                quiz_id=quiz.id, joueur_id=joueur_id, parametres_id=p.id, essai=essai, etat=etat,
-                jour=debut.date(), commencee_le=debut, derniere_activite=debut,
-                terminee_le=debut + timedelta(seconds=90) if etat is EtatTentative.terminee else None,
-                score=score if etat is EtatTentative.terminee else None,
-                reussie=reussie if etat is EtatTentative.terminee else None, mouvement_id=mouvement_id,
-            )
+        activite = debut + timedelta(seconds=duree)
+        element = TentativeQuiz(
+            quiz_id=quiz.id, joueur_id=joueur_id, parametres_id=p.id, essai=essai, etat=etat,
+            jour=debut.date(), commencee_le=debut, derniere_activite=activite,
+            terminee_le=activite + timedelta(seconds=cloture) if etat is EtatTentative.terminee else None,
+            score=score if etat is EtatTentative.terminee else None,
+            reussie=reussie if etat is EtatTentative.terminee else None, mouvement_id=mouvement_id,
         )  # fmt: skip
+        db.add(element)
+        return element
 
-    en_base(inserer)
+    return en_base(inserer)
 
 
 def test_les_quiz_valides_et_toutes_les_tentatives(
@@ -136,7 +139,9 @@ def test_les_quiz_valides_et_toutes_les_tentatives(
 
     assert reponse.status_code == 200, reponse.text
     donnees = reponse.json()
-    assert donnees["resume"] == {"quiz_valides": 2, "tentatives": 4, "echecs": 1, "points": 40}
+    assert donnees["resume"] == {
+        "quiz_valides": 2, "tentatives": 4, "echecs": 1, "points": 40, "temps_total_s": 360, "temps_moyen_s": 90,
+    }  # fmt: skip
     valides = {v["titre"]: v for v in donnees["valides"]}
     assert set(valides) == {"Hygiène", "Nutrition"}
     assert valides["Hygiène"]["meilleur_score"] == 14
@@ -177,7 +182,9 @@ def test_un_inscrit_sans_quiz(lecteur: TestClient, creer_encadreur: Callable[...
 
     donnees = lecteur.get(f"{INSCRITS}/{encadreur.id}/quiz").json()
 
-    assert donnees["resume"] == {"quiz_valides": 0, "tentatives": 0, "echecs": 0, "points": 0}
+    assert donnees["resume"] == {
+        "quiz_valides": 0, "tentatives": 0, "echecs": 0, "points": 0, "temps_total_s": 0, "temps_moyen_s": 0,
+    }  # fmt: skip
     assert donnees["valides"] == []
     assert donnees["tentatives"]["tentatives"] == []
 
