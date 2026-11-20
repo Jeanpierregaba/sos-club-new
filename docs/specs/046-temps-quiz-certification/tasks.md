@@ -1,0 +1,22 @@
+# 046 — Tâches
+
+- [ ] 1. Tests API des temps des quiz :
+  - durée corrigée et abandon ;
+  - résumé ;
+  - moyenne nationale ;
+  - « Très rapide ».
+- [ ] 2. Implémenter `temps_de_jeu`, `_tentative`, et les champs de `quiz_de` et des schémas.
+- [ ] 3. Tests API du détail d'une tentative :
+  - les états des questions ;
+  - l'ordre ;
+  - l'absence de `bonne_reponse` ;
+  - les cas 404 et 403.
+- [ ] 4. Implémenter `tentative_de` et sa route.
+- [ ] 5. Tests API des temps de la certification : places, badges, certificat, inscrit vide.
+- [ ] 6. Implémenter ces temps dans `certification_de`.
+- [ ] 7. Régénérer les types et ajouter `dureeLisible` (+ test) et `chargerTentativeInscrit`.
+- [ ] 8. Site : onglet Quiz (temps, moyenne, pastille, abandon) et panneau `DetailTentative` (+ test).
+- [ ] 9. Site : onglet Certification (temps des places, badges et certificats).
+- [ ] 10. Vérifier tous les critères d'acceptation de spec.md (lint, typecheck, tests ciblés, build).
+- [ ] 11. Relecture par le sous-agent reviewer.
+- [ ] 12. Vérification au navigateur avec une connexion admin (par l'utilisateur).
