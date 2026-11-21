@@ -42,6 +42,9 @@ from app.encadreurs.router import router_admin as router_encadreurs_admin
 from app.jeux.router import router as router_jeux
 from app.jeux.router_admin import router as router_jeux_admin
 from app.jeux.router_quiz import router as router_jeux_quiz
+from app.maintenance.dependances import verifier_maintenance
+from app.maintenance.router import router as router_maintenance
+from app.maintenance.router import router_admin as router_maintenance_admin
 from app.moderation.photos import purger_regulierement as purger_photos_regulierement
 from app.moderation.router import router_admin as router_moderation_admin
 from app.notifications.router import router as router_notifications
@@ -87,11 +90,13 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(title="API Club Santé SOS Docteur TV", lifespan=lifespan)
 
 # Toutes les routes sous /api sont servies sur le domaine du site (ADR-0006).
-api = APIRouter(prefix="/api", dependencies=[Depends(verifier_origine)])
+api = APIRouter(prefix="/api", dependencies=[Depends(verifier_origine), Depends(verifier_maintenance)])
+api.include_router(router_maintenance)
 api.include_router(router_comptes)
 api.include_router(router_visiteurs)
 api.include_router(router_admin)
 api.include_router(router_activation)
+api.include_router(router_maintenance_admin)
 api.include_router(router_referentiel)
 api.include_router(router_referentiel_admin)
 api.include_router(router_points_admin)
