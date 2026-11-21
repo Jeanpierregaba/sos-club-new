@@ -159,18 +159,18 @@ def test_la_purge_efface_les_invites_de_plus_de_7_jours(
     assert en_base(lambda db: db.scalar(select(func.count()).select_from(TentativeQuiz))) == 0
 
 
-def test_les_quiz_des_jeux_et_de_la_certification_laissent_20_secondes(
+def test_les_quiz_des_jeux_et_de_la_certification_laissent_15_secondes(
     client: TestClient, en_base: Callable[..., Any]
 ) -> None:
-    """Le chrono des jeux passe à 20 s (2026-11-10) ; la certification aussi, avec ses propres paramètres (spec 034)."""
+    """Spec 048 : 15 s par question dans les jeux et la certification (20 s depuis le 2026-11-10)."""
     from app.quiz import parametres
 
-    assert client.get(QUIZ).json()["temps_ms"] == 20000
+    assert client.get(QUIZ).json()["temps_ms"] == 15000
 
     async def certification(db: Any) -> int:
         return (await parametres.en_cours(db, "certification")).temps_ms
 
-    assert en_base(certification) == 20000
+    assert en_base(certification) == 15000
 
 
 def test_un_refus_d_origine_n_est_pas_une_fin_d_essai(client: TestClient, en_base: Callable[..., Any]) -> None:

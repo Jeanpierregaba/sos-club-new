@@ -9,12 +9,20 @@ from app.quiz.models import PARCOURS_CERTIFICATION, PARCOURS_JEUX, ParametresQui
 
 # Q12 : 15 questions, 2 secondes de tolérance, réussite à 12 ; plafond de 10 tentatives par jour.
 PAR_DEFAUT = {"nb_questions": 15, "temps_ms": 5000, "tolerance_ms": 2000, "seuil": 12, "tentatives_par_jour": 10}
-# Les quiz de la page des jeux passent à 20 secondes par question (2026-11-10) ; la certification a les siens.
+# Spec 048 : 15 secondes par question dans les jeux et la certification (20 s depuis le 2026-11-10).
+TEMPS_MS = 15000
 PAR_DEFAUT_PARCOURS = {
-    PARCOURS_JEUX: PAR_DEFAUT | {"temps_ms": 20000},
-    # Spec 034 : 10 questions de 20 s, 10/10, arrêt à la première erreur, sans plafond.
+    PARCOURS_JEUX: PAR_DEFAUT | {"temps_ms": TEMPS_MS},
+    # Spec 034 : 10 questions, 10/10, arrêt à la première erreur, sans plafond par quiz (les vies de la spec 048
+    # s'appliquent à tous les parcours).
     PARCOURS_CERTIFICATION: PAR_DEFAUT
-    | {"nb_questions": 10, "temps_ms": 20000, "seuil": 10, "tentatives_par_jour": None, "arret_premiere_erreur": True},
+    | {
+        "nb_questions": 10,
+        "temps_ms": TEMPS_MS,
+        "seuil": 10,
+        "tentatives_par_jour": None,
+        "arret_premiere_erreur": True,
+    },
 }
 
 

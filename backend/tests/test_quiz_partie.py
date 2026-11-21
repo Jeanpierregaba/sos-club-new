@@ -146,14 +146,14 @@ def test_la_pause_de_correction_ne_prend_pas_sur_le_temps_de_la_question_suivant
 ) -> None:
     etat = lancer(client, quiz)
     etat = repondre(client, etat, bon_choix(etat["question"]))
-    assert etat["question"]["restant_ms"] == 20000
+    assert etat["question"]["restant_ms"] == 15000
 
-    heure.avancer(1.2 + 19)
+    heure.avancer(1.2 + 14)
     reprise = client.get(f"{QUIZ}/tentatives/{etat['tentative_id']}").json()
     assert reprise["question"]["rang"] == 2
     assert reprise["question"]["restant_ms"] == 1000
 
-    heure.avancer(2.9)  # 20 s affichées + 2 s de tolérance, comptées après la pause
+    heure.avancer(2.9)  # 15 s affichées + 2 s de tolérance, comptées après la pause
     suite = repondre(client, reprise, bon_choix(reprise["question"]))
     assert suite["correction"]["juste"] is True
 
@@ -214,7 +214,7 @@ def test_une_question_arrive_seule_avec_ses_choix_melanges(
 
     assert etat["total"] == 15
     assert etat["question"]["rang"] == 1
-    assert etat["question"]["temps_ms"] == 20000
+    assert etat["question"]["temps_ms"] == 15000
     assert etat["resultat"] is None
     assert sorted(t.split(" ")[0] for t in etat["question"]["choix"]) == ["Faux", "Faux", "Juste"]
 
@@ -231,14 +231,15 @@ def _premiere_a(client: TestClient, quiz: Quiz, heure: Horloge, secondes: float)
     return etat["resultat"]
 
 
-def test_une_reponse_a_21_9_secondes_compte(client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge) -> None:
-    assert _premiere_a(client, quiz, heure, 21.9)["score"] == 15
+def test_une_reponse_a_16_9_secondes_compte(client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge) -> None:
+    """Spec 048 : 15 s par question, plus 2 s de tolérance."""
+    assert _premiere_a(client, quiz, heure, 16.9)["score"] == 15
 
 
-def test_une_reponse_a_22_1_secondes_est_ratee(
+def test_une_reponse_a_17_1_secondes_est_ratee(
     client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
 ) -> None:
-    assert _premiere_a(client, quiz, heure, 22.1)["score"] == 14
+    assert _premiere_a(client, quiz, heure, 17.1)["score"] == 14
 
 
 def test_le_delai_court_a_partir_de_lenvoi_de_chaque_question(
@@ -246,7 +247,7 @@ def test_le_delai_court_a_partir_de_lenvoi_de_chaque_question(
 ) -> None:
     etat = lancer(client, quiz)
     for _ in range(15):
-        heure.avancer(21.5)
+        heure.avancer(16.5)
         etat = repondre(client, etat, bon_choix(etat["question"]))
 
     assert etat["resultat"]["score"] == 15
@@ -254,7 +255,7 @@ def test_le_delai_court_a_partir_de_lenvoi_de_chaque_question(
 
 def test_recharger_ne_rend_pas_de_temps(client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge) -> None:
     etat = lancer(client, quiz)
-    heure.avancer(19)
+    heure.avancer(14)
     reprise = client.get(f"{QUIZ}/tentatives/{etat['tentative_id']}").json()
 
     assert reprise["question"]["rang"] == 1
@@ -277,7 +278,7 @@ def test_apres_une_coupure_le_joueur_reprend_a_la_question_suivante(
     reprise = client.get(f"{QUIZ}/tentatives/{etat['tentative_id']}").json()
 
     assert reprise["question"]["rang"] == 2
-    assert reprise["question"]["restant_ms"] == 20000
+    assert reprise["question"]["restant_ms"] == 15000
 
 
 def test_une_tentative_inactive_10_minutes_est_close_avec_le_score_acquis(
