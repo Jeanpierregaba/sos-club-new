@@ -7,9 +7,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_session
-from app.quiz import partie
+from app.quiz import horloge, partie, vies
 from app.quiz.dependances import MESSAGE_CERTIFICATION, Joueur
-from app.quiz.schemas import EtatPartie, ListeQuiz, ReponseJoueur
+from app.quiz.schemas import EtatPartie, ListeQuiz, ReponseJoueur, Vies
 
 router = APIRouter(prefix="/quiz", tags=["quiz"])
 
@@ -23,6 +23,11 @@ def erreur_de_partie(erreur: Exception) -> HTTPException:
     if isinstance(erreur, partie.PlafondAtteint):
         return HTTPException(
             status.HTTP_429_TOO_MANY_REQUESTS, "Tu as joué toutes tes parties du jour à ce quiz : reviens demain."
+        )
+    if isinstance(erreur, partie.PlusDeVies):
+        return HTTPException(
+            status.HTTP_409_CONFLICT,
+            "Tu as utilisé tes 7 vies aujourd'hui. Reviens demain, elles se rechargent à minuit.",
         )
     if isinstance(erreur, partie.ChoixInvalide):
         return HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Ce choix n'existe pas pour cette question.")
@@ -38,11 +43,22 @@ def erreur_de_partie(erreur: Exception) -> HTTPException:
 ERREURS = (
     partie.Introuvable,
     partie.PlafondAtteint,
+    partie.PlusDeVies,
     partie.ChoixInvalide,
     partie.QuizIncomplet,
     partie.PlaceVerrouillee,
     partie.ReserveCertification,
 )
+
+
+@router.get("/vies")
+async def mes_vies(db: Db, joueur: Joueur) -> Vies | None:
+    """Les vies du jour (spec 048), communes aux quiz des jeux et à la certification. Une partie abandonnée est
+    d'abord close, comme sur la liste des quiz : sa vie est perdue, ou rendue si elle était réussie."""
+    await partie.clore_abandonnees(db, joueur)
+    resultat = await vies.resume(db, joueur, horloge.maintenant().date())
+    await db.commit()
+    return resultat
 
 
 @router.get("")

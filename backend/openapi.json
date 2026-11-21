@@ -10705,6 +10705,36 @@
         }
       }
     },
+    "/api/quiz/vies": {
+      "get": {
+        "tags": [
+          "quiz"
+        ],
+        "summary": "Mes Vies",
+        "description": "Les vies du jour (spec 048), communes aux quiz des jeux et à la certification. Une partie abandonnée est\nd'abord close, comme sur la liste des quiz : sa vie est perdue, ou rendue si elle était réussie.",
+        "operationId": "mes_vies_api_quiz_vies_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Vies"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Mes Vies Api Quiz Vies Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/quiz": {
       "get": {
         "tags": [
@@ -21803,6 +21833,17 @@
                 "type": "null"
               }
             ]
+          },
+          "vies_restantes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vies Restantes"
           }
         },
         "type": "object",
@@ -25750,6 +25791,16 @@
             "type": "integer",
             "title": "Seuil"
           },
+          "vies": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Vies"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "quiz": {
             "items": {
               "$ref": "#/components/schemas/QuizJoueur"
@@ -25944,6 +25995,16 @@
           "seuil": {
             "type": "integer",
             "title": "Seuil"
+          },
+          "vies": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Vies"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -32924,6 +32985,35 @@
         ],
         "title": "VerificationCarte",
         "description": "La page publique du QR (Q30) : le type, le numéro, le club et le statut. Rien d'autre, jamais."
+      },
+      "Vies": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "restantes": {
+            "type": "integer",
+            "title": "Restantes"
+          },
+          "perdues": {
+            "type": "integer",
+            "title": "Perdues"
+          },
+          "en_cours": {
+            "type": "integer",
+            "title": "En Cours"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "restantes",
+          "perdues",
+          "en_cours"
+        ],
+        "title": "Vies",
+        "description": "Spec 048 : les vies du jour, communes aux jeux et à la certification."
       },
       "Vue": {
         "type": "string",

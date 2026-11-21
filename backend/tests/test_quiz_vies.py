@@ -1,0 +1,145 @@
+"""Les vies quotidiennes (spec 048) : 7 par jour, communes aux jeux et à la certification ; seule une partie ratée en
+coûte une ; une partie en cours en réserve une ; recharge à minuit."""
+
+from collections.abc import Callable
+from typing import Any
+
+import pytest
+from fastapi.testclient import TestClient
+
+from app.comptes.models import Utilisateur
+from app.quiz.models import Quiz
+from app.quiz.vies import VIES_PAR_JOUR
+from tests.certification import creer_parcours
+from tests.quiz import QUIZ, Horloge, connecter, creer_quiz, figer_horloge, jouer, lancer
+
+MESSAGE = "Tu as utilisé tes 7 vies aujourd'hui. Reviens demain, elles se rechargent à minuit."
+
+
+@pytest.fixture
+def heure(monkeypatch: pytest.MonkeyPatch) -> Horloge:
+    return figer_horloge(monkeypatch)
+
+
+@pytest.fixture
+def eleve(client: TestClient, creer_eleve: Callable[..., Utilisateur]) -> Utilisateur:
+    utilisateur = creer_eleve("ama")
+    connecter(client, "ama")
+    return utilisateur
+
+
+@pytest.fixture
+def quiz(en_base: Callable[..., Any]) -> Quiz:
+    return creer_quiz(en_base)
+
+
+def vies(client: TestClient) -> dict[str, int]:
+    reponse = client.get(f"{QUIZ}/vies")
+    assert reponse.status_code == 200, reponse.text
+    return reponse.json()
+
+
+def rater(client: TestClient, quiz: Quiz, fois: int) -> None:
+    for _ in range(fois):
+        jouer(client, quiz, 0)
+
+
+def test_un_joueur_commence_la_journee_avec_7_vies(client: TestClient, eleve: Utilisateur, heure: Horloge) -> None:
+    assert VIES_PAR_JOUR == 7
+    assert vies(client) == {"total": 7, "restantes": 7, "perdues": 0, "en_cours": 0}
+
+
+def test_apres_7_parties_ratees_le_lancement_est_refuse(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge, en_base: Callable[..., Any]
+) -> None:
+    autre = creer_quiz(en_base, titre="Autre quiz")
+    rater(client, quiz, 4)
+    rater(client, autre, 3)
+
+    reponse = client.post(f"{QUIZ}/{quiz.id}/tentatives")
+
+    assert reponse.status_code == 409
+    assert reponse.json()["detail"] == MESSAGE
+    assert vies(client)["restantes"] == 0
+    # Tous les quiz sont concernés : les vies se comptent sur la journée.
+    assert client.post(f"{QUIZ}/{creer_quiz(en_base, titre='Troisième').id}/tentatives").status_code == 409
+
+
+def test_une_partie_reussie_ne_coute_aucune_vie(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
+) -> None:
+    rater(client, quiz, 6)
+    fin = jouer(client, quiz, 15)
+
+    assert fin["resultat"]["reussie"] is True
+    assert fin["vies_restantes"] == 1
+    assert vies(client)["perdues"] == 6
+    lancer(client, quiz)
+
+
+def test_la_fin_de_partie_et_la_liste_donnent_les_vies_restantes(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
+) -> None:
+    fin = jouer(client, quiz, 0)
+
+    assert fin["vies_restantes"] == 6
+    assert client.get(QUIZ).json()["vies"]["restantes"] == 6
+
+
+def test_une_partie_en_cours_reserve_une_vie(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge, en_base: Callable[..., Any]
+) -> None:
+    rater(client, quiz, 6)
+    lancer(client, quiz)
+
+    assert vies(client) | {} == {"total": 7, "restantes": 0, "perdues": 6, "en_cours": 1}
+    autre = creer_quiz(en_base, titre="Autre quiz")
+    assert client.post(f"{QUIZ}/{autre.id}/tentatives").status_code == 409
+
+
+def test_une_partie_abandonnee_ratee_coute_une_vie(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge, en_base: Callable[..., Any]
+) -> None:
+    rater(client, quiz, 6)
+    lancer(client, quiz)
+    # Partie quittée : close au lancement suivant, sans réussite.
+    heure.avancer(11 * 60)
+
+    autre = creer_quiz(en_base, titre="Autre quiz")
+    assert client.post(f"{QUIZ}/{autre.id}/tentatives").status_code == 409
+    assert vies(client) == {"total": 7, "restantes": 0, "perdues": 7, "en_cours": 0}
+
+
+def test_les_vies_se_rechargent_le_lendemain(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
+) -> None:
+    rater(client, quiz, 7)
+    assert client.post(f"{QUIZ}/{quiz.id}/tentatives").status_code == 409
+
+    heure.avancer(24 * 3600)
+
+    assert vies(client)["restantes"] == 7
+    lancer(client, quiz)
+
+
+def test_jeux_et_certification_partagent_les_memes_vies(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge, en_base: Callable[..., Any]
+) -> None:
+    parcours = creer_parcours(en_base, places=[1])
+    rater(client, quiz, 6)
+    fin = jouer(client, parcours[1], 0)
+
+    assert fin["resultat"]["reussie"] is False
+    assert client.post(f"{QUIZ}/{quiz.id}/tentatives").status_code == 409
+    assert client.post(f"{QUIZ}/{parcours[1].id}/tentatives").status_code == 409
+    assert client.get("/api/certification").json()["vies"]["restantes"] == 0
+
+
+def test_un_encadreur_a_aussi_7_vies(
+    client: TestClient, creer_encadreur: Callable[..., Utilisateur], quiz: Quiz, heure: Horloge
+) -> None:
+    creer_encadreur("prof")
+    connecter(client, "prof")
+    rater(client, quiz, 7)
+
+    assert client.post(f"{QUIZ}/{quiz.id}/tentatives").status_code == 409

@@ -20,7 +20,7 @@ from app.certification import progression
 from app.comptes.models import Role, Utilisateur
 from app.jeux import progression as jeux_progression
 from app.points.models import MouvementPoints
-from app.quiz import horloge, parametres
+from app.quiz import horloge, parametres, vies
 from app.quiz.models import (
     PARCOURS_CERTIFICATION,
     PARCOURS_JEUX,
@@ -58,6 +58,10 @@ class Introuvable(Exception):
 
 class PlafondAtteint(Exception):
     pass
+
+
+class PlusDeVies(Exception):
+    """Spec 048 : le joueur a perdu ses vies du jour."""
 
 
 class ReserveCertification(Exception):
@@ -149,6 +153,12 @@ async def lancer(db: AsyncSession, joueur: Utilisateur, quiz_id: UUID, *, essai:
         )
         if p.tentatives_par_jour is not None and (du_jour or 0) >= p.tentatives_par_jour:
             raise PlafondAtteint
+        if vies.concerne(joueur):
+            # Spec 048 : les parties abandonnées d'abord closes (leur vie est perdue ou rendue), puis le compte des
+            # vies, sous le verrou du joueur : deux lancements simultanés ne passent pas avec une seule vie.
+            await clore_abandonnees(db, joueur)
+            if (await vies.du_jour(db, joueur.id, maintenant.date())).restantes == 0:
+                raise PlusDeVies
 
     reserve = list(
         (
@@ -280,6 +290,7 @@ async def liste(db: AsyncSession, joueur: Utilisateur, axe: str | None = None) -
     return ListeQuiz(
         nb_questions=p.nb_questions,
         seuil=p.seuil,
+        vies=await vies.resume(db, joueur, horloge.maintenant().date()),
         quiz=[
             QuizJoueur(
                 id=q.id,
@@ -469,6 +480,11 @@ async def _etat(
             # Pendant la pause de correction, le chrono n'a pas encore démarré : le temps reste plein.
             restant_ms=min(p.temps_ms, max(0, _ms(restant))),
         )
+    vies_restantes = None
+    if tentative.etat is EtatTentative.terminee and not tentative.essai:
+        joueur = await db.get(Utilisateur, tentative.joueur_id)
+        resume = await vies.resume(db, joueur, maintenant.date()) if joueur else None
+        vies_restantes = resume.restantes if resume else None
     return EtatPartie(
         tentative_id=tentative.id,
         quiz_id=quiz.id,
@@ -476,6 +492,7 @@ async def _etat(
         total=p.nb_questions,
         question=question,
         resultat=resultat,
+        vies_restantes=vies_restantes,
     )
 
 

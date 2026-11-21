@@ -51,6 +51,15 @@ class ResultatPartie(BaseModel):
     erreurs: list[ErreurPartie] | None = None
 
 
+class Vies(BaseModel):
+    """Spec 048 : les vies du jour, communes aux jeux et à la certification."""
+
+    total: int
+    restantes: int
+    perdues: int
+    en_cours: int
+
+
 class EtatPartie(BaseModel):
     tentative_id: UUID
     quiz_id: UUID
@@ -61,6 +70,9 @@ class EtatPartie(BaseModel):
     resultat: ResultatPartie | None
     # Après une réponse à un quiz des jeux : la correction de cette réponse. None sinon.
     correction: CorrectionReponse | None = None
+    # Une fois la partie terminée : les vies qu'il reste aujourd'hui (spec 048). None en cours, en essai ou pour un
+    # invité.
+    vies_restantes: int | None = None
 
 
 class ReponseJoueur(BaseModel):
@@ -89,4 +101,6 @@ class QuizJoueur(BaseModel):
 class ListeQuiz(BaseModel):
     nb_questions: int
     seuil: int
+    # Spec 048 : None pour un invité, qui a sa propre limite.
+    vies: Vies | None = None
     quiz: list[QuizJoueur]

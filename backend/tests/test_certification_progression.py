@@ -180,12 +180,13 @@ def test_un_temps_depasse_arrete_aussi_la_tentative(
     assert reprise["resultat"]["reussie"] is False
 
 
-def test_la_certification_n_a_pas_de_plafond_quotidien(
+def test_la_certification_n_a_pas_de_plafond_par_quiz_mais_partage_les_7_vies(
     client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
 ) -> None:
+    """Spec 048 : plus de parties illimitées ; la même place se rejoue tant qu'il reste des vies du jour."""
     quiz = creer_parcours(en_base, places=[1])
 
-    for _ in range(12):
+    for _ in range(6):
         jouer(client, quiz[1], justes=0)
 
     assert jouer(client, quiz[1], justes=10)["resultat"]["reussie"] is True

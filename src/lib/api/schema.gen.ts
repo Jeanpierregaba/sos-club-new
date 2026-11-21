@@ -3571,6 +3571,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/quiz/vies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Mes Vies
+         * @description Les vies du jour (spec 048), communes aux quiz des jeux et à la certification. Une partie abandonnée est
+         *     d'abord close, comme sur la liste des quiz : sa vie est perdue, ou rendue si elle était réussie.
+         */
+        get: operations["mes_vies_api_quiz_vies_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/quiz": {
         parameters: {
             query?: never;
@@ -7357,6 +7378,8 @@ export interface components {
             question: components["schemas"]["QuestionJoueur"] | null;
             resultat: components["schemas"]["ResultatPartie"] | null;
             correction?: components["schemas"]["CorrectionReponse"] | null;
+            /** Vies Restantes */
+            vies_restantes?: number | null;
         };
         /**
          * EtatQuelAxe
@@ -8584,6 +8607,7 @@ export interface components {
             nb_questions: number;
             /** Seuil */
             seuil: number;
+            vies?: components["schemas"]["Vies"] | null;
             /** Quiz */
             quiz: components["schemas"]["QuizJoueur"][];
         };
@@ -8645,6 +8669,7 @@ export interface components {
             nb_questions: number;
             /** Seuil */
             seuil: number;
+            vies?: components["schemas"]["Vies"] | null;
         };
         /**
          * MembreClub
@@ -10986,6 +11011,20 @@ export interface components {
              * Format: date-time
              */
             verifiee_le: string;
+        };
+        /**
+         * Vies
+         * @description Spec 048 : les vies du jour, communes aux jeux et à la certification.
+         */
+        Vies: {
+            /** Total */
+            total: number;
+            /** Restantes */
+            restantes: number;
+            /** Perdues */
+            perdues: number;
+            /** En Cours */
+            en_cours: number;
         };
         /**
          * Vue
@@ -17984,6 +18023,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mes_vies_api_quiz_vies_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Vies"] | null;
                 };
             };
         };

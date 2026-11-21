@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_vali
 from app.certification.models import EtatCertificat
 from app.encadreurs.models import Fonction
 from app.quiz.models import PLACES, PLACES_PAR_THEMATIQUE
+from app.quiz.schemas import Vies
 
 EtatPlace = Literal["verrouillee", "ouverte", "reussie", "bientot"]
 
@@ -68,6 +69,8 @@ class MaCertification(BaseModel):
     certificat: CertificatJoueur | None
     nb_questions: int
     seuil: int
+    # Spec 048 : les vies du jour, communes aux quiz des jeux et à la certification.
+    vies: Vies | None = None
 
 
 # Public -----------------------------------------------------------------------------------------------------------

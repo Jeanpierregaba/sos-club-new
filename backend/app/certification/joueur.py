@@ -18,7 +18,7 @@ from app.certification.schemas import (
 )
 from app.clubs.models import Club
 from app.comptes.models import Utilisateur
-from app.quiz import horloge, parametres, partie
+from app.quiz import horloge, parametres, partie, vies
 from app.quiz.models import (
     PARCOURS_CERTIFICATION,
     PLACES,
@@ -120,6 +120,7 @@ async def ma_certification(db: AsyncSession, joueur: Utilisateur) -> MaCertifica
         certificat=await _certificat(db, joueur.id),
         nb_questions=p.nb_questions,
         seuil=p.seuil,
+        vies=await vies.resume(db, joueur, horloge.maintenant().date()),
     )
 
 
