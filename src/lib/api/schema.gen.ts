@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/api/etat-site": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Etat Site
+         * @description Indique au client si la maintenance est active. Exempté de la garde de maintenance.
+         */
+        get: operations["etat_site_api_etat_site_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/comptes/connexion": {
         parameters: {
             query?: never;
@@ -798,6 +818,24 @@ export interface paths {
         put?: never;
         /** Activer */
         post: operations["activer_api_activation_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/maintenance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire Maintenance */
+        get: operations["lire_maintenance_api_admin_maintenance_get"];
+        /** Changer Maintenance */
+        put: operations["changer_maintenance_api_admin_maintenance_put"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -7276,6 +7314,13 @@ export interface components {
             /** Valide */
             valide: boolean;
         };
+        /** EtatMaintenance */
+        EtatMaintenance: {
+            /** Maintenance Active */
+            maintenance_active: boolean;
+            /** Active Le */
+            active_le: string | null;
+        };
         /**
          * EtatPartagesArticle
          * @description Ce que la personne connectée peut encore déclarer sur un article.
@@ -7340,6 +7385,14 @@ export interface components {
          * @enum {string}
          */
         EtatRessource: "brouillon" | "soumis" | "publie" | "depublie";
+        /**
+         * EtatSitePublic
+         * @description État visible par le client, sans détail sensible.
+         */
+        EtatSitePublic: {
+            /** Maintenance */
+            maintenance: boolean;
+        };
         /**
          * EtatVerification
          * @enum {string}
@@ -8665,6 +8718,11 @@ export interface components {
             club: components["schemas"]["ClubRapport"] | null;
             /** Modeles */
             modeles: components["schemas"]["ModeleRapport"][];
+        };
+        /** MiseAJourMaintenance */
+        MiseAJourMaintenance: {
+            /** Maintenance Active */
+            maintenance_active: boolean;
         };
         /**
          * ModeleRapport
@@ -10977,6 +11035,26 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    etat_site_api_etat_site_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatSitePublic"];
+                };
+            };
+        };
+    };
     connexion_api_comptes_connexion_post: {
         parameters: {
             query?: never;
@@ -12493,6 +12571,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Moi"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_maintenance_api_admin_maintenance_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatMaintenance"];
+                };
+            };
+        };
+    };
+    changer_maintenance_api_admin_maintenance_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MiseAJourMaintenance"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EtatMaintenance"];
                 };
             };
             /** @description Validation Error */

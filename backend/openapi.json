@@ -5,6 +5,28 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/etat-site": {
+      "get": {
+        "tags": [
+          "maintenance"
+        ],
+        "summary": "Etat Site",
+        "description": "Indique au client si la maintenance est active. Exempté de la garde de maintenance.",
+        "operationId": "etat_site_api_etat_site_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatSitePublic"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/comptes/connexion": {
       "post": {
         "tags": [
@@ -2367,6 +2389,66 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Moi"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/maintenance": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lire Maintenance",
+        "operationId": "lire_maintenance_api_admin_maintenance_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatMaintenance"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Changer Maintenance",
+        "operationId": "changer_maintenance_api_admin_maintenance_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MiseAJourMaintenance"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EtatMaintenance"
                 }
               }
             }
@@ -21603,6 +21685,32 @@
         ],
         "title": "EtatLien"
       },
+      "EtatMaintenance": {
+        "properties": {
+          "maintenance_active": {
+            "type": "boolean",
+            "title": "Maintenance Active"
+          },
+          "active_le": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Le"
+          }
+        },
+        "type": "object",
+        "required": [
+          "maintenance_active",
+          "active_le"
+        ],
+        "title": "EtatMaintenance"
+      },
       "EtatPartagesArticle": {
         "properties": {
           "nature": {
@@ -21778,6 +21886,21 @@
           "depublie"
         ],
         "title": "EtatRessource"
+      },
+      "EtatSitePublic": {
+        "properties": {
+          "maintenance": {
+            "type": "boolean",
+            "title": "Maintenance"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "maintenance"
+        ],
+        "title": "EtatSitePublic",
+        "description": "État visible par le client, sans détail sensible."
       },
       "EtatVerification": {
         "type": "string",
@@ -26015,6 +26138,20 @@
           "modeles"
         ],
         "title": "MesRapports"
+      },
+      "MiseAJourMaintenance": {
+        "properties": {
+          "maintenance_active": {
+            "type": "boolean",
+            "title": "Maintenance Active"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "maintenance_active"
+        ],
+        "title": "MiseAJourMaintenance"
       },
       "ModeleRapport": {
         "type": "string",

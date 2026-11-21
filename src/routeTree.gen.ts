@@ -25,6 +25,7 @@ import { Route as InscriptionRouteImport } from './routes/inscription'
 import { Route as JeuxRouteImport } from './routes/jeux'
 import { Route as Les7AxesRouteImport } from './routes/les-7-axes'
 import { Route as MagazineRouteImport } from './routes/magazine'
+import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as MotDePasseOublieRouteImport } from './routes/mot-de-passe-oublie'
 import { Route as ConnecteAdminRouteImport } from './routes/_connecte/admin'
 import { Route as ConnecteMaCarteRouteImport } from './routes/_connecte/ma-carte'
@@ -52,6 +53,7 @@ import { Route as ConnecteAdminDoubleAuthentificationRouteImport } from './route
 import { Route as ConnecteAdminEncadreursRouteImport } from './routes/_connecte/admin/encadreurs'
 import { Route as ConnecteAdminExportsRouteImport } from './routes/_connecte/admin/exports'
 import { Route as ConnecteAdminJournalRouteImport } from './routes/_connecte/admin/journal'
+import { Route as ConnecteAdminMaintenanceRouteImport } from './routes/_connecte/admin/maintenance'
 import { Route as ConnecteAdminModerationRouteImport } from './routes/_connecte/admin/moderation'
 import { Route as ConnecteAdminPointsRouteImport } from './routes/_connecte/admin/points'
 import { Route as ConnecteAdminQuizRouteImport } from './routes/_connecte/admin/quiz'
@@ -180,6 +182,11 @@ const Les7AxesRoute = Les7AxesRouteImport.update({
 const MagazineRoute = MagazineRouteImport.update({
   id: '/magazine',
   path: '/magazine',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaintenanceRoute = MaintenanceRouteImport.update({
+  id: '/maintenance',
+  path: '/maintenance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MotDePasseOublieRoute = MotDePasseOublieRouteImport.update({
@@ -320,6 +327,12 @@ const ConnecteAdminJournalRoute = ConnecteAdminJournalRouteImport.update({
   path: '/journal',
   getParentRoute: () => ConnecteAdminRoute,
 } as any)
+const ConnecteAdminMaintenanceRoute =
+  ConnecteAdminMaintenanceRouteImport.update({
+    id: '/maintenance',
+    path: '/maintenance',
+    getParentRoute: () => ConnecteAdminRoute,
+  } as any)
 const ConnecteAdminModerationRoute = ConnecteAdminModerationRouteImport.update({
   id: '/moderation',
   path: '/moderation',
@@ -622,6 +635,7 @@ export interface FileRoutesByFullPath {
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
+  '/maintenance': typeof MaintenanceRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/admin': typeof ConnecteAdminRouteWithChildren
   '/ma-carte': typeof ConnecteMaCarteRoute
@@ -648,6 +662,7 @@ export interface FileRoutesByFullPath {
   '/admin/encadreurs': typeof ConnecteAdminEncadreursRoute
   '/admin/exports': typeof ConnecteAdminExportsRoute
   '/admin/journal': typeof ConnecteAdminJournalRoute
+  '/admin/maintenance': typeof ConnecteAdminMaintenanceRoute
   '/admin/moderation': typeof ConnecteAdminModerationRoute
   '/admin/points': typeof ConnecteAdminPointsRouteWithChildren
   '/admin/quiz': typeof ConnecteAdminQuizRouteWithChildren
@@ -716,6 +731,7 @@ export interface FileRoutesByTo {
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
+  '/maintenance': typeof MaintenanceRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/ma-carte': typeof ConnecteMaCarteRoute
   '/ma-fiche': typeof ConnecteMaFicheRoute
@@ -739,6 +755,7 @@ export interface FileRoutesByTo {
   '/admin/encadreurs': typeof ConnecteAdminEncadreursRoute
   '/admin/exports': typeof ConnecteAdminExportsRoute
   '/admin/journal': typeof ConnecteAdminJournalRoute
+  '/admin/maintenance': typeof ConnecteAdminMaintenanceRoute
   '/admin/moderation': typeof ConnecteAdminModerationRoute
   '/admin/rapports': typeof ConnecteAdminRapportsRoute
   '/mes-articles/$id': typeof ConnecteMesArticlesIdRoute
@@ -806,6 +823,7 @@ export interface FileRoutesById {
   '/jeux': typeof JeuxRoute
   '/les-7-axes': typeof Les7AxesRoute
   '/magazine': typeof MagazineRoute
+  '/maintenance': typeof MaintenanceRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/_connecte/admin': typeof ConnecteAdminRouteWithChildren
   '/_connecte/ma-carte': typeof ConnecteMaCarteRoute
@@ -832,6 +850,7 @@ export interface FileRoutesById {
   '/_connecte/admin/encadreurs': typeof ConnecteAdminEncadreursRoute
   '/_connecte/admin/exports': typeof ConnecteAdminExportsRoute
   '/_connecte/admin/journal': typeof ConnecteAdminJournalRoute
+  '/_connecte/admin/maintenance': typeof ConnecteAdminMaintenanceRoute
   '/_connecte/admin/moderation': typeof ConnecteAdminModerationRoute
   '/_connecte/admin/points': typeof ConnecteAdminPointsRouteWithChildren
   '/_connecte/admin/quiz': typeof ConnecteAdminQuizRouteWithChildren
@@ -902,6 +921,7 @@ export interface FileRouteTypes {
     | '/jeux'
     | '/les-7-axes'
     | '/magazine'
+    | '/maintenance'
     | '/mot-de-passe-oublie'
     | '/admin'
     | '/ma-carte'
@@ -928,6 +948,7 @@ export interface FileRouteTypes {
     | '/admin/encadreurs'
     | '/admin/exports'
     | '/admin/journal'
+    | '/admin/maintenance'
     | '/admin/moderation'
     | '/admin/points'
     | '/admin/quiz'
@@ -996,6 +1017,7 @@ export interface FileRouteTypes {
     | '/jeux'
     | '/les-7-axes'
     | '/magazine'
+    | '/maintenance'
     | '/mot-de-passe-oublie'
     | '/ma-carte'
     | '/ma-fiche'
@@ -1019,6 +1041,7 @@ export interface FileRouteTypes {
     | '/admin/encadreurs'
     | '/admin/exports'
     | '/admin/journal'
+    | '/admin/maintenance'
     | '/admin/moderation'
     | '/admin/rapports'
     | '/mes-articles/$id'
@@ -1085,6 +1108,7 @@ export interface FileRouteTypes {
     | '/jeux'
     | '/les-7-axes'
     | '/magazine'
+    | '/maintenance'
     | '/mot-de-passe-oublie'
     | '/_connecte/admin'
     | '/_connecte/ma-carte'
@@ -1111,6 +1135,7 @@ export interface FileRouteTypes {
     | '/_connecte/admin/encadreurs'
     | '/_connecte/admin/exports'
     | '/_connecte/admin/journal'
+    | '/_connecte/admin/maintenance'
     | '/_connecte/admin/moderation'
     | '/_connecte/admin/points'
     | '/_connecte/admin/quiz'
@@ -1181,6 +1206,7 @@ export interface RootRouteChildren {
   JeuxRoute: typeof JeuxRoute
   Les7AxesRoute: typeof Les7AxesRoute
   MagazineRoute: typeof MagazineRoute
+  MaintenanceRoute: typeof MaintenanceRoute
   MotDePasseOublieRoute: typeof MotDePasseOublieRoute
   AgendaIdRoute: typeof AgendaIdRoute
   ArticlesAdresseRoute: typeof ArticlesAdresseRoute
@@ -1309,6 +1335,13 @@ declare module '@tanstack/react-router' {
       path: '/magazine'
       fullPath: '/magazine'
       preLoaderRoute: typeof MagazineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maintenance': {
+      id: '/maintenance'
+      path: '/maintenance'
+      fullPath: '/maintenance'
+      preLoaderRoute: typeof MaintenanceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mot-de-passe-oublie': {
@@ -1498,6 +1531,13 @@ declare module '@tanstack/react-router' {
       path: '/journal'
       fullPath: '/admin/journal'
       preLoaderRoute: typeof ConnecteAdminJournalRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
+    '/_connecte/admin/maintenance': {
+      id: '/_connecte/admin/maintenance'
+      path: '/maintenance'
+      fullPath: '/admin/maintenance'
+      preLoaderRoute: typeof ConnecteAdminMaintenanceRouteImport
       parentRoute: typeof ConnecteAdminRoute
     }
     '/_connecte/admin/moderation': {
@@ -1966,6 +2006,7 @@ interface ConnecteAdminRouteChildren {
   ConnecteAdminEncadreursRoute: typeof ConnecteAdminEncadreursRoute
   ConnecteAdminExportsRoute: typeof ConnecteAdminExportsRoute
   ConnecteAdminJournalRoute: typeof ConnecteAdminJournalRoute
+  ConnecteAdminMaintenanceRoute: typeof ConnecteAdminMaintenanceRoute
   ConnecteAdminModerationRoute: typeof ConnecteAdminModerationRoute
   ConnecteAdminPointsRoute: typeof ConnecteAdminPointsRouteWithChildren
   ConnecteAdminQuizRoute: typeof ConnecteAdminQuizRouteWithChildren
@@ -1988,6 +2029,7 @@ const ConnecteAdminRouteChildren: ConnecteAdminRouteChildren = {
   ConnecteAdminEncadreursRoute: ConnecteAdminEncadreursRoute,
   ConnecteAdminExportsRoute: ConnecteAdminExportsRoute,
   ConnecteAdminJournalRoute: ConnecteAdminJournalRoute,
+  ConnecteAdminMaintenanceRoute: ConnecteAdminMaintenanceRoute,
   ConnecteAdminModerationRoute: ConnecteAdminModerationRoute,
   ConnecteAdminPointsRoute: ConnecteAdminPointsRouteWithChildren,
   ConnecteAdminQuizRoute: ConnecteAdminQuizRouteWithChildren,
@@ -2079,6 +2121,7 @@ const rootRouteChildren: RootRouteChildren = {
   JeuxRoute: JeuxRoute,
   Les7AxesRoute: Les7AxesRoute,
   MagazineRoute: MagazineRoute,
+  MaintenanceRoute: MaintenanceRoute,
   MotDePasseOublieRoute: MotDePasseOublieRoute,
   AgendaIdRoute: AgendaIdRoute,
   ArticlesAdresseRoute: ArticlesAdresseRoute,

@@ -26,11 +26,13 @@ import {
   UserCheck,
   UserCog,
   Users,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
 
 import logo from "@/assets/logo.webp";
+import { BandeauMaintenance } from "@/components/admin/BandeauMaintenance";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { CLE_MOI } from "@/hooks/use-moi";
@@ -38,6 +40,7 @@ import { peut, peutExporter, peutVoirInscrits } from "@/lib/admin";
 import {
   chargerAdminMoi,
   chargerCatalogue,
+  chargerEtatSite,
   deconnecter,
   ErreurApi,
   type AdminMoi,
@@ -64,7 +67,10 @@ export const Route = createFileRoute("/_connecte/admin")({
     if (admin.double_auth_requise && location.pathname !== PAGE_DOUBLE_AUTH) {
       throw redirect({ to: PAGE_DOUBLE_AUTH });
     }
-    return { admin, catalogue: await chargerCatalogue() };
+    // L'état public suffit pour le bandeau ; la page dédiée lit l'état admin complet.
+    const maintenance =
+      admin.super_admin && ((await chargerEtatSite().catch(() => null))?.maintenance ?? false);
+    return { admin, catalogue: await chargerCatalogue(), maintenance };
   },
   gcTime: 0,
   head: () => ({
@@ -167,6 +173,12 @@ function entrees(admin: AdminMoi): Entree[] {
       to: "/admin/collaborateurs",
       libelle: "Collaborateurs",
       i: UserCog,
+      visible: admin.super_admin,
+    },
+    {
+      to: "/admin/maintenance",
+      libelle: "Maintenance",
+      i: Wrench,
       visible: admin.super_admin,
     },
   ];
@@ -300,7 +312,7 @@ function Menu_({
 }
 
 function EspaceAdmin() {
-  const { admin, catalogue } = Route.useRouteContext();
+  const { admin, catalogue, maintenance } = Route.useRouteContext();
   const [ouvert, setOuvert] = useState(false);
 
   return (
@@ -331,6 +343,7 @@ function EspaceAdmin() {
             </SheetContent>
           </Sheet>
         </header>
+        {maintenance && <BandeauMaintenance />}
         <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
           <Outlet />
         </main>

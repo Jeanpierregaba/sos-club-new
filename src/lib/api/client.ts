@@ -202,6 +202,9 @@ export type BibliothequePublique = Schemas["Bibliotheque"];
 export type RessourceGestion = Schemas["RessourceGestion"];
 export type RessourceEntree = Schemas["RessourceEntree"];
 export type ListeGestion = Schemas["ListeGestion"];
+export type EtatSitePublic = Schemas["EtatSitePublic"];
+export type EtatMaintenance = Schemas["EtatMaintenance"];
+export type MiseAJourMaintenance = Schemas["MiseAJourMaintenance"];
 
 export const MESSAGE_SAISIE = "Vérifie le formulaire : un champ est vide, trop long ou mal rempli.";
 
@@ -220,6 +223,10 @@ export class ErreurApi extends Error {
     this.name = "ErreurApi";
   }
 }
+
+// Le garde de maintenance répond 503 avec X-Raison: maintenance, à distinguer d'une panne ordinaire.
+export const estMaintenance = (erreur: unknown): erreur is ErreurApi =>
+  erreur instanceof ErreurApi && erreur.statut === 503 && erreur.raison === "maintenance";
 
 // Dans le navigateur, /api passe par le domaine du site (ADR-0006). Pendant le rendu serveur, le site
 // appelle l'API directement et lui transmet le cookie reçu du navigateur.
@@ -318,6 +325,16 @@ export function deconnecter(): Promise<void> {
 export const chargerAdminMoi = () => requeteApi<AdminMoi>("/api/admin/moi");
 export const chargerCatalogue = () => requeteApi<Catalogue>("/api/admin/catalogue");
 export const chargerTableauDeBord = () => requeteApi<TableauDeBord>("/api/admin/tableau-de-bord");
+
+// Mode maintenance (spec 047) : l'état public, puis la bascule réservée au super-administrateur.
+export const chargerEtatSite = () => requeteApi<EtatSitePublic>("/api/etat-site");
+export const chargerMaintenance = () => requeteApi<EtatMaintenance>("/api/admin/maintenance");
+export const changerMaintenance = (maintenanceActive: boolean) =>
+  envoyerJson<EtatMaintenance>(
+    "/api/admin/maintenance",
+    { maintenance_active: maintenanceActive },
+    "PUT",
+  );
 
 export const commencerEnrolement = () =>
   envoyerJson<Enrolement>("/api/admin/double-auth/enrolement");

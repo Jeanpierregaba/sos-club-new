@@ -3,6 +3,7 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  redirect,
   useRouter,
   HeadContent,
   Scripts,
@@ -12,6 +13,7 @@ import type { ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { RetourEnHaut } from "@/components/RetourEnHaut";
+import { chargerAdminMoi, chargerEtatSite } from "@/lib/api/client";
 
 function NotFoundComponent() {
   return (
@@ -71,6 +73,28 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  // Garde d'affichage du mode maintenance (spec 047) : l'API bloque de toute façon chaque route.
+  beforeLoad: async ({ location }) => {
+    if (["/maintenance", "/connexion", "/activation"].includes(location.pathname)) return;
+
+    let etat;
+    try {
+      etat = await chargerEtatSite();
+    } catch {
+      // API injoignable : les pages affichent leur propre erreur, ce n'est pas la maintenance.
+      return;
+    }
+    if (!etat.maintenance) return;
+
+    // Seul un super-administrateur connecté contourne la maintenance, comme côté API.
+    try {
+      const admin = await chargerAdminMoi();
+      if (admin.super_admin) return;
+    } catch {
+      // Visiteur, élève, encadreur ou collaborateur non super-admin : on affiche la page.
+    }
+    throw redirect({ to: "/maintenance" });
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },

@@ -142,6 +142,9 @@ export const ACTIONS_JOURNAL: Record<string, string> = {
   evenement_cree: "Événement de l'équipe publié",
   evenement_modifie: "Événement de l'équipe modifié",
   evenement_annule: "Événement annulé",
+  // Spec 047.
+  maintenance_activee: "Maintenance activée",
+  maintenance_desactivee: "Maintenance désactivée",
 };
 
 const formatDate = new Intl.DateTimeFormat("fr-FR", {

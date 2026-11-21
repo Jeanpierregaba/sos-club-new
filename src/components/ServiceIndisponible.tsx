@@ -1,9 +1,14 @@
 import { useRouter, type ErrorComponentProps } from "@tanstack/react-router";
 
+import { PageMaintenance } from "@/components/PageMaintenance";
 import { Button } from "@/components/ui/button";
+import { estMaintenance } from "@/lib/api/client";
 
-export function ServiceIndisponible({ reset }: ErrorComponentProps) {
+export function ServiceIndisponible({ error, reset }: ErrorComponentProps) {
   const router = useRouter();
+
+  // Une route bloquée par la maintenance n'est pas une panne : on affiche la page dédiée.
+  if (estMaintenance(error)) return <PageMaintenance />;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-mist-soft px-4">
