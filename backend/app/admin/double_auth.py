@@ -73,7 +73,8 @@ async def commencer_enrolement(db: AsyncSession, utilisateur: Utilisateur) -> tu
     await db.commit()
 
     uri = pyotp.TOTP(secret).provisioning_uri(name=utilisateur.email or utilisateur.identifiant, issuer_name=EMETTEUR)
-    svg = segno.make(uri, error="m").svg_inline(scale=5, border=2, dark="#1e3a6e")
+    # Modules noirs sur fond blanc, marge large : indispensable pour que les applis d'authentification lisent le code.
+    svg = segno.make(uri, error="m").svg_inline(scale=5, border=4, dark="#000000", light="#ffffff")
     return secret, svg
 
 
