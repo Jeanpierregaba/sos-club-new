@@ -7,4 +7,4 @@
 - [x] 5. **Client API et types** : exporter OpenAPI, régénérer les types, ajouter appels client et gestion du signal `maintenance` (503 + `raison`).
 - [x] 6. **Page maintenance frontend** : composant `PageMaintenance` (mascottes regroupées + texte fixe), et garde globale pour afficher la page quand la maintenance est active (sauf contournement super-admin).
 - [x] 7. **Contrôle admin et bandeau** : interface super-admin pour activer/désactiver, bandeau visible « maintenance active » pour le super-admin connecté.
-- [ ] 8. **Vérification finale** : lint, typecheck, tests ciblés puis pertinents, vérification manuelle du flux (activation, blocage, connexion super-admin, désactivation) ; mise à jour `TASKS.md`.
+- [x] 8. **Vérification finale** : lint, typecheck, tests ciblés puis pertinents, vérification manuelle du flux (activation, blocage, connexion super-admin, désactivation) ; mise à jour `TASKS.md`.
