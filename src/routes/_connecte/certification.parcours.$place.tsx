@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import { PartieQuiz } from "@/components/quiz/PartieQuiz";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
+import { Vies } from "@/components/quiz/Vies";
+import { plusDeVies } from "@/lib/vies";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,6 +46,7 @@ export const Route = createFileRoute("/_connecte/certification/parcours/$place")
       quizId: place.quiz_id,
       nbQuestions: parcours.nb_questions,
       seuil: parcours.seuil,
+      vies: parcours.vies ?? null,
     };
   },
   head: () => ({
@@ -57,7 +60,7 @@ export const Route = createFileRoute("/_connecte/certification/parcours/$place")
 });
 
 function JouerPlace() {
-  const { place, quizId, nbQuestions, seuil } = Route.useLoaderData();
+  const { place, quizId, nbQuestions, seuil, vies } = Route.useLoaderData();
   const { moi } = Route.useRouteContext();
   const [partie, setPartie] = useState<EtatPartie | null>(null);
   const [enCours, setEnCours] = useState(false);
@@ -143,12 +146,13 @@ function JouerPlace() {
                 </li>
                 <li>
                   Il faut {seuil}/{nbQuestions} pour valider ce quiz et ouvrir le suivant ; tu peux
-                  recommencer autant de fois que tu veux.
+                  recommencer tant qu'il te reste des vies.
                 </li>
                 {place.tentatives_restantes !== null && (
                   <li>Parties restantes aujourd'hui sur ce quiz : {place.tentatives_restantes}.</li>
                 )}
               </ul>
+              <Vies vies={vies} />
               {enCoursId && (
                 <p className="rounded-2xl bg-sun/20 p-3 text-sm font-semibold text-ink">
                   Tu as une partie en cours sur ce quiz : reprends-la, ou recommence (la partie en
@@ -173,7 +177,7 @@ function JouerPlace() {
                 <Button
                   variant={enCoursId ? "outline" : "default"}
                   className="h-12 rounded-full px-6 font-bold"
-                  disabled={enCours}
+                  disabled={enCours || plusDeVies(vies)}
                   onClick={() => void demarrer(() => lancerQuiz(quizId))}
                 >
                   {enCours ? (

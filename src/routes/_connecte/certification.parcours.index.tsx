@@ -2,6 +2,7 @@ import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
 import { BadgesParcours } from "@/components/certification/BadgesParcours";
+import { Vies } from "@/components/quiz/Vies";
 import { CarteCertificat } from "@/components/certification/CarteCertificat";
 import { CartePlace } from "@/components/certification/CartePlace";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
@@ -112,6 +113,12 @@ function MaCertificationPage() {
             </section>
 
             {parcours.certificat && <CarteCertificat certificat={parcours.certificat} />}
+
+            {parcours.vies && (
+              <section className="rounded-3xl bg-card p-5 shadow-card sm:p-7">
+                <Vies vies={parcours.vies} />
+              </section>
+            )}
 
             <section aria-labelledby="titre-quiz">
               <h2 id="titre-quiz" className="font-sans text-xl font-extrabold text-logo-blue">

@@ -160,6 +160,7 @@ export type MesCommentaires = Schemas["MesCommentaires"];
 export type CommentairePublic = Schemas["CommentairePublic"];
 export type CommentairesPublics = Schemas["CommentairesPublics"];
 export type EtatPartie = Schemas["EtatPartie"];
+export type Vies = Schemas["Vies"];
 export type CorrectionReponse = Schemas["CorrectionReponse"];
 export type ErreurPartie = Schemas["ErreurPartie"];
 export type QuestionJoueur = Schemas["QuestionJoueur"];

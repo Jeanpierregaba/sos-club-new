@@ -2,6 +2,8 @@ import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { ArrowLeft, Brain, CheckCircle2, Play } from "lucide-react";
 
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
+import { Vies } from "@/components/quiz/Vies";
+import { plusDeVies } from "@/lib/vies";
 import {
   chargerAxes,
   chargerQuiz,
@@ -94,6 +96,12 @@ function PageQuiz() {
                 </nav>
               )}
 
+              {liste.vies && (
+                <section className="rounded-3xl bg-card p-5 shadow-card sm:p-7">
+                  <Vies vies={liste.vies} />
+                </section>
+              )}
+
               {joues.length > 0 && (
                 <section className="rounded-3xl bg-card p-5 shadow-card sm:p-7">
                   <h2 className="font-display text-xl text-ink">Mes quiz</h2>
@@ -151,7 +159,9 @@ function PageQuiz() {
                             ? "Parties sans limite"
                             : `${q.tentatives_restantes} partie${q.tentatives_restantes > 1 ? "s" : ""} possible${q.tentatives_restantes > 1 ? "s" : ""} aujourd'hui`}
                         </span>
-                        {q.tentatives_restantes === null || q.tentatives_restantes > 0 ? (
+                        {/* Spec 048 : sans vie, seule une partie en cours se reprend. */}
+                        {(q.tentatives_restantes === null || q.tentatives_restantes > 0) &&
+                        (!plusDeVies(liste.vies) || q.tentative_en_cours) ? (
                           <Link
                             to="/quiz/$id"
                             params={{ id: q.id }}

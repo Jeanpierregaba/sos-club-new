@@ -3,6 +3,8 @@ import { Hourglass, Loader2, Play, UserPlus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { PartieQuiz } from "@/components/quiz/PartieQuiz";
+import { Vies } from "@/components/quiz/Vies";
+import { plusDeVies } from "@/lib/vies";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -18,6 +20,7 @@ import {
   type CatalogueQuiz,
   type EtatPartie,
   type QuizOuvert,
+  type Vies as ViesDuJour,
 } from "@/lib/api/client";
 import { NIVEAUX_JEUX, points } from "@/lib/bareme";
 
@@ -85,6 +88,7 @@ export function DefiQuiz({
   const [enCoursId, setEnCoursId] = useState<string | null>(null);
   const [interdit, setInterdit] = useState(false);
   const [verifie, setVerifie] = useState(false);
+  const [vies, setVies] = useState<ViesDuJour | null>(null);
   // Le dernier défi reste affiché pendant l'animation de fermeture.
   const [affiche, setAffiche] = useState<Defi | null>(defi);
   // Chaque ouverture reçoit un numéro : une réponse arrivée après un changement de défi est ignorée.
@@ -103,11 +107,13 @@ export function DefiQuiz({
     setInterdit(false);
     setEnCours(false);
     setVerifie(!connecte);
+    setVies(null);
     if (!connecte) return;
     chargerQuiz()
       .then((liste) => {
         if (numero !== ouverture.current) return;
         setEnCoursId(liste.quiz.find((q) => q.id === defi.quiz.id)?.tentative_en_cours ?? null);
+        setVies(liste.vies ?? null);
       })
       .catch((e: unknown) => {
         if (numero !== ouverture.current) return;
@@ -207,6 +213,7 @@ export function DefiQuiz({
                     <li>Il faut {catalogue.seuil} bonnes réponses pour réussir.</li>
                     <li>Si tu fermes la fenêtre, la question en cours est perdue.</li>
                   </ul>
+                  <Vies vies={vies} />
                   {enCoursId && (
                     <p className="rounded-2xl bg-sun/20 p-3 text-sm font-semibold text-ink">
                       Tu as une partie en cours sur ce quiz : reprends-la, ou recommence (la partie
@@ -231,7 +238,7 @@ export function DefiQuiz({
                     <Button
                       variant={enCoursId ? "outline" : "default"}
                       className="btn-fx h-12 rounded-full px-6 font-bold"
-                      disabled={enCours || !verifie}
+                      disabled={enCours || !verifie || plusDeVies(vies)}
                       onClick={() => void demarrer(() => lancer(affiche.quiz.id))}
                     >
                       {enCours ? (

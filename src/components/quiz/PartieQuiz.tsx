@@ -2,6 +2,7 @@ import { Check, Loader2, PartyPopper, RotateCcw, Timer, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { MESSAGE_PLUS_DE_VIES } from "@/lib/vies";
 import { Button } from "@/components/ui/button";
 import {
   ErreurApi,
@@ -172,11 +173,21 @@ export function PartieQuiz({
           </p>
         )}
         {r.erreurs && <Recapitulatif erreurs={r.erreurs} />}
+        {/* Spec 048 : les vies du jour, après la partie (None pour un invité). */}
+        {etat.vies_restantes != null && (
+          <p
+            className={`text-sm font-bold ${etat.vies_restantes === 0 ? "rounded-2xl bg-logo-red/10 p-3 text-ink" : "text-muted-foreground"}`}
+          >
+            {etat.vies_restantes === 0
+              ? MESSAGE_PLUS_DE_VIES
+              : `Il te reste ${etat.vies_restantes} vie${etat.vies_restantes > 1 ? "s" : ""} aujourd'hui.`}
+          </p>
+        )}
         <div className="flex flex-wrap justify-center gap-3">
           {onRejouer && (
             <Button
               className="h-11 rounded-full px-6 font-bold"
-              disabled={enCours}
+              disabled={enCours || etat.vies_restantes === 0}
               onClick={() => void rejouer()}
             >
               <RotateCcw className="size-4" /> Rejouer
