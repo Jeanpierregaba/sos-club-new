@@ -8,6 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
+- [ ] [047 — Mode maintenance du site](docs/specs/047-mode-maintenance/spec.md) : spec, plan et tâches validés le 2026-11-21 ; implémentation en cours ([tâches](docs/specs/047-mode-maintenance/tasks.md))
 - [ ] [046 — Temps passé sur les quiz et la certification d'un inscrit](docs/specs/046-temps-quiz-certification/spec.md) : implémentée et relue le 2026-11-20 ; reste la vérification au navigateur avec une connexion admin et le déploiement de la migration `e4a7c2d9b6f1` ([tâches](docs/specs/046-temps-quiz-certification/tasks.md))
 - [ ] [045 — Fiche d'un inscrit : modification, registre complet et parcours](docs/specs/045-fiche-inscrit-complete/spec.md) : implémentée et relue le 2026-11-20 ; reste la vérification au navigateur avec une connexion admin ([tâches](docs/specs/045-fiche-inscrit-complete/tasks.md))
 - [ ] [044 — Partages : carte de classement et partages d'articles vérifiés (R17)](docs/specs/044-partages/spec.md) : spec, plan et tâches validés le 2026-11-19 ; implémentation en cours ([tâches](docs/specs/044-partages/tasks.md))
