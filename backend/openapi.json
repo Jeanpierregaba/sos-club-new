@@ -10719,15 +10719,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/Vies"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Response Mes Vies Api Quiz Vies Get"
+                  "$ref": "#/components/schemas/Vies"
                 }
               }
             }

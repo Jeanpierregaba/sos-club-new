@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import { PartieQuiz } from "@/components/quiz/PartieQuiz";
 import { ServiceIndisponible } from "@/components/ServiceIndisponible";
+import { Vies } from "@/components/quiz/Vies";
+import { plusDeVies } from "@/lib/vies";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,7 +33,7 @@ export const Route = createFileRoute("/_connecte/quiz/$id")({
     }
     const quiz = liste.quiz.find((q) => q.id === params.id);
     if (!quiz) throw notFound();
-    return { quiz, nbQuestions: liste.nb_questions, seuil: liste.seuil };
+    return { quiz, nbQuestions: liste.nb_questions, seuil: liste.seuil, vies: liste.vies ?? null };
   },
   head: () => ({
     meta: [{ title: "Quiz — Club Santé SOS Docteur TV" }, { name: "robots", content: "noindex" }],
@@ -48,7 +50,7 @@ export const Route = createFileRoute("/_connecte/quiz/$id")({
 });
 
 function JouerQuiz() {
-  const { quiz, nbQuestions, seuil } = Route.useLoaderData();
+  const { quiz, nbQuestions, seuil, vies } = Route.useLoaderData();
   const { moi } = Route.useRouteContext();
   const [partie, setPartie] = useState<EtatPartie | null>(null);
   const [enCours, setEnCours] = useState(false);
@@ -118,6 +120,7 @@ function JouerQuiz() {
                   suivante.
                 </li>
               </ul>
+              <Vies vies={vies} />
               {enCoursId && (
                 <p className="rounded-2xl bg-sun/20 p-3 text-sm font-semibold text-ink">
                   Tu as une partie en cours sur ce quiz : reprends-la, ou recommence (la partie en
@@ -142,7 +145,7 @@ function JouerQuiz() {
                 <Button
                   variant={enCoursId ? "outline" : "default"}
                   className="h-12 rounded-full px-6 font-bold"
-                  disabled={enCours}
+                  disabled={enCours || plusDeVies(vies)}
                   onClick={() => void demarrer(() => lancerQuiz(quiz.id))}
                 >
                   {enCours ? (

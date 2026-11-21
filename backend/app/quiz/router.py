@@ -27,7 +27,7 @@ def erreur_de_partie(erreur: Exception) -> HTTPException:
     if isinstance(erreur, partie.PlusDeVies):
         return HTTPException(
             status.HTTP_409_CONFLICT,
-            "Tu as utilisé tes 7 vies aujourd'hui. Reviens demain, elles se rechargent à minuit.",
+            f"Tu as utilisé tes {vies.VIES_PAR_JOUR} vies aujourd'hui. Reviens demain, elles se rechargent à minuit.",
         )
     if isinstance(erreur, partie.ChoixInvalide):
         return HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Ce choix n'existe pas pour cette question.")
@@ -52,12 +52,14 @@ ERREURS = (
 
 
 @router.get("/vies")
-async def mes_vies(db: Db, joueur: Joueur) -> Vies | None:
+async def mes_vies(db: Db, joueur: Joueur) -> Vies:
     """Les vies du jour (spec 048), communes aux quiz des jeux et à la certification. Une partie abandonnée est
     d'abord close, comme sur la liste des quiz : sa vie est perdue, ou rendue si elle était réussie."""
     await partie.clore_abandonnees(db, joueur)
     resultat = await vies.resume(db, joueur, horloge.maintenant().date())
     await db.commit()
+    # `Joueur` exclut les invités : un joueur connecté a toujours des vies.
+    assert resultat is not None
     return resultat
 
 

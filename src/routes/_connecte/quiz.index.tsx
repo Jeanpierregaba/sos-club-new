@@ -156,7 +156,7 @@ function PageQuiz() {
                       <div className="mt-auto flex items-center justify-between gap-3 pt-4">
                         <span className="text-xs text-muted-foreground">
                           {q.tentatives_restantes === null
-                            ? "Parties sans limite"
+                            ? "Sans limite par quiz"
                             : `${q.tentatives_restantes} partie${q.tentatives_restantes > 1 ? "s" : ""} possible${q.tentatives_restantes > 1 ? "s" : ""} aujourd'hui`}
                         </span>
                         {/* Spec 048 : sans vie, seule une partie en cours se reprend. */}

@@ -92,7 +92,7 @@ def test_une_partie_en_cours_reserve_une_vie(
     rater(client, quiz, 6)
     lancer(client, quiz)
 
-    assert vies(client) | {} == {"total": 7, "restantes": 0, "perdues": 6, "en_cours": 1}
+    assert vies(client) == {"total": 7, "restantes": 0, "perdues": 6, "en_cours": 1}
     autre = creer_quiz(en_base, titre="Autre quiz")
     assert client.post(f"{QUIZ}/{autre.id}/tentatives").status_code == 409
 
@@ -143,3 +143,65 @@ def test_un_encadreur_a_aussi_7_vies(
     rater(client, quiz, 7)
 
     assert client.post(f"{QUIZ}/{quiz.id}/tentatives").status_code == 409
+
+
+# Cas limites relevés à la relecture ----------------------------------------------------------------------------
+
+
+def test_recommencer_a_zero_vie_garde_la_partie_en_cours(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
+) -> None:
+    rater(client, quiz, 6)
+    en_cours = lancer(client, quiz)
+
+    refus = client.post(f"{QUIZ}/{quiz.id}/tentatives")
+
+    assert refus.status_code == 409
+    # La clôture que tentait le lancement est annulée : la partie se reprend telle quelle.
+    reprise = client.get(f"{QUIZ}/tentatives/{en_cours['tentative_id']}").json()
+    assert reprise["question"] is not None
+    assert vies(client)["en_cours"] == 1
+
+
+def test_une_partie_lancee_avant_minuit_compte_pour_la_veille(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge
+) -> None:
+    heure.maintenant = heure.maintenant.replace(hour=23, minute=59, second=0)
+    etat = lancer(client, quiz)
+    heure.avancer(120)
+    while etat["question"] is not None:
+        etat = client.post(
+            f"{QUIZ}/tentatives/{etat['tentative_id']}/reponses",
+            json={"rang": etat["question"]["rang"], "choix": 0},
+        ).json()
+
+    assert etat["resultat"]["reussie"] is False
+    assert vies(client)["restantes"] == 7
+
+
+def test_un_visiteur_a_aussi_7_vies(
+    client: TestClient, creer_utilisateur: Callable[..., Utilisateur], quiz: Quiz, heure: Horloge
+) -> None:
+    from datetime import UTC, datetime
+
+    from app.comptes.models import Role
+
+    creer_utilisateur("passant", Role.visiteur, email="passant@exemple.tg", email_confirme_le=datetime.now(UTC))
+    connecter(client, "passant")
+
+    assert vies(client)["restantes"] == 7
+    rater(client, quiz, 7)
+    assert client.post(f"{QUIZ}/{quiz.id}/tentatives").status_code == 409
+
+
+def test_un_invite_sans_compte_n_a_pas_de_vies(client: TestClient, quiz: Quiz, heure: Horloge) -> None:
+    lance = client.post(f"/api/jeux/quiz/{quiz.id}/tentatives")
+    assert lance.status_code == 201, lance.text
+    etat = lance.json()
+    while etat["question"] is not None:
+        etat = client.post(
+            f"/api/jeux/quiz/tentatives/{etat['tentative_id']}/reponses",
+            json={"rang": etat["question"]["rang"], "choix": 0},
+        ).json()
+
+    assert etat["vies_restantes"] is None

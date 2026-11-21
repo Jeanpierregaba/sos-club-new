@@ -23,7 +23,7 @@ describe("Vies (spec 048)", () => {
   it("montre un cœur plein par vie restante", () => {
     render(<Vies vies={vies(5)} />);
 
-    expect(screen.getByRole("img", { name: "5 vies sur 7 aujourd'hui" })).toBeInTheDocument();
+    expect(screen.getByText("5 vies sur 7 aujourd'hui")).toBeInTheDocument();
     expect(screen.getByText(/Jeux et certification partagent/)).toBeInTheDocument();
   });
 

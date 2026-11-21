@@ -126,6 +126,8 @@ Champs structurants :
   `validateur_qualite` (validation médicale nommée, Q11). `question_quiz` : `enonce`, `choix` (2 à 4),
   `bonne_reponse`, `explication` (équipe seulement), `active` (une question déjà tirée se désactive, ne
   s'efface pas). `parametres_quiz` : versions des paramètres du parcours « jeux ».
+- Vies quotidiennes (spec 048) : pas de table ; `quiz/vies.py` les compte à partir de `tentative_quiz` (7 par jour, parties
+  terminées non réussies du jour, plus une par partie en cours), contrôlées au lancement sous le verrou du joueur.
 - `tentative_quiz` (spec 027) : `quiz_id`, `joueur_id`, `parametres_id`, `essai` (mode test, effacé à la fin),
   `etat`, `jour`, `score`, `reussie`, `mouvement_id` ; une seule en cours par joueur et par quiz.
   `reponse_quiz` : `rang`, `question_id`, `ordre_choix` (permutation), `envoyee_le`, `repondue_le`, `choix`,

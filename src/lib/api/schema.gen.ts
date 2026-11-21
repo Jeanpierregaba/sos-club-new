@@ -18042,7 +18042,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Vies"] | null;
+                    "application/json": components["schemas"]["Vies"];
                 };
             };
         };

@@ -1,7 +1,7 @@
 import { Heart } from "lucide-react";
 
 import type { Vies as ViesDuJour } from "@/lib/api/client";
-import { MESSAGE_PLUS_DE_VIES } from "@/lib/vies";
+import { messagePlusDeVies } from "@/lib/vies";
 
 // Les vies du jour (spec 048) : 7 cœurs, communs aux quiz des jeux et à la certification. Un cœur plein par vie
 // restante ; une vie perdue (partie ratée) ou réservée (partie en cours) est un cœur vide. L'API arbitre : ce
@@ -20,8 +20,8 @@ export function Vies({
       <div className="flex flex-wrap items-center gap-3">
         <p
           className="flex items-center gap-1"
-          role="img"
-          aria-label={`${vies.restantes} vie${vies.restantes > 1 ? "s" : ""} sur ${vies.total} aujourd'hui`}
+          // Le texte voisin dit déjà le nombre de vies : les cœurs ne sont pas relus.
+          aria-hidden
         >
           {Array.from({ length: vies.total }, (_, i) => (
             <Heart
@@ -43,7 +43,7 @@ export function Vies({
       </div>
       {vies.restantes === 0 ? (
         <p role="status" className="rounded-2xl bg-logo-red/10 p-3 text-sm font-semibold text-ink">
-          {MESSAGE_PLUS_DE_VIES}
+          {messagePlusDeVies(vies.total)}
         </p>
       ) : (
         <p className={`text-xs font-medium ${clair ? "text-white/75" : "text-muted-foreground"}`}>
