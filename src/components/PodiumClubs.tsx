@@ -16,7 +16,6 @@ import {
 import { useState } from "react";
 
 import { Compteur } from "@/components/Compteur";
-import mascotte from "@/assets/mascotte-bourses.webp";
 import {
   chargerChiffresAccueil,
   chargerClassementPublic,
@@ -88,12 +87,21 @@ export function PodiumClubs() {
     retry: false,
     staleTime: 5 * 60_000,
   });
-  const { data: classement } = useQuery({
-    queryKey: ["top5-accueil", onglet],
-    queryFn: () => top5(onglet),
+  // Les deux classements se chargent dès l'arrivée : changer d'onglet est instantané, sans état intermédiaire.
+  const eleves = useQuery({
+    queryKey: ["top5-accueil", "eleves"],
+    queryFn: () => top5("eleves"),
     retry: false,
     staleTime: 5 * 60_000,
   });
+  const clubs = useQuery({
+    queryKey: ["top5-accueil", "clubs"],
+    queryFn: () => top5("clubs"),
+    retry: false,
+    staleTime: 5 * 60_000,
+  });
+  const requete = onglet === "eleves" ? eleves : clubs;
+  const classement = requete.data;
 
   return (
     <section
@@ -114,25 +122,14 @@ export function PodiumClubs() {
       />
 
       <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] xl:gap-12">
-        <div
-          data-reveal="left"
-          className="relative grid items-end gap-6 md:grid-cols-[15rem_minmax(0,1fr)]"
-        >
-          <img
-            src={mascotte}
-            alt=""
-            aria-hidden
-            width={1414}
-            height={2000}
-            loading="lazy"
-            className="pointer-events-none mx-auto w-32 drop-shadow-[0_20px_30px_rgba(0,0,0,0.45)] motion-safe:animate-respire md:w-60"
-          />
+        <div data-reveal="left" className="relative grid gap-6">
           <div className="text-center md:text-left">
             <p className="inline-flex items-center gap-2 rounded-full border-2 border-sun/80 bg-ink/20 px-4 py-1.5 text-sm font-extrabold uppercase tracking-wide">
               <Gamepad2 aria-hidden className="size-5 text-sun" /> Jeux & classement
             </p>
             <h2 id="titre-podium" className="mt-5 font-display text-4xl leading-tight md:text-5xl">
-              Et si ton lycée devenait{" "}
+              {/* Deux lignes : la question, puis le N°1 dans son étiquette jaune. */}
+              <span className="block lg:whitespace-nowrap">Et si ton lycée devenait</span>
               <span className="mt-2 inline-block -rotate-1 rounded-2xl bg-sun px-4 py-1 text-ink shadow-lg shadow-sun/20">
                 N°1 du Togo&#8239;?
               </span>
@@ -144,7 +141,7 @@ export function PodiumClubs() {
           </div>
 
           <ul
-            className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:col-span-2"
+            className="grid grid-cols-2 gap-3 sm:grid-cols-4"
             aria-label="Le programme en chiffres"
           >
             {TUILES.map(({ cle, libelle, icone: Icone, fond }) => (
@@ -163,7 +160,7 @@ export function PodiumClubs() {
             ))}
           </ul>
 
-          <div className="grid gap-3 rounded-2xl bg-white/10 p-4 ring-1 ring-white/20 sm:grid-cols-2 sm:divide-x sm:divide-white/20 md:col-span-2">
+          <div className="grid gap-3 rounded-2xl bg-white/10 p-4 ring-1 ring-white/20 sm:grid-cols-2 sm:divide-x sm:divide-white/20">
             <Atout
               icone={MessageCircleQuestion}
               titre="Des quiz santé"
@@ -176,7 +173,7 @@ export function PodiumClubs() {
             />
           </div>
 
-          <div className="flex flex-wrap justify-center gap-3 md:col-span-2 md:justify-start">
+          <div className="flex flex-wrap justify-center gap-3 md:justify-start">
             <Link
               to="/jeux"
               className="btn-fx inline-flex items-center gap-2 rounded-full bg-sun px-7 py-3.5 text-lg font-extrabold text-ink shadow-lg shadow-sun/20"
@@ -243,7 +240,9 @@ export function PodiumClubs() {
             role="tabpanel"
             aria-label={onglet === "eleves" ? "Top 5 des élèves" : "Top 5 des clubs"}
           >
-            {classement && classement.categorie === "clubs" && onglet === "clubs" ? (
+            {requete.isPending ? (
+              <Chargement />
+            ) : classement && classement.categorie === "clubs" && onglet === "clubs" ? (
               <TopClubs lignes={classement.lignes} />
             ) : classement && classement.categorie === "eleves" && onglet === "eleves" ? (
               <TopEleves lignes={classement.lignes} />
@@ -313,7 +312,7 @@ function Ligne({
   const premier = index === 0;
   return (
     <li
-      className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 sm:gap-4 sm:px-4 ${
+      className={`flex h-14 items-center gap-3 rounded-2xl px-3 sm:gap-4 sm:px-4 ${
         premier
           ? "bg-linear-to-r from-sun to-[oklch(0.9_0.12_90)] text-ink shadow-lg"
           : "bg-white/10 ring-1 ring-white/15"
@@ -345,7 +344,7 @@ function Ligne({
 function TopEleves({ lignes }: { lignes: ClassementPersonnesPublic["lignes"] }) {
   return (
     <ol className="mt-3 space-y-2" aria-label="Top 5 des élèves">
-      {lignes.map((eleve, i) => (
+      {lignes.slice(0, NB_LIGNES).map((eleve, i) => (
         <Ligne
           key={`${eleve.rang}-${eleve.nom}`}
           rang={eleve.rang}
@@ -359,6 +358,7 @@ function TopEleves({ lignes }: { lignes: ClassementPersonnesPublic["lignes"] }) 
           </span>
         </Ligne>
       ))}
+      <LignesVides deja={lignes.length} />
     </ol>
   );
 }
@@ -366,7 +366,7 @@ function TopEleves({ lignes }: { lignes: ClassementPersonnesPublic["lignes"] }) 
 function TopClubs({ lignes }: { lignes: ClassementClubsPublic["lignes"] }) {
   return (
     <ol className="mt-3 space-y-2" aria-label="Top 5 des clubs">
-      {lignes.map((club, i) => (
+      {lignes.slice(0, NB_LIGNES).map((club, i) => (
         <Ligne
           key={club.club_id}
           rang={club.rang}
@@ -382,30 +382,65 @@ function TopClubs({ lignes }: { lignes: ClassementClubsPublic["lignes"] }) {
           </Link>
         </Ligne>
       ))}
+      <LignesVides deja={lignes.length} />
     </ol>
   );
 }
 
+// La carte garde toujours la hauteur de 5 lignes, quel que soit l'onglet ou l'état : rien ne saute à l'affichage.
+const NB_LIGNES = 5;
+
+// Complète un classement de moins de 5 lignes.
+function LignesVides({ deja }: { deja: number }) {
+  return Array.from({ length: Math.max(0, NB_LIGNES - deja) }, (_, i) => (
+    <li
+      key={`vide-${i}`}
+      aria-hidden
+      className="h-14 rounded-2xl bg-white/5 ring-1 ring-white/10"
+    />
+  ));
+}
+
+function LigneFantome({ index }: { index: number }) {
+  return (
+    <div
+      aria-hidden
+      className="flex h-14 items-center gap-4 rounded-2xl bg-white/10 px-4 ring-1 ring-white/15"
+    >
+      <span
+        className={`inline-flex size-9 shrink-0 items-center justify-center rounded-full font-display text-lg opacity-80 ${MEDAILLES[index] ?? MEDAILLE_SIMPLE}`}
+      >
+        {index + 1}
+      </span>
+      <span className="h-3 flex-1 rounded-full bg-white/20" />
+      <span className="font-display text-lg text-white/60">? pts</span>
+    </div>
+  );
+}
+
+function Chargement() {
+  return (
+    <div className="mt-3 space-y-2 motion-safe:animate-pulse" aria-label="Chargement du classement">
+      {Array.from({ length: NB_LIGNES }, (_, i) => (
+        <LigneFantome key={i} index={i} />
+      ))}
+    </div>
+  );
+}
+
+// Pas encore de points : 5 lignes fantômes, et l'annonce posée par-dessus (même hauteur que la liste).
 function BientotLa({ texte }: { texte: string }) {
   return (
-    <div className="mt-3 space-y-2">
-      {[1, 2, 3, 4, 5].map((rang, i) => (
-        <div
-          key={rang}
-          aria-hidden
-          className="flex items-center gap-4 rounded-2xl bg-white/10 px-4 py-2.5 ring-1 ring-white/15"
-        >
-          <span
-            className={`inline-flex size-9 shrink-0 items-center justify-center rounded-full font-display text-lg opacity-80 ${MEDAILLES[i] ?? MEDAILLE_SIMPLE}`}
-          >
-            {rang}
-          </span>
-          <span className="h-3 flex-1 rounded-full bg-white/20" />
-          <span className="font-display text-lg text-white/60">? pts</span>
-        </div>
-      ))}
-      <p className="pt-2 text-center font-bold">Le classement arrive bientôt&#8239;!</p>
-      <p className="text-center text-sm font-medium text-white/75">{texte}</p>
+    <div className="relative mt-3">
+      <div className="space-y-2 opacity-60">
+        {Array.from({ length: NB_LIGNES }, (_, i) => (
+          <LigneFantome key={i} index={i} />
+        ))}
+      </div>
+      <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 rounded-2xl bg-[oklch(0.25_0.11_268)]/95 px-5 py-4 text-center shadow-xl ring-1 ring-white/20">
+        <p className="font-bold">Le classement arrive bientôt&#8239;!</p>
+        <p className="mt-1 text-sm font-medium text-white/80">{texte}</p>
+      </div>
     </div>
   );
 }

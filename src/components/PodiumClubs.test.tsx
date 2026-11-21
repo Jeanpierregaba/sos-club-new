@@ -166,4 +166,24 @@ describe("PodiumClubs", () => {
     expect(await screen.findByText("Le classement arrive bientôt !")).toBeInTheDocument();
     expect(screen.queryByRole("listitem", { name: /pts/ })).not.toBeInTheDocument();
   });
+
+  it("garde 5 lignes, donc la même hauteur, dans chaque onglet et chaque état", async () => {
+    // Deux élèves classés, aucun club : liste complétée d'un côté, annonce de l'autre.
+    classements({ "eleves/semestre": [eleve(1, "Kofi", 300), eleve(2, "Ama", 120)] });
+    await afficher();
+    const panneau = () => screen.getByRole("tabpanel");
+    const lignes = () => panneau().querySelectorAll("li, [aria-hidden].h-14").length;
+
+    expect(await within(panneau()).findByText("Kofi")).toBeInTheDocument();
+    expect(lignes()).toBe(5);
+
+    fireEvent.click(screen.getByRole("tab", { name: /Clubs/ }));
+    expect(within(panneau()).getByText("Le classement arrive bientôt !")).toBeInTheDocument();
+    expect(lignes()).toBe(5);
+    // Les deux classements sont chargés d'avance : revenir aux élèves ne relance rien.
+    const appels = api.chargerClassementPublic.mock.calls.length;
+    fireEvent.click(screen.getByRole("tab", { name: /Élèves/ }));
+    expect(within(panneau()).getByText("Kofi")).toBeInTheDocument();
+    expect(api.chargerClassementPublic.mock.calls.length).toBe(appels);
+  });
 });
