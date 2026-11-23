@@ -108,7 +108,7 @@ questions « moyennement difficiles » (M) des « très difficiles » (D).
 - [ ] Après la remise à zéro, un élève réussit la place 1 et gagne +50, gagne un badge et une étoile comme
       avant (les anciennes clés d'idempotence ne bloquent pas).
 - [ ] Relancer la migration ne change rien ; une base sans quiz (celle des tests) passe la migration sans erreur.
-- [ ] Un joueur a 3 vies par jour ; la 4e partie du jour est refusée.
+- [ ] Un joueur a 3 vies par jour ; après 3 parties ratées, le lancement est refusé jusqu'à minuit.
 - [ ] Le site montre 3 vies, et le favicon est le logo.
 
 ## Cas limites et erreurs
