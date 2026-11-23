@@ -18,6 +18,7 @@ from app.quiz.models import EtatQuiz, QuestionQuiz, Quiz
 from tests.quiz import QUIZ, Horloge, connecter, figer_horloge, gains, lancer
 
 AVANT = "8224c2108aff"
+APRES = "4dc45a4fff16"  # la migration de la spec 043
 DONNEES = Path(__file__).resolve().parents[1] / "alembic" / "donnees"
 CERTIFICATION = json.loads((DONNEES / "certification_expert.json").read_text(encoding="utf-8"))
 LOT7 = json.loads((DONNEES / "quiz_sante_lot7.json").read_text(encoding="utf-8"))
@@ -107,6 +108,8 @@ def test_une_seconde_execution_ne_change_rien(en_base: Callable[..., Any]) -> No
     _recharger()
     avant = _etat(en_base)
 
+    # Les migrations suivantes créent des tables (spec 049) : on les défait avant de rejouer celle de la spec 043.
+    command.downgrade(configuration(), APRES)
     command.stamp(configuration(), AVANT)
     command.upgrade(configuration(), "head")
 
