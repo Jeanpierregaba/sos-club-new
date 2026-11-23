@@ -2,7 +2,7 @@
 
 ## Livres
 
-- PDF et couvertures (PNG de la première page) dans `backend/app/bibliotheque/livres/` : ils partent avec l'image de
+- PDF et couvertures (JPEG de la première page) dans `backend/app/bibliotheque/livres/` : ils partent avec l'image de
   l'API (≈ 11 Mo).
 - `app/bibliotheque/livres_officiels.py` : la liste des 4 livres et `charger(db, stockage)`. Pour chaque livre absent
   (même titre), le PDF passe par `fichiers.pdf.examiner`, la couverture par `fichiers.images.preparer`, les trois
