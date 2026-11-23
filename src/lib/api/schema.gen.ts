@@ -44,6 +44,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/activite/{bloc}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lire Bloc */
+        get: operations["lire_bloc_api_admin_activite__bloc__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/activite/{bloc}/export.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Exporter Bloc */
+        get: operations["exporter_bloc_api_admin_activite__bloc__export_csv_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/comptes/connexion": {
         parameters: {
             query?: never;
@@ -5330,6 +5364,59 @@ export interface components {
             ressources: components["schemas"]["RessourcePublique"][];
             chiffres: components["schemas"]["Chiffres"];
         };
+        /** Bloc */
+        Bloc: {
+            /**
+             * Bloc
+             * @enum {string}
+             */
+            bloc: "audience" | "inscription" | "jeux" | "certification" | "contenus" | "regions" | "retention" | "erreurs";
+            /**
+             * Du
+             * Format: date
+             */
+            du: string;
+            /**
+             * Au
+             * Format: date
+             */
+            au: string;
+            /**
+             * Precedent Du
+             * Format: date
+             */
+            precedent_du: string;
+            /**
+             * Precedent Au
+             * Format: date
+             */
+            precedent_au: string;
+            /**
+             * Chiffres
+             * @default []
+             */
+            chiffres: components["schemas"]["Chiffre"][];
+            /**
+             * Series
+             * @default []
+             */
+            series: components["schemas"]["Serie"][];
+            /**
+             * Tableaux
+             * @default []
+             */
+            tableaux: components["schemas"]["Tableau"][];
+            /**
+             * Grilles
+             * @default []
+             */
+            grilles: components["schemas"]["Grille"][];
+            /**
+             * Notes
+             * @default []
+             */
+            notes: string[];
+        };
         /** Body_ajouter_document_api_rapports__contenu_id__documents_post */
         Body_ajouter_document_api_rapports__contenu_id__documents_post: {
             /** Fichier */
@@ -5798,6 +5885,23 @@ export interface components {
              * @default false
              */
             hors_photo: boolean;
+        };
+        /** Chiffre */
+        Chiffre: {
+            /** Cle */
+            cle: string;
+            /** Libelle */
+            libelle: string;
+            /** Valeur */
+            valeur: number | null;
+            /** Precedent */
+            precedent?: number | null;
+            /**
+             * Unite
+             * @default nombre
+             * @enum {string}
+             */
+            unite: "nombre" | "pourcent" | "secondes" | "texte";
         };
         /** Chiffres */
         Chiffres: {
@@ -6408,6 +6512,19 @@ export interface components {
              * Format: date-time
              */
             cree_le: string;
+        };
+        /** Colonne */
+        Colonne: {
+            /** Cle */
+            cle: string;
+            /** Libelle */
+            libelle: string;
+            /**
+             * Unite
+             * @default nombre
+             * @enum {string}
+             */
+            unite: "nombre" | "pourcent" | "secondes" | "texte";
         };
         /**
          * CommentaireAuteur
@@ -7633,6 +7750,11 @@ export interface components {
             referent?: string | null;
             /** Utm Source */
             utm_source?: string | null;
+            /**
+             * Entree
+             * @default false
+             */
+            entree: boolean;
         };
         /** ExportCandidats */
         ExportCandidats: {
@@ -7992,6 +8114,18 @@ export interface components {
              * @enum {string}
              */
             nom: "garde" | "absorbe";
+        };
+        /**
+         * Grille
+         * @description Une heatmap jour de la semaine (0 = lundi) × heure (0 à 23, heure de Lomé).
+         */
+        Grille: {
+            /** Cle */
+            cle: string;
+            /** Titre */
+            titre: string;
+            /** Valeurs */
+            valeurs: number[][];
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -9503,6 +9637,16 @@ export interface components {
             /** Tentative En Cours */
             tentative_en_cours: string | null;
         };
+        /** PointSerie */
+        PointSerie: {
+            /**
+             * Jour
+             * Format: date
+             */
+            jour: string;
+            /** Valeur */
+            valeur: number;
+        };
         /** PointsDuClub */
         PointsDuClub: {
             annee: components["schemas"]["AnneeResume"] | null;
@@ -10650,6 +10794,15 @@ export interface components {
              */
             fin: string;
         };
+        /** Serie */
+        Serie: {
+            /** Cle */
+            cle: string;
+            /** Libelle */
+            libelle: string;
+            /** Points */
+            points: components["schemas"]["PointSerie"][];
+        };
         /** Seuils */
         Seuils: {
             /** Encadreurs */
@@ -10785,6 +10938,19 @@ export interface components {
             propositions: components["schemas"]["PropositionFiche"][];
             /** Actualites */
             actualites: components["schemas"]["ResumeArticleAuteur"][];
+        };
+        /** Tableau */
+        Tableau: {
+            /** Cle */
+            cle: string;
+            /** Titre */
+            titre: string;
+            /** Colonnes */
+            colonnes: components["schemas"]["Colonne"][];
+            /** Lignes */
+            lignes: {
+                [key: string]: string | number | null;
+            }[];
         };
         /** TableauDeBord */
         TableauDeBord: {
@@ -11151,6 +11317,72 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lire_bloc_api_admin_activite__bloc__get: {
+        parameters: {
+            query?: {
+                du?: string | null;
+                au?: string | null;
+            };
+            header?: never;
+            path: {
+                bloc: "audience" | "inscription" | "jeux" | "certification" | "contenus" | "regions" | "retention" | "erreurs";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Bloc"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    exporter_bloc_api_admin_activite__bloc__export_csv_get: {
+        parameters: {
+            query?: {
+                du?: string | null;
+                au?: string | null;
+            };
+            header?: never;
+            path: {
+                bloc: "audience" | "inscription" | "jeux" | "certification" | "contenus" | "regions" | "retention" | "erreurs";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

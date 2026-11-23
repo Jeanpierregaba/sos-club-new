@@ -183,6 +183,7 @@ async def ecrire(
     *,
     referent: str | None = None,
     utm: str | None = None,
+    entree: bool = False,
 ) -> bool:
     """Enregistre l'événement, déjà validé, sauf exclusion. Ne valide pas la transaction. Renvoie True s'il est écrit."""
     if ne_pas_suivre(request):
@@ -195,7 +196,7 @@ async def ecrire(
     await db.execute(
         insert(EvenementActivite).values(
             cree_le=maintenant(), jour=jour, type=type_, visiteur=_empreinte(await _sel(db, jour), request),
-            chemin=chemin, detail=detail, provenance=provenance(referent, utm), appareil=appareil(agent),
+            chemin=chemin, detail=detail, provenance=provenance(referent, utm) if entree else None, appareil=appareil(agent),
             navigateur=navigateur(agent), connecte=connecte,
         )
     )  # fmt: skip

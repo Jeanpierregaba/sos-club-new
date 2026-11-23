@@ -46,7 +46,7 @@ def jour(monkeypatch: pytest.MonkeyPatch) -> Callable[[date], None]:
 def test_une_page_vue_est_enregistree_sans_donnee_personnelle(client: TestClient, en_base: Callable[..., Any]) -> None:
     reponse = envoyer(
         client,
-        {"type": "page_vue", "chemin": "/quiz/$id", "referent": "https://l.facebook.com/l.php?u=x"},
+        {"type": "page_vue", "chemin": "/quiz/$id", "referent": "https://l.facebook.com/l.php?u=x", "entree": True},
     )
     assert reponse.status_code == 204
     [evenement] = lister(en_base)
@@ -246,3 +246,17 @@ def test_le_debit_est_limite_par_adresse(
     codes = [envoyer(client, {"type": "page_vue", "chemin": "/"}).status_code for _ in range(5)]
     assert codes == [204, 204, 204, 429, 429]
     assert len(lister(en_base)) == 3
+
+
+def test_seule_la_page_d_entree_porte_la_provenance(client: TestClient, en_base: Callable[..., Any]) -> None:
+    envoyer(client, {"type": "page_vue", "chemin": "/", "referent": "https://www.google.com/", "entree": True})
+    envoyer(client, {"type": "page_vue", "chemin": "/jeux", "referent": "https://www.google.com/"})
+    assert [e.provenance for e in lister(en_base)] == ["recherche", None]
+
+
+def test_un_article_ou_un_quiz_se_compte_un_par_un(client: TestClient, en_base: Callable[..., Any]) -> None:
+    adresse = "se-laver-les-mains-" + "x" * 80
+    assert envoyer(client, {"type": "page_vue", "chemin": "/articles/$adresse", "detail": adresse}).status_code == 204
+    assert envoyer(client, {"type": "page_vue", "chemin": "/jeux", "detail": "jeux"}).status_code == 422
+    assert envoyer(client, {"type": "page_vue", "chemin": "/quiz/$id", "detail": "Pas Une Adresse"}).status_code == 422
+    assert [e.detail for e in lister(en_base)] == [adresse[:60]]

@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.activite.models import TypeEvenement
 from app.activite.purge import purger_regulierement as purger_activite_regulierement
 from app.activite.router import router as router_activite
+from app.activite.router_admin import router_admin as router_activite_admin
 from app.activite.service import enregistrer
 from app.admin.exports import purger_regulierement
 from app.admin.router import router as router_admin
@@ -99,6 +100,7 @@ app = FastAPI(title="API Club Santé SOS Docteur TV", lifespan=lifespan)
 api = APIRouter(prefix="/api", dependencies=[Depends(verifier_origine), Depends(verifier_maintenance)])
 api.include_router(router_maintenance)
 api.include_router(router_activite)
+api.include_router(router_activite_admin)
 api.include_router(router_comptes)
 api.include_router(router_visiteurs)
 api.include_router(router_admin)

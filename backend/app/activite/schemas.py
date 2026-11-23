@@ -1,5 +1,6 @@
 """Le schéma fermé de la collecte (spec 051) : seuls ces types et ces détails passent."""
 
+import re
 import unicodedata
 from typing import Literal
 
@@ -18,6 +19,9 @@ PROFILS = ("eleve", "encadreur", "visiteur")
 # Étapes vues par le site seulement ; les suivantes (envoi, refus, création…) sont écrites par l'API.
 ETAPES_SITE = frozenset(f"{p}:{e}" for p in PROFILS for e in ("ouvert", "commence"))
 CHEMINS_RECHERCHE = frozenset({"/inscription", "/carte-des-clubs"})
+# Pages dont le contenu se compte un par un : l'adresse publique d'un article, l'identifiant d'un quiz.
+PAGES_DETAILLEES = frozenset({"/articles/$adresse", "/quiz/$id"})
+ADRESSE = re.compile(r"[a-z0-9-]{1,140}")
 
 
 def nettoyer_recherche(saisie: str) -> str | None:
@@ -36,11 +40,13 @@ class EvenementSite(BaseModel):
     detail: str | None = Field(default=None, max_length=200)
     referent: str | None = Field(default=None, max_length=500)
     utm_source: str | None = Field(default=None, max_length=100)
+    # Première page vue au chargement du site : la seule qui porte la provenance.
+    entree: bool = False
 
     @model_validator(mode="after")
     def detail_attendu(self) -> EvenementSite:
         attendu = {
-            "page_vue": lambda d: d is None,
+            "page_vue": lambda d: d is None or (self.chemin in PAGES_DETAILLEES and ADRESSE.fullmatch(d) is not None),
             "clic_inscription": lambda d: d in ENDROITS,
             "etape_inscription": lambda d: d in ETAPES_SITE,
             "recherche": lambda d: bool(d),

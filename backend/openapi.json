@@ -62,6 +62,171 @@
         }
       }
     },
+    "/api/admin/activite/{bloc}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Lire Bloc",
+        "operationId": "lire_bloc_api_admin_activite__bloc__get",
+        "parameters": [
+          {
+            "name": "bloc",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "audience",
+                "inscription",
+                "jeux",
+                "certification",
+                "contenus",
+                "regions",
+                "retention",
+                "erreurs"
+              ],
+              "type": "string",
+              "title": "Bloc"
+            }
+          },
+          {
+            "name": "du",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Du"
+            }
+          },
+          {
+            "name": "au",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Au"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bloc"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/activite/{bloc}/export.csv": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Exporter Bloc",
+        "operationId": "exporter_bloc_api_admin_activite__bloc__export_csv_get",
+        "parameters": [
+          {
+            "name": "bloc",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "audience",
+                "inscription",
+                "jeux",
+                "certification",
+                "contenus",
+                "regions",
+                "retention",
+                "erreurs"
+              ],
+              "type": "string",
+              "title": "Bloc"
+            }
+          },
+          {
+            "name": "du",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Du"
+            }
+          },
+          {
+            "name": "au",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Au"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/comptes/connexion": {
       "post": {
         "tags": [
@@ -16134,6 +16299,93 @@
         ],
         "title": "Bibliotheque"
       },
+      "Bloc": {
+        "properties": {
+          "bloc": {
+            "type": "string",
+            "enum": [
+              "audience",
+              "inscription",
+              "jeux",
+              "certification",
+              "contenus",
+              "regions",
+              "retention",
+              "erreurs"
+            ],
+            "title": "Bloc"
+          },
+          "du": {
+            "type": "string",
+            "format": "date",
+            "title": "Du"
+          },
+          "au": {
+            "type": "string",
+            "format": "date",
+            "title": "Au"
+          },
+          "precedent_du": {
+            "type": "string",
+            "format": "date",
+            "title": "Precedent Du"
+          },
+          "precedent_au": {
+            "type": "string",
+            "format": "date",
+            "title": "Precedent Au"
+          },
+          "chiffres": {
+            "items": {
+              "$ref": "#/components/schemas/Chiffre"
+            },
+            "type": "array",
+            "title": "Chiffres",
+            "default": []
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/Serie"
+            },
+            "type": "array",
+            "title": "Series",
+            "default": []
+          },
+          "tableaux": {
+            "items": {
+              "$ref": "#/components/schemas/Tableau"
+            },
+            "type": "array",
+            "title": "Tableaux",
+            "default": []
+          },
+          "grilles": {
+            "items": {
+              "$ref": "#/components/schemas/Grille"
+            },
+            "type": "array",
+            "title": "Grilles",
+            "default": []
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "bloc",
+          "du",
+          "au",
+          "precedent_du",
+          "precedent_au"
+        ],
+        "title": "Bloc"
+      },
       "Body_ajouter_document_api_rapports__contenu_id__documents_post": {
         "properties": {
           "fichier": {
@@ -17462,6 +17714,58 @@
         ],
         "title": "ChangementActuel",
         "description": "`points_actuels` vaut None si l'élève n'est plus classable (suspendu, ancien, total nul) ; `hors_photo`\nsignale un élève toujours classé, mais au-delà des 50 premiers."
+      },
+      "Chiffre": {
+        "properties": {
+          "cle": {
+            "type": "string",
+            "title": "Cle"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "valeur": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valeur"
+          },
+          "precedent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Precedent"
+          },
+          "unite": {
+            "type": "string",
+            "enum": [
+              "nombre",
+              "pourcent",
+              "secondes",
+              "texte"
+            ],
+            "title": "Unite",
+            "default": "nombre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cle",
+          "libelle",
+          "valeur"
+        ],
+        "title": "Chiffre"
       },
       "Chiffres": {
         "properties": {
@@ -19114,6 +19418,35 @@
           "cree_le"
         ],
         "title": "CollaborateurResume"
+      },
+      "Colonne": {
+        "properties": {
+          "cle": {
+            "type": "string",
+            "title": "Cle"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "unite": {
+            "type": "string",
+            "enum": [
+              "nombre",
+              "pourcent",
+              "secondes",
+              "texte"
+            ],
+            "title": "Unite",
+            "default": "nombre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cle",
+          "libelle"
+        ],
+        "title": "Colonne"
       },
       "CommentaireAuteur": {
         "properties": {
@@ -22539,6 +22872,11 @@
               }
             ],
             "title": "Utm Source"
+          },
+          "entree": {
+            "type": "boolean",
+            "title": "Entree",
+            "default": false
           }
         },
         "additionalProperties": false,
@@ -23816,6 +24154,36 @@
         ],
         "title": "Fusion",
         "description": "Fusionne `absorbe_id` dans l'établissement de la route (le gardé). `nom` : le nom final, celui du gardé ou\ncelui de l'absorbé ; les versions protègent d'une modification faite entre l'aperçu et la confirmation."
+      },
+      "Grille": {
+        "properties": {
+          "cle": {
+            "type": "string",
+            "title": "Cle"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "valeurs": {
+            "items": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Valeurs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cle",
+          "titre",
+          "valeurs"
+        ],
+        "title": "Grille",
+        "description": "Une heatmap jour de la semaine (0 = lundi) × heure (0 à 23, heure de Lomé)."
       },
       "HTTPValidationError": {
         "properties": {
@@ -28394,6 +28762,25 @@
         ],
         "title": "PlaceParcours"
       },
+      "PointSerie": {
+        "properties": {
+          "jour": {
+            "type": "string",
+            "format": "date",
+            "title": "Jour"
+          },
+          "valeur": {
+            "type": "number",
+            "title": "Valeur"
+          }
+        },
+        "type": "object",
+        "required": [
+          "jour",
+          "valeur"
+        ],
+        "title": "PointSerie"
+      },
       "PointsDuClub": {
         "properties": {
           "annee": {
@@ -31911,6 +32298,32 @@
         ],
         "title": "SemestreResume"
       },
+      "Serie": {
+        "properties": {
+          "cle": {
+            "type": "string",
+            "title": "Cle"
+          },
+          "libelle": {
+            "type": "string",
+            "title": "Libelle"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/PointSerie"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cle",
+          "libelle",
+          "points"
+        ],
+        "title": "Serie"
+      },
       "Seuils": {
         "properties": {
           "encadreurs": {
@@ -32252,6 +32665,53 @@
           "actualites"
         ],
         "title": "SuiviClub"
+      },
+      "Tableau": {
+        "properties": {
+          "cle": {
+            "type": "string",
+            "title": "Cle"
+          },
+          "titre": {
+            "type": "string",
+            "title": "Titre"
+          },
+          "colonnes": {
+            "items": {
+              "$ref": "#/components/schemas/Colonne"
+            },
+            "type": "array",
+            "title": "Colonnes"
+          },
+          "lignes": {
+            "items": {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Lignes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cle",
+          "titre",
+          "colonnes",
+          "lignes"
+        ],
+        "title": "Tableau"
       },
       "TableauDeBord": {
         "properties": {

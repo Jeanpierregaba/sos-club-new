@@ -21,7 +21,7 @@ async def recevoir(evenement: EvenementSite, request: Request, db: Base) -> Resp
     """Enregistre un événement anonyme du site. Toujours 204 : le visiteur n'apprend jamais s'il a été compté."""
     if service.ne_pas_suivre(request):
         return Response(status_code=status.HTTP_204_NO_CONTENT)
-    detail = evenement.detail
+    detail = evenement.detail[:60] if evenement.detail else None
     if evenement.type == "erreur":
         chemin = service.segment_introuvable(evenement.chemin)
     else:
@@ -35,7 +35,14 @@ async def recevoir(evenement: EvenementSite, request: Request, db: Base) -> Resp
     except limite_adresse.PlafondAtteint:
         raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, "Trop d'envois depuis ce réseau.") from None
     await service.ecrire(
-        db, request, evenement.type_evenement, chemin, detail, referent=evenement.referent, utm=evenement.utm_source
+        db,
+        request,
+        evenement.type_evenement,
+        chemin,
+        detail,
+        referent=evenement.referent,
+        utm=evenement.utm_source,
+        entree=evenement.entree and evenement.type == "page_vue",
     )
     await db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
