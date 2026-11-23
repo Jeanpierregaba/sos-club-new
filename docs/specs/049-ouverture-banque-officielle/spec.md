@@ -94,25 +94,25 @@ questions « moyennement difficiles » (M) des « très difficiles » (D).
 
 ## Critères d'acceptation
 
-- [ ] L'outil de lecture du document en tire 1 000 questions de 3 propositions, une seule en gras chacune, rangées
+- [x] L'outil de lecture du document en tire 1 000 questions de 3 propositions, une seule en gras chacune, rangées
       par partie et difficulté (180/120, 150/100, 120/80, 150/100) ; un document ambigu est refusé.
-- [ ] Le fichier de données compte 80 quiz Jeux de 10 questions (32/24/16/8 par niveau) et 20 quiz de
+- [x] Le fichier de données compte 80 quiz Jeux de 10 questions (32/24/16/8 par niveau) et 20 quiz de
       certification de 10 questions ; les 1 000 énoncés sont tous utilisés, une seule fois.
-- [ ] Aucun quiz Jeux ne contient une question de la certification.
-- [ ] Les places 1 à 16 ont des questions D de leur partie ; les places 17 à 20 en ont 10 de chaque partie.
-- [ ] Après la migration, seuls les 80 nouveaux quiz Jeux et les 20 nouveaux quiz de certification sont publiés ;
+- [x] Aucun quiz Jeux ne contient une question de la certification.
+- [x] Les places 1 à 16 ont des questions D de leur partie ; les places 17 à 20 en ont 10 de chaque partie.
+- [x] Après la migration, seuls les 80 nouveaux quiz Jeux et les 20 nouveaux quiz de certification sont publiés ;
       les anciens sont dépubliés, aucun quiz ni partie n'est supprimé.
-- [ ] Après la migration, chaque élève et chaque encadreur a 0 point Jeux et 0 point de certification, et aucun
+- [x] Après la migration, chaque élève et chaque encadreur a 0 point Jeux et 0 point de certification, et aucun
       club n'a de point venu des quiz ; les points de la vie du club ne changent pas.
-- [ ] Les étoiles, places et badges sont dans les tables d'archive, plus dans les tables en service ; les
+- [x] Les étoiles, places et badges sont dans les tables d'archive, plus dans les tables en service ; les
       certificats sont révoqués avec le motif.
-- [ ] Après la remise à zéro, un élève réussit la place 1 et gagne +50, gagne un badge et une étoile comme
+- [x] Après la remise à zéro, un élève réussit la place 1 et gagne +50, gagne un badge et une étoile comme
       avant (les anciennes clés d'idempotence ne bloquent pas).
-- [ ] Une fois la remise à zéro faite, le retour arrière de la migration est refusé ; une base sans la banque
+- [x] Une fois la remise à zéro faite, le retour arrière de la migration est refusé ; une base sans la banque
       (celle des tests) passe la migration sans changement de ses données.
-- [ ] Un joueur a 3 vies par jour ; après 3 parties ratées, le lancement est refusé jusqu'à minuit.
-- [ ] Le site montre 3 vies, et le favicon est le logo.
-- [ ] La page /jeux présente les 80 quiz en 4 parties, avec les titres, numéros et niveaux du fichier de données.
+- [x] Un joueur a 3 vies par jour ; après 3 parties ratées, le lancement est refusé jusqu'à minuit.
+- [x] Le site montre 3 vies, et le favicon est le logo.
+- [x] La page /jeux présente les 80 quiz en 4 parties, avec les titres, numéros et niveaux du fichier de données.
 
 ## Cas limites et erreurs
 

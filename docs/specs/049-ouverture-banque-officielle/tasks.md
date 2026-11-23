@@ -5,4 +5,4 @@
 - [x] 3. Favicon et icône Apple
 - [x] 4. Tables d'archive, `certificat.archive_le`, clés avec saison (tests : regagner après remise à zéro)
 - [x] 5. Migration : dépublication, chargement, annulations, archives, révocations (tests)
-- [ ] 6. Suite complète, critères d'acceptation, relecture par le sous-agent reviewer, PRD et TASKS
+- [x] 6. Suite complète, critères d'acceptation, relecture par le sous-agent reviewer, PRD et TASKS

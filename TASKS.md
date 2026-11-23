@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] [049 — Ouverture au public : banque officielle, remise à zéro, 3 vies, favicon](docs/specs/049-ouverture-banque-officielle/spec.md) : spec, plan et tâches validés le 2026-11-23 ; implémentation en cours ([tâches](docs/specs/049-ouverture-banque-officielle/tasks.md))
+- [ ] [049 — Ouverture au public : banque officielle, remise à zéro, 3 vies, favicon](docs/specs/049-ouverture-banque-officielle/spec.md) : implémentée, relue et poussée sur develop le 2026-11-23 (suite complète verte) ; reste le merge vers main avec sauvegarde de la base de prod ([tâches](docs/specs/049-ouverture-banque-officielle/tasks.md))
 - [ ] [048 — Vies quotidiennes et chrono de 15 secondes](docs/specs/048-vies-et-chrono-15s/spec.md) : tâches 1–3 faites le 2026-11-21 ; en cours : clôture (suite complète, relecture `reviewer`) ([tâches](docs/specs/048-vies-et-chrono-15s/tasks.md))
 - [ ] [046 — Temps passé sur les quiz et la certification d'un inscrit](docs/specs/046-temps-quiz-certification/spec.md) : implémentée et relue le 2026-11-20 ; reste la vérification au navigateur avec une connexion admin et le déploiement de la migration `e4a7c2d9b6f1` ([tâches](docs/specs/046-temps-quiz-certification/tasks.md))
 - [ ] [045 — Fiche d'un inscrit : modification, registre complet et parcours](docs/specs/045-fiche-inscrit-complete/spec.md) : implémentée et relue le 2026-11-20 ; reste la vérification au navigateur avec une connexion admin ([tâches](docs/specs/045-fiche-inscrit-complete/tasks.md))
