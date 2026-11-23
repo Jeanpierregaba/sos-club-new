@@ -13,6 +13,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.activite.router import router as router_activite
 from app.admin.exports import purger_regulierement
 from app.admin.router import router as router_admin
 from app.admin.router import router_activation
@@ -92,6 +93,7 @@ app = FastAPI(title="API Club Santé SOS Docteur TV", lifespan=lifespan)
 # Toutes les routes sous /api sont servies sur le domaine du site (ADR-0006).
 api = APIRouter(prefix="/api", dependencies=[Depends(verifier_origine), Depends(verifier_maintenance)])
 api.include_router(router_maintenance)
+api.include_router(router_activite)
 api.include_router(router_comptes)
 api.include_router(router_visiteurs)
 api.include_router(router_admin)
