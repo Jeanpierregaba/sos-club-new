@@ -266,3 +266,69 @@ def test_l_export_ne_contient_que_des_totaux_et_est_journalise(
     assert "emprt0123456789a" not in texte
     actions = en_base(lambda db: db.scalars(select(JournalAudit.action)))
     assert "activite_exportee" in list(actions)
+
+
+# Rétention, régions, contenus, erreurs du serveur ----------------------------------------------------------------
+
+
+def test_retention_par_cohorte_sans_part_pour_une_semaine_pas_finie(
+    super_admin: TestClient, en_base: Callable[..., Any], creer_utilisateur: Callable[..., Any]
+) -> None:
+    from app.activite.models import PresenceSemaine
+
+    lundi = date(2026, 11, 2)
+    inscription = datetime(2026, 11, 3, 9, tzinfo=UTC)
+    aya = creer_utilisateur("aya", cree_le=inscription)
+    creer_utilisateur("kofi", cree_le=inscription)
+    ajouter(en_base, PresenceSemaine(utilisateur_id=aya.id, semaine=lundi + timedelta(weeks=1)))
+    [cohorte] = tableau(lire(super_admin, "retention"), "cohortes")
+    # La semaine + 4 (le 30 novembre) n'est pas encore finie le 23 : pas de part.
+    assert cohorte == {"semaine": "2026-11-02", "inscrits": 2, "s1": 50.0, "s4": None}
+
+
+def test_regions_par_dre(super_admin: TestClient, creer_eleve: Callable[..., Any]) -> None:
+    creer_eleve("ama", dre="grand-lome")
+    lignes = {ligne["dre"]: ligne for ligne in tableau(lire(super_admin, "regions"), "dre")}
+    assert sum(int(ligne["inscrits"]) for ligne in lignes.values()) == 1
+    assert len(lignes) > 1  # toutes les DRE actives, même sans activité
+
+
+def test_contenus_par_document(super_admin: TestClient, en_base: Callable[..., Any]) -> None:
+    from tests.bibliotheque import creer_ressource
+
+    ressource = creer_ressource(en_base, titre="Guide du lavage des mains")
+    jour = date(2026, 11, 20)
+    fichier = TypeEvenement.telechargement
+    ajouter(
+        en_base,
+        vue(jour, "a", "/bibliotheque", type_=fichier, detail=f"lire:{ressource.id}"),
+        vue(jour, "b", "/bibliotheque", type_=fichier, detail=f"telecharger:{ressource.id}"),
+    )
+    resultat = lire(super_admin, "contenus")
+    assert tableau(resultat, "bibliotheque") == [
+        {"document": "Guide du lavage des mains", "lectures": 1, "telechargements": 1}
+    ]
+    assert chiffre(resultat, "documents") == (2, 0)
+
+
+def test_erreurs_du_serveur_par_route(super_admin: TestClient, en_base: Callable[..., Any]) -> None:
+    jour = date(2026, 11, 20)
+    erreur = TypeEvenement.erreur
+    ajouter(
+        en_base,
+        vue(jour, "a", "/api/jeux/quiz/{quiz_id}", type_=erreur, detail="500"),
+        vue(jour, "b", "/api/jeux/quiz/{quiz_id}", type_=erreur, detail="500"),
+    )
+    resultat = lire(super_admin, "erreurs")
+    assert tableau(resultat, "routes") == [{"route": "/api/jeux/quiz/{quiz_id}", "nombre": 2}]
+    assert chiffre(resultat, "serveur")[0] == 2
+
+
+def test_l_export_neutralise_les_formules(super_admin: TestClient, en_base: Callable[..., Any]) -> None:
+    jour = date(2026, 11, 20)
+    ajouter(
+        en_base,
+        *[vue(jour, v, "/inscription", type_=TypeEvenement.recherche, detail="=lien(x)") for v in "abc"],
+    )
+    texte = super_admin.get(f"{URL}/erreurs/export.csv", params=PERIODE).content.decode("utf-8-sig")
+    assert "'=lien(x)" in texte

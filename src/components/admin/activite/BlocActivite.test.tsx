@@ -100,10 +100,15 @@ describe("BlocActivite", () => {
     );
     expect(screen.getByRole("heading", { name: "Audience" })).toBeInTheDocument();
     expect(screen.getByText("+50 %")).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "Visiteurs par jour par jour" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", {
+        name: /Visiteurs par jour par jour : 30 au total, 20 au plus haut/,
+      }),
+    ).toBeInTheDocument();
     const tableau = screen.getByRole("table");
     expect(within(tableau).getByText("/jeux")).toBeInTheDocument();
     expect(within(tableau).getByText("12")).toBeInTheDocument();
     expect(screen.getByText("Pages vues par heure")).toBeInTheDocument();
+    expect(screen.getByText("Moment le plus chargé : Lun à 0 h, 1.")).toBeInTheDocument();
   });
 });

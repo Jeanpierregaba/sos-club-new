@@ -14,13 +14,15 @@ const JOUR_COURT = new Intl.DateTimeFormat("fr-FR", {
   timeZone: "UTC",
 });
 
+// Vide : aucun chiffre ni sur la période ni sur la précédente, et aucune mesure dans les tableaux (le numéro d'une
+// place de la certification n'est pas une mesure).
 function estVide(bloc: Bloc): boolean {
   return (
-    bloc.chiffres.every((c) => !c.valeur) &&
-    bloc.tableaux.every(
-      (t) =>
-        t.lignes.length === 0 ||
-        t.lignes.every((l) => Object.values(l).every((v) => !v || typeof v === "string")),
+    bloc.chiffres.every((c) => !c.valeur && !c.precedent) &&
+    bloc.tableaux.every((t) =>
+      t.lignes.every((l) =>
+        t.colonnes.every((c) => c.unite === "texte" || c.cle === "place" || !l[c.cle]),
+      ),
     ) &&
     bloc.series.every((s) => s.points.every((p) => !p.valeur)) &&
     bloc.grilles.every((g) => g.valeurs.every((ligne) => ligne.every((v) => !v)))
@@ -61,7 +63,7 @@ function Courbe({ serie }: { serie: Bloc["series"][number] }) {
       <div
         className="mt-3 flex h-28 items-end gap-px"
         role="img"
-        aria-label={`${serie.libelle} par jour`}
+        aria-label={`${serie.libelle} par jour : ${formater(serie.points.reduce((t, p) => t + p.valeur, 0))} au total, ${formater(max)} au plus haut`}
       >
         {serie.points.map((p) => (
           <div
@@ -128,11 +130,21 @@ function TableauActivite({ tableau }: { tableau: Bloc["tableaux"][number] }) {
 
 function Heatmap({ grille }: { grille: Bloc["grilles"][number] }) {
   const max = Math.max(1, ...grille.valeurs.flat());
+  const jourMax = grille.valeurs.findIndex((ligne) => ligne.includes(max));
+  const heureMax = jourMax >= 0 ? (grille.valeurs[jourMax] ?? []).indexOf(max) : -1;
   return (
     <figure className="rounded-2xl bg-mist-soft p-4">
       <figcaption className="text-sm font-bold text-ink">{grille.titre}</figcaption>
+      <p className="sr-only">
+        {jourMax >= 0
+          ? `Moment le plus chargé : ${JOURS[jourMax]} à ${heureMax} h, ${formater(max)}.`
+          : "Aucune activité sur la période."}
+      </p>
       <div className="mt-3 overflow-x-auto">
-        <div className="grid min-w-[520px] grid-cols-[2.5rem_repeat(24,minmax(0,1fr))] gap-0.5 text-[10px]">
+        <div
+          aria-hidden
+          className="grid min-w-[520px] grid-cols-[2.5rem_repeat(24,minmax(0,1fr))] gap-0.5 text-[10px]"
+        >
           <span />
           {Array.from({ length: 24 }, (_, h) => (
             <span key={h} className="text-center text-muted-foreground">

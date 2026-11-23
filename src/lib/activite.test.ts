@@ -134,6 +134,9 @@ describe("clics « S'inscrire »", () => {
       "pied-de-page",
     );
     expect(endroitDuClic(lien('<a href="/inscription">x</a>'), "/")).toBe("accueil");
+    expect(
+      endroitDuClic(lien('<div role="dialog"><a href="/inscription">x</a></div>'), "/jeux"),
+    ).toBe("menu-mobile");
     expect(endroitDuClic(lien('<a href="/inscription">x</a>'), "/quiz/abc")).toBe("quiz");
     expect(endroitDuClic(lien('<a href="/inscription">x</a>'), "/charte")).toBe("autre");
   });

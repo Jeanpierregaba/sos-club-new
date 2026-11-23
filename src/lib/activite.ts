@@ -54,6 +54,8 @@ const ENDROITS_PAR_PAGE: [RegExp, string][] = [
 
 /** L'endroit d'où part un lien d'inscription : le menu, le pied de page, ou la page où il se trouve. */
 export function endroitDuClic(lien: Element, page: string): string {
+  // Le menu mobile s'ouvre dans un panneau (dialogue) hors de l'en-tête.
+  if (lien.closest('[role="dialog"]')) return "menu-mobile";
   if (lien.closest("header")) return "menu";
   if (lien.closest("footer")) return "pied-de-page";
   return ENDROITS_PAR_PAGE.find(([motif]) => motif.test(page))?.[1] ?? "autre";

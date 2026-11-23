@@ -12,8 +12,9 @@ from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import and_, extract, func, select
+from sqlalchemy import and_, extract, func, literal_column, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 from sqlalchemy.sql import ColumnElement
 
 from app.activite.models import (
@@ -27,6 +28,7 @@ from app.activite.models import (
     VisiteursGroupeJour,
     VisiteursJour,
 )
+from app.activite.purge import PRESENCE_SEMAINES
 from app.activite.schemas_admin import Bloc, Chiffre, Colonne, Grille, NomBloc, PointSerie, Serie, Tableau
 from app.bibliotheque.models import Ressource
 from app.certification.models import BadgeObtenu, Certificat, PlaceReussie
@@ -269,8 +271,8 @@ async def _comptes_crees(db: AsyncSession, q: Periode) -> int:
 async def inscription(db: AsyncSession, p: Periode) -> Bloc:
     clics = await evenements(db, p, TypeEvenement.clic_inscription, "detail")
     clics_av = await evenements(db, p.precedente, TypeEvenement.clic_inscription, "detail")
-    etapes = {c[0]: v for c, (_, v) in (await evenements(db, p, TypeEvenement.etape_inscription, "detail")).items()}
     refus = await evenements(db, p, TypeEvenement.etape_inscription, "detail")
+    etapes = {c[0]: v for c, (_, v) in refus.items()}
     tableaux = [
         Tableau(
             cle="clics",
@@ -346,6 +348,14 @@ async def inscription(db: AsyncSession, p: Periode) -> Bloc:
 # 3. Jeux ---------------------------------------------------------------------------------------------------------
 
 
+def _abandonnee() -> ColumnElement[bool]:
+    """Une partie jamais finie : toujours en cours une heure après sa dernière réponse."""
+    return and_(
+        TentativeQuiz.etat == EtatTentative.en_cours,
+        TentativeQuiz.derniere_activite < datetime.now(UTC) - timedelta(hours=1),
+    )
+
+
 def _parties(p: Periode, parcours: str) -> list[ColumnElement[bool]]:
     return [Quiz.parcours == parcours, TentativeQuiz.essai.is_(False), p.contient(TentativeQuiz.commencee_le)]
 
@@ -357,7 +367,7 @@ async def _comptes_parties(db: AsyncSession, q: Periode, parcours: str) -> dict[
                 func.count(),
                 func.count().filter(TentativeQuiz.etat == EtatTentative.terminee),
                 func.count().filter(TentativeQuiz.reussie.is_(True)),
-                func.count().filter(TentativeQuiz.etat == EtatTentative.en_cours),
+                func.count().filter(_abandonnee()),
                 func.count(TentativeQuiz.joueur_id.distinct()),
             )
             .join(Quiz, Quiz.id == TentativeQuiz.quiz_id)
@@ -391,7 +401,7 @@ async def jeux(db: AsyncSession, p: Periode) -> Bloc:
     quiz = await db.execute(
         select(
             Quiz.numero, Quiz.titre, func.count(), func.count().filter(TentativeQuiz.reussie.is_(True)),
-            func.count().filter(TentativeQuiz.etat == EtatTentative.en_cours),
+            func.count().filter(_abandonnee()),
         )
         .join(Quiz, Quiz.id == TentativeQuiz.quiz_id)
         .where(*_parties(p, "jeux"))
@@ -415,7 +425,9 @@ async def jeux(db: AsyncSession, p: Periode) -> Bloc:
         select(TentativeQuiz.joueur_id, TentativeQuiz.jour)
         .where(
             TentativeQuiz.essai.is_(False), p.contient(TentativeQuiz.commencee_le),
-            TentativeQuiz.etat == EtatTentative.terminee, TentativeQuiz.reussie.is_(False),
+            TentativeQuiz.etat == EtatTentative.terminee, TentativeQuiz.reussie.is_not(True),
+            # Comme `quiz/vies.py` : les invités sans compte n'ont pas de vies.
+            TentativeQuiz.joueur_id.not_in(select(Utilisateur.id).where(Utilisateur.role == Role.invite)),
         )
         .group_by(TentativeQuiz.joueur_id, TentativeQuiz.jour)
         .having(func.count() >= 3)
@@ -531,7 +543,6 @@ async def certification(db: AsyncSession, p: Periode) -> Bloc:
             {"place": place, "candidats": int(atteintes.get(place, 0)), "tentatives": t, "echec": _taux(t - r, t),
              "temps": round(float(m)) if m is not None else None}
         )  # fmt: skip
-    # Le décrochage : la place où l'on perd le plus de candidats par rapport à la précédente.
     badges = await db.scalar(select(func.count()).select_from(BadgeObtenu).where(p.contient(BadgeObtenu.obtenu_le)))
     badges_av = await db.scalar(
         select(func.count()).select_from(BadgeObtenu).where(p.precedente.contient(BadgeObtenu.obtenu_le))
@@ -773,28 +784,38 @@ def _grille(lignes: Iterable[tuple[Any, Any, Any]]) -> list[list[int]]:
 
 
 async def retention(db: AsyncSession, p: Periode, aujourdhui: date) -> Bloc:
+    # Une seule requête : chaque cohorte (semaine d'inscription) jointe à ses présences 1 et 4 semaines après.
     semaine = func.date_trunc("week", Utilisateur.cree_le).cast(PresenceSemaine.semaine.type)
-    cohortes = await db.execute(
-        select(semaine, func.count(), func.array_agg(Utilisateur.id))
+    comptes = (
+        select(Utilisateur.id.label("id"), semaine.label("semaine"))
         .where(Utilisateur.role.in_(INSCRITS), p.contient(Utilisateur.cree_le))
-        .group_by(semaine)
-        .order_by(semaine)
+        .subquery()
     )
-    lignes = []
-    for lundi, taille, comptes in cohortes:
-        retours: dict[str, float | None] = {}
-        for decalage in (1, 4):
-            cible = lundi + timedelta(weeks=decalage)
-            if cible > _lundi(aujourdhui):
-                retours[f"s{decalage}"] = None
-                continue
-            presents = await db.scalar(
-                select(func.count(PresenceSemaine.utilisateur_id.distinct())).where(
-                    PresenceSemaine.semaine == cible, PresenceSemaine.utilisateur_id.in_(comptes)
-                )
-            )
-            retours[f"s{decalage}"] = _taux(int(presents or 0), taille)
-        lignes.append({"semaine": lundi.isoformat(), "inscrits": taille, **retours})
+    s1, s4 = aliased(PresenceSemaine), aliased(PresenceSemaine)
+    cohortes = await db.execute(
+        select(
+            comptes.c.semaine, func.count(comptes.c.id.distinct()),
+            func.count(s1.utilisateur_id.distinct()), func.count(s4.utilisateur_id.distinct()),
+        )
+        .select_from(comptes)
+        .outerjoin(s1, and_(s1.utilisateur_id == comptes.c.id, s1.semaine == comptes.c.semaine + literal_column("7")))
+        .outerjoin(s4, and_(s4.utilisateur_id == comptes.c.id, s4.semaine == comptes.c.semaine + literal_column("28")))
+        .group_by(comptes.c.semaine)
+        .order_by(comptes.c.semaine)
+    )  # fmt: skip
+    # Une semaine pas encore finie, ou déjà purgée (26 semaines), n'a pas de part : « — », pas 0 %.
+    lundi_courant = _lundi(aujourdhui)
+    horizon = lundi_courant - timedelta(weeks=PRESENCE_SEMAINES)
+
+    def part(lundi: date, decalage: int, presents: int, taille: int) -> float | None:
+        cible = lundi + timedelta(weeks=decalage)
+        return None if cible >= lundi_courant or cible < horizon else _taux(presents, taille)
+
+    lignes = [
+        {"semaine": lundi.isoformat(), "inscrits": taille, "s1": part(lundi, 1, un, taille),
+         "s4": part(lundi, 4, quatre, taille)}
+        for lundi, taille, un, quatre in cohortes
+    ]  # fmt: skip
     dow, heure = extract("dow", E.cree_le), extract("hour", E.cree_le)
     pages = await db.execute(
         select(dow, heure, func.count()).where(E.type == TypeEvenement.page_vue, E.jour >= p.du, E.jour <= p.au)

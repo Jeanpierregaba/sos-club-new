@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.activite import indicateurs, service
 from app.activite.schemas_admin import Bloc, NomBloc
 from app.admin.dependances import Acces, adresse_ip, exiger_super_admin_pour
+from app.admin.exports import neutraliser
 from app.admin.journal import journaliser
 from app.db import get_session
 
@@ -49,7 +50,8 @@ def _cellule(valeur: object) -> object:
     """Un entier s'écrit sans « ,0 » ; une valeur absente, vide."""
     if isinstance(valeur, float) and valeur.is_integer():
         return int(valeur)
-    return "" if valeur is None else valeur
+    # Une recherche ou un titre en « =… » ne doit pas devenir une formule dans le tableur.
+    return neutraliser(valeur) if isinstance(valeur, str) else ("" if valeur is None else valeur)
 
 
 def _csv(bloc: Bloc) -> str:

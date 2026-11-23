@@ -173,8 +173,9 @@ function SuiviActivite() {
       return { fullPath: route.fullPath, params: correspondance.params as Record<string, string> };
     };
     const surPage = () => {
-      const adresse = router.state.location.href;
-      // Une même adresse ne compte qu'une fois, même si le routeur la résout deux fois au chargement.
+      // Une même page ne compte qu'une fois, même résolue deux fois au chargement ou quand seuls ses filtres
+      // (`?…`) changent.
+      const adresse = router.state.location.pathname;
       if (adresse === derniere) return;
       const introuvable = router.state.matches.some(
         (m) => m.status === "notFound" || (m as { globalNotFound?: boolean }).globalNotFound,

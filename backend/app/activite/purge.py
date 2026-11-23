@@ -9,12 +9,10 @@
 """
 
 import asyncio
-import contextlib
 import logging
 from datetime import date, timedelta
 
 from sqlalchemy import Integer, String, delete, func, insert, literal, select, tuple_
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.activite import service
@@ -106,9 +104,11 @@ async def purger(db: AsyncSession, aujourdhui: date | None = None) -> int:
 
 async def purger_regulierement() -> None:
     while True:
-        with contextlib.suppress(SQLAlchemyError, OSError):
+        try:
             async with SessionLocal() as db:
                 nombre = await purger(db)
                 if nombre:
                     journal.info("Suivi d'activité : %s événement(s) de plus de 90 jours comptés par jour.", nombre)
+        except Exception:  # noqa: BLE001 - une purge manquée se refait à l'heure suivante ; la boucle ne s'arrête pas
+            journal.exception("Suivi d'activité : purge non faite")
         await asyncio.sleep(3600)

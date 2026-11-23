@@ -14,7 +14,10 @@ mkdir -p sauvegardes
 fichier="sauvegardes/$(date -u +%Y%m%dT%H%M%SZ)-$etiquette.dump"
 
 # Écrit d'abord à côté : une sauvegarde interrompue ne doit pas passer pour une sauvegarde valide.
-docker compose exec -T db pg_dump --username sosclub --format custom sosclub > "$fichier.partiel"
+# Le sel du jour du suivi d'activité (spec 051) n'est jamais sauvegardé : sans lui, l'empreinte d'un visiteur ne se
+# recalcule plus. La table est restaurée vide ; un nouveau sel se tire au premier événement.
+docker compose exec -T db pg_dump --username sosclub --format custom --exclude-table-data=sel_activite sosclub \
+  > "$fichier.partiel"
 # Un fichier illisible ne doit pas passer pour une sauvegarde.
 docker compose exec -T db pg_restore --list < "$fichier.partiel" > /dev/null
 mv "$fichier.partiel" "$fichier"
