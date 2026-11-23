@@ -12,7 +12,11 @@ Un seul VPS héberge la preprod et la prod, derrière un même proxy HTTPS. La d
 puis lance `deployer.sh` sur le VPS : sauvegarde, migrations, nouveaux conteneurs, et retour automatique à la
 version précédente s'ils ne démarrent pas. Après les migrations, le même service charge la banque du défi du jour
 (`python -m app.jeux.banque_initiale`) : il n'ajoute que les questions absentes, actives en preprod et désactivées en
-prod tant que l'équipe nationale ne les a pas relues. **Un push sur `main` part en production sans validation
+prod tant que l'équipe nationale ne les a pas relues. Il publie ensuite les livres officiels de la bibliothèque
+(`python -m app.bibliotheque.livres_officiels`, spec 050), une seule fois chacun. S'ils échouent, le déploiement
+continue et le journal affiche « Livres non chargés » ; une fois la cause réglée, relance depuis le dossier de
+l'environnement : `docker compose --profile migrations run --rm -T migrations` (il ne refait que ce qui manque).
+**Un push sur `main` part en production sans validation
 supplémentaire** : sur un dépôt privé en GitHub Free, les approbations de déploiement ne sont pas disponibles.
 
 ## Avant la production

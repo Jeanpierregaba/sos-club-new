@@ -50,7 +50,7 @@ export const Route = createFileRoute("/jeux")({
 // Spec 050 : les 100 quiz de la banque officielle, numérotés dans le parcours (les parties alternent).
 const totalQuiz = poles.reduce((n, p) => n + p.quiz.length, 0);
 
-// Spec 034 et 049 : 8 000 points de quiz et 6 000 points d'étoiles au plus, pour l'élève ; la moitié pour son club.
+// Spec 034 et 050 : 10 000 points de quiz et 6 000 points d'étoiles au plus, pour l'élève ; la moitié pour son club.
 const chiffres = [
   { n: totalQuiz, t: "Quiz défis" },
   { n: 1000, t: "Questions" },

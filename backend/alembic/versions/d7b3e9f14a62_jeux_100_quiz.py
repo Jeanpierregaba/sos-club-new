@@ -2,7 +2,8 @@
 
 Les 80 quiz Jeux de la banque officielle (spec 049) sont dépubliés, avec un motif, et remplacés par les 100 quiz de
 `alembic/donnees/jeux_100.json`, qui couvrent les 1 000 questions : les 200 questions de la certification y figurent
-aussi. Les parties en cours sur les 80 quiz sont closes sans réussite ; les parties jouées et les points restent. Les
+aussi. Un quiz Jeux numéroté encore publié hors des 80 (un ancien défi republié) est dépublié lui aussi.
+Les parties en cours sur ces quiz sont closes sans réussite ; les parties jouées et les points restent. Les
 20 quiz de certification ne changent pas.
 
 Rien n'est fait sur une base sans les 80 quiz de la spec 049, ni sur une base qui a déjà les 100 quiz.
@@ -79,25 +80,27 @@ def upgrade() -> None:
         print("Spec 050 : les 100 quiz Jeux sont déjà là.")
         return
     if not _existe(connexion, f"{LES_80} AND etat = 'publie'"):
-        print("Spec 050 : base sans les 80 quiz de la banque officielle, rien à recomposer.")
+        print("Spec 050 : aucun des 80 quiz de la banque officielle n'est publié, rien à recomposer.")
         return
     maintenant = datetime.now(UTC)
-    # L'API encore en service pendant le déploiement attend la fin de la migration : aucune partie ne démarre sur un
-    # des 80 quiz pendant qu'on les retire.
+    # D'abord la dépublication : elle attend les lancements de partie en cours (qui verrouillent la ligne du quiz), et
+    # les suivants trouvent le quiz dépublié. Tout quiz Jeux numéroté encore publié (un ancien défi republié par
+    # l'équipe) laisse aussi sa place : les numéros 1 à 100 reviennent aux nouveaux quiz.
+    connexion.execute(
+        sa.text(
+            "UPDATE quiz SET etat = 'depublie', motif = :motif, version = version + 1, modifie_le = :maintenant "
+            "WHERE parcours = 'jeux' AND etat = 'publie' AND numero IS NOT NULL"
+        ),
+        {"motif": MOTIF, "maintenant": maintenant},
+    )
+    # Puis les parties restées en cours sur ces quiz : closes sans réussite, aucune nouvelle ne peut plus démarrer.
     connexion.execute(sa.text("LOCK TABLE tentative_quiz IN SHARE ROW EXCLUSIVE MODE"))
     connexion.execute(
         sa.text(
             "UPDATE tentative_quiz SET etat = 'terminee', reussie = false, terminee_le = :maintenant "
-            f"WHERE etat = 'en_cours' AND quiz_id IN (SELECT id FROM quiz WHERE {LES_80})"
+            "WHERE etat = 'en_cours' AND quiz_id IN (SELECT id FROM quiz WHERE parcours = 'jeux' AND motif = :motif)"
         ),
-        MOTIFS | {"maintenant": maintenant},
-    )
-    connexion.execute(
-        sa.text(
-            "UPDATE quiz SET etat = 'depublie', motif = :motif, version = version + 1, modifie_le = :maintenant "
-            f"WHERE {LES_80} AND etat = 'publie'"
-        ),
-        MOTIFS | {"motif": MOTIF, "maintenant": maintenant},
+        {"motif": MOTIF, "maintenant": maintenant},
     )
     for entree in json.loads(FICHIER.read_text(encoding="utf-8")):
         quiz_id = uuid7()
@@ -137,6 +140,8 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     connexion = op.get_bind()
+    # Aucune partie ne démarre sur un des 100 quiz entre la vérification et leur retrait.
+    connexion.execute(sa.text("LOCK TABLE tentative_quiz IN SHARE ROW EXCLUSIVE MODE"))
     joues = connexion.execute(
         sa.text(f"SELECT 1 FROM tentative_quiz t JOIN quiz ON quiz.id = t.quiz_id WHERE {LES_100} LIMIT 1"), MOTIFS
     ).first()

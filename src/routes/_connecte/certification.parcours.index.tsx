@@ -60,11 +60,11 @@ function MaCertificationPage() {
           </h1>
           {parcours && (
             <p className="mt-3 max-w-2xl text-muted-foreground">
-              {parcours.places.length} quiz à réussir dans l'ordre, en 5 thématiques, chacun avec{" "}
+              {parcours.places.length} quiz à réussir dans l'ordre, en 5 groupes de 4, chacun avec{" "}
               {parcours.nb_questions} questions chronométrées et {parcours.seuil} bonnes réponses
               pour le valider : à la première erreur, le quiz recommence. Lis le fascicule avant de
-              jouer : chaque thématique terminée débloque un badge, et les {parcours.places.length}{" "}
-              quiz ton certificat.
+              jouer : chaque groupe terminé débloque son badge, et les {parcours.places.length} quiz
+              ton certificat.
             </p>
           )}
         </header>

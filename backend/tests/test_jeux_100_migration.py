@@ -130,3 +130,15 @@ def test_rien_sans_les_80_quiz(en_base: Callable[..., Any]) -> None:
     command.upgrade(configuration(), "head")
 
     assert [q.id for q in _publies(en_base, "jeux")] == [test.id]
+
+
+def test_un_ancien_defi_republie_laisse_son_numero(en_base: Callable[..., Any], banque_049: dict[str, Any]) -> None:
+    """L'équipe a republié un ancien défi avec le numéro 90 : il est dépublié pour le nouveau quiz 90."""
+    defi = creer_quiz(en_base, titre="Ancien défi 90", niveau="expert", numero=90)
+
+    command.upgrade(configuration(), "head")
+
+    jeux = _publies(en_base, "jeux")
+    assert sorted(q.numero for q in jeux) == list(range(1, 101))
+    assert defi.id not in {q.id for q in jeux}
+    assert en_base(lambda db: db.get(Quiz, defi.id)).motif == MOTIF

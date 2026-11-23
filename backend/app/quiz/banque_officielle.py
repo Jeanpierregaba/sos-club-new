@@ -1,10 +1,10 @@
 """La banque officielle de 1 000 questions des Clubs Santé (spec 049) : lecture du document Word et composition des
-80 quiz Jeux et des 20 quiz de certification.
+quiz Jeux et des 20 quiz de certification.
 
 Le document a 4 parties (« Partie N – … »), chacune en deux blocs : « Questions moyennement difficiles » (M) puis
 « Questions très difficiles » (D). Chaque QCM a 3 propositions, la bonne en gras (lecture de `import_docx`).
 
-Composition :
+Composition de la spec 049 (fichier `banque_officielle.json`, gardé pour sa migration) :
 
 - 50 questions D par partie sont réservées à la certification, prises à intervalles réguliers dans l'ordre du
   document : 40 pour les 4 places de la partie, 10 pour les places 17 à 20, qui mêlent les 4 parties ;
