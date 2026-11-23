@@ -14,6 +14,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.activite.models import TypeEvenement
+from app.activite.purge import purger_regulierement as purger_activite_regulierement
 from app.activite.router import router as router_activite
 from app.activite.service import enregistrer
 from app.admin.exports import purger_regulierement
@@ -81,6 +82,8 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         asyncio.create_task(purger_photos_regulierement()),
         asyncio.create_task(purger_pieces_regulierement()),
         asyncio.create_task(purger_visiteurs_regulierement()),
+        # Le suivi d'activité (spec 051) : totaux à 90 jours, sels, recherches rares, présences.
+        asyncio.create_task(purger_activite_regulierement()),
     ]
     yield
     for purge in purges:

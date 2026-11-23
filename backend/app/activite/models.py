@@ -61,17 +61,15 @@ class TotalActiviteJour(Base):
     groupe ce jour-là."""
 
     __tablename__ = "total_activite_jour"
-    __table_args__ = (Index("ix_total_activite_jour_jour_type", "jour", "type"),)
-
-    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
-    jour: Mapped[date] = mapped_column(Date)
-    type: Mapped[TypeEvenement] = mapped_column(TYPE)
-    chemin: Mapped[str] = mapped_column(String(120))
-    detail: Mapped[str] = mapped_column(String(60), default="")
-    provenance: Mapped[str] = mapped_column(String(30), default="")
-    appareil: Mapped[str] = mapped_column(String(10), default="")
-    navigateur: Mapped[str] = mapped_column(String(20), default="")
-    connecte: Mapped[bool] = mapped_column(default=False)
+    # Un groupe par ligne : la clé est le groupe lui-même (chaîne vide pour une valeur absente).
+    jour: Mapped[date] = mapped_column(Date, primary_key=True)
+    type: Mapped[TypeEvenement] = mapped_column(TYPE, primary_key=True)
+    chemin: Mapped[str] = mapped_column(String(120), primary_key=True)
+    detail: Mapped[str] = mapped_column(String(60), primary_key=True)
+    provenance: Mapped[str] = mapped_column(String(30), primary_key=True)
+    appareil: Mapped[str] = mapped_column(String(10), primary_key=True)
+    navigateur: Mapped[str] = mapped_column(String(20), primary_key=True)
+    connecte: Mapped[bool] = mapped_column(primary_key=True)
     evenements: Mapped[int] = mapped_column(Integer)
     visiteurs: Mapped[int] = mapped_column(Integer)
 
