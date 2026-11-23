@@ -244,6 +244,13 @@ cd /opt/sosclub/proxy && docker compose up -d --wait --force-recreate
 La recréation coupe les connexions quelques secondes. Elle garantit que Caddy lit le nouveau fichier, ce que ne fait
 pas toujours un simple rechargement.
 
+**Rediriger un ancien domaine** (par exemple `clubsante.org` vers la prod) : fais d'abord pointer le domaine vers
+l'adresse IP du VPS, puis renseigne `DOMAINES_REDIRIGES` dans `/opt/sosclub/proxy/.env`, séparés par une virgule
+(`clubsante.org, www.clubsante.org`), et recrée le proxy comme ci-dessus. Caddy obtient leur certificat et répond
+par une redirection 301 vers `DOMAINE_PROD`, en gardant le chemin. Ne mets que des domaines qui pointent déjà vers
+le VPS : pour les autres, Caddy réessaie sans fin d'obtenir le certificat. Vérifie avec
+`curl -sI https://clubsante.org/bibliotheque`, qui doit renvoyer `301` et `location: https://<domaine de la prod>/bibliotheque`.
+
 **Lire les journaux** :
 
 ```bash

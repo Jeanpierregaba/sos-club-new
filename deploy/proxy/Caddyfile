@@ -38,3 +38,9 @@
 	header X-Robots-Tag "noindex, nofollow"
 	import application preprod
 }
+
+# Anciens domaines (par exemple clubsante.org) : redirection 301 vers la prod, chemin et paramètres gardés. Caddy
+# obtient aussi leur certificat, pour que https://clubsante.org redirige sans alerte du navigateur.
+{$DOMAINES_REDIRIGES} {
+	redir https://{$DOMAINE_PROD}{uri} permanent
+}
