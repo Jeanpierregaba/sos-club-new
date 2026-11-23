@@ -24,6 +24,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/activite/evenements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Recevoir
+         * @description Enregistre un événement anonyme du site. Toujours 204 : le visiteur n'apprend jamais s'il a été compté.
+         */
+        post: operations["recevoir_api_activite_evenements_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/comptes/connexion": {
         parameters: {
             query?: never;
@@ -7598,6 +7618,22 @@ export interface components {
             peut_repondre: boolean;
             ma_reponse?: components["schemas"]["Reponse"] | null;
         };
+        /** EvenementSite */
+        EvenementSite: {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "page_vue" | "clic_inscription" | "etape_inscription" | "recherche" | "erreur";
+            /** Chemin */
+            chemin: string;
+            /** Detail */
+            detail?: string | null;
+            /** Referent */
+            referent?: string | null;
+            /** Utm Source */
+            utm_source?: string | null;
+        };
         /** ExportCandidats */
         ExportCandidats: {
             filtres?: components["schemas"]["FiltresCandidats"];
@@ -11096,6 +11132,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EtatSitePublic"];
+                };
+            };
+        };
+    };
+    recevoir_api_activite_evenements_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EvenementSite"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

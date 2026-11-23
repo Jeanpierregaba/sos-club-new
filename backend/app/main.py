@@ -13,7 +13,9 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.activite.models import TypeEvenement
 from app.activite.router import router as router_activite
+from app.activite.service import enregistrer
 from app.admin.exports import purger_regulierement
 from app.admin.router import router as router_admin
 from app.admin.router import router_activation
@@ -146,6 +148,15 @@ async def interdire_le_cache(request: Request, suivant: Callable[[Request], Awai
     if request.url.path.startswith("/api/") and not PHOTOS_PUBLIQUES.match(request.url.path):
         reponse.headers["Cache-Control"] = "no-store"
     return reponse
+
+
+@app.exception_handler(Exception)
+async def erreur_serveur(request: Request, _: Exception) -> JSONResponse:
+    """Une erreur inattendue : compte dans le suivi d'activité (spec 051) par le gabarit de sa route, jamais par
+    l'adresse réelle ; l'erreur reste journalisée par le serveur."""
+    route = request.scope.get("route")
+    await enregistrer(request, TypeEvenement.erreur, getattr(route, "path", "autre")[:120], "500")
+    return JSONResponse({"detail": "Erreur interne : réessaie dans un moment."}, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @app.exception_handler(RequestValidationError)

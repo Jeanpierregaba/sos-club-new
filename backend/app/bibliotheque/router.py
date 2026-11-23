@@ -3,10 +3,12 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.activite.models import TypeEvenement
+from app.activite.service import enregistrer
 from app.bibliotheque import lecture, public
 from app.bibliotheque.models import CategorieRessource
 from app.bibliotheque.schemas import Bibliotheque
@@ -23,7 +25,7 @@ async def bibliotheque(db: Db, categorie: CategorieRessource | None = None, axe:
 
 
 @router.get("/{ressource_id}/fichier", response_class=StreamingResponse)
-async def fichier(ressource_id: UUID, db: Db, telecharger: bool = False) -> StreamingResponse:
+async def fichier(ressource_id: UUID, request: Request, db: Db, telecharger: bool = False) -> StreamingResponse:
     ressource = await public.publiee(db, ressource_id)
     if ressource is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, lecture.INTROUVABLE)
@@ -35,6 +37,9 @@ async def fichier(ressource_id: UUID, db: Db, telecharger: bool = False) -> Stre
         # Le fichier est déjà ouvert : le refermer plutôt que d'attendre le ramasse-miettes.
         await reponse.body_iterator.aclose()  # type: ignore[attr-defined]
         raise
+    # Spec 051 : la lecture ou le téléchargement du jour, par document (son identifiant, jamais le lecteur).
+    action = "telecharger" if telecharger else "lire"
+    await enregistrer(request, TypeEvenement.telechargement, "/bibliotheque", f"{action}:{ressource.id}")
     return reponse
 
 

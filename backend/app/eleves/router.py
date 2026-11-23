@@ -7,6 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.activite.suivi import suivre_inscription
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.inscription import InscriptionsFermees, Refus, TropDInscriptions
 from app.comptes.models import Role, Utilisateur
@@ -50,17 +51,18 @@ async def inscription(entree: InscriptionEntree, request: Request, response: Res
     jeton = request.cookies.get(settings.cookie_session)
     if jeton and await utilisateur_de_la_session(db, jeton):
         raise HTTPException(status.HTTP_409_CONFLICT, "Tu es déjà connecté : déconnecte-toi pour créer un compte.")
-    try:
-        with _traduire_refus():
-            utilisateur = await service.inscrire(db, entree, _adresse(request))
-    except InscriptionsFermees:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Les inscriptions ne sont pas encore ouvertes.") from None
-    except TropDInscriptions:
-        raise HTTPException(
-            status.HTTP_429_TOO_MANY_REQUESTS, "Trop d'inscriptions depuis ce réseau. Réessaie dans une heure."
-        ) from None
-    # La session valide la transaction : le compte, son profil et ses points de bienvenue sont écrits ensemble.
-    _poser_cookie(response, utilisateur, await ouvrir_session(db, utilisateur, adresse_ip=_adresse(request)))
+    async with suivre_inscription(request, "eleve"):
+        try:
+            with _traduire_refus():
+                utilisateur = await service.inscrire(db, entree, _adresse(request))
+        except InscriptionsFermees:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "Les inscriptions ne sont pas encore ouvertes.") from None
+        except TropDInscriptions:
+            raise HTTPException(
+                status.HTTP_429_TOO_MANY_REQUESTS, "Trop d'inscriptions depuis ce réseau. Réessaie dans une heure."
+            ) from None
+        # La session valide la transaction : le compte, son profil et ses points de bienvenue sont écrits ensemble.
+        _poser_cookie(response, utilisateur, await ouvrir_session(db, utilisateur, adresse_ip=_adresse(request)))
     return Moi.model_validate(utilisateur)
 
 

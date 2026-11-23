@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.activite.suivi import noter_presence
 from app.comptes.models import Role, Utilisateur
 from app.comptes.service import utilisateur_de_la_session
 from app.config import settings
@@ -27,6 +28,7 @@ async def utilisateur_courant(request: Request, db: Annotated[AsyncSession, Depe
     # Le jeton d'un joueur sans compte (spec 031) ne vaut que pour /jeux/quiz, jamais comme session.
     if utilisateur is None or utilisateur.role is Role.invite:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Connecte-toi pour continuer.")
+    await _presence(utilisateur)
     return utilisateur
 
 
@@ -45,4 +47,13 @@ async def utilisateur_facultatif(
     """L'utilisateur connecté, ou None pour un visiteur : pour une route publique qui en fait plus pour un compte."""
     jeton = request.cookies.get(settings.cookie_session)
     utilisateur = await utilisateur_de_la_session(db, jeton) if jeton else None
-    return None if utilisateur is None or utilisateur.role is Role.invite else utilisateur
+    if utilisateur is None or utilisateur.role is Role.invite:
+        return None
+    await _presence(utilisateur)
+    return utilisateur
+
+
+async def _presence(utilisateur: Utilisateur) -> None:
+    """La semaine d'activité d'un compte, pour la rétention (spec 051) ; l'équipe n'est pas comptée."""
+    if utilisateur.role is not Role.admin:
+        await noter_presence(utilisateur.id)

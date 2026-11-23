@@ -8,6 +8,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.activite.suivi import suivre_inscription
 from app.admin.catalogue import Action
 from app.admin.dependances import Acces, adresse_ip, exiger_permission
 from app.comptes.dependances import utilisateur_courant
@@ -70,17 +71,18 @@ async def inscription(entree: InscriptionEncadreur, request: Request, response: 
     jeton = request.cookies.get(settings.cookie_session)
     if jeton and await utilisateur_de_la_session(db, jeton):
         raise HTTPException(status.HTTP_409_CONFLICT, "Tu es déjà connecté : déconnecte-toi pour créer un compte.")
-    try:
-        with _traduire_refus():
-            utilisateur = await service.inscrire(db, entree, _adresse(request))
-    except InscriptionsFermees:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Les inscriptions ne sont pas encore ouvertes.") from None
-    except TropDInscriptions:
-        raise HTTPException(
-            status.HTTP_429_TOO_MANY_REQUESTS, "Trop d'inscriptions depuis ce réseau. Réessaie dans une heure."
-        ) from None
-    # La session valide la transaction : le compte et son profil sont écrits ensemble.
-    _poser_cookie(response, utilisateur, await ouvrir_session(db, utilisateur, adresse_ip=_adresse(request)))
+    async with suivre_inscription(request, "encadreur"):
+        try:
+            with _traduire_refus():
+                utilisateur = await service.inscrire(db, entree, _adresse(request))
+        except InscriptionsFermees:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "Les inscriptions ne sont pas encore ouvertes.") from None
+        except TropDInscriptions:
+            raise HTTPException(
+                status.HTTP_429_TOO_MANY_REQUESTS, "Trop d'inscriptions depuis ce réseau. Réessaie dans une heure."
+            ) from None
+        # La session valide la transaction : le compte et son profil sont écrits ensemble.
+        _poser_cookie(response, utilisateur, await ouvrir_session(db, utilisateur, adresse_ip=_adresse(request)))
     return Moi.model_validate(utilisateur)
 
 

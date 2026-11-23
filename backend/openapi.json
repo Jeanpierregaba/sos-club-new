@@ -27,6 +27,41 @@
         }
       }
     },
+    "/api/activite/evenements": {
+      "post": {
+        "tags": [
+          "activite"
+        ],
+        "summary": "Recevoir",
+        "description": "Enregistre un événement anonyme du site. Toujours 204 : le visiteur n'apprend jamais s'il a été compté.",
+        "operationId": "recevoir_api_activite_evenements_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvenementSite"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/comptes/connexion": {
       "post": {
         "tags": [
@@ -22449,6 +22484,70 @@
         ],
         "title": "EvenementPublic",
         "description": "Ce que montre l'agenda public : aucun nom d'élève, seulement le nombre de participants."
+      },
+      "EvenementSite": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "page_vue",
+              "clic_inscription",
+              "etape_inscription",
+              "recherche",
+              "erreur"
+            ],
+            "title": "Type"
+          },
+          "chemin": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Chemin"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "referent": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referent"
+          },
+          "utm_source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Utm Source"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "chemin"
+        ],
+        "title": "EvenementSite"
       },
       "ExportCandidats": {
         "properties": {

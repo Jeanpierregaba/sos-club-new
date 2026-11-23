@@ -7,6 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.activite.suivi import suivre_inscription
 from app.comptes import limite_adresse
 from app.comptes.dependances import utilisateur_courant
 from app.comptes.inscription import InscriptionsFermees, Refus, TropDInscriptions
@@ -51,20 +52,21 @@ async def inscription(entree: InscriptionVisiteur, request: Request, db: Base) -
     jeton = request.cookies.get(settings.cookie_session)
     if jeton and await utilisateur_de_la_session(db, jeton):
         raise HTTPException(status.HTTP_409_CONFLICT, "Tu es déjà connecté : déconnecte-toi pour créer un compte.")
-    try:
-        with _traduire():
-            return await service.inscrire(db, entree, _adresse(request))
-    except InscriptionsFermees:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Les inscriptions ne sont pas encore ouvertes.") from None
-    except TropDInscriptions:
-        raise HTTPException(
-            status.HTTP_429_TOO_MANY_REQUESTS, "Trop d'inscriptions depuis ce réseau. Réessaie dans une heure."
-        ) from None
-    except service.ServiceIndisponible:
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE,
-            "L'envoi des e-mails est indisponible pour le moment : réessaie un peu plus tard.",
-        ) from None
+    async with suivre_inscription(request, "visiteur"):
+        try:
+            with _traduire():
+                return await service.inscrire(db, entree, _adresse(request))
+        except InscriptionsFermees:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "Les inscriptions ne sont pas encore ouvertes.") from None
+        except TropDInscriptions:
+            raise HTTPException(
+                status.HTTP_429_TOO_MANY_REQUESTS, "Trop d'inscriptions depuis ce réseau. Réessaie dans une heure."
+            ) from None
+        except service.ServiceIndisponible:
+            raise HTTPException(
+                status.HTTP_503_SERVICE_UNAVAILABLE,
+                "L'envoi des e-mails est indisponible pour le moment : réessaie un peu plus tard.",
+            ) from None
 
 
 TROP_DE_CODES = "Trop de tentatives depuis ce réseau. Réessaie dans un moment."
@@ -81,10 +83,11 @@ async def _limiter_codes(db: AsyncSession, request: Request) -> None:
 @router.post("/confirmation")
 async def confirmation(entree: ConfirmationEntree, request: Request, response: Response, db: Base) -> Moi:
     await _limiter_codes(db, request)
-    with _traduire():
-        utilisateur = await service.confirmer(db, entree.email, entree.code, _adresse(request))
-    # La session valide la transaction : l'adresse confirmée et la session sont écrites ensemble.
-    _poser_cookie(response, utilisateur, await ouvrir_session(db, utilisateur, adresse_ip=_adresse(request)))
+    async with suivre_inscription(request, "visiteur", "confirme", debut=None, refus="code-refuse"):
+        with _traduire():
+            utilisateur = await service.confirmer(db, entree.email, entree.code, _adresse(request))
+        # La session valide la transaction : l'adresse confirmée et la session sont écrites ensemble.
+        _poser_cookie(response, utilisateur, await ouvrir_session(db, utilisateur, adresse_ip=_adresse(request)))
     return Moi.model_validate(utilisateur)
 
 
