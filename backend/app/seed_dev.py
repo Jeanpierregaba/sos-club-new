@@ -28,6 +28,7 @@ from app.admin.models import DoubleAuth
 from app.agenda.models import Evenement, NiveauEvenement, Reponse, ReponseEvenement
 from app.agenda.schemas import ChampsEvenement
 from app.agenda.service import copier as copier_evenement
+from app.bibliotheque import livres_officiels
 from app.bibliotheque.models import CategorieRessource, EtatRessource, Ressource
 from app.clubs import activation
 from app.clubs.models import Adhesion, Club, ClubAxe, EtatAdhesion, EtatClub
@@ -727,7 +728,10 @@ def ecrire_fichier(acces: list[dict[str, str]], chemin: Path = FICHIER_ACCES) ->
 async def _principal() -> list[dict[str, str]]:
     try:
         async with SessionLocal() as db:
-            return await semer(db)
+            acces = await semer(db)
+            # Les livres officiels de la bibliothèque (spec 050), comme au déploiement.
+            await livres_officiels.charger(db)
+            return acces
     finally:
         await engine.dispose()
 
