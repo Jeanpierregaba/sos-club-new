@@ -59,7 +59,7 @@ def _publie_jeux():
 
 
 def _du_parcours():
-    """Les quiz qui comptent pour les étoiles : publiés et numérotés dans le parcours officiel (80 quiz depuis la spec 049), ceux
+    """Les quiz qui comptent pour les étoiles : publiés et numérotés dans le parcours officiel (100 quiz depuis la spec 050), ceux
     que la page Jeux montre. Un quiz sans numéro rapporte ses points sans compter pour une étoile."""
     return *_publie_jeux(), Quiz.numero.is_not(None)
 

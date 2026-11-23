@@ -10,7 +10,7 @@ export const BAREME = {
   certification: { eleve: 1000, club: 500 },
 } as const;
 
-// Les 4 niveaux des 80 quiz Jeux (spec 034, répartis par la spec 049) : nombre de quiz, gain d'un quiz réussi et bonus de l'étoile du niveau,
+// Les 4 niveaux des 100 quiz Jeux (spec 034, répartis par la spec 050) : nombre de quiz, gain d'un quiz réussi et bonus de l'étoile du niveau,
 // pour l'élève ; son club reçoit la moitié.
 export type NiveauJeux = "debutant" | "intermediaire" | "avance" | "expert";
 export const NIVEAUX_JEUX: {
@@ -20,10 +20,10 @@ export const NIVEAUX_JEUX: {
   eleve: number;
   etoile: number;
 }[] = [
-  { code: "debutant", nom: "Débutant", quiz: 32, eleve: 50, etoile: 500 },
-  { code: "intermediaire", nom: "Intermédiaire", quiz: 24, eleve: 100, etoile: 1000 },
-  { code: "avance", nom: "Avancé", quiz: 16, eleve: 150, etoile: 1500 },
-  { code: "expert", nom: "Expert", quiz: 8, eleve: 200, etoile: 3000 },
+  { code: "debutant", nom: "Débutant", quiz: 40, eleve: 50, etoile: 500 },
+  { code: "intermediaire", nom: "Intermédiaire", quiz: 30, eleve: 100, etoile: 1000 },
+  { code: "avance", nom: "Avancé", quiz: 20, eleve: 150, etoile: 1500 },
+  { code: "expert", nom: "Expert", quiz: 10, eleve: 200, etoile: 3000 },
 ];
 export const TOTAL_QUIZ_JEUX = NIVEAUX_JEUX.reduce((n, x) => n + x.quiz, 0);
 export const MAX_POINTS_QUIZ = NIVEAUX_JEUX.reduce((n, x) => n + x.quiz * x.eleve, 0);

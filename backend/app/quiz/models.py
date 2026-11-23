@@ -44,7 +44,7 @@ class EtatQuiz(StrEnum):
 
 
 class NiveauQuiz(StrEnum):
-    """Les quatre niveaux des quiz Jeux (spec 034) : 32, 24, 16 et 8 quiz depuis la spec 049, mieux payés à chaque
+    """Les quatre niveaux des quiz Jeux (spec 034) : 40, 30, 20 et 10 quiz depuis la spec 050, mieux payés à chaque
     niveau."""
 
     debutant = "debutant"

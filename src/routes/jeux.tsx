@@ -37,7 +37,7 @@ export const Route = createFileRoute("/jeux")({
       {
         name: "description",
         content:
-          "L'arène de gamification des Clubs Santé : 80 quiz officiels en 4 parties, 1 000 questions, des points et un classement national.",
+          "L'arène de gamification des Clubs Santé : 100 quiz officiels en 4 parties, 1 000 questions, des points et un classement national.",
       },
       { property: "og:title", content: "Joue, apprends & deviens champion de la santé" },
     ],
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/jeux")({
   component: Jeux,
 });
 
-// Spec 049 : les 80 quiz de la banque officielle, numérotés dans le parcours (les parties alternent).
+// Spec 050 : les 100 quiz de la banque officielle, numérotés dans le parcours (les parties alternent).
 const totalQuiz = poles.reduce((n, p) => n + p.quiz.length, 0);
 
 // Spec 034 et 049 : 8 000 points de quiz et 6 000 points d'étoiles au plus, pour l'élève ; la moitié pour son club.
