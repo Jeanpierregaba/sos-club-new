@@ -22,6 +22,14 @@ class TypeEvenement(StrEnum):
     recherche = "recherche"
 
 
+# Les regroupements de la page « Activité » dont les visiteurs distincts sont gardés au-delà de 90 jours, dans cet ordre
+# de colonnes ; les valeurs sont jointes par le séparateur d'unité (US), qui n'apparaît dans aucune donnée.
+ORDRE_DIMENSIONS = ("chemin", "detail", "provenance", "appareil", "navigateur", "connecte")
+DIMENSIONS_VISITEURS = (
+    (), ("connecte",), ("chemin",), ("detail",), ("provenance",), ("appareil",), ("navigateur",), ("chemin", "detail"),
+)  # fmt: skip
+SEPARATEUR = "\x1f"
+
 TYPE = Enum(TypeEvenement, name="type_evenement", native_enum=False, create_constraint=True, length=20)
 
 
@@ -57,8 +65,8 @@ class EvenementActivite(Base):
 
 
 class TotalActiviteJour(Base):
-    """Les événements de plus de 90 jours, comptés par jour et par groupe. `visiteurs` : empreintes distinctes du
-    groupe ce jour-là."""
+    """Les événements de plus de 90 jours, comptés par jour et par groupe. Les visiteurs ne s'additionnent pas d'un
+    groupe à l'autre : ils sont comptés à part, dans `visiteurs_groupe_jour`."""
 
     __tablename__ = "total_activite_jour"
     # Un groupe par ligne : la clé est le groupe lui-même (chaîne vide pour une valeur absente).
@@ -71,6 +79,18 @@ class TotalActiviteJour(Base):
     navigateur: Mapped[str] = mapped_column(String(20), primary_key=True)
     connecte: Mapped[bool] = mapped_column(primary_key=True)
     evenements: Mapped[int] = mapped_column(Integer)
+
+
+class VisiteursGroupeJour(Base):
+    """Les visiteurs distincts d'un jour sorti des 90 jours, par type et par regroupement de la page « Activité »
+    (`dimensions` : « chemin », « chemin,detail »… ; `valeurs` : leurs valeurs jointes par le séparateur US)."""
+
+    __tablename__ = "visiteurs_groupe_jour"
+
+    jour: Mapped[date] = mapped_column(Date, primary_key=True)
+    type: Mapped[TypeEvenement] = mapped_column(TYPE, primary_key=True)
+    dimensions: Mapped[str] = mapped_column(String(60), primary_key=True)
+    valeurs: Mapped[str] = mapped_column(String(300), primary_key=True)
     visiteurs: Mapped[int] = mapped_column(Integer)
 
 

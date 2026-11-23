@@ -78,7 +78,7 @@ def test_au_dela_de_90_jours_les_totaux_remplacent_le_detail_sans_changer(en_bas
     assert pages_par_chemin(en_base) == avant == {"/jeux": 4, "/": 1}
     assert compter(en_base, EvenementActivite) == 1
     jeux = en_base(lambda db: db.scalar(select(TotalActiviteJour).where(TotalActiviteJour.chemin == "/jeux")))
-    assert (jeux.evenements, jeux.visiteurs, jeux.detail) == (3, 2, "")
+    assert (jeux.evenements, jeux.detail) == (3, "")
     assert en_base(lambda db: db.get(VisiteursJour, vieux)).visiteurs == 2
 
 
@@ -89,15 +89,15 @@ def test_la_purge_se_relance_sans_rien_doubler(en_base: Callable[..., Any]) -> N
     assert compter(en_base, TotalActiviteJour) == 1
 
 
-def test_un_mot_cherche_par_moins_de_3_visiteurs_part_au_bout_de_7_jours(en_base: Callable[..., Any]) -> None:
-    il_y_a_8 = AUJOURDHUI - timedelta(days=8)
+def test_un_mot_cherche_par_moins_de_3_visiteurs_le_meme_jour_part_le_lendemain(en_base: Callable[..., Any]) -> None:
+    hier = AUJOURDHUI - timedelta(days=1)
     recherche = TypeEvenement.recherche
     ajouter(
         en_base,
-        evenement(il_y_a_8, "a", recherche, chemin="/inscription", detail="kodjo mensah"),
-        evenement(il_y_a_8, "a", recherche, chemin="/inscription", detail="kodjo mensah"),
+        evenement(hier, "a", recherche, chemin="/inscription", detail="kodjo mensah"),
+        evenement(hier, "a", recherche, chemin="/inscription", detail="kodjo mensah"),
         evenement(AUJOURDHUI, "b", recherche, chemin="/inscription", detail="lycée de kpalimé"),
-        *[evenement(il_y_a_8, v, recherche, chemin="/inscription", detail="lycée de tsévié") for v in "xyz"],
+        *[evenement(hier, v, recherche, chemin="/inscription", detail="lycée de tsévié") for v in "xyz"],
     )
     purger(en_base)
     restants = en_base(lambda db: db.scalars(select(EvenementActivite.detail)))
@@ -131,3 +131,36 @@ def test_une_presence_part_avec_le_compte(en_base: Callable[..., Any], creer_uti
 
     en_base(effacer)
     assert compter(en_base, PresenceSemaine) == 0
+
+
+def test_les_visiteurs_d_un_regroupement_restent_justes_apres_la_purge(en_base: Callable[..., Any]) -> None:
+    """Un visiteur qui ouvre deux quiz, arrive d'un réseau puis navigue : 1 visiteur sur « /quiz/$id » avant comme
+    après la purge, même si ses événements tombent dans des groupes différents."""
+    from app.activite import indicateurs
+
+    vieux = AUJOURDHUI - timedelta(days=95)
+    ajouter(
+        en_base,
+        evenement(vieux, "a", chemin="/quiz/$id", detail="quiz-1", provenance="facebook"),
+        evenement(vieux, "a", chemin="/quiz/$id", detail="quiz-2"),
+        evenement(vieux, "a", chemin="/quiz/$id", detail="quiz-2", connecte=True),
+        evenement(vieux, "b", chemin="/quiz/$id", detail="quiz-2"),
+    )
+    periode = indicateurs.Periode(vieux, vieux)
+
+    def lire() -> tuple[Any, Any, Any]:
+        async def _lire(db: AsyncSession) -> tuple[Any, Any, Any]:
+            page = TypeEvenement.page_vue
+            return (
+                await indicateurs.evenements(db, periode, page, "chemin"),
+                await indicateurs.evenements(db, periode, page, "detail", chemin="/quiz/$id"),
+                await indicateurs.evenements(db, periode, page, "connecte"),
+            )
+
+        return en_base(_lire)
+
+    avant = lire()
+    assert avant[0] == {("/quiz/$id",): (4, 2)}
+    purger(en_base)
+    assert compter(en_base, EvenementActivite) == 0
+    assert lire() == avant

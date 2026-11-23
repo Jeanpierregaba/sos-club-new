@@ -10,7 +10,13 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.activite import service
-from app.activite.models import EvenementActivite, TotalActiviteJour, TypeEvenement, VisiteursJour
+from app.activite.models import (
+    EvenementActivite,
+    TotalActiviteJour,
+    TypeEvenement,
+    VisiteursGroupeJour,
+    VisiteursJour,
+)
 from app.admin.models import JournalAudit
 from app.quiz import parametres
 from app.quiz.models import EtatTentative, Quiz, TentativeQuiz
@@ -114,8 +120,13 @@ def test_audience_reunit_evenements_bruts_et_totaux(super_admin: TestClient, en_
         # Un jour sorti des 90 jours dans la période : seulement ses totaux.
         TotalActiviteJour(
             jour=date(2026, 11, 2), type=TypeEvenement.page_vue, chemin="/jeux", detail="", provenance="",
-            appareil="", navigateur="", connecte=False, evenements=5, visiteurs=2,
+            appareil="", navigateur="", connecte=False, evenements=5,
         ),
+        *[
+            VisiteursGroupeJour(jour=date(2026, 11, 2), type=TypeEvenement.page_vue, dimensions=d, valeurs=v, visiteurs=2)
+            for d, v in (("", ""), ("chemin", "/jeux"), ("connecte", "false"), ("provenance", ""), ("appareil", ""),
+                         ("navigateur", ""))
+        ],
         VisiteursJour(jour=date(2026, 11, 2), visiteurs=2),
     )  # fmt: skip
     resultat = lire(super_admin, "audience")

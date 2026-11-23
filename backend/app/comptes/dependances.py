@@ -28,7 +28,7 @@ async def utilisateur_courant(request: Request, db: Annotated[AsyncSession, Depe
     # Le jeton d'un joueur sans compte (spec 031) ne vaut que pour /jeux/quiz, jamais comme session.
     if utilisateur is None or utilisateur.role is Role.invite:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Connecte-toi pour continuer.")
-    await _presence(utilisateur)
+    await _presence(db, utilisateur)
     return utilisateur
 
 
@@ -49,11 +49,11 @@ async def utilisateur_facultatif(
     utilisateur = await utilisateur_de_la_session(db, jeton) if jeton else None
     if utilisateur is None or utilisateur.role is Role.invite:
         return None
-    await _presence(utilisateur)
+    await _presence(db, utilisateur)
     return utilisateur
 
 
-async def _presence(utilisateur: Utilisateur) -> None:
+async def _presence(db: AsyncSession, utilisateur: Utilisateur) -> None:
     """La semaine d'activité d'un compte, pour la rétention (spec 051) ; l'équipe n'est pas comptée."""
     if utilisateur.role is not Role.admin:
-        await noter_presence(utilisateur.id)
+        await noter_presence(db, utilisateur.id)

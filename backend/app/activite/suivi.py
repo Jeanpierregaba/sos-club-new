@@ -10,10 +10,11 @@ from datetime import date, timedelta
 from uuid import UUID
 
 from fastapi import HTTPException, Request
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.activite import service
 from app.activite.models import TypeEvenement
-from app.db import SessionLocal
 
 journal = logging.getLogger(__name__)
 
@@ -63,7 +64,9 @@ def oublier_presences() -> None:
     _semaine.clear()
 
 
-async def noter_presence(utilisateur_id: UUID) -> None:
+async def noter_presence(db: AsyncSession, utilisateur_id: UUID) -> None:
+    """Dans la session de la requête, qui n'a encore rien écrit : une insertion idempotente validée aussitôt, sans
+    prendre une seconde connexion."""
     jour = service.aujourdhui()
     lundi = jour - timedelta(days=jour.weekday())
     if _semaine != [lundi]:
@@ -72,9 +75,9 @@ async def noter_presence(utilisateur_id: UUID) -> None:
     if utilisateur_id in _notes:
         return
     try:
-        async with SessionLocal() as db:
-            await service.noter_presence(db, utilisateur_id)
-            await db.commit()
+        await service.noter_presence(db, utilisateur_id)
+        await db.commit()
         _notes.add(utilisateur_id)
-    except Exception:  # noqa: BLE001 - le suivi ne doit jamais faire échouer la requête de l'utilisateur
+    except SQLAlchemyError:
+        await db.rollback()
         journal.exception("Suivi d'activité : présence non notée")

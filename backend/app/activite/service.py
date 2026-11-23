@@ -5,12 +5,14 @@ du jour, l'appareil, le navigateur et la provenance, puis jette l'adresse IP et 
 pour un navigateur qui demande à ne pas être suivi, un robot ou un compte de l'équipe.
 """
 
+import asyncio
 import hashlib
 import hmac
 import json
 import logging
 import re
 import secrets
+from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -18,18 +20,40 @@ from urllib.parse import urlsplit
 from fastapi import Request
 from sqlalchemy import delete, insert, select
 from sqlalchemy.dialects.postgresql import insert as insert_pg
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.activite.models import EvenementActivite, PresenceSemaine, SelActivite, TypeEvenement
 from app.comptes.models import Role
 from app.comptes.service import cle_adresse, utilisateur_de_la_session
 from app.config import settings
-from app.db import SessionLocal
 
 journal = logging.getLogger(__name__)
 
-# Appels de collecte par adresse et par fenêtre des essais (15 minutes) : large, une classe partage souvent une adresse.
-PLAFOND = 600
+# Les événements vus par l'API s'écrivent par un petit pool à part, au délai court : une requête qui tient déjà une
+# connexion du pool principal n'en attend jamais une seconde, et un pool saturé fait perdre l'événement, pas la requête.
+moteur_suivi = create_async_engine(
+    settings.database_url, pool_size=2, max_overflow=3, pool_timeout=1, pool_pre_ping=True,
+    connect_args={"timeout": 2}, hide_parameters=True,
+)  # fmt: skip
+SessionSuivi = async_sessionmaker(moteur_suivi, expire_on_commit=False)
+DELAI_SUIVI = 2
+
+# Débit de la collecte, compté en mémoire seulement (aucune adresse écrite en base) : par adresse et par quart d'heure,
+# large car un opérateur mobile ou une école met des centaines d'élèves derrière une même adresse ; et par jour, pour
+# qu'un abus ne remplisse pas la table. Au-delà, l'événement est ignoré sans erreur.
+PLAFOND = 3000
+PLAFOND_JOUR = 500_000
+
+
+@dataclass
+class _Debit:
+    fenetre: datetime | None = None
+    jour: date | None = None
+    du_jour: int = 0
+    adresses: dict[str, int] = field(default_factory=dict)
+
+
+_debit = _Debit()
 CHEMINS = frozenset(json.loads((Path(__file__).parent / "chemins.json").read_text()))
 AUTRE = "autre"
 
@@ -57,6 +81,25 @@ def maintenant() -> datetime:
 def aujourdhui() -> date:
     # Lomé est à UTC+0 toute l'année : le jour UTC est le jour local.
     return maintenant().date()
+
+
+def oublier_debit() -> None:
+    global _debit
+    _debit = _Debit()
+
+
+def accepter(request: Request) -> bool:
+    """Compte l'appel dans le débit en mémoire ; False au-delà des plafonds."""
+    instant = maintenant()
+    fenetre = instant.replace(minute=instant.minute // 15 * 15, second=0, microsecond=0)
+    if _debit.fenetre != fenetre:
+        _debit.fenetre, _debit.adresses = fenetre, {}
+    if _debit.jour != instant.date():
+        _debit.jour, _debit.du_jour = instant.date(), 0
+    cle = hashlib.sha256(cle_adresse(request.client.host if request.client else None).encode()).hexdigest()
+    _debit.adresses[cle] = _debit.adresses.get(cle, 0) + 1
+    _debit.du_jour += 1
+    return _debit.adresses[cle] <= PLAFOND and _debit.du_jour <= PLAFOND_JOUR
 
 
 # Description de la requête ---------------------------------------------------------------------------------------
@@ -195,7 +238,8 @@ async def ecrire(
     agent = request.headers.get("user-agent", "")
     await db.execute(
         insert(EvenementActivite).values(
-            cree_le=maintenant(), jour=jour, type=type_, visiteur=_empreinte(await _sel(db, jour), request),
+            # À l'heure près : assez pour la heatmap, trop peu pour rapprocher un événement d'un autre journal.
+            cree_le=maintenant().replace(minute=0, second=0, microsecond=0), jour=jour, type=type_, visiteur=_empreinte(await _sel(db, jour), request),
             chemin=chemin, detail=detail, provenance=provenance(referent, utm) if entree else None, appareil=appareil(agent),
             navigateur=navigateur(agent), connecte=connecte,
         )
@@ -206,10 +250,14 @@ async def ecrire(
 async def enregistrer(request: Request, type_: TypeEvenement, chemin: str, detail: str | None = None) -> None:
     """Pour les événements vus par l'API (étapes d'inscription, téléchargements, erreurs) : dans sa propre
     transaction, pour survivre au refus d'une action, et sans jamais lever : le suivi ne casse aucune action."""
-    try:
-        async with SessionLocal() as db:
+
+    async def _ecrire() -> None:
+        async with SessionSuivi() as db:
             await ecrire(db, request, type_, chemin, detail[:60] if detail else None)
             await db.commit()
+
+    try:
+        await asyncio.wait_for(_ecrire(), DELAI_SUIVI)
     except Exception:  # noqa: BLE001 - le suivi ne doit jamais faire échouer l'action de l'utilisateur
         journal.exception("Suivi d'activité : événement %s non enregistré", type_)
 

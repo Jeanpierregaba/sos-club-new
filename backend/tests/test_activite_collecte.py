@@ -6,11 +6,12 @@ from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import func, select
 from sqlalchemy import inspect as inspecter
-from sqlalchemy import select
 
 from app.activite import service
 from app.activite.models import EvenementActivite, SelActivite
+from app.comptes.models import TentativeConnexion
 from tests.conftest import connecter_admin
 from tests.test_connexion import se_connecter
 
@@ -27,9 +28,14 @@ def envoyer(client: TestClient, corps: dict[str, Any], agent: str = CHROME_ANDRO
 
 def lister(en_base: Callable[..., Any]) -> list[EvenementActivite]:
     async def _lister(db: Any) -> list[EvenementActivite]:
-        return list(await db.scalars(select(EvenementActivite).order_by(EvenementActivite.cree_le)))
+        return list(await db.scalars(select(EvenementActivite).order_by(EvenementActivite.id)))
 
     return en_base(_lister)
+
+
+@pytest.fixture(autouse=True)
+def debit_neuf() -> None:
+    service.oublier_debit()
 
 
 @pytest.fixture
@@ -239,13 +245,21 @@ def test_une_page_introuvable_garde_seulement_un_premier_segment_lisible(
 # Débit -----------------------------------------------------------------------------------------------------------
 
 
-def test_le_debit_est_limite_par_adresse(
+def test_le_debit_est_limite_en_silence_sans_ecrire_l_adresse(
     client: TestClient, en_base: Callable[..., Any], monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(service, "PLAFOND", 3)
     codes = [envoyer(client, {"type": "page_vue", "chemin": "/"}).status_code for _ in range(5)]
-    assert codes == [204, 204, 204, 429, 429]
+    assert codes == [204] * 5
     assert len(lister(en_base)) == 3
+    # Le débit se compte en mémoire : aucune adresse dans le journal des essais de connexion.
+    assert en_base(lambda db: db.scalar(select(func.count()).select_from(TentativeConnexion))) == 0
+
+
+def test_l_heure_est_tronquee(client: TestClient, en_base: Callable[..., Any]) -> None:
+    envoyer(client, {"type": "page_vue", "chemin": "/"})
+    [evenement] = lister(en_base)
+    assert (evenement.cree_le.minute, evenement.cree_le.second, evenement.cree_le.microsecond) == (0, 0, 0)
 
 
 def test_seule_la_page_d_entree_porte_la_provenance(client: TestClient, en_base: Callable[..., Any]) -> None:

@@ -16,7 +16,17 @@ from sqlalchemy import and_, extract, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import ColumnElement
 
-from app.activite.models import EvenementActivite, PresenceSemaine, TotalActiviteJour, TypeEvenement, VisiteursJour
+from app.activite.models import (
+    DIMENSIONS_VISITEURS,
+    ORDRE_DIMENSIONS,
+    SEPARATEUR,
+    EvenementActivite,
+    PresenceSemaine,
+    TotalActiviteJour,
+    TypeEvenement,
+    VisiteursGroupeJour,
+    VisiteursJour,
+)
 from app.activite.schemas_admin import Bloc, Chiffre, Colonne, Grille, NomBloc, PointSerie, Serie, Tableau
 from app.bibliotheque.models import Ressource
 from app.certification.models import BadgeObtenu, Certificat, PlaceReussie
@@ -31,6 +41,7 @@ from app.referentiel.models import Dre, Etablissement, Iesg
 
 E = EvenementActivite
 T = TotalActiviteJour
+V = VisiteursGroupeJour
 INSCRITS = (Role.eleve, Role.encadreur, Role.visiteur)
 NOTE_MINIMUM = (
     "Les visiteurs se comptent par jour, sans cookie : une classe sur un même ordinateur compte pour un, et un "
@@ -104,15 +115,46 @@ async def evenements(
     )
     filtres_t = [T.type == type_, T.jour >= p.du, T.jour <= p.au, *(getattr(T, c) == v for c, v in egal.items())]
     totaux = await db.execute(
-        select(*(getattr(T, c) for c in groupe), func.sum(T.evenements), func.sum(T.visiteurs))
+        select(*(getattr(T, c) for c in groupe), func.sum(T.evenements))
         .where(*filtres_t)
         .group_by(*(getattr(T, c) for c in groupe))
     )
     resultat: dict[tuple[Any, ...], list[int]] = defaultdict(lambda: [0, 0])
-    for *cle, n, v in [*bruts.all(), *totaux.all()]:
+    for *cle, n, v in bruts.all():
         resultat[tuple(cle)][0] += int(n or 0)
         resultat[tuple(cle)][1] += int(v or 0)
+    for *cle, n in totaux.all():
+        resultat[tuple(cle)][0] += int(n or 0)
+    for cle, v in (await _visiteurs_anciens(db, p, type_, groupe, egal)).items():
+        resultat[cle][1] += v
     return {cle: (n, v) for cle, (n, v) in resultat.items()}
+
+
+def _texte(valeur: str | bool) -> str:
+    return ("true" if valeur else "false") if isinstance(valeur, bool) else valeur
+
+
+async def _visiteurs_anciens(
+    db: AsyncSession, p: Periode, type_: TypeEvenement, groupe: tuple[str, ...], egal: dict[str, str | bool]
+) -> dict[tuple[Any, ...], int]:
+    """Les visiteurs des jours sortis des 90 jours, lus dans le regroupement gardé par la purge."""
+    colonnes = {c for c in groupe if c != "jour"} | set(egal)
+    dimensions = tuple(d for d in ORDRE_DIMENSIONS if d in colonnes)
+    if dimensions not in DIMENSIONS_VISITEURS:
+        raise ValueError(f"Regroupement sans visiteurs gardés : {dimensions}")
+    lignes = await db.execute(
+        select(V.jour, V.valeurs, V.visiteurs).where(
+            V.type == type_, V.jour >= p.du, V.jour <= p.au, V.dimensions == ",".join(dimensions)
+        )
+    )
+    resultat: dict[tuple[Any, ...], int] = defaultdict(int)
+    for jour, valeurs, visiteurs in lignes:
+        ligne = dict(zip(dimensions, valeurs.split(SEPARATEUR), strict=True)) if dimensions else {}
+        if any(ligne[c] != _texte(v) for c, v in egal.items()):
+            continue
+        cle = tuple(jour if c == "jour" else (ligne[c] == "true" if c == "connecte" else ligne[c]) for c in groupe)
+        resultat[cle] += int(visiteurs)
+    return resultat
 
 
 async def visiteurs_par_jour(db: AsyncSession, p: Periode) -> dict[date, int]:

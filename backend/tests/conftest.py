@@ -92,6 +92,18 @@ def annuaire() -> None:
     asyncio.run(_charger_annuaire())
 
 
+@pytest.fixture(autouse=True)
+def sans_purge_activite(monkeypatch: pytest.MonkeyPatch) -> None:
+    """La purge du suivi d'activité (spec 051) part au démarrage de l'API : elle effacerait le sel ou les recherches
+    d'un jour fixé par le test pendant qu'il tourne. Ses propres tests l'appellent directement."""
+    import app.main
+
+    async def rien() -> None:
+        return None
+
+    monkeypatch.setattr(app.main, "purger_activite_regulierement", rien)
+
+
 @pytest.fixture
 def client() -> Iterator[TestClient]:
     with TestClient(app) as test_client:

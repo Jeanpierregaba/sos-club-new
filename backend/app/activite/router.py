@@ -2,13 +2,11 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.activite import service
 from app.activite.schemas import CHEMINS_RECHERCHE, EvenementSite, nettoyer_recherche
-from app.admin.dependances import adresse_ip
-from app.comptes import limite_adresse
 from app.db import get_session
 
 Base = Annotated[AsyncSession, Depends(get_session)]
@@ -30,10 +28,8 @@ async def recevoir(evenement: EvenementSite, request: Request, db: Base) -> Resp
         detail = nettoyer_recherche(evenement.detail or "")
         if detail is None or chemin not in CHEMINS_RECHERCHE:
             return Response(status_code=status.HTTP_204_NO_CONTENT)
-    try:
-        await limite_adresse.limiter(db, "ACTIVITE", adresse_ip(request), service.PLAFOND)
-    except limite_adresse.PlafondAtteint:
-        raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, "Trop d'envois depuis ce réseau.") from None
+    if not service.accepter(request):
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
     await service.ecrire(
         db,
         request,

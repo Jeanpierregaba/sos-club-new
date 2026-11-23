@@ -17,7 +17,7 @@ from app.activite.models import TypeEvenement
 from app.activite.purge import purger_regulierement as purger_activite_regulierement
 from app.activite.router import router as router_activite
 from app.activite.router_admin import router_admin as router_activite_admin
-from app.activite.service import enregistrer
+from app.activite.service import enregistrer, moteur_suivi
 from app.admin.exports import purger_regulierement
 from app.admin.router import router as router_admin
 from app.admin.router import router_activation
@@ -92,6 +92,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         with contextlib.suppress(asyncio.CancelledError):
             await purge
     await engine.dispose()
+    await moteur_suivi.dispose()
 
 
 app = FastAPI(title="API Club Santé SOS Docteur TV", lifespan=lifespan)

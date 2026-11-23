@@ -37,7 +37,7 @@ def evenements(en_base: Callable[..., Any]) -> list[tuple[str, str, str | None]]
     async def lire(db: Any) -> list[tuple[str, str, str | None]]:
         lignes = await db.execute(
             select(EvenementActivite.type, EvenementActivite.chemin, EvenementActivite.detail).order_by(
-                EvenementActivite.cree_le
+                EvenementActivite.id
             )
         )
         return [tuple(ligne) for ligne in lignes]
