@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { TITRES_AXES } from "@/lib/axes";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -85,43 +86,43 @@ export const Route = createFileRoute("/")({
 // Les 7 axes stratégiques. `t` : nom de l'axe, au dos de la carte ; `s` : slogan ; `c` : couleur de la carte.
 const univers = [
   {
-    t: "Académie GENIE IMHOTEP : jeu de culture générale en santé publique dans les collèges et lycées du Togo",
+    t: TITRES_AXES[0],
     s: "Génie Imhotep, c’est ici et maintenant",
     c: "bg-sky",
     img: mascotteImhotep,
   },
   {
-    t: "Sensibilisation, Information et Communication sur l’éducation aux valeurs et à la santé sexuelle (EVSS), les Journées Mondiales en lien avec la Santé (JMS)",
+    t: TITRES_AXES[1],
     s: "EVSS, Un élève bien informé est un élève serein et engagé dans sa communauté",
     c: "bg-rose",
     img: mascotteValeurs,
   },
   {
-    t: "Production et diffusion des émissions de santé par les élèves sur SOS DOCTEUR TV",
+    t: TITRES_AXES[2],
     s: "La voix des jeunes au cœur des ondes de santé",
     c: "bg-grape",
     img: mascotteMedias,
   },
   {
-    t: "Organisation et soutien des activités sportives, culturelles et de secourisme dans les établissements scolaires",
+    t: TITRES_AXES[3],
     s: "Un esprit sain dans un corps sain et agile",
     c: "bg-tangerine",
     img: mascotteSecourisme,
   },
   {
-    t: "Bourses d’excellence, gamification, parrainage des orphelins et distinctions des meilleurs acteurs",
+    t: TITRES_AXES[4],
     s: "L’excellence récompensée, l’émulation stimulée",
     c: "bg-sun",
     img: mascotteBourses,
   },
   {
-    t: "Développement personnel, leadership transformationnel, promotion du genre et mentorat",
+    t: TITRES_AXES[5],
     s: "Oser grandir, inspirer et diriger avec intégrité",
     c: "bg-bark",
     img: mascotteLeadership,
   },
   {
-    t: "Promotion de la santé, cadre de vie et cohésion sociale (Santé environnementale, nutrition & PEVPAH)",
+    t: TITRES_AXES[6],
     s: "Un environnement scolaire sain pour une jeunesse épanouie",
     c: "bg-leaf",
     img: mascotteEnvironnement,
@@ -162,7 +163,7 @@ const chiffresCles = [
   {
     plus: true,
     n: 800,
-    t: "Clubs de santé actifs",
+    t: "Clubs actifs sur le terrain",
     i: HeartPulse,
     place: "col-span-2 lg:row-span-2",
     fond: "bg-linear-to-br from-logo-blue to-night text-white",

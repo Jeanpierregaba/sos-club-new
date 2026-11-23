@@ -69,3 +69,14 @@ export const axes = [
 ] as const;
 
 export type NumeroAxe = (typeof axes)[number]["n"];
+
+// Les titres officiels des 7 axes, dans l'ordre : la page d'accueil et la page « Les 7 axes » les partagent.
+export const TITRES_AXES = [
+  "Académie GENIE IMHOTEP : jeu de culture générale en santé publique dans les collèges et lycées du Togo",
+  "Sensibilisation, Information et Communication sur l’éducation aux valeurs et à la santé sexuelle (EVSS), les Journées Mondiales en lien avec la Santé (JMS)",
+  "Production et diffusion des émissions de santé par les élèves sur SOS DOCTEUR TV",
+  "Organisation et soutien des activités sportives, culturelles et de secourisme dans les établissements scolaires",
+  "Bourses d’excellence, gamification, parrainage des orphelins et distinctions des meilleurs acteurs",
+  "Développement personnel, leadership transformationnel, promotion du genre et mentorat",
+  "Promotion de la santé, cadre de vie et cohésion sociale (Santé environnementale, nutrition & PEVPAH)",
+] as const;

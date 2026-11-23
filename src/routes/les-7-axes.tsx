@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { TITRES_AXES } from "@/lib/axes";
 import {
   ArrowDown,
   ArrowRight,
@@ -47,9 +48,7 @@ export const Route = createFileRoute("/les-7-axes")({
 // `couleur` : la couleur de l'axe, posée en variable CSS sur sa section ; `encre` : le texte posé sur cette couleur.
 const axes = [
   {
-    bleu: "Génie",
-    vert: "Imhotep",
-    t: "Académie GENIE IMHOTEP : jeu de culture générale en santé publique dans les collèges et lycées du Togo.",
+    t: TITRES_AXES[0],
     s: "Génie Imhotep, c’est ici et maintenant",
     activites: [
       "Vulgarisation du jeu de culture générale en santé publique dénommé « Académie Génie Imhotep » dans tous les collèges et lycées du Togo.",
@@ -62,9 +61,7 @@ const axes = [
     encre: "text-white",
   },
   {
-    bleu: "Santé sexuelle",
-    vert: "& EVSS",
-    t: "Sensibilisation, information et communication sur l’éducation aux valeurs et à la santé sexuelle (EVSS) et les Journées Mondiales en lien avec la Santé (JMS).",
+    t: TITRES_AXES[1],
     s: "EVSS, un élève bien informé est un élève serein et engagé dans sa communauté",
     activites: [
       "E-Club Santé sur l’application SOS DOCTEUR TV : un cadre d’expression et d’échanges avec les professionnels de santé.",
@@ -77,9 +74,7 @@ const axes = [
     encre: "text-white",
   },
   {
-    bleu: "Production TV",
-    vert: "& médias",
-    t: "Production et diffusion des émissions de santé par les élèves sur SOS DOCTEUR TV.",
+    t: TITRES_AXES[2],
     s: "La voix des jeunes au cœur des ondes de santé",
     activites: [
       "Vulgarisation des Journées Mondiales de Santé (JMS) dans les établissements scolaires.",
@@ -92,9 +87,7 @@ const axes = [
     encre: "text-white",
   },
   {
-    bleu: "Sport",
-    vert: "& secourisme",
-    t: "Organisation et soutien des activités sportives, culturelles et de secourisme dans les établissements scolaires.",
+    t: TITRES_AXES[3],
     s: "Un esprit sain dans un corps sain et agile",
     activites: [
       "Soutien aux activités physiques, tournois sportifs et olympiades scolaires inter-clubs.",
@@ -107,9 +100,7 @@ const axes = [
     encre: "text-white",
   },
   {
-    bleu: "Bourses",
-    vert: "& excellence",
-    t: "Bourses d’excellence, gamification, parrainage des orphelins et distinctions des meilleurs acteurs.",
+    t: TITRES_AXES[4],
     s: "L’excellence récompensée, l’émulation stimulée",
     activites: [
       "Bourses PEEP Plus : 100 bourses annuelles d’excellence pour les bacheliers méritants inscrits en sciences de la santé.",
@@ -122,9 +113,7 @@ const axes = [
     encre: "text-ink",
   },
   {
-    bleu: "Leadership",
-    vert: "& mentorat",
-    t: "Développement personnel, leadership transformationnel, promotion du genre et mentorat.",
+    t: TITRES_AXES[5],
     s: "Oser grandir, inspirer et diriger avec intégrité",
     activites: [
       "Rencontres inspirantes et mentorat direct avec des personnalités médicales et des leaders d’opinion apolitiques.",
@@ -137,9 +126,7 @@ const axes = [
     encre: "text-white",
   },
   {
-    bleu: "Santé",
-    vert: "& environnement",
-    t: "Promotion de la santé, cadre de vie et cohésion sociale : santé environnementale, nutrition et PEVPAH.",
+    t: TITRES_AXES[6],
     s: "Un environnement scolaire sain pour une jeunesse épanouie",
     activites: [
       "Prix PEVPAH (Établissement Vert, Propre, Assaini et Hygiénique) récompensant les meilleurs lycées.",
@@ -186,7 +173,7 @@ function Axe({ a, n }: { a: (typeof axes)[number]; n: number }) {
           />
           <img
             src={a.img}
-            alt={`Mascotte de l’axe ${n} : ${a.bleu} ${a.vert}`}
+            alt={`Mascotte de l’axe ${n} : ${a.t}`}
             loading="lazy"
             width={1414}
             height={2000}
@@ -210,11 +197,7 @@ function Axe({ a, n }: { a: (typeof axes)[number]; n: number }) {
               Axe {n} sur 7
             </p>
           </div>
-          <h2 className="mt-4 text-4xl md:text-5xl">
-            <span className="text-logo-blue">{a.bleu}</span>{" "}
-            <span className="text-primary">{a.vert}</span>
-          </h2>
-          <p className="mt-4 text-lg font-medium leading-relaxed text-muted-foreground">{a.t}</p>
+          <h2 className="mt-4 text-2xl leading-tight text-logo-blue md:text-3xl">{a.t}</h2>
 
           <p className="mt-8 flex items-center gap-2 text-sm font-extrabold uppercase tracking-widest text-logo-blue">
             <ListChecks aria-hidden className="size-4" /> Activités opérationnelles
@@ -315,7 +298,7 @@ function LesSeptAxes() {
         </div>
         <div aria-hidden className="flex h-2.5">
           {axes.map((a) => (
-            <span key={a.bleu} className="flex-1" style={{ background: a.couleur }} />
+            <span key={a.t} className="flex-1" style={{ background: a.couleur }} />
           ))}
         </div>
       </section>
@@ -365,7 +348,7 @@ function LesSeptAxes() {
               <ul aria-hidden className="flex gap-1.5">
                 {axes.map((a) => (
                   <li
-                    key={a.bleu}
+                    key={a.t}
                     className="h-2 flex-1 rounded-full"
                     style={{ background: a.couleur }}
                   />
@@ -383,7 +366,7 @@ function LesSeptAxes() {
       </section>
 
       {axes.map((a, i) => (
-        <Axe key={a.bleu} a={a} n={i + 1} />
+        <Axe key={a.t} a={a} n={i + 1} />
       ))}
 
       {/* Documentation officielle : la plaquette et le documentaire. Les liens restent à fournir. */}

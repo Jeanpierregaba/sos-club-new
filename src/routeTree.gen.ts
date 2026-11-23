@@ -27,6 +27,7 @@ import { Route as Les7AxesRouteImport } from './routes/les-7-axes'
 import { Route as MagazineRouteImport } from './routes/magazine'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as MotDePasseOublieRouteImport } from './routes/mot-de-passe-oublie'
+import { Route as TemoignagesRouteImport } from './routes/temoignages'
 import { Route as ConnecteAdminRouteImport } from './routes/_connecte/admin'
 import { Route as ConnecteMaCarteRouteImport } from './routes/_connecte/ma-carte'
 import { Route as ConnecteMaFicheRouteImport } from './routes/_connecte/ma-fiche'
@@ -192,6 +193,11 @@ const MaintenanceRoute = MaintenanceRouteImport.update({
 const MotDePasseOublieRoute = MotDePasseOublieRouteImport.update({
   id: '/mot-de-passe-oublie',
   path: '/mot-de-passe-oublie',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemoignagesRoute = TemoignagesRouteImport.update({
+  id: '/temoignages',
+  path: '/temoignages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConnecteAdminRoute = ConnecteAdminRouteImport.update({
@@ -637,6 +643,7 @@ export interface FileRoutesByFullPath {
   '/magazine': typeof MagazineRoute
   '/maintenance': typeof MaintenanceRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
+  '/temoignages': typeof TemoignagesRoute
   '/admin': typeof ConnecteAdminRouteWithChildren
   '/ma-carte': typeof ConnecteMaCarteRoute
   '/ma-fiche': typeof ConnecteMaFicheRoute
@@ -733,6 +740,7 @@ export interface FileRoutesByTo {
   '/magazine': typeof MagazineRoute
   '/maintenance': typeof MaintenanceRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
+  '/temoignages': typeof TemoignagesRoute
   '/ma-carte': typeof ConnecteMaCarteRoute
   '/ma-fiche': typeof ConnecteMaFicheRoute
   '/mes-commentaires': typeof ConnecteMesCommentairesRoute
@@ -825,6 +833,7 @@ export interface FileRoutesById {
   '/magazine': typeof MagazineRoute
   '/maintenance': typeof MaintenanceRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
+  '/temoignages': typeof TemoignagesRoute
   '/_connecte/admin': typeof ConnecteAdminRouteWithChildren
   '/_connecte/ma-carte': typeof ConnecteMaCarteRoute
   '/_connecte/ma-fiche': typeof ConnecteMaFicheRoute
@@ -923,6 +932,7 @@ export interface FileRouteTypes {
     | '/magazine'
     | '/maintenance'
     | '/mot-de-passe-oublie'
+    | '/temoignages'
     | '/admin'
     | '/ma-carte'
     | '/ma-fiche'
@@ -1019,6 +1029,7 @@ export interface FileRouteTypes {
     | '/magazine'
     | '/maintenance'
     | '/mot-de-passe-oublie'
+    | '/temoignages'
     | '/ma-carte'
     | '/ma-fiche'
     | '/mes-commentaires'
@@ -1110,6 +1121,7 @@ export interface FileRouteTypes {
     | '/magazine'
     | '/maintenance'
     | '/mot-de-passe-oublie'
+    | '/temoignages'
     | '/_connecte/admin'
     | '/_connecte/ma-carte'
     | '/_connecte/ma-fiche'
@@ -1208,6 +1220,7 @@ export interface RootRouteChildren {
   MagazineRoute: typeof MagazineRoute
   MaintenanceRoute: typeof MaintenanceRoute
   MotDePasseOublieRoute: typeof MotDePasseOublieRoute
+  TemoignagesRoute: typeof TemoignagesRoute
   AgendaIdRoute: typeof AgendaIdRoute
   ArticlesAdresseRoute: typeof ArticlesAdresseRoute
   CarteCodeRoute: typeof CarteCodeRoute
@@ -1349,6 +1362,13 @@ declare module '@tanstack/react-router' {
       path: '/mot-de-passe-oublie'
       fullPath: '/mot-de-passe-oublie'
       preLoaderRoute: typeof MotDePasseOublieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/temoignages': {
+      id: '/temoignages'
+      path: '/temoignages'
+      fullPath: '/temoignages'
+      preLoaderRoute: typeof TemoignagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_connecte/admin': {
@@ -2123,6 +2143,7 @@ const rootRouteChildren: RootRouteChildren = {
   MagazineRoute: MagazineRoute,
   MaintenanceRoute: MaintenanceRoute,
   MotDePasseOublieRoute: MotDePasseOublieRoute,
+  TemoignagesRoute: TemoignagesRoute,
   AgendaIdRoute: AgendaIdRoute,
   ArticlesAdresseRoute: ArticlesAdresseRoute,
   CarteCodeRoute: CarteCodeRoute,
