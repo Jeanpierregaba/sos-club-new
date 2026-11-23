@@ -25,7 +25,10 @@ dans le dépôt.
      service ;
    - révoque les certificats valides (`etat = revoque`, `motif`, `decide_le = now()`) et les marque archivés
      (nouvelle colonne `certificat.archive_le`) ;
-   - sur une base sans quiz ni gain (celle des tests), elle ne fait rien.
+   - crée une version des paramètres Jeux à 10 questions et 8 bonnes réponses (les quiz ont 10 questions) ;
+   - clôt sans réussite les parties en cours ;
+   - ne touche aux données que sur une base qui a les 100 défis d'AIMES-AFRIQUE (préprod, prod, développement),
+     jamais sur celle des tests.
 4. **Regagner après la remise à zéro.**
    - Les clés d'idempotence des étoiles, places, badges et certificats prennent un suffixe de saison
      (`SAISON = "2"` dans `app/points/bareme.py`) : `etoile:<niveau>:<id>:s2`, etc. Les anciennes clés ne bloquent
@@ -59,6 +62,8 @@ dans le dépôt.
 - `backend/app/quiz/vies.py` et les tests des vies ; `src/lib/vies.ts`, `src/components/quiz/Vies*.tsx` et les
   textes du site qui disent 7.
 - `public/favicon.ico`, `src/routes/__root.tsx`.
+- `src/lib/quiz.ts` (catalogue des 80 quiz, tiré du JSON), `src/routes/jeux.tsx` (4 parties), `src/lib/bareme.ts`
+  (32/24/16/8), `CarteMembre.tsx` et `TableauAnnuel.tsx` (« / 80 quiz »).
 - `docs/PRD.md` (banque officielle, 80 quiz, 3 vies), `TASKS.md`.
 
 ## Données

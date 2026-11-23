@@ -959,7 +959,7 @@ export const lancerQuiz = (quizId: string) =>
 export type CatalogueQuiz = Schemas["CatalogueQuiz"];
 export type QuizOuvert = Schemas["QuizOuvert"];
 export const chargerCatalogueJeux = () => requeteApi<CatalogueQuiz>("/api/jeux/quiz");
-// Spec 034 : la progression de l'élève dans les 100 quiz (étoiles, sous-totaux, carte Gold).
+// Spec 034 : la progression de l'élève dans les quiz Jeux (étoiles, sous-totaux, carte Gold).
 export type ProgressionJeux = Schemas["ProgressionJeux"];
 export const chargerProgressionJeux = () =>
   requeteApi<ProgressionJeux>("/api/jeux/quiz/progression");

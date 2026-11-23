@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Crown, IdCard, Star } from "lucide-react";
 
 import type { MaCarte, ProgressionJeux } from "@/lib/api/client";
-import { NIVEAUX_JEUX } from "@/lib/bareme";
+import { NIVEAUX_JEUX, TOTAL_QUIZ_JEUX } from "@/lib/bareme";
 
 // La carte de membre numérique de l'élève (spec 034) : son pseudonyme, son club, ses quiz réussis et ses étoiles.
 // Avec les 4 étoiles, elle passe au statut Gold, qui ouvre l'éligibilité au tirage au sort de fournitures scolaires.
@@ -48,8 +48,8 @@ export function CarteMembre({
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
         <p className="font-semibold">
-          <strong className="font-display text-2xl">{jeux.quiz_reussis}</strong> / 100 quiz Jeux
-          réussis
+          <strong className="font-display text-2xl">{jeux.quiz_reussis}</strong> / {TOTAL_QUIZ_JEUX}{" "}
+          quiz Jeux réussis
         </p>
         <ul className="flex gap-2" aria-label="Étoiles">
           {NIVEAUX_JEUX.map((n, i) => (

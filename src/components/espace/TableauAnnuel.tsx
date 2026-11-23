@@ -1,5 +1,6 @@
 import { Award, Gamepad2, MessageSquareText, Trophy, Users } from "lucide-react";
 
+import { TOTAL_QUIZ_JEUX } from "@/lib/bareme";
 import type { PointsDuClub, TableauGamification } from "@/lib/api/client";
 import { REGIONS_SCOLAIRES } from "@/lib/clubs";
 
@@ -57,7 +58,9 @@ export function TableauAnnuel({ tableau }: { tableau: TableauGamification }) {
           </li>
         </Parcours>
         <Parcours icone={Gamepad2} titre="Jeux" points={tableau.parcours["jeux"] ?? 0}>
-          <li>{j.quiz_reussis} / 100 quiz réussis</li>
+          <li>
+            {j.quiz_reussis} / {TOTAL_QUIZ_JEUX} quiz réussis
+          </li>
           <li>{j.niveaux.filter((n) => n.etoile).length} / 4 étoiles</li>
           <li>
             Cette année : quiz {nombre(j.points_quiz)} · étoiles {nombre(j.points_etoiles)}

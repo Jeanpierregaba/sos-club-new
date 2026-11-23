@@ -95,7 +95,7 @@ function Certificats() {
                 >
                   Vérification publique
                 </Link>
-                {decideur && c.etat !== "remplace" && (
+                {decideur && c.etat !== "remplace" && !c.archive && (
                   <Button
                     variant="outline"
                     size="sm"

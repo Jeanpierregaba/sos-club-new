@@ -43,7 +43,8 @@ questions « moyennement difficiles » (M) des « très difficiles » (D).
   4 Avancé ; les quiz D remplissent les 12 autres Avancé et les 8 Expert. Les parties sont alternées dans chaque
   niveau.
 - Titre : « <Partie> — quiz <k> » (par exemple « Santé publique — quiz 3 »), numéro 1 à 80 dans le parcours.
-- Un quiz pose ses 10 questions dans un ordre tiré au hasard, avec 15 secondes par question (spec 048).
+- Un quiz pose ses 10 questions dans un ordre tiré au hasard, avec 15 secondes par question (spec 048). La partie
+  est réussie à **8/10** (aujourd'hui 12/15) : la migration crée une nouvelle version des paramètres Jeux.
 - Les gains par niveau et les étoiles ne changent pas. Une étoile s'obtient en réussissant tous les quiz du niveau.
 - Les quiz sont publiés au nom d'AIMES-AFRIQUE, comme aujourd'hui.
 
@@ -107,9 +108,11 @@ questions « moyennement difficiles » (M) des « très difficiles » (D).
       certificats sont révoqués avec le motif.
 - [ ] Après la remise à zéro, un élève réussit la place 1 et gagne +50, gagne un badge et une étoile comme
       avant (les anciennes clés d'idempotence ne bloquent pas).
-- [ ] Relancer la migration ne change rien ; une base sans quiz (celle des tests) passe la migration sans erreur.
+- [ ] Une fois la remise à zéro faite, le retour arrière de la migration est refusé ; une base sans la banque
+      (celle des tests) passe la migration sans changement de ses données.
 - [ ] Un joueur a 3 vies par jour ; après 3 parties ratées, le lancement est refusé jusqu'à minuit.
 - [ ] Le site montre 3 vies, et le favicon est le logo.
+- [ ] La page /jeux présente les 80 quiz en 4 parties, avec les titres, numéros et niveaux du fichier de données.
 
 ## Cas limites et erreurs
 

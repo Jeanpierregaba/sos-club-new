@@ -37,7 +37,7 @@ export const Route = createFileRoute("/jeux")({
       {
         name: "description",
         content:
-          "L'arène de gamification des Clubs Santé : 100 quiz officiels en 6 pôles, 1 000 questions, des points et un classement national.",
+          "L'arène de gamification des Clubs Santé : 80 quiz officiels en 4 parties, 1 000 questions, des points et un classement national.",
       },
       { property: "og:title", content: "Joue, apprends & deviens champion de la santé" },
     ],
@@ -47,17 +47,16 @@ export const Route = createFileRoute("/jeux")({
   component: Jeux,
 });
 
-// Numéro de chaque quiz dans le parcours (1 à 100) : les pôles se suivent.
-const departs = poles.map((_, i) => poles.slice(0, i).reduce((n, p) => n + p.quiz.length, 1));
+// Spec 049 : les 80 quiz de la banque officielle, numérotés dans le parcours (les parties alternent).
 const totalQuiz = poles.reduce((n, p) => n + p.quiz.length, 0);
 
-// Spec 034 : 10 000 points de quiz et 6 000 points d'étoiles au plus, pour l'élève ; la moitié pour son club.
+// Spec 034 et 049 : 8 000 points de quiz et 6 000 points d'étoiles au plus, pour l'élève ; la moitié pour son club.
 const chiffres = [
   { n: totalQuiz, t: "Quiz défis" },
   { n: 1000, t: "Questions" },
   { n: NIVEAUX_JEUX.length, t: "Niveaux, 4 étoiles" },
   { n: points(MAX_POINTS_QUIZ + MAX_POINTS_ETOILES), t: "Points à gagner" },
-  { n: poles.length, t: "Pôles santé" },
+  { n: poles.length, t: "Parties santé" },
 ];
 
 const etapes = [
@@ -71,7 +70,7 @@ const etapes = [
   },
   {
     n: "02",
-    sur: "100 quiz interactifs",
+    sur: `${totalQuiz} quiz interactifs`,
     t: "Jouer maintenant",
     i: Gamepad2,
     href: "#quiz",
@@ -106,15 +105,14 @@ function quizParNumero(catalogue: CatalogueQuiz | null) {
 
 function Jeux() {
   const catalogue = Route.useLoaderData();
-  const [pole, setPole] = useState(2);
+  const [pole, setPole] = useState(0);
   const [defi, setDefi] = useState<Defi | null>(null);
   const [niveau, setNiveau] = useState<NiveauJeux | null>(null);
   const p = poles[pole] ?? poles[0]!;
   const jouables = quizParNumero(catalogue);
   const reussis = new Set(catalogue?.progression?.reussis ?? []);
   const quiz = p.quiz
-    .map(([t], i) => {
-      const n = (departs[pole] ?? 1) + i;
+    .map(({ t, n }) => {
       const serveur = jouables.get(n);
       return {
         t,
@@ -159,9 +157,9 @@ function Jeux() {
                 <span className="block text-primary">de la santé</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg font-medium text-white/80">
-                Relève les 100 quiz officiels issus du référentiel des 1 000 QCM des Clubs Santé SOS
-                Docteur TV ! Accumule des points, hisse ton établissement au sommet du classement
-                DRE et national, et décroche ta certification.
+                Relève les {totalQuiz} quiz officiels issus de la banque des 1 000 questions des
+                Clubs Santé SOS Docteur TV ! Accumule des points, hisse ton établissement au sommet
+                du classement DRE et national, et décroche ta certification.
               </p>
             </div>
           </div>
@@ -221,10 +219,10 @@ function Jeux() {
         </ol>
       </section>
 
-      {/* Catalogue : les 6 pôles en tuiles, puis les quiz du pôle choisi. */}
+      {/* Catalogue : les 4 parties en tuiles, puis les quiz de la partie choisie. */}
       <section id="quiz" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-20">
         <EnTete
-          sur="Parcours officiel en 6 pôles"
+          sur="Parcours officiel en 4 parties"
           bleu={`Les ${totalQuiz} quiz`}
           vert="de gamification"
         >
@@ -239,8 +237,8 @@ function Jeux() {
 
         <div
           role="group"
-          aria-label="Pôles"
-          className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6"
+          aria-label="Parties"
+          className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4"
         >
           {poles.map((x, i) => {
             const on = i === pole;
@@ -289,8 +287,7 @@ function Jeux() {
               {String(pole + 1).padStart(2, "0")}
             </span>
             <p className="text-xs font-extrabold uppercase tracking-widest text-white/80">
-              Pôle {String(pole + 1).padStart(2, "0")} · {p.sur} · Quiz {departs[pole]} à{" "}
-              {(departs[pole] ?? 1) + p.quiz.length - 1}
+              {p.sur} · {p.quiz.length} quiz
             </p>
             <h3 className="mt-2 text-3xl md:text-4xl">{p.nom}</h3>
             <p className="mt-3 max-w-3xl font-medium text-white/90">{p.d}</p>
@@ -343,7 +340,7 @@ function Jeux() {
 
             {quiz.length === 0 ? (
               <p className="mt-6 rounded-2xl border border-dashed p-8 text-center font-semibold text-muted-foreground">
-                Aucun quiz de ce niveau dans ce pôle.
+                Aucun quiz de ce niveau dans cette partie.
               </p>
             ) : (
               <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

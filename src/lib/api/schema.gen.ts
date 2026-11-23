@@ -5672,6 +5672,11 @@ export interface components {
             decide_le: string | null;
             /** Remplace Numero */
             remplace_numero: string | null;
+            /**
+             * Archive
+             * @default false
+             */
+            archive: boolean;
         };
         /** CertificatJoueur */
         CertificatJoueur: {
@@ -8936,7 +8941,8 @@ export interface components {
         };
         /**
          * NiveauQuiz
-         * @description Les quatre niveaux des 100 quiz Jeux (spec 034) : 40, 30, 20 et 10 quiz, mieux payés à chaque niveau.
+         * @description Les quatre niveaux des quiz Jeux (spec 034) : 32, 24, 16 et 8 quiz depuis la spec 049, mieux payés à chaque
+         *     niveau.
          * @enum {string}
          */
         NiveauQuiz: "debutant" | "intermediaire" | "avance" | "expert";
