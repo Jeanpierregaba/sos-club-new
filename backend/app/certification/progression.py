@@ -22,7 +22,13 @@ from app.certification.models import BadgeObtenu, Certificat, EtatCertificat, Pl
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.notifications.service import notifier
 from app.points import service as points
-from app.points.bareme import BADGE_ELEVE, CERTIFICATION_ELEVE, CERTIFICATION_ENCADREUR, QUIZ_CERTIFICATION_ELEVE
+from app.points.bareme import (
+    BADGE_ELEVE,
+    CERTIFICATION_ELEVE,
+    CERTIFICATION_ENCADREUR,
+    QUIZ_CERTIFICATION_ELEVE,
+    SAISON,
+)
 from app.points.models import MouvementPoints
 from app.quiz import horloge
 from app.quiz.dependances import peut_certifier
@@ -92,7 +98,7 @@ async def enregistrer_reussite(
         and joueur.ancien_eleve_le is None
     ):
         gain = await points.crediter(
-            db, QUIZ_CERTIFICATION_ELEVE, joueur.id, f"certification:place:{quiz.place}:{joueur.id}"
+            db, QUIZ_CERTIFICATION_ELEVE, joueur.id, f"certification:place:{quiz.place}:{joueur.id}:{SAISON}"
         )
     await mettre_a_jour(db, joueur)
     return gain
@@ -117,7 +123,9 @@ async def mettre_a_jour(db: AsyncSession, joueur: Utilisateur) -> None:
         # Spec 034 : le +50 d'une place acquise quand il n'a pas pu être versé (compte suspendu, action désactivée)
         # se rattrape ici ; la clé du registre le garde unique.
         for place in await places_reussies(db, joueur.id):
-            await points.crediter(db, QUIZ_CERTIFICATION_ELEVE, joueur.id, f"certification:place:{place}:{joueur.id}")
+            await points.crediter(
+                db, QUIZ_CERTIFICATION_ELEVE, joueur.id, f"certification:place:{place}:{joueur.id}:{SAISON}"
+            )
 
     en_cours = await regles.en_cours(db)
     obtenus = set((await db.scalars(select(BadgeObtenu.rang).where(BadgeObtenu.utilisateur_id == joueur.id))).all())
@@ -142,7 +150,7 @@ async def mettre_a_jour(db: AsyncSession, joueur: Utilisateur) -> None:
             continue
         message = f"Tu as réussi {palier} quiz du parcours Génie Imhotep."
         if eleve:
-            gain = await points.crediter(db, BADGE_ELEVE, joueur.id, f"badge:{rang}:{joueur.id}")
+            gain = await points.crediter(db, BADGE_ELEVE, joueur.id, f"badge:{rang}:{joueur.id}:{SAISON}")
             if gain is not None:
                 badge.mouvement_id = gain.id
                 message += f" +{gain.montant} points."
@@ -176,7 +184,7 @@ async def _delivrer_certificat(
     if certificat is None:
         return
     action = CERTIFICATION_ELEVE if joueur.role is Role.eleve else CERTIFICATION_ENCADREUR
-    gain = await points.crediter(db, action, joueur.id, f"certification:{joueur.id}")
+    gain = await points.crediter(db, action, joueur.id, f"certification:{joueur.id}:{SAISON}")
     message = f"Ton certificat porte le numéro {certificat.numero}."
     if gain is not None:
         certificat.mouvement_id = gain.id

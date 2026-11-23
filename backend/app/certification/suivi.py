@@ -390,7 +390,11 @@ async def _par_semaine(db: AsyncSession, c: Any, instant: datetime) -> list[Lign
     # Un certifié compte la semaine de son premier certificat (une réémission ne le recompte pas).
     premier = (
         select(Certificat.utilisateur_id, func.min(Certificat.delivre_le).label("le"))
-        .where(Certificat.utilisateur_id.in_(select(c.c.uid).where(c.c.certificat.is_not(None))))
+        .where(
+            Certificat.utilisateur_id.in_(select(c.c.uid).where(c.c.certificat.is_not(None))),
+            # Spec 049 : les certificats de la phase de test ne comptent plus.
+            Certificat.archive_le.is_(None),
+        )
         .group_by(Certificat.utilisateur_id)
         .subquery()
     )

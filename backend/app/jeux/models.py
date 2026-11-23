@@ -109,3 +109,16 @@ class EtoileObtenue(Base):
     # Le bonus crédité ; nul si le barème était à 0 ou désactivé à ce moment.
     mouvement_id: Mapped[UUID | None] = mapped_column(ForeignKey("mouvement_points.id", ondelete="RESTRICT"))
     obtenue_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class EtoileObtenueArchive(Base):
+    """Une étoile obtenue avant la remise à zéro de l'ouverture (spec 049) : l'historique, hors des Jeux."""
+
+    __tablename__ = "etoile_obtenue_archive"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True)
+    utilisateur_id: Mapped[UUID] = mapped_column(ForeignKey("utilisateur.id", ondelete="CASCADE"), index=True)
+    niveau: Mapped[str] = mapped_column(String(20))
+    mouvement_id: Mapped[UUID | None] = mapped_column(ForeignKey("mouvement_points.id", ondelete="RESTRICT"))
+    obtenue_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    archive_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))

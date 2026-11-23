@@ -49,6 +49,9 @@ QUIZ_CERTIFICATION_ELEVE = "eleve.quiz_certification"
 BADGE_ELEVE = "eleve.badge"
 CERTIFICATION_ELEVE = "eleve.certification"
 CERTIFICATION_ENCADREUR = "encadreur.certification"
+# Spec 049 : la certification et les étoiles repartent de zéro à l'ouverture au public. Les clés de leurs gains
+# uniques portent la saison, pour que les anciennes, annulées par la remise à zéro, ne bloquent pas les nouvelles.
+SAISON = "s2"
 # Ligne technique de la correction manuelle (spec 036) : jamais un gain automatique, masquée du barème.
 ACTION_CORRECTION = "admin.correction"
 

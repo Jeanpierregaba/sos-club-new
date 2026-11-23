@@ -15,6 +15,7 @@ from app.certification import progression
 from app.certification.models import Certificat, EtatCertificat
 from app.comptes.models import StatutCompte, Utilisateur
 from app.notifications.models import Notification
+from app.points.bareme import SAISON
 from app.quiz.models import EtatQuiz, Quiz
 from tests.certification import (
     NUMERO,
@@ -180,13 +181,13 @@ def test_un_temps_depasse_arrete_aussi_la_tentative(
     assert reprise["resultat"]["reussie"] is False
 
 
-def test_la_certification_n_a_pas_de_plafond_par_quiz_mais_partage_les_7_vies(
+def test_la_certification_n_a_pas_de_plafond_par_quiz_mais_partage_les_3_vies(
     client: TestClient, eleve: Utilisateur, en_base: Callable[..., Any], heure: Horloge
 ) -> None:
     """Spec 048 : plus de parties illimitées ; la même place se rejoue tant qu'il reste des vies du jour."""
     quiz = creer_parcours(en_base, places=[1])
 
-    for _ in range(6):
+    for _ in range(2):
         jouer(client, quiz[1], justes=0)
 
     assert jouer(client, quiz[1], justes=10)["resultat"]["reussie"] is True
@@ -203,7 +204,7 @@ def test_une_place_validee_rapporte_50_points_une_seule_fois(
     assert (resultat["reussie"], resultat["points"], rejoue["points"]) == (True, 50, 0)
     assert places(en_base, eleve.id) == [1]
     assert actions(en_base, eleve, avec_places=True) == [("eleve.quiz_certification", 50)]
-    assert [g.cle for g in gains(en_base, eleve.id)] == [f"certification:place:1:{eleve.id}"]
+    assert [g.cle for g in gains(en_base, eleve.id)] == [f"certification:place:1:{eleve.id}:{SAISON}"]
 
 
 def test_la_partie_suit_les_parametres_du_parcours_de_certification(

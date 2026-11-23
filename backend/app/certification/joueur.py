@@ -161,7 +161,12 @@ async def _certificat(db: AsyncSession, joueur_id: UUID) -> CertificatJoueur | N
     """Le certificat valide, sinon le dernier (révoqué) ; un certificat remplacé laisse la place au suivant."""
     certificat = await certificat_valide(db, joueur_id) or await db.scalar(
         select(Certificat)
-        .where(Certificat.utilisateur_id == joueur_id, Certificat.etat == EtatCertificat.revoque)
+        # Un certificat archivé par la remise à zéro de l'ouverture (spec 049) n'est plus montré au joueur.
+        .where(
+            Certificat.utilisateur_id == joueur_id,
+            Certificat.etat == EtatCertificat.revoque,
+            Certificat.archive_le.is_(None),
+        )
         .order_by(Certificat.delivre_le.desc())
         .limit(1)
     )

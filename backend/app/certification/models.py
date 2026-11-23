@@ -83,12 +83,49 @@ class BadgeObtenu(Base):
     obtenu_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+class PlaceReussieArchive(Base):
+    """Une place réussie avant la remise à zéro de l'ouverture (spec 049) : l'historique, hors du parcours."""
+
+    __tablename__ = "place_reussie_archive"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    utilisateur_id: Mapped[UUID] = mapped_column(ForeignKey("utilisateur.id", ondelete="RESTRICT"), index=True)
+    place: Mapped[int] = mapped_column(Integer)
+    quiz_id: Mapped[UUID] = mapped_column(ForeignKey("quiz.id", ondelete="RESTRICT"))
+    tentative_id: Mapped[UUID] = mapped_column(ForeignKey("tentative_quiz.id", ondelete="RESTRICT"))
+    reussie_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    archive_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class BadgeObtenuArchive(Base):
+    """Un badge délivré avant la remise à zéro de l'ouverture (spec 049) : l'historique, hors du parcours."""
+
+    __tablename__ = "badge_obtenu_archive"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    utilisateur_id: Mapped[UUID] = mapped_column(ForeignKey("utilisateur.id", ondelete="RESTRICT"), index=True)
+    rang: Mapped[int] = mapped_column(Integer)
+    nom: Mapped[str] = mapped_column(String(40))
+    palier: Mapped[int] = mapped_column(Integer)
+    regles_version: Mapped[int] = mapped_column(Integer)
+    club_id: Mapped[UUID | None] = mapped_column(ForeignKey("club.id", ondelete="SET NULL"))
+    mouvement_id: Mapped[UUID | None] = mapped_column(ForeignKey("mouvement_points.id", ondelete="RESTRICT"))
+    obtenu_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    archive_le: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 class Certificat(Base):
     __tablename__ = "certificat"
     __table_args__ = (
         # Un seul certificat délivré automatiquement par personne, à jamais : un certificat révoqué n'est pas
         # redélivré par une nouvelle réussite. Seule une réémission (remplace_id renseigné) en crée un autre.
-        Index("uq_certificat_origine", "utilisateur_id", unique=True, postgresql_where=text("remplace_id IS NULL")),
+        # Un certificat archivé par la remise à zéro de l'ouverture (spec 049) ne compte plus.
+        Index(
+            "uq_certificat_origine",
+            "utilisateur_id",
+            unique=True,
+            postgresql_where=text("remplace_id IS NULL AND archive_le IS NULL"),
+        ),
         Index("uq_certificat_valide", "utilisateur_id", unique=True, postgresql_where=text("etat = 'valide'")),
         CheckConstraint("etat = 'valide' OR decide_le IS NOT NULL", name="decision_datee"),
     )
@@ -115,5 +152,7 @@ class Certificat(Base):
     remplace_id: Mapped[UUID | None] = mapped_column(ForeignKey("certificat.id", ondelete="RESTRICT"), unique=True)
     # Motif de la révocation ; qui a révoqué ou remplacé ce certificat, et quand.
     motif: Mapped[str | None] = mapped_column(String(500))
+    # Spec 049 : révoqué par la remise à zéro de l'ouverture ; il ne bloque plus un nouveau certificat.
+    archive_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     decide_par: Mapped[UUID | None] = mapped_column(ForeignKey("utilisateur.id", ondelete="RESTRICT"))
     decide_le: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

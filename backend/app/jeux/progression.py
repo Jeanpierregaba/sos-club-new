@@ -1,4 +1,4 @@
-"""Progression d'un élève dans les 100 quiz Jeux (spec 034, lot 2) : gain selon le niveau du quiz, étoile de chaque
+"""Progression d'un élève dans les quiz Jeux (spec 034, lot 2) : gain selon le niveau du quiz, étoile de chaque
 niveau validé, carte Gold aux quatre étoiles, et décompte « points des quiz » / « points des étoiles ».
 
 Le serveur seul décide (ADR-0004) : une étoile s'écrit par une insertion unique (élève, niveau), puis son bonus par
@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.comptes.models import Role, StatutCompte, Utilisateur
 from app.jeux.models import EtoileObtenue
 from app.points import service as points
-from app.points.bareme import ETOILE_NIVEAU, QUIZ_ELEVE, QUIZ_NIVEAU
+from app.points.bareme import ETOILE_NIVEAU, QUIZ_ELEVE, QUIZ_NIVEAU, SAISON
 from app.points.models import LigneBareme, MouvementPoints, SousCompte
 from app.quiz.models import NIVEAUX, PARCOURS_JEUX, EtatQuiz, NiveauQuiz, Quiz, TentativeQuiz
 
@@ -59,7 +59,7 @@ def _publie_jeux():
 
 
 def _du_parcours():
-    """Les quiz qui comptent pour les étoiles : publiés et numérotés dans le parcours officiel des 100 défis, ceux
+    """Les quiz qui comptent pour les étoiles : publiés et numérotés dans le parcours officiel (80 quiz depuis la spec 049), ceux
     que la page Jeux montre. Un quiz sans numéro rapporte ses points sans compter pour une étoile."""
     return *_publie_jeux(), Quiz.numero.is_not(None)
 
@@ -99,7 +99,9 @@ async def verifier_etoile(db: AsyncSession, joueur_id: UUID, niveau: NiveauQuiz)
     )
     if etoile_id is None:
         return False
-    bonus = await points.crediter(db, ETOILE_NIVEAU[niveau.value], joueur_id, f"etoile:{niveau.value}:{joueur_id}")
+    bonus = await points.crediter(
+        db, ETOILE_NIVEAU[niveau.value], joueur_id, f"etoile:{niveau.value}:{joueur_id}:{SAISON}"
+    )
     etoile = await db.get(EtoileObtenue, etoile_id)
     if etoile is not None and bonus is not None:
         etoile.mouvement_id = bonus.id

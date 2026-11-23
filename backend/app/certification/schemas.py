@@ -147,6 +147,8 @@ class CertificatGestion(BaseModel):
     motif: str | None
     decide_le: datetime | None
     remplace_numero: str | None
+    # Spec 049 : révoqué par la remise à zéro de l'ouverture ; il ne se réémet pas.
+    archive: bool = False
 
 
 class ListeCertificats(BaseModel):

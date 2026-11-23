@@ -120,6 +120,7 @@ async def lister_certificats(
                 motif=c.motif,
                 decide_le=c.decide_le,
                 remplace_numero=numero,
+                archive=c.archive_le is not None,
             )
             for c, club, numero, pseudonyme in (await db.execute(requete)).all()
         ]
@@ -202,6 +203,9 @@ async def reemettre(db: AsyncSession, acces: Acces, certificat_id: UUID, ip: str
     ancien = await _verrouiller(db, certificat_id)
     if ancien.etat is EtatCertificat.remplace:
         raise EtatInvalide("Ce certificat a déjà été remplacé : réémets le plus récent.")
+    if ancien.archive_le is not None:
+        # Spec 049 : révoqué par la remise à zéro de l'ouverture ; seul un nouveau parcours le redonne.
+        raise EtatInvalide("Ce certificat date de la phase de test : il ne se réémet pas.")
     titulaire = await db.get(Utilisateur, ancien.utilisateur_id)
     assert titulaire is not None
     maintenant = horloge.maintenant()
