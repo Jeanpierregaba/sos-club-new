@@ -29,14 +29,17 @@ période précédente de même durée (« +12 % »). Les dates sont celles de Lo
 - Clics sur les boutons « S'inscrire » / « Rejoindre », avec l'endroit du site où ils ont été faits (accueil, Jeux,
   certification, menu…).
 - Étapes de l'inscription par profil (élève, encadreur, visiteur) : formulaire ouvert → première étape remplie →
-  formulaire envoyé → compte créé → e-mail confirmé (visiteur) ou compte vérifié (encadreur) → première connexion.
-- Taux de passage d'une étape à la suivante, et **abandon** : ouvert sans envoi, envoyé mais refusé (avec le motif du
-  refus : pseudonyme pris, établissement introuvable…), créé mais jamais confirmé.
+  formulaire envoyé → compte créé → e-mail confirmé (visiteur). Le retour des inscrits se lit dans la rétention.
+- Taux de passage d'une étape à la suivante, et **abandon** : ouvert sans envoi, envoyé mais refusé (avec la catégorie
+  du refus : doublon, saisie invalide, inscriptions fermées, trop d'essais… ; jamais le message, qui peut citer une
+  saisie), créé mais jamais confirmé. Un formulaire refusé avant d'atteindre la route (champ mal formé) n'est pas
+  compté « envoyé ».
 
 **3. Jeux**
 
 - Parties lancées, terminées, réussies, abandonnées (lancées et jamais finies), par niveau et par quiz.
-- Les quiz les plus joués, les plus réussis et les plus abandonnés ; les questions les plus ratées.
+- Les quiz les plus joués, avec leur taux de réussite et de parties jamais finies (toujours en cours une heure après
+  la dernière réponse) ; les questions les plus ratées.
 - Joueurs actifs par jour, part des joueurs sans compte (spec 031), vies épuisées (spec 048), défi du jour joué.
 
 **4. Certification**
@@ -47,12 +50,12 @@ période précédente de même durée (« +12 % »). Les dates sont celles de Lo
 **5. Contenus**
 
 - Lectures et téléchargements de la bibliothèque, par document.
-- Articles et capsules les plus lus, partages (spec 044).
+- Articles les plus lus, partages (spec 044).
 
 **6. Régions et clubs** (retenu le 2026-11-23)
 
 - Carte du Togo : par DRE, inscriptions, joueurs actifs, certifiés et clubs sur la période.
-- Clubs actifs, clubs dormants (aucune activité de leurs membres depuis 30 jours), demandes de club abandonnées.
+- Clubs en service, clubs dormants (aucun de leurs membres n'a joué dans les 30 jours avant la fin de la période).
 
 **7. Rétention et moments d'usage** (retenu le 2026-11-23)
 
@@ -64,8 +67,8 @@ période précédente de même durée (« +12 % »). Les dates sont celles de Lo
 
 - Pages introuvables (404) les plus demandées, avec leur provenance ; nombre d'erreurs serveur par jour.
 - Recherches sans résultat : établissements introuvables à l'inscription, recherches de la carte des clubs. Le mot
-  cherché est gardé seulement s'il est cherché par au moins 3 visiteurs différents, pour ne jamais garder un nom de
-  personne tapé une fois.
+  cherché n'est affiché que s'il a été cherché par au moins 3 visiteurs différents le même jour ; sinon il est effacé
+  dès le lendemain, pour ne jamais garder un nom de personne tapé une fois.
 
 **Export** : chaque bloc s'exporte en CSV (chiffres agrégés seulement, jamais de ligne par personne).
 
@@ -78,7 +81,9 @@ période précédente de même durée (« +12 % »). Les dates sont celles de Lo
   une provenance, un appareil, une date. Aucun identifiant de compte, aucun nom, aucune saisie de formulaire.
 - **Visiteur unique sans cookie** : une empreinte du jour calculée par l'API à partir de l'adresse IP, du navigateur
   et d'un sel tiré au hasard chaque jour puis détruit, à la manière de Plausible. On peut compter les visiteurs d'une
-  journée, jamais reconnaître quelqu'un le lendemain ni retrouver son adresse IP. L'adresse IP n'est pas stockée.
+  journée, jamais reconnaître quelqu'un le lendemain ni retrouver son adresse IP. L'adresse IP n'est stockée nulle
+  part, pas même pour limiter le débit (compté en mémoire) ; l'heure d'un événement est arrondie à l'heure, et le sel
+  n'entre jamais dans les sauvegardes.
 - Pas de bandeau de cookies nécessaire, puisqu'aucun traceur n'est déposé. Un navigateur réglé sur « Ne pas me
   suivre » (`Sec-GPC` / `DNT`) n'est pas compté.
 - Le trafic de l'équipe (comptes admin) et des robots n'est pas compté.
@@ -110,7 +115,9 @@ période précédente de même durée (« +12 % »). Les dates sont celles de Lo
   division par zéro.
 - **Bloqueur de publicités** : les événements du site peuvent être bloqués ; les chiffres tirés de la base (comptes,
   parties) restent justes. La page l'indique sous la courbe d'audience.
-- **Rafale ou faux trafic** : limite de débit par adresse IP ; les chemins hors du site sont ramenés à « autre ».
+- **Rafale ou faux trafic** : débit limité par adresse (3 000 événements par quart d'heure, large pour les réseaux
+  mobiles partagés) et par jour ; au-delà, l'événement est ignoré sans erreur. Les chemins hors du site sont ramenés
+  à « autre ».
 - **Classe derrière une même adresse IP** : plusieurs élèves sur le même navigateur d'école comptent pour un
   visiteur. Le chiffre est donc un minimum ; la page le dit.
 - **Paramètres sensibles dans l'URL** (code de vérification de carte, lien de mot de passe) : le chemin enregistré
@@ -137,6 +144,8 @@ Aucune : prêt pour le plan.
 
 ## Idées pour plus tard
 
+- **Étapes « compte vérifié » (encadreur) et « première connexion »**, **demandes de club abandonnées**, **capsules
+  les plus vues** et **quiz les plus abandonnés** en tableau à part : écartés de la version du 2026-11-23 (relecture).
 - **Campagnes** : liens marqués (`?utm_source=affiche-lome`) avec leur propre tableau, pour mesurer une affiche, une
   émission de SOS Docteur TV ou une publication Facebook. (La provenance par `utm_source` reste comptée dans
   l'audience.)

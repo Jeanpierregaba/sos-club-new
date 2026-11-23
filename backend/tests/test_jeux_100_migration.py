@@ -92,6 +92,8 @@ def test_rejouer_ne_change_rien(en_base: Callable[..., Any], banque_049: dict[st
     command.upgrade(configuration(), "head")
     premiers = {q.id for q in _publies(en_base, "jeux")}
 
+    # Les migrations suivantes créent des tables (spec 051) : on les défait avant de rejouer celle de la spec 050.
+    command.downgrade(configuration(), "d7b3e9f14a62")
     command.stamp(configuration(), BANQUE_049)
     command.upgrade(configuration(), "head")
 

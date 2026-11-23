@@ -131,3 +131,22 @@ les mots de recherche sous le seuil, et les présences de plus de 26 semaines. I
   export sans colonne par personne ; un échec du suivi ne casse pas l'inscription.
 - Site : `signaler` muet en SSR et avec GPC ; `LienInscription` envoie son endroit ; page admin rendue avec des
   données vides et pleines.
+
+## Écarts après la relecture du 2026-11-23
+
+- **Débit** : compté en mémoire du processus (par empreinte de l'adresse, 3 000 par quart d'heure, et 500 000 par
+  jour), au lieu de `limite_adresse.limiter`, qui écrivait l'adresse IP dans `tentative_connexion`. Au-delà, 204 sans
+  rien écrire.
+- **Heure** : `evenement_activite.cree_le` est arrondi à l'heure (la heatmap n'en demande pas plus).
+- **Connexions** : la présence hebdomadaire s'écrit dans la session de la requête (cache par processus, une écriture
+  par compte et par semaine) ; les événements vus par l'API passent par un petit pool à part (`moteur_suivi`, 2 + 3
+  connexions, attente d'une seconde, 2 secondes au plus) : un pool saturé perd l'événement, jamais la requête.
+- **Visiteurs au-delà de 90 jours** : `total_activite_jour` ne garde que les événements ; les visiteurs distincts sont
+  gardés par regroupement de la page dans `visiteurs_groupe_jour`, pour que les chiffres ne changent pas à la purge.
+- **Recherches** : une recherche faite par moins de 3 visiteurs le même jour est effacée dès le lendemain.
+- **Clics d'inscription** : une délégation de clic dans `__root.tsx` remplace le composant `LienInscription` prévu ;
+  le menu mobile est reconnu à son panneau (`role="dialog"`).
+- **Pages vues** : une page compte une fois par chemin ; un changement de filtres (`?…`) ne la recompte pas.
+- **Maintenance** : la collecte répond 503 comme le reste de l'API ; rien n'est enregistré.
+- **Sauvegardes** : `deploy/sauvegarder.sh` exclut les données de `sel_activite`.
+- **Export CSV** : les cellules texte sont neutralisées comme les autres exports (`neutraliser`).
