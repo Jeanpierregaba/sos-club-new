@@ -39,6 +39,7 @@ NIVEAUX_D = (("avance", 12), ("expert", 8))
 NIVEAUX_100_M = (("debutant", 40), ("intermediaire", 20))
 NIVEAUX_100_D = (("intermediaire", 10), ("avance", 20), ("expert", 10))
 DESCRIPTION = "Banque officielle des Clubs Santé (spec 049)"
+DESCRIPTION_100 = "Banque officielle des Clubs Santé, 100 quiz (spec 050)"
 
 # L'axe de chaque partie du document.
 AXES: dict[int, str] = {
@@ -135,6 +136,7 @@ def _quiz_jeux(
     ordre_d: list[tuple[int, list[Question]]],
     niveaux_m: tuple[tuple[str, int], ...],
     niveaux_d: tuple[tuple[str, int], ...],
+    description: str,
 ) -> list[dict]:
     """Les quiz Jeux, numérotés dans l'ordre du parcours : les quiz M, puis les quiz D."""
     niveaux = _niveaux(ordre_m, niveaux_m) + _niveaux(ordre_d, niveaux_d)
@@ -148,7 +150,7 @@ def _quiz_jeux(
                 "numero": numero,
                 "niveau": niveau,
                 "titre": f"{titres[partie]} — quiz {compteurs[partie]}",
-                "description": f"{DESCRIPTION} · partie {partie} : {titres[partie]} · questions {difficulte}.",
+                "description": f"{description} · partie {partie} : {titres[partie]} · questions {difficulte}.",
                 "axe": AXES[partie],
                 "questions": [_q(q) for q in questions],
             }
@@ -161,7 +163,7 @@ def composer_jeux(parties: list[Partie]) -> list[dict]:
     titres = {p.numero: p.titre for p in parties}
     ordre_m = _alterner([_par_dix(p.moyennes, p.numero) for p in parties])
     ordre_d = _alterner([_par_dix(p.difficiles, p.numero) for p in parties])
-    return _quiz_jeux(titres, ordre_m, ordre_d, NIVEAUX_100_M, NIVEAUX_100_D)
+    return _quiz_jeux(titres, ordre_m, ordre_d, NIVEAUX_100_M, NIVEAUX_100_D, DESCRIPTION_100)
 
 
 def composer(parties: list[Partie]) -> dict:
@@ -184,7 +186,7 @@ def composer(parties: list[Partie]) -> dict:
         jeux_m.append(_par_dix(p.moyennes, p.numero))
         jeux_d.append(_par_dix([q for i, q in enumerate(p.difficiles) if i not in pris], p.numero))
 
-    jeux = _quiz_jeux(titres, _alterner(jeux_m), _alterner(jeux_d), NIVEAUX_M, NIVEAUX_D)
+    jeux = _quiz_jeux(titres, _alterner(jeux_m), _alterner(jeux_d), NIVEAUX_M, NIVEAUX_D, DESCRIPTION)
 
     # Les 20 places : 4 par partie (ses 40 questions, tour à tour), puis 4 places de mélange.
     certification = []

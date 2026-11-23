@@ -35,6 +35,9 @@ AIMES = "AIMES-AFRIQUE — Clubs Santé SOS Docteur TV"
 DONNEES = json.loads(
     (Path(__file__).resolve().parents[1] / "alembic" / "donnees" / "banque_officielle.json").read_text(encoding="utf-8")
 )
+JEUX_100 = json.loads(
+    (Path(__file__).resolve().parents[1] / "alembic" / "donnees" / "jeux_100.json").read_text(encoding="utf-8")
+)
 JEUX_CERTIFICATION = {*QUIZ_NIVEAU.values(), *ETOILE_NIVEAU.values()} | {
     "eleve.quiz_certification",
     "eleve.badge",
@@ -169,8 +172,9 @@ def test_remplace_les_quiz(en_base: Callable[..., Any], avant_l_ouverture: dict[
 
     etat = en_base(lire)
 
-    assert [n for n, _ in etat["jeux"]] == list(range(1, 81))
-    assert [niveau for _, niveau in etat["jeux"]] == [q["niveau"] for q in DONNEES["jeux"]]
+    # Puis la spec 050 recompose les 80 quiz Jeux en 100.
+    assert [n for n, _ in etat["jeux"]] == list(range(1, 101))
+    assert [niveau for _, niveau in etat["jeux"]] == [q["niveau"] for q in JEUX_100]
     assert etat["places"] == list(range(1, 21))
     assert etat["questions"] == {10}
     assert etat["anciens"] == {EtatQuiz.depublie}

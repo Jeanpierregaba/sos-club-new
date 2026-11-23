@@ -3,7 +3,7 @@
   "numero": 1,
   "niveau": "debutant",
   "titre": "Santé publique — quiz 1",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -112,7 +112,7 @@
   "numero": 2,
   "niveau": "debutant",
   "titre": "Santé sexuelle et reproductive — quiz 1",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -221,7 +221,7 @@
   "numero": 3,
   "niveau": "debutant",
   "titre": "EVSS — quiz 1",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -330,7 +330,7 @@
   "numero": 4,
   "niveau": "debutant",
   "titre": "Journées mondiales de la santé — quiz 1",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -439,7 +439,7 @@
   "numero": 5,
   "niveau": "debutant",
   "titre": "Santé publique — quiz 2",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -548,7 +548,7 @@
   "numero": 6,
   "niveau": "debutant",
   "titre": "Santé sexuelle et reproductive — quiz 2",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -657,7 +657,7 @@
   "numero": 7,
   "niveau": "debutant",
   "titre": "EVSS — quiz 2",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -766,7 +766,7 @@
   "numero": 8,
   "niveau": "debutant",
   "titre": "Journées mondiales de la santé — quiz 2",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -875,7 +875,7 @@
   "numero": 9,
   "niveau": "debutant",
   "titre": "Santé publique — quiz 3",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -984,7 +984,7 @@
   "numero": 10,
   "niveau": "debutant",
   "titre": "Santé sexuelle et reproductive — quiz 3",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -1093,7 +1093,7 @@
   "numero": 11,
   "niveau": "debutant",
   "titre": "EVSS — quiz 3",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -1202,7 +1202,7 @@
   "numero": 12,
   "niveau": "debutant",
   "titre": "Santé publique — quiz 4",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -1311,7 +1311,7 @@
   "numero": 13,
   "niveau": "debutant",
   "titre": "Journées mondiales de la santé — quiz 3",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -1420,7 +1420,7 @@
   "numero": 14,
   "niveau": "debutant",
   "titre": "Santé sexuelle et reproductive — quiz 4",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -1529,7 +1529,7 @@
   "numero": 15,
   "niveau": "debutant",
   "titre": "EVSS — quiz 4",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -1638,7 +1638,7 @@
   "numero": 16,
   "niveau": "debutant",
   "titre": "Santé publique — quiz 5",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -1747,7 +1747,7 @@
   "numero": 17,
   "niveau": "debutant",
   "titre": "Journées mondiales de la santé — quiz 4",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -1856,7 +1856,7 @@
   "numero": 18,
   "niveau": "debutant",
   "titre": "Santé sexuelle et reproductive — quiz 5",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -1965,7 +1965,7 @@
   "numero": 19,
   "niveau": "debutant",
   "titre": "EVSS — quiz 5",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -2074,7 +2074,7 @@
   "numero": 20,
   "niveau": "debutant",
   "titre": "Santé publique — quiz 6",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -2183,7 +2183,7 @@
   "numero": 21,
   "niveau": "debutant",
   "titre": "Santé publique — quiz 7",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -2292,7 +2292,7 @@
   "numero": 22,
   "niveau": "debutant",
   "titre": "Santé sexuelle et reproductive — quiz 6",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -2401,7 +2401,7 @@
   "numero": 23,
   "niveau": "debutant",
   "titre": "EVSS — quiz 6",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -2510,7 +2510,7 @@
   "numero": 24,
   "niveau": "debutant",
   "titre": "Journées mondiales de la santé — quiz 5",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -2619,7 +2619,7 @@
   "numero": 25,
   "niveau": "debutant",
   "titre": "Santé publique — quiz 8",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -2728,7 +2728,7 @@
   "numero": 26,
   "niveau": "debutant",
   "titre": "Santé sexuelle et reproductive — quiz 7",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -2837,7 +2837,7 @@
   "numero": 27,
   "niveau": "debutant",
   "titre": "EVSS — quiz 7",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -2946,7 +2946,7 @@
   "numero": 28,
   "niveau": "debutant",
   "titre": "Journées mondiales de la santé — quiz 6",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -3055,7 +3055,7 @@
   "numero": 29,
   "niveau": "debutant",
   "titre": "Santé publique — quiz 9",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -3164,7 +3164,7 @@
   "numero": 30,
   "niveau": "debutant",
   "titre": "Santé sexuelle et reproductive — quiz 8",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -3273,7 +3273,7 @@
   "numero": 31,
   "niveau": "debutant",
   "titre": "EVSS — quiz 8",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -3382,7 +3382,7 @@
   "numero": 32,
   "niveau": "debutant",
   "titre": "Santé publique — quiz 10",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -3491,7 +3491,7 @@
   "numero": 33,
   "niveau": "debutant",
   "titre": "Journées mondiales de la santé — quiz 7",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -3600,7 +3600,7 @@
   "numero": 34,
   "niveau": "debutant",
   "titre": "Santé sexuelle et reproductive — quiz 9",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -3709,7 +3709,7 @@
   "numero": 35,
   "niveau": "debutant",
   "titre": "EVSS — quiz 9",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -3818,7 +3818,7 @@
   "numero": 36,
   "niveau": "debutant",
   "titre": "Santé publique — quiz 11",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -3927,7 +3927,7 @@
   "numero": 37,
   "niveau": "debutant",
   "titre": "Journées mondiales de la santé — quiz 8",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -4036,7 +4036,7 @@
   "numero": 38,
   "niveau": "debutant",
   "titre": "Santé sexuelle et reproductive — quiz 10",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -4145,7 +4145,7 @@
   "numero": 39,
   "niveau": "debutant",
   "titre": "EVSS — quiz 10",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -4254,7 +4254,7 @@
   "numero": 40,
   "niveau": "debutant",
   "titre": "Santé publique — quiz 12",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -4363,7 +4363,7 @@
   "numero": 41,
   "niveau": "intermediaire",
   "titre": "Santé publique — quiz 13",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -4472,7 +4472,7 @@
   "numero": 42,
   "niveau": "intermediaire",
   "titre": "Santé sexuelle et reproductive — quiz 11",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -4581,7 +4581,7 @@
   "numero": 43,
   "niveau": "intermediaire",
   "titre": "EVSS — quiz 11",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -4690,7 +4690,7 @@
   "numero": 44,
   "niveau": "intermediaire",
   "titre": "Journées mondiales de la santé — quiz 9",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -4799,7 +4799,7 @@
   "numero": 45,
   "niveau": "intermediaire",
   "titre": "Santé publique — quiz 14",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -4908,7 +4908,7 @@
   "numero": 46,
   "niveau": "intermediaire",
   "titre": "Santé sexuelle et reproductive — quiz 12",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -5017,7 +5017,7 @@
   "numero": 47,
   "niveau": "intermediaire",
   "titre": "EVSS — quiz 12",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -5126,7 +5126,7 @@
   "numero": 48,
   "niveau": "intermediaire",
   "titre": "Journées mondiales de la santé — quiz 10",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -5235,7 +5235,7 @@
   "numero": 49,
   "niveau": "intermediaire",
   "titre": "Santé publique — quiz 15",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -5344,7 +5344,7 @@
   "numero": 50,
   "niveau": "intermediaire",
   "titre": "Santé sexuelle et reproductive — quiz 13",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -5453,7 +5453,7 @@
   "numero": 51,
   "niveau": "intermediaire",
   "titre": "EVSS — quiz 13",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -5562,7 +5562,7 @@
   "numero": 52,
   "niveau": "intermediaire",
   "titre": "Santé publique — quiz 16",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -5671,7 +5671,7 @@
   "numero": 53,
   "niveau": "intermediaire",
   "titre": "Journées mondiales de la santé — quiz 11",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -5780,7 +5780,7 @@
   "numero": 54,
   "niveau": "intermediaire",
   "titre": "Santé sexuelle et reproductive — quiz 14",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -5889,7 +5889,7 @@
   "numero": 55,
   "niveau": "intermediaire",
   "titre": "EVSS — quiz 14",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -5998,7 +5998,7 @@
   "numero": 56,
   "niveau": "intermediaire",
   "titre": "Santé publique — quiz 17",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -6107,7 +6107,7 @@
   "numero": 57,
   "niveau": "intermediaire",
   "titre": "Journées mondiales de la santé — quiz 12",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions moyennement difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -6216,7 +6216,7 @@
   "numero": 58,
   "niveau": "intermediaire",
   "titre": "Santé sexuelle et reproductive — quiz 15",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -6325,7 +6325,7 @@
   "numero": 59,
   "niveau": "intermediaire",
   "titre": "EVSS — quiz 15",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions moyennement difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -6434,7 +6434,7 @@
   "numero": 60,
   "niveau": "intermediaire",
   "titre": "Santé publique — quiz 18",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions moyennement difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions moyennement difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -6543,7 +6543,7 @@
   "numero": 61,
   "niveau": "intermediaire",
   "titre": "Santé publique — quiz 19",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions très difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -6652,7 +6652,7 @@
   "numero": 62,
   "niveau": "intermediaire",
   "titre": "Santé sexuelle et reproductive — quiz 16",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -6761,7 +6761,7 @@
   "numero": 63,
   "niveau": "intermediaire",
   "titre": "EVSS — quiz 16",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -6870,7 +6870,7 @@
   "numero": 64,
   "niveau": "intermediaire",
   "titre": "Journées mondiales de la santé — quiz 13",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -6979,7 +6979,7 @@
   "numero": 65,
   "niveau": "intermediaire",
   "titre": "Santé publique — quiz 20",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions très difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -7088,7 +7088,7 @@
   "numero": 66,
   "niveau": "intermediaire",
   "titre": "Santé sexuelle et reproductive — quiz 17",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -7197,7 +7197,7 @@
   "numero": 67,
   "niveau": "intermediaire",
   "titre": "EVSS — quiz 17",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -7306,7 +7306,7 @@
   "numero": 68,
   "niveau": "intermediaire",
   "titre": "Journées mondiales de la santé — quiz 14",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -7415,7 +7415,7 @@
   "numero": 69,
   "niveau": "intermediaire",
   "titre": "Santé publique — quiz 21",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions très difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -7524,7 +7524,7 @@
   "numero": 70,
   "niveau": "intermediaire",
   "titre": "Santé sexuelle et reproductive — quiz 18",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -7633,7 +7633,7 @@
   "numero": 71,
   "niveau": "avance",
   "titre": "EVSS — quiz 18",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -7742,7 +7742,7 @@
   "numero": 72,
   "niveau": "avance",
   "titre": "Santé publique — quiz 22",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions très difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -7851,7 +7851,7 @@
   "numero": 73,
   "niveau": "avance",
   "titre": "Journées mondiales de la santé — quiz 15",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -7960,7 +7960,7 @@
   "numero": 74,
   "niveau": "avance",
   "titre": "Santé sexuelle et reproductive — quiz 19",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -8069,7 +8069,7 @@
   "numero": 75,
   "niveau": "avance",
   "titre": "EVSS — quiz 19",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -8178,7 +8178,7 @@
   "numero": 76,
   "niveau": "avance",
   "titre": "Santé publique — quiz 23",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions très difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -8287,7 +8287,7 @@
   "numero": 77,
   "niveau": "avance",
   "titre": "Journées mondiales de la santé — quiz 16",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -8396,7 +8396,7 @@
   "numero": 78,
   "niveau": "avance",
   "titre": "Santé sexuelle et reproductive — quiz 20",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -8505,7 +8505,7 @@
   "numero": 79,
   "niveau": "avance",
   "titre": "EVSS — quiz 20",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -8614,7 +8614,7 @@
   "numero": 80,
   "niveau": "avance",
   "titre": "Santé publique — quiz 24",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions très difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -8723,7 +8723,7 @@
   "numero": 81,
   "niveau": "avance",
   "titre": "Santé publique — quiz 25",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions très difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -8832,7 +8832,7 @@
   "numero": 82,
   "niveau": "avance",
   "titre": "Santé sexuelle et reproductive — quiz 21",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -8941,7 +8941,7 @@
   "numero": 83,
   "niveau": "avance",
   "titre": "EVSS — quiz 21",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -9050,7 +9050,7 @@
   "numero": 84,
   "niveau": "avance",
   "titre": "Journées mondiales de la santé — quiz 17",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -9159,7 +9159,7 @@
   "numero": 85,
   "niveau": "avance",
   "titre": "Santé publique — quiz 26",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions très difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -9268,7 +9268,7 @@
   "numero": 86,
   "niveau": "avance",
   "titre": "Santé sexuelle et reproductive — quiz 22",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -9377,7 +9377,7 @@
   "numero": 87,
   "niveau": "avance",
   "titre": "EVSS — quiz 22",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -9486,7 +9486,7 @@
   "numero": 88,
   "niveau": "avance",
   "titre": "Journées mondiales de la santé — quiz 18",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -9595,7 +9595,7 @@
   "numero": 89,
   "niveau": "avance",
   "titre": "Santé publique — quiz 27",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions très difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -9704,7 +9704,7 @@
   "numero": 90,
   "niveau": "avance",
   "titre": "Santé sexuelle et reproductive — quiz 23",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -9813,7 +9813,7 @@
   "numero": 91,
   "niveau": "expert",
   "titre": "EVSS — quiz 23",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -9922,7 +9922,7 @@
   "numero": 92,
   "niveau": "expert",
   "titre": "Santé publique — quiz 28",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions très difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -10031,7 +10031,7 @@
   "numero": 93,
   "niveau": "expert",
   "titre": "Journées mondiales de la santé — quiz 19",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -10140,7 +10140,7 @@
   "numero": 94,
   "niveau": "expert",
   "titre": "Santé sexuelle et reproductive — quiz 24",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -10249,7 +10249,7 @@
   "numero": 95,
   "niveau": "expert",
   "titre": "EVSS — quiz 24",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -10358,7 +10358,7 @@
   "numero": 96,
   "niveau": "expert",
   "titre": "Santé publique — quiz 29",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions très difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
@@ -10467,7 +10467,7 @@
   "numero": 97,
   "niveau": "expert",
   "titre": "Journées mondiales de la santé — quiz 20",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 3 : Journées mondiales de la santé · questions très difficiles.",
   "axe": "sante-environnement",
   "questions": [
    {
@@ -10576,7 +10576,7 @@
   "numero": 98,
   "niveau": "expert",
   "titre": "Santé sexuelle et reproductive — quiz 25",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 2 : Santé sexuelle et reproductive · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -10685,7 +10685,7 @@
   "numero": 99,
   "niveau": "expert",
   "titre": "EVSS — quiz 25",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 4 : EVSS · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 4 : EVSS · questions très difficiles.",
   "axe": "sante-sexuelle-evss",
   "questions": [
    {
@@ -10794,7 +10794,7 @@
   "numero": 100,
   "niveau": "expert",
   "titre": "Santé publique — quiz 30",
-  "description": "Banque officielle des Clubs Santé (spec 049) · partie 1 : Santé publique · questions très difficiles.",
+  "description": "Banque officielle des Clubs Santé, 100 quiz (spec 050) · partie 1 : Santé publique · questions très difficiles.",
   "axe": "sport-secourisme",
   "questions": [
    {
