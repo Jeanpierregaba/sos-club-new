@@ -17,6 +17,7 @@ import { chercher, compterParType, indexer } from "@/lib/carte-des-clubs";
 import { LIBELLE_SANS_CLUB, STATUTS_CARTE } from "@/lib/clubs";
 import { DRE_PAR_DEFAUT, dessins, regions } from "@/lib/togo-dre";
 import mascottesEquipe from "@/assets/mascottes-equipe.webp";
+import { useRechercheSansResultat } from "@/lib/activite";
 
 export const Route = createFileRoute("/carte-des-clubs")({
   head: () => ({
@@ -158,6 +159,9 @@ function CarteDesClubs() {
   const q = recherche.trim();
   const resultats = useMemo(() => chercher(index, q), [index, q]);
   const enRecherche = q.replace(/\s/g, "").length >= 2;
+  // Spec 051 : les recherches restées sans résultat, dans la bannière ou dans une DRE.
+  useRechercheSansResultat(q, enRecherche && resultats.length === 0);
+  useRechercheSansResultat(qDre, rechercheDansDre && trouvesDansDre.length === 0);
 
   return (
     <div className="min-h-screen overflow-x-clip bg-carnet text-ink">

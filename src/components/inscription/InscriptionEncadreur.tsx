@@ -37,6 +37,7 @@ import {
   type SaisieEtablissement,
 } from "@/lib/saisie-etablissement";
 import { normaliserTelephone, telephoneValide } from "@/lib/telephone";
+import { useEtapesInscription } from "@/lib/activite";
 
 const schema = z
   .object({
@@ -95,6 +96,8 @@ const CHAMPS_NOMMES: [string, keyof Valeurs][] = [
 
 // Le formulaire d'inscription d'un encadreur (spec 018) : le compte attend la vérification de l'équipe.
 export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
+  // Spec 051 : formulaire ouvert, puis commencé à la première saisie (événements anonymes).
+  const commencer = useEtapesInscription("encadreur");
   const queryClient = useQueryClient();
   const router = useRouter();
   const haut = useRef<HTMLDivElement>(null);
@@ -163,7 +166,7 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={envoyer} noValidate className="space-y-6">
+      <form onSubmit={envoyer} onChange={commencer} noValidate className="space-y-6">
         <div ref={haut}>
           {erreur && (
             <Alert variant="destructive" role="alert">

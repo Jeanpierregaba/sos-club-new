@@ -33,6 +33,7 @@ import {
 import { SEXES } from "@/lib/fiche";
 import { REGIONS } from "@/lib/visiteurs";
 import { normaliserTelephone, telephoneValide } from "@/lib/telephone";
+import { useEtapesInscription } from "@/lib/activite";
 
 const schema = z.object({
   nom: z.string().trim().min(1, "Indique ton nom.").max(100, "Ce nom est trop long."),
@@ -70,6 +71,8 @@ const CHAMPS_NOMMES: [string, keyof Valeurs][] = [
 
 // Le compte visiteur (spec 030) : un compte léger, confirmé par un code reçu par e-mail, pour jouer aux quiz.
 export function InscriptionVisiteur() {
+  // Spec 051 : formulaire ouvert, puis commencé à la première saisie (événements anonymes).
+  const commencer = useEtapesInscription("visiteur");
   const queryClient = useQueryClient();
   const router = useRouter();
   const haut = useRef<HTMLDivElement>(null);
@@ -176,7 +179,7 @@ export function InscriptionVisiteur() {
 
   return (
     <Form {...form}>
-      <form onSubmit={envoyer} noValidate className="space-y-6">
+      <form onSubmit={envoyer} onChange={commencer} noValidate className="space-y-6">
         <div ref={haut}>
           {erreur && (
             <Alert variant="destructive" role="alert">

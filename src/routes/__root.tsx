@@ -9,13 +9,18 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { RetourEnHaut } from "@/components/RetourEnHaut";
+import { endroitDuClic, lienInscription, pageVue, signaler } from "@/lib/activite";
 import { chargerAdminMoi, chargerEtatSite } from "@/lib/api/client";
 
 function NotFoundComponent() {
+  // Spec 051 : la page introuvable compte, avec l'adresse demandée (l'API n'en garde qu'un premier segment lisible).
+  useEffect(() => {
+    signaler({ type: "erreur", chemin: window.location.pathname.slice(0, 200), detail: "404" });
+  }, []);
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
@@ -149,6 +154,60 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <RetourEnHaut />
+      <SuiviActivite />
     </QueryClientProvider>
   );
+}
+
+/** Pages vues et clics « S'inscrire » (spec 051) : des événements anonymes, sans cookie. */
+function SuiviActivite() {
+  const router = useRouter();
+  useEffect(() => {
+    let derniere: string | null = null;
+    const cheminActuel = () => {
+      const correspondance = router.state.matches.at(-1);
+      if (!correspondance) return null;
+      const route = router.routesById[correspondance.routeId as keyof typeof router.routesById] as {
+        fullPath: string;
+      };
+      return { fullPath: route.fullPath, params: correspondance.params as Record<string, string> };
+    };
+    const surPage = () => {
+      const adresse = router.state.location.href;
+      // Une même adresse ne compte qu'une fois, même si le routeur la résout deux fois au chargement.
+      if (adresse === derniere) return;
+      const introuvable = router.state.matches.some(
+        (m) => m.status === "notFound" || (m as { globalNotFound?: boolean }).globalNotFound,
+      );
+      const actuel = cheminActuel();
+      if (introuvable || !actuel) return;
+      const evenement = pageVue(
+        actuel,
+        derniere === null
+          ? { referent: document.referrer, recherche: window.location.search }
+          : null,
+      );
+      derniere = adresse;
+      if (evenement) signaler(evenement);
+    };
+    const surClic = (e: MouseEvent) => {
+      const lien = lienInscription(e.target);
+      const actuel = cheminActuel();
+      if (!lien || !actuel) return;
+      const page = pageVue(actuel, null)?.chemin ?? "autre";
+      signaler({
+        type: "clic_inscription",
+        chemin: page,
+        detail: endroitDuClic(lien, window.location.pathname),
+      });
+    };
+    surPage();
+    const desabonner = router.subscribe("onResolved", surPage);
+    document.addEventListener("click", surClic, true);
+    return () => {
+      desabonner();
+      document.removeEventListener("click", surClic, true);
+    };
+  }, [router]);
+  return null;
 }

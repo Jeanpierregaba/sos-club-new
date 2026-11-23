@@ -45,6 +45,7 @@ import {
   SAISIE_VIDE,
   type SaisieEtablissement,
 } from "@/lib/saisie-etablissement";
+import { useEtapesInscription } from "@/lib/activite";
 
 const schema = z.object({
   prenom: z.string().trim().min(1, "Indique ton prénom.").max(100, "Ce prénom est trop long."),
@@ -103,6 +104,8 @@ const ETAPES = [
 
 // Le formulaire d'inscription d'un élève (spec 017), avec sa fiche d'adhésion (spec 030).
 export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxePublic[] }) {
+  // Spec 051 : formulaire ouvert, puis commencé à la première saisie (événements anonymes).
+  const commencer = useEtapesInscription("eleve");
   const queryClient = useQueryClient();
   const router = useRouter();
   const haut = useRef<HTMLDivElement>(null);
@@ -203,7 +206,7 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
 
   return (
     <Form {...form}>
-      <form onSubmit={envoyer} noValidate className="space-y-6">
+      <form onSubmit={envoyer} onChange={commencer} noValidate className="space-y-6">
         <div ref={haut}>
           {erreur && (
             <Alert variant="destructive" role="alert">

@@ -3,6 +3,7 @@ import { useEffect, useId, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import { chercherEtablissements, type EtablissementTrouve } from "@/lib/api/client";
+import { useRechercheSansResultat } from "@/lib/activite";
 
 export type EtablissementChoisi = {
   id: string;
@@ -63,6 +64,8 @@ export function ChoixEtablissement({
       clearTimeout(minuteur);
     };
   }, [recherche, exclure]);
+  // Spec 051 : un établissement introuvable, pour savoir lesquels manquent au référentiel.
+  useRechercheSansResultat(recherche, resultats?.length === 0);
 
   if (valeur) {
     return (
