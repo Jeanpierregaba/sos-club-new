@@ -273,6 +273,7 @@ utilisateur. Sur les pages publiques, un élève apparaît par son pseudonyme et
 - Logs structurés de l'API, sans mot de passe ni donnée personnelle d'élève.
 - `GET /health` vérifie la base ; un service externe de surveillance l'interroge en production.
 - Suivi d'erreurs : à choisir dans la spec 002, sans envoyer de données d'élèves à un tiers.
+- Mesure d'audience : interne à l'API, sans cookie ni tiers ([ADR-0014](decisions/0014-mesure-d-audience-interne-et-anonyme.md), spec 051).
 - `src/lib/error-capture.ts` et `src/lib/error-page.ts` gèrent déjà les erreurs de rendu du site.
 
 ## Choix techniques
