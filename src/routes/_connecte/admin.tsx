@@ -8,6 +8,7 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import {
+  Activity,
   Award,
   Brain,
   CalendarDays,
@@ -168,6 +169,13 @@ function entrees(admin: AdminMoi): Entree[] {
       libelle: "Journal d'audit",
       i: ScrollText,
       visible: peut(admin, "journal", "consulter"),
+    },
+    {
+      // Spec 051 : le suivi d'activité, réservé au super-administrateur.
+      to: "/admin/activite",
+      libelle: "Activité",
+      i: Activity,
+      visible: admin.super_admin,
     },
     {
       to: "/admin/collaborateurs",

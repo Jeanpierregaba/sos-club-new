@@ -46,6 +46,7 @@ import { Route as GenieImhotepDescriptionRouteImport } from './routes/genie-imho
 import { Route as GenieImhotepInscriptionRouteImport } from './routes/genie-imhotep/inscription'
 import { Route as MotDePasseNouveauRouteImport } from './routes/mot-de-passe.nouveau'
 import { Route as ConnecteAdminIndexRouteImport } from './routes/_connecte/admin/index'
+import { Route as ConnecteAdminActiviteRouteImport } from './routes/_connecte/admin/activite'
 import { Route as ConnecteAdminAgendaRouteImport } from './routes/_connecte/admin/agenda'
 import { Route as ConnecteAdminBibliothequeRouteImport } from './routes/_connecte/admin/bibliotheque'
 import { Route as ConnecteAdminCertificationRouteImport } from './routes/_connecte/admin/certification'
@@ -288,6 +289,11 @@ const MotDePasseNouveauRoute = MotDePasseNouveauRouteImport.update({
 const ConnecteAdminIndexRoute = ConnecteAdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => ConnecteAdminRoute,
+} as any)
+const ConnecteAdminActiviteRoute = ConnecteAdminActiviteRouteImport.update({
+  id: '/activite',
+  path: '/activite',
   getParentRoute: () => ConnecteAdminRoute,
 } as any)
 const ConnecteAdminAgendaRoute = ConnecteAdminAgendaRouteImport.update({
@@ -661,6 +667,7 @@ export interface FileRoutesByFullPath {
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
   '/mot-de-passe/nouveau': typeof MotDePasseNouveauRoute
   '/articles/': typeof ArticlesIndexRoute
+  '/admin/activite': typeof ConnecteAdminActiviteRoute
   '/admin/agenda': typeof ConnecteAdminAgendaRoute
   '/admin/bibliotheque': typeof ConnecteAdminBibliothequeRouteWithChildren
   '/admin/certification': typeof ConnecteAdminCertificationRouteWithChildren
@@ -757,6 +764,7 @@ export interface FileRoutesByTo {
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
   '/mot-de-passe/nouveau': typeof MotDePasseNouveauRoute
   '/articles': typeof ArticlesIndexRoute
+  '/admin/activite': typeof ConnecteAdminActiviteRoute
   '/admin/agenda': typeof ConnecteAdminAgendaRoute
   '/admin/clubs': typeof ConnecteAdminClubsRoute
   '/admin/double-authentification': typeof ConnecteAdminDoubleAuthentificationRoute
@@ -851,6 +859,7 @@ export interface FileRoutesById {
   '/genie-imhotep/inscription': typeof GenieImhotepInscriptionRoute
   '/mot-de-passe/nouveau': typeof MotDePasseNouveauRoute
   '/articles/': typeof ArticlesIndexRoute
+  '/_connecte/admin/activite': typeof ConnecteAdminActiviteRoute
   '/_connecte/admin/agenda': typeof ConnecteAdminAgendaRoute
   '/_connecte/admin/bibliotheque': typeof ConnecteAdminBibliothequeRouteWithChildren
   '/_connecte/admin/certification': typeof ConnecteAdminCertificationRouteWithChildren
@@ -950,6 +959,7 @@ export interface FileRouteTypes {
     | '/genie-imhotep/inscription'
     | '/mot-de-passe/nouveau'
     | '/articles/'
+    | '/admin/activite'
     | '/admin/agenda'
     | '/admin/bibliotheque'
     | '/admin/certification'
@@ -1046,6 +1056,7 @@ export interface FileRouteTypes {
     | '/genie-imhotep/inscription'
     | '/mot-de-passe/nouveau'
     | '/articles'
+    | '/admin/activite'
     | '/admin/agenda'
     | '/admin/clubs'
     | '/admin/double-authentification'
@@ -1139,6 +1150,7 @@ export interface FileRouteTypes {
     | '/genie-imhotep/inscription'
     | '/mot-de-passe/nouveau'
     | '/articles/'
+    | '/_connecte/admin/activite'
     | '/_connecte/admin/agenda'
     | '/_connecte/admin/bibliotheque'
     | '/_connecte/admin/certification'
@@ -1495,6 +1507,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof ConnecteAdminIndexRouteImport
+      parentRoute: typeof ConnecteAdminRoute
+    }
+    '/_connecte/admin/activite': {
+      id: '/_connecte/admin/activite'
+      path: '/activite'
+      fullPath: '/admin/activite'
+      preLoaderRoute: typeof ConnecteAdminActiviteRouteImport
       parentRoute: typeof ConnecteAdminRoute
     }
     '/_connecte/admin/agenda': {
@@ -2018,6 +2037,7 @@ const ConnecteAdminReferentielRouteWithChildren =
   )
 
 interface ConnecteAdminRouteChildren {
+  ConnecteAdminActiviteRoute: typeof ConnecteAdminActiviteRoute
   ConnecteAdminAgendaRoute: typeof ConnecteAdminAgendaRoute
   ConnecteAdminBibliothequeRoute: typeof ConnecteAdminBibliothequeRouteWithChildren
   ConnecteAdminCertificationRoute: typeof ConnecteAdminCertificationRouteWithChildren
@@ -2040,6 +2060,7 @@ interface ConnecteAdminRouteChildren {
 }
 
 const ConnecteAdminRouteChildren: ConnecteAdminRouteChildren = {
+  ConnecteAdminActiviteRoute: ConnecteAdminActiviteRoute,
   ConnecteAdminAgendaRoute: ConnecteAdminAgendaRoute,
   ConnecteAdminBibliothequeRoute: ConnecteAdminBibliothequeRouteWithChildren,
   ConnecteAdminCertificationRoute: ConnecteAdminCertificationRouteWithChildren,

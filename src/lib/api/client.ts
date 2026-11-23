@@ -327,6 +327,16 @@ export const chargerAdminMoi = () => requeteApi<AdminMoi>("/api/admin/moi");
 export const chargerCatalogue = () => requeteApi<Catalogue>("/api/admin/catalogue");
 export const chargerTableauDeBord = () => requeteApi<TableauDeBord>("/api/admin/tableau-de-bord");
 
+// Suivi d'activité (spec 051) : réservé au super-administrateur, un appel par bloc ; l'export est un lien direct.
+export type BlocActivite = Schemas["Bloc"];
+export type NomBlocActivite = BlocActivite["bloc"];
+export type PeriodeActivite = { du?: string | undefined; au?: string | undefined };
+const ACTIVITE = "/api/admin/activite";
+export const chargerBlocActivite = (bloc: NomBlocActivite, periode: PeriodeActivite) =>
+  requeteApi<BlocActivite>(avecParametres(`${ACTIVITE}/${bloc}`, periode));
+export const urlExportActivite = (bloc: NomBlocActivite, periode: PeriodeActivite) =>
+  avecParametres(`${ACTIVITE}/${bloc}/export.csv`, periode);
+
 // Mode maintenance (spec 047) : l'état public, puis la bascule réservée au super-administrateur.
 export const chargerEtatSite = () => requeteApi<EtatSitePublic>("/api/etat-site");
 export const chargerMaintenance = () => requeteApi<EtatMaintenance>("/api/admin/maintenance");
