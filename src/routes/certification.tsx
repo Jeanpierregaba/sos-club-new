@@ -110,11 +110,10 @@ const etapes = [
 ];
 
 // Les 5 badges du parcours (spec 034) : un par thématique de 4 quiz, chacun +500 points pour l'élève et la moitié pour
-// son club, une fois. Les intitulés des thématiques restent à fournir par l'équipe pédagogique : chacune porte le nom
-// de son badge. `apres` : le nombre de quiz réussis qui débloque le badge ; `fond` : le dégradé de la médaille.
+// son club, une fois. Chaque groupe de 4 quiz porte le nom de son badge (spec 050). `apres` : le nombre de quiz
+// réussis qui débloque le badge ; `fond` : le dégradé de la médaille.
 const badges: {
   n: string;
-  metal: string;
   i: LucideIcon;
   t: string;
   apres: number;
@@ -124,7 +123,6 @@ const badges: {
 }[] = [
   {
     n: "01",
-    metal: "Thématique 1",
     i: Medal,
     t: "Ambassadeur Santé Junior",
     apres: 4,
@@ -134,37 +132,33 @@ const badges: {
   },
   {
     n: "02",
-    metal: "Thématique 2",
     i: Medal,
     t: "Pair Éducateur Santé et Citoyenneté",
     apres: 8,
-    d: "La deuxième thématique terminée : 8 quiz réussis.",
+    d: "Les quiz 5 à 8 réussis à leur tour : 8 quiz validés en tout.",
     quiz: "Quiz 5 à 8",
     fond: "from-[oklch(0.82_0.02_257)] to-[oklch(0.58_0.03_257)]",
   },
   {
     n: "03",
-    metal: "Thématique 3",
     i: ShieldCheck,
     t: "Sentinelle de la Prévention",
     apres: 12,
-    d: "La troisième thématique terminée : 12 quiz réussis.",
+    d: "Les quiz 9 à 12 réussis à leur tour : 12 quiz validés en tout.",
     quiz: "Quiz 9 à 12",
     fond: "from-[oklch(0.85_0.04_200)] to-sky",
   },
   {
     n: "04",
-    metal: "Thématique 4",
     i: Crown,
     t: "Champion de la Santé et EVSS",
     apres: 16,
-    d: "La quatrième thématique terminée : 16 quiz réussis.",
+    d: "Les quiz 13 à 16 réussis à leur tour : 16 quiz validés en tout.",
     quiz: "Quiz 13 à 16",
     fond: "from-sun to-tangerine",
   },
   {
     n: "05",
-    metal: "Thématique 5",
     i: Gem,
     t: "Maître Génie Imhotep",
     apres: 20,
@@ -427,7 +421,7 @@ function Certification() {
                   <p.i className="size-9" />
                 </span>
                 <p className="mt-5 text-xs font-extrabold uppercase tracking-widest text-sun">
-                  Badge {p.n} · {p.metal}
+                  Badge {p.n}
                 </p>
                 <h3 className="mt-1 font-display text-2xl leading-tight">{p.t}</h3>
                 <p className="mt-1 text-sm font-bold text-primary">Après {p.apres} quiz réussis</p>
@@ -472,16 +466,15 @@ function Certification() {
               className={`flex flex-col rounded-[1.75rem] p-6 shadow-sm ring-1 ring-border ${i === badges.length - 1 ? "bg-linear-to-br from-sun/30 to-white" : "bg-white"}`}
             >
               <div className="flex items-center justify-between gap-3">
-                <span className="font-display text-xl text-logo-blue">{b.metal}</span>
+                <span className="rounded-full bg-logo-blue/10 px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-logo-blue">
+                  {b.quiz}
+                </span>
                 <span className="rounded-full bg-sun px-2.5 py-0.5 text-xs font-extrabold text-ink">
                   {points(BAREME.quizCertification.eleve)} pts par quiz
                 </span>
               </div>
-              <span className="mt-4 self-start rounded-full bg-logo-blue/10 px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-logo-blue">
-                {b.quiz}
-              </span>
-              <h3 className="mt-2 flex-1 font-sans text-lg font-extrabold leading-snug">
-                Badge {b.t}
+              <h3 className="mt-4 flex-1 font-display text-2xl leading-tight text-logo-blue">
+                {b.t}
               </h3>
               <p className="mt-3 text-sm font-medium text-muted-foreground">
                 {b.d} Badge : {points(BAREME.badge.eleve)} points.

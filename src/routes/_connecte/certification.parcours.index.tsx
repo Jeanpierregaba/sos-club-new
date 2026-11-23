@@ -124,13 +124,13 @@ function MaCertificationPage() {
               <h2 id="titre-quiz" className="font-sans text-xl font-extrabold text-logo-blue">
                 Les {parcours.places.length} quiz du parcours
               </h2>
-              {/* Spec 034 : 5 thématiques de 4 quiz, chacune avec le badge qu'elle délivre. */}
+              {/* Spec 034 : 5 groupes de 4 quiz, chacun titré par le badge qu'il délivre (spec 050). */}
               {[...new Set(parcours.places.map((p) => p.thematique))].map((t) => {
                 const places = parcours.places.filter((p) => p.thematique === t);
                 return (
                   <div key={t} className="mt-6">
                     <h3 className="font-sans text-base font-extrabold text-ink">
-                      Thématique {t} · badge {places[0]?.thematique_nom}
+                      Badge {places[0]?.thematique_nom}
                     </h3>
                     <ol className="mt-3 space-y-3">
                       {places.map((p) => (
