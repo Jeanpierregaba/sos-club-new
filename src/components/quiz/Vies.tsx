@@ -3,7 +3,7 @@ import { Heart } from "lucide-react";
 import type { Vies as ViesDuJour } from "@/lib/api/client";
 import { messagePlusDeVies } from "@/lib/vies";
 
-// Les vies du jour (spec 048) : 7 cœurs, communs aux quiz des jeux et à la certification. Un cœur plein par vie
+// Les vies du jour (spec 048, spec 049) : 3 cœurs, communs aux quiz des jeux et à la certification. Un cœur plein par vie
 // restante ; une vie perdue (partie ratée) ou réservée (partie en cours) est un cœur vide. L'API arbitre : ce
 // composant ne fait qu'afficher.
 export function Vies({

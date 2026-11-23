@@ -1,4 +1,4 @@
-"""Les vies quotidiennes (spec 048) : 7 par jour, communes aux quiz des jeux et à la certification.
+"""Les vies quotidiennes (spec 048, spec 049) : 3 par jour, communes aux quiz des jeux et à la certification.
 
 Les vies ne sont pas stockées : elles se comptent à partir des parties du joueur. Une partie terminée sans réussite,
 lancée aujourd'hui (jour de Lomé), coûte une vie ; une partie réussie ne coûte rien ; une partie en cours réserve une
@@ -17,7 +17,7 @@ from app.comptes.models import Role, Utilisateur
 from app.quiz.models import EtatTentative, TentativeQuiz
 from app.quiz.schemas import Vies as VuesVies
 
-VIES_PAR_JOUR = 7
+VIES_PAR_JOUR = 3
 
 
 @dataclass(frozen=True)

@@ -5,7 +5,7 @@ import { PartieQuiz } from "./PartieQuiz";
 import { Vies } from "./Vies";
 import type { EtatPartie } from "@/lib/api/client";
 
-const vies = (restantes: number) => ({ total: 7, restantes, perdues: 7 - restantes, en_cours: 0 });
+const vies = (restantes: number) => ({ total: 3, restantes, perdues: 3 - restantes, en_cours: 0 });
 
 const fin = (vies_restantes: number | null): EtatPartie => ({
   tentative_id: "t1",
@@ -21,9 +21,9 @@ const appels = { repondre: vi.fn(), reprendre: vi.fn() };
 
 describe("Vies (spec 048)", () => {
   it("montre un cœur plein par vie restante", () => {
-    render(<Vies vies={vies(5)} />);
+    render(<Vies vies={vies(2)} />);
 
-    expect(screen.getByText("5 vies sur 7 aujourd'hui")).toBeInTheDocument();
+    expect(screen.getByText("2 vies sur 3 aujourd'hui")).toBeInTheDocument();
     expect(screen.getByText(/Jeux et certification partagent/)).toBeInTheDocument();
   });
 
@@ -31,7 +31,7 @@ describe("Vies (spec 048)", () => {
     render(<Vies vies={vies(0)} />);
 
     expect(screen.getByRole("status")).toHaveTextContent(
-      "Tu as utilisé tes 7 vies aujourd'hui. Reviens demain, elles se rechargent à minuit.",
+      "Tu as utilisé tes 3 vies aujourd'hui. Reviens demain, elles se rechargent à minuit.",
     );
   });
 
@@ -51,7 +51,7 @@ describe("Vies (spec 048)", () => {
     rerender(
       <PartieQuiz key="zero" depart={fin(0)} appels={appels} avecPoints onRejouer={rejouer} />,
     );
-    expect(screen.getByText(/Tu as utilisé tes 7 vies aujourd'hui/)).toBeInTheDocument();
+    expect(screen.getByText(/Tu as utilisé tes 3 vies aujourd'hui/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Rejouer/ }));
     expect(screen.getByRole("button", { name: /Rejouer/ })).toBeDisabled();
     expect(rejouer).not.toHaveBeenCalled();
