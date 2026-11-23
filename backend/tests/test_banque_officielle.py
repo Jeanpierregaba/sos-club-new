@@ -6,11 +6,13 @@ from pathlib import Path
 
 import pytest
 
-from app.quiz.banque_officielle import AXES, Incoherence, Partie, composer, lire
+from app.quiz.banque_officielle import AXES, Incoherence, Partie, composer, composer_jeux, lire
 from app.quiz.import_docx import Question
 from tests.test_import_docx import _docx, _paragraphe, _question
 
 FICHIER = Path(__file__).resolve().parents[1] / "alembic" / "donnees" / "banque_officielle.json"
+JEUX_100 = FICHIER.with_name("jeux_100.json")
+NIVEAUX_100 = {"debutant": 40, "intermediaire": 30, "avance": 20, "expert": 10}
 # Les effectifs du document : (moyennement difficiles, très difficiles) par partie.
 EFFECTIFS = {1: (180, 120), 2: (150, 100), 3: (120, 80), 4: (150, 100)}
 
@@ -138,3 +140,38 @@ def test_le_fichier_commite() -> None:
     for place in places[:16]:
         debut, fin = bornes[(place["place"] - 1) // 4 + 1]
         assert all(debut <= x["n"] <= fin for x in place["questions"])
+
+
+def test_cent_quiz_jeux_sur_les_1000_questions() -> None:
+    """Spec 050 : les Jeux couvrent toute la banque, la certification puise dans les quiz très difficiles."""
+    banque = _banque()
+    difficiles = {q.n for p in banque for q in p.difficiles}
+
+    jeux = composer_jeux(banque)
+
+    assert [q["numero"] for q in jeux] == list(range(1, 101))
+    assert Counter(q["niveau"] for q in jeux) == NIVEAUX_100
+    assert sorted(x["n"] for q in jeux for x in q["questions"]) == list(range(1, 1001))
+    assert all(not {x["n"] for x in q["questions"]} & difficiles for q in jeux[:60])
+    assert all({x["n"] for x in q["questions"]} <= difficiles for q in jeux[60:])
+    assert {q["niveau"] for q in jeux[:40]} == {"debutant"}
+    partie_de = {q.n: p.numero for p in banque for q in p.moyennes + p.difficiles}
+    assert all(len({partie_de[x["n"]] for x in q["questions"]}) == 1 for q in jeux)
+    # Les parties alternent : jamais deux fois la même partie sur les quatre premiers quiz.
+    assert len({partie_de[jeux[i]["questions"][0]["n"]] for i in range(4)}) == 4
+
+
+def test_le_fichier_des_100_quiz_commite() -> None:
+    jeux = json.loads(JEUX_100.read_text(encoding="utf-8"))
+    places = json.loads(FICHIER.read_text(encoding="utf-8"))["certification"]
+    par_numero = {x["n"]: (q["niveau"], x) for q in jeux for x in q["questions"]}
+
+    assert len(jeux) == 100 and Counter(q["niveau"] for q in jeux) == NIVEAUX_100
+    assert sorted(par_numero) == list(range(1, 1001))
+    assert all(len(q["questions"]) == 10 for q in jeux)
+    # Les 200 questions de la certification sont aussi jouées dans les Jeux, à partir du niveau Intermédiaire.
+    for place in places:
+        for x in place["questions"]:
+            niveau, question = par_numero[x["n"]]
+            assert question == x
+            assert niveau != "debutant"

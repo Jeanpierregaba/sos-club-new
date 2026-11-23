@@ -13,6 +13,12 @@ Composition :
   Expert (8). Les parties sont alternées dans l'ordre du parcours.
 
     uv run python -m app.quiz.banque_officielle <document.docx> alembic/donnees/banque_officielle.json
+
+Spec 050 : les Jeux reprennent les 1 000 questions en 100 quiz (`composer_jeux`), et la certification garde ses
+20 places, dont les questions figurent donc aussi dans les Jeux. Les 60 quiz M font les niveaux Débutant (40) et
+Intermédiaire (20) ; les 40 quiz D, Intermédiaire (10), Avancé (20) et Expert (10).
+
+    uv run python -m app.quiz.banque_officielle --jeux-100 <document.docx> alembic/donnees/jeux_100.json
 """
 
 import argparse
@@ -30,6 +36,8 @@ RESERVE_CERTIFICATION = 50  # questions D par partie
 POUR_LE_MELANGE = 10  # sur ces 50, celles des places 17 à 20
 NIVEAUX_M = (("debutant", 32), ("intermediaire", 24), ("avance", 4))
 NIVEAUX_D = (("avance", 12), ("expert", 8))
+NIVEAUX_100_M = (("debutant", 40), ("intermediaire", 20))
+NIVEAUX_100_D = (("intermediaire", 10), ("avance", 20), ("expert", 10))
 DESCRIPTION = "Banque officielle des Clubs Santé (spec 049)"
 
 # L'axe de chaque partie du document.
@@ -121,6 +129,41 @@ def _niveaux(quiz: list, repartition: tuple[tuple[str, int], ...]) -> list[str]:
     return niveaux
 
 
+def _quiz_jeux(
+    titres: dict[int, str],
+    ordre_m: list[tuple[int, list[Question]]],
+    ordre_d: list[tuple[int, list[Question]]],
+    niveaux_m: tuple[tuple[str, int], ...],
+    niveaux_d: tuple[tuple[str, int], ...],
+) -> list[dict]:
+    """Les quiz Jeux, numérotés dans l'ordre du parcours : les quiz M, puis les quiz D."""
+    niveaux = _niveaux(ordre_m, niveaux_m) + _niveaux(ordre_d, niveaux_d)
+    compteurs: dict[int, int] = {}
+    jeux = []
+    for numero, ((partie, questions), niveau) in enumerate(zip(ordre_m + ordre_d, niveaux, strict=True), start=1):
+        compteurs[partie] = compteurs.get(partie, 0) + 1
+        difficulte = "très difficiles" if numero > len(ordre_m) else "moyennement difficiles"
+        jeux.append(
+            {
+                "numero": numero,
+                "niveau": niveau,
+                "titre": f"{titres[partie]} — quiz {compteurs[partie]}",
+                "description": f"{DESCRIPTION} · partie {partie} : {titres[partie]} · questions {difficulte}.",
+                "axe": AXES[partie],
+                "questions": [_q(q) for q in questions],
+            }
+        )
+    return jeux
+
+
+def composer_jeux(parties: list[Partie]) -> list[dict]:
+    """Spec 050 : 100 quiz Jeux sur les 1 000 questions, chacun d'une seule partie et d'une seule difficulté."""
+    titres = {p.numero: p.titre for p in parties}
+    ordre_m = _alterner([_par_dix(p.moyennes, p.numero) for p in parties])
+    ordre_d = _alterner([_par_dix(p.difficiles, p.numero) for p in parties])
+    return _quiz_jeux(titres, ordre_m, ordre_d, NIVEAUX_100_M, NIVEAUX_100_D)
+
+
 def composer(parties: list[Partie]) -> dict:
     titres = {p.numero: p.titre for p in parties}
     certif_par_partie: dict[int, list[Question]] = {}
@@ -141,24 +184,7 @@ def composer(parties: list[Partie]) -> dict:
         jeux_m.append(_par_dix(p.moyennes, p.numero))
         jeux_d.append(_par_dix([q for i, q in enumerate(p.difficiles) if i not in pris], p.numero))
 
-    # Les quiz Jeux, numérotés dans l'ordre du parcours.
-    ordre_m, ordre_d = _alterner(jeux_m), _alterner(jeux_d)
-    niveaux = _niveaux(ordre_m, NIVEAUX_M) + _niveaux(ordre_d, NIVEAUX_D)
-    compteurs: dict[int, int] = {}
-    jeux = []
-    for numero, ((partie, questions), niveau) in enumerate(zip(ordre_m + ordre_d, niveaux, strict=True), start=1):
-        compteurs[partie] = compteurs.get(partie, 0) + 1
-        difficulte = "très difficiles" if (partie, questions) in ordre_d else "moyennement difficiles"
-        jeux.append(
-            {
-                "numero": numero,
-                "niveau": niveau,
-                "titre": f"{titres[partie]} — quiz {compteurs[partie]}",
-                "description": f"{DESCRIPTION} · partie {partie} : {titres[partie]} · questions {difficulte}.",
-                "axe": AXES[partie],
-                "questions": [_q(q) for q in questions],
-            }
-        )
+    jeux = _quiz_jeux(titres, _alterner(jeux_m), _alterner(jeux_d), NIVEAUX_M, NIVEAUX_D)
 
     # Les 20 places : 4 par partie (ses 40 questions, tour à tour), puis 4 places de mélange.
     certification = []
@@ -189,10 +215,17 @@ def composer(parties: list[Partie]) -> dict:
 
 def main() -> None:
     parseur = argparse.ArgumentParser(description=__doc__)
+    parseur.add_argument("--jeux-100", action="store_true", help="les 100 quiz Jeux de la spec 050")
     parseur.add_argument("document", type=Path)
     parseur.add_argument("sortie", type=Path)
     arguments = parseur.parse_args()
-    donnees = composer(lire(arguments.document.read_bytes()))
+    parties = lire(arguments.document.read_bytes())
+    if arguments.jeux_100:
+        jeux = composer_jeux(parties)
+        arguments.sortie.write_text(json.dumps(jeux, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        print(f"{len(jeux)} quiz Jeux → {arguments.sortie}")
+        return
+    donnees = composer(parties)
     arguments.sortie.write_text(json.dumps(donnees, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(
         f"{len(donnees['jeux'])} quiz Jeux et {len(donnees['certification'])} quiz de certification → {arguments.sortie}"
