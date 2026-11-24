@@ -10,71 +10,83 @@ import couverture from "@/assets/story2.jpg";
 import hygiene from "@/assets/campagne-hygiene.jpg";
 import ecologie from "@/assets/campagne-ecologie.jpg";
 import slideClubs from "@/assets/slide-clubs.webp";
+import { formatDeLaLangue } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/magazine")({
   head: () => ({
     meta: [
-      { title: "Magazine — Club Santé SOS Docteur TV" },
-      {
-        name: "description",
-        content:
-          "Le magazine officiel des Clubs Santé : reportages dans les lycées, articles d'éducation sanitaire, émissions SOS Docteur TV et paroles d'élèves.",
-      },
-      { property: "og:title", content: "Le magazine des Clubs Santé" },
+      { title: m.mag_meta_titre() },
+      { name: "description", content: m.mag_meta_description() },
+      { property: "og:title", content: m.mag_meta_og() },
     ],
   }),
   component: Magazine,
 });
 
-const rubriques = [
-  { t: "Hygiène & sensibilisation", c: "bg-sky" },
-  { t: "Santé publique & reportages TV", c: "bg-grape" },
-  { t: "Nutrition", c: "bg-tangerine" },
-  { t: "Protection de l’environnement", c: "bg-leaf" },
-  { t: "Paroles aux élèves", c: "bg-rose" },
+type Rubrique = "hygiene" | "sante" | "nutrition" | "environnement" | "paroles";
+
+// Des fonctions : les textes suivent la langue de la page (spec 052).
+const rubriques = (): { id: Rubrique; t: string; c: string }[] => [
+  { id: "hygiene", t: m.mag_rubrique_hygiene(), c: "bg-sky" },
+  { id: "sante", t: m.mag_rubrique_sante(), c: "bg-grape" },
+  { id: "nutrition", t: m.mag_rubrique_nutrition(), c: "bg-tangerine" },
+  { id: "environnement", t: m.mag_rubrique_environnement(), c: "bg-leaf" },
+  { id: "paroles", t: m.mag_rubrique_paroles(), c: "bg-rose" },
 ];
 
 // Articles et compteurs repris du magazine du site de référence fourni par le porteur du projet (clubsante.ibdastudio.com).
 // `cadrage` : la partie de la photo gardée quand elle est rognée.
-const articles = [
+const articles = (): {
+  rubrique: Rubrique;
+  date: string;
+  club: string;
+  t: string;
+  d: string;
+  img: string;
+  cadrage: string;
+  aime: number;
+  vues: number;
+}[] => [
   {
-    rubrique: "Hygiène & sensibilisation",
+    rubrique: "hygiene",
     date: "2026-06-15",
     club: "Club Santé du Lycée de Tokoin",
-    t: "Grande journée « Lavage des mains & hygiène » avec SOS Docteur TV",
-    d: "Le Club Santé du Lycée de Tokoin, avec l’équipe médicale de SOS Docteur TV, a organisé une démonstration géante du lavage des mains selon les normes de l’OMS. Plus de 350 élèves ont été formés, et des kits sanitaires ont été distribués.",
+    t: m.mag_article_1_titre(),
+    d: m.mag_article_1_texte(),
     img: hygiene,
     cadrage: "object-[50%_30%]",
     aime: 42,
     vues: 180,
   },
   {
-    rubrique: "Protection de l’environnement",
+    rubrique: "environnement",
     date: "2026-06-20",
     club: "Club Santé du Lycée de Kpalimé",
-    t: "Campagne de reboisement et création d’un jardin de plantes médicinales",
-    d: "Pour agir face au changement climatique et créer un cadre de vie sain, les membres du club ont planté 150 arbres à croissance rapide dans l’enceinte du lycée, et aménagé un espace pour les plantes thérapeutiques locales : moringa, citronnelle et neem.",
+    t: m.mag_article_2_titre(),
+    d: m.mag_article_2_texte(),
     img: ecologie,
     cadrage: "object-[50%_40%]",
     aime: 38,
     vues: 125,
   },
   {
-    rubrique: "Nutrition",
+    rubrique: "nutrition",
     date: "2026-06-28",
     club: "Club Santé du Lycée de Kara 1",
-    t: "Distribution de fruits de saison & causerie sur la nutrition équilibrée",
-    d: "Une alimentation équilibrée est la clé d’une bonne santé d’apprentissage ! Le club a mobilisé des partenaires pour distribuer mangues, oranges et bananes aux élèves du premier cycle, avec un mini-quiz interactif sur les vitamines essentielles.",
+    t: m.mag_article_3_titre(),
+    d: m.mag_article_3_texte(),
     img: slideClubs,
     cadrage: "object-center",
     aime: 29,
     vues: 92,
   },
 ];
+type Article = ReturnType<typeof articles>[number];
 
-const couleur = (r: string) => rubriques.find((x) => x.t === r)?.c ?? "bg-logo-blue";
+const rubriqueDe = (r: Rubrique) => rubriques().find((x) => x.id === r);
 const date = (iso: string) =>
-  new Date(`${iso}T12:00:00Z`).toLocaleDateString("fr-FR", {
+  new Date(`${iso}T12:00:00Z`).toLocaleDateString(formatDeLaLangue(), {
     timeZone: "UTC",
     day: "numeric",
     month: "long",
@@ -82,8 +94,8 @@ const date = (iso: string) =>
   });
 
 function Magazine() {
-  const [rubrique, setRubrique] = useState<string | null>(null);
-  const liste = articles.filter((a) => !rubrique || a.rubrique === rubrique);
+  const [rubrique, setRubrique] = useState<Rubrique | null>(null);
+  const liste = articles().filter((a) => !rubrique || a.rubrique === rubrique);
   const [une, ...autres] = liste;
 
   return (
@@ -99,26 +111,22 @@ function Magazine() {
         />
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-8 md:pt-12 lg:grid-cols-[1.15fr_1fr]">
           <div>
-            <FilAriane rubrique="Actualités" page="Magazine" clair />
+            <FilAriane rubrique={m.menu_actualites()} page={m.menu_magazine()} clair />
             <div data-reveal="left" className="pt-12">
               <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-logo-red">
-                <Newspaper className="size-4" /> Le blog & magazine officiel
+                <Newspaper className="size-4" /> {m.mag_blog()}
               </span>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-6xl">
-                <span className="block">La voix de la jeunesse</span>
-                <span className="block text-sun">& l’actu santé en direct</span>
+                <span className="block">{m.mag_titre_1()}</span>
+                <span className="block text-sun">{m.mag_titre_2()}</span>
               </h1>
-              <p className="mt-6 max-w-xl text-lg font-medium text-white/90">
-                Plonge au cœur du magazine des Clubs Santé SOS Docteur TV : reportages photo dans
-                les lycées, articles d’éducation sanitaire, émissions TV, chroniques d’élèves et
-                témoignages d’impact dans tout le Togo.
-              </p>
+              <p className="mt-6 max-w-xl text-lg font-medium text-white/90">{m.mag_intro()}</p>
               <ul className="mt-6 flex flex-wrap gap-2">
                 {[
-                  "Reportages terrain",
-                  "Paroles aux élèves",
-                  "Prévention & hygiène",
-                  "Émissions SOS Docteur TV",
+                  m.mag_tag_terrain(),
+                  m.mag_rubrique_paroles(),
+                  m.mag_tag_prevention(),
+                  m.mag_tag_emissions(),
                 ].map((t) => (
                   <li
                     key={t}
@@ -132,14 +140,14 @@ function Magazine() {
                 href="#articles"
                 className="btn-fx mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground shadow-card"
               >
-                Lire les articles <ArrowDown className="size-4" />
+                {m.mag_lire_articles()} <ArrowDown className="size-4" />
               </a>
               {/* Les articles des élèves et des encadreurs, publiés après modération (spec 023). */}
               <Link
                 to="/articles"
                 className="btn-fx ml-3 mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-[15px] font-bold text-logo-red shadow-card"
               >
-                <PenLine className="size-4" /> Articles des clubs
+                <PenLine className="size-4" /> {m.mag_articles_clubs()}
               </Link>
             </div>
           </div>
@@ -147,32 +155,36 @@ function Magazine() {
           <div data-reveal="right" className="relative mx-auto w-full max-w-sm">
             <div className="rotate-3 overflow-hidden rounded-[1.5rem] bg-white text-ink shadow-[0_30px_60px_-20px_rgb(0_0_0/0.5)]">
               <div className="flex items-baseline justify-between bg-ink px-5 py-3 text-white">
-                <span className="font-display text-2xl">Le Mag’ Santé</span>
-                <span className="text-xs font-bold text-white/70">N° 01 · 2026</span>
+                <span className="font-display text-2xl">{m.mag_mag_sante()}</span>
+                <span className="text-xs font-bold text-white/70">{m.mag_numero()}</span>
               </div>
               <div className="relative">
                 <img
                   src={couverture}
-                  alt="Des lycéens du Club Santé en reportage"
+                  alt={m.mag_couverture_alt()}
                   width={992}
                   height={672}
                   className="aspect-[4/5] w-full object-cover"
                 />
                 <div className="absolute inset-0 flex flex-col justify-between bg-linear-to-t from-night/90 via-transparent to-night/30 p-5 text-white">
                   <span className="self-start rounded bg-sun px-2 py-1 text-xs font-extrabold uppercase text-ink">
-                    À la une des clubs
+                    {m.mag_une_clubs()}
                   </span>
                   <div>
-                    <p className="font-display text-3xl leading-tight">Paroles aux élèves</p>
-                    <p className="mt-1 text-sm font-bold text-white/80">100 % presse jeunesse</p>
+                    <p className="font-display text-3xl leading-tight">
+                      {m.mag_rubrique_paroles()}
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-white/80">
+                      {m.mag_presse_jeunesse()}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
             <span className="absolute -left-6 -top-6 inline-flex size-24 -rotate-12 items-center justify-center rounded-full bg-sun text-center font-display text-sm leading-tight text-ink shadow-card">
-              Nouveau
+              {m.mag_nouveau()}
               <br />
-              numéro
+              {m.mag_numero_court()}
             </span>
           </div>
         </div>
@@ -180,28 +192,28 @@ function Magazine() {
 
       {/* Articles : un filtre par rubrique, l'article à la une en grand, puis les suivants. */}
       <section id="articles" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-20">
-        <EnTete sur="À la une des clubs" bleu="Les derniers" vert="articles" />
+        <EnTete sur={m.mag_une_clubs()} bleu={m.mag_derniers()} vert={m.mag_articles()} />
         <div data-reveal className="mt-8 flex flex-wrap gap-2">
-          {[null, ...rubriques.map((r) => r.t)].map((r) => (
+          {[null, ...rubriques()].map((r) => (
             <button
-              key={r ?? "tous"}
+              key={r?.id ?? "tous"}
               type="button"
-              aria-pressed={rubrique === r}
-              onClick={() => setRubrique(r)}
+              aria-pressed={rubrique === (r?.id ?? null)}
+              onClick={() => setRubrique(r?.id ?? null)}
               className={`rounded-full px-4 py-2 text-sm font-bold transition active:scale-95 ${
-                rubrique === r
+                rubrique === (r?.id ?? null)
                   ? "bg-logo-red text-white shadow-card"
                   : "bg-white ring-1 ring-border hover:ring-logo-red/40"
               }`}
             >
-              {r ?? "Tous"}
+              {r?.t ?? m.mag_tous()}
             </button>
           ))}
         </div>
 
         {!une ? (
           <p className="mt-10 rounded-[1.75rem] border border-dashed p-10 text-center font-semibold text-muted-foreground">
-            Les premiers articles de cette rubrique arrivent bientôt.
+            {m.mag_bientot()}
           </p>
         ) : (
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
@@ -259,11 +271,10 @@ function Magazine() {
           </span>
           <div>
             <h2 className="text-3xl md:text-4xl">
-              Ton club a une histoire <span className="text-sun">à raconter ?</span>
+              {m.mag_histoire_1()} <span className="text-sun">{m.mag_histoire_2()}</span>
             </h2>
             <p className="mt-2 max-w-3xl text-lg font-medium text-white/80">
-              Reportage, chronique ou action de terrain : prépare ton article avec l’encadreur de
-              ton Club Santé, qui le transmet à la rédaction pour validation avant publication.
+              {m.mag_histoire_texte()}
             </p>
           </div>
         </div>
@@ -274,20 +285,20 @@ function Magazine() {
   );
 }
 
-function Meta({ a }: { a: (typeof articles)[number] }) {
+function Meta({ a }: { a: Article }) {
   return (
     <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-muted-foreground">
       <span
-        className={`rounded-full px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-white ${couleur(a.rubrique)}`}
+        className={`rounded-full px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-white ${rubriqueDe(a.rubrique)?.c ?? "bg-logo-blue"}`}
       >
-        {a.rubrique}
+        {rubriqueDe(a.rubrique)?.t}
       </span>
       {date(a.date)} · {a.club}
     </p>
   );
 }
 
-function Reactions({ a }: { a: (typeof articles)[number] }) {
+function Reactions({ a }: { a: Article }) {
   return (
     <p className="mt-5 flex items-center gap-4 border-t pt-4 text-sm font-bold text-muted-foreground">
       <span className="flex items-center gap-1.5">

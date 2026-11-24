@@ -9,7 +9,15 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ErreurApi, chargerEvenement } from "@/lib/api/client";
 import type { EvenementPublic } from "@/lib/api/client";
-import { COULEURS_NIVEAU, NIVEAUX, TYPES_EVENEMENT, plageEvenement } from "@/lib/agenda";
+import { ContenuEnFrancais } from "@/components/ContenuEnFrancais";
+import {
+  COULEURS_NIVEAU,
+  NIVEAUX,
+  participants,
+  plageEvenement,
+  typeEvenement,
+} from "@/lib/agenda";
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/agenda_/$id")({
   loader: async ({ params }) => {
@@ -22,7 +30,7 @@ export const Route = createFileRoute("/agenda_/$id")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.titre ?? "Événement"} — Agenda des Clubs Santé` },
+      { title: m.agenda_page_titre({ titre: loaderData?.titre ?? m.agenda_evenement() }) },
       { name: "description", content: loaderData?.description.slice(0, 160) ?? "" },
     ],
   }),
@@ -36,12 +44,10 @@ function Introuvable() {
     <div className="min-h-screen bg-carnet text-ink">
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-5 py-20 text-center">
-        <h1 className="text-4xl text-logo-blue">Cet événement n'existe pas</h1>
-        <p className="mt-4 font-medium text-muted-foreground">
-          Il a peut-être été retiré de l'agenda, ou il attend encore la validation de l'équipe.
-        </p>
+        <h1 className="text-4xl text-logo-blue">{m.agenda_introuvable()}</h1>
+        <p className="mt-4 font-medium text-muted-foreground">{m.agenda_introuvable_texte()}</p>
         <Link to="/agenda" className="mt-8 inline-flex font-bold text-logo-blue hover:underline">
-          Voir l'agenda
+          {m.agenda_voir()}
         </Link>
       </main>
       <SiteFooter />
@@ -58,12 +64,12 @@ function PageEvenement() {
     <div className="min-h-screen overflow-x-clip bg-carnet text-ink">
       <SiteHeader />
       <main className="mx-auto max-w-4xl px-5 pb-20 pt-8">
-        <FilAriane rubrique="Agenda" page={evenement.titre} />
+        <FilAriane rubrique={m.menu_agenda()} page={evenement.titre} />
         <Link
           to="/agenda"
           className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-logo-blue hover:underline"
         >
-          <ArrowLeft className="size-4" /> Tout l'agenda
+          <ArrowLeft className="size-4" /> {m.agenda_tout()}
         </Link>
 
         <article className="mt-6 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-border md:p-10">
@@ -75,26 +81,27 @@ function PageEvenement() {
               {NIVEAUX[evenement.niveau].court}
             </span>
             <span className="rounded-full bg-mist px-3 py-1 text-xs font-extrabold uppercase text-logo-blue">
-              {TYPES_EVENEMENT[evenement.type] ?? evenement.type}
+              {typeEvenement(evenement.type)}
             </span>
             {evenement.annule && (
               <span className="rounded-full bg-logo-red px-3 py-1 text-xs font-extrabold uppercase text-white">
-                Annulé
+                {m.agenda_annule()}
               </span>
             )}
             {!evenement.annule && evenement.complet && (
               <span className="rounded-full bg-sun px-3 py-1 text-xs font-extrabold uppercase text-ink">
-                Complet
+                {m.agenda_complet()}
               </span>
             )}
           </div>
           <h1 className="mt-4 text-4xl leading-tight text-logo-blue md:text-5xl">
             {evenement.titre}
           </h1>
+          <ContenuEnFrancais className="mt-3" />
 
           {evenement.annule && (
             <p className="mt-5 rounded-2xl bg-logo-red/10 px-4 py-3 font-semibold">
-              Cet événement est annulé. Les membres invités ont été prévenus.
+              {m.agenda_annule_texte()}
             </p>
           )}
 
@@ -102,7 +109,7 @@ function PageEvenement() {
             <div className="flex gap-3">
               <CalendarDays className="size-5 shrink-0 text-logo-red" />
               <div>
-                <dt className="sr-only">Date</dt>
+                <dt className="sr-only">{m.agenda_date()}</dt>
                 <dd>{plageEvenement(evenement.debut, evenement.fin)}</dd>
               </div>
             </div>
@@ -113,7 +120,7 @@ function PageEvenement() {
                 <MapPin className="size-5 shrink-0 text-logo-red" />
               )}
               <div className="min-w-0">
-                <dt className="sr-only">Lieu</dt>
+                <dt className="sr-only">{m.agenda_lieu()}</dt>
                 <dd className="break-words">
                   {evenement.en_ligne && evenement.lien ? (
                     <a
@@ -122,7 +129,7 @@ function PageEvenement() {
                       rel="noopener noreferrer"
                       className="text-logo-blue underline"
                     >
-                      En ligne
+                      {m.agenda_en_ligne()}
                     </a>
                   ) : (
                     evenement.lieu
@@ -134,7 +141,7 @@ function PageEvenement() {
               <div className="flex gap-3">
                 <Users className="size-5 shrink-0 text-logo-red" />
                 <div>
-                  <dt className="sr-only">Organisateur</dt>
+                  <dt className="sr-only">{m.agenda_organisateur()}</dt>
                   <dd>
                     {evenement.club}
                     {evenement.etablissement && (
@@ -150,7 +157,7 @@ function PageEvenement() {
               <div className="flex gap-3">
                 <Target className="size-5 shrink-0 text-logo-red" />
                 <div>
-                  <dt className="sr-only">Public visé</dt>
+                  <dt className="sr-only">{m.agenda_public()}</dt>
                   <dd>{evenement.public_vise}</dd>
                 </div>
               </div>
@@ -159,19 +166,18 @@ function PageEvenement() {
 
           {evenement.objectif && (
             <section className="mt-8">
-              <h2 className="text-xl text-logo-blue">Objectif</h2>
+              <h2 className="text-xl text-logo-blue">{m.agenda_objectif()}</h2>
               <p className="mt-2 whitespace-pre-line font-medium">{evenement.objectif}</p>
             </section>
           )}
           <section className="mt-6">
-            <h2 className="text-xl text-logo-blue">Programme</h2>
+            <h2 className="text-xl text-logo-blue">{m.agenda_programme()}</h2>
             <p className="mt-2 whitespace-pre-line font-medium">{evenement.description}</p>
           </section>
 
           {evenement.niveau === "club" && (
             <p className="mt-8 text-sm font-bold text-muted-foreground">
-              {evenement.participants} participant{evenement.participants > 1 ? "s" : ""}
-              {evenement.places ? ` sur ${evenement.places} places` : ""}
+              {participants(evenement.participants, evenement.places, true)}
             </p>
           )}
 

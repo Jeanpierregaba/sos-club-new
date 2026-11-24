@@ -5,10 +5,12 @@ import type { EvenementPublic } from "@/lib/api/client";
 import {
   COULEURS_NIVEAU,
   NIVEAUX,
-  TYPES_EVENEMENT,
   dateEvenement,
+  participants,
   plageEvenement,
+  typeEvenement,
 } from "@/lib/agenda";
+import { m } from "@/paraglide/messages.js";
 
 // Un événement de l'agenda public. Aucun nom d'élève : le club, l'établissement et le nombre de participants.
 export function CarteEvenement({
@@ -47,19 +49,19 @@ export function CarteEvenement({
             {NIVEAUX[evenement.niveau].court}
           </span>
           <span className="rounded-full bg-mist px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-logo-blue">
-            {TYPES_EVENEMENT[evenement.type] ?? evenement.type}
+            {typeEvenement(evenement.type)}
           </span>
           {evenement.annule ? (
             <span className="ml-auto rounded-full bg-logo-red px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-white">
-              Annulé
+              {m.agenda_annule()}
             </span>
           ) : evenement.complet ? (
             <span className="ml-auto rounded-full bg-sun px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-ink">
-              Complet
+              {m.agenda_complet()}
             </span>
           ) : passe ? (
             <span className="ml-auto text-xs font-extrabold uppercase text-muted-foreground">
-              Terminé
+              {m.agenda_termine()}
             </span>
           ) : null}
         </div>
@@ -78,7 +80,7 @@ export function CarteEvenement({
           <span className="flex min-w-0 items-center gap-1.5">
             {evenement.en_ligne ? (
               <>
-                <Globe className="size-4 shrink-0 text-logo-red" /> En ligne
+                <Globe className="size-4 shrink-0 text-logo-red" /> {m.agenda_en_ligne()}
               </>
             ) : (
               <>
@@ -98,9 +100,7 @@ export function CarteEvenement({
           {evenement.dre && <span className="text-muted-foreground">DRE {evenement.dre}</span>}
           {evenement.niveau === "club" && (
             <span className="flex items-center gap-1.5 text-muted-foreground">
-              <Users className="size-4" /> {evenement.participants} participant
-              {evenement.participants > 1 ? "s" : ""}
-              {evenement.places ? ` sur ${evenement.places}` : ""}
+              <Users className="size-4" /> {participants(evenement.participants, evenement.places)}
             </span>
           )}
           <Link
@@ -108,7 +108,7 @@ export function CarteEvenement({
             params={{ id: evenement.id }}
             className="ml-auto inline-flex items-center gap-1.5 font-bold text-logo-blue hover:underline"
           >
-            Détails <ArrowRight className="size-4" />
+            {m.agenda_details()} <ArrowRight className="size-4" />
           </Link>
         </div>
       </div>

@@ -14,6 +14,9 @@ import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
 import mascottesLivres from "@/assets/mascottes-livres.webp";
 import { chargerAxes, chargerBibliotheque, type CategorieRessource } from "@/lib/api/client";
 import { CATEGORIES, estCategorie, ORDRE_CATEGORIES } from "@/lib/bibliotheque";
+import { ContenuEnFrancais } from "@/components/ContenuEnFrancais";
+import { auSingulier, formatDeLaLangue, lien } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 type Recherche = { categorie?: CategorieRessource; axe?: string };
 
@@ -36,20 +39,16 @@ export const Route = createFileRoute("/bibliotheque")({
   },
   head: () => ({
     meta: [
-      { title: "Bibliothèque — Club Santé SOS Docteur TV" },
-      {
-        name: "description",
-        content:
-          "Magazines, guides d'action, fiches pratiques, affiches et fascicules validés par l'équipe nationale, à lire ou télécharger librement.",
-      },
-      { property: "og:title", content: "La bibliothèque des Clubs Santé" },
+      { title: m.biblio_meta_titre() },
+      { name: "description", content: m.biblio_meta_description() },
+      { property: "og:title", content: m.biblio_meta_og() },
     ],
   }),
   errorComponent: ServiceIndisponible,
   component: Bibliotheque,
 });
 
-const nombre = (n: number) => n.toLocaleString("fr-FR");
+const nombre = (n: number) => n.toLocaleString(formatDeLaLangue());
 
 // Un filtre vide disparaît de l'adresse.
 const filtres = (categorie?: CategorieRessource, axe?: string): Recherche => ({
@@ -64,8 +63,11 @@ function Bibliotheque() {
   const { ressources, a_la_une, chiffres } = bibliotheque;
   const filtre = Boolean(categorie || axe);
   const chiffresAffiches = [
-    { n: nombre(chiffres.documents), t: chiffres.documents > 1 ? "Documents" : "Document" },
-    { n: nombre(chiffres.telechargements), t: "Téléchargements" },
+    {
+      n: nombre(chiffres.documents),
+      t: auSingulier(chiffres.documents) ? m.biblio_document() : m.biblio_documents(),
+    },
+    { n: nombre(chiffres.telechargements), t: m.biblio_telechargements() },
   ];
 
   return (
@@ -86,21 +88,17 @@ function Bibliotheque() {
         <DecorAnime ton="clair" />
         <div className="mx-auto grid max-w-7xl items-end gap-8 px-5 pt-8 md:pt-12 lg:grid-cols-[1.2fr_1fr]">
           <div className="pb-14 lg:pb-24">
-            <FilAriane rubrique="Vie du club" page="Bibliothèque" />
+            <FilAriane rubrique={m.menu_vie_du_club()} page={m.menu_bibliotheque()} />
             <div data-reveal="left" className="pt-12 lg:pt-16">
               <p className="flex items-center gap-3 text-sm font-extrabold uppercase tracking-widest text-logo-red">
                 <span className="h-1 w-8 rounded-full bg-primary" />
                 AIMES-AFRIQUE · SOS Docteur TV
               </p>
               <h1 className="mt-4 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block text-logo-blue">La bibliothèque</span>
-                <span className="block text-primary">des Clubs Santé</span>
+                <span className="block text-logo-blue">{m.biblio_titre_1()}</span>
+                <span className="block text-primary">{m.biblio_titre_2()}</span>
               </h1>
-              <p className="mt-6 max-w-xl text-lg font-medium text-ink/75">
-                Accède librement aux magazines, guides d’action, fiches pratiques, affiches et
-                fascicules pour bien animer ton Club Santé SOS Docteur TV. Chaque document est
-                validé avant sa mise en ligne.
-              </p>
+              <p className="mt-6 max-w-xl text-lg font-medium text-ink/75">{m.biblio_intro()}</p>
               <dl className="mt-8 grid max-w-sm grid-cols-2 gap-3">
                 {chiffresAffiches.map((c) => (
                   <div
@@ -116,7 +114,7 @@ function Bibliotheque() {
           </div>
           <img
             src={mascottesLivres}
-            alt="Les mascottes du Club Santé, livres en main"
+            alt={m.biblio_mascottes_alt()}
             width={1122}
             height={1402}
             data-reveal="right"
@@ -130,12 +128,16 @@ function Bibliotheque() {
       {/* Rayonnages : un filtre par catégorie et par axe, puis les documents. */}
       <section className="mx-auto max-w-7xl px-5 py-20">
         <div className="flex flex-wrap items-end justify-between gap-6">
-          <EnTete sur="Ressources en libre accès" bleu="Tous les" vert="documents">
-            Validés par l’équipe nationale, à lire en ligne ou à télécharger.
+          <EnTete
+            sur={m.biblio_rayons_sur()}
+            bleu={m.biblio_rayons_bleu()}
+            vert={m.biblio_rayons_vert()}
+          >
+            {m.biblio_rayons_texte()}
           </EnTete>
           {axes.length > 0 && (
             <label data-reveal className="grid gap-1 text-sm font-bold text-ink">
-              Axe de santé
+              {m.biblio_axe()}
               <select
                 value={axe ?? ""}
                 onChange={(e) =>
@@ -146,7 +148,7 @@ function Bibliotheque() {
                 }
                 className="h-11 rounded-full bg-white px-4 font-semibold ring-1 ring-border"
               >
-                <option value="">Tous les axes</option>
+                <option value="">{m.biblio_tous_axes()}</option>
                 {axes.map((a) => (
                   <option key={a.code} value={a.code}>
                     {a.libelle}
@@ -156,7 +158,7 @@ function Bibliotheque() {
             </label>
           )}
         </div>
-        <nav aria-label="Catégories" data-reveal className="mt-8 flex flex-wrap gap-2">
+        <nav aria-label={m.biblio_categories()} data-reveal className="mt-8 flex flex-wrap gap-2">
           {([undefined, ...ORDRE_CATEGORIES] as (CategorieRessource | undefined)[]).map((c) => (
             <Link
               key={c ?? "tous"}
@@ -170,11 +172,12 @@ function Bibliotheque() {
                   : "bg-white text-ink ring-1 ring-border hover:ring-logo-blue/40"
               }`}
             >
-              {c ? CATEGORIES[c].pluriel : "Tous les documents"}
+              {c ? CATEGORIES[c].pluriel : m.biblio_tous_documents()}
             </Link>
           ))}
         </nav>
 
+        <ContenuEnFrancais className="mt-4" />
         {ressources.length > 0 ? (
           <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {ressources.map((r, i) => (
@@ -185,9 +188,7 @@ function Bibliotheque() {
           <div className="mt-10 flex flex-col items-center gap-4 rounded-[1.75rem] bg-white p-10 text-center shadow-card">
             <LibraryBig aria-hidden className="size-12 text-logo-blue" />
             <p className="max-w-md font-semibold">
-              {filtre
-                ? "Aucun document ne correspond à ce choix pour le moment."
-                : "La bibliothèque se remplit : les premiers documents arrivent bientôt."}
+              {filtre ? m.biblio_aucun_filtre() : m.biblio_vide()}
             </p>
             {filtre && (
               <Link
@@ -195,7 +196,7 @@ function Bibliotheque() {
                 resetScroll={false}
                 className="font-bold text-logo-blue hover:underline"
               >
-                Voir tous les documents
+                {m.biblio_voir_tous()}
               </Link>
             )}
           </div>
@@ -214,20 +215,20 @@ function Bibliotheque() {
           />
           <div>
             <p className="text-sm font-extrabold uppercase tracking-widest text-sun">
-              Réviser avant de jouer
+              {m.biblio_reviser_sur()}
             </p>
             <h2 className="mt-3 text-4xl md:text-5xl">
-              Prépare ta <span className="text-primary">certification</span>
+              {m.biblio_reviser_titre_1()}{" "}
+              <span className="text-primary">{m.biblio_reviser_titre_2()}</span>
             </h2>
             <p className="mt-4 max-w-2xl text-lg font-medium text-white/80">
-              Avant de passer les quiz, consulte et télécharge gratuitement les fascicules
-              pédagogiques : apprends, révise, puis lance-toi dans les 20 quiz du parcours.
+              {m.biblio_reviser_texte()}
             </p>
             <a
-              href="/certification"
+              href={lien("/certification")}
               className="btn-fx mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
             >
-              Découvrir la certification <ArrowRight className="size-4" />
+              {m.biblio_decouvrir_certif()} <ArrowRight className="size-4" />
             </a>
           </div>
           <img

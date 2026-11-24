@@ -20,7 +20,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteMotion } from "@/components/SiteMotion";
 import { chargerAxes, chargerFicheClub, ErreurApi } from "@/lib/api/client";
 import { libelleAxes, libellesDesAxes, STATUTS_CLUB } from "@/lib/clubs";
+import { ContenuEnFrancais } from "@/components/ContenuEnFrancais";
 import { dateCourte } from "@/lib/dates";
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/clubs/$id")({
   loader: async ({ params }) => {
@@ -32,12 +34,8 @@ export const Route = createFileRoute("/clubs/$id")({
   },
   head: () => ({
     meta: [
-      { title: "Un Club Santé — Club Santé SOS Docteur TV" },
-      {
-        name: "description",
-        content:
-          "La fiche publique d'un Club Santé : son établissement, sa Direction Régionale de l'Éducation et ses axes d'intervention.",
-      },
+      { title: m.club_meta_titre() },
+      { name: "description", content: m.club_meta_description() },
     ],
   }),
   errorComponent: (props) =>
@@ -55,15 +53,13 @@ function ClubIntrouvable() {
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-5 py-24 text-center">
         <p className="font-display text-7xl text-primary">404</p>
-        <h1 className="mt-3 text-4xl text-logo-blue">Ce club est introuvable</h1>
-        <p className="mt-3 font-medium text-muted-foreground">
-          Il n'existe pas, ou son ouverture n'a pas encore été validée par l'équipe nationale.
-        </p>
+        <h1 className="mt-3 text-4xl text-logo-blue">{m.club_introuvable()}</h1>
+        <p className="mt-3 font-medium text-muted-foreground">{m.club_introuvable_texte()}</p>
         <Link
           to="/carte-des-clubs"
           className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground"
         >
-          <ArrowLeft className="size-4" /> Revenir à la carte des clubs
+          <ArrowLeft className="size-4" /> {m.club_revenir_carte()}
         </Link>
       </main>
       <SiteFooter />
@@ -86,7 +82,7 @@ function FicheClubPage() {
           <div className="absolute -right-32 top-1/2 size-[32rem] -translate-y-1/2 rounded-full border-[2.5rem] border-white/5" />
         </div>
         <div className="mx-auto max-w-5xl px-5 pb-16 pt-8 md:pb-20 md:pt-12">
-          <FilAriane rubrique="Vie du club" page="Fiche du club" clair />
+          <FilAriane rubrique={m.menu_vie_du_club()} page={m.carte_clubs_fiche()} clair />
           <div data-reveal="left" className="pt-10 md:pt-14">
             <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-bold backdrop-blur-sm">
               <Sparkles className="size-4 text-sun" /> {STATUTS_CLUB[club.statut].libelle}
@@ -101,8 +97,8 @@ function FicheClubPage() {
             </p>
             {club.actif_le && (
               <p className="mt-2 flex items-center gap-2 text-sm font-semibold text-white/70">
-                <CalendarDays aria-hidden className="size-4" /> Club actif depuis le{" "}
-                {dateCourte(club.actif_le)}
+                <CalendarDays aria-hidden className="size-4" />{" "}
+                {m.club_actif_depuis({ date: dateCourte(club.actif_le) })}
               </p>
             )}
           </div>
@@ -112,18 +108,17 @@ function FicheClubPage() {
       <main className="mx-auto max-w-5xl px-5 pb-20 pt-10">
         <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-border md:p-10">
           <h2 className="text-2xl">
-            <span className="text-logo-blue">Le</span> <span className="text-primary">club</span>
+            <span className="text-logo-blue">{m.club_le()}</span>{" "}
+            <span className="text-primary">{m.club_club()}</span>
           </h2>
           <p className="mt-3 max-w-3xl whitespace-pre-line font-medium leading-relaxed text-ink/80">
-            {club.description ??
-              "Les membres de ce club détailleront bientôt ses actions ici. En attendant, contacte l'établissement pour en savoir plus."}
+            {club.description ?? m.club_sans_description()}
           </p>
 
-          <h3 className="mt-8 text-lg font-extrabold text-ink">Axes d'intervention</h3>
+          {club.description && <ContenuEnFrancais className="mt-2" />}
+          <h3 className="mt-8 text-lg font-extrabold text-ink">{m.club_axes()}</h3>
           {club.axes.length === 0 ? (
-            <p className="mt-2 font-medium text-muted-foreground">
-              Les axes seront précisés par le club.
-            </p>
+            <p className="mt-2 font-medium text-muted-foreground">{m.club_axes_a_preciser()}</p>
           ) : (
             <ul className="mt-3 flex flex-wrap gap-2">
               {club.axes.map((code) => (
@@ -139,7 +134,7 @@ function FicheClubPage() {
 
           {club.actualites.length > 0 && (
             <>
-              <h3 className="mt-8 text-lg font-extrabold text-ink">Actualités du club</h3>
+              <h3 className="mt-8 text-lg font-extrabold text-ink">{m.club_actualites()}</h3>
               <ul className="mt-3 grid gap-3 sm:grid-cols-2">
                 {club.actualites.map((a) => (
                   <li key={a.adresse}>
@@ -161,16 +156,14 @@ function FicheClubPage() {
           )}
 
           <div className="mt-8 rounded-2xl bg-mist-soft p-4 text-sm font-medium text-muted-foreground">
-            Seuls le nom du club, son établissement, ses axes et ses actualités validées sont
-            publics. La liste des membres n'est visible que de ses membres, de ses encadreurs et de
-            l'équipe des Clubs Santé.
+            {m.club_public()}
           </div>
 
           <Link
             to="/carte-des-clubs"
             className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-logo-blue hover:underline"
           >
-            <ArrowLeft className="size-4" /> Tous les clubs sur la carte
+            <ArrowLeft className="size-4" /> {m.club_tous_carte()}
           </Link>
         </section>
       </main>

@@ -5,7 +5,7 @@ import { Landmark, School, Stethoscope } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import type { EvenementPublic, ReponseAgenda } from "@/lib/api/client";
-import { formatDeLaLangue, LANGUE_DE_BASE, langueCourante } from "@/lib/langues";
+import { auSingulier, formatDeLaLangue, LANGUE_DE_BASE, langueCourante } from "@/lib/langues";
 import { m } from "@/paraglide/messages.js";
 
 export const FUSEAU = "Africa/Lome";
@@ -27,11 +27,30 @@ export function typeEvenement(type: string): string {
   return typeof message === "function" ? message() : (TYPES_EVENEMENT[type] ?? type);
 }
 
-export const NIVEAUX: Record<"national" | "regional" | "club", { court: string; long: string }> = {
-  national: { court: "Secrétariat technique permanent", long: "Coordination centrale & pilotage" },
-  regional: { court: "Comité", long: "Encadrement scientifique & régional" },
-  club: { court: "Club Santé SOS Docteur TV", long: "Actions terrain & vie des établissements" },
+// Les libellés sont lus à l'affichage, dans la langue de la page (spec 052).
+const niveau = (court: () => string, long: () => string) => ({
+  get court() {
+    return court();
+  },
+  get long() {
+    return long();
+  },
+});
+
+export const NIVEAUX: Record<
+  "national" | "regional" | "club",
+  { readonly court: string; readonly long: string }
+> = {
+  national: niveau(m.agenda_niveau_national, m.agenda_niveau_national_long),
+  regional: niveau(m.agenda_niveau_regional, m.agenda_niveau_regional_long),
+  club: niveau(m.agenda_niveau_club, m.agenda_niveau_club_long),
 };
+
+/** « 3 participants », « 1 participant » ; avec les places : « 3 participants sur 20 places ». */
+export const participants = (nombre: number, places?: number | null, long = false) =>
+  (auSingulier(nombre) ? m.agenda_un_participant : m.agenda_n_participants)({
+    nombre: String(nombre),
+  }) + (places ? (long ? m.agenda_sur_places : m.agenda_sur)({ places: String(places) }) : "");
 
 export const REPONSES: Record<ReponseAgenda, string> = {
   participe: "Je participe",

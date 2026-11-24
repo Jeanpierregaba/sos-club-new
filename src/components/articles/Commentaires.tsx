@@ -18,6 +18,7 @@ import {
 } from "@/lib/api/client";
 import { signer } from "@/lib/articles";
 import { dateCourte } from "@/lib/dates";
+import { m } from "@/paraglide/messages.js";
 
 const LONGUEUR_MAX = 1000;
 const CONFIRMATION = "Merci ! Ton commentaire sera visible après sa validation.";
@@ -47,23 +48,19 @@ export function Commentaires({ adresse }: { adresse: string }) {
     <section aria-labelledby="commentaires" className="mt-14 border-t pt-10">
       <h2 id="commentaires" className="flex items-center gap-2 text-2xl text-logo-blue">
         <MessageCircle className="size-6" />
-        Commentaires
+        {m.commentaires_titre()}
         {total > 0 && <span className="text-base text-muted-foreground">({total})</span>}
       </h2>
 
       {publics.isError ? (
-        <p className="mt-4 text-sm text-muted-foreground">
-          Les commentaires ne sont pas disponibles pour le moment.
-        </p>
+        <p className="mt-4 text-sm text-muted-foreground">{m.commentaires_indisponibles()}</p>
       ) : publics.isPending ? (
         <Loader2
           className="mt-4 size-5 animate-spin text-muted-foreground"
-          aria-label="Chargement"
+          aria-label={m.commun_chargement()}
         />
       ) : total === 0 ? (
-        <p className="mt-4 text-sm text-muted-foreground">
-          Personne n'a encore commenté cet article.
-        </p>
+        <p className="mt-4 text-sm text-muted-foreground">{m.commentaires_aucun()}</p>
       ) : (
         <ol className="mt-6 space-y-4">
           {publics.data.commentaires.map((c) => (
@@ -78,17 +75,17 @@ export function Commentaires({ adresse }: { adresse: string }) {
         </ol>
       )}
       {publics.data && publics.data.pages > 1 && (
-        <nav aria-label="Pages des commentaires" className="mt-4 flex items-center gap-3 text-sm">
+        <nav aria-label={m.commentaires_pages()} className="mt-4 flex items-center gap-3 text-sm">
           <Button
             variant="outline"
             size="sm"
             disabled={page <= 1}
             onClick={() => setPage(page - 1)}
           >
-            Précédents
+            {m.classement_precedents()}
           </Button>
           <span>
-            Page {page} sur {publics.data.pages}
+            {m.articles_page_sur({ page: String(page), pages: String(publics.data.pages) })}
           </span>
           <Button
             variant="outline"
@@ -96,7 +93,7 @@ export function Commentaires({ adresse }: { adresse: string }) {
             disabled={page >= publics.data.pages}
             onClick={() => setPage(page + 1)}
           >
-            Suivants
+            {m.classement_suivants()}
           </Button>
         </nav>
       )}
@@ -121,9 +118,9 @@ export function Commentaires({ adresse }: { adresse: string }) {
       ) : moi ? null : (
         <p className="mt-6 rounded-2xl bg-mist p-4 text-sm">
           <Link to="/connexion" className="font-bold text-logo-blue hover:underline">
-            Connecte-toi
-          </Link>{" "}
-          pour commenter cet article.
+            {m.commentaires_connecte_toi()}
+          </Link>
+          {m.commentaires_pour_commenter()}
         </p>
       )}
     </section>

@@ -10,7 +10,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteMotion } from "@/components/SiteMotion";
 import { chargerArticles, chargerAxes } from "@/lib/api/client";
 import { signer } from "@/lib/articles";
+import { ContenuEnFrancais } from "@/components/ContenuEnFrancais";
 import { dateCourte } from "@/lib/dates";
+import { m } from "@/paraglide/messages.js";
 
 type Recherche = { page?: number; axe?: string };
 
@@ -33,12 +35,8 @@ export const Route = createFileRoute("/articles/")({
   },
   head: () => ({
     meta: [
-      { title: "Articles des Clubs Santé — Club Santé SOS Docteur TV" },
-      {
-        name: "description",
-        content:
-          "Les articles des élèves et des encadreurs des Clubs Santé, relus par l'équipe nationale avant leur publication.",
-      },
+      { title: m.articles_meta_titre() },
+      { name: "description", content: m.articles_meta_description() },
     ],
   }),
   errorComponent: ServiceIndisponible,
@@ -57,24 +55,21 @@ function Articles() {
       <section className="relative isolate overflow-hidden bg-linear-to-br from-mist via-white to-lilac">
         <DecorAnime ton="clair" />
         <div className="mx-auto max-w-7xl px-5 pb-14 pt-8 md:pt-12">
-          <FilAriane rubrique="Actualités" page="Articles" />
+          <FilAriane rubrique={m.menu_actualites()} page={m.articles_fil()} />
           <div data-reveal className="max-w-3xl pt-10">
             <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-logo-red shadow-sm">
-              <Newspaper className="size-4" /> Écrits par les clubs
+              <Newspaper className="size-4" /> {m.articles_ecrits()}
             </span>
             <h1 className="mt-5 text-5xl leading-[0.95] md:text-6xl">
-              <span className="text-logo-blue">Les articles</span>{" "}
-              <span className="text-primary">des Clubs Santé</span>
+              <span className="text-logo-blue">{m.articles_titre_1()}</span>{" "}
+              <span className="text-primary">{m.articles_titre_2()}</span>
             </h1>
-            <p className="mt-5 max-w-2xl text-lg font-medium text-ink/75">
-              Actions de terrain, conseils de santé, coups de cœur : les élèves et les encadreurs
-              racontent. Chaque article est relu par l'équipe nationale avant sa publication.
-            </p>
+            <p className="mt-5 max-w-2xl text-lg font-medium text-ink/75">{m.articles_intro()}</p>
             <Link
               to="/mes-articles"
               className="btn-fx mt-7 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground shadow-card"
             >
-              <PenLine className="size-4" /> Écrire un article
+              <PenLine className="size-4" /> {m.articles_ecrire()}
             </Link>
           </div>
         </div>
@@ -82,21 +77,22 @@ function Articles() {
 
       <section id="articles" className="mx-auto max-w-5xl px-5 py-12">
         {axes.length > 0 && (
-          <nav aria-label="Filtrer par axe" className="flex flex-wrap gap-2">
-            <Filtre actif={!axe} libelle="Tous les axes" />
+          <nav aria-label={m.articles_filtrer_axe()} className="flex flex-wrap gap-2">
+            <Filtre actif={!axe} libelle={m.biblio_tous_axes()} />
             {axes.map((a) => (
               <Filtre key={a.code} actif={axe === a.code} libelle={a.libelle} axe={a.code} />
             ))}
           </nav>
         )}
 
+        <ContenuEnFrancais className="mt-4" />
         {articles.articles.length === 0 ? (
           <div className="mt-8 rounded-3xl bg-card p-10 text-center shadow-card">
             <Newspaper className="mx-auto size-10 text-logo-blue/40" />
             <p className="mt-3 font-semibold">
-              Aucun article publié {axe ? "dans cet axe " : ""}pour le moment.
+              {axe ? m.articles_aucun_axe() : m.articles_aucun()}
             </p>
-            <p className="text-sm text-muted-foreground">Et si le premier était le tien ?</p>
+            <p className="text-sm text-muted-foreground">{m.articles_premier()}</p>
           </div>
         ) : (
           <ul className="mt-8 grid gap-5 md:grid-cols-2">
@@ -121,7 +117,7 @@ function Articles() {
                     </span>
                     {a.nature === "actualite" && (
                       <span className="rounded-full bg-sun/30 px-3 py-1 text-xs font-bold text-ink">
-                        Actualité du club
+                        {m.articles_actualite_club()}
                       </span>
                     )}
                   </span>
@@ -140,7 +136,10 @@ function Articles() {
         )}
 
         {articles.pages > 1 && (
-          <nav aria-label="Pages" className="mt-10 flex items-center justify-center gap-3">
+          <nav
+            aria-label={m.articles_pages()}
+            className="mt-10 flex items-center justify-center gap-3"
+          >
             {articles.page > 1 && (
               <Link
                 to="/articles"
@@ -150,11 +149,11 @@ function Articles() {
                 }}
                 className="rounded-full bg-white px-5 py-2 font-bold text-logo-blue shadow-sm"
               >
-                Plus récents
+                {m.articles_plus_recents()}
               </Link>
             )}
             <span className="text-sm text-muted-foreground">
-              Page {articles.page} sur {articles.pages}
+              {m.articles_page_sur({ page: String(articles.page), pages: String(articles.pages) })}
             </span>
             {articles.page < articles.pages && (
               <Link
@@ -162,7 +161,7 @@ function Articles() {
                 search={{ ...(axe ? { axe } : {}), page: articles.page + 1 }}
                 className="rounded-full bg-white px-5 py-2 font-bold text-logo-blue shadow-sm"
               >
-                Plus anciens
+                {m.articles_plus_anciens()}
               </Link>
             )}
           </nav>

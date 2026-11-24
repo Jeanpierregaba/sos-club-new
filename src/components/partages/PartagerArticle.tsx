@@ -1,3 +1,4 @@
+import { m } from "@/paraglide/messages.js";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Copy, Loader2, Send, Share2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -30,7 +31,7 @@ export function PartagerArticle({ adresse, titre }: { adresse: string; titre: st
     <section aria-labelledby="partager" className="mt-14 rounded-3xl bg-white p-6 shadow-sm">
       <h2 id="partager" className="flex items-center gap-2 text-2xl text-logo-blue">
         <Share2 className="size-6" />
-        Partage cet article
+        {m.partage_titre()}
       </h2>
       <LiensDePartage url={url} titre={titre} />
       {peutDeclarer && <Declaration adresse={adresse} />}
@@ -71,7 +72,7 @@ function LiensDePartage({ url, titre }: { url: string; titre: string }) {
         }}
       >
         {copie ? <Check className="size-4" /> : <Copy className="size-4" />}
-        {copie ? "Lien copié" : "Copier le lien (Instagram, TikTok)"}
+        {copie ? m.partage_copie() : m.partage_copier()}
       </button>
       {natif && (
         <button
@@ -79,7 +80,7 @@ function LiensDePartage({ url, titre }: { url: string; titre: string }) {
           className={classe}
           onClick={() => void navigator.share({ title: titre, url }).catch(() => undefined)}
         >
-          <Share2 className="size-4" /> Partager…
+          <Share2 className="size-4" /> {m.partage_partager()}
         </button>
       )}
     </div>

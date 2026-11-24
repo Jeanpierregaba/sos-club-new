@@ -8,7 +8,16 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteMotion, retard } from "@/components/SiteMotion";
 import { chargerAgenda, chargerAxes, chargerDre } from "@/lib/api/client";
 import type { EvenementPublic } from "@/lib/api/client";
-import { COULEURS_NIVEAU, NIVEAUX, TYPES_EVENEMENT, dateEvenement } from "@/lib/agenda";
+import { ContenuEnFrancais } from "@/components/ContenuEnFrancais";
+import {
+  COULEURS_NIVEAU,
+  NIVEAUX,
+  TYPES_EVENEMENT,
+  dateEvenement,
+  typeEvenement,
+} from "@/lib/agenda";
+import { auSingulier } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 type Niveau = "national" | "regional" | "club";
 type Recherche = {
@@ -44,13 +53,9 @@ export const Route = createFileRoute("/agenda")({
   },
   head: () => ({
     meta: [
-      { title: "Agenda — Club Santé SOS Docteur TV" },
-      {
-        name: "description",
-        content:
-          "L'agenda officiel des Clubs Santé SOS Docteur TV : concours, formations, campagnes et actions de terrain dans les régions du Togo.",
-      },
-      { property: "og:title", content: "L'agenda officiel des Clubs Santé" },
+      { title: m.agenda_meta_titre() },
+      { name: "description", content: m.agenda_meta_description() },
+      { property: "og:title", content: m.agenda_meta_og() },
     ],
   }),
   errorComponent: ServiceIndisponible,
@@ -80,9 +85,9 @@ function Agenda() {
 
   const total = avenir.total + passes.total;
   const groupes = [
-    ...parMois(avenir.evenements),
+    ...parMois(avenir.evenements).map((g) => ({ ...g, passe: false })),
     ...(passes.evenements.length > 0
-      ? [{ titre: "Déjà passés", evenements: passes.evenements }]
+      ? [{ titre: m.agenda_deja_passes(), evenements: passes.evenements, passe: true }]
       : []),
   ];
 
@@ -99,19 +104,16 @@ function Agenda() {
         />
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 pb-16 pt-8 md:pt-12 lg:grid-cols-[1.1fr_1fr] lg:pb-20">
           <div>
-            <FilAriane rubrique="Actualités" page="Agenda" clair />
+            <FilAriane rubrique={m.menu_actualites()} page={m.menu_agenda()} clair />
             <div data-reveal="left" className="pt-12">
               <span className="inline-flex rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-ink">
-                Calendrier officiel en 3 sections
+                {m.agenda_calendrier()}
               </span>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block">L’agenda officiel</span>
-                <span className="block text-sun">des Clubs Santé</span>
+                <span className="block">{m.agenda_titre_1()}</span>
+                <span className="block text-sun">{m.agenda_titre_2()}</span>
               </h1>
-              <p className="mt-6 max-w-xl text-lg font-medium text-white/85">
-                Retrouve toute la programmation officielle, organisée autour de 3 instances : le
-                Secrétariat technique permanent, le Comité et le Club Santé SOS Docteur TV.
-              </p>
+              <p className="mt-6 max-w-xl text-lg font-medium text-white/85">{m.agenda_intro()}</p>
             </div>
           </div>
           <ul className="grid gap-3">
@@ -140,7 +142,7 @@ function Agenda() {
                       <span
                         className={`block text-[11px] font-extrabold uppercase tracking-wider ${actif ? "text-muted-foreground" : "text-white/70"}`}
                       >
-                        Section 0{i + 1} · {NIVEAUX[niveau].long}
+                        {m.agenda_section({ numero: `0${i + 1}`, nom: NIVEAUX[niveau].long })}
                       </span>
                       <span className="block font-display text-xl leading-tight">
                         {NIVEAUX[niveau].court}
@@ -161,19 +163,21 @@ function Agenda() {
           className="flex flex-wrap items-center gap-3 rounded-[1.75rem] bg-white p-4 shadow-card md:p-5"
         >
           <span className="text-sm font-extrabold">
-            {total} événement{total > 1 ? "s" : ""}
+            {(auSingulier(total) ? m.agenda_un_evenement : m.agenda_n_evenements)({
+              nombre: String(total),
+            })}
             {recherche.niveau && (
               <span className="text-muted-foreground"> · {NIVEAUX[recherche.niveau].court}</span>
             )}
           </span>
           <span className="ml-auto flex flex-wrap gap-2">
             <select
-              aria-label="Région"
+              aria-label={m.agenda_region()}
               value={recherche.dre ?? ""}
               onChange={(e) => filtrer({ dre: e.target.value || undefined })}
               className={selectCls}
             >
-              <option value="">Toutes les régions</option>
+              <option value="">{m.agenda_toutes_regions()}</option>
               {dre.map((d) => (
                 <option key={d.code} value={d.code}>
                   {d.nom}
@@ -181,25 +185,25 @@ function Agenda() {
               ))}
             </select>
             <select
-              aria-label="Type d’activité"
+              aria-label={m.agenda_type_activite()}
               value={recherche.type ?? ""}
               onChange={(e) => filtrer({ type: e.target.value || undefined })}
               className={selectCls}
             >
-              <option value="">Toutes les activités</option>
-              {Object.entries(TYPES_EVENEMENT).map(([code, libelle]) => (
+              <option value="">{m.agenda_toutes_activites()}</option>
+              {Object.keys(TYPES_EVENEMENT).map((code) => (
                 <option key={code} value={code}>
-                  {libelle}
+                  {typeEvenement(code)}
                 </option>
               ))}
             </select>
             <select
-              aria-label="Axe"
+              aria-label={m.agenda_axe()}
               value={recherche.axe ?? ""}
               onChange={(e) => filtrer({ axe: e.target.value || undefined })}
               className={selectCls}
             >
-              <option value="">Tous les axes</option>
+              <option value="">{m.biblio_tous_axes()}</option>
               {axes.map((a) => (
                 <option key={a.code} value={a.code}>
                   {a.libelle}
@@ -209,9 +213,10 @@ function Agenda() {
           </span>
         </div>
 
+        <ContenuEnFrancais className="mt-4" />
         {total === 0 && (
           <p className="mt-10 rounded-[1.75rem] border border-dashed p-10 text-center font-semibold text-muted-foreground">
-            Aucun événement ne correspond à ces filtres pour le moment.
+            {m.agenda_aucun_filtre()}
           </p>
         )}
 
@@ -223,7 +228,7 @@ function Agenda() {
             </h2>
             <ol className="relative mt-6 grid gap-5 border-l-2 border-dashed border-logo-blue/20 pl-6 md:pl-10">
               {groupe.evenements.map((evenement) => {
-                const passe = groupe.titre === "Déjà passés";
+                const passe = groupe.passe;
                 return (
                   <li key={evenement.id} className="relative">
                     <span

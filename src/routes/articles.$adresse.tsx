@@ -11,7 +11,9 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { chargerArticle, ErreurApi } from "@/lib/api/client";
 import { signer } from "@/lib/articles";
+import { ContenuEnFrancais } from "@/components/ContenuEnFrancais";
 import { dateCourte } from "@/lib/dates";
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/articles/$adresse")({
   loader: async ({ params }) => {
@@ -29,7 +31,7 @@ export const Route = createFileRoute("/articles/$adresse")({
           { name: "description", content: loaderData.chapo },
           { property: "og:title", content: loaderData.titre },
         ]
-      : [{ title: "Article introuvable — Club Santé SOS Docteur TV" }],
+      : [{ title: m.article_introuvable_titre() }],
   }),
   errorComponent: ServiceIndisponible,
   notFoundComponent: Introuvable,
@@ -45,8 +47,8 @@ function Article() {
       <section className="bg-linear-to-br from-mist via-white to-lilac">
         <div className="mx-auto max-w-3xl px-5 pb-10 pt-8 md:pt-12">
           <FilAriane
-            rubrique="Actualités"
-            parent={{ t: "Articles", href: "/articles" }}
+            rubrique={m.menu_actualites()}
+            parent={{ t: m.articles_fil(), href: "/articles" }}
             page={article.titre}
           />
           <Link
@@ -58,16 +60,17 @@ function Article() {
           </Link>
           {article.nature === "actualite" && (
             <span className="ml-2 mt-8 inline-block rounded-full bg-sun/30 px-3 py-1 text-xs font-bold text-ink">
-              Actualité du club
+              {m.articles_actualite_club()}
             </span>
           )}
           <h1 className="mt-4 text-4xl leading-tight text-logo-blue md:text-5xl">
             {article.titre}
           </h1>
           <p className="mt-4 text-lg font-semibold text-ink/75">{article.chapo}</p>
+          <ContenuEnFrancais className="mt-4" />
           <p className="mt-5 text-sm text-muted-foreground">
-            Par <strong className="text-ink">{signer(article.signature)}</strong> · publié le{" "}
-            {dateCourte(article.publie_le)}
+            {m.article_par()} <strong className="text-ink">{signer(article.signature)}</strong> ·{" "}
+            {m.article_publie_le({ date: dateCourte(article.publie_le) })}
           </p>
         </div>
       </section>
@@ -98,7 +101,7 @@ function Article() {
           to="/articles"
           className="mt-12 inline-flex items-center gap-2 font-bold text-logo-blue hover:underline"
         >
-          <ArrowLeft className="size-4" /> Tous les articles
+          <ArrowLeft className="size-4" /> {m.article_tous()}
         </Link>
       </article>
       <SiteFooter />
@@ -111,13 +114,13 @@ function Introuvable() {
     <div className="min-h-screen bg-carnet text-ink">
       <SiteHeader />
       <main className="mx-auto max-w-xl px-5 py-24 text-center">
-        <h1 className="text-4xl text-logo-blue">Article introuvable</h1>
-        <p className="mt-3 text-muted-foreground">Cet article n'existe pas ou n'est plus publié.</p>
+        <h1 className="text-4xl text-logo-blue">{m.article_introuvable()}</h1>
+        <p className="mt-3 text-muted-foreground">{m.article_introuvable_texte()}</p>
         <Link
           to="/articles"
           className="btn-fx mt-8 inline-flex rounded-full bg-primary px-6 py-3 font-bold text-primary-foreground"
         >
-          Voir tous les articles
+          {m.article_voir_tous()}
         </Link>
       </main>
       <SiteFooter />

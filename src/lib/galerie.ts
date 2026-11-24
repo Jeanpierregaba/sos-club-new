@@ -1,5 +1,6 @@
 import dimensions from "@/assets/galerie/dimensions.json";
 import { axes, type NumeroAxe } from "@/lib/axes";
+import { m } from "@/paraglide/messages.js";
 
 export { axes, type NumeroAxe };
 
@@ -15,21 +16,22 @@ export type Photo = {
   h: number;
   // La partie de la photo gardée quand elle est rognée dans une vignette.
   pos: string;
-  alt: string;
+  // Lu à l'affichage, dans la langue de la page (spec 052).
+  readonly alt: string;
 };
 
-export const COORDINATION = "Coordination nationale";
+export const coordination = () => m.galerie_coordination();
 
 // Ce que montrent les photos de chaque catégorie : le texte alternatif, suivi du numéro de la photo.
-const LEGENDES: Record<string, string> = {
-  "axe-1": "Génie Imhotep : phases, équipes au pupitre et remises de prix",
-  "axe-2": "Sensibilisation à la santé sexuelle et à l’EVSS par les Clubs Santé",
-  "axe-3": "Médias et expression : émissions, plateaux et spectacles des Clubs Santé",
-  "axe-4": "Sport et secourisme : tournois et remises d’équipements aux Clubs Santé",
-  "axe-5": "Bourses et excellence : remise des prix aux lauréats",
-  "axe-6": "Leadership et mentorat : les lauréats reçus par les autorités",
-  "axe-7": "Santé et environnement : formations et actions de terrain",
-  coordination: "Coordination nationale : partenariats et formations des encadreurs",
+const LEGENDES: Record<string, () => string> = {
+  "axe-1": m.galerie_legende_1,
+  "axe-2": m.galerie_legende_2,
+  "axe-3": m.galerie_legende_3,
+  "axe-4": m.galerie_legende_4,
+  "axe-5": m.galerie_legende_5,
+  "axe-6": m.galerie_legende_6,
+  "axe-7": m.galerie_legende_7,
+  coordination: m.galerie_legende_coordination,
 };
 
 const fichiers = import.meta.glob<string>("@/assets/galerie/*/*.webp", {
@@ -46,8 +48,18 @@ const toutes: Photo[] = dimensions.flatMap(({ f, w, h }) => {
   const categorie: Categorie =
     dossier === "coordination" ? "coordination" : (Number(dossier.slice(4)) as NumeroAxe);
   const numero = Number(nom.replace(/\D+/g, " ").trim().split(" ").pop());
+  const legende = LEGENDES[dossier] ?? (() => "");
   return [
-    { categorie, img, w, h, pos: "object-center", alt: `${LEGENDES[dossier]} (photo ${numero})` },
+    {
+      categorie,
+      img,
+      w,
+      h,
+      pos: "object-center",
+      get alt() {
+        return m.galerie_photo({ legende: legende(), numero: String(numero) });
+      },
+    },
   ];
 });
 

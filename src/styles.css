@@ -306,6 +306,13 @@
     min-inline-size: 0;
   }
 
+  /* Les mots composés allemands (« Gesundheitsclubs ») débordaient des grands titres sur un téléphone (spec 052) :
+     césure automatique en allemand, et coupure en dernier recours si un mot reste trop long. */
+  :lang(de) :is(h1, h2, h3) {
+    hyphens: auto;
+    overflow-wrap: break-word;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);

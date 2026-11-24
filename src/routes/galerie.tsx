@@ -6,18 +6,16 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteMotion } from "@/components/SiteMotion";
 import { DecorAnime } from "@/components/DecorAnime";
-import { axes, COORDINATION, eventail, photos, type Categorie } from "@/lib/galerie";
+import { texteAxe } from "@/lib/axes";
+import { axes, coordination, eventail, photos, type Categorie } from "@/lib/galerie";
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/galerie")({
   head: () => ({
     meta: [
-      { title: "Galerie — Club Santé SOS Docteur TV" },
-      {
-        name: "description",
-        content:
-          "Les Clubs Santé en images, classées par axe d’intervention : Génie Imhotep, secourisme, médias, environnement et sensibilisation.",
-      },
-      { property: "og:title", content: "La galerie des Clubs Santé" },
+      { title: m.galerie_meta_titre() },
+      { name: "description", content: m.galerie_meta_description() },
+      { property: "og:title", content: m.galerie_meta_og() },
     ],
   }),
   component: Galerie,
@@ -30,12 +28,16 @@ const collage = [
   { p: eventail[2], c: "rotate-6 right-0 top-10" },
 ];
 
-// Les filtres : chaque axe d'intervention, puis la coordination nationale.
-const filtres: { cle: Categorie; court: string; nom: string }[] = [
-  ...axes.map((a) => ({ cle: a.n, court: `Axe ${a.n}`, nom: a.nom })),
-  { cle: "coordination", court: "Coordination", nom: COORDINATION },
+// Les filtres : chaque axe d'intervention, puis la coordination nationale. Une fonction : les noms suivent la langue.
+const lesFiltres = (): { cle: Categorie; court: string; nom: string }[] => [
+  ...axes.map((a) => ({
+    cle: a.n,
+    court: m.galerie_axe({ numero: String(a.n) }),
+    nom: texteAxe(a.n).nom,
+  })),
+  { cle: "coordination", court: m.galerie_coordination_court(), nom: coordination() },
 ];
-const nomDe = (c: Categorie) => filtres.find((f) => f.cle === c);
+const nomDe = (c: Categorie) => lesFiltres().find((f) => f.cle === c);
 
 function Galerie() {
   const [axe, setAxe] = useState<Categorie | null>(null);
@@ -75,19 +77,16 @@ function Galerie() {
         <DecorAnime />
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-8 md:pt-12 lg:grid-cols-[1fr_1.1fr]">
           <div>
-            <FilAriane rubrique="Vie du club" page="Galerie" clair />
+            <FilAriane rubrique={m.menu_vie_du_club()} page={m.menu_galerie()} clair />
             <div data-reveal="left" className="pt-12">
               <span className="inline-flex rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-ink">
-                {photos.length} photos · {axes.length} axes
+                {m.galerie_compte({ photos: String(photos.length), axes: String(axes.length) })}
               </span>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block">Les Clubs Santé</span>
-                <span className="block text-sun">en images</span>
+                <span className="block">{m.galerie_titre_1()}</span>
+                <span className="block text-sun">{m.galerie_titre_2()}</span>
               </h1>
-              <p className="mt-6 max-w-xl text-lg font-medium text-white/80">
-                Compétitions, formations, émissions et actions de terrain : revis les moments forts
-                des Clubs Santé SOS Docteur TV partout au Togo.
-              </p>
+              <p className="mt-6 max-w-xl text-lg font-medium text-white/80">{m.galerie_intro()}</p>
             </div>
           </div>
           <div
@@ -113,14 +112,18 @@ function Galerie() {
       {/* Mur de photos en colonnes, filtrable par axe d'intervention ; un clic ouvre la visionneuse. */}
       <section className="mx-auto max-w-7xl px-5 py-16">
         <div data-reveal className="flex flex-wrap gap-2">
-          {[null, ...filtres].map((f) => {
+          {[null, ...lesFiltres()].map((f) => {
             const n = f?.cle ?? null;
             return (
               <button
                 key={n ?? "tous"}
                 type="button"
                 aria-pressed={axe === n}
-                aria-label={f && f.cle !== "coordination" ? `${f.court} : ${f.nom}` : undefined}
+                aria-label={
+                  f && f.cle !== "coordination"
+                    ? m.galerie_axe_nom({ numero: String(f.cle), nom: f.nom })
+                    : undefined
+                }
                 title={f?.nom}
                 onClick={() => setAxe(n)}
                 className={`rounded-full px-4 py-2 text-sm font-bold transition active:scale-95 ${
@@ -129,19 +132,21 @@ function Galerie() {
                     : "bg-white ring-1 ring-border hover:ring-logo-blue/40"
                 }`}
               >
-                {f ? f.court : "Toutes"}
+                {f ? f.court : m.galerie_toutes()}
               </button>
             );
           })}
         </div>
         {axe !== null && (
           <p className="mt-4 text-sm font-bold text-muted-foreground">
-            {axe === "coordination" ? COORDINATION : `Axe ${axe} : ${nomDe(axe)?.nom}`}
+            {axe === "coordination"
+              ? coordination()
+              : m.galerie_axe_nom({ numero: String(axe), nom: nomDe(axe)?.nom ?? "" })}
           </p>
         )}
         {liste.length === 0 && (
           <p className="mt-8 rounded-2xl bg-white p-6 text-center font-semibold text-muted-foreground ring-1 ring-border">
-            Pas encore de photo pour cet axe : reviens bientôt !
+            {m.galerie_aucune()}
           </p>
         )}
 
@@ -202,7 +207,7 @@ function Galerie() {
           <button
             type="button"
             onClick={() => setOuverte(null)}
-            aria-label="Fermer"
+            aria-label={m.galerie_fermer()}
             autoFocus
             className="absolute right-4 top-4 inline-flex size-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white hover:text-ink"
           >
@@ -216,7 +221,7 @@ function Galerie() {
                   e.stopPropagation();
                   aller(-1);
                 }}
-                aria-label="Photo précédente"
+                aria-label={m.galerie_precedente()}
                 className="absolute left-3 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white hover:text-ink"
               >
                 <ChevronLeft className="size-5" />
@@ -227,7 +232,7 @@ function Galerie() {
                   e.stopPropagation();
                   aller(1);
                 }}
-                aria-label="Photo suivante"
+                aria-label={m.galerie_suivante()}
                 className="absolute right-3 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white hover:text-ink"
               >
                 <ChevronRight className="size-5" />

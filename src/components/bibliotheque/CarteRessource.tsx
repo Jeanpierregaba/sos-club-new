@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import { urlRessource, type RessourcePublique } from "@/lib/api/client";
 import { CATEGORIES, pages, tailleLisible, telechargements } from "@/lib/bibliotheque";
 import { dateCourte } from "@/lib/dates";
+import { m } from "@/paraglide/messages.js";
 
 // Une ressource publiée (spec 028) : sa couverture ou le visuel de sa catégorie, son validateur, et les deux
 // façons de l'ouvrir. Les liens vont droit à l'API : le PDF part en flux, sans passer par le site.
@@ -56,7 +57,7 @@ export function CarteRessource({
           )}
           {ressource.contenu_de_test && (
             <span className="rounded-full bg-sun/30 px-2 py-0.5 normal-case tracking-normal text-ink">
-              Contenu de test
+              {m.biblio_contenu_test()}
             </span>
           )}
         </p>
@@ -67,7 +68,10 @@ export function CarteRessource({
         <p className="mt-3 flex items-start gap-1.5 text-xs font-semibold text-ink/70">
           <BadgeCheck aria-hidden className="mt-px size-4 shrink-0 text-primary" />
           <span>
-            Validé par {ressource.validateur_nom} ({ressource.validateur_qualite})
+            {m.biblio_valide_par({
+              nom: ressource.validateur_nom,
+              qualite: ressource.validateur_qualite,
+            })}
           </span>
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
@@ -80,18 +84,18 @@ export function CarteRessource({
             href={urlRessource(ressource.id)}
             target="_blank"
             rel="noopener"
-            aria-label={`Lire : ${ressource.titre} (s'ouvre dans un nouvel onglet)`}
+            aria-label={m.biblio_lire_aria({ titre: ressource.titre })}
             className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-bold text-logo-blue ring-1 ring-border transition hover:bg-mist"
           >
-            <BookOpenText className="size-4" /> Lire
+            <BookOpenText className="size-4" /> {m.biblio_lire()}
           </a>
           <a
             href={urlRessource(ressource.id, true)}
             download
-            aria-label={`Télécharger : ${ressource.titre}`}
+            aria-label={m.biblio_telecharger_aria({ titre: ressource.titre })}
             className="btn-fx inline-flex h-11 items-center gap-2 rounded-full bg-primary px-4 text-sm font-bold text-primary-foreground"
           >
-            <Download className="size-4" /> Télécharger
+            <Download className="size-4" /> {m.biblio_telecharger()}
           </a>
         </div>
       </div>

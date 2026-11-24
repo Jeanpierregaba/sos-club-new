@@ -14,7 +14,9 @@ import {
   type TypeEtablissement,
 } from "@/lib/api/client";
 import { chercher, compterParType, indexer } from "@/lib/carte-des-clubs";
-import { LIBELLE_SANS_CLUB, STATUTS_CARTE } from "@/lib/clubs";
+import { libelleSansClub, STATUTS_CARTE } from "@/lib/clubs";
+import { auSingulier, lien } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 import { DRE_PAR_DEFAUT, dessins, regions } from "@/lib/togo-dre";
 import mascottesEquipe from "@/assets/mascottes-equipe.webp";
 import { useRechercheSansResultat } from "@/lib/activite";
@@ -22,13 +24,9 @@ import { useRechercheSansResultat } from "@/lib/activite";
 export const Route = createFileRoute("/carte-des-clubs")({
   head: () => ({
     meta: [
-      { title: "Carte des clubs — Club Santé SOS Docteur TV" },
-      {
-        name: "description",
-        content:
-          "Carte des Clubs Santé SOS Docteur TV au Togo : les Directions Régionales de l'Éducation, leurs IESG et les collèges et lycées du réseau.",
-      },
-      { property: "og:title", content: "La carte des Clubs Santé du Togo" },
+      { title: m.carte_clubs_meta_titre() },
+      { name: "description", content: m.carte_clubs_meta_description() },
+      { property: "og:title", content: m.carte_clubs_meta_og() },
     ],
   }),
   // L'annuaire et la carte des clubs viennent de l'API (specs 016 et 033). Sans elle, la carte garde ses
@@ -44,21 +42,34 @@ export const Route = createFileRoute("/carte-des-clubs")({
   component: CarteDesClubs,
 });
 
-const types: Record<TypeEtablissement, { t: string; c: string }> = {
-  lycee: { t: "Lycée", c: "text-sky" },
-  college: { t: "Collège", c: "text-primary" },
-  complexe: { t: "Complexe", c: "text-tangerine" },
-  autre: { t: "Établissement", c: "text-muted-foreground" },
+// Les libellés sont lus à l'affichage, dans la langue de la page (spec 052).
+const type = (t: () => string, pluriel: () => string, c: string) => ({
+  get t() {
+    return t();
+  },
+  get pluriel() {
+    return pluriel();
+  },
+  c,
+});
+const types: Record<
+  TypeEtablissement,
+  { readonly t: string; readonly pluriel: string; c: string }
+> = {
+  lycee: type(m.carte_clubs_type_lycee, m.carte_clubs_type_lycees, "text-sky"),
+  college: type(m.carte_clubs_type_college, m.carte_clubs_type_colleges, "text-primary"),
+  complexe: type(m.carte_clubs_type_complexe, m.carte_clubs_type_complexes, "text-tangerine"),
+  autre: type(m.carte_clubs_type_autre, m.carte_clubs_type_autres, "text-muted-foreground"),
 };
 const ORDRE_TYPES = Object.keys(types) as TypeEtablissement[];
 
 const APERCU = 30;
 
 type EtatFiltre = "tous" | "actif" | "en_constitution";
-const ETATS: { v: EtatFiltre; t: string }[] = [
-  { v: "tous", t: "Tous les établissements" },
-  { v: "actif", t: "Club actif" },
-  { v: "en_constitution", t: "Club en constitution" },
+const etats = (): { v: EtatFiltre; t: string }[] => [
+  { v: "tous", t: m.carte_clubs_etat_tous() },
+  { v: "actif", t: m.carte_clubs_etat_actif() },
+  { v: "en_constitution", t: m.carte_clubs_etat_constitution() },
 ];
 
 // Les statuts des établissements et les clubs actifs de chaque DRE, lus dans la carte de l'API.
@@ -78,7 +89,7 @@ function StatutEtablissement({ statut }: { statut: CarteEtablissement | undefine
   if (statut.statut === "reference")
     return (
       <span className="mt-0.5 block text-xs font-medium text-muted-foreground">
-        {statut.declare_terrain ? "Club déclaré sur le terrain" : LIBELLE_SANS_CLUB}
+        {statut.declare_terrain ? m.carte_clubs_declare() : libelleSansClub()}
       </span>
     );
   const pastille = STATUTS_CARTE[statut.statut];
@@ -93,7 +104,7 @@ function StatutEtablissement({ statut }: { statut: CarteEtablissement | undefine
           params={{ id: statut.club_id }}
           className="inline-flex items-center gap-1 text-xs font-bold text-logo-blue hover:underline"
         >
-          Fiche du club <ArrowRight aria-hidden className="size-3" />
+          {m.carte_clubs_fiche()} <ArrowRight aria-hidden className="size-3" />
         </Link>
       )}
     </span>
@@ -110,9 +121,9 @@ function CarteDesClubs() {
   // Les trois chiffres du cahier des charges (spec 033), tous calculés par l'API ; sans elle, aucun chiffre.
   const chiffres = carte
     ? [
-        { n: carte.chiffres.etablissements, t: "Établissements" },
-        { n: carte.chiffres.clubs, t: "Clubs Santé" },
-        { n: carte.chiffres.clubs_actifs, t: "Clubs actifs sur la plateforme" },
+        { n: carte.chiffres.etablissements, t: m.carte_clubs_chiffre_etablissements() },
+        { n: carte.chiffres.clubs, t: m.carte_clubs_chiffre_clubs() },
+        { n: carte.chiffres.clubs_actifs, t: m.carte_clubs_chiffre_actifs() },
       ]
     : [];
 
@@ -180,20 +191,17 @@ function CarteDesClubs() {
 
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 pb-16 pt-8 md:pt-12 lg:grid-cols-[1.2fr_1fr] lg:pb-20">
           <div>
-            <FilAriane rubrique="Vie du club" page="Carte des clubs" clair />
+            <FilAriane rubrique={m.menu_vie_du_club()} page={m.menu_carte_des_clubs()} clair />
             <div data-reveal="left" className="pt-10 lg:pt-14">
               <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-bold backdrop-blur-sm">
-                <MapPin className="size-4 text-sun" /> Réseau national · Togo
+                <MapPin className="size-4 text-sun" /> {m.carte_clubs_reseau()}
               </p>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block">La carte</span>
-                <span className="block text-sun">des clubs santé</span>
+                <span className="block">{m.carte_clubs_titre_1()}</span>
+                <span className="block text-sun">{m.carte_clubs_titre_2()}</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg font-medium text-white/80">
-                Les établissements du Togo et leur Club Santé, par région, Direction Régionale de
-                l’Éducation et Inspection (IESG). Un club devient actif dès qu’il réunit 3
-                encadreurs et 21 élèves. Choisis ta région sur la carte, ou cherche ton
-                établissement.
+                {m.carte_clubs_intro()}
               </p>
 
               {/* Entrée amène les résultats, affichés dans l'explorateur, sous les yeux. */}
@@ -214,15 +222,15 @@ function CarteDesClubs() {
                   enterKeyHint="search"
                   value={recherche}
                   onChange={(e) => setRecherche(e.target.value)}
-                  placeholder="Cherche ton collège ou lycée…"
-                  aria-label="Rechercher un établissement"
+                  placeholder={m.carte_clubs_cherche()}
+                  aria-label={m.carte_clubs_rechercher()}
                   className="h-14 w-full rounded-full border-2 border-transparent bg-white pl-14 pr-14 text-base font-semibold text-ink shadow-card outline-none transition placeholder:font-medium placeholder:text-muted-foreground focus:border-sun"
                 />
                 {recherche && (
                   <button
                     type="button"
                     onClick={() => setRecherche("")}
-                    aria-label="Effacer la recherche"
+                    aria-label={m.carte_clubs_effacer()}
                     className="absolute right-3 top-1/2 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition hover:bg-mist hover:text-ink"
                   >
                     <X className="size-4" />
@@ -232,13 +240,12 @@ function CarteDesClubs() {
 
               {chiffres.length === 0 && (
                 <p className="mt-8 max-w-xl text-sm font-semibold text-white/75">
-                  Les chiffres des clubs sont momentanément indisponibles.
+                  {m.carte_clubs_chiffres_indispo()}
                 </p>
               )}
               {carte && carte.chiffres.clubs === 0 && (
                 <p className="mt-8 max-w-xl text-sm font-semibold text-white/80">
-                  Aucun Club Santé pour l’instant : les premiers s’ouvrent avec les inscriptions des
-                  élèves et des encadreurs.
+                  {m.carte_clubs_aucun_club()}
                 </p>
               )}
               {chiffres.length > 0 && (
@@ -265,7 +272,7 @@ function CarteDesClubs() {
           <img
             data-reveal="right"
             src={mascottesEquipe}
-            alt="Les sept mascottes des Clubs Santé, en polo du club : trophée, trousse de secours, plante, mégaphone, micro"
+            alt={m.certif_mascottes_alt()}
             width={1122}
             height={1402}
             className="mx-auto -mb-16 w-full max-w-xs self-end drop-shadow-[0_24px_40px_oklch(0_0_0/0.35)] sm:max-w-sm lg:-mb-24 lg:max-w-md"
@@ -343,16 +350,17 @@ function CarteDesClubs() {
           {!dre ? (
             <div className="rounded-[2rem] border bg-white p-6 md:p-10">
               <p role="status" className="font-bold">
-                La liste des établissements est momentanément indisponible. Réessaie dans quelques
-                instants.
+                {m.carte_clubs_liste_indispo()}
               </p>
             </div>
           ) : enRecherche ? (
             <div className="rounded-[2rem] border bg-white p-6 md:p-8">
               <p aria-live="polite" className="font-bold">
                 {resultats.length === 0
-                  ? `Aucun établissement ne correspond à « ${q} ».`
-                  : `${resultats.length} établissement${resultats.length > 1 ? "s" : ""} pour « ${q} »`}
+                  ? m.carte_clubs_aucun_resultat({ q })
+                  : (auSingulier(resultats.length)
+                      ? m.carte_clubs_un_resultat
+                      : m.carte_clubs_n_resultats)({ nombre: String(resultats.length), q })}
               </p>
               {resultats.length > 0 && (
                 <ul className="mt-5 divide-y border-y">
@@ -390,7 +398,7 @@ function CarteDesClubs() {
               )}
               {resultats.length > 50 && (
                 <p className="mt-4 text-sm font-semibold text-muted-foreground">
-                  Précise ta recherche pour voir les {resultats.length - 50} autres.
+                  {m.carte_clubs_preciser({ nombre: String(resultats.length - 50) })}
                 </p>
               )}
             </div>
@@ -406,7 +414,7 @@ function CarteDesClubs() {
                       className="size-2.5 rounded-full"
                       style={{ backgroundColor: dre.couleur }}
                     />
-                    Direction régionale de l’éducation
+                    {m.carte_clubs_dre_long()}
                   </p>
                   <h2 className="mt-2 text-4xl md:text-5xl">
                     <span className="text-logo-blue">DRE</span>{" "}
@@ -414,20 +422,21 @@ function CarteDesClubs() {
                   </h2>
                 </div>
                 <p className="text-sm font-semibold text-muted-foreground">
-                  <strong className="text-ink">{dre.nb_etablissements}</strong> établissements ·{" "}
+                  <strong className="text-ink">{dre.nb_etablissements}</strong>{" "}
+                  {m.carte_clubs_etablissements()} ·{" "}
                   <strong className="text-ink">{dre.iesg.length}</strong> IESG ·{" "}
                   <strong className="text-ink">{clubsDeLaDre}</strong>{" "}
-                  {clubsDeLaDre === 1 ? "club actif" : "clubs actifs"} ·{" "}
+                  {clubsDeLaDre === 1 ? m.carte_clubs_un_actif() : m.carte_clubs_n_actifs()} ·{" "}
                   <strong className="text-ink">
                     {Math.round((dre.nb_etablissements / (totalEtablissements || 1)) * 100)} %
                   </strong>{" "}
-                  du réseau
+                  {m.carte_clubs_du_reseau()}
                 </p>
               </div>
 
               <div
                 role="group"
-                aria-label="Inspections de la région"
+                aria-label={m.carte_clubs_inspections()}
                 className="mt-8 flex flex-wrap gap-2"
               >
                 {dre.iesg.map((i) => {
@@ -465,15 +474,15 @@ function CarteDesClubs() {
                     setRechercheDre(e.target.value);
                     setToutVoir(false);
                   }}
-                  placeholder={`Cherche un établissement de la DRE ${dre.nom}…`}
-                  aria-label={`Rechercher un établissement de la DRE ${dre.nom} par son nom`}
+                  placeholder={m.carte_clubs_cherche_dre({ dre: dre.nom })}
+                  aria-label={m.carte_clubs_rechercher_dre({ dre: dre.nom })}
                   className="h-11 w-full rounded-full border-2 border-border bg-mist-soft pl-11 pr-11 text-sm font-semibold outline-none transition placeholder:font-medium placeholder:text-muted-foreground focus:border-logo-blue focus:bg-white"
                 />
                 {rechercheDre && (
                   <button
                     type="button"
                     onClick={() => setRechercheDre("")}
-                    aria-label="Effacer la recherche"
+                    aria-label={m.carte_clubs_effacer()}
                     className="absolute right-2 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition hover:bg-mist hover:text-ink"
                   >
                     <X className="size-4" />
@@ -483,8 +492,8 @@ function CarteDesClubs() {
               {rechercheDansDre && (
                 <p aria-live="polite" className="mt-3 text-sm font-semibold text-muted-foreground">
                   {trouvesDansDre.length === 0
-                    ? `Aucun établissement de la DRE ${dre.nom} ne correspond à « ${qDre} ».`
-                    : `Résultats dans toutes les IESG de la DRE ${dre.nom}.`}
+                    ? m.carte_clubs_aucun_dre({ dre: dre.nom, q: qDre })
+                    : m.carte_clubs_resultats_dre({ dre: dre.nom })}
                 </p>
               )}
 
@@ -506,13 +515,13 @@ function CarteDesClubs() {
                           : "border-transparent text-muted-foreground hover:text-ink"
                       }`}
                     >
-                      {f.t ? `${types[f.t].t}s` : "Tous"}{" "}
+                      {f.t ? types[f.t].pluriel : m.carte_clubs_tous()}{" "}
                       <span className="font-semibold">({f.n})</span>
                     </button>
                   );
                 })}
                 <label className="ml-auto flex items-center gap-2 text-muted-foreground">
-                  <span className="sr-only">État du club</span>
+                  <span className="sr-only">{m.carte_clubs_etat_club()}</span>
                   <select
                     value={etat}
                     onChange={(e) => {
@@ -522,7 +531,7 @@ function CarteDesClubs() {
                     }}
                     className="h-10 rounded-full border-2 border-border bg-white px-4 text-sm font-bold text-ink outline-none transition focus:border-logo-blue"
                   >
-                    {ETATS.map((o) => (
+                    {etats().map((o) => (
                       <option key={o.v} value={o.v}>
                         {o.t}
                       </option>
@@ -560,10 +569,10 @@ function CarteDesClubs() {
               {affiches.length === 0 && !(rechercheDansDre && trouvesDansDre.length === 0) && (
                 <p role="status" className="mt-4 text-sm font-semibold text-muted-foreground">
                   {etat === "actif"
-                    ? "Aucun club actif ici pour l’instant."
+                    ? m.carte_clubs_aucun_actif_ici()
                     : etat === "en_constitution"
-                      ? "Aucun club en constitution ici pour l’instant."
-                      : "Aucun établissement ici."}
+                      ? m.carte_clubs_aucun_constitution_ici()
+                      : m.carte_clubs_aucun_ici()}
                 </p>
               )}
               {affiches.length > APERCU && (
@@ -573,8 +582,8 @@ function CarteDesClubs() {
                   className="mt-6 text-sm font-bold text-logo-blue underline underline-offset-4 hover:text-primary"
                 >
                   {toutVoir
-                    ? "Réduire la liste"
-                    : `Afficher les ${affiches.length - APERCU} autres`}
+                    ? m.carte_clubs_reduire()
+                    : m.carte_clubs_afficher_autres({ nombre: String(affiches.length - APERCU) })}
                 </button>
               )}
             </div>
@@ -589,18 +598,16 @@ function CarteDesClubs() {
         >
           <div>
             <h2 className="text-3xl md:text-4xl">
-              Ton établissement <span className="text-sun">n’a pas encore de club ?</span>
+              {m.carte_clubs_pas_club_1()}{" "}
+              <span className="text-sun">{m.carte_clubs_pas_club_2()}</span>
             </h2>
-            <p className="mt-2 font-medium text-white/80">
-              Il s’ouvre tout seul : inscris-toi sur la plateforme avec tes camarades et tes
-              encadreurs. Dès 3 encadreurs et 21 élèves confirmés, ton club devient actif.
-            </p>
+            <p className="mt-2 font-medium text-white/80">{m.carte_clubs_pas_club_texte()}</p>
           </div>
           <a
-            href="/club-sante#adhesion"
+            href={lien("/club-sante#adhesion")}
             className="btn-fx inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
           >
-            Voir les règles d’adhésion <ArrowRight className="size-4" />
+            {m.carte_clubs_regles()} <ArrowRight className="size-4" />
           </a>
         </div>
       </section>

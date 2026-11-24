@@ -1,3 +1,4 @@
+import { m } from "@/paraglide/messages.js";
 import { useState } from "react";
 
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -34,7 +35,7 @@ export function Galerie({ adresse, photos }: { adresse: string; photos: PhotoPub
   if (photos.length === 0) return null;
 
   return (
-    <section aria-label="Photos de l'article" className="mt-10">
+    <section aria-label={m.article_photos()} className="mt-10">
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {photos.map((p) => (
           <li key={p.id}>
@@ -43,7 +44,11 @@ export function Galerie({ adresse, photos }: { adresse: string; photos: PhotoPub
                 type="button"
                 onClick={() => setOuverte(p)}
                 className="block w-full overflow-hidden rounded-2xl bg-mist"
-                aria-label={p.legende ? `Agrandir : ${p.legende}` : "Agrandir la photo"}
+                aria-label={
+                  p.legende
+                    ? m.article_agrandir({ legende: p.legende })
+                    : m.article_agrandir_photo()
+                }
               >
                 <img
                   src={urlPhotoPublique(adresse, p.id, "vignette")}
@@ -67,8 +72,8 @@ export function Galerie({ adresse, photos }: { adresse: string; photos: PhotoPub
 
       <Dialog open={ouverte !== null} onOpenChange={(o) => !o && setOuverte(null)}>
         <DialogContent className="max-h-[95dvh] w-full max-w-4xl overflow-y-auto p-3 sm:p-4">
-          <DialogTitle className="sr-only">{ouverte?.legende ?? "Photo de l'article"}</DialogTitle>
-          <DialogDescription className="sr-only">Photo agrandie</DialogDescription>
+          <DialogTitle className="sr-only">{ouverte?.legende ?? m.article_photo()}</DialogTitle>
+          <DialogDescription className="sr-only">{m.article_photo_agrandie()}</DialogDescription>
           {ouverte && (
             <figure>
               <Couverture adresse={adresse} photo={ouverte} className="rounded-xl" />

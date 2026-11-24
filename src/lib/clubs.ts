@@ -6,23 +6,32 @@ import type {
   RegionScolaire,
   StatutClub,
 } from "@/lib/api/client";
+import { m } from "@/paraglide/messages.js";
 
 // Sur la carte, un établissement sans club ne doit plus passer pour un club.
-export const LIBELLE_SANS_CLUB = "Aucun club enregistré pour cet établissement";
+export const libelleSansClub = () => m.clubs_sans_club();
 
-type Pastille = { libelle: string; classe: string };
+type Pastille = { readonly libelle: string; classe: string };
+
+// Le libellé est lu à l'affichage, dans la langue de la page (spec 052).
+const pastille = (libelle: () => string, classe: string): Pastille => ({
+  get libelle() {
+    return libelle();
+  },
+  classe,
+});
 
 // Statuts calculés par l'API (spec 033, ADR-0011).
 export const STATUTS_CLUB: Record<StatutClub, Pastille> = {
-  en_constitution: { libelle: "En constitution", classe: "bg-sun/30 text-ink" },
-  actif: { libelle: "Club actif", classe: "bg-primary/10 text-primary" },
-  en_regularisation: { libelle: "En régularisation", classe: "bg-sun/60 text-ink" },
-  suspendu: { libelle: "Suspendu", classe: "bg-logo-red/10 text-logo-red" },
+  en_constitution: pastille(m.clubs_statut_en_constitution, "bg-sun/30 text-ink"),
+  actif: pastille(m.clubs_statut_actif, "bg-primary/10 text-primary"),
+  en_regularisation: pastille(m.clubs_statut_en_regularisation, "bg-sun/60 text-ink"),
+  suspendu: pastille(m.clubs_statut_suspendu, "bg-logo-red/10 text-logo-red"),
 };
 
 // Le statut public d'un établissement sur la carte : une régularisation s'y montre « actif ».
 export const STATUTS_CARTE: Record<CarteEtablissement["statut"], Pastille> = {
-  reference: { libelle: "Référencé", classe: "bg-mist text-muted-foreground" },
+  reference: pastille(m.clubs_statut_reference, "bg-mist text-muted-foreground"),
   en_constitution: STATUTS_CLUB.en_constitution,
   actif: STATUTS_CLUB.actif,
   suspendu: STATUTS_CLUB.suspendu,
