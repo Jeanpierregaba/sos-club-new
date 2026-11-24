@@ -1,10 +1,73 @@
-// Sélecteur FR / EN / DE (spec 052) : ouvre la même page dans l'autre langue. Un vrai changement de page (pas une
-// navigation du routeur) : tous les textes, rendus serveur compris, passent ainsi dans la nouvelle langue.
+// Sélecteur FR / EN / DE (spec 052) : un menu déroulant à drapeaux ronds qui ouvre la même page dans l'autre langue.
+// Un vrai changement de page (pas une navigation du routeur) : tous les textes, rendus serveur compris, passent ainsi
+// dans la nouvelle langue.
 import { useRouterState } from "@tanstack/react-router";
+import { Check, ChevronDown } from "lucide-react";
+import { useId } from "react";
 
-import { estTraduite, LANGUES, langueCourante, localiser, NOMS_DES_LANGUES } from "@/lib/langues";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  estTraduite,
+  LANGUES,
+  langueCourante,
+  localiser,
+  NOMS_DES_LANGUES,
+  type Langue,
+} from "@/lib/langues";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages.js";
+
+/** Drapeau dessiné en SVG (les émojis drapeaux ne s'affichent pas sous Windows), recadré dans un rond. */
+function Drapeau({ langue, className }: { langue: Langue; className?: string }) {
+  // Identifiant propre à chaque drapeau : le sélecteur apparaît deux fois (en-tête et menu mobile).
+  const decoupe = useId();
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "inline-flex size-6 shrink-0 overflow-hidden rounded-full ring-1 ring-black/10",
+        className,
+      )}
+    >
+      {langue === "fr" && (
+        <svg viewBox="0 0 3 2" preserveAspectRatio="xMidYMid slice" className="size-full">
+          <rect width="1" height="2" fill="#002654" />
+          <rect x="1" width="1" height="2" fill="#fff" />
+          <rect x="2" width="1" height="2" fill="#CE1126" />
+        </svg>
+      )}
+      {langue === "de" && (
+        <svg viewBox="0 0 5 3" preserveAspectRatio="xMidYMid slice" className="size-full">
+          <rect width="5" height="1" fill="#000" />
+          <rect y="1" width="5" height="1" fill="#DD0000" />
+          <rect y="2" width="5" height="1" fill="#FFCE00" />
+        </svg>
+      )}
+      {langue === "en" && (
+        <svg viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice" className="size-full">
+          <clipPath id={decoupe}>
+            <path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z" />
+          </clipPath>
+          <rect width="60" height="30" fill="#012169" />
+          <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6" />
+          <path
+            d="M0,0 L60,30 M60,0 L0,30"
+            clipPath={`url(#${decoupe})`}
+            stroke="#C8102E"
+            strokeWidth="4"
+          />
+          <path d="M30,0 v30 M0,15 h60" stroke="#fff" strokeWidth="10" />
+          <path d="M30,0 v30 M0,15 h60" stroke="#C8102E" strokeWidth="6" />
+        </svg>
+      )}
+    </span>
+  );
+}
 
 export function SelecteurLangue({ className }: { className?: string }) {
   const { pathname, searchStr, hash } = useRouterState({ select: (etat) => etat.location });
@@ -14,35 +77,39 @@ export function SelecteurLangue({ className }: { className?: string }) {
   const page = pathname + searchStr + (hash ? `#${hash}` : "");
 
   return (
-    <nav
-      aria-label={m.langue_choisir()}
-      className={cn("flex items-center rounded-full border px-2 py-1 text-sm font-bold", className)}
-    >
-      {LANGUES.map((langue, n) => (
-        <span key={langue} className="flex items-center">
-          {n > 0 && (
-            <span aria-hidden className="text-muted-foreground">
-              /
-            </span>
-          )}
-          <a
-            href={localiser(page, langue)}
-            hrefLang={langue}
-            lang={langue}
-            aria-current={langue === actuelle ? "true" : undefined}
-            aria-label={m.langue_lire_en(
-              { langue: NOMS_DES_LANGUES[langue].nom },
-              { locale: langue },
-            )}
-            className={cn(
-              "rounded-full px-1.5 py-1 transition hover:text-logo-blue",
-              langue === actuelle ? "text-logo-blue" : "text-muted-foreground",
-            )}
-          >
-            {NOMS_DES_LANGUES[langue].court}
-          </a>
-        </span>
-      ))}
-    </nav>
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger
+        aria-label={`${m.langue_choisir()} : ${NOMS_DES_LANGUES[actuelle].nom}`}
+        className={cn(
+          "flex w-fit items-center gap-1 rounded-full border p-1 pr-1.5 transition hover:border-logo-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-logo-blue",
+          className,
+        )}
+      >
+        <Drapeau langue={actuelle} />
+        <ChevronDown aria-hidden className="size-4 text-muted-foreground" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-40">
+        {LANGUES.map((langue) => (
+          <DropdownMenuItem key={langue} asChild className="cursor-pointer gap-3">
+            <a
+              href={localiser(page, langue)}
+              hrefLang={langue}
+              lang={langue}
+              aria-current={langue === actuelle ? "true" : undefined}
+              aria-label={m.langue_lire_en(
+                { langue: NOMS_DES_LANGUES[langue].nom },
+                { locale: langue },
+              )}
+            >
+              <Drapeau langue={langue} />
+              <span className={cn("flex-1", langue === actuelle && "font-bold")}>
+                {NOMS_DES_LANGUES[langue].nom}
+              </span>
+              {langue === actuelle && <Check aria-hidden className="text-logo-blue" />}
+            </a>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

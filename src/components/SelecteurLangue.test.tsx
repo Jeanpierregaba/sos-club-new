@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { dateCourte } from "@/lib/dates";
@@ -22,19 +22,22 @@ afterEach(() => {
 });
 
 describe("sélecteur de langue (spec 052)", () => {
-  it("ouvre la même page dans chaque langue et signale la langue active", () => {
+  it("ouvre un menu à drapeaux vers la même page dans chaque langue, la langue active signalée", () => {
     parler("en");
     render(<SelecteurLangue />);
-    const choix = screen.getByRole("navigation", { name: "Site language" });
-    expect(
-      within(choix).getByRole("link", { name: "Lire cette page en Français" }),
-    ).toHaveAttribute("href", "/articles/mon-article?page=2");
-    const anglais = within(choix).getByRole("link", { name: "Read this page in English" });
+    const bouton = screen.getByRole("button", { name: "Site language : English" });
+    fireEvent.keyDown(bouton, { key: "Enter" });
+    expect(screen.getByRole("menuitem", { name: "Lire cette page en Français" })).toHaveAttribute(
+      "href",
+      "/articles/mon-article?page=2",
+    );
+    const anglais = screen.getByRole("menuitem", { name: "Read this page in English" });
     expect(anglais).toHaveAttribute("href", "/en/articles/mon-article?page=2");
     expect(anglais).toHaveAttribute("aria-current", "true");
-    expect(
-      within(choix).getByRole("link", { name: "Diese Seite auf Deutsch lesen" }),
-    ).toHaveAttribute("href", "/de/articles/mon-article?page=2");
+    expect(screen.getByRole("menuitem", { name: "Diese Seite auf Deutsch lesen" })).toHaveAttribute(
+      "href",
+      "/de/articles/mon-article?page=2",
+    );
   });
 
   it("n'apparaît pas sur une page restée en français", () => {
