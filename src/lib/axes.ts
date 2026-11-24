@@ -1,3 +1,4 @@
+import { m } from "@/paraglide/messages.js";
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
 import mascotteValeurs from "@/assets/mascotte-valeurs.webp";
 import mascotteMedias from "@/assets/mascotte-medias.webp";
@@ -80,3 +81,10 @@ export const TITRES_AXES = [
   "Développement personnel, leadership transformationnel, promotion du genre et mentorat",
   "Promotion de la santé, cadre de vie et cohésion sociale (Santé environnementale, nutrition & PEVPAH)",
 ] as const;
+
+// Les textes d'un axe dans la langue de la page (spec 052). Une fonction, jamais une constante : la langue n'est
+// connue qu'au rendu.
+export function texteAxe(n: NumeroAxe): { nom: string; slogan: string; titre: string } {
+  const cle = (champ: string) => m[`axe_${n}_${champ}` as keyof typeof m] as () => string;
+  return { nom: cle("nom")(), slogan: cle("slogan")(), titre: cle("titre")() };
+}

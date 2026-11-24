@@ -5,47 +5,47 @@ import { EnTete } from "@/components/EnTete";
 import { FilAriane } from "@/components/FilAriane";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { LANGUE_DE_BASE, langueCourante } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/charte")({
   head: () => ({
     meta: [
-      { title: "Charte des Clubs Santé — Club Santé SOS Docteur TV" },
-      {
-        name: "description",
-        content: "Les règles que chaque membre des Clubs Santé accepte en créant son compte.",
-      },
+      { title: m.charte_meta_titre() },
+      { name: "description", content: m.charte_meta_description() },
     ],
   }),
   component: Charte,
 });
 
 // Texte provisoire (spec 017), tiré de docs/RULES.md : à valider par le porteur du projet et par un juriste.
-// Le changer impose de changer aussi `version_charte` dans la configuration de l'API.
-const regles = [
+// Le changer impose de changer aussi `version_charte` dans la configuration de l'API. Spec 052 : la version française
+// fait foi, l'anglais et l'allemand le disent.
+const regles = () => [
   {
     i: HeartHandshake,
-    t: "Je respecte les autres",
-    d: "Pas d'insulte, de moquerie, de harcèlement ni de propos discriminant, en ligne comme dans mon club.",
+    t: m.charte_1_titre(),
+    d: m.charte_1_texte(),
   },
   {
     i: UserRound,
-    t: "J'utilise un pseudonyme",
-    d: "Mon pseudonyme est mon seul nom public. Il ne contient ni mon nom complet, ni mon numéro, ni mon adresse email. L'équipe nationale peut me demander d'en changer.",
+    t: m.charte_2_titre(),
+    d: m.charte_2_texte(),
   },
   {
     i: EyeOff,
-    t: "Je protège mes informations",
-    d: "Je ne publie jamais mes coordonnées ni celles d'un autre élève. Mon identifiant et mon mot de passe restent secrets.",
+    t: m.charte_3_titre(),
+    d: m.charte_3_texte(),
   },
   {
     i: ShieldCheck,
-    t: "Je publie des contenus fiables",
-    d: "Tout ce que je publie est relu par l'équipe nationale avant d'être visible. Je partage des informations de santé vérifiées, sans photo d'une personne qui n'a pas donné son accord.",
+    t: m.charte_4_titre(),
+    d: m.charte_4_texte(),
   },
   {
     i: MessageSquareWarning,
-    t: "Je joue franc-jeu",
-    d: "Un seul compte par élève. Les points obtenus par la triche (comptes multiples, réponses copiées) sont retirés, et le compte peut être suspendu.",
+    t: m.charte_5_titre(),
+    d: m.charte_5_texte(),
   },
 ];
 
@@ -55,18 +55,18 @@ function Charte() {
       <SiteHeader />
       <main className="bg-carnet">
         <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 md:py-16">
-          <FilAriane rubrique="Compte élève" page="Charte" />
+          <FilAriane rubrique={m.charte_rubrique()} page={m.charte_page()} />
           <div className="mt-6">
-            <EnTete sur="Charte" bleu="Les règles des" vert="Clubs Santé">
-              En créant ton compte, tu acceptes ces règles. Elles protègent chaque membre de la
-              communauté.
+            <EnTete sur={m.charte_page()} bleu={m.charte_bleu()} vert={m.charte_vert()}>
+              {m.charte_texte()}
             </EnTete>
           </div>
           <p className="mt-6 rounded-2xl bg-sun/20 px-4 py-3 text-sm font-semibold text-ink/80">
-            Version provisoire, en cours de validation par l'équipe du programme.
+            {m.charte_provisoire()}
+            {langueCourante() !== LANGUE_DE_BASE && <> {m.charte_reference()}</>}
           </p>
           <ol className="mt-10 grid gap-4">
-            {regles.map(({ i: Icone, t, d }, rang) => (
+            {regles().map(({ i: Icone, t, d }, rang) => (
               <li
                 key={t}
                 className="flex gap-4 rounded-3xl bg-white p-5 shadow-card ring-1 ring-border sm:p-6"

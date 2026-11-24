@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import mascotte from "@/assets/mascotte-leadership.webp";
+import { ContenuEnFrancais } from "@/components/ContenuEnFrancais";
 import { temoignages } from "@/lib/temoignages";
+import { m } from "@/paraglide/messages.js";
 
 export function TemoignagesSection() {
   const [actif, setActif] = useState(0);
@@ -15,15 +17,15 @@ export function TemoignagesSection() {
     <section id="temoignages" className="scroll-mt-16 overflow-hidden bg-mist-soft py-20">
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 lg:grid-cols-[2fr_3fr] lg:gap-14">
         <div data-reveal="left">
-          <p className="text-sm font-extrabold uppercase text-primary">Témoignages</p>
-          <h2 className="mt-2 text-4xl md:text-5xl">
-            <span className="text-logo-blue">Les Clubs Santé</span>{" "}
-            <span className="text-primary">en paroles</span>
-          </h2>
-          <p className="mt-4 text-muted-foreground">
-            Découvre ce que les Clubs Santé ont changé pour celles et ceux qui les font vivre au
-            quotidien.
+          <p className="text-sm font-extrabold uppercase text-primary">
+            {m.temoignages_bloc_etiquette()}
           </p>
+          <h2 className="mt-2 text-4xl md:text-5xl">
+            <span className="text-logo-blue">{m.temoignages_bloc_titre_1()}</span>{" "}
+            <span className="text-primary">{m.temoignages_bloc_titre_2()}</span>
+          </h2>
+          <p className="mt-4 text-muted-foreground">{m.temoignages_bloc_texte()}</p>
+          <ContenuEnFrancais className="mt-3" />
         </div>
 
         <figure
@@ -61,7 +63,7 @@ export function TemoignagesSection() {
                 hash={x.id}
                 className="mt-5 self-start text-sm font-extrabold text-primary underline-offset-4 hover:underline"
               >
-                Lire la suite
+                {m.temoignages_lire_suite()}
               </Link>
             )}
             <figcaption className="mt-6">
@@ -73,7 +75,7 @@ export function TemoignagesSection() {
             <div className="mt-6 flex items-center gap-2">
               <button
                 type="button"
-                aria-label="Témoignage précédent"
+                aria-label={m.temoignages_precedent()}
                 onClick={() => aller(-1)}
                 className="btn-fx flex h-11 w-11 items-center justify-center rounded-full border bg-card text-logo-blue"
               >
@@ -81,7 +83,7 @@ export function TemoignagesSection() {
               </button>
               <button
                 type="button"
-                aria-label="Témoignage suivant"
+                aria-label={m.temoignages_suivant()}
                 onClick={() => aller(1)}
                 className="btn-fx flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground"
               >
@@ -93,7 +95,10 @@ export function TemoignagesSection() {
                   <button
                     key={t.nom}
                     type="button"
-                    aria-label={`Témoignage ${i + 1} sur ${temoignages.length}`}
+                    aria-label={m.temoignages_position({
+                      numero: String(i + 1),
+                      total: String(temoignages.length),
+                    })}
                     aria-current={i === actif}
                     onClick={() => aller(i - actif)}
                     className={`h-2.5 rounded-full transition-all ${

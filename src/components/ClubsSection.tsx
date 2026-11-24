@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import type { DrePublique } from "@/lib/api/client";
+import { formatDeLaLangue, lien } from "@/lib/langues";
 import { DRE_PAR_DEFAUT, regions } from "@/lib/togo-dre";
+import { m } from "@/paraglide/messages.js";
 
 const teinte = (couleur: string) => `color-mix(in oklch, ${couleur} 12%, white)`;
 // Assombrie pour que le texte blanc reste lisible, y compris sur les régions orange.
@@ -17,11 +19,11 @@ export function ClubsSection({ liste }: { liste: DrePublique[] }) {
   if (!dre) return null;
   const c = dre.couleur;
   const stats = [
-    { n: dre.nb_etablissements, t: "Total clubs" },
-    { n: dre.iesg.length, t: "IESG rattachées" },
+    { n: dre.nb_etablissements, t: m.clubs_stat_total() },
+    { n: dre.iesg.length, t: m.clubs_stat_iesg() },
     {
-      n: `${((dre.nb_etablissements / (totalClubs || 1)) * 100).toFixed(1).replace(".", ",")} %`,
-      t: "des clubs du Togo",
+      n: `${new Intl.NumberFormat(formatDeLaLangue(), { maximumFractionDigits: 1, minimumFractionDigits: 1 }).format((dre.nb_etablissements / (totalClubs || 1)) * 100)} %`,
+      t: m.clubs_stat_part(),
     },
   ];
 
@@ -33,13 +35,10 @@ export function ClubsSection({ liste }: { liste: DrePublique[] }) {
       <div className="mx-auto max-w-7xl px-5">
         <div data-reveal className="mx-auto max-w-3xl text-center">
           <h2 className="text-4xl md:text-5xl">
-            <span className="text-logo-blue">Trouve toi aussi</span>{" "}
-            <span className="text-primary">ton club santé</span>
+            <span className="text-logo-blue">{m.clubs_titre_1()}</span>{" "}
+            <span className="text-primary">{m.clubs_titre_2()}</span>
           </h2>
-          <p className="mt-4 text-muted-foreground">
-            Découvre les clubs santé partout au Togo, de ta Direction Régionale de l’Éducation (DRE)
-            jusqu’à ton Inspection (IESG). Clique sur ta région sur la carte pour voir ses IESG.
-          </p>
+          <p className="mt-4 text-muted-foreground">{m.clubs_texte()}</p>
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[2fr_3fr]">
@@ -111,7 +110,7 @@ export function ClubsSection({ liste }: { liste: DrePublique[] }) {
             <div key={dre.code} className="flex flex-1 flex-col animate-in fade-in duration-300">
               <div className="p-6 text-primary-foreground md:p-8" style={{ background: fond(c) }}>
                 <span className="rounded-full border border-white/40 bg-white/15 px-3 py-1 text-[11px] font-extrabold uppercase">
-                  Zone scolaire officielle
+                  {m.clubs_zone_officielle()}
                 </span>
                 <h3 className="mt-4 text-4xl uppercase md:text-5xl">DRE {dre.nom}</h3>
                 <p className="mt-1 font-medium">{dre.nom_complet}</p>
@@ -132,12 +131,10 @@ export function ClubsSection({ liste }: { liste: DrePublique[] }) {
 
               <div className="flex flex-1 flex-col p-6 md:p-8">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-extrabold uppercase">
-                    Inspections de l’Éducation Secondaire Générale
-                  </p>
+                  <p className="text-sm font-extrabold uppercase">{m.clubs_inspections()}</p>
                   {dre.iesg.length > 0 && (
                     <p className="text-xs font-semibold text-muted-foreground">
-                      Sélectionne une IESG
+                      {m.clubs_selectionne_iesg()}
                     </p>
                   )}
                 </div>
@@ -172,7 +169,7 @@ export function ClubsSection({ liste }: { liste: DrePublique[] }) {
                             <span className="font-display text-5xl leading-none">
                               {i.nb_etablissements}
                             </span>
-                            <span className="text-sm font-bold">clubs actifs</span>
+                            <span className="text-sm font-bold">{m.clubs_actifs()}</span>
                           </span>
                           <span className="mt-4 block h-1.5 overflow-hidden rounded-full bg-card">
                             <span
@@ -181,7 +178,7 @@ export function ClubsSection({ liste }: { liste: DrePublique[] }) {
                             />
                           </span>
                           <span className="mt-2 block text-xs font-semibold text-ink/70">
-                            {part} % des clubs de la région
+                            {m.clubs_part_region({ part: String(part) })}
                           </span>
                         </a>
                       );
@@ -189,14 +186,14 @@ export function ClubsSection({ liste }: { liste: DrePublique[] }) {
                   </div>
                 ) : (
                   <p className="mt-4 flex flex-1 items-center justify-center rounded-2xl border border-dashed p-6 text-center text-sm font-semibold text-muted-foreground">
-                    Le détail des IESG de cette région sera bientôt disponible.
+                    {m.clubs_iesg_bientot()}
                   </p>
                 )}
                 <a
-                  href="/carte-des-clubs"
+                  href={lien("/carte-des-clubs")}
                   className="btn-fx mt-6 self-start rounded-full bg-primary px-6 py-3 text-center text-[15px] font-bold text-primary-foreground shadow-card"
                 >
-                  Découvrir les établissements
+                  {m.clubs_decouvrir()}
                 </a>
               </div>
             </div>

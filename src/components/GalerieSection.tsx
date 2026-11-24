@@ -1,5 +1,7 @@
 import { ArrowRight } from "lucide-react";
+import { lien } from "@/lib/langues";
 import { photos } from "@/lib/galerie";
+import { m } from "@/paraglide/messages.js";
 
 export function GalerieSection() {
   return (
@@ -8,19 +10,16 @@ export function GalerieSection() {
         <div data-reveal className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <h2 className="text-4xl md:text-5xl">
-              <span className="text-logo-blue">Les Clubs Santé</span>{" "}
-              <span className="text-primary">en images</span>
+              <span className="text-logo-blue">{m.galerie_bloc_titre_1()}</span>{" "}
+              <span className="text-primary">{m.galerie_bloc_titre_2()}</span>
             </h2>
-            <p className="mt-4 max-w-xl text-muted-foreground">
-              Revis en images les moments forts des Clubs Santé : compétitions, formations et
-              actions de terrain.
-            </p>
+            <p className="mt-4 max-w-xl text-muted-foreground">{m.galerie_bloc_texte()}</p>
           </div>
           <a
-            href="/galerie"
+            href={lien("/galerie")}
             className="btn-fx inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground shadow-card"
           >
-            Voir plus <ArrowRight className="size-4" />
+            {m.galerie_voir_plus()} <ArrowRight className="size-4" />
           </a>
         </div>
 

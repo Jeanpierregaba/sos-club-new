@@ -1,5 +1,8 @@
 import { ChevronRight } from "lucide-react";
 
+import { lien } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
+
 // Fil d'Ariane des pages du menu : Accueil, la rubrique, puis la page. `clair` : texte blanc pour une bannière foncée.
 // `parent` : un niveau intermédiaire cliquable, pour une sous-page (une édition du Hall of Fame, par exemple).
 export function FilAriane({
@@ -15,13 +18,13 @@ export function FilAriane({
 }) {
   return (
     <nav
-      aria-label="Fil d’Ariane"
+      aria-label={m.fil_ariane()}
       className={`text-sm font-semibold ${clair ? "text-white/70" : "text-muted-foreground"}`}
     >
       <ol className="flex flex-wrap items-center gap-1.5">
         <li>
-          <a href="/" className={clair ? "hover:text-white" : "hover:text-logo-blue"}>
-            Accueil
+          <a href={lien("/")} className={clair ? "hover:text-white" : "hover:text-logo-blue"}>
+            {m.entete_accueil()}
           </a>
         </li>
         <li className="flex items-center gap-1.5">
@@ -30,7 +33,10 @@ export function FilAriane({
         {parent && (
           <li className="flex items-center gap-1.5">
             <ChevronRight aria-hidden className="size-3.5" />
-            <a href={parent.href} className={clair ? "hover:text-white" : "hover:text-logo-blue"}>
+            <a
+              href={lien(parent.href)}
+              className={clair ? "hover:text-white" : "hover:text-logo-blue"}
+            >
               {parent.t}
             </a>
           </li>

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
 
+import { m } from "@/paraglide/messages.js";
+
 // Bouton « Retour en haut », sur tout le site : il apparaît une fois qu'on a descendu d'un écran.
 // --retour-bas : posé par une bulle flottante (BulleDefi) pour que le bouton passe au-dessus d'elle.
 export function RetourEnHaut() {
@@ -22,8 +24,8 @@ export function RetourEnHaut() {
     <button
       type="button"
       onClick={remonter}
-      aria-label="Retour en haut de la page"
-      title="Retour en haut"
+      aria-label={m.retour_haut_page()}
+      title={m.retour_haut()}
       tabIndex={visible ? 0 : -1}
       aria-hidden={!visible}
       className={`btn-fx fixed bottom-[var(--retour-bas,1.25rem)] right-6 z-40 inline-flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-card ring-2 ring-white transition-[opacity,translate] duration-300 print:hidden md:bottom-[var(--retour-bas-md,2rem)] md:right-10 ${

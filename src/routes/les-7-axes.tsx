@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { TITRES_AXES } from "@/lib/axes";
+import { texteAxe } from "@/lib/axes";
+import { lien } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 import {
   ArrowDown,
   ArrowRight,
@@ -33,106 +35,75 @@ import mascotteEnvironnement from "@/assets/mascotte-environnement.webp";
 export const Route = createFileRoute("/les-7-axes")({
   head: () => ({
     meta: [
-      { title: "Les 7 axes — Club Santé SOS Docteur TV" },
-      {
-        name: "description",
-        content:
-          "Les 7 axes d'intervention des Clubs Santé SOS Docteur TV : slogan et activités opérationnelles de chaque axe, du Génie Imhotep à la santé environnementale.",
-      },
-      { property: "og:title", content: "Les 7 axes des Clubs Santé" },
+      { title: m.axes7_meta_titre() },
+      { name: "description", content: m.axes7_meta_description() },
+      { property: "og:title", content: m.axes7_meta_og() },
     ],
   }),
   component: LesSeptAxes,
 });
 
 // `couleur` : la couleur de l'axe, posée en variable CSS sur sa section ; `encre` : le texte posé sur cette couleur.
-const axes = [
+// Une fonction : les textes suivent la langue de la page.
+const lesAxes = () => [
   {
-    t: TITRES_AXES[0],
-    s: "Génie Imhotep, c’est ici et maintenant",
-    activites: [
-      "Vulgarisation du jeu de culture générale en santé publique dénommé « Académie Génie Imhotep » dans tous les collèges et lycées du Togo.",
-      "Compétition nationale de culture générale en santé « GÉNIE IMHOTEP » au niveau communal, préfectoral, inspection, régional et national.",
-      "Organisation hebdomadaire du jeu GÉNIE IMHOTEP sur la chaîne SOS DOCTEUR TV.",
-    ],
+    t: texteAxe(1).titre,
+    s: texteAxe(1).slogan,
+    activites: [m.axe_1_activite_1(), m.axe_1_activite_2(), m.axe_1_activite_3()],
     i: Brain,
     img: mascotteImhotep,
     couleur: "var(--sky)",
     encre: "text-white",
   },
   {
-    t: TITRES_AXES[1],
-    s: "EVSS, un élève bien informé est un élève serein et engagé dans sa communauté",
-    activites: [
-      "E-Club Santé sur l’application SOS DOCTEUR TV : un cadre d’expression et d’échanges avec les professionnels de santé.",
-      "Sensibilisation sur la Santé Sexuelle et Reproductive (SSR) et les déterminants de santé en milieu scolaire.",
-      "Innovation et créativité des jeunes dans les messages de sensibilisation, avec un recueil annuel des bonnes pratiques.",
-    ],
+    t: texteAxe(2).titre,
+    s: m.axe_2_slogan_evss(),
+    activites: [m.axe_2_activite_1(), m.axe_2_activite_2(), m.axe_2_activite_3()],
     i: MessageCircleHeart,
     img: mascotteValeurs,
     couleur: "var(--rose)",
     encre: "text-white",
   },
   {
-    t: TITRES_AXES[2],
-    s: "La voix des jeunes au cœur des ondes de santé",
-    activites: [
-      "Vulgarisation des Journées Mondiales de Santé (JMS) dans les établissements scolaires.",
-      "Entraînement et production de sketchs, poèmes, slams, chants et reportages santé.",
-      "Émissions « Télé des Ados » : diffusion hebdomadaire des prestations des clubs par région éducative.",
-    ],
+    t: texteAxe(3).titre,
+    s: texteAxe(3).slogan,
+    activites: [m.axe_3_activite_1(), m.axe_3_activite_2(), m.axe_3_activite_3()],
     i: Clapperboard,
     img: mascotteMedias,
     couleur: "var(--grape)",
     encre: "text-white",
   },
   {
-    t: TITRES_AXES[3],
-    s: "Un esprit sain dans un corps sain et agile",
-    activites: [
-      "Soutien aux activités physiques, tournois sportifs et olympiades scolaires inter-clubs.",
-      "Formation certifiante aux gestes qui sauvent et aux premiers secours d’urgence.",
-      "Promotion des jeux de réflexion (échecs, scrabble) et découverte des fédérations sportives nationales.",
-    ],
+    t: texteAxe(4).titre,
+    s: texteAxe(4).slogan,
+    activites: [m.axe_4_activite_1(), m.axe_4_activite_2(), m.axe_4_activite_3()],
     i: Dumbbell,
     img: mascotteSecourisme,
     couleur: "var(--tangerine)",
     encre: "text-white",
   },
   {
-    t: TITRES_AXES[4],
-    s: "L’excellence récompensée, l’émulation stimulée",
-    activites: [
-      "Bourses PEEP Plus : 100 bourses annuelles d’excellence pour les bacheliers méritants inscrits en sciences de la santé.",
-      "Prix spéciaux trimestriels pour les meilleurs enseignants encadreurs et agents de santé.",
-      "Cérémonie solennelle de remise de distinctions nationales aux élèves et établissements lauréats.",
-    ],
+    t: texteAxe(5).titre,
+    s: texteAxe(5).slogan,
+    activites: [m.axe_5_activite_1(), m.axe_5_activite_2(), m.axe_5_activite_3()],
     i: Award,
     img: mascotteBourses,
     couleur: "var(--sun)",
     encre: "text-ink",
   },
   {
-    t: TITRES_AXES[5],
-    s: "Oser grandir, inspirer et diriger avec intégrité",
-    activites: [
-      "Rencontres inspirantes et mentorat direct avec des personnalités médicales et des leaders d’opinion apolitiques.",
-      "Dispositif « Ma Parole, Ma Voix Compte » : boîtes à idées et expression libre des apprenants dans chaque école.",
-      "Formation démocratique des bureaux d’élèves et responsabilisation civique des jeunes.",
-    ],
+    t: texteAxe(6).titre,
+    s: texteAxe(6).slogan,
+    activites: [m.axe_6_activite_1(), m.axe_6_activite_2(), m.axe_6_activite_3()],
     i: Compass,
     img: mascotteLeadership,
     couleur: "var(--bark)",
     encre: "text-white",
   },
   {
-    t: TITRES_AXES[6],
-    s: "Un environnement scolaire sain pour une jeunesse épanouie",
-    activites: [
-      "Prix PEVPAH (Établissement Vert, Propre, Assaini et Hygiénique) récompensant les meilleurs lycées.",
-      "Contrôle sanitaire et encadrement des revendeuses d’aliments scolaires pour une nutrition saine.",
-      "Reboisement scolaire (« 1 élève, 1 arbre »), gestion des déchets plastiques et hygiène de l’eau.",
-    ],
+    t: texteAxe(7).titre,
+    s: texteAxe(7).slogan,
+    activites: [m.axe_7_activite_1(), m.axe_7_activite_2(), m.axe_7_activite_3()],
     i: Sprout,
     img: mascotteEnvironnement,
     couleur: "var(--leaf)",
@@ -140,15 +111,15 @@ const axes = [
   },
 ];
 
-const reperes = [
-  { n: "7", t: "axes d’intervention" },
-  { n: "21", t: "activités opérationnelles" },
-  { n: "7", t: "mascottes pour t’accompagner" },
+const reperes = () => [
+  { n: "7", t: m.axes7_repere_axes() },
+  { n: "21", t: m.axes7_repere_activites() },
+  { n: "7", t: m.axes7_repere_mascottes() },
 ];
 
 // Un axe : la mascotte sur un aplat de sa couleur avec le slogan en bulle, le texte et les activités en face.
 // Les côtés alternent d'un axe à l'autre, et chaque bande prend une teinte claire de la couleur de l'axe.
-function Axe({ a, n }: { a: (typeof axes)[number]; n: number }) {
+function Axe({ a, n }: { a: ReturnType<typeof lesAxes>[number]; n: number }) {
   const inverse = n % 2 === 0;
   return (
     <section
@@ -173,7 +144,7 @@ function Axe({ a, n }: { a: (typeof axes)[number]; n: number }) {
           />
           <img
             src={a.img}
-            alt={`Mascotte de l’axe ${n} : ${a.t}`}
+            alt={m.axes7_mascotte_alt({ numero: String(n), titre: a.t })}
             loading="lazy"
             width={1414}
             height={2000}
@@ -182,7 +153,7 @@ function Axe({ a, n }: { a: (typeof axes)[number]; n: number }) {
           <p
             className={`absolute bottom-0 max-w-[18rem] rounded-2xl bg-white p-4 font-hand text-xl leading-tight sm:text-2xl text-ink shadow-card sm:max-w-xs ${inverse ? "left-0 rotate-2" : "right-0 -rotate-2"}`}
           >
-            « {a.s} »
+            {m.commun_citation({ texte: a.s })}
           </p>
         </div>
 
@@ -194,13 +165,13 @@ function Axe({ a, n }: { a: (typeof axes)[number]; n: number }) {
               <a.i className="size-6" />
             </span>
             <p className="text-sm font-extrabold uppercase tracking-widest text-logo-red">
-              Axe {n} sur 7
+              {m.axes7_axe_sur_7({ numero: String(n) })}
             </p>
           </div>
           <h2 className="mt-4 text-2xl leading-tight text-logo-blue md:text-3xl">{a.t}</h2>
 
           <p className="mt-8 flex items-center gap-2 text-sm font-extrabold uppercase tracking-widest text-logo-blue">
-            <ListChecks aria-hidden className="size-4" /> Activités opérationnelles
+            <ListChecks aria-hidden className="size-4" /> {m.axes7_activites()}
           </p>
           <ol className="mt-4 grid gap-3">
             {a.activites.map((act, j) => (
@@ -226,6 +197,7 @@ function Axe({ a, n }: { a: (typeof axes)[number]; n: number }) {
 }
 
 function LesSeptAxes() {
+  const axes = lesAxes();
   return (
     <div className="min-h-screen overflow-x-clip bg-carnet text-ink">
       <SiteMotion />
@@ -253,23 +225,19 @@ function LesSeptAxes() {
         <DecorAnime />
         <div className="mx-auto grid max-w-7xl gap-6 px-5 pt-8 md:pt-12 lg:grid-cols-[1.1fr_1fr] lg:gap-10">
           <div className="pb-4 lg:pb-20">
-            <FilAriane rubrique="Vie du club" page="Les 7 axes" clair />
+            <FilAriane rubrique={m.menu_vie_du_club()} page={m.menu_7_axes()} clair />
 
             <div data-reveal="left" className="pt-12 lg:pt-20">
               <span className="inline-flex rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-ink">
-                Cadre d’orientation des Clubs Santé
+                {m.axes7_cadre()}
               </span>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block">Les 7 axes</span>
-                <span className="block text-primary">de santé</span>
+                <span className="block">{m.axes7_titre_1()}</span>
+                <span className="block text-primary">{m.axes7_titre_2()}</span>
               </h1>
-              <p className="mt-6 max-w-xl text-lg font-medium text-white/85">
-                Sept univers, sept mascottes : chaque axe donne à ton Club Santé des activités
-                concrètes à mener toute l’année dans ton établissement, des quiz du Génie Imhotep au
-                reboisement de ta cour.
-              </p>
+              <p className="mt-6 max-w-xl text-lg font-medium text-white/85">{m.axes7_intro()}</p>
               <ul className="mt-8 flex flex-wrap gap-x-8 gap-y-4">
-                {reperes.map((r) => (
+                {reperes().map((r) => (
                   <li key={r.t} className="flex items-center gap-3">
                     <span className="font-display text-4xl leading-none text-sun">{r.n}</span>
                     <span className="max-w-[7rem] text-sm font-bold leading-tight text-white/80">
@@ -282,14 +250,14 @@ function LesSeptAxes() {
                 href="#axe-1"
                 className="btn-fx mt-9 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground shadow-card"
               >
-                Explorer les 7 axes <ArrowDown className="size-4" />
+                {m.axes7_explorer()} <ArrowDown className="size-4" />
               </a>
             </div>
           </div>
 
           <img
             src={mascottesAxes}
-            alt="Quatre mascottes des Clubs Santé : caméra, mégaphone, pouce levé et arrosoir"
+            alt={m.axes7_mascottes_alt()}
             width={1122}
             height={1402}
             data-reveal="right"
@@ -320,7 +288,7 @@ function LesSeptAxes() {
             <div className="drop-shadow-2xl">
               <img
                 src={mascotteImhotep}
-                alt="La mascotte caméléon des Clubs Santé, dont la couleur change sans cesse"
+                alt={m.axes7_cameleon_alt()}
                 loading="lazy"
                 width={1414}
                 height={2000}
@@ -331,18 +299,15 @@ function LesSeptAxes() {
 
           <div data-reveal>
             <p className="text-sm font-extrabold uppercase tracking-widest text-logo-red">
-              Notre mascotte
+              {m.axes7_notre_mascotte()}
             </p>
             <h2 className="mt-3 text-4xl md:text-5xl">
-              <span className="text-logo-blue">Pourquoi</span>{" "}
-              <span className="text-primary">un caméléon ?</span>
+              <span className="text-logo-blue">{m.axes7_pourquoi_1()}</span>{" "}
+              <span className="text-primary">{m.axes7_pourquoi_2()}</span>
             </h2>
-            <p className="mt-6 text-xl font-semibold leading-relaxed">
-              Le caméléon change de couleur, mais reste toujours le même.
-            </p>
+            <p className="mt-6 text-xl font-semibold leading-relaxed">{m.axes7_cameleon_1()}</p>
             <p className="mt-4 text-lg font-medium leading-relaxed text-muted-foreground">
-              Comme lui, chaque jeune peut apprendre, évoluer, développer de nouvelles compétences
-              et s’adapter aux situations, tout en restant fidèle à ses valeurs.
+              {m.axes7_cameleon_2()}
             </p>
             <div className="mt-8 rounded-3xl bg-mist-soft p-6 ring-1 ring-border md:p-8">
               <ul aria-hidden className="flex gap-1.5">
@@ -355,11 +320,9 @@ function LesSeptAxes() {
                 ))}
               </ul>
               <p className="mt-5 font-display text-2xl leading-snug text-logo-blue md:text-3xl">
-                Plusieurs couleurs, plusieurs talents…
+                {m.axes7_couleurs()}
               </p>
-              <p className="mt-2 text-lg font-bold">
-                Une même génération de jeunes en bonne santé, responsables et épanouis.
-              </p>
+              <p className="mt-2 text-lg font-bold">{m.axes7_generation()}</p>
             </div>
           </div>
         </div>
@@ -384,41 +347,38 @@ function LesSeptAxes() {
               SOS Docteur TV & AIMES-AFRIQUE
             </p>
             <h2 className="mt-3 text-4xl md:text-5xl">
-              Documentation <span className="text-primary">& reportage officiel</span>
+              {m.axes7_doc_1()} <span className="text-primary">{m.axes7_doc_2()}</span>
             </h2>
-            <p className="mt-4 max-w-xl text-lg font-medium text-white/80">
-              Retrouve l’intégralité du cadre d’orientation des Clubs Santé déployé dans les 7
-              Directions Régionales de l’Éducation (DRE) du Togo.
-            </p>
+            <p className="mt-4 max-w-xl text-lg font-medium text-white/80">{m.axes7_doc_texte()}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href="#"
                 className="btn-fx inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
               >
-                <Download className="size-4" /> Télécharger la plaquette complète
+                <Download className="size-4" /> {m.axes7_plaquette()}
               </a>
               <a
                 href="#"
                 className="btn-fx inline-flex items-center gap-2 rounded-full border-2 border-white px-7 py-3 text-[15px] font-bold hover:bg-white hover:text-logo-blue"
               >
-                <CirclePlay className="size-4" /> Visionner le documentaire national
+                <CirclePlay className="size-4" /> {m.axes7_documentaire()}
               </a>
             </div>
           </div>
           <div className="relative min-h-64">
             <img
               src={slideAxes}
-              alt="Élèves des Clubs Santé qui applaudissent, drapeau du Togo levé"
+              alt={m.axes7_applaudir_alt()}
               loading="lazy"
               width={2000}
               height={1228}
               className="absolute inset-0 size-full object-cover [mask-image:linear-gradient(to_bottom,transparent,black_35%)] lg:[mask-image:linear-gradient(to_right,transparent,black_40%)]"
             />
             <a
-              href="/club-sante"
+              href={lien("/club-sante")}
               className="btn-fx absolute bottom-5 right-5 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-logo-blue shadow-card"
             >
-              Découvrir le Club Santé <ArrowRight className="size-4" />
+              {m.axes7_decouvrir_club()} <ArrowRight className="size-4" />
             </a>
           </div>
         </div>

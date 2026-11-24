@@ -12,41 +12,43 @@ import {
 import { retard } from "@/components/SiteMotion";
 import { TikTokIcon } from "@/components/TikTokIcon";
 import photo from "@/assets/initiateur-kodom.webp";
+import { m } from "@/paraglide/messages.js";
 
-const titres = [
-  { i: Stethoscope, a: "Médecin spécialiste en", t: "Médecine interne" },
-  { i: GraduationCap, a: "Diplômé en", t: "Éducation pour la santé" },
-  { i: Newspaper, a: "Diplômé en", t: "Journalisme médical" },
-  { i: Globe, a: "Diplômé en", t: "Diplomatie de la santé" },
+// Des fonctions : les textes suivent la langue de la page.
+const titres = () => [
+  { i: Stethoscope, a: m.initiateur_titre_specialiste(), t: m.initiateur_titre_medecine_interne() },
+  { i: GraduationCap, a: m.initiateur_diplome_en(), t: m.initiateur_titre_education_sante() },
+  { i: Newspaper, a: m.initiateur_diplome_en(), t: m.initiateur_titre_journalisme() },
+  { i: Globe, a: m.initiateur_diplome_en(), t: m.initiateur_titre_diplomatie() },
 ];
 
-const fonctions = [
+const fonctions = () => [
   {
     i: HeartHandshake,
-    role: "Président Fondateur",
+    role: m.initiateur_role_president(),
     org: "AIMES-AFRIQUE",
-    tag: "ONG humanitaire",
+    tag: m.initiateur_tag_ong(),
     c: "bg-tangerine",
   },
   {
     i: Tv,
-    role: "Directeur Général",
+    role: m.initiateur_role_directeur(),
     org: "SOS DOCTEUR TV",
-    tag: "1ère télévision santé Afrique",
+    tag: m.initiateur_tag_tv(),
     c: "bg-primary",
   },
   {
     i: Hospital,
-    role: "Directeur Général",
+    role: m.initiateur_role_directeur(),
     org: "Clinique Internationale Dr KODOM – Lomé",
-    tag: "Pôle médical",
+    tag: m.initiateur_tag_medical(),
     c: "bg-logo-blue",
   },
 ];
 
 // Adresse et liens à renseigner : ils pointent vers « # » en attendant.
-const reseaux = [
-  { i: Mail, t: "Mail", href: "#" },
+const reseaux = () => [
+  { i: Mail, t: m.initiateur_mail(), href: "#" },
   { i: Facebook, t: "Facebook", href: "#" },
   { i: TikTokIcon, t: "TikTok", href: "#" },
 ];
@@ -56,13 +58,10 @@ export function InitiateurSection() {
     <section id="initiateur" className="mx-auto max-w-7xl scroll-mt-16 px-5 py-20">
       <div data-reveal className="mx-auto max-w-3xl text-center">
         <h2 className="text-4xl md:text-5xl">
-          <span className="text-logo-blue">L’Initiateur</span>{" "}
-          <span className="text-primary">du Projet</span>
+          <span className="text-logo-blue">{m.initiateur_bloc_titre_1()}</span>{" "}
+          <span className="text-primary">{m.initiateur_bloc_titre_2()}</span>
         </h2>
-        <p className="mt-4 text-muted-foreground">
-          L’engagement médical, humanitaire et pédagogique au cœur du déploiement national des Clubs
-          Santé SOS DOCTEUR TV à travers tous les établissements scolaires du Togo.
-        </p>
+        <p className="mt-4 text-muted-foreground">{m.initiateur_bloc_texte()}</p>
       </div>
 
       <div
@@ -73,7 +72,7 @@ export function InitiateurSection() {
         <div className="relative aspect-[4/5] lg:aspect-auto">
           <img
             src={photo}
-            alt="Prof Honoraire Dr KODOM Serge Michel en blouse blanche, un stéthoscope autour du cou"
+            alt={m.initiateur_photo()}
             loading="lazy"
             width={1097}
             height={1434}
@@ -83,18 +82,12 @@ export function InitiateurSection() {
         </div>
 
         <div className="min-w-0 p-6 pb-20 md:p-10 md:pb-24 lg:pl-6">
-          <h3 className="text-3xl md:text-4xl">Prof Honoraire Dr KODOM Serge Michel</h3>
-          <p className="mt-4 md:text-lg">
-            Pionnier de la santé communautaire et de la télémédecine en Afrique, le Prof. Hon. Dr
-            KODOM Serge Michel consacre son engagement au service de l’éducation sanitaire des
-            élèves et de l’autonomie citoyenne de la jeunesse togolaise.
-          </p>
+          <h3 className="text-3xl md:text-4xl">{m.initiateur_nom()}</h3>
+          <p className="mt-4 md:text-lg">{m.initiateur_presentation()}</p>
 
-          <p className="mt-6 text-sm font-extrabold uppercase text-sun">
-            Titres honorifiques & spécialités médicales
-          </p>
+          <p className="mt-6 text-sm font-extrabold uppercase text-sun">{m.initiateur_titres()}</p>
           <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-            {titres.map((x) => (
+            {titres().map((x) => (
               <li
                 key={x.t}
                 className="group flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 p-3 transition duration-300 hover:bg-white/20"
@@ -109,7 +102,7 @@ export function InitiateurSection() {
           </ul>
 
           <ul className="mt-6 flex gap-3 sm:gap-6">
-            {reseaux.map((r) => (
+            {reseaux().map((r) => (
               <li key={r.t}>
                 <a
                   href={r.href}
@@ -130,10 +123,10 @@ export function InitiateurSection() {
       {/* Les fonctions chevauchent le bas du panneau. */}
       <div className="relative -mt-14 px-3 md:px-8">
         <p className="mx-auto w-fit rounded-full bg-sun px-4 py-1.5 text-center text-xs font-extrabold uppercase text-ink">
-          Gouvernance & hautes fonctions
+          {m.initiateur_fonctions()}
         </p>
         <ol className="mt-3 grid gap-4 md:grid-cols-3">
-          {fonctions.map((f, i) => (
+          {fonctions().map((f, i) => (
             <li
               key={f.org}
               data-reveal

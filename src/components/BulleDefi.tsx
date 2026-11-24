@@ -5,12 +5,13 @@ import { Check, Loader2, X } from "lucide-react";
 import mascotteBourses from "@/assets/mascotte-bourses.webp";
 
 import { useMoi } from "@/hooks/use-moi";
+import { ContenuEnFrancais } from "@/components/ContenuEnFrancais";
 import { BAREME, points } from "@/lib/bareme";
+import { m } from "@/paraglide/messages.js";
 
 import {
   chargerDefiDuJour,
   corrigerDefi,
-  MESSAGE_INDISPONIBLE,
   type CorrectionDefi,
   type DefiDuJour,
 } from "@/lib/api/client";
@@ -77,7 +78,7 @@ function Bulle({ defi, joueur, cle }: { defi: DefiDuJour; joueur: Joueur; cle: u
       if (joueur === "eleve")
         clientRequetes.setQueryData<DefiDuJour>(cle, (d) => d && { ...d, ma_reponse: reponse });
     } catch {
-      setErreur(MESSAGE_INDISPONIBLE);
+      setErreur(m.commun_indisponible());
     } finally {
       setEnvoi(false);
     }
@@ -142,11 +143,9 @@ function Bulle({ defi, joueur, cle }: { defi: DefiDuJour; joueur: Joueur; cle: u
           <TeteMascotte className="size-12 shrink-0 ring-2 ring-white" />
           <div className="min-w-0">
             <p id="bulle-defi-titre" className="font-display text-xl leading-tight">
-              Le défi <span className="text-sun">du jour</span>
+              {m.defi_titre_1()} <span className="text-sun">{m.defi_titre_2()}</span>
             </p>
-            <p className="text-xs font-semibold text-white/80">
-              Une nouvelle question santé chaque jour
-            </p>
+            <p className="text-xs font-semibold text-white/80">{m.defi_sous_titre()}</p>
           </div>
           <button
             ref={fermer}
@@ -155,7 +154,7 @@ function Bulle({ defi, joueur, cle }: { defi: DefiDuJour; joueur: Joueur; cle: u
               setOuverte(false);
               bouton.current?.focus({ preventScroll: true });
             }}
-            aria-label="Fermer le défi du jour"
+            aria-label={m.defi_fermer()}
             className="ml-auto inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 transition hover:bg-white hover:text-ink"
           >
             <X className="size-4" />
@@ -166,6 +165,7 @@ function Bulle({ defi, joueur, cle }: { defi: DefiDuJour; joueur: Joueur; cle: u
           <span className="rounded-full bg-rose px-3 py-1 text-[11px] font-extrabold uppercase text-primary-foreground">
             {defi.categorie}
           </span>
+          <ContenuEnFrancais className="mt-2" />
           {/* La question, comme un message de la mascotte. */}
           <p className="mt-3 rounded-2xl rounded-tl-sm bg-mist-soft p-4 font-display text-xl leading-tight text-logo-blue">
             {defi.question}
@@ -190,13 +190,13 @@ function Bulle({ defi, joueur, cle }: { defi: DefiDuJour; joueur: Joueur; cle: u
                 {valide && i === bonne && (
                   <>
                     <Check aria-hidden className="size-5 shrink-0" />
-                    <span className="sr-only">(bonne réponse)</span>
+                    <span className="sr-only">{m.defi_bonne_reponse_lue()}</span>
                   </>
                 )}
                 {valide && i === choix && i !== bonne && (
                   <>
                     <X aria-hidden className="size-5 shrink-0" />
-                    <span className="sr-only">(ta réponse)</span>
+                    <span className="sr-only">{m.defi_ta_reponse_lue()}</span>
                   </>
                 )}
               </button>
@@ -222,14 +222,14 @@ function Bulle({ defi, joueur, cle }: { defi: DefiDuJour; joueur: Joueur; cle: u
                 className="btn-fx ml-auto inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground disabled:opacity-50"
               >
                 {envoi && <Loader2 aria-hidden className="size-4 animate-spin" />}
-                Valider
+                {m.defi_valider()}
               </button>
             )}
           </div>
           {correction && (
             <div className="mt-3 rounded-2xl bg-leaf/10 p-3 text-sm font-medium text-ink">
               <p>{correction.explication}</p>
-              <p className="mt-2 font-bold text-logo-blue">Reviens demain pour un nouveau défi !</p>
+              <p className="mt-2 font-bold text-logo-blue">{m.defi_reviens_demain()}</p>
             </div>
           )}
         </div>
@@ -241,7 +241,7 @@ function Bulle({ defi, joueur, cle }: { defi: DefiDuJour; joueur: Joueur; cle: u
           aria-hidden
           className="fixed bottom-8 right-24 z-40 rounded-2xl rounded-br-sm bg-white px-4 py-2 text-sm font-bold text-ink shadow-card ring-1 ring-border animate-in fade-in slide-in-from-right-2 md:bottom-11 md:right-28"
         >
-          Le défi du jour t’attend !
+          {m.defi_invitation()}
         </p>
       )}
 
@@ -252,7 +252,7 @@ function Bulle({ defi, joueur, cle }: { defi: DefiDuJour; joueur: Joueur; cle: u
         onClick={basculer}
         aria-expanded={ouverte}
         aria-controls="bulle-defi"
-        aria-label={ouverte ? "Fermer le défi du jour" : "Ouvrir le défi du jour"}
+        aria-label={ouverte ? m.defi_fermer() : m.defi_ouvrir()}
         className="fixed bottom-5 right-4 z-50 size-16 rounded-full shadow-card transition hover:scale-105 active:scale-95 md:bottom-8 md:right-8"
       >
         {!vue && (
@@ -286,9 +286,10 @@ function Gains({ joueur }: { joueur: Joueur }) {
   if (joueur === "eleve")
     return (
       <p className="mt-3 text-xs font-semibold text-muted-foreground">
-        Bonne réponse :{" "}
-        <strong className="text-leaf">{points(BAREME.questionDuJour.eleve)} points</strong> pour
-        toi, {points(BAREME.questionDuJour.club)} pour ton club. Une seule réponse par jour.
+        {m.defi_gains_eleve({
+          points: points(BAREME.questionDuJour.eleve),
+          club: points(BAREME.questionDuJour.club),
+        })}
       </p>
     );
   if (joueur === "visiteur")
@@ -299,26 +300,22 @@ function Gains({ joueur }: { joueur: Joueur }) {
           search={{ redirection: "/" }}
           className="font-bold text-logo-blue underline"
         >
-          Connecte-toi à ton compte Élève
+          {m.defi_gains_connexion()}
         </Link>{" "}
-        pour gagner {points(BAREME.questionDuJour.eleve)} points avec une bonne réponse.
+        {m.defi_gains_visiteur({ points: points(BAREME.questionDuJour.eleve) })}
       </p>
     );
-  return (
-    <p className="mt-3 text-xs font-semibold text-muted-foreground">
-      Les points du défi du jour sont réservés aux élèves.
-    </p>
-  );
+  return <p className="mt-3 text-xs font-semibold text-muted-foreground">{m.defi_gains_autre()}</p>;
 }
 
 // Le verdict nomme la bonne réponse : il ne repose pas sur la couleur.
 function Verdict({ correction, bonne }: { correction: CorrectionDefi; bonne: string }) {
   if (correction.deja_repondu)
     return correction.points > 0
-      ? `Tu as déjà répondu aujourd'hui : déjà récompensée, ${points(correction.points)} points.`
-      : `Tu as déjà répondu aujourd'hui. La bonne réponse : « ${bonne} ».`;
-  if (!correction.correcte) return `Pas tout à fait : la bonne réponse est « ${bonne} ».`;
+      ? m.defi_deja_recompense({ points: points(correction.points) })
+      : m.defi_deja_repondu({ bonne });
+  if (!correction.correcte) return m.defi_pas_tout_a_fait({ bonne });
   return correction.points > 0
-    ? `Bravo ! ${points(correction.points)} points pour toi.`
-    : "Bravo, c'est la bonne réponse !";
+    ? m.defi_bravo_points({ points: points(correction.points) })
+    : m.defi_bravo();
 }

@@ -5,17 +5,15 @@ import { EnTete } from "@/components/EnTete";
 import { FilAriane } from "@/components/FilAriane";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { ContenuEnFrancais } from "@/components/ContenuEnFrancais";
 import { temoignages } from "@/lib/temoignages";
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/temoignages")({
   head: () => ({
     meta: [
-      { title: "Témoignages — Club Santé SOS Docteur TV" },
-      {
-        name: "description",
-        content:
-          "Élèves et présidents de club racontent ce que les Clubs Santé SOS Docteur TV ont changé pour eux.",
-      },
+      { title: m.temoignages_meta_titre() },
+      { name: "description", content: m.temoignages_meta_description() },
     ],
   }),
   component: Temoignages,
@@ -29,12 +27,16 @@ function Temoignages() {
       <SiteHeader />
       <main className="bg-carnet">
         <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 md:py-16">
-          <FilAriane rubrique="Clubs Santé" page="Témoignages" />
+          <FilAriane rubrique={m.temoignages_rubrique()} page={m.temoignages_bloc_etiquette()} />
           <div className="mt-6">
-            <EnTete sur="Témoignages" bleu="Les Clubs Santé" vert="en paroles">
-              Découvre ce que les Clubs Santé ont changé pour celles et ceux qui les font vivre au
-              quotidien.
+            <EnTete
+              sur={m.temoignages_bloc_etiquette()}
+              bleu={m.temoignages_bloc_titre_1()}
+              vert={m.temoignages_bloc_titre_2()}
+            >
+              {m.temoignages_bloc_texte()}
             </EnTete>
+            <ContenuEnFrancais className="mt-3" />
           </div>
           <ol className="mt-10 grid gap-6">
             {temoignages.map((x) => (

@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { TITRES_AXES } from "@/lib/axes";
+import { texteAxe } from "@/lib/axes";
+import { lien } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -58,15 +60,12 @@ import slideAxes from "@/assets/slide-axes.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Club Santé SOS Docteur TV — Ton club, tes talents, tes défis" },
-      {
-        name: "description",
-        content: "Apprends, joue et fais bouger ton établissement avec les Clubs Santé du Togo.",
-      },
+      { title: m.accueil_meta_titre() },
+      { name: "description", content: m.accueil_meta_description() },
       { property: "og:title", content: "Club Santé SOS Docteur TV" },
       {
         property: "og:description",
-        content: "Apprends, joue et fais bouger ton établissement avec les Clubs Santé du Togo.",
+        content: m.accueil_meta_description(),
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -84,74 +83,74 @@ export const Route = createFileRoute("/")({
 });
 
 // Les 7 axes stratégiques. `t` : nom de l'axe, au dos de la carte ; `s` : slogan ; `c` : couleur de la carte.
-const univers = [
+const univers = () => [
   {
-    t: TITRES_AXES[0],
-    s: "Génie Imhotep, c’est ici et maintenant",
+    t: texteAxe(1).titre,
+    s: texteAxe(1).slogan,
     c: "bg-sky",
     img: mascotteImhotep,
   },
   {
-    t: TITRES_AXES[1],
-    s: "EVSS, Un élève bien informé est un élève serein et engagé dans sa communauté",
+    t: texteAxe(2).titre,
+    s: m.axe_2_slogan_evss(),
     c: "bg-rose",
     img: mascotteValeurs,
   },
   {
-    t: TITRES_AXES[2],
-    s: "La voix des jeunes au cœur des ondes de santé",
+    t: texteAxe(3).titre,
+    s: texteAxe(3).slogan,
     c: "bg-grape",
     img: mascotteMedias,
   },
   {
-    t: TITRES_AXES[3],
-    s: "Un esprit sain dans un corps sain et agile",
+    t: texteAxe(4).titre,
+    s: texteAxe(4).slogan,
     c: "bg-tangerine",
     img: mascotteSecourisme,
   },
   {
-    t: TITRES_AXES[4],
-    s: "L’excellence récompensée, l’émulation stimulée",
+    t: texteAxe(5).titre,
+    s: texteAxe(5).slogan,
     c: "bg-sun",
     img: mascotteBourses,
   },
   {
-    t: TITRES_AXES[5],
-    s: "Oser grandir, inspirer et diriger avec intégrité",
+    t: texteAxe(6).titre,
+    s: texteAxe(6).slogan,
     c: "bg-bark",
     img: mascotteLeadership,
   },
   {
-    t: TITRES_AXES[6],
-    s: "Un environnement scolaire sain pour une jeunesse épanouie",
+    t: texteAxe(7).titre,
+    s: texteAxe(7).slogan,
     c: "bg-leaf",
     img: mascotteEnvironnement,
   },
 ];
 
 // Piliers et valeurs du programme. `c` : fond de l'icône et filet du bas ; `tc` : couleur du mot clé.
-const valeurs = [
+const valeurs = () => [
   {
     i: Sparkles,
-    mot: "Confiance",
-    titre: "Découverte et confiance en soi",
-    d: "École, un lieu de révélation de talents et de vocations & Leadership transformationnel",
+    mot: m.accueil_valeur_1_mot(),
+    titre: m.accueil_valeur_1_titre(),
+    d: m.accueil_valeur_1_texte(),
     c: "bg-logo-blue",
     tc: "text-logo-blue",
   },
   {
     i: Earth,
-    mot: "Citoyenneté",
-    titre: "Culture de la citoyenneté et du panafricanisme",
-    d: "Engagement citoyen et Ouverture sur l’Afrique",
+    mot: m.accueil_valeur_2_mot(),
+    titre: m.accueil_valeur_2_titre(),
+    d: m.accueil_valeur_2_texte(),
     c: "bg-primary",
     tc: "text-primary",
   },
   {
     i: Pyramid,
-    mot: "Bâtisseur",
-    titre: "Esprit bâtisseur et polyvalence (Imhotep)",
-    d: "Innovation & Impact communautaire",
+    mot: m.accueil_valeur_3_mot(),
+    titre: m.accueil_valeur_3_titre(),
+    d: m.accueil_valeur_3_texte(),
     c: "bg-tangerine",
     tc: "text-tangerine",
   },
@@ -159,11 +158,11 @@ const valeurs = [
 
 // `plus` : le chiffre est un minimum, affiché « +800 ». Grille bento : l'ordre remplit la grille ligne par ligne,
 // `place` fixe l'emprise de la case (2 colonnes sur mobile, 4 sur grand écran) et `taille` celle du chiffre.
-const chiffresCles = [
+const chiffresCles = () => [
   {
     plus: true,
     n: 800,
-    t: "Clubs actifs sur le terrain",
+    t: m.accueil_chiffre_clubs(),
     i: HeartPulse,
     place: "col-span-2 lg:row-span-2",
     fond: "bg-linear-to-br from-logo-blue to-night text-white",
@@ -173,7 +172,7 @@ const chiffresCles = [
   {
     plus: true,
     n: 3500,
-    t: "Encadreurs pédagogiques & pairs éducateurs",
+    t: m.accueil_chiffre_encadreurs(),
     i: Users,
     place: "col-span-2",
     fond: "bg-primary text-white",
@@ -183,7 +182,7 @@ const chiffresCles = [
   {
     plus: true,
     n: 2396,
-    t: "Établissements du secondaire 1",
+    t: m.accueil_chiffre_secondaire1(),
     i: Backpack,
     place: "",
     fond: "bg-sun text-ink",
@@ -193,7 +192,7 @@ const chiffresCles = [
   {
     plus: true,
     n: 714,
-    t: "Établissements du secondaire 2",
+    t: m.accueil_chiffre_secondaire2(),
     i: School,
     place: "",
     fond: "bg-mist text-ink",
@@ -203,7 +202,7 @@ const chiffresCles = [
   {
     plus: false,
     n: 7,
-    t: "Directions régionales de l'éducation",
+    t: m.accueil_chiffre_dre(),
     i: MapPinned,
     place: "",
     fond: "bg-card text-ink ring-1 ring-logo-blue/15",
@@ -213,7 +212,7 @@ const chiffresCles = [
   {
     plus: false,
     n: 19,
-    t: "Inspections pédagogiques",
+    t: m.accueil_chiffre_inspections(),
     i: SearchCheck,
     place: "",
     fond: "bg-tangerine text-white",
@@ -223,7 +222,7 @@ const chiffresCles = [
   {
     plus: false,
     n: 1,
-    t: "Cabinet ministériel",
+    t: m.accueil_chiffre_cabinet(),
     i: Landmark,
     place: "col-span-2",
     fond: "bg-logo-red text-white",
@@ -233,118 +232,118 @@ const chiffresCles = [
 ];
 
 // Section Actualités : un article à la une, puis les autres en ligne.
-const aLaUne = {
+const aLaUne = () => ({
   img: grandesFinales,
-  tag: "Génie Imhotep",
-  t: "Grandes finales du Championnat national Génie Imhotep",
-  d: "Retour sur la 1re édition : champions, finalistes et demi-finalistes des clubs santé récompensés sur scène.",
-};
+  tag: m.accueil_une_etiquette(),
+  t: m.accueil_une_titre(),
+  d: m.accueil_une_texte(),
+});
 
-const stars = [
+const stars = () => [
   {
     img: story2,
-    tag: "TV & Médias",
+    tag: m.accueil_star_1_etiquette(),
     tc: "bg-grape",
-    t: "Les lycéens en action !",
-    d: "Reportage du Club Santé du Lycée de Lomé sur la prévention du paludisme.",
+    t: m.accueil_star_1_titre(),
+    d: m.accueil_star_1_texte(),
   },
   {
     img: story1,
-    tag: "Sports & Secourisme",
+    tag: m.accueil_star_2_etiquette(),
     tc: "bg-tangerine",
-    t: "Apprendre aujourd'hui, sauver des vies demain !",
-    d: "Initiation aux premiers secours avec les clubs santé.",
+    t: m.accueil_star_2_titre(),
+    d: m.accueil_star_2_texte(),
   },
   {
     img: hero,
-    tag: "Vie des clubs",
+    tag: m.accueil_star_3_etiquette(),
     tc: "bg-leaf",
-    t: "Une journée verte pour un meilleur cadre de vie",
-    d: "Les clubs se mobilisent pour l'environnement.",
+    t: m.accueil_star_3_titre(),
+    d: m.accueil_star_3_texte(),
   },
 ];
 
 // `onglet` : nom court affiché en étiquette au-dessus du titre. `fond` : dégradé de la section, assez sombre pour le texte blanc.
 // `accent` : couleur du cadre décalé derrière la photo. `cadrage` : point de la photo à garder visible.
 
-const heroSlides = [
+const heroSlides = () => [
   {
     img: slideMascottes,
     video: "0eflxy2KLRQ",
-    onglet: "Mascottes",
+    onglet: m.accueil_slide_1_onglet(),
     fond: "from-logo-blue to-grape",
     accent: "bg-sun",
     cadrage: "object-[50%_25%]",
-    alt: "Remise du trophée de champion national Génie Imhotep 2026 à une élève en t-shirt orange",
-    lines: ["DÉCOUVRE NOS", "MASCOTTES !"],
+    alt: m.accueil_slide_1_alt(),
+    lines: [m.accueil_slide_1_ligne1(), m.accueil_slide_1_ligne2()],
     cta: [
-      { t: "Découvrir les mascottes", href: "#" },
-      { t: "Obtenir ma certification", href: "/certification" },
+      { t: m.accueil_slide_1_action1(), href: "#" },
+      { t: m.accueil_slide_1_action2(), href: "/certification" },
     ],
-    sub: "Découvre les mascottes qui accompagnent les jeunes à apprendre, créer, s’engager et révéler leurs talents.",
+    sub: m.accueil_slide_1_texte(),
   },
   {
     img: slideClubs,
-    onglet: "Clubs Santé",
+    onglet: m.accueil_slide_2_onglet(),
     fond: "from-night to-logo-blue",
     accent: "bg-primary",
     cadrage: "object-center",
-    alt: "Jeunes des Clubs Santé en t-shirt blanc, affiches à la main, salués par un responsable",
+    alt: m.accueil_slide_2_alt(),
     mascot: {
       src: mascottesLivres,
-      alt: "Deux mascottes caméléons, l'une brune et l'autre bleue, entourées de livres",
+      alt: m.accueil_slide_2_mascotte(),
       width: 1122,
       height: 1402,
     },
-    lines: ["CLUBS SANTÉ", "SOS DOCTEUR TV"],
+    lines: [m.accueil_slide_2_ligne1(), m.accueil_slide_2_ligne2()],
     cta: [
-      { t: "Rejoindre un club", href: "/club-sante#adhesion" },
-      { t: "Découvrir les clubs", href: "/carte-des-clubs" },
+      { t: m.accueil_slide_2_action1(), href: "/club-sante#adhesion" },
+      { t: m.accueil_slide_2_action2(), href: "/carte-des-clubs" },
     ],
-    tagline: "Ensemble pour une génération de jeunes en bonne santé, responsables et épanouie",
-    sub: "Les Clubs Santé SOS DOCTEUR TV réunissent des milliers de jeunes engagés pour la santé, le leadership, l'excellence et la citoyenneté active au Togo.",
+    tagline: m.accueil_slide_2_accroche(),
+    sub: m.accueil_slide_2_texte(),
   },
   {
     img: slideGenie,
-    onglet: "Génie Imhotep",
+    onglet: m.accueil_une_etiquette(),
     fond: "from-grape to-night",
     accent: "bg-tangerine",
     cadrage: "object-center",
-    alt: "Trois élèves du Collège St. Joseph en polo bleu au pupitre de Génie Imhotep",
+    alt: m.accueil_slide_3_alt(),
     mascot: {
       src: mascottesVs,
-      alt: "Deux mascottes caméléons, l'une bleue et l'autre violette, face à un grand VS doré",
+      alt: m.accueil_slide_3_mascotte(),
       width: 2000,
       height: 2000,
     },
-    lines: ["GÉNIE", "IMHOTEP"],
+    lines: [m.accueil_slide_3_ligne1(), m.accueil_slide_3_ligne2()],
     cta: [
-      { t: "Lancer le quiz", href: "/jeux" },
-      { t: "Voir la carte", href: "/carte-des-clubs" },
+      { t: m.accueil_slide_3_action1(), href: "/jeux" },
+      { t: m.accueil_slide_3_action2(), href: "/carte-des-clubs" },
     ],
-    tagline: "C’est ici et maintenant",
-    sub: "La grande compétition de culture générale en santé publique dans les collèges et lycées du Togo et sur la chaîne SOS DOCTEUR TV !",
+    tagline: m.accueil_slide_3_accroche(),
+    sub: m.accueil_slide_3_texte(),
   },
   {
     img: slideAxes,
-    onglet: "7 axes",
+    onglet: m.accueil_slide_4_onglet(),
     fond: "from-logo-blue to-night",
     accent: "bg-sky",
     cadrage: "object-center",
-    alt: "Élèves qui applaudissent et agitent le drapeau togolais",
+    alt: m.accueil_slide_4_alt(),
     mascot: {
       src: mascottesAxes,
-      alt: "Quatre mascottes caméléons avec une caméra, un mégaphone et un arrosoir",
+      alt: m.accueil_slide_4_mascotte(),
       width: 1122,
       height: 1402,
     },
-    lines: ["7 AXES", "STRATÉGIQUES"],
+    lines: [m.accueil_slide_4_ligne1(), m.accueil_slide_4_ligne2()],
     cta: [
-      { t: "Découvrir les 7 axes", href: "/les-7-axes" },
-      { t: "Bibliothèque", href: "/bibliotheque" },
+      { t: m.accueil_slide_4_action1(), href: "/les-7-axes" },
+      { t: m.accueil_slide_4_action2(), href: "/bibliotheque" },
     ],
-    tagline: "Conçus pour permettre aux élèves de mener leurs activités de façon autonome.",
-    sub: "Conçus pour permettre aux élèves de mener leurs activités de façon autonome : découvre les programmes d'action concrets de l'hygiène au secourisme, de la nutrition à la santé mentale dans chaque établissement.",
+    tagline: m.accueil_slide_4_accroche(),
+    sub: m.accueil_slide_4_texte(),
   },
 ];
 
@@ -354,7 +353,7 @@ const heroFade = (on: boolean) =>
 
 // Carte d'un axe : la mascotte au recto, la description et le slogan au verso.
 // À la souris, le survol la retourne ; au toucher et au clavier, chaque appui la retourne et la laisse ainsi.
-function CarteAxe({ u, i }: { u: (typeof univers)[number]; i: number }) {
+function CarteAxe({ u, i }: { u: ReturnType<typeof univers>[number]; i: number }) {
   const [retournee, setRetournee] = useState(false);
   const basculer = () => setRetournee((r) => !r);
 
@@ -392,7 +391,7 @@ function CarteAxe({ u, i }: { u: (typeof univers)[number]; i: number }) {
             className="absolute inset-x-0 bottom-0 mx-auto h-[94%] w-auto object-contain object-bottom"
           />
           <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 font-display text-sm uppercase text-ink shadow-card">
-            Axe {i + 1}
+            {m.axe_numero({ numero: String(i + 1) })}
           </span>
           {/* Indice au recto : la carte se retourne. */}
           <span className="absolute bottom-3 right-3 rounded-full bg-white/25 p-2 backdrop-blur-sm">
@@ -408,13 +407,13 @@ function CarteAxe({ u, i }: { u: (typeof univers)[number]; i: number }) {
           <span
             className={`${u.c} relative self-start rounded-full px-3 py-1 text-xs font-extrabold uppercase text-primary-foreground`}
           >
-            Axe {i + 1}
+            {m.axe_numero({ numero: String(i + 1) })}
           </span>
           <h3 className="relative mt-4 flex-1 font-sans text-lg font-extrabold leading-snug lg:text-base xl:text-lg">
             {u.t}
           </h3>
           <p className="relative font-hand text-2xl leading-tight text-sun lg:text-xl xl:text-2xl">
-            « {u.s} »
+            {m.commun_citation({ texte: u.s })}
           </p>
         </div>
       </div>
@@ -427,14 +426,11 @@ function ObjectifProgramme() {
     <section id="objectif" className="mx-auto max-w-7xl scroll-mt-16 px-5 pt-20">
       <div data-reveal>
         <h2 className="text-4xl md:text-5xl">
-          <span className="text-logo-blue">Objectif</span>{" "}
-          <span className="text-primary">du programme</span>
+          <span className="text-logo-blue">{m.accueil_objectif_1()}</span>{" "}
+          <span className="text-primary">{m.accueil_objectif_2()}</span>
         </h2>
         <p className="mt-3 max-w-4xl text-lg font-medium text-muted-foreground">
-          Mobiliser les apprenants autour de 5 entités clés à savoir : la redynamisation de la vie
-          scolaire ; la promotion de la santé dès le bas âge ; la culture de l’excellence et
-          l’émulation ; la responsabilité et la citoyenneté pour un épanouissement intégral des
-          élèves.
+          {m.accueil_objectif_texte()}
         </p>
       </div>
 
@@ -443,10 +439,10 @@ function ObjectifProgramme() {
         className="mt-12 flex items-center gap-3 font-sans text-sm font-extrabold uppercase tracking-widest text-logo-blue"
       >
         <span className="h-1 w-8 rounded-full bg-primary" />
-        Piliers & valeurs du programme
+        {m.accueil_piliers()}
       </h3>
       <div className="mt-6 grid gap-6 md:grid-cols-3">
-        {valeurs.map((v, i) => (
+        {valeurs().map((v, i) => (
           <article
             key={v.mot}
             data-reveal
@@ -477,10 +473,10 @@ function ObjectifProgramme() {
         className="mt-12 flex items-center gap-3 font-sans text-sm font-extrabold uppercase tracking-widest text-logo-blue"
       >
         <span className="h-1 w-8 rounded-full bg-primary" />
-        Chiffres clés du réseau national
+        {m.accueil_chiffres()}
       </h3>
       <ul className="mt-8 grid grid-cols-2 gap-4 md:gap-5 lg:auto-rows-[minmax(12.5rem,auto)] lg:grid-cols-4">
-        {chiffresCles.map((c, i) => (
+        {chiffresCles().map((c, i) => (
           <li
             key={c.t}
             data-reveal={i === 0 ? "zoom" : ""}
@@ -521,15 +517,17 @@ function ObjectifProgramme() {
 // Actualités : « C'est toi la star ! » sur deux colonnes (un article à la une, puis trois en ligne), l'agenda en colonne de droite.
 function ActualitesSection() {
   const { prochains } = Route.useLoaderData();
+  const une = aLaUne();
+  const articles = stars();
   return (
     <section id="actualites" className="mx-auto max-w-7xl scroll-mt-16 px-5 pb-12 pt-20">
       <div data-reveal>
         <h2 className="text-4xl md:text-5xl">
-          <span className="text-logo-blue">Actualités</span>{" "}
-          <span className="text-primary">des clubs</span>
+          <span className="text-logo-blue">{m.accueil_actus_1()}</span>{" "}
+          <span className="text-primary">{m.accueil_actus_2()}</span>
         </h2>
         <p className="mt-3 max-w-2xl text-lg font-medium text-muted-foreground">
-          Les talents des jeunes, les temps forts et les prochains rendez-vous des Clubs Santé.
+          {m.accueil_actus_texte()}
         </p>
       </div>
 
@@ -537,14 +535,14 @@ function ActualitesSection() {
         <div className="min-w-0 lg:col-span-2">
           <div data-reveal className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
             <h3 className="text-3xl">
-              <span className="text-logo-blue">C'est toi</span>{" "}
-              <span className="text-primary">la star !</span>
+              <span className="text-logo-blue">{m.accueil_star_titre_1()}</span>{" "}
+              <span className="text-primary">{m.accueil_star_titre_2()}</span>
             </h3>
             <a
-              href="/magazine"
+              href={lien("/magazine")}
               className="group flex items-center gap-1.5 font-bold text-logo-blue"
             >
-              Toutes les actus
+              {m.accueil_toutes_actus()}
               <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
           </div>
@@ -555,7 +553,7 @@ function ActualitesSection() {
             className="group relative isolate mt-5 flex min-h-[30rem] items-end overflow-hidden rounded-[2rem] shadow-card md:aspect-video md:min-h-0"
           >
             <img
-              src={aLaUne.img}
+              src={une.img}
               alt=""
               loading="lazy"
               width={2000}
@@ -563,7 +561,7 @@ function ActualitesSection() {
               className="absolute inset-0 -z-10 size-full object-cover transition duration-1000 group-hover:scale-105"
             />
             <span className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-sun px-3 py-1.5 text-xs font-extrabold uppercase text-ink shadow-card">
-              <Sparkles className="size-3.5" /> À la une
+              <Sparkles className="size-3.5" /> {m.accueil_a_la_une()}
             </span>
             <div className="relative m-3 max-w-lg overflow-hidden rounded-[1.5rem] border border-white/30 bg-logo-blue/80 p-5 text-white shadow-[0_20px_50px_-12px] shadow-night/50 backdrop-blur-xl backdrop-saturate-150 md:m-5 md:p-7">
               <div
@@ -571,15 +569,15 @@ function ActualitesSection() {
                 className="absolute inset-x-0 top-0 -z-10 h-1/2 bg-linear-to-b from-white/15 to-transparent"
               />
               <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-extrabold uppercase text-sun ring-1 ring-white/25">
-                {aLaUne.tag}
+                {une.tag}
               </span>
-              <h4 className="mt-3 font-display text-2xl leading-tight md:text-3xl">{aLaUne.t}</h4>
-              <p className="mt-2 font-medium text-white/90">{aLaUne.d}</p>
+              <h4 className="mt-3 font-display text-2xl leading-tight md:text-3xl">{une.t}</h4>
+              <p className="mt-2 font-medium text-white/90">{une.d}</p>
               <a
-                href="/magazine"
+                href={lien("/magazine")}
                 className="btn-fx mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-[15px] font-bold text-primary-foreground after:absolute after:inset-0"
               >
-                Lire l'article <ArrowRight className="size-4" />
+                {m.accueil_lire_article()} <ArrowRight className="size-4" />
               </a>
             </div>
           </article>
@@ -588,10 +586,10 @@ function ActualitesSection() {
               Chaque article est une photo pleine, son titre posé sur un bandeau de verre blanc. */}
           <div className="group/defile mt-5 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
             <ul className="flex w-max gap-4 py-2 motion-safe:animate-marquee group-hover/defile:[animation-play-state:paused] md:gap-5">
-              {[...stars, ...stars].map((s, i) => (
+              {[...articles, ...articles].map((s, i) => (
                 <li
                   key={i}
-                  aria-hidden={i >= stars.length}
+                  aria-hidden={i >= articles.length}
                   className="card-fx group relative isolate flex aspect-[4/5] w-60 shrink-0 items-end overflow-hidden rounded-3xl shadow-card sm:w-64"
                 >
                   <img
@@ -608,8 +606,8 @@ function ActualitesSection() {
                     </span>
                     <h4 className="mt-2 font-sans font-extrabold leading-snug text-ink">
                       <a
-                        href="/magazine"
-                        tabIndex={i >= stars.length ? -1 : undefined}
+                        href={lien("/magazine")}
+                        tabIndex={i >= articles.length ? -1 : undefined}
                         className="after:absolute after:inset-0"
                       >
                         {s.t}
@@ -646,21 +644,22 @@ function JeuConcours() {
         {/* Deux lignes à partir de 640 px ; en dessous, le texte revient à la ligne selon la place. */}
         <h2 className="text-[1.75rem] uppercase leading-[1.15] sm:text-3xl lg:text-[2rem] xl:text-[2.5rem]">
           <span className="sm:block sm:whitespace-nowrap">
-            Obtiens ta <span className="text-sun">certification</span> &
+            {m.accueil_concours_1()}{" "}
+            <span className="text-sun">{m.accueil_concours_certification()}</span>
           </span>{" "}
           <span className="sm:block sm:whitespace-nowrap">
-            gagne jusqu'à{" "}
+            {m.accueil_concours_2()}{" "}
             <span className="inline-block -rotate-2 whitespace-nowrap rounded-2xl bg-sun px-3 py-0.5 text-ink shadow-[0_12px_30px_-8px] shadow-black/40">
-              1 million FCFA !
+              {m.accueil_concours_somme()}
             </span>
           </span>
         </h2>
 
         <a
-          href="/certification"
+          href={lien("/certification")}
           className="btn-fx flex h-12 items-center justify-center whitespace-nowrap rounded-full bg-primary px-6 text-sm font-bold text-primary-foreground shadow-card sm:text-[15px] lg:h-14 lg:px-8"
         >
-          Obtenir ma certification & jouer
+          {m.accueil_concours_action()}
         </a>
       </div>
     </section>
@@ -688,7 +687,9 @@ function Index() {
   const [active, setActive] = useState(0);
   const [son, setSon] = useState(false);
   const lecteur = useRef<HTMLIFrameElement>(null);
-  const count = heroSlides.length;
+  const diapositives = heroSlides();
+  const univers7 = univers();
+  const count = diapositives.length;
 
   useEffect(() => {
     if (son) return;
@@ -715,7 +716,7 @@ function Index() {
 
       {/* Hero : un fond coloré propre à chaque slide, la photo dans un cadre arrondi et des flèches sur les bords. */}
       <section className="relative isolate flex min-h-[80vh] flex-col justify-center overflow-hidden text-white">
-        {heroSlides.map((s, i) => (
+        {diapositives.map((s, i) => (
           <div
             key={i}
             aria-hidden
@@ -733,7 +734,7 @@ function Index() {
         <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-5 pb-52 pt-8 sm:pb-48 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-16 xl:px-16 xl:pb-36">
           {/* Toutes les slides partagent la même cellule : la hauteur reste celle de la plus longue. */}
           <div className="grid">
-            {heroSlides.map((s, i) => {
+            {diapositives.map((s, i) => {
               const Heading = i === 0 ? "h1" : "h2";
               return (
                 <div
@@ -763,7 +764,7 @@ function Index() {
                     {s.cta.map((c, j) => (
                       <a
                         key={c.t}
-                        href={c.href}
+                        href={lien(c.href)}
                         className={`btn-fx group flex h-12 w-60 items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 text-[15px] font-bold ${j === 0 ? "bg-primary text-primary-foreground shadow-card" : "border-2 border-white/60 bg-white/10 backdrop-blur-sm"}`}
                       >
                         {c.t}{" "}
@@ -778,7 +779,7 @@ function Index() {
 
           {/* Sur mobile la photo passe en premier : la hauteur réservée au texte le plus long se retrouve avant les flèches, pas entre le texte et la photo. */}
           <div className="relative order-first mx-auto w-full max-w-md sm:max-w-lg lg:order-none lg:max-w-none">
-            {heroSlides.map((s, i) => (
+            {diapositives.map((s, i) => (
               <div
                 key={i}
                 aria-hidden
@@ -787,7 +788,7 @@ function Index() {
             ))}
             {/* La nouvelle photo arrive par-dessus l'ancienne, qui ne s'efface qu'ensuite. Elle avance lentement pendant son affichage, et ne revient à sa taille qu'une fois invisible. */}
             <div className="relative isolate aspect-video overflow-hidden rounded-3xl shadow-2xl ring-4 ring-white/25">
-              {heroSlides.map((s, i) => (
+              {diapositives.map((s, i) => (
                 <img
                   key={i}
                   src={s.img}
@@ -799,7 +800,7 @@ function Index() {
                 />
               ))}
               {/* Le cadre est en 16/9, comme la vidéo : elle s'affiche en entier, sans rognage. */}
-              {heroSlides.map(
+              {diapositives.map(
                 (s, i) =>
                   s.video && (
                     <iframe
@@ -807,7 +808,7 @@ function Index() {
                       ref={lecteur}
                       onLoad={(e) => sansSousTitres(e.currentTarget)}
                       src={`https://www.youtube-nocookie.com/embed/${s.video}?autoplay=1&mute=1&loop=1&playlist=${s.video}&controls=0&rel=0&playsinline=1&modestbranding=1&cc_load_policy=0&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1`}
-                      title="Vidéo de présentation des Clubs Santé SOS Docteur TV"
+                      title={m.accueil_video_titre()}
                       allow="autoplay; encrypted-media; picture-in-picture"
                       tabIndex={-1}
                       aria-hidden={i !== active}
@@ -815,7 +816,7 @@ function Index() {
                     />
                   ),
               )}
-              {heroSlides[active]?.video && (
+              {diapositives[active]?.video && (
                 <button
                   type="button"
                   onClick={basculerSon}
@@ -823,12 +824,12 @@ function Index() {
                   className="absolute bottom-4 right-4 z-30 inline-flex items-center gap-2 rounded-full bg-night/70 px-4 py-2 text-sm font-bold backdrop-blur-sm transition hover:bg-night"
                 >
                   {son ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
-                  {son ? "Couper le son" : "Activer le son"}
+                  {son ? m.accueil_couper_son() : m.accueil_activer_son()}
                 </button>
               )}
             </div>
             {/* La slide de la vidéo n'a pas de mascotte : rien ne vient la masquer. */}
-            {heroSlides.map(
+            {diapositives.map(
               (s, i) =>
                 s.mascot && (
                   <img
@@ -847,14 +848,14 @@ function Index() {
 
         {/* Flèches centrées sur les bords à partir de 1280 px ; en dessous, elles passent en bas, au-dessus du bandeau de certification qui chevauche le hero. */}
         <button
-          aria-label="Diapositive précédente"
+          aria-label={m.accueil_precedente()}
           onClick={() => changer((active - 1 + count) % count)}
           className="absolute bottom-36 left-5 z-10 sm:bottom-32 flex size-10 items-center justify-center rounded-full border-2 border-white/40 bg-white/10 backdrop-blur-sm transition hover:scale-110 hover:bg-white hover:text-ink active:scale-95 xl:bottom-auto xl:left-4 xl:top-1/2 xl:-translate-y-1/2"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
         <button
-          aria-label="Diapositive suivante"
+          aria-label={m.accueil_suivante()}
           onClick={() => changer((active + 1) % count)}
           className="absolute bottom-36 right-5 z-10 sm:bottom-32 flex size-10 items-center justify-center rounded-full border-2 border-white/40 bg-white/10 backdrop-blur-sm transition hover:scale-110 hover:bg-white hover:text-ink active:scale-95 xl:bottom-auto xl:right-4 xl:top-1/2 xl:-translate-y-1/2"
         >
@@ -870,25 +871,22 @@ function Index() {
         <div data-reveal className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-4xl md:text-5xl">
-              <span className="text-logo-blue">Les 7 Axes</span>{" "}
-              <span className="text-primary">Stratégiques</span>
+              <span className="text-logo-blue">{m.accueil_axes_1()}</span>{" "}
+              <span className="text-primary">{m.accueil_axes_2()}</span>
             </h2>
-            <p className="mt-2 text-muted-foreground">
-              Une approche holistique pour promouvoir la santé publique et l'excellence dans les
-              collèges et lycées du Togo.
-            </p>
+            <p className="mt-2 text-muted-foreground">{m.accueil_axes_texte()}</p>
           </div>
           <a
-            href="/les-7-axes"
+            href={lien("/les-7-axes")}
             className="group font-bold text-primary underline transition hover:brightness-90"
           >
-            Découvrir les 7 axes{" "}
+            {m.accueil_axes_decouvrir()}{" "}
             <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
           </a>
         </div>
         {/* 4 cartes puis 3 centrées : chaque carte couvre 2 colonnes sur 8, et la 5e commence à la 2e colonne. */}
         <div className="mx-auto mt-8 grid max-w-sm gap-6 sm:max-w-none sm:grid-cols-4 lg:grid-cols-8">
-          {univers.map((u, i) => (
+          {univers7.map((u, i) => (
             <CarteAxe key={u.t} u={u} i={i} />
           ))}
         </div>

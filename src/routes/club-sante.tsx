@@ -4,7 +4,6 @@ import {
   Accessibility,
   ArrowRight,
   Check,
-  ChevronRight,
   GraduationCap,
   HeartPulse,
   MapPinned,
@@ -32,28 +31,28 @@ import banniere from "@/assets/club-sante-banniere.jpg";
 import mascottesTrophees from "@/assets/mascottes-trophees.webp";
 import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
 import kodom from "@/assets/initiateur-kodom.webp";
+import { FilAriane } from "@/components/FilAriane";
+import { lien } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/club-sante")({
   head: () => ({
     meta: [
-      { title: "Le Club Santé — Club Santé SOS Docteur TV" },
-      {
-        name: "description",
-        content:
-          "Vision, objectifs, règles d'adhésion et fonctionnement des Clubs Santé SOS Docteur TV dans les collèges et lycées du Togo.",
-      },
-      { property: "og:title", content: "Le Club Santé SOS Docteur TV" },
+      { title: m.cs_meta_titre() },
+      { name: "description", content: m.cs_meta_description() },
+      { property: "og:title", content: m.cs_meta_og() },
     ],
   }),
   component: ClubSante,
 });
 
+// Les textes de la page sont des fonctions : ils suivent la langue de la page.
 // Repères posés sous la bannière.
-const reperesBanniere = [
-  { i: MapPinned, n: "7", t: "Directions régionales de l’éducation", c: "bg-sky" },
-  { i: HeartPulse, n: "+800", t: "Clubs santé actifs", c: "bg-primary" },
-  { i: Users, n: "21", t: "Membres par bureau de club", c: "bg-tangerine" },
-  { i: GraduationCap, n: "3", t: "Enseignants encadreurs au minimum", c: "bg-grape" },
+const reperesBanniere = () => [
+  { i: MapPinned, n: "7", t: m.cs_repere_dre(), c: "bg-sky" },
+  { i: HeartPulse, n: "+800", t: m.cs_repere_clubs(), c: "bg-primary" },
+  { i: Users, n: "21", t: m.cs_repere_membres(), c: "bg-tangerine" },
+  { i: GraduationCap, n: "3", t: m.cs_repere_enseignants(), c: "bg-grape" },
 ];
 
 // Les sigles des ministères tiennent lieu de logos en attendant les fichiers officiels.
@@ -64,170 +63,179 @@ const ministeres = [
   { t: "MESR", c: "border-grape text-grape", r: "-rotate-3" },
 ];
 
-const lots = [
+const lots = () => [
   {
     i: Trophy,
-    tag: "Grand prix & bourses",
-    t: "1 million FCFA",
-    d: "Cagnotte exceptionnelle, bourses scolaires et appuis financiers pour récompenser l’excellence des jeunes certifiés.",
+    tag: m.cs_lot_1_etiquette(),
+    t: m.cs_lot_1_titre(),
+    d: m.cs_lot_1_texte(),
   },
   {
     i: Laptop,
-    tag: "Numérique & études",
-    t: "Des ordinateurs portables",
-    d: "Des PC portables neufs pour accompagner tes recherches scientifiques, tes cours et tes projets numériques.",
+    tag: m.cs_lot_2_etiquette(),
+    t: m.cs_lot_2_titre(),
+    d: m.cs_lot_2_texte(),
   },
   {
     i: Smartphone,
-    tag: "High-tech & kits",
-    t: "Des téléphones & lots",
-    d: "Smartphones dernière génération, tablettes éducatives, médailles et kits officiels Clubs Santé SOS DOCTEUR TV.",
+    tag: m.cs_lot_3_etiquette(),
+    t: m.cs_lot_3_titre(),
+    d: m.cs_lot_3_texte(),
   },
 ];
 
-const objectifs = [
+const objectifs = () => [
   {
-    tag: "Santé & vocations",
-    t: "Promouvoir la culture générale en santé et susciter des vocations auprès des jeunes",
+    tag: m.cs_objectif_1_etiquette(),
+    t: m.cs_objectif_1(),
     c: "bg-sky",
   },
   {
-    tag: "Leadership",
-    t: "Développer le leadership personnel et transformationnel chez les jeunes apprenants",
+    tag: m.cs_objectif_2_etiquette(),
+    t: m.cs_objectif_2(),
     c: "bg-tangerine",
   },
   {
-    tag: "Citoyenneté",
-    t: "Promouvoir la citoyenneté et le changement de comportement dans la communauté",
+    tag: m.cs_objectif_3_etiquette(),
+    t: m.cs_objectif_3(),
     c: "bg-primary",
   },
   {
-    tag: "Innovation",
-    t: "Stimuler l’innovation et l’esprit d’initiative chez les jeunes",
+    tag: m.cs_objectif_4_etiquette(),
+    t: m.cs_objectif_4(),
     c: "bg-grape",
   },
   {
-    tag: "Inclusion & équité",
-    t: "Promouvoir l’inclusion, la masculinité positive et l’équité chez les jeunes",
+    tag: m.cs_objectif_5_etiquette(),
+    t: m.cs_objectif_5(),
     c: "bg-rose",
   },
 ];
 
-const valeurs = [
-  { t: "Excellence", c: "bg-logo-blue" },
-  { t: "Émulation", c: "bg-primary" },
-  { t: "Engagement", c: "bg-tangerine" },
-  { t: "Innovation", c: "bg-grape" },
-  { t: "Leadership", c: "bg-rose" },
+const valeurs = () => [
+  { t: m.cs_valeur_excellence(), c: "bg-logo-blue" },
+  { t: m.cs_valeur_emulation(), c: "bg-primary" },
+  { t: m.cs_valeur_engagement(), c: "bg-tangerine" },
+  { t: m.cs_valeur_innovation(), c: "bg-grape" },
+  { t: m.cs_valeur_leadership(), c: "bg-rose" },
 ];
 
-const jalons = [
+const jalons = () => [
   {
-    date: "19 – 29 mars 2024",
-    t: "Tournée de lancement de la création des Clubs Santé SOS DOCTEUR TV dans les 7 DRE",
+    date: m.cs_jalon_1_date(),
+    t: m.cs_jalon_1(),
     c: "bg-sky",
   },
   {
-    date: "24 mars 2025",
-    t: "Lancement des activités des Clubs Santé SOS DOCTEUR TV",
+    date: m.cs_jalon_2_date(),
+    t: m.cs_jalon_2(),
     c: "bg-primary",
   },
   {
-    date: "02 avril 2026",
-    t: "Lancement de la 1re édition du championnat GÉNIE IMHOTEP",
+    date: m.cs_jalon_3_date(),
+    t: m.cs_jalon_3(),
     c: "bg-tangerine",
   },
 ];
 
-const educations = [
+const educations = () => [
   {
     i: School,
-    tag: "Système structuré",
-    t: "Éducation formelle",
-    d: "Elle se déroule dans le cadre du système éducatif structuré, du préscolaire jusqu’à l’université.",
+    tag: m.cs_education_1_etiquette(),
+    t: m.cs_education_1_titre(),
+    d: m.cs_education_1_texte(),
     coeur: false,
   },
   {
     i: HeartHandshake,
-    tag: "Cœur des Clubs Santé",
-    t: "Éducation non formelle",
-    d: "Elle regroupe les activités éducatives organisées en dehors de l’enseignement formel, notamment les activités parascolaires, périscolaires et extrascolaires.",
+    tag: m.cs_education_2_etiquette(),
+    t: m.cs_education_2_titre(),
+    d: m.cs_education_2_texte(),
     coeur: true,
   },
   {
     i: House,
-    tag: "Vie quotidienne",
-    t: "Éducation informelle",
-    d: "Elle résulte des apprentissages du quotidien, notamment à la maison, dans le quartier, à travers les réseaux sociaux et les différentes expériences de la vie.",
+    tag: m.cs_education_3_etiquette(),
+    t: m.cs_education_3_titre(),
+    d: m.cs_education_3_texte(),
     coeur: false,
   },
 ];
 
-const regles = [
-  "Chaque club santé est encadré par au moins 03 enseignants volontaires et bénévoles.",
-  "Tout élève régulièrement inscrit peut adhérer au club.",
-  "L’adhésion est libre et volontaire. Une liste des membres doit obligatoirement être tenue.",
-  "Une fois inscrit, la participation aux activités des « commissions / composantes / axes » est obligatoire.",
-  "Le nombre d’élèves du Club Santé SOS DOCTEUR TV n’est pas limité.",
-  "Le club est ouvert aux garçons comme aux filles, mais l’enrôlement des filles est encouragé.",
+const regles = () => [
+  m.cs_regle_1(),
+  m.cs_regle_2(),
+  m.cs_regle_3(),
+  m.cs_regle_4(),
+  m.cs_regle_5(),
+  m.cs_regle_6(),
 ];
 
-const bureau = [
-  "1 Président(e) et son/sa Adjoint(e)",
-  "1 Secrétaire Général(e) et son/sa Adjoint(e)",
-  "1 Trésorier(ère) Général(e) et son/sa Adjoint(e)",
-  "1 Coordonnateur(trice) par commission (Axe 1 à Axe 7), ainsi que leurs Adjoints(es) respectifs(ves)",
-  "1 Conseiller(ère)",
+const bureau = () => [
+  m.cs_bureau_1(),
+  m.cs_bureau_2(),
+  m.cs_bureau_3(),
+  m.cs_bureau_4(),
+  m.cs_bureau_5(),
 ];
 
-// Couleur de l'étiquette de chaque thème de la FAQ.
+// Couleur de l'étiquette de chaque thème de la FAQ, et son nom dans la langue de la page.
 const themes = {
-  Adhésion: "bg-sky",
-  Bureau: "bg-rose",
-  Fonctionnement: "bg-tangerine",
-  Championnat: "bg-grape",
+  adhesion: "bg-sky",
+  bureau: "bg-rose",
+  fonctionnement: "bg-tangerine",
+  championnat: "bg-grape",
 } as const;
 
-const faq: { theme: keyof typeof themes; q: string; r: string }[] = [
+const NOMS_THEMES = {
+  adhesion: m.cs_theme_adhesion,
+  bureau: m.cs_theme_bureau,
+  fonctionnement: m.cs_theme_fonctionnement,
+  championnat: m.cs_theme_championnat,
+};
+const nomTheme = (theme: keyof typeof themes | null) =>
+  theme ? NOMS_THEMES[theme]() : m.cs_theme_tout();
+
+const questions = (): { theme: keyof typeof themes; q: string; r: string }[] => [
   {
-    theme: "Adhésion",
-    q: "Qui peut adhérer au Club Santé dans un collège ou un lycée ?",
-    r: "Tout élève régulièrement inscrit peut adhérer au club : l’adhésion est libre et volontaire, et le nombre de membres n’est pas limité. Le club est ouvert aux garçons comme aux filles, mais l’enrôlement des filles est encouragé. Une liste des membres doit être tenue, et chaque membre participe aux activités des commissions. Le club est encadré par au moins 03 enseignants volontaires et bénévoles.",
+    theme: "adhesion",
+    q: m.cs_faq_1_q(),
+    r: m.cs_faq_1_r(),
   },
   {
-    theme: "Bureau",
-    q: "Combien de membres composent obligatoirement le bureau du club ?",
-    r: "Tout bureau du « Club Santé SOS DOCTEUR TV » compte 21 personnes, dont au moins 11 filles et au plus 10 garçons : 1 Président(e), 1 Secrétaire Général(e), 1 Trésorier(ère) Général(e) et leurs Adjoint(e)s ; 1 Coordonnateur(trice) par commission (Axe 1 à Axe 7) et leurs Adjoint(e)s ; 1 Conseiller(ère).",
+    theme: "bureau",
+    q: m.cs_faq_2_q(),
+    r: m.cs_faq_2_r(),
   },
   {
-    theme: "Bureau",
-    q: "Les élèves vivant avec un handicap peuvent-ils faire partie du bureau ?",
-    r: "Oui, tout à fait ! Le bureau doit être inclusif, notamment en favorisant la participation des personnes vivant avec un handicap, et comporter de préférence plus de filles que de garçons.",
+    theme: "bureau",
+    q: m.cs_faq_3_q(),
+    r: m.cs_faq_3_r(),
   },
   {
-    theme: "Adhésion",
-    q: "Tous les établissements du secondaire doivent-ils avoir un club ?",
-    r: "Oui. Selon les directives nationales, tous les établissements du secondaire (collèges et lycées) du Togo sont tenus d’avoir un club santé.",
+    theme: "adhesion",
+    q: m.cs_faq_4_q(),
+    r: m.cs_faq_4_r(),
   },
   {
-    theme: "Fonctionnement",
-    q: "Comment s’organisent les réunions et activités du club ?",
-    r: "Le bureau se réunit en session ordinaire une fois par mois, et en session extraordinaire sur convocation du Président ou à la demande de la majorité des membres. Les activités de sensibilisation, journées de salubrité et causeries éducatives sont programmées en dehors des heures de cours pour respecter le calendrier pédagogique.",
+    theme: "fonctionnement",
+    q: m.cs_faq_5_q(),
+    r: m.cs_faq_5_r(),
   },
   {
-    theme: "Fonctionnement",
-    q: "Quel est le rôle des 3 enseignants encadreurs ?",
-    r: "Les enseignants tuteurs volontaires assurent la supervision pédagogique, facilitent les autorisations avec la direction de l’établissement, valident les plans d’action trimestriels et accompagnent la préparation des élèves aux compétitions et activités communautaires.",
+    theme: "fonctionnement",
+    q: m.cs_faq_6_q(),
+    r: m.cs_faq_6_r(),
   },
   {
-    theme: "Adhésion",
-    q: "Comment un club santé est-il officiellement enregistré ?",
-    r: "Le chef d’établissement transmet le procès-verbal d’installation du bureau et la liste des membres à la Direction Régionale de l’Éducation (DRE) ainsi qu’à la coordination nationale SOS DOCTEUR TV / AIMES-AFRIQUE, pour l’obtention de l’attestation officielle d’affiliation.",
+    theme: "adhesion",
+    q: m.cs_faq_7_q(),
+    r: m.cs_faq_7_r(),
   },
   {
-    theme: "Championnat",
-    q: "Qu’est-ce que le Championnat national GÉNIE IMHOTEP ?",
-    r: "C’est la compétition nationale d’excellence scolaire retransmise sur SOS DOCTEUR TV, qui confronte les clubs santé sur la culture générale en santé, les gestes qui sauvent et les projets d’impact communautaire. Lancement officiel de la 1re édition : 02 avril 2026.",
+    theme: "championnat",
+    q: m.cs_faq_8_q(),
+    r: m.cs_faq_8_r(),
   },
 ];
 
@@ -236,6 +244,7 @@ const faq: { theme: keyof typeof themes; q: string; r: string }[] = [
 function FaqSection() {
   const [theme, setTheme] = useState<keyof typeof themes | null>(null);
   const [ouverte, setOuverte] = useState(0);
+  const faq = questions();
   const visibles = faq.map((f, i) => ({ ...f, i })).filter((f) => !theme || f.theme === theme);
   const active = faq[ouverte];
   const filtrer = (t: keyof typeof themes | null) => {
@@ -253,14 +262,8 @@ function FaqSection() {
         className="absolute -left-16 top-10 -z-10 size-72 -rotate-12 text-sun/40"
       />
       <div className="mx-auto max-w-7xl px-5">
-        <EnTete
-          sur="Réponses & informations pratiques"
-          bleu="Foire aux questions"
-          vert="& vie des clubs"
-          centre
-        >
-          Tout ce que tu dois savoir pour démarrer, animer sereinement ton Club Santé et participer
-          au championnat.
+        <EnTete sur={m.cs_faq_sur()} bleu={m.cs_faq_bleu()} vert={m.cs_faq_vert()} centre>
+          {m.cs_faq_texte()}
         </EnTete>
 
         <div data-reveal className="mt-8 flex flex-wrap justify-center gap-2">
@@ -276,7 +279,7 @@ function FaqSection() {
                   : "bg-white text-logo-blue ring-1 ring-logo-blue/15 hover:ring-logo-blue/40"
               }`}
             >
-              {t ?? "Tout"}
+              {nomTheme(t)}
             </button>
           ))}
         </div>
@@ -338,7 +341,7 @@ function FaqSection() {
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-extrabold uppercase text-white ${themes[active.theme]}`}
                     >
-                      {active.theme}
+                      {nomTheme(active.theme)}
                     </span>
                     <span className="font-display text-5xl leading-none text-sun">
                       {String(ouverte + 1).padStart(2, "0")}
@@ -351,8 +354,7 @@ function FaqSection() {
                 </div>
                 <div className="flex items-end gap-4 bg-mist-soft pl-8 pr-4 pt-4 md:pl-10">
                   <p className="mb-8 flex-1 rounded-2xl rounded-br-none bg-white p-4 text-sm font-bold shadow-sm">
-                    Tu ne trouves pas ta réponse ? Pose ta question à tes encadreurs : ils sont là
-                    pour t’accompagner.
+                    {m.cs_faq_pas_trouve()}
                   </p>
                   <img
                     src={mascotteImhotep}
@@ -382,7 +384,7 @@ function ClubSante() {
       <section className="relative isolate overflow-hidden text-white">
         <img
           src={banniere}
-          alt="Élèves des Clubs Santé en t-shirts bleus, verts et rouges, drapeaux du Togo en main"
+          alt={m.cs_banniere_alt()}
           width={2000}
           height={1160}
           className="absolute inset-0 -z-20 size-full object-cover object-[60%_30%] transition-transform duration-[6s] ease-out starting:scale-110"
@@ -392,49 +394,32 @@ function ClubSante() {
           className="absolute inset-0 -z-10 bg-linear-to-t from-night from-30% via-night/70 to-night/10 lg:bg-linear-to-r lg:from-0% lg:from-night/95 lg:via-logo-blue/70 lg:to-transparent"
         />
         <div className="mx-auto flex min-h-[38rem] max-w-7xl flex-col px-5 pb-36 pt-8 md:pt-12 lg:min-h-[44rem] lg:pb-40">
-          <nav aria-label="Fil d’Ariane" className="text-sm font-semibold text-white/70">
-            <ol className="flex flex-wrap items-center gap-1.5">
-              <li>
-                <a href="/" className="hover:text-white">
-                  Accueil
-                </a>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <ChevronRight aria-hidden className="size-3.5" /> Vie du club
-              </li>
-              <li aria-current="page" className="flex items-center gap-1.5 text-white">
-                <ChevronRight aria-hidden className="size-3.5" /> Club santé
-              </li>
-            </ol>
-          </nav>
+          <FilAriane rubrique={m.menu_vie_du_club()} page={m.menu_club_sante()} clair />
 
           <div data-reveal="left" className="mt-auto max-w-2xl pt-16">
             <span className="inline-flex rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-ink">
-              Slogan officiel du programme
+              {m.cs_slogan_officiel()}
             </span>
             <h1 className="mt-5 text-5xl leading-[0.95] [text-shadow:0_2px_16px_rgb(0_0_0/0.55)] md:text-7xl">
-              <span className="block">Le Club Santé</span>
+              <span className="block">{m.cs_titre_1()}</span>
               <span className="block text-primary">SOS Docteur TV</span>
             </h1>
             <p className="mt-6 font-hand text-3xl leading-tight text-sun md:text-4xl">
-              « Ensemble pour une génération de jeunes en bonne santé, responsable et épanouie »
+              {m.commun_citation({ texte: m.cs_slogan() })}
             </p>
-            <p className="mt-5 max-w-xl text-lg font-medium text-white/85">
-              AIMES-AFRIQUE & SOS DOCTEUR TV mobilisent la jeunesse scolaire dans les collèges et
-              lycées des 7 Directions Régionales de l’Éducation (DRE) du Togo.
-            </p>
+            <p className="mt-5 max-w-xl text-lg font-medium text-white/85">{m.cs_intro()}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href="#adhesion"
                 className="btn-fx inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground shadow-card"
               >
-                Règles d’adhésion <ArrowRight className="size-4" />
+                {m.cs_regles_adhesion()} <ArrowRight className="size-4" />
               </a>
               <a
                 href="#piliers"
                 className="btn-fx rounded-full border-2 border-white px-7 py-3 text-[15px] font-bold hover:bg-white hover:text-logo-blue"
               >
-                Vision des clubs
+                {m.cs_vision_clubs()}
               </a>
             </div>
           </div>
@@ -446,7 +431,7 @@ function ClubSante() {
           data-reveal
           className="grid grid-cols-2 gap-px overflow-hidden rounded-[2rem] bg-border shadow-card lg:grid-cols-4"
         >
-          {reperesBanniere.map((r) => (
+          {reperesBanniere().map((r) => (
             <li key={r.t} className="flex items-start gap-4 bg-card p-5 sm:items-center md:p-7">
               <span
                 className={`${r.c} hidden size-12 shrink-0 items-center justify-center rounded-2xl text-white sm:inline-flex`}
@@ -473,23 +458,15 @@ function ClubSante() {
           <div>
             <p className="flex items-center gap-3 text-sm font-extrabold uppercase tracking-widest text-logo-red">
               <span className="h-1 w-8 rounded-full bg-primary" />
-              Cadre réglementaire & accords interministériels
+              {m.cs_cadre_sur()}
             </p>
             <h2 className="mt-3 text-4xl md:text-5xl">
-              <span className="text-logo-blue">Autorisations officielles</span>{" "}
-              <span className="text-primary">& cadre ministériel</span>
+              <span className="text-logo-blue">{m.cs_cadre_bleu()}</span>{" "}
+              <span className="text-primary">{m.cs_cadre_vert()}</span>
             </h2>
-            <p className="mt-4 text-lg font-medium text-muted-foreground">
-              La mise en place et le fonctionnement de ces clubs respectent les procédures de
-              création suivantes et s’articulent autour des notes de service du MEPS/MEN, du MSHPAUS
-              et du MSGFPE.
-            </p>
+            <p className="mt-4 text-lg font-medium text-muted-foreground">{m.cs_cadre_texte()}</p>
             <ul className="mt-6 grid gap-3">
-              {[
-                "Notes de service interministérielles",
-                "Reconnaissance officielle dans les 7 DRE du Togo",
-                "Encadrement certifié par au moins 3 enseignants tuteurs",
-              ].map((t) => (
+              {[m.cs_cadre_point_1(), m.cs_cadre_point_2(), m.cs_cadre_point_3()].map((t) => (
                 <li key={t} className="flex items-center gap-3 font-bold">
                   <CircleCheck className="size-6 shrink-0 text-primary" /> {t}
                 </li>
@@ -498,17 +475,17 @@ function ClubSante() {
           </div>
           <div className="rounded-3xl bg-mist p-6 md:p-8">
             <p className="text-center text-xs font-extrabold uppercase tracking-widest text-logo-blue">
-              Ministères & partenaires officiels
+              {m.cs_ministeres()}
             </p>
             <ul className="mt-6 grid grid-cols-2 gap-5">
-              {ministeres.map((m, i) => (
+              {ministeres.map((ministere, i) => (
                 <li
-                  key={m.t}
+                  key={ministere.t}
                   data-reveal="zoom"
                   style={retard(i)}
-                  className={`mx-auto flex aspect-square w-full max-w-36 items-center justify-center rounded-full border-4 border-double bg-white p-3 text-center font-display text-lg leading-tight shadow-sm transition duration-300 hover:rotate-0 hover:scale-105 ${m.c} ${m.r}`}
+                  className={`mx-auto flex aspect-square w-full max-w-36 items-center justify-center rounded-full border-4 border-double bg-white p-3 text-center font-display text-lg leading-tight shadow-sm transition duration-300 hover:rotate-0 hover:scale-105 ${ministere.c} ${ministere.r}`}
                 >
-                  {m.t}
+                  {ministere.t}
                 </li>
               ))}
             </ul>
@@ -525,22 +502,20 @@ function ClubSante() {
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 md:py-20 lg:grid-cols-[1.15fr_1fr]">
           <div data-reveal="left">
             <span className="inline-flex items-center gap-2 rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-ink">
-              <Trophy className="size-4" /> Certification jeunesse & méga lots à la clé
+              <Trophy className="size-4" /> {m.cs_certif_etiquette()}
             </span>
             <h2 className="mt-5 text-4xl leading-[1.05] md:text-5xl">
-              Décroche ta certification officielle & gagne jusqu’à{" "}
+              {m.cs_certif_titre_1()}{" "}
               <span className="inline-block -rotate-2 whitespace-nowrap rounded-xl bg-sun px-3 text-ink">
-                1 million FCFA
+                {m.cs_certif_somme()}
               </span>
-              , des ordinateurs et des téléphones !
+              {m.cs_certif_titre_2()}
             </h2>
             <p className="mt-5 max-w-2xl text-lg font-medium text-white/85">
-              Complète les 12 Quiz de Santé Publique, collectionne tes 5 Badges d’excellence
-              partageables et accède aux tirages et récompenses nationales destinés aux jeunes les
-              plus engagés du Togo.
+              {m.cs_certif_texte()}
             </p>
             <ul className="mt-8 grid gap-3">
-              {lots.map((l, i) => (
+              {lots().map((l, i) => (
                 <li
                   key={l.t}
                   data-reveal
@@ -564,14 +539,12 @@ function ClubSante() {
             </ul>
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
               <a
-                href="/certification"
+                href={lien("/certification")}
                 className="btn-fx inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold shadow-card"
               >
-                Lancer ma certification <ArrowRight className="size-4" />
+                {m.cs_certif_lancer()} <ArrowRight className="size-4" />
               </a>
-              <p className="text-sm font-bold text-white/80">
-                12 Quiz · 5 badges · 1 certificat officiel téléchargeable
-              </p>
+              <p className="text-sm font-bold text-white/80">{m.cs_certif_resume()}</p>
             </div>
           </div>
 
@@ -587,21 +560,23 @@ function ClubSante() {
             />
             <img
               src={mascottesTrophees}
-              alt="Les mascottes du Club Santé avec des trophées, un ordinateur portable et des livres"
+              alt={m.cs_certif_mascottes()}
               loading="lazy"
               width={1122}
               height={1402}
               className="mx-auto w-4/5 drop-shadow-2xl sm:w-full"
             />
             <span className="absolute left-0 top-8 -rotate-6 rounded-2xl bg-sun px-4 py-2 text-ink shadow-card sm:-left-4">
-              <span className="block text-[11px] font-extrabold uppercase">Grand prix</span>
+              <span className="block text-[11px] font-extrabold uppercase">
+                {m.cs_grand_prix()}
+              </span>
               <span className="block font-display text-2xl leading-none md:text-3xl">
-                1 000 000 FCFA
+                {m.cs_grand_prix_somme()}
               </span>
             </span>
             <span className="absolute bottom-10 right-0 flex size-24 rotate-12 flex-col items-center justify-center rounded-full bg-primary shadow-card md:size-28">
               <span className="font-display text-4xl leading-none">12</span>
-              <span className="text-xs font-extrabold uppercase">Quiz santé</span>
+              <span className="text-xs font-extrabold uppercase">{m.cs_quiz_sante()}</span>
             </span>
           </div>
         </div>
@@ -609,30 +584,24 @@ function ClubSante() {
 
       {/* Objectifs : l'objectif général en grand, puis les cinq objectifs spécifiques en tickets numérotés. */}
       <section id="objectifs" className="mx-auto max-w-7xl scroll-mt-20 px-5 pt-20">
-        <EnTete sur="Objectif général" bleu="Mobiliser" vert="les apprenants" />
+        <EnTete sur={m.cs_objectif_sur()} bleu={m.cs_objectif_bleu()} vert={m.cs_objectif_vert()} />
         <blockquote
           data-reveal
           className="relative mt-8 overflow-hidden rounded-[2rem] bg-logo-blue p-8 text-xl font-bold leading-relaxed text-white shadow-card md:p-12 md:text-2xl"
         >
           <Quote aria-hidden className="absolute right-6 top-6 size-20 text-white/10" />
-          Mobiliser les apprenants autour de 5 entités clés à savoir : la redynamisation de la vie
-          scolaire ; la promotion de la santé dès le bas âge ; la culture de l’excellence et
-          l’émulation ; la responsabilité et la citoyenneté pour un épanouissement intégral des
-          élèves.
+          {m.accueil_objectif_texte()}
         </blockquote>
 
         <div data-reveal className="mt-14">
           <h3 className="text-3xl">
-            <span className="text-logo-blue">Cinq orientations concrètes</span>{" "}
-            <span className="text-primary">pour transformer le quotidien des élèves</span>
+            <span className="text-logo-blue">{m.cs_orientations_1()}</span>{" "}
+            <span className="text-primary">{m.cs_orientations_2()}</span>
           </h3>
-          <p className="mt-2 font-medium text-muted-foreground">
-            Objectifs spécifiques · feuille de route opérationnelle : des actions ciblées pour
-            impacter durablement les établissements scolaires et les communautés.
-          </p>
+          <p className="mt-2 font-medium text-muted-foreground">{m.cs_orientations_texte()}</p>
         </div>
         <ol className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-          {objectifs.map((o, i) => (
+          {objectifs().map((o, i) => (
             <li
               key={o.tag}
               data-reveal
@@ -665,11 +634,7 @@ function ClubSante() {
       {/* Piliers en grille bento, sur un fond blanc bleuté qui rompt la feuille de carnet. */}
       <section id="piliers" className="mt-20 scroll-mt-20 bg-mist-soft py-20">
         <div className="mx-auto max-w-7xl px-5">
-          <EnTete
-            sur="Les piliers fondamentaux du programme"
-            bleu="Vision, but,"
-            vert="mission & valeurs"
-          />
+          <EnTete sur={m.cs_piliers_sur()} bleu={m.cs_piliers_bleu()} vert={m.cs_piliers_vert()} />
           <div className="mt-8 grid gap-5 lg:grid-cols-3">
             <article
               data-reveal
@@ -680,14 +645,12 @@ function ClubSante() {
                 className="absolute -bottom-8 -right-8 -z-10 size-56 text-white/10"
               />
               <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-widest text-sun">
-                <Eye className="size-5" /> Vision
+                <Eye className="size-5" /> {m.cs_vision()}
               </p>
               <p className="mt-4 max-w-xl font-display text-3xl leading-tight md:text-5xl">
-                Jeunesse en bonne santé, responsable et épanouie
+                {m.cs_vision_texte()}
               </p>
-              <p className="mt-4 font-semibold text-white/75">
-                Santé et Éducation pour chaque apprenant
-              </p>
+              <p className="mt-4 font-semibold text-white/75">{m.cs_vision_sous()}</p>
             </article>
             <article
               data-reveal
@@ -695,26 +658,17 @@ function ClubSante() {
               className="card-fx rounded-[2rem] bg-primary p-8 text-white shadow-card"
             >
               <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-widest">
-                <Target className="size-5" /> But
+                <Target className="size-5" /> {m.cs_but()}
               </p>
-              <p className="mt-4 text-xl font-extrabold leading-snug">
-                Culture de la responsabilité sociale, le leadership transformationnel et le
-                volontariat
-              </p>
-              <p className="mt-4 font-semibold text-white/80">
-                Volontariat & engagement communautaire
-              </p>
+              <p className="mt-4 text-xl font-extrabold leading-snug">{m.cs_but_texte()}</p>
+              <p className="mt-4 font-semibold text-white/80">{m.cs_but_sous()}</p>
             </article>
             <article data-reveal className="card-fx rounded-[2rem] bg-sun p-8 text-ink shadow-card">
               <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-widest">
-                <Rocket className="size-5" /> Mission
+                <Rocket className="size-5" /> {m.cs_mission()}
               </p>
-              <p className="mt-4 text-xl font-extrabold leading-snug">
-                Excellence et Émulation en milieu scolaire et universitaire
-              </p>
-              <p className="mt-4 font-semibold text-ink/70">
-                Stimulation des talents et de l’excellence
-              </p>
+              <p className="mt-4 text-xl font-extrabold leading-snug">{m.cs_mission_texte()}</p>
+              <p className="mt-4 font-semibold text-ink/70">{m.cs_mission_sous()}</p>
             </article>
             <article
               data-reveal
@@ -722,10 +676,10 @@ function ClubSante() {
               className="card-fx rounded-[2rem] bg-card p-8 shadow-card lg:col-span-2"
             >
               <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-widest text-logo-blue">
-                <Gem className="size-5" /> Valeurs
+                <Gem className="size-5" /> {m.cs_valeurs()}
               </p>
               <ul className="mt-5 flex flex-wrap gap-3">
-                {valeurs.map((v) => (
+                {valeurs().map((v) => (
                   <li
                     key={v.t}
                     className={`${v.c} rounded-full px-5 py-2 font-display text-xl text-white transition duration-300 hover:-rotate-3 hover:scale-105`}
@@ -734,10 +688,7 @@ function ClubSante() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-5 font-semibold text-muted-foreground">
-                Des repères cardinaux pour former une élite responsable au service de la nation
-                togolaise.
-              </p>
+              <p className="mt-5 font-semibold text-muted-foreground">{m.cs_valeurs_texte()}</p>
             </article>
             <article
               data-reveal
@@ -750,15 +701,14 @@ function ClubSante() {
               <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-widest text-white/85">
-                    <Megaphone className="size-5" /> Slogan
+                    <Megaphone className="size-5" /> {m.cs_slogan_etiquette()}
                   </p>
                   <p className="mt-3 font-hand text-3xl leading-tight md:text-5xl">
-                    « Ensemble pour une génération de jeunes en bonne santé, responsable et épanouie
-                    »
+                    {m.commun_citation({ texte: m.cs_slogan() })}
                   </p>
                 </div>
                 <p className="max-w-xs shrink-0 font-semibold text-white/85">
-                  Un mot d’ordre fédérateur unissant élèves, éducateurs et soignants.
+                  {m.cs_slogan_texte()}
                 </p>
               </div>
             </article>
@@ -771,28 +721,16 @@ function ClubSante() {
         <div className="grid gap-10 lg:grid-cols-[1.35fr_1fr] lg:gap-14">
           <div>
             <EnTete
-              sur="Historique & vision globale d’AIMES-AFRIQUE"
-              bleu="Santé et éducation :"
-              vert="une vision portée depuis 2005"
+              sur={m.cs_historique_sur()}
+              bleu={m.cs_historique_bleu()}
+              vert={m.cs_historique_vert()}
             />
             <div
               data-reveal
               className="mt-6 space-y-4 text-lg leading-relaxed text-muted-foreground"
             >
-              <p>
-                C’est dans cette dynamique que l’Association Internationale des Médecins pour la
-                promotion de l’Éducation et de la Santé en Afrique (AIMES-AFRIQUE), créée en janvier
-                2005 à Lomé et aujourd’hui présente dans 20 pays, renforce son engagement en faveur
-                de l’éducation en promouvant l’excellence et l’émulation en milieu scolaire et
-                universitaire, telles que prévues dans ses statuts.
-              </p>
-              <p>
-                Dans le cadre de sa mission globale, AIMES-AFRIQUE a lancé en août 2020 la première
-                chaîne de télévision panafricaine thématique 100 % santé, SOS DOCTEUR TV. Après le
-                volet consacré à la santé, elle a renforcé en mars 2025 son deuxième volet
-                d’intervention, « l’Éducation », à travers le programme « Excellence et Émulation en
-                milieu scolaire et universitaire au Togo ».
-              </p>
+              <p>{m.cs_historique_1()}</p>
+              <p>{m.cs_historique_2()}</p>
             </div>
           </div>
 
@@ -801,11 +739,11 @@ function ClubSante() {
             className="self-start rounded-[2rem] bg-card p-7 shadow-card md:p-9 lg:sticky lg:top-24"
           >
             <p className="text-sm font-extrabold uppercase tracking-widest text-logo-blue">
-              Jalons clés du programme
+              {m.cs_jalons_titre()}
             </p>
-            <h3 className="mt-1 text-3xl text-primary">Repères</h3>
+            <h3 className="mt-1 text-3xl text-primary">{m.cs_reperes()}</h3>
             <ol className="relative mt-6 space-y-8 border-l-2 border-dashed border-logo-blue/25 pl-8">
-              {jalons.map((j) => (
+              {jalons().map((j) => (
                 <li key={j.date} className="relative">
                   <span
                     aria-hidden
@@ -826,12 +764,16 @@ function ClubSante() {
 
       {/* Les trois formes d'éducation : la non formelle, cœur des clubs, au centre et en couleur. */}
       <section id="education" className="mx-auto max-w-7xl scroll-mt-20 px-5 pt-20">
-        <EnTete sur="Cadre pédagogique" bleu="Les trois formes" vert="d’éducation" centre>
-          Comprendre l’articulation entre école, activités parascolaires et apprentissages
-          quotidiens.
+        <EnTete
+          sur={m.cs_education_sur()}
+          bleu={m.cs_education_bleu()}
+          vert={m.cs_education_vert()}
+          centre
+        >
+          {m.cs_education_texte()}
         </EnTete>
         <div className="mt-10 grid items-center gap-5 md:grid-cols-3">
-          {educations.map((e, i) => (
+          {educations().map((e, i) => (
             <article
               key={e.t}
               data-reveal
@@ -840,7 +782,7 @@ function ClubSante() {
             >
               {e.coeur && (
                 <span className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase text-ink shadow-card">
-                  Cœur des Clubs Santé
+                  {m.cs_education_2_etiquette()}
                 </span>
               )}
               <span
@@ -862,7 +804,7 @@ function ClubSante() {
               <p
                 className={`mt-5 border-t pt-4 text-sm font-bold ${e.coeur ? "border-white/25" : ""}`}
               >
-                Dimension {i + 1} de l’apprentissage
+                {m.cs_education_dimension({ numero: String(i + 1) })}
               </p>
             </article>
           ))}
@@ -875,13 +817,8 @@ function ClubSante() {
             <HeartHandshake className="size-8" />
           </span>
           <div>
-            <h3 className="text-2xl text-logo-blue">Positionnement sur l’éducation non formelle</h3>
-            <p className="mt-2 font-medium text-muted-foreground">
-              Les Clubs Santé SOS DOCTEUR TV se positionnent principalement dans le champ de
-              l’éducation non formelle, en proposant aux jeunes des activités complémentaires à
-              l’enseignement scolaire, axées sur la santé, le développement personnel, la confiance
-              en soi, la responsabilité et l’engagement pour un leadership transformationnel.
-            </p>
+            <h3 className="text-2xl text-logo-blue">{m.cs_positionnement_titre()}</h3>
+            <p className="mt-2 font-medium text-muted-foreground">{m.cs_positionnement_texte()}</p>
           </div>
         </div>
       </section>
@@ -900,7 +837,7 @@ function ClubSante() {
             />
             <img
               src={kodom}
-              alt="Dr Serge Michel KODOM"
+              alt={m.cs_promoteur_photo()}
               loading="lazy"
               width={1097}
               height={1434}
@@ -909,20 +846,14 @@ function ClubSante() {
           </div>
           <div data-reveal="right">
             <p className="text-sm font-extrabold uppercase tracking-widest text-sun">
-              Le mot du promoteur
+              {m.cs_promoteur_etiquette()}
             </p>
             <blockquote className="mt-4 text-xl font-semibold leading-relaxed md:text-2xl">
               <Quote aria-hidden className="mb-3 size-10 text-primary" />
-              C’est avec une immense fierté que nous constatons l’impact croissant des Clubs Santé
-              scolaires au Togo. Notre ambition ultime à travers ce programme est de forger une
-              nouvelle génération de leaders civiques et d’ambassadeurs de santé publique, capables
-              d’agir concrètement à l’école pour transformer durablement la santé de nos communautés
-              locales.
+              {m.cs_promoteur_texte()}
             </blockquote>
-            <p className="mt-6 font-display text-2xl">Dr Serge Michel KODOM</p>
-            <p className="text-sm font-semibold text-white/70">
-              Président-fondateur d’AIMES-AFRIQUE · Promoteur de SOS DOCTEUR TV
-            </p>
+            <p className="mt-6 font-display text-2xl">{m.cs_promoteur_photo()}</p>
+            <p className="text-sm font-semibold text-white/70">{m.cs_promoteur_role()}</p>
           </div>
         </div>
       </section>
@@ -930,29 +861,23 @@ function ClubSante() {
       {/* Adhésion et gouvernance : les règles à gauche, le bureau de 21 membres à droite. */}
       <section id="adhesion" className="mx-auto max-w-7xl scroll-mt-20 px-5 pt-20">
         <div className="flex flex-wrap items-end justify-between gap-6">
-          <EnTete
-            sur="Cadre d’adhésion et gouvernance scolaire"
-            bleu="Qui peut adhérer"
-            vert="et comment fonctionnent les clubs ?"
-          >
-            Directives officielles applicables à l’ensemble des collèges et lycées du Togo.
+          <EnTete sur={m.cs_adhesion_sur()} bleu={m.cs_adhesion_bleu()} vert={m.cs_adhesion_vert()}>
+            {m.cs_adhesion_texte()}
           </EnTete>
           <a
             href="#"
             data-reveal
             className="btn-fx inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground shadow-card"
           >
-            Faire une demande d’affiliation <ArrowRight className="size-4" />
+            {m.cs_affiliation()} <ArrowRight className="size-4" />
           </a>
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-2">
           <article data-reveal="left" className="rounded-[2rem] bg-card p-7 shadow-card md:p-9">
-            <h3 className="text-2xl text-logo-blue md:text-3xl">
-              Qui peut adhérer au Club Santé dans un collège ou un lycée ?
-            </h3>
+            <h3 className="text-2xl text-logo-blue md:text-3xl">{m.cs_faq_1_q()}</h3>
             <ul className="mt-6 space-y-4">
-              {regles.map((r, i) => (
+              {regles().map((r, i) => (
                 <li key={r} className="flex gap-4">
                   <span
                     className={`mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full text-white ${["bg-sky", "bg-primary", "bg-tangerine", "bg-grape", "bg-rose", "bg-logo-blue"][i]}`}
@@ -966,15 +891,15 @@ function ClubSante() {
           </article>
 
           <article data-reveal="right" className="rounded-[2rem] bg-card p-7 shadow-card md:p-9">
-            <h3 className="text-2xl text-logo-blue md:text-3xl">Composition du bureau des clubs</h3>
-            <p className="mt-1 font-semibold text-muted-foreground">
-              Structure officielle et parité obligatoire
-            </p>
+            <h3 className="text-2xl text-logo-blue md:text-3xl">{m.cs_bureau_titre()}</h3>
+            <p className="mt-1 font-semibold text-muted-foreground">{m.cs_bureau_sous()}</p>
             {/* 21 pastilles : 11 filles au moins, 10 garçons au plus. */}
             <div className="mt-6 flex flex-wrap items-center gap-6 rounded-3xl bg-mist p-5">
               <div>
                 <p className="font-display text-6xl leading-none text-logo-blue">21</p>
-                <p className="text-xs font-extrabold uppercase tracking-wide">membres au total</p>
+                <p className="text-xs font-extrabold uppercase tracking-wide">
+                  {m.cs_membres_total()}
+                </p>
               </div>
               <div className="flex-1">
                 <ul aria-hidden className="grid max-w-64 grid-cols-7 gap-1.5">
@@ -987,16 +912,16 @@ function ClubSante() {
                 </ul>
                 <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm font-bold">
                   <span className="flex items-center gap-1.5">
-                    <span className="size-3 rounded-full bg-rose" /> au moins 11 filles
+                    <span className="size-3 rounded-full bg-rose" /> {m.cs_filles()}
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <span className="size-3 rounded-full bg-sky" /> au plus 10 garçons
+                    <span className="size-3 rounded-full bg-sky" /> {m.cs_garcons()}
                   </span>
                 </p>
               </div>
             </div>
             <ol className="mt-6 space-y-3">
-              {bureau.map((b, i) => (
+              {bureau().map((b, i) => (
                 <li key={b} className="flex gap-3">
                   <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-lg bg-logo-blue font-display text-sm text-white">
                     {i + 1}
@@ -1008,9 +933,7 @@ function ClubSante() {
             <p className="mt-6 flex gap-3 rounded-2xl bg-primary/10 p-4 text-sm font-semibold">
               <Accessibility className="size-5 shrink-0 text-primary" />
               <span>
-                <strong>Inclusion & parité :</strong> le bureau doit être inclusif, notamment en
-                favorisant la participation des personnes vivant avec un handicap, et comporter de
-                préférence plus de filles que de garçons.
+                <strong>{m.cs_inclusion_titre()}</strong> {m.cs_inclusion_texte()}
               </span>
             </p>
           </article>

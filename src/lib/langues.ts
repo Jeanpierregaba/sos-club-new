@@ -41,6 +41,10 @@ export const estTraduite = (page: string): boolean =>
 export const localiser = (lien: string, langue: Langue): string =>
   localizeHref(lien, { locale: langue });
 
+/** Un lien interne dans la langue de la page en cours ; les ancres, liens externes, `mailto:` et `tel:` inchangés. */
+export const lien = (href: string): string =>
+  href.startsWith("/") && !href.startsWith("//") ? localiser(href, langueCourante()) : href;
+
 /**
  * L'adresse où renvoyer, s'il le faut : `/fr/...` vers l'adresse sans préfixe (une seule adresse par page), et
  * `/en/...` ou `/de/...` d'une page non traduite vers sa version française. `null` sinon, page inconnue comprise
@@ -68,6 +72,17 @@ export function liensHreflang(
     ...LANGUES.map((langue) => ({ hreflang: langue, href: localiser(francais, langue) })),
     { hreflang: "x-default", href: francais },
   ];
+}
+
+/** Un rang écrit en toutes lettres pour les lecteurs d'écran : « 1er », « 2nd »… selon la langue. */
+export function ordinal(rang: number, langue: Langue = langueCourante()): string {
+  if (langue === "de") return `${rang}.`;
+  if (langue === "en") {
+    const fin =
+      rang % 100 >= 11 && rang % 100 <= 13 ? "th" : (["th", "st", "nd", "rd"][rang % 10] ?? "th");
+    return `${rang}${fin}`;
+  }
+  return `${rang}${rang === 1 ? "er" : "e"}`;
 }
 
 const FORMATS: Record<Langue, string> = { fr: "fr-FR", en: "en-US", de: "de-DE" };

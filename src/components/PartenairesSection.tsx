@@ -5,6 +5,7 @@ import ministereEducation from "@/assets/partenaires/ministere-education-nationa
 import ministereSante from "@/assets/partenaires/ministere-sante.webp";
 import ministereSolidarites from "@/assets/partenaires/ministere-solidarites.webp";
 import unfpa from "@/assets/partenaires/unfpa.svg";
+import { m } from "@/paraglide/messages.js";
 
 const PARTENAIRES = [
   { src: clubSante, nom: "Club Santé SOS Docteur TV" },
@@ -56,13 +57,10 @@ export function PartenairesSection() {
     <section id="partenaires" className="scroll-mt-16 py-20">
       <div data-reveal className="mx-auto max-w-3xl px-5 text-center">
         <h2 className="text-4xl md:text-5xl">
-          <span className="text-logo-blue">Nos Soutiens</span>{" "}
-          <span className="text-primary">& Partenaires</span>
+          <span className="text-logo-blue">{m.partenaires_titre_1()}</span>{" "}
+          <span className="text-primary">{m.partenaires_titre_2()}</span>
         </h2>
-        <p className="mt-4 text-muted-foreground">
-          Nous remercions chaleureusement les ministères, organisations non-gouvernementales et
-          réseaux de médias qui soutiennent l’excellence sanitaire chez les jeunes du Togo.
-        </p>
+        <p className="mt-4 text-muted-foreground">{m.partenaires_texte()}</p>
       </div>
       {/* La seconde liste, identique, prend le relais quand la première sort de l'écran. Sans animation, le visiteur fait défiler à la main. */}
       <div

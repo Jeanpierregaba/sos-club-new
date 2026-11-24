@@ -19,7 +19,6 @@ import {
   commencerQuelAxe,
   ErreurApi,
   etatQuelAxe,
-  MESSAGE_INDISPONIBLE,
   repondreQuelAxe,
   terminerQuelAxe,
   type EtatQuelAxe,
@@ -27,6 +26,8 @@ import {
   type QuestionQuelAxe,
 } from "@/lib/api/client";
 import { axeDecouverte, partagerAxe, type AxeDecouverte } from "@/lib/axes-decouverte";
+import { lien } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 // L'adresse de retour après la connexion : l'accueil, qui rouvre le test (voir `QuelAxe`).
 const RETOUR = "/?test=quel-axe#quel-axe";
@@ -67,16 +68,16 @@ export function QuelAxeTest() {
   if (acces === "visiteur") return <Visiteur />;
   if (acces === "reserve")
     return (
-      <Message titre="Ce jeu est réservé aux élèves inscrits.">
-        Il se joue depuis un compte Élève. Les sept axes restent ouverts à tous sur la page{" "}
-        <a href="/les-7-axes" className="font-bold text-logo-blue underline">
-          Les 7 axes
+      <Message titre={m.quelaxe_reserve_titre()}>
+        {m.quelaxe_reserve_texte()}{" "}
+        <a href={lien("/les-7-axes")} className="font-bold text-logo-blue underline">
+          {m.menu_7_axes()}
         </a>
         .
       </Message>
     );
   if (acces === "indisponible")
-    return <Message titre="Le test est indisponible">{MESSAGE_INDISPONIBLE}</Message>;
+    return <Message titre={m.quelaxe_indisponible()}>{m.commun_indisponible()}</Message>;
   return <Jeu surErreur={surErreur} />;
 }
 
@@ -589,21 +590,21 @@ function AutreAxe({ axe }: { axe: AxeDecouverte }) {
 
 function Visiteur() {
   return (
-    <Message titre="Connecte-toi à ton compte Élève pour découvrir ton axe !">
+    <Message titre={m.quelaxe_visiteur_titre()}>
       <span className="mt-5 flex flex-wrap justify-center gap-3">
         <Link
           to="/connexion"
           search={{ redirection: RETOUR }}
           className="btn-fx inline-flex items-center gap-2 rounded-full bg-grape px-6 py-3 font-bold text-white"
         >
-          <Lock className="size-4" /> Se connecter
+          <Lock className="size-4" /> {m.entete_se_connecter()}
         </Link>
         <Link
           to="/inscription"
           search={{ profil: "eleve" }}
           className="inline-flex items-center gap-2 rounded-full border-2 border-grape px-6 py-3 font-bold text-grape transition hover:bg-grape hover:text-white"
         >
-          <UserPlus className="size-4" /> Créer mon compte Élève
+          <UserPlus className="size-4" /> {m.quelaxe_creer_compte()}
         </Link>
       </span>
     </Message>
@@ -628,7 +629,7 @@ function Message({ titre, children }: { titre: string; children: ReactNode }) {
 
 function Chargement() {
   return (
-    <div className="flex justify-center p-16" aria-label="Chargement">
+    <div className="flex justify-center p-16" aria-label={m.commun_chargement()}>
       <Loader2 className="size-8 animate-spin text-grape" />
     </div>
   );

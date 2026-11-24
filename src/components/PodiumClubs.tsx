@@ -24,6 +24,8 @@ import {
   type ClassementPublic,
   type PeriodeClassement,
 } from "@/lib/api/client";
+import { formatDeLaLangue, ordinal } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 const MEDAILLES = [
   "bg-linear-to-br from-sun to-[oklch(0.75_0.16_75)] text-ink",
@@ -32,33 +34,34 @@ const MEDAILLES = [
 ];
 const MEDAILLE_SIMPLE = "bg-white/15 text-white";
 
-const TUILES: {
+// Une fonction : les libellés suivent la langue de la page.
+const tuiles = (): {
   cle: "eleves" | "clubs" | "quiz" | "points";
   libelle: string;
   icone: LucideIcon;
   fond: string;
-}[] = [
+}[] => [
   {
     cle: "eleves",
-    libelle: "Élèves inscrits",
+    libelle: m.podium_tuile_eleves(),
     icone: Users,
     fond: "from-[oklch(0.5_0.17_258)] to-[oklch(0.38_0.15_262)]",
   },
   {
     cle: "clubs",
-    libelle: "Clubs Santé (établissements)",
+    libelle: m.podium_tuile_clubs(),
     icone: Landmark,
     fond: "from-[oklch(0.55_0.11_200)] to-[oklch(0.4_0.1_210)]",
   },
   {
     cle: "quiz",
-    libelle: "Quiz réalisés",
+    libelle: m.podium_tuile_quiz(),
     icone: Brain,
     fond: "from-[oklch(0.5_0.2_300)] to-[oklch(0.38_0.18_295)]",
   },
   {
     cle: "points",
-    libelle: "Points gagnés",
+    libelle: m.podium_tuile_points(),
     icone: Trophy,
     fond: "from-[oklch(0.55_0.1_60)] to-[oklch(0.4_0.08_50)]",
   },
@@ -125,26 +128,22 @@ export function PodiumClubs() {
         <div data-reveal="left" className="relative grid gap-6">
           <div className="text-center md:text-left">
             <p className="inline-flex items-center gap-2 rounded-full border-2 border-sun/80 bg-ink/20 px-4 py-1.5 text-sm font-extrabold uppercase tracking-wide">
-              <Gamepad2 aria-hidden className="size-5 text-sun" /> Jeux & classement
+              <Gamepad2 aria-hidden className="size-5 text-sun" /> {m.podium_etiquette()}
             </p>
             <h2 id="titre-podium" className="mt-5 font-display text-4xl leading-tight md:text-5xl">
               {/* Deux lignes : la question, puis le N°1 dans son étiquette jaune. */}
-              <span className="block lg:whitespace-nowrap">Et si ton lycée devenait</span>
+              <span className="block lg:whitespace-nowrap">{m.podium_titre_1()}</span>
               <span className="mt-2 inline-block -rotate-1 rounded-2xl bg-sun px-4 py-1 text-ink shadow-lg shadow-sun/20">
-                N°1 du Togo&#8239;?
+                {m.podium_titre_2()}
               </span>
             </h2>
             <p className="mt-5 max-w-lg text-lg font-semibold text-white/90 max-md:mx-auto">
-              Teste tes connaissances en santé et fais grimper ton Club Santé dans le classement
-              national&#8239;!
+              {m.podium_texte()}
             </p>
           </div>
 
-          <ul
-            className="grid grid-cols-2 gap-3 sm:grid-cols-4"
-            aria-label="Le programme en chiffres"
-          >
-            {TUILES.map(({ cle, libelle, icone: Icone, fond }) => (
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4" aria-label={m.podium_en_chiffres()}>
+            {tuiles().map(({ cle, libelle, icone: Icone, fond }) => (
               <li
                 key={cle}
                 className={`flex flex-col items-center rounded-2xl bg-linear-to-b px-3 py-4 text-center shadow-lg ring-1 ring-white/25 ${fond}`}
@@ -163,13 +162,13 @@ export function PodiumClubs() {
           <div className="grid gap-3 rounded-2xl bg-white/10 p-4 ring-1 ring-white/20 sm:grid-cols-2 sm:divide-x sm:divide-white/20">
             <Atout
               icone={MessageCircleQuestion}
-              titre="Des quiz santé"
-              texte="Apprends en t’amusant"
+              titre={m.podium_atout_quiz_titre()}
+              texte={m.podium_atout_quiz_texte()}
             />
             <Atout
               icone={BarChart3}
-              titre="Un classement national"
-              texte="Fais progresser ton club"
+              titre={m.podium_atout_classement_titre()}
+              texte={m.podium_atout_classement_texte()}
             />
           </div>
 
@@ -178,14 +177,14 @@ export function PodiumClubs() {
               to="/jeux"
               className="btn-fx inline-flex items-center gap-2 rounded-full bg-sun px-7 py-3.5 text-lg font-extrabold text-ink shadow-lg shadow-sun/20"
             >
-              <Gamepad2 aria-hidden className="size-6" /> Découvrir les jeux
+              <Gamepad2 aria-hidden className="size-6" /> {m.podium_decouvrir_jeux()}
               <ArrowRight aria-hidden className="size-5" />
             </Link>
             <Link
               to="/hall-of-fame"
               className="btn-fx inline-flex items-center gap-2 rounded-full border-2 border-white/80 px-7 py-3.5 text-lg font-extrabold text-white hover:bg-white hover:text-ink"
             >
-              <Trophy aria-hidden className="size-6 text-sun" /> Découvrir le classement
+              <Trophy aria-hidden className="size-6 text-sun" /> {m.podium_decouvrir_classement()}
               <ArrowRight aria-hidden className="size-5" />
             </Link>
           </div>
@@ -196,12 +195,13 @@ export function PodiumClubs() {
           className="mx-auto w-full min-w-0 max-w-xl rounded-[2rem] bg-[oklch(0.25_0.11_268)]/80 p-4 shadow-[0_0_40px_oklch(0.6_0.2_285/0.45)] ring-2 ring-[oklch(0.7_0.15_280)]/60 backdrop-blur-md sm:p-6"
         >
           <p className="flex items-center justify-center gap-3 text-center font-display text-2xl md:text-3xl">
-            <Trophy aria-hidden className="size-8 text-sun drop-shadow" /> Classement national
+            <Trophy aria-hidden className="size-8 text-sun drop-shadow" />{" "}
+            {m.podium_classement_national()}
           </p>
 
           <div
             role="tablist"
-            aria-label="Classement à afficher"
+            aria-label={m.podium_classement_a_afficher()}
             className="mt-5 grid grid-cols-2 rounded-full p-1 ring-2 ring-white/30"
           >
             <BoutonOnglet
@@ -209,36 +209,38 @@ export function PodiumClubs() {
               onClick={() => setOnglet("eleves")}
               icone={User}
             >
-              Élèves
+              {m.podium_onglet_eleves()}
             </BoutonOnglet>
             <BoutonOnglet
               actif={onglet === "clubs"}
               onClick={() => setOnglet("clubs")}
               icone={School}
             >
-              Clubs
+              {m.podium_onglet_clubs()}
             </BoutonOnglet>
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm">
             <p className="font-bold">
-              Top 5 –{" "}
-              {classement?.periode === "historique"
-                ? "Depuis le début"
-                : (classement?.semestre?.libelle ?? "Semestre en cours")}
+              {m.podium_top5({
+                periode:
+                  classement?.periode === "historique"
+                    ? m.podium_depuis_debut()
+                    : (classement?.semestre?.libelle ?? m.podium_semestre_en_cours()),
+              })}
             </p>
             <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 font-semibold text-white/90">
               <span
                 aria-hidden
                 className="size-2.5 rounded-full bg-[oklch(0.75_0.2_145)] motion-safe:animate-pulse"
               />
-              Classement en temps réel
+              {m.podium_temps_reel()}
             </p>
           </div>
 
           <div
             role="tabpanel"
-            aria-label={onglet === "eleves" ? "Top 5 des élèves" : "Top 5 des clubs"}
+            aria-label={onglet === "eleves" ? m.podium_top5_eleves() : m.podium_top5_clubs()}
           >
             {requete.isPending ? (
               <Chargement />
@@ -248,11 +250,7 @@ export function PodiumClubs() {
               <TopEleves lignes={classement.lignes} />
             ) : (
               <BientotLa
-                texte={
-                  onglet === "eleves"
-                    ? "Les meilleurs élèves s’afficheront ici : joue aux quiz pour y figurer."
-                    : "Les points des Clubs Santé s’afficheront ici : ton lycée peut prendre la première place."
-                }
+                texte={onglet === "eleves" ? m.podium_bientot_eleves() : m.podium_bientot_clubs()}
               />
             )}
           </div>
@@ -261,7 +259,7 @@ export function PodiumClubs() {
             to="/hall-of-fame"
             className="btn-fx mt-5 flex items-center justify-center gap-2 rounded-full border-2 border-sun px-6 py-3 text-lg font-extrabold text-white hover:bg-sun hover:text-ink"
           >
-            <Trophy aria-hidden className="size-6 text-sun" /> Voir tout le classement
+            <Trophy aria-hidden className="size-6 text-sun" /> {m.podium_voir_tout()}
             <ArrowRight aria-hidden className="size-5" />
           </Link>
         </div>
@@ -324,7 +322,7 @@ function Ligne({
       >
         {rang}
       </span>
-      <span className="sr-only">{`${rang}${rang === 1 ? "er" : "e"}`}</span>
+      <span className="sr-only">{ordinal(rang)}</span>
       <span
         aria-hidden
         className={`hidden size-10 shrink-0 items-center justify-center rounded-full font-display text-lg sm:inline-flex ${
@@ -335,7 +333,8 @@ function Ligne({
       </span>
       <span className="min-w-0 flex-1">{children}</span>
       <span className="shrink-0 font-display text-lg sm:text-xl">
-        {points.toLocaleString("fr-FR")} <span className="text-sm">pts</span>
+        {points.toLocaleString(formatDeLaLangue())}{" "}
+        <span className="text-sm">{m.podium_pts()}</span>
       </span>
     </li>
   );
@@ -343,7 +342,7 @@ function Ligne({
 
 function TopEleves({ lignes }: { lignes: ClassementPersonnesPublic["lignes"] }) {
   return (
-    <ol className="mt-3 space-y-2" aria-label="Top 5 des élèves">
+    <ol className="mt-3 space-y-2" aria-label={m.podium_top5_eleves()}>
       {lignes.slice(0, NB_LIGNES).map((eleve, i) => (
         <Ligne
           key={`${eleve.rang}-${eleve.nom}`}
@@ -365,7 +364,7 @@ function TopEleves({ lignes }: { lignes: ClassementPersonnesPublic["lignes"] }) 
 
 function TopClubs({ lignes }: { lignes: ClassementClubsPublic["lignes"] }) {
   return (
-    <ol className="mt-3 space-y-2" aria-label="Top 5 des clubs">
+    <ol className="mt-3 space-y-2" aria-label={m.podium_top5_clubs()}>
       {lignes.slice(0, NB_LIGNES).map((club, i) => (
         <Ligne
           key={club.club_id}
@@ -413,14 +412,14 @@ function LigneFantome({ index }: { index: number }) {
         {index + 1}
       </span>
       <span className="h-3 flex-1 rounded-full bg-white/20" />
-      <span className="font-display text-lg text-white/60">? pts</span>
+      <span className="font-display text-lg text-white/60">? {m.podium_pts()}</span>
     </div>
   );
 }
 
 function Chargement() {
   return (
-    <div className="mt-3 space-y-2 motion-safe:animate-pulse" aria-label="Chargement du classement">
+    <div className="mt-3 space-y-2 motion-safe:animate-pulse" aria-label={m.podium_chargement()}>
       {Array.from({ length: NB_LIGNES }, (_, i) => (
         <LigneFantome key={i} index={i} />
       ))}
@@ -438,7 +437,7 @@ function BientotLa({ texte }: { texte: string }) {
         ))}
       </div>
       <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 rounded-2xl bg-[oklch(0.25_0.11_268)]/95 px-5 py-4 text-center shadow-xl ring-1 ring-white/20">
-        <p className="font-bold">Le classement arrive bientôt&#8239;!</p>
+        <p className="font-bold">{m.podium_bientot()}</p>
         <p className="mt-1 text-sm font-medium text-white/80">{texte}</p>
       </div>
     </div>

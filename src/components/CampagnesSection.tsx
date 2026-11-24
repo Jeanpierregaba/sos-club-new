@@ -4,47 +4,49 @@ import hygiene from "@/assets/campagne-hygiene.jpg";
 import ecologie from "@/assets/campagne-ecologie.jpg";
 import secourisme from "@/assets/campagne-secourisme.jpg";
 import sensibilisation from "@/assets/campagne-sensibilisation.jpg";
+import { m } from "@/paraglide/messages.js";
 
 // pos : le cadrage de l'affiche, pour garder l'action visible quand elle est rognée.
-const campagnes = [
+// Une fonction : les textes suivent la langue de la page.
+const campagnesTraduites = () => [
   {
-    tag: "Hygiène",
-    slogan: "Zéro microbe à l’école !",
-    t: "Lavage des mains & hygiène",
-    d: "Adopte le geste barrière essentiel : lave-toi les mains à l’eau courante et au savon après chaque récréation.",
+    tag: m.campagne_1_etiquette(),
+    slogan: m.campagne_1_slogan(),
+    t: m.campagne_1_titre(),
+    d: m.campagne_1_texte(),
     img: hygiene,
     pos: "object-[50%_30%]",
-    alt: "La mascotte rouge du Club Santé se lave les mains au savon avec une élève",
+    alt: m.campagne_1_alt(),
     fond: "from-sky to-logo-blue",
   },
   {
-    tag: "Écologie",
-    slogan: "Un Togo vert pour demain",
-    t: "1 élève, 1 arbre",
-    d: "Chaque membre s’engage à planter et parrainer un jeune plant d’arbre dans son établissement ou son quartier.",
+    tag: m.campagne_2_etiquette(),
+    slogan: m.campagne_2_slogan(),
+    t: m.campagne_2_titre(),
+    d: m.campagne_2_texte(),
     img: ecologie,
     pos: "object-[50%_45%]",
-    alt: "La mascotte verte du Club Santé plante un arbre avec un élève",
+    alt: m.campagne_2_alt(),
     fond: "from-primary to-leaf",
   },
   {
-    tag: "Secourisme",
-    slogan: "Savoir réagir, c’est sauver !",
-    t: "Secourisme & premiers gestes",
-    d: "Inscris-toi aux ateliers d’AIMES-AFRIQUE pour apprendre la réanimation et la prise en charge des malaises.",
+    tag: m.campagne_3_etiquette(),
+    slogan: m.campagne_3_slogan(),
+    t: m.campagne_3_titre(),
+    d: m.campagne_3_texte(),
     img: secourisme,
     pos: "object-[50%_75%]",
-    alt: "La mascotte orange du Club Santé pratique un massage cardiaque sur un mannequin",
+    alt: m.campagne_3_alt(),
     fond: "from-rose to-logo-red",
   },
   {
-    tag: "Sensibilisation",
-    slogan: "S’informer en toute confiance",
-    t: "Santé sexuelle & reproductive",
-    d: "Des causeries éducatives anonymes pour lever les tabous et répondre à toutes tes questions.",
+    tag: m.campagne_4_etiquette(),
+    slogan: m.campagne_4_slogan(),
+    t: m.campagne_4_titre(),
+    d: m.campagne_4_texte(),
     img: sensibilisation,
     pos: "object-top",
-    alt: "Affiche « Zéro grossesse et IST dans mon établissement » : la mascotte rouge discute avec deux élèves",
+    alt: m.campagne_4_alt(),
     fond: "from-tangerine to-logo-red",
   },
 ];
@@ -54,6 +56,7 @@ const DUREE = 7000;
 // Slider des campagnes : le texte sur un fond propre à chaque campagne, l'affiche à droite.
 export function CampagnesSection() {
   const [actif, setActif] = useState(0);
+  const campagnes = campagnesTraduites();
   const n = campagnes.length;
   const aller = (pas: number) => setActif((a) => (a + pas + n) % n);
 
@@ -67,17 +70,17 @@ export function CampagnesSection() {
   return (
     <section id="campagnes" className="mx-auto max-w-7xl scroll-mt-16 px-5 pb-20 pt-8">
       <div data-reveal>
-        <p className="text-sm font-extrabold uppercase text-primary">Campagnes</p>
+        <p className="text-sm font-extrabold uppercase text-primary">{m.campagnes_etiquette()}</p>
         <h2 className="mt-2 text-4xl md:text-5xl">
-          <span className="text-logo-blue">Nos campagnes</span>{" "}
-          <span className="text-primary">de sensibilisation</span>
+          <span className="text-logo-blue">{m.campagnes_titre_1()}</span>{" "}
+          <span className="text-primary">{m.campagnes_titre_2()}</span>
         </h2>
       </div>
 
       <div
         data-reveal="zoom"
-        aria-roledescription="carrousel"
-        aria-label="Campagnes du Club Santé"
+        aria-roledescription={m.commun_carrousel()}
+        aria-label={m.campagnes_carrousel()}
         className="relative isolate mt-8 grid overflow-hidden rounded-3xl text-white shadow-card lg:min-h-[34rem] lg:grid-cols-[1.3fr_1fr]"
       >
         {campagnes.map((c, i) => (
@@ -117,7 +120,7 @@ export function CampagnesSection() {
               <button
                 type="button"
                 onClick={() => aller(-1)}
-                aria-label="Campagne précédente"
+                aria-label={m.campagnes_precedente()}
                 className="inline-flex size-11 items-center justify-center rounded-xl transition hover:bg-white/15 active:scale-90"
               >
                 <ChevronLeft className="size-5" />
@@ -125,7 +128,7 @@ export function CampagnesSection() {
               <button
                 type="button"
                 onClick={() => aller(1)}
-                aria-label="Campagne suivante"
+                aria-label={m.campagnes_suivante()}
                 className="inline-flex size-11 items-center justify-center rounded-xl transition hover:bg-white/15 active:scale-90"
               >
                 <ChevronRight className="size-5" />
@@ -159,7 +162,7 @@ export function CampagnesSection() {
                   key={c.tag}
                   type="button"
                   onClick={() => setActif(i)}
-                  aria-label={`Voir la campagne ${c.tag}`}
+                  aria-label={m.campagnes_voir({ nom: c.tag })}
                   aria-current={i === actif}
                   className={`relative h-2.5 overflow-hidden rounded-full transition-all duration-300 ${i === actif ? "w-12 bg-white/30" : "w-2.5 bg-white/40 hover:bg-white/70"}`}
                 >
@@ -174,7 +177,7 @@ export function CampagnesSection() {
               ))}
             </div>
             <p aria-live="polite" className="text-sm font-extrabold uppercase">
-              Campagne {actif + 1} / {n}
+              {m.campagnes_position({ numero: String(actif + 1), total: String(n) })}
             </p>
           </div>
         </div>

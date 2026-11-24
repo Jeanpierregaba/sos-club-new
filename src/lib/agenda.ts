@@ -5,6 +5,8 @@ import { Landmark, School, Stethoscope } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import type { EvenementPublic, ReponseAgenda } from "@/lib/api/client";
+import { formatDeLaLangue, LANGUE_DE_BASE, langueCourante } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 export const FUSEAU = "Africa/Lome";
 
@@ -18,6 +20,12 @@ export const TYPES_EVENEMENT: Record<string, string> = {
   reunion: "Réunion",
   autre: "Autre",
 };
+
+/** Le type d'un événement dans la langue de la page (spec 052) ; un type inconnu s'affiche tel quel. */
+export function typeEvenement(type: string): string {
+  const message = m[`agenda_type_${type}` as keyof typeof m] as (() => string) | undefined;
+  return typeof message === "function" ? message() : (TYPES_EVENEMENT[type] ?? type);
+}
 
 export const NIVEAUX: Record<"national" | "regional" | "club", { court: string; long: string }> = {
   national: { court: "Secrétariat technique permanent", long: "Coordination centrale & pilotage" },
@@ -42,13 +50,17 @@ export const ETATS_EVENEMENT: Record<string, string> = {
 };
 
 export function dateEvenement(iso: string, options: Intl.DateTimeFormatOptions): string {
-  return new Date(iso).toLocaleDateString("fr-FR", { timeZone: FUSEAU, ...options });
+  return new Date(iso).toLocaleDateString(formatDeLaLangue(), { timeZone: FUSEAU, ...options });
 }
 
 export function heureEvenement(iso: string): string {
-  return new Date(iso)
-    .toLocaleTimeString("fr-FR", { timeZone: FUSEAU, hour: "2-digit", minute: "2-digit" })
-    .replace(":", " h ");
+  const heure = new Date(iso).toLocaleTimeString(formatDeLaLangue(), {
+    timeZone: FUSEAU,
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  // « 09 h 30 » en français ; l'anglais et l'allemand gardent leur propre écriture.
+  return langueCourante() === LANGUE_DE_BASE ? heure.replace(":", " h ") : heure;
 }
 
 // « Samedi 5 décembre, 09 h 30 – 11 h 30 »

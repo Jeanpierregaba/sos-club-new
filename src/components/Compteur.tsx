@@ -1,3 +1,4 @@
+import { formatDeLaLangue } from "@/lib/langues";
 import { useEffect, useRef, useState } from "react";
 
 // Le rendu serveur affiche le vrai chiffre (sans JavaScript, ou si l'utilisateur limite les animations) ; le compte part de 0 quand le chiffre devient visible.

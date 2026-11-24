@@ -7,31 +7,33 @@ import mascotteMedias from "@/assets/mascotte-medias.webp";
 import mascotteSecourisme from "@/assets/mascotte-secourisme.webp";
 import { QuelAxeTest } from "@/components/QuelAxeTest";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import { axes } from "@/lib/axes";
+import { axes, texteAxe } from "@/lib/axes";
+import { m } from "@/paraglide/messages.js";
 
 // Le paramètre ajouté à l'adresse de retour après la connexion : le test s'ouvre dès l'arrivée sur l'accueil.
 export const PARAMETRE_TEST = "test";
 
 // Les trois cartes de la maquette : une mascotte officielle, la couleur de fond et la question de sa bulle.
-const CARTES = [
+// Une fonction : les textes suivent la langue de la page.
+const cartes = () => [
   {
     img: mascotteMedias,
-    nom: "Production TV & médias",
-    bulle: "Créatif ?",
+    nom: texteAxe(3).nom,
+    bulle: m.quelaxe_bulle_createur(),
     fond: "from-sun to-tangerine",
     pente: "-rotate-6",
   },
   {
     img: mascotteSecourisme,
-    nom: "Sport & secourisme",
-    bulle: "Sportif ?",
+    nom: texteAxe(4).nom,
+    bulle: m.quelaxe_bulle_sportif(),
     fond: "from-sky to-logo-blue",
     pente: "rotate-0 -translate-y-3",
   },
   {
     img: mascotteLeadership,
-    nom: "Leadership & mentorat",
-    bulle: "Leader ?",
+    nom: texteAxe(6).nom,
+    bulle: m.quelaxe_bulle_leader(),
     fond: "from-leaf to-[oklch(0.6_0.12_200)]",
     pente: "rotate-6",
   },
@@ -156,7 +158,7 @@ export function QuelAxe() {
           </span>
           <img
             src={mascotteEnvironnement}
-            alt="La mascotte de l’axe Santé & environnement"
+            alt={m.quelaxe_mascotte_axe({ nom: texteAxe(7).nom })}
             width={1414}
             height={2000}
             loading="lazy"
@@ -165,13 +167,11 @@ export function QuelAxe() {
         </div>
 
         <div data-reveal className="text-center md:text-left">
-          <p className="font-hand text-2xl text-logo-red">
-            7 axes. Des talents à révéler. Et toi, où vas-tu briller&#8239;?
-          </p>
+          <p className="font-hand text-2xl text-logo-red">{m.quelaxe_accroche()}</p>
           <h2 className="mt-1 font-display text-4xl leading-tight text-ink md:text-5xl xl:text-6xl">
-            Quel{" "}
+            {m.quelaxe_titre_1()}{" "}
             <span className="relative inline-block text-grape">
-              axe
+              {m.quelaxe_titre_axe()}
               <svg
                 aria-hidden
                 viewBox="0 0 120 14"
@@ -189,11 +189,10 @@ export function QuelAxe() {
                 />
               </svg>
             </span>{" "}
-            est fait pour toi&#8239;?
+            {m.quelaxe_titre_2()}
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-lg font-semibold text-ink/75 md:mx-0">
-            Tu aimes créer, apprendre, aider, diriger ou relever des défis&#8239;? Réponds à sept
-            questions et découvre l’axe des Clubs Santé qui correspond le mieux à tes envies&#8239;!
+            {m.quelaxe_texte()}
           </p>
           <div className="relative mt-8 inline-flex">
             <span
@@ -205,13 +204,11 @@ export function QuelAxe() {
               onClick={() => setOuvert(true)}
               className="btn-fx group relative inline-flex items-center gap-2 rounded-full bg-grape px-8 py-4 text-base font-bold text-white shadow-lg shadow-grape/30"
             >
-              Commencer le jeu{" "}
+              {m.quelaxe_commencer()}{" "}
               <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
-          <p className="mt-3 text-sm font-medium text-muted-foreground">
-            Réservé aux élèves inscrits · 3 participations maximum
-          </p>
+          <p className="mt-3 text-sm font-medium text-muted-foreground">{m.quelaxe_reserve()}</p>
         </div>
 
         {/* Trois cartes inclinées qui flottent chacune à son rythme ; au survol, la carte se redresse. */}
@@ -219,7 +216,7 @@ export function QuelAxe() {
           data-reveal="right"
           className="mx-auto flex items-end justify-center -space-x-4 pt-4 sm:-space-x-2 md:col-span-2 xl:col-span-1"
         >
-          {CARTES.map((c, i) => (
+          {cartes().map((c, i) => (
             <li
               key={c.bulle}
               className={`group relative transition-[rotate,translate,scale] duration-300 hover:z-10 hover:-translate-y-4 hover:rotate-0 hover:scale-105 ${c.pente}`}
@@ -234,7 +231,7 @@ export function QuelAxe() {
                   />
                   <img
                     src={c.img}
-                    alt={`La mascotte de l’axe ${c.nom}`}
+                    alt={m.quelaxe_mascotte_axe({ nom: c.nom })}
                     width={1414}
                     height={2000}
                     loading="lazy"
@@ -255,10 +252,8 @@ export function QuelAxe() {
 
       <Dialog open={ouvert} onOpenChange={setOuvert}>
         <DialogContent className="max-h-[100dvh] w-full max-w-2xl overflow-y-auto rounded-none p-0 sm:max-h-[92dvh] sm:rounded-[2rem]">
-          <DialogTitle className="sr-only">Quel axe est fait pour toi ?</DialogTitle>
-          <DialogDescription className="sr-only">
-            Sept questions pour découvrir l’axe des Clubs Santé qui te ressemble.
-          </DialogDescription>
+          <DialogTitle className="sr-only">{m.quelaxe_dialogue_titre()}</DialogTitle>
+          <DialogDescription className="sr-only">{m.quelaxe_dialogue_texte()}</DialogDescription>
           {ouvert && <QuelAxeTest />}
         </DialogContent>
       </Dialog>
@@ -274,7 +269,7 @@ export function BandeAxes() {
         {[0, 1].map((copie) => (
           <ul
             key={copie}
-            aria-label={copie === 0 ? "Les 7 axes des Clubs Santé" : undefined}
+            aria-label={copie === 0 ? m.quelaxe_bande() : undefined}
             aria-hidden={copie === 1 || undefined}
             className="flex shrink-0 gap-3 pr-3"
           >
@@ -293,7 +288,7 @@ export function BandeAxes() {
                   loading="lazy"
                   className="size-8 rounded-full bg-white/90 object-cover object-top"
                 />
-                {a.nom}
+                {texteAxe(a.n).nom}
               </li>
             ))}
           </ul>
