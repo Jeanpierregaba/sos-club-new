@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { sansBarreFinale } from "./lib/langues";
 import { paraglideMiddleware } from "./paraglide/server.js";
 
 type ServerEntry = {
@@ -48,6 +49,15 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      // `/en/jeux/` : Paraglide ne reconnaîtrait pas l'adresse (spec 052), on renvoie vers celle sans barre finale.
+      const url = new URL(request.url);
+      const sansBarre = sansBarreFinale(url.pathname);
+      if (sansBarre !== null) {
+        return new Response(null, {
+          status: 301,
+          headers: { location: sansBarre + url.search },
+        });
+      }
       const handler = await getServerEntry();
       // Langue de la page (spec 052) connue pendant tout le rendu. Le routeur réécrit lui-même les adresses : on lui
       // passe la requête d'origine.

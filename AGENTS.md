@@ -42,7 +42,7 @@ des points et des classements. Détail : `docs/PRD.md`.
 - Installer : site `bun install` ; API `cd backend && uv sync`
 - Démarrer en local : base `docker compose up -d --wait` ; site `npm run dev` ; API `cd backend && uv run fastapi dev app/main.py --port 8000`
 - Lint : site `npm run lint` ; API `cd backend && uv run ruff check . && uv run ruff format --check .`
-- Typecheck : site `npx tsc --noEmit`
+- Typecheck : site `npx tsc --noEmit` (après `npm run langues`, qui génère `src/paraglide/`)
 - Tests : site `npm test` ; API, suite complète `cd backend && uv run pytest -n auto --dist loadfile` (base démarrée,
   une base `sosclub_test_gwN` par processus) ; un fichier seul `uv run pytest tests/test_x.py`
 - Migrations : `cd backend && uv run alembic upgrade head`

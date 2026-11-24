@@ -87,13 +87,6 @@ const CHAMPS_NOMMES: [string, keyof Valeurs][] = [
   ["email", "email"],
   ["téléphone", "telephone"],
   ["mot de passe", "motDePasse"],
-  // Les mêmes mots en anglais et en allemand (spec 052).
-  ["username", "identifiant"],
-  ["phone", "telephone"],
-  ["password", "motDePasse"],
-  ["benutzername", "identifiant"],
-  ["telefon", "telephone"],
-  ["passwort", "motDePasse"],
 ];
 
 // Le formulaire d'inscription d'un encadreur (spec 018) : le compte attend la vérification de l'équipe.
@@ -154,7 +147,8 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
         const message = e instanceof ErreurApi ? e.message : m.erreur_indisponible();
         // La saisie est gardée, sauf le mot de passe.
         form.resetField("motDePasse");
-        const champ = CHAMPS_NOMMES.find(([mot]) => message.toLowerCase().includes(mot));
+        const origine = e instanceof ErreurApi ? e.messageFrancais.toLowerCase() : "";
+        const champ = CHAMPS_NOMMES.find(([mot]) => origine.includes(mot));
         if (champ) form.setError(champ[1], { message }, { shouldFocus: true });
         else {
           setErreur(message);

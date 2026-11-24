@@ -3,6 +3,8 @@
 // pas être suivi. L'envoi n'attend rien et n'affiche jamais d'erreur : le suivi ne gêne pas la navigation.
 import { useEffect, useRef } from "react";
 
+import { pageSansLangue } from "./langues";
+
 export type TypeEvenement =
   "page_vue" | "clic_inscription" | "etape_inscription" | "recherche" | "erreur";
 
@@ -52,8 +54,12 @@ const ENDROITS_PAR_PAGE: [RegExp, string][] = [
   [/^\/bibliotheque/, "bibliotheque"],
 ];
 
-/** L'endroit d'où part un lien d'inscription : le menu, le pied de page, ou la page où il se trouve. */
-export function endroitDuClic(lien: Element, page: string): string {
+/**
+ * L'endroit d'où part un lien d'inscription : le menu, le pied de page, ou la page où il se trouve (`/en/jeux` compte
+ * comme `/jeux`, spec 052).
+ */
+export function endroitDuClic(lien: Element, adresse: string): string {
+  const page = pageSansLangue(adresse);
   // Le menu mobile s'ouvre dans un panneau (dialogue) hors de l'en-tête.
   if (lien.closest('[role="dialog"]')) return "menu-mobile";
   if (lien.closest("header")) return "menu";
@@ -66,7 +72,9 @@ export function lienInscription(cible: EventTarget | null): HTMLAnchorElement | 
   const lien = cible instanceof Element ? cible.closest("a[href]") : null;
   if (!(lien instanceof HTMLAnchorElement)) return null;
   const url = new URL(lien.href, window.location.href);
-  return url.origin === window.location.origin && url.pathname === "/inscription" ? lien : null;
+  return url.origin === window.location.origin && pageSansLangue(url.pathname) === "/inscription"
+    ? lien
+    : null;
 }
 
 // Pages vues ----------------------------------------------------------------------------------------------------
@@ -125,7 +133,7 @@ export function useRechercheSansResultat(texte: string, sansResultat: boolean): 
     const propre = texte.trim().toLowerCase();
     if (!sansResultat || propre.replace(/\s/g, "").length < 3 || dejaSignales.current.has(propre))
       return;
-    const page = window.location.pathname;
+    const page = pageSansLangue(window.location.pathname);
     if (page !== "/inscription" && page !== "/carte-des-clubs") return;
     const minuteur = setTimeout(() => {
       dejaSignales.current.add(propre);

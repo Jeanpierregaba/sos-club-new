@@ -14,6 +14,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { RetourEnHaut } from "@/components/RetourEnHaut";
 import { endroitDuClic, lienInscription, pageVue, signaler } from "@/lib/activite";
+import { origineDuSite } from "@/lib/origine";
 import { chargerAdminMoi, chargerEtatSite } from "@/lib/api/client";
 import {
   langueCourante,
@@ -122,10 +123,10 @@ export const Route = createRootRouteWithContext<{
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Club Santé" },
-      { name: "description", content: "Club Santé — jeunes en bonne santé" },
+      { name: "description", content: m.commun_description_defaut() },
       { name: "author", content: "Club Santé SOS Docteur TV" },
       { property: "og:title", content: "Club Santé" },
-      { property: "og:description", content: "Club Santé — jeunes en bonne santé" },
+      { property: "og:description", content: m.commun_description_defaut() },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -169,7 +170,7 @@ function RootShell({ children }: { children: ReactNode }) {
 /** Les versions de la page dans chaque langue, pour les moteurs de recherche (spec 052). */
 function VersionsDeLaPage() {
   const { pathname, searchStr } = useRouterState({ select: (etat) => etat.location });
-  return liensHreflang(pathname, searchStr).map((lien) => (
+  return liensHreflang(pathname, searchStr, origineDuSite()).map((lien) => (
     <link key={lien.hreflang} rel="alternate" hrefLang={lien.hreflang} href={lien.href} />
   ));
 }

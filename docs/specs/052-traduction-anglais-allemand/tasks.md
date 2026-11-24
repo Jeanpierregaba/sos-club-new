@@ -25,4 +25,5 @@ Ordre d'exécution. Chaque groupe de pages est livrable seul : une page pas enco
       téléphone (textes allemands longs), recherche de textes français restés en dur ; `AGENTS.md` (où sont les
       textes, ajouter une clé)
 - [ ] 11. Suite complète (lint, typecheck, Vitest, build), critères d'acceptation, relecture par le sous-agent
-      `reviewer`, `TASKS.md` ; relecture des traductions par l'équipe avant la fusion dans `main`
+      `reviewer`, `TASKS.md` ; relecture des traductions par l'équipe avant la fusion dans `main` — fait le 2026-11-24, sauf la relecture
+      par l'équipe

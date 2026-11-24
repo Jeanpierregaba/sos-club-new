@@ -43,6 +43,13 @@ describe("erreurs de l'API dans la langue de la page (spec 052)", () => {
     );
   });
 
+  it("garde le message français de l'API pour rattacher l'erreur à son champ, quelle que soit la langue", () => {
+    parler("de");
+    const erreur = new ErreurApi(409, "Ce pseudonyme est déjà pris.");
+    expect(erreur.message).not.toBe("Ce pseudonyme est déjà pris.");
+    expect(erreur.messageFrancais).toBe("Ce pseudonyme est déjà pris.");
+  });
+
   it("traduit par statut une limite ou une panne au message inconnu", () => {
     parler("de");
     expect(traduireErreur("Un message que le site ne connaît pas.", 429)).toBe(

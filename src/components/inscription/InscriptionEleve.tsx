@@ -86,12 +86,6 @@ const CHAMPS_NOMMES: [string, keyof Valeurs][] = [
   ["identifiant", "identifiant"],
   ["email", "email"],
   ["mot de passe", "motDePasse"],
-  // Les mêmes mots en anglais et en allemand (spec 052).
-  ["nickname", "pseudonyme"],
-  ["username", "identifiant"],
-  ["password", "motDePasse"],
-  ["benutzername", "identifiant"],
-  ["passwort", "motDePasse"],
 ];
 
 // Les étapes, pour rester lisible sur un téléphone : chaque « Suivant » ne valide que les champs affichés.
@@ -183,7 +177,8 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
         const message = e instanceof ErreurApi ? e.message : m.erreur_indisponible();
         // La saisie est gardée, sauf le mot de passe.
         form.resetField("motDePasse");
-        const champ = CHAMPS_NOMMES.find(([mot]) => message.toLowerCase().includes(mot));
+        const origine = e instanceof ErreurApi ? e.messageFrancais.toLowerCase() : "";
+        const champ = CHAMPS_NOMMES.find(([mot]) => origine.includes(mot));
         if (champ) {
           // Ces champs sont sur la première étape.
           setEtape(0);

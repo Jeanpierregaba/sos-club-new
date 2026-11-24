@@ -57,16 +57,13 @@ const schema = z.object({
 
 type Valeurs = z.infer<typeof schema>;
 
-// Les mots qui rattachent une erreur de l'API à son champ, dans les trois langues (spec 052).
+// Le champ d'une erreur de l'API, d'après un mot de son message français (spec 052 : la langue de la page n'y
+// change rien).
 const CHAMPS_NOMMES: [string, keyof Valeurs][] = [
   ["email", "email"],
   ["e-mail", "email"],
   ["téléphone", "telephone"],
-  ["phone", "telephone"],
-  ["telefon", "telephone"],
   ["mot de passe", "motDePasse"],
-  ["password", "motDePasse"],
-  ["passwort", "motDePasse"],
 ];
 
 // Le compte visiteur (spec 030) : un compte léger, confirmé par un code reçu par e-mail, pour jouer aux quiz.
@@ -122,7 +119,8 @@ export function InscriptionVisiteur() {
     } catch (e) {
       const message = e instanceof ErreurApi ? e.message : m.erreur_indisponible();
       form.resetField("motDePasse");
-      const champ = CHAMPS_NOMMES.find(([mot]) => message.toLowerCase().includes(mot));
+      const origine = e instanceof ErreurApi ? e.messageFrancais.toLowerCase() : "";
+      const champ = CHAMPS_NOMMES.find(([mot]) => origine.includes(mot));
       if (champ) form.setError(champ[1], { message }, { shouldFocus: true });
       else {
         setErreur(message);

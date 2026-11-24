@@ -1901,5 +1901,6 @@
   "enc_envoyer": "Envoyer ma demande",
   "enc_email_aide": "Tu y recevras la réponse de l'équipe.",
   "enc_region_dre": "Région (DRE)",
-  "enc_ville_lycee": "Ville du lycée"
+  "enc_ville_lycee": "Ville du lycée",
+  "commun_description_defaut": "Club Santé — jeunes en bonne santé"
 }

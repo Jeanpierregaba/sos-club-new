@@ -110,6 +110,8 @@ services:
     <<: [*journaux, *durci]
     environment:
       API_URL_INTERNE: http://${ENVIRONNEMENT}-api:8000
+      # Adresse publique du site : les liens hreflang doivent être complets (spec 052).
+      SITE_ORIGINE: ${SITE_ORIGINE:?}
     networks:
       web:
         aliases:

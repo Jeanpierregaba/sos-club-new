@@ -1901,5 +1901,6 @@
   "enc_envoyer": "Meine Anfrage senden",
   "enc_email_aide": "Dorthin bekommst du die Antwort des Teams.",
   "enc_region_dre": "Region (DRE)",
-  "enc_ville_lycee": "Ort der Schule"
+  "enc_ville_lycee": "Ort der Schule",
+  "commun_description_defaut": "Club Santé — gesunde junge Menschen"
 }

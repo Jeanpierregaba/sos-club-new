@@ -26,7 +26,17 @@ export function langueDeLAdresse(chemin: string): Langue {
 /** L'adresse sans son préfixe de langue. */
 export function pageSansLangue(chemin: string): string {
   const trouve = PREFIXE.exec(chemin);
-  return trouve ? trouve[2] || "/" : chemin;
+  return trouve ? "/" + (trouve[2] ?? "").replace(/^\/+/, "") : chemin;
+}
+
+/**
+ * `/en/jeux/` ou `/de/` : l'adresse sans la barre finale, que Paraglide ne reconnaîtrait pas (la page serait une
+ * 404). `null` pour toute autre adresse : le français accepte déjà la barre finale.
+ */
+export function sansBarreFinale(chemin: string): string | null {
+  const trouve = /^\/(en|de)(\/.*?)?\/+$/.exec(chemin);
+  if (!trouve) return null;
+  return `/${trouve[1]}${(trouve[2] ?? "").replace(/^\/+/, "/")}`;
 }
 
 const MOTIFS_TRADUITS = PAGES_TRADUITES.map(
@@ -56,21 +66,43 @@ export function redirectionLangue(
 ): string | null {
   const trouve = PREFIXE.exec(chemin);
   if (!trouve) return null;
-  const page = trouve[2] || "/";
+  // Plusieurs barres d'affilée (`/fr//site.com`) n'en font qu'une : jamais d'adresse vers un autre site.
+  const page = pageSansLangue(chemin);
   if (trouve[1] === LANGUE_DE_BASE) return page;
   return estTraduite(page) || !pageExiste(page) ? null : page;
 }
 
-/** Les versions d'une page traduite dans chaque langue, pour les moteurs de recherche (`hreflang`). */
+/**
+ * Le routeur a-t-il une page à cette adresse ? Il rapproche `/jeux/xyz` de `/jeux` en gardant le reste dans `**` :
+ * ce n'est pas une page qui existe.
+ */
+export function pageDuRouteur(
+  routeur: {
+    getMatchedRoutes: (chemin: string) => readonly [unknown, Record<string, string>, unknown];
+  },
+  chemin: string,
+): boolean {
+  const [, parametres, route] = routeur.getMatchedRoutes(chemin);
+  return route !== undefined && !parametres["**"];
+}
+
+/**
+ * Les versions d'une page traduite dans chaque langue, pour les moteurs de recherche (`hreflang`). Adresses
+ * complètes : les moteurs ignorent les adresses relatives.
+ */
 export function liensHreflang(
   page: string,
   recherche: string,
+  origine: string,
 ): { hreflang: string; href: string }[] {
   if (!estTraduite(page)) return [];
   const francais = page + recherche;
   return [
-    ...LANGUES.map((langue) => ({ hreflang: langue, href: localiser(francais, langue) })),
-    { hreflang: "x-default", href: francais },
+    ...LANGUES.map((langue) => ({
+      hreflang: langue,
+      href: origine + localiser(francais, langue),
+    })),
+    { hreflang: "x-default", href: origine + francais },
   ];
 }
 

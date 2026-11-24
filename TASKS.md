@@ -8,7 +8,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 
 ## En cours
 
-- [ ] [052 — Site en anglais et en allemand](docs/specs/052-traduction-anglais-allemand/spec.md) : spec, plan et tâches validés le 2026-11-24 ; implémentation en cours ([tâches](docs/specs/052-traduction-anglais-allemand/tasks.md))
+- [ ] [052 — Site en anglais et en allemand](docs/specs/052-traduction-anglais-allemand/spec.md) : implémentée et relue le 2026-11-24 ; reste la relecture des traductions par l'équipe avant la fusion dans `main`, et plus tard : traduire le test « Quel axe » de l'accueil (élève connecté) et la description d'une 404 sous `/en` ou `/de` ([tâches](docs/specs/052-traduction-anglais-allemand/tasks.md))
 - [ ] [049 — Ouverture au public : banque officielle, remise à zéro, 3 vies, favicon](docs/specs/049-ouverture-banque-officielle/spec.md) : implémentée, relue et fusionnée dans main le 2026-11-23 ; reste à lire le journal du déploiement de la prod ([tâches](docs/specs/049-ouverture-banque-officielle/tasks.md))
 - [ ] [048 — Vies quotidiennes et chrono de 15 secondes](docs/specs/048-vies-et-chrono-15s/spec.md) : tâches 1–3 faites le 2026-11-21 ; en cours : clôture (suite complète, relecture `reviewer`) ([tâches](docs/specs/048-vies-et-chrono-15s/tasks.md))
 - [ ] [046 — Temps passé sur les quiz et la certification d'un inscrit](docs/specs/046-temps-quiz-certification/spec.md) : implémentée et relue le 2026-11-20 ; reste la vérification au navigateur avec une connexion admin et le déploiement de la migration `e4a7c2d9b6f1` ([tâches](docs/specs/046-temps-quiz-certification/tasks.md))

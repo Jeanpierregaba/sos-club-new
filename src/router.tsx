@@ -1,12 +1,12 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
-import { REECRITURE_LANGUES } from "./lib/langues";
+import { pageDuRouteur, REECRITURE_LANGUES } from "./lib/langues";
 import { routeTree } from "./routeTree.gen";
 
 export const getRouter = () => {
   const queryClient = new QueryClient();
   // Spec 052 : `/en/<page non traduite>` renvoie vers la page française, `/en/<page inconnue>` est une 404.
-  const pageExiste = (chemin: string): boolean => router.getMatchedRoutes(chemin)[2] !== undefined;
+  const pageExiste = (chemin: string): boolean => pageDuRouteur(router, chemin);
 
   const router = createRouter({
     routeTree,

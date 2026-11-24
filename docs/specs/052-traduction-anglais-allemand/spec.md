@@ -23,7 +23,8 @@ seulement (décision de l'utilisateur, 2026-11-24). Le français reste la langue
    questions, livres de la bibliothèque) restent dans leur langue d'origine, le français. Une mention discrète le
    signale dans les pages qui en affichent (« Contenu disponible en français » / « Inhalt auf Französisch »).
 6. Les espaces connectés (élève, encadreur, président) et l'espace d'administration restent en français : depuis une
-   page `/en/...`, « Mon espace » ou « Se connecter » mène à la page française. Le sélecteur n'y est pas proposé.
+   page `/en/...`, « Mon espace » mène à la page française (la connexion, publique, reste en anglais). Le sélecteur n'y
+   est pas proposé.
 7. Les dates et les nombres suivent la langue : « 24 novembre 2026 », « November 24, 2026 », « 24. November 2026 ».
 8. Ton : le tutoiement du site devient « you » en anglais et « du » en allemand (registre informel, public jeune).
 9. Les traductions sont écrites par Claude puis relues par l'équipe ou un locuteur avant la mise en production ;
@@ -37,25 +38,25 @@ certificat, carte de classement partagée, page 404 et page d'erreur.
 
 ## Critères d'acceptation
 
-- [ ] Étant donné la page `/`, quand on choisit « EN », alors l'adresse devient `/en` et le titre principal, le menu
+- [x] Étant donné la page `/`, quand on choisit « EN », alors l'adresse devient `/en` et le titre principal, le menu
       et le pied de page sont en anglais ; avec « DE », `/de` en allemand ; avec « FR », retour à `/`.
-- [ ] Étant donné n'importe quelle page publique traduite, quand on change de langue, alors on reste sur la même page
+- [x] Étant donné n'importe quelle page publique traduite, quand on change de langue, alors on reste sur la même page
       (mêmes paramètres, par exemple `/en/articles/mon-article` ↔ `/de/articles/mon-article`).
-- [ ] Étant donné une page `/en/...`, alors `<html lang="en">` ; `/de/...` → `lang="de"` ; sans préfixe → `lang="fr"`.
-- [ ] Chaque page traduite déclare ses versions dans les trois langues (`hreflang` fr, en, de et `x-default` vers le
+- [x] Étant donné une page `/en/...`, alors `<html lang="en">` ; `/de/...` → `lang="de"` ; sans préfixe → `lang="fr"`.
+- [x] Chaque page traduite déclare ses versions dans les trois langues (`hreflang` fr, en, de et `x-default` vers le
       français) et a un titre et une description traduits.
-- [ ] Un test vérifie que chaque clé de texte existe en français, en anglais et en allemand (aucune clé manquante,
+- [x] Un test vérifie que chaque clé de texte existe en français, en anglais et en allemand (aucune clé manquante,
       aucune clé en trop).
-- [ ] Étant donné une page `/en/...`, alors chaque lien interne vers une page traduite garde le préfixe `/en`, et
+- [x] Étant donné une page `/en/...`, alors chaque lien interne vers une page traduite garde le préfixe `/en`, et
       chaque lien vers un espace connecté ou l'admin pointe vers l'adresse française.
-- [ ] Étant donné l'inscription ou la connexion en anglais, quand une erreur survient (champ manquant, identifiants
+- [x] Étant donné l'inscription ou la connexion en anglais, quand une erreur survient (champ manquant, identifiants
       faux, trop de tentatives, réseau coupé), alors le message est en anglais.
-- [ ] Étant donné une date affichée sur une page traduite, alors elle est écrite selon la langue de la page.
-- [ ] Une adresse `/en/<page non traduite>` (par exemple `/en/mon-espace`) redirige vers la page française,
+- [x] Étant donné une date affichée sur une page traduite, alors elle est écrite selon la langue de la page.
+- [x] Une adresse `/en/<page non traduite>` (par exemple `/en/mon-espace`) redirige vers la page française,
       `/en/<page inconnue>` affiche la 404 en anglais.
-- [ ] Le suivi d'activité (spec 051) compte une page vue sous le même gabarit quelle que soit la langue
+- [x] Le suivi d'activité (spec 051) compte une page vue sous le même gabarit quelle que soit la langue
       (`/en/jeux` et `/jeux` comptent pour `/jeux`).
-- [ ] Les pages et parcours existants en français ne changent pas (tests existants verts, adresses inchangées).
+- [x] Les pages et parcours existants en français ne changent pas (tests existants verts, adresses inchangées).
 
 ## Cas limites et erreurs
 
@@ -68,6 +69,11 @@ certificat, carte de classement partagée, page 404 et page d'erreur.
 - Liens partagés existants (sans préfixe) : inchangés, toujours en français.
 - Élève connecté qui navigue sur `/en/...` : les pages publiques sont en anglais, son espace reste en français.
 - Page servie pendant la maintenance : la page de maintenance reste en français (hors périmètre).
+- Barre oblique finale (`/en/jeux/`, `/de/`) : renvoi vers l'adresse sans la barre, pas de 404.
+- Sous-adresse inconnue d'une page traduite (`/en/jeux/xyz`) : 404 dans la langue du préfixe.
+- Test « Quel axe » de l'accueil, réservé à un élève connecté : contenu de l'espace élève, il reste en français
+  (traduction à faire plus tard, voir `TASKS.md`).
+- Description d'une 404 sous `/en` ou `/de` : celle du site, en français (la page elle-même est traduite).
 - Contenus avec nom d'élève : aucun changement des règles de `docs/RULES.md` (pseudonyme et club seulement).
 
 ## Hors périmètre

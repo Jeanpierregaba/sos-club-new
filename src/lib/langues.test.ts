@@ -7,6 +7,7 @@ import {
   localiser,
   pageSansLangue,
   redirectionLangue as rediriger,
+  sansBarreFinale,
 } from "./langues";
 
 describe("adresses des langues (spec 052)", () => {
@@ -73,21 +74,61 @@ describe("adresses des langues (spec 052)", () => {
     expect(redirectionLangue("/es/jeux")).toBeNull();
     // Une page inconnue sous un préfixe reste une 404, dans la langue du préfixe.
     expect(redirectionLangue("/en/page-inconnue")).toBeNull();
+    // Plusieurs barres d'affilée n'ouvrent jamais un autre site.
+    expect(redirectionLangue("/fr//site.com")).toBe("/site.com");
+    expect(redirectionLangue("/en//site.com/x")).toBe("/site.com/x");
+  });
+
+  it("retire la barre finale d'une adresse anglaise ou allemande, que Paraglide ne reconnaîtrait pas", () => {
+    expect(sansBarreFinale("/en/")).toBe("/en");
+    expect(sansBarreFinale("/de/jeux/")).toBe("/de/jeux");
+    expect(sansBarreFinale("/en/articles/mon-article//")).toBe("/en/articles/mon-article");
+    expect(sansBarreFinale("/en//jeux/")).toBe("/en/jeux");
+    expect(sansBarreFinale("/en/jeux")).toBeNull();
+    expect(sansBarreFinale("/jeux/")).toBeNull();
+    expect(sansBarreFinale("/english/")).toBeNull();
+    expect(sansBarreFinale("/")).toBeNull();
   });
 
   it("déclare les trois versions d'une page traduite, et aucune pour une page française seulement", () => {
-    expect(liensHreflang("/articles/mon-article", "?page=2")).toEqual([
-      { hreflang: "fr", href: "/articles/mon-article?page=2" },
-      { hreflang: "en", href: "/en/articles/mon-article?page=2" },
-      { hreflang: "de", href: "/de/articles/mon-article?page=2" },
-      { hreflang: "x-default", href: "/articles/mon-article?page=2" },
+    const site = "https://club.example";
+    expect(liensHreflang("/articles/mon-article", "?page=2", site)).toEqual([
+      { hreflang: "fr", href: "https://club.example/articles/mon-article?page=2" },
+      { hreflang: "en", href: "https://club.example/en/articles/mon-article?page=2" },
+      { hreflang: "de", href: "https://club.example/de/articles/mon-article?page=2" },
+      { hreflang: "x-default", href: "https://club.example/articles/mon-article?page=2" },
     ]);
-    expect(liensHreflang("/", "")).toContainEqual({ hreflang: "en", href: "/en" });
-    expect(liensHreflang("/mon-espace", "")).toEqual([]);
+    expect(liensHreflang("/", "", site)).toContainEqual({
+      hreflang: "en",
+      href: "https://club.example/en",
+    });
+    expect(liensHreflang("/mon-espace", "", site)).toEqual([]);
   });
 });
 
 describe("routeur et suivi d'activité (spec 051)", () => {
+  it("ne prend pas une sous-adresse inconnue d'une page pour cette page (sa 404 garde la langue)", async () => {
+    const { createMemoryHistory, createRootRoute, createRoute, createRouter } =
+      await import("@tanstack/react-router");
+    const { pageDuRouteur } = await import("./langues");
+    const racine = createRootRoute();
+    const jeux = createRoute({ getParentRoute: () => racine, path: "/jeux" });
+    const espace = createRoute({ getParentRoute: () => racine, path: "/mon-espace" });
+    const article = createRoute({ getParentRoute: () => racine, path: "/articles/$adresse" });
+    const routeur = createRouter({
+      routeTree: racine.addChildren([jeux, espace, article]),
+      history: createMemoryHistory({ initialEntries: ["/"] }),
+    });
+    expect(pageDuRouteur(routeur, "/jeux")).toBe(true);
+    expect(pageDuRouteur(routeur, "/mon-espace")).toBe(true);
+    expect(pageDuRouteur(routeur, "/articles/mon-article")).toBe(true);
+    expect(pageDuRouteur(routeur, "/jeux/xyz")).toBe(false);
+    expect(pageDuRouteur(routeur, "/articles/a/b")).toBe(false);
+    expect(pageDuRouteur(routeur, "/page-inconnue")).toBe(false);
+    // Avec le vrai routeur : `/en/jeux/xyz` n'est pas renvoyé vers le français.
+    expect(rediriger("/en/jeux/xyz", (page) => pageDuRouteur(routeur, page))).toBeNull();
+  });
+
   it("une page ouverte en allemand se résout sur le gabarit français, que le suivi compte tel quel", async () => {
     const { createMemoryHistory, createRootRoute, createRoute, createRouter } =
       await import("@tanstack/react-router");

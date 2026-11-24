@@ -122,7 +122,10 @@ describe("clics « S'inscrire »", () => {
     expect(
       lienInscription(lien('<a href="/inscription?profil=eleve"><span>Go</span></a>')),
     ).not.toBeNull();
+    expect(lienInscription(lien('<a href="/en/inscription">Sign up</a>'))).not.toBeNull();
+    expect(lienInscription(lien('<a href="/de/inscription?profil=eleve">Los</a>'))).not.toBeNull();
     expect(lienInscription(lien('<a href="/genie-imhotep/inscription">Go</a>'))).toBeNull();
+    expect(lienInscription(lien('<a href="/en/genie-imhotep/inscription">Go</a>'))).toBeNull();
     expect(lienInscription(lien('<a href="https://ailleurs.tg/inscription">Go</a>'))).toBeNull();
   });
 
@@ -139,5 +142,8 @@ describe("clics « S'inscrire »", () => {
     ).toBe("menu-mobile");
     expect(endroitDuClic(lien('<a href="/inscription">x</a>'), "/quiz/abc")).toBe("quiz");
     expect(endroitDuClic(lien('<a href="/inscription">x</a>'), "/charte")).toBe("autre");
+    // En anglais et en allemand, la page sans son préfixe (spec 052).
+    expect(endroitDuClic(lien('<a href="/en/inscription">x</a>'), "/en/jeux")).toBe("jeux");
+    expect(endroitDuClic(lien('<a href="/de/inscription">x</a>'), "/de")).toBe("accueil");
   });
 });

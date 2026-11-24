@@ -214,6 +214,9 @@ export const MESSAGE_INDISPONIBLE =
   "Connexion impossible pour le moment. Réessaie dans quelques instants.";
 
 export class ErreurApi extends Error {
+  /** Le message tel que l'API l'a écrit, en français : pour reconnaître une erreur sans dépendre de la langue. */
+  readonly messageFrancais: string;
+
   constructor(
     readonly statut: number,
     message: string,
@@ -223,6 +226,7 @@ export class ErreurApi extends Error {
   ) {
     // L'API répond en français ; sur une page en anglais ou en allemand, le message suit la langue (spec 052).
     super(traduireErreur(message, statut));
+    this.messageFrancais = message;
     this.name = "ErreurApi";
   }
 }
