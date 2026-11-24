@@ -1,3 +1,4 @@
+import { m } from "@/paraglide/messages.js";
 import type { NiveauJeux } from "@/lib/bareme";
 
 // Catalogue des 100 quiz Jeux de la banque officielle des Clubs Santé (spec 050), dans les 4 parties du document.
@@ -174,3 +175,29 @@ export const poles: Pole[] = [
 export const niveauParNumero: Map<number, NiveauJeux> = new Map(
   poles.flatMap((p) => p.quiz.map((q) => [q.n, q.niveau] as const)),
 );
+
+// Les textes d'une partie dans la langue de la page (spec 052). Des fonctions : la langue n'est connue qu'au rendu.
+const MESSAGES_PARTIE: Record<string, string> = {
+  "sante-publique": "partie_sante_publique",
+  "sante-sexuelle-reproductive": "partie_sante_sexuelle",
+  "journees-mondiales": "partie_journees",
+  evss: "partie_evss",
+};
+
+export function textePole(pole: Pole): { nom: string; sur: string; d: string; themes: string[] } {
+  const prefixe = MESSAGES_PARTIE[pole.id];
+  if (!prefixe) return pole;
+  const texte = (champ: string) => (m[`${prefixe}_${champ}` as keyof typeof m] as () => string)();
+  return {
+    nom: texte("nom"),
+    sur: texte("sur"),
+    d: texte("texte"),
+    themes: texte("themes").split("|"),
+  };
+}
+
+/** « Santé publique — quiz 3 » dans la langue de la page : le titre suit toujours ce modèle. */
+export function titreQuiz(pole: Pole, titre: string): string {
+  const numero = /quiz (\d+)$/.exec(titre)?.[1];
+  return numero ? m.jeux_quiz_titre({ partie: textePole(pole).nom, numero }) : titre;
+}

@@ -24,8 +24,16 @@ import {
   type PeriodeClassement,
 } from "@/lib/api/client";
 import { useMoi } from "@/hooks/use-moi";
-import { CATEGORIES, estCategorie, estPeriode, PERIODES, sousTitre } from "@/lib/classements";
+import {
+  categoriesTraduites,
+  estCategorie,
+  estPeriode,
+  formaterPoints,
+  periodesTraduites,
+  sousTitre,
+} from "@/lib/classements";
 import { dateCourte } from "@/lib/dates";
+import { m } from "@/paraglide/messages.js";
 import mascottesTrophees from "@/assets/mascottes-trophees.webp";
 
 const PAR_PAGE = 50;
@@ -74,23 +82,25 @@ export const Route = createFileRoute("/hall-of-fame")({
   },
   head: () => ({
     meta: [
-      { title: "Classements — Club Santé SOS Docteur TV" },
-      {
-        name: "description",
-        content:
-          "Les classements des élèves, des encadreurs et des Clubs Santé, au niveau national et par DRE, pour le semestre en cours et depuis le début.",
-      },
-      { property: "og:title", content: "Les classements des Clubs Santé" },
+      { title: m.classement_meta_titre() },
+      { name: "description", content: m.classement_meta_description() },
+      { property: "og:title", content: m.classement_meta_og() },
     ],
   }),
   errorComponent: ServiceIndisponible,
   component: HallOfFame,
 });
 
-const MESSAGES_VIDES: Record<CategorieClassement, string> = {
-  eleves: "Aucun élève n'a encore de points sur cette période.",
-  encadreurs: "Aucun encadreur n'a encore de points sur cette période.",
-  clubs: "Aucun Club Santé n'a encore de points sur cette période.",
+const MESSAGES_VIDES: Record<CategorieClassement, () => string> = {
+  eleves: m.classement_vide_eleves,
+  encadreurs: m.classement_vide_encadreurs,
+  clubs: m.classement_vide_clubs,
+};
+
+const LIBELLES_LISTES: Record<CategorieClassement, () => string> = {
+  eleves: m.classement_liste_eleves,
+  encadreurs: m.classement_liste_encadreurs,
+  clubs: m.classement_liste_clubs,
 };
 
 function HallOfFame() {
@@ -143,26 +153,28 @@ function HallOfFame() {
         <DecorAnime ton="clair" />
         <div className="mx-auto grid max-w-7xl items-end gap-8 px-4 pt-8 sm:px-5 md:pt-12 lg:grid-cols-[1.2fr_1fr]">
           <div className="pb-12 lg:pb-20">
-            <FilAriane rubrique="Gamification" page="Classements" />
+            <FilAriane rubrique={m.menu_gamification()} page={m.menu_classements()} />
             <div data-reveal="left" className="pt-10">
               <p className="flex items-center gap-3 text-sm font-extrabold uppercase tracking-widest text-logo-red">
                 <span className="h-1 w-8 rounded-full bg-primary" />
-                Hall of Fame des Clubs Santé
+                {m.classement_surtitre()}
               </p>
               <h1 className="mt-4 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block text-logo-blue">Les classements</span>
-                <span className="block text-primary">du réseau</span>
+                <span className="block text-logo-blue">{m.classement_titre_1()}</span>
+                <span className="block text-primary">{m.classement_titre_2()}</span>
               </h1>
               <p className="mt-6 max-w-2xl text-lg font-medium text-ink/75">
-                Élèves, encadreurs et Clubs Santé, au niveau national ou dans ta DRE. Chaque point
-                vient d'une action vérifiée : quiz réussis, articles publiés, commentaires
-                approuvés.
+                {m.classement_intro()}
               </p>
               <p className="mt-4 flex items-center gap-2 text-sm font-bold text-logo-blue">
                 <CalendarRange aria-hidden className="size-4" />
                 {classement.semestre
-                  ? `${classement.semestre.libelle}, du ${dateCourte(classement.semestre.debut)} au ${dateCourte(classement.semestre.fin)}`
-                  : "Aucun semestre en cours"}
+                  ? m.classement_semestre_dates({
+                      libelle: classement.semestre.libelle,
+                      debut: dateCourte(classement.semestre.debut),
+                      fin: dateCourte(classement.semestre.fin),
+                    })
+                  : m.classement_aucun_semestre()}
               </p>
               <PartagerSiConnecte />
             </div>
@@ -174,26 +186,26 @@ function HallOfFame() {
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-10 sm:px-5">
         <div className="space-y-3 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-border sm:p-5">
           <Choix
-            libelle="Catégorie"
-            options={CATEGORIES}
+            libelle={m.classement_categorie()}
+            options={categoriesTraduites()}
             valeur={categorie}
             choisir={(valeur) => filtrer({ categorie: valeur })}
           />
           <div className="flex flex-wrap items-center gap-3">
             <Choix
-              libelle="Période"
-              options={PERIODES}
+              libelle={m.classement_periode()}
+              options={periodesTraduites()}
               valeur={periode}
               choisir={(valeur) => filtrer({ periode: valeur })}
             />
             <label className="flex min-w-0 items-center gap-2 text-sm font-bold text-ink">
-              Niveau
+              {m.classement_niveau()}
               <select
                 value={recherche.dre ?? ""}
                 onChange={(evenement) => filtrer({ dre: evenement.target.value })}
                 className="min-w-0 rounded-full border bg-white px-4 py-2 font-semibold"
               >
-                <option value="">National</option>
+                <option value="">{m.classement_national()}</option>
                 {dres.map((dre) => (
                   <option key={dre.code} value={dre.code}>
                     DRE {dre.nom}
@@ -206,28 +218,26 @@ function HallOfFame() {
 
         {sansSemestre ? (
           <div className="rounded-3xl border border-dashed p-8 text-center">
-            <p className="font-display text-2xl text-logo-blue">Aucun semestre en cours</p>
-            <p className="mt-2 font-semibold text-muted-foreground">
-              Le classement du semestre reprendra à l'ouverture du prochain semestre.
-            </p>
+            <p className="font-display text-2xl text-logo-blue">{m.classement_aucun_semestre()}</p>
+            <p className="mt-2 font-semibold text-muted-foreground">{m.classement_reprise()}</p>
             <button
               type="button"
               onClick={() => filtrer({ periode: "historique" })}
               className="mt-4 font-bold text-primary underline-offset-4 hover:underline"
             >
-              Voir le total historique
+              {m.classement_voir_historique()}
             </button>
           </div>
         ) : lignes.length === 0 ? (
           <div className="rounded-3xl border border-dashed p-8 text-center font-semibold text-muted-foreground">
-            <p>{page > 1 ? "Cette page est vide." : MESSAGES_VIDES[categorie]}</p>
+            <p>{page > 1 ? m.classement_page_vide() : MESSAGES_VIDES[categorie]()}</p>
             {page > 1 && (
               <button
                 type="button"
                 onClick={() => filtrer({ page: 1 })}
                 className="mt-3 font-bold text-primary underline-offset-4 hover:underline"
               >
-                Revenir à la première page
+                {m.classement_premiere_page()}
               </button>
             )}
           </div>
@@ -235,7 +245,7 @@ function HallOfFame() {
           <>
             {page === 1 && <Podium lignes={lignes.slice(0, 3)} />}
             <ListeClassement
-              libelle={`Classement des ${CATEGORIES.find((c) => c.valeur === categorie)?.libelle.toLowerCase()}`}
+              libelle={LIBELLES_LISTES[categorie]()}
               lignes={page === 1 ? lignes.slice(3) : lignes}
             />
             <Pagination
@@ -252,13 +262,13 @@ function HallOfFame() {
         <aside className="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-logo-blue p-6 text-white">
           <p className="flex items-center gap-3 font-bold">
             <Trophy aria-hidden className="size-6 text-sun" />
-            Les lauréats du championnat Génie Imhotep ont leur propre Hall of Fame.
+            {m.classement_genie_texte()}
           </p>
           <Link
             to="/genie-imhotep/hall-of-fame"
             className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 font-bold text-logo-blue"
           >
-            Hall of Fame du Génie Imhotep <ArrowRight className="size-4" />
+            {m.classement_genie_lien()} <ArrowRight className="size-4" />
           </Link>
         </aside>
       </main>
@@ -291,12 +301,15 @@ function PodiumHero({ lignes }: { lignes: LigneHero[] }) {
     <div data-reveal="right" className="relative mx-auto w-full max-w-xs self-end sm:max-w-md">
       <img
         src={mascottesTrophees}
-        alt="Les mascottes des Clubs Santé, trophées en main"
+        alt={m.classement_mascottes_alt()}
         width={1122}
         height={1402}
         className="relative z-10 mx-auto -mb-6 w-3/4 drop-shadow-2xl"
       />
-      <ol className="relative z-20 grid grid-cols-3 items-end gap-2" aria-label="Le podium">
+      <ol
+        className="relative z-20 grid grid-cols-3 items-end gap-2"
+        aria-label={m.classement_podium()}
+      >
         {MARCHES.map(({ place, hauteur, fond }) => {
           const ligne = lignes[place];
           return (
@@ -307,7 +320,7 @@ function PodiumHero({ lignes }: { lignes: LigneHero[] }) {
                     {ligne.nom}
                   </span>
                   <span className="block text-xs font-bold text-logo-blue">
-                    {ligne.points.toLocaleString("fr-FR")} pts
+                    {m.jeux_pts({ points: formaterPoints(ligne.points) })}
                   </span>
                 </p>
               )}

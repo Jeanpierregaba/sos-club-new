@@ -3,13 +3,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Verifier } from "@/components/cartes/Verifier";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { m } from "@/paraglide/messages.js";
 
 // Vérification publique d'une carte numérique (spec 040), ouverte par son QR code. Elle est faite par le navigateur,
 // pas au rendu serveur : la limite par adresse IP de l'API doit voir l'adresse du visiteur, pas celle du site.
 export const Route = createFileRoute("/carte/$code")({
   head: () => ({
     meta: [
-      { title: "Vérifier une carte — Club Santé SOS Docteur TV" },
+      { title: m.carte_meta_titre() },
       { name: "robots", content: "noindex" },
       { name: "referrer", content: "no-referrer" },
     ],
@@ -29,8 +30,8 @@ function PageVerification() {
             Clubs Santé SOS Docteur TV
           </p>
           <h1 className="mt-3 text-4xl leading-tight md:text-5xl">
-            <span className="text-logo-blue">Vérifier une</span>{" "}
-            <span className="text-primary">carte</span>
+            <span className="text-logo-blue">{m.carte_titre_1()}</span>{" "}
+            <span className="text-primary">{m.carte_titre_2()}</span>
           </h1>
         </header>
         <div className="mt-8">

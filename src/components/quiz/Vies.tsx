@@ -1,7 +1,9 @@
 import { Heart } from "lucide-react";
 
 import type { Vies as ViesDuJour } from "@/lib/api/client";
+import { auSingulier } from "@/lib/langues";
 import { messagePlusDeVies } from "@/lib/vies";
+import { m } from "@/paraglide/messages.js";
 
 // Les vies du jour (spec 048, spec 049) : 3 cœurs, communs aux quiz des jeux et à la certification. Un cœur plein par vie
 // restante ; une vie perdue (partie ratée) ou réservée (partie en cours) est un cœur vide. L'API arbitre : ce
@@ -38,7 +40,10 @@ export function Vies({
           ))}
         </p>
         <p className={`text-sm font-bold ${texte}`}>
-          {vies.restantes} vie{vies.restantes > 1 ? "s" : ""} sur {vies.total} aujourd'hui
+          {(auSingulier(vies.restantes) ? m.vies_compte_un : m.vies_compte)({
+            restantes: String(vies.restantes),
+            total: String(vies.total),
+          })}
         </p>
       </div>
       {vies.restantes === 0 ? (
@@ -47,8 +52,7 @@ export function Vies({
         </p>
       ) : (
         <p className={`text-xs font-medium ${clair ? "text-white/75" : "text-muted-foreground"}`}>
-          Une partie ratée coûte une vie, une partie réussie ne coûte rien. Jeux et certification
-          partagent les mêmes vies.
+          {m.vies_regle()}
         </p>
       )}
     </div>

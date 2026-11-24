@@ -11,7 +11,15 @@ import { Input } from "@/components/ui/input";
 import { ErreurApi, verifierCertificat, type VerificationCertificat } from "@/lib/api/client";
 import { ETATS_CERTIFICAT, nomPublicEncadreur } from "@/lib/certification";
 import { dateCourte } from "@/lib/dates";
-import { libelleFonction } from "@/lib/fonctions";
+import { nomFonction } from "@/lib/fonctions";
+import { lien } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
+
+const ETATS_TRADUITS = {
+  valide: m.certificat_etat_valide,
+  revoque: m.certificat_etat_revoque,
+  remplace: m.certificat_etat_remplace,
+};
 
 // Vérification publique d'un certificat Génie Imhotep (spec 029), ouverte par le QR code du PDF. Elle dit si le
 // certificat est valide et à qui il revient, sans jamais montrer le nom complet d'un élève (RULES).
@@ -27,10 +35,7 @@ export const Route = createFileRoute("/certificats/$numero")({
     }
   },
   head: () => ({
-    meta: [
-      { title: "Vérifier un certificat Génie Imhotep — Club Santé SOS Docteur TV" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: m.certificat_meta_titre() }, { name: "robots", content: "noindex" }],
   }),
   errorComponent: ServiceIndisponible,
   component: VerifierCertificat,
@@ -40,7 +45,7 @@ function Titulaire({ titulaire }: { titulaire: VerificationCertificat["titulaire
   if (titulaire.type === "eleve") {
     return (
       <>
-        <dt className="text-sm text-muted-foreground">Élève</dt>
+        <dt className="text-sm text-muted-foreground">{m.certificat_eleve()}</dt>
         <dd className="font-bold text-ink">
           {titulaire.pseudonyme}
           {titulaire.club && (
@@ -54,11 +59,11 @@ function Titulaire({ titulaire }: { titulaire: VerificationCertificat["titulaire
   }
   return (
     <>
-      <dt className="text-sm text-muted-foreground">Encadreur</dt>
+      <dt className="text-sm text-muted-foreground">{m.certificat_encadreur()}</dt>
       <dd className="font-bold text-ink">
         {nomPublicEncadreur(titulaire.prenom, titulaire.initiale)}
         <span className="block text-sm font-semibold text-muted-foreground">
-          {libelleFonction(titulaire.fonction)}
+          {nomFonction(titulaire.fonction)}
         </span>
       </dd>
     </>
@@ -81,40 +86,40 @@ function Resultat({ verification }: { verification: VerificationCertificat }) {
         />
         <span className="font-display text-2xl text-ink sm:text-3xl">
           {valide
-            ? "Certificat valide"
+            ? m.certificat_valide()
             : verification.etat === "revoque"
-              ? "Certificat révoqué"
-              : "Certificat remplacé"}
+              ? m.certificat_revoque()
+              : m.certificat_remplace()}
         </span>
         <span className={`rounded-full px-3 py-1 text-xs font-bold ${etat.classe}`}>
-          {etat.libelle}
+          {ETATS_TRADUITS[verification.etat]()}
         </span>
       </p>
       <p className="mt-3 text-muted-foreground">
         {valide
-          ? "Ce certificat Génie Imhotep a bien été délivré par la plateforme des Clubs Santé."
+          ? m.certificat_valide_texte()
           : verification.etat === "revoque"
-            ? "Ce certificat a été retiré par l'équipe nationale : il n'atteste plus rien."
-            : "Ce certificat a été remplacé par un nouveau numéro, qui seul fait foi."}
+            ? m.certificat_revoque_texte()
+            : m.certificat_remplace_texte()}
       </p>
       <dl className="mt-6 grid gap-4 sm:grid-cols-3">
         <div>
           <Titulaire titulaire={verification.titulaire} />
         </div>
         <div>
-          <dt className="text-sm text-muted-foreground">Délivré le</dt>
+          <dt className="text-sm text-muted-foreground">{m.certificat_delivre_le()}</dt>
           <dd className="font-bold text-ink">{dateCourte(verification.delivre_le)}</dd>
         </div>
         <div>
-          <dt className="text-sm text-muted-foreground">Numéro</dt>
+          <dt className="text-sm text-muted-foreground">{m.certificat_numero()}</dt>
           <dd className="break-all font-mono font-bold text-ink">{verification.numero}</dd>
         </div>
       </dl>
       {verification.remplace_par && (
         <p className="mt-6 text-sm">
-          Nouveau numéro :{" "}
+          {m.certificat_nouveau_numero()}{" "}
           <a
-            href={`/certificats/${verification.remplace_par}`}
+            href={lien(`/certificats/${verification.remplace_par}`)}
             className="font-mono font-bold text-logo-blue hover:underline"
           >
             {verification.remplace_par}
@@ -141,15 +146,15 @@ function VerifierCertificat() {
     <div className="min-h-screen overflow-x-clip bg-carnet text-ink">
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-4 pb-20 pt-8 sm:px-5">
-        <FilAriane rubrique="Gamification" page="Vérifier un certificat" />
+        <FilAriane rubrique={m.menu_gamification()} page={m.certificat_fil()} />
         <header className="pt-8">
           <p className="flex items-center gap-3 text-sm font-extrabold uppercase tracking-widest text-logo-red">
             <span className="h-1 w-8 rounded-full bg-primary" />
-            Certification Génie Imhotep
+            {m.certificat_surtitre()}
           </p>
           <h1 className="mt-3 text-4xl leading-tight md:text-5xl">
-            <span className="text-logo-blue">Vérifier un</span>{" "}
-            <span className="text-primary">certificat</span>
+            <span className="text-logo-blue">{m.certificat_titre_1()}</span>{" "}
+            <span className="text-primary">{m.certificat_titre_2()}</span>
           </h1>
         </header>
 
@@ -163,18 +168,17 @@ function VerifierCertificat() {
             >
               <p className="flex items-center gap-3 font-display text-2xl text-ink">
                 <ShieldAlert aria-hidden className="size-9 shrink-0 text-logo-red" />
-                Certificat introuvable
+                {m.certificat_introuvable()}
               </p>
               <p className="mt-3 break-words text-muted-foreground">
-                Aucun certificat ne porte le numéro « {numero} ». Vérifie qu'il est bien recopié (il
-                commence par GI-).
+                {m.certificat_introuvable_texte({ numero })}
               </p>
             </section>
           )}
 
           <form onSubmit={chercher} className="rounded-3xl bg-card p-5 shadow-card sm:p-6">
             <label htmlFor="numero" className="font-bold text-ink">
-              Vérifier un autre numéro
+              {m.certificat_autre()}
             </label>
             <div className="mt-2 flex flex-col gap-2 sm:flex-row">
               <Input
@@ -186,7 +190,7 @@ function VerifierCertificat() {
                 className="h-11 rounded-full font-mono"
               />
               <Button type="submit" className="h-11 rounded-full px-6 font-bold">
-                <Search className="size-4" /> Vérifier
+                <Search className="size-4" /> {m.certificat_verifier()}
               </Button>
             </div>
           </form>

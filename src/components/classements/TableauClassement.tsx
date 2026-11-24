@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { formaterPoints, formaterRang, nombreDePages } from "@/lib/classements";
+import { formatDeLaLangue } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 // Une ligne affichable : un élève, un encadreur ou un club. Le sous-titre porte le club ou l'établissement, et la
 // DRE ; aucune donnée personnelle n'arrive ici sans être déjà publique (spec 036).
@@ -25,7 +27,7 @@ const COULEURS_PODIUM = [
 export function Podium({ lignes }: { lignes: LigneAffichee[] }) {
   if (lignes.length === 0) return null;
   return (
-    <ol aria-label="Les trois premiers" className="grid gap-3 sm:grid-cols-3">
+    <ol aria-label={m.classement_trois_premiers()} className="grid gap-3 sm:grid-cols-3">
       {lignes.map((ligne) => (
         <li
           key={ligne.cle}
@@ -37,7 +39,8 @@ export function Podium({ lignes }: { lignes: LigneAffichee[] }) {
           <p className="mt-2 break-words font-display text-2xl text-ink">{ligne.nom}</p>
           <p className="mt-1 text-sm font-semibold text-muted-foreground">{ligne.sousTitre}</p>
           <p className="mt-3 font-display text-3xl text-primary">
-            {formaterPoints(ligne.points)} <span className="text-base text-ink/60">pts</span>
+            {formaterPoints(ligne.points)}{" "}
+            <span className="text-base text-ink/60">{m.certif_pts()}</span>
           </p>
         </li>
       ))}
@@ -65,7 +68,7 @@ export function ListeClassement({ lignes, libelle }: { lignes: LigneAffichee[]; 
               {ligne.nom}
               {ligne.estMoi && (
                 <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs font-extrabold text-white">
-                  Toi
+                  {m.classement_toi()}
                 </span>
               )}
             </p>
@@ -76,7 +79,7 @@ export function ListeClassement({ lignes, libelle }: { lignes: LigneAffichee[]; 
             )}
           </div>
           <span className="shrink-0 font-extrabold text-ink">
-            {formaterPoints(ligne.points)} pts
+            {m.jeux_pts({ points: formaterPoints(ligne.points) })}
           </span>
           {ligne.action}
         </li>
@@ -100,7 +103,7 @@ export function Pagination({
   if (pages <= 1) return null;
   return (
     <nav
-      aria-label="Pages du classement"
+      aria-label={m.classement_pages()}
       className="flex flex-wrap items-center justify-between gap-3"
     >
       <Button
@@ -109,10 +112,14 @@ export function Pagination({
         disabled={page <= 1}
         onClick={() => allerA(page - 1)}
       >
-        <ChevronLeft className="size-4" /> Précédents
+        <ChevronLeft className="size-4" /> {m.classement_precedents()}
       </Button>
       <p className="text-sm font-semibold text-muted-foreground">
-        Page {page} sur {pages} · {total.toLocaleString("fr-FR")} classés
+        {m.classement_page_sur({
+          page: String(page),
+          pages: String(pages),
+          total: total.toLocaleString(formatDeLaLangue()),
+        })}
       </p>
       <Button
         variant="outline"
@@ -120,7 +127,7 @@ export function Pagination({
         disabled={page >= pages}
         onClick={() => allerA(page + 1)}
       >
-        Suivants <ChevronRight className="size-4" />
+        {m.classement_suivants()} <ChevronRight className="size-4" />
       </Button>
     </nav>
   );

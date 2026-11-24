@@ -1,18 +1,15 @@
 import { Award } from "lucide-react";
 
 import type { PalmaresPublic } from "@/lib/api/client";
-import { formaterPoints } from "@/lib/classements";
+import { formaterPoints, regleExAequo } from "@/lib/classements";
 import { dateCourte } from "@/lib/dates";
+import { m } from "@/paraglide/messages.js";
 
 const COULEURS = [
   "bg-sun/30 ring-sun",
   "bg-mist-soft ring-border",
   "bg-[color-mix(in_oklch,var(--tangerine)_18%,white)] ring-tangerine/40",
 ];
-
-// La règle d'égalité publiée (spec 037) : elle s'affiche avec le palmarès, comme le demande le cahier des charges.
-export const REGLE_EX_AEQUO =
-  "À égalité de points, passe devant l'élève dont le total n'a plus bougé depuis le plus longtemps (date de sa dernière ligne de points du semestre, gain, correction ou annulation) ; à la même seconde, l'ordre alphabétique du nom de joueur décide.";
 
 // Le palmarès des semestres clôturés (spec 037) : Grand Champion, Vice-Champion et Jeune Talent, par leur nom de
 // joueur, leur club et leur DRE. Rien d'autre n'est public.
@@ -24,19 +21,18 @@ export function Palmares({ palmares }: { palmares: PalmaresPublic }) {
       className="scroll-mt-24 space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-border sm:p-8"
     >
       <p className="text-xs font-extrabold uppercase tracking-widest text-logo-red">
-        Top 3 national des élèves
+        {m.palmares_sur()}
       </p>
       <h2 id="titre-palmares" className="text-3xl">
-        <span className="text-logo-blue">Palmarès des</span>{" "}
-        <span className="text-primary">semestres</span>
+        <span className="text-logo-blue">{m.palmares_bleu()}</span>{" "}
+        <span className="text-primary">{m.palmares_vert()}</span>
       </h2>
       <p className="max-w-3xl text-sm font-medium text-muted-foreground">
-        À la fin de chaque semestre, l'équipe nationale fige le classement, le contrôle puis publie
-        le Top 3. {REGLE_EX_AEQUO}
+        {m.palmares_texte()} {regleExAequo()}
       </p>
       {palmares.semestres.length === 0 ? (
         <p className="rounded-2xl border border-dashed p-6 text-center font-semibold text-muted-foreground">
-          Le premier palmarès sera publié à la fin du semestre.
+          {m.palmares_premier()}
         </p>
       ) : (
         <div className="space-y-6">
@@ -45,11 +41,14 @@ export function Palmares({ palmares }: { palmares: PalmaresPublic }) {
               <h3 className="font-display text-xl text-logo-blue">
                 {semestre.libelle}
                 <span className="ml-2 text-sm font-semibold text-muted-foreground">
-                  du {dateCourte(semestre.debut)} au {dateCourte(semestre.fin)}
+                  {m.palmares_du_au({
+                    debut: dateCourte(semestre.debut),
+                    fin: dateCourte(semestre.fin),
+                  })}
                 </span>
               </h3>
               <ol
-                aria-label={`Lauréats de ${semestre.libelle}`}
+                aria-label={m.palmares_laureats({ semestre: semestre.libelle })}
                 className="grid gap-3 sm:grid-cols-3"
               >
                 {semestre.laureats.map((laureat) => (
@@ -68,7 +67,7 @@ export function Palmares({ palmares }: { palmares: PalmaresPublic }) {
                     </p>
                     <p className="mt-3 font-display text-2xl text-primary">
                       {formaterPoints(laureat.points)}{" "}
-                      <span className="text-base text-ink/60">pts</span>
+                      <span className="text-base text-ink/60">{m.certif_pts()}</span>
                     </p>
                   </li>
                 ))}

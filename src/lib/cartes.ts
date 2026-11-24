@@ -1,4 +1,5 @@
 import type { MaCarte } from "@/lib/api/client";
+import { m } from "@/paraglide/messages.js";
 
 // Libellés des cartes numériques (spec 040), partagés par l'espace, la page publique et l'admin.
 
@@ -34,3 +35,7 @@ export const CAUSES_ADMIN: Record<Cause, string> = {
   non_verifie: "Encadreur non vérifié",
   sans_rattachement: "Encadreur sans rattachement",
 };
+
+/** Le type de carte dans la langue de la page (spec 052), pour la vérification publique. */
+export const typeDeCarte = (type: MaCarte["type"]) =>
+  type === "membre" ? m.carte_membre() : m.carte_encadreur();

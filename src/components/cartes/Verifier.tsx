@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import { VerificationCarte } from "@/components/cartes/VerificationCarte";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { m } from "@/paraglide/messages.js";
 import {
   ErreurApi,
   MESSAGE_INDISPONIBLE,
@@ -42,7 +43,7 @@ export function Verifier({ code }: { code: string }) {
   if (etat.phase === "chargement")
     return (
       <p className="flex items-center gap-2 text-muted-foreground" role="status">
-        <Loader2 aria-hidden className="size-5 animate-spin" /> Vérification en cours…
+        <Loader2 aria-hidden className="size-5 animate-spin" /> {m.carte_en_cours()}
       </p>
     );
   if (etat.phase === "erreur")

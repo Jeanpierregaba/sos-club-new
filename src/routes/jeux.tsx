@@ -23,23 +23,23 @@ import {
   MAX_POINTS_ETOILES,
   MAX_POINTS_QUIZ,
   NIVEAUX_JEUX,
+  nomNiveau,
   points,
   type NiveauJeux,
 } from "@/lib/bareme";
-import { niveauParNumero, poles } from "@/lib/quiz";
+import { ContenuEnFrancais } from "@/components/ContenuEnFrancais";
+import { formatDeLaLangue, lien } from "@/lib/langues";
+import { niveauParNumero, poles, textePole, titreQuiz } from "@/lib/quiz";
+import { m } from "@/paraglide/messages.js";
 import mascottesVs from "@/assets/mascottes-vs.webp";
 import mascottesTrophees from "@/assets/mascottes-trophees.webp";
 
 export const Route = createFileRoute("/jeux")({
   head: () => ({
     meta: [
-      { title: "Jeux — Club Santé SOS Docteur TV" },
-      {
-        name: "description",
-        content:
-          "L'arène de gamification des Clubs Santé : 100 quiz officiels en 4 parties, 1 000 questions, des points et un classement national.",
-      },
-      { property: "og:title", content: "Joue, apprends & deviens champion de la santé" },
+      { title: m.jeux_meta_titre() },
+      { name: "description", content: m.jeux_meta_description() },
+      { property: "og:title", content: m.jeux_meta_og() },
     ],
   }),
   // Les quiz jouables (spec 031). API en panne : la page reste lisible, sans bouton pour jouer.
@@ -51,35 +51,36 @@ export const Route = createFileRoute("/jeux")({
 const totalQuiz = poles.reduce((n, p) => n + p.quiz.length, 0);
 
 // Spec 034 et 050 : 10 000 points de quiz et 6 000 points d'étoiles au plus, pour l'élève ; la moitié pour son club.
-const chiffres = [
-  { n: totalQuiz, t: "Quiz défis" },
-  { n: 1000, t: "Questions" },
-  { n: NIVEAUX_JEUX.length, t: "Niveaux, 4 étoiles" },
-  { n: points(MAX_POINTS_QUIZ + MAX_POINTS_ETOILES), t: "Points à gagner" },
-  { n: poles.length, t: "Parties santé" },
+// Des fonctions : les textes suivent la langue de la page.
+const chiffres = () => [
+  { n: totalQuiz, t: m.jeux_chiffre_quiz() },
+  { n: new Intl.NumberFormat(formatDeLaLangue()).format(1000), t: m.jeux_chiffre_questions() },
+  { n: NIVEAUX_JEUX.length, t: m.jeux_chiffre_niveaux() },
+  { n: points(MAX_POINTS_QUIZ + MAX_POINTS_ETOILES), t: m.jeux_chiffre_points() },
+  { n: poles.length, t: m.jeux_chiffre_parties() },
 ];
 
-const etapes = [
+const etapes = () => [
   {
     n: "01",
-    sur: "Compte joueur",
-    t: "S’inscrire",
+    sur: m.jeux_etape_1_sur(),
+    t: m.jeux_etape_1(),
     i: UserPlus,
     href: "/connexion",
     c: "bg-sky text-white",
   },
   {
     n: "02",
-    sur: `${totalQuiz} quiz interactifs`,
-    t: "Jouer maintenant",
+    sur: m.jeux_etape_2_sur({ nombre: String(totalQuiz) }),
+    t: m.jeux_etape_2(),
     i: Gamepad2,
     href: "#quiz",
     c: "bg-primary text-white",
   },
   {
     n: "03",
-    sur: "Diplôme officiel",
-    t: "Faire la certification",
+    sur: m.jeux_etape_3_sur(),
+    t: m.jeux_etape_3(),
     i: GraduationCap,
     href: "/certification",
     c: "bg-sun text-ink",
@@ -93,8 +94,10 @@ const COULEURS: Record<NiveauJeux, string> = {
   avance: "bg-tangerine/15 text-tangerine",
   expert: "bg-grape/15 text-grape",
 };
-const niveauDe = (code: NiveauJeux) =>
-  NIVEAUX_JEUX.find((x) => x.code === code) ?? NIVEAUX_JEUX[0]!;
+const niveauDe = (code: NiveauJeux) => {
+  const niveau = NIVEAUX_JEUX.find((x) => x.code === code) ?? NIVEAUX_JEUX[0]!;
+  return { ...niveau, nom: nomNiveau(niveau.code) };
+};
 
 // Chaque défi a son quiz côté serveur, retrouvé par son numéro dans le parcours officiel (spec 034).
 function quizParNumero(catalogue: CatalogueQuiz | null) {
@@ -109,13 +112,14 @@ function Jeux() {
   const [defi, setDefi] = useState<Defi | null>(null);
   const [niveau, setNiveau] = useState<NiveauJeux | null>(null);
   const p = poles[pole] ?? poles[0]!;
+  const texteP = textePole(p);
   const jouables = quizParNumero(catalogue);
   const reussis = new Set(catalogue?.progression?.reussis ?? []);
   const quiz = p.quiz
     .map(({ t, n }) => {
       const serveur = jouables.get(n);
       return {
-        t,
+        t: titreQuiz(p, t),
         n,
         niveau: serveur?.niveau ?? niveauParNumero.get(n) ?? "debutant",
         quiz: serveur,
@@ -146,26 +150,24 @@ function Jeux() {
         <DecorAnime />
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 pb-16 pt-8 md:pt-12 lg:grid-cols-[1.2fr_1fr]">
           <div>
-            <FilAriane rubrique="Gamification" page="Jeux" clair />
+            <FilAriane rubrique={m.menu_gamification()} page={m.menu_jeux()} clair />
             <div data-reveal="left" className="pt-12">
               <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide ring-1 ring-white/25">
-                <Gamepad2 className="size-4 text-sun" /> Arène nationale de gamification
+                <Gamepad2 className="size-4 text-sun" /> {m.jeux_arene()}
               </span>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block">Joue, apprends</span>
-                <span className="block text-sun">& deviens champion</span>
-                <span className="block text-primary">de la santé</span>
+                <span className="block">{m.jeux_titre_1()}</span>
+                <span className="block text-sun">{m.jeux_titre_2()}</span>
+                <span className="block text-primary">{m.jeux_titre_3()}</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg font-medium text-white/80">
-                Relève les {totalQuiz} quiz officiels issus de la banque des 1 000 questions des
-                Clubs Santé SOS Docteur TV ! Accumule des points, hisse ton établissement au sommet
-                du classement DRE et national, et décroche ta certification.
+                {m.jeux_intro({ nombre: String(totalQuiz) })}
               </p>
             </div>
           </div>
           <img
             src={mascottesVs}
-            alt="Deux mascottes du Club Santé face à face, prêtes pour le duel"
+            alt={m.jeux_mascottes_alt()}
             width={2000}
             height={2000}
             data-reveal="right"
@@ -174,7 +176,7 @@ function Jeux() {
         </div>
         <dl className="border-t border-white/10 bg-black/20">
           <div className="mx-auto grid max-w-7xl grid-cols-2 gap-px px-5 sm:grid-cols-3 lg:grid-cols-5">
-            {chiffres.map((c) => (
+            {chiffres().map((c) => (
               <div key={c.t} className="flex flex-col-reverse py-6 text-center">
                 <dt className="mt-2 text-xs font-bold uppercase tracking-wider text-white/60">
                   {c.t}
@@ -192,13 +194,13 @@ function Jeux() {
           data-reveal
           className="text-center text-sm font-extrabold uppercase tracking-widest text-logo-red"
         >
-          Passe à l’action · Choisis ton défi santé
+          {m.jeux_action()}
         </p>
         <ol className="mt-6 grid gap-4 md:grid-cols-3">
-          {etapes.map((e, i) => (
+          {etapes().map((e, i) => (
             <li key={e.n} data-reveal style={retard(i)}>
               <a
-                href={e.href}
+                href={lien(e.href)}
                 className="card-fx group flex items-center gap-5 rounded-[1.75rem] bg-white p-6 shadow-card"
               >
                 <span
@@ -208,7 +210,7 @@ function Jeux() {
                 </span>
                 <span className="flex-1">
                   <span className="block text-xs font-extrabold uppercase tracking-wider text-muted-foreground">
-                    Étape {e.n} · {e.sur}
+                    {m.jeux_etape({ numero: e.n, sur: e.sur })}
                   </span>
                   <span className="mt-1 block font-display text-2xl text-logo-blue">{e.t}</span>
                 </span>
@@ -222,22 +224,25 @@ function Jeux() {
       {/* Catalogue : les 4 parties en tuiles, puis les quiz de la partie choisie. */}
       <section id="quiz" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-20">
         <EnTete
-          sur="Parcours officiel en 4 parties"
-          bleu={`Les ${totalQuiz} quiz`}
-          vert="de gamification"
+          sur={m.jeux_parcours_sur()}
+          bleu={m.jeux_parcours_bleu({ nombre: String(totalQuiz) })}
+          vert={m.jeux_parcours_vert()}
         >
           {catalogue
-            ? `Chaque quiz tire ${catalogue.nb_questions} questions des 1 000 QCM officiels. Chrono de ${catalogue.temps_ms / 1000} s par question, et ${catalogue.seuil}/${catalogue.nb_questions} minimum pour valider !`
-            : "Chaque quiz tire ses questions des 1 000 QCM officiels, avec un chrono par question."}{" "}
-          Réussis tous les quiz d’un niveau pour décrocher son étoile, et les 4 étoiles pour ta
-          carte Gold.
+            ? m.jeux_parcours_regles({
+                questions: String(catalogue.nb_questions),
+                secondes: String(catalogue.temps_ms / 1000),
+                seuil: String(catalogue.seuil),
+              })
+            : m.jeux_parcours_regles_sans()}{" "}
+          {m.jeux_parcours_etoiles()}
         </EnTete>
 
         {catalogue?.progression && <ProgressionJeux progression={catalogue.progression} />}
 
         <div
           role="group"
-          aria-label="Parties"
+          aria-label={m.jeux_parties()}
           className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4"
         >
           {poles.map((x, i) => {
@@ -263,11 +268,13 @@ function Jeux() {
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span className="mt-3 flex-1 text-sm font-extrabold leading-snug">{x.nom}</span>
+                <span className="mt-3 flex-1 text-sm font-extrabold leading-snug">
+                  {textePole(x).nom}
+                </span>
                 <span
                   className={`mt-2 text-xs font-bold ${on ? "text-white/80" : "text-muted-foreground"}`}
                 >
-                  {x.quiz.length} quiz
+                  {m.jeux_nb_quiz({ nombre: String(x.quiz.length) })}
                 </span>
               </button>
             );
@@ -287,12 +294,12 @@ function Jeux() {
               {String(pole + 1).padStart(2, "0")}
             </span>
             <p className="text-xs font-extrabold uppercase tracking-widest text-white/80">
-              {p.sur} · {p.quiz.length} quiz
+              {texteP.sur} · {m.jeux_nb_quiz({ nombre: String(p.quiz.length) })}
             </p>
-            <h3 className="mt-2 text-3xl md:text-4xl">{p.nom}</h3>
-            <p className="mt-3 max-w-3xl font-medium text-white/90">{p.d}</p>
+            <h3 className="mt-2 text-3xl md:text-4xl">{texteP.nom}</h3>
+            <p className="mt-3 max-w-3xl font-medium text-white/90">{texteP.d}</p>
             <ul className="mt-5 flex flex-wrap gap-2">
-              {p.themes.map((t) => (
+              {texteP.themes.map((t) => (
                 <li
                   key={t}
                   className="rounded-full bg-white/15 px-3 py-1 text-xs font-bold ring-1 ring-white/25"
@@ -305,7 +312,7 @@ function Jeux() {
 
           <div className="p-6 md:p-8">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="mr-2 text-sm font-extrabold">Difficulté :</span>
+              <span className="mr-2 text-sm font-extrabold">{m.jeux_difficulte()}</span>
               {[null, ...NIVEAUX_JEUX].map((x) => {
                 const on = niveau === (x?.code ?? null);
                 return (
@@ -318,29 +325,29 @@ function Jeux() {
                       on ? "bg-ink text-white" : "bg-mist-soft ring-1 ring-border hover:ring-ink/30"
                     }`}
                   >
-                    {x ? x.nom : "Toutes"}
+                    {x ? nomNiveau(x.code) : m.jeux_toutes()}
                   </button>
                 );
               })}
             </div>
 
             <p className="mt-4 rounded-2xl bg-mist-soft px-4 py-3 text-sm font-semibold text-ink/80">
-              Un quiz réussi pour la première fois rapporte selon son niveau :{" "}
+              {m.jeux_bareme_debut()}{" "}
               {NIVEAUX_JEUX.map((x, i) => (
                 <span key={x.code}>
                   {i > 0 && ", "}
                   <strong className="text-ink">
-                    {x.nom} {points(x.eleve)}
+                    {nomNiveau(x.code)} {points(x.eleve)}
                   </strong>
                 </span>
               ))}
-              . Ton Club Santé reçoit la moitié si tu y es affilié. Rejouer un quiz déjà réussi ne
-              rapporte rien de plus.
+              {m.jeux_bareme_fin()}
             </p>
+            <ContenuEnFrancais className="mt-3" />
 
             {quiz.length === 0 ? (
               <p className="mt-6 rounded-2xl border border-dashed p-8 text-center font-semibold text-muted-foreground">
-                Aucun quiz de ce niveau dans cette partie.
+                {m.jeux_aucun_quiz()}
               </p>
             ) : (
               <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -351,13 +358,13 @@ function Jeux() {
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-display text-lg text-(color:--c)">
-                        Quiz {String(q.n).padStart(2, "0")}
+                        {m.jeux_quiz_numero({ numero: String(q.n).padStart(2, "0") })}
                       </span>
                       <span className="flex items-center gap-1.5">
                         {q.reussi && (
                           <CheckCircle2
                             role="img"
-                            aria-label="Déjà réussi"
+                            aria-label={m.jeux_deja_reussi()}
                             className="size-4 text-primary"
                           />
                         )}
@@ -372,16 +379,19 @@ function Jeux() {
                     <p className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
                       <Clock className="size-3.5" />{" "}
                       {catalogue
-                        ? `${catalogue.nb_questions} QCM · ${catalogue.temps_ms / 1000} s par question`
-                        : "QCM chronométrés"}
+                        ? m.jeux_qcm_chrono({
+                            questions: String(catalogue.nb_questions),
+                            secondes: String(catalogue.temps_ms / 1000),
+                          })
+                        : m.jeux_qcm_chronometres()}
                     </p>
                     <div className="mt-4 flex items-center justify-between gap-3 border-t pt-4">
                       <span className="leading-tight">
                         <span className="block font-display text-xl text-sun [text-shadow:0_1px_0_var(--ink)]">
-                          {points(niveauDe(q.niveau).eleve)} pts
+                          {m.jeux_pts({ points: points(niveauDe(q.niveau).eleve) })}
                         </span>
                         <span className="block text-[11px] font-bold text-muted-foreground">
-                          {points(niveauDe(q.niveau).eleve / 2)} pour ton club
+                          {m.jeux_pour_ton_club({ points: points(niveauDe(q.niveau).eleve / 2) })}
                         </span>
                       </span>
                       {q.quiz ? (
@@ -392,13 +402,13 @@ function Jeux() {
                           }
                           className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition group-hover:brightness-105"
                         >
-                          Relever le défi <ArrowRight className="size-3.5" />
+                          {m.jeux_relever()} <ArrowRight className="size-3.5" />
                         </button>
                       ) : (
                         // API injoignable : pas de bouton, sans annoncer à tort une nouveauté.
                         catalogue && (
                           <span className="rounded-full bg-mist-soft px-4 py-2 text-sm font-bold text-muted-foreground">
-                            Bientôt
+                            {m.jeux_bientot()}
                           </span>
                         )
                       )}
@@ -414,10 +424,12 @@ function Jeux() {
       {/* Classement : vide tant que personne n'a joué, avec un podium en attente. */}
       <section className="bg-mist-soft py-20">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 lg:grid-cols-[1fr_1.1fr]">
-          <EnTete sur="Émulation & classement" bleu="Le classement" vert="national">
-            Les élèves sentinelles et les établissements les plus engagés y apparaîtront, avec leur
-            pseudonyme et leur club, dès l’ouverture des quiz. Connecte-toi pour y inscrire ton nom
-            !
+          <EnTete
+            sur={m.jeux_classement_sur()}
+            bleu={m.jeux_classement_bleu()}
+            vert={m.jeux_classement_vert()}
+          >
+            {m.jeux_classement_texte()}
           </EnTete>
           <div data-reveal="zoom" className="flex items-end justify-center gap-3 sm:gap-5">
             {[
@@ -448,20 +460,21 @@ function Jeux() {
         >
           <div>
             <p className="text-sm font-extrabold uppercase tracking-widest text-logo-red">
-              Certification & récompenses
+              {m.jeux_certif_sur()}
             </p>
             <h2 className="mt-3 text-4xl text-ink md:text-5xl">
-              Gagne jusqu’à <span className="text-logo-blue">1 million FCFA</span> !
+              {m.jeux_certif_titre_1()}{" "}
+              <span className="text-logo-blue">{m.jeux_certif_somme()}</span>
+              {m.jeux_certif_titre_2()}
             </h2>
             <p className="mt-4 max-w-xl text-lg font-semibold text-ink/75">
-              Relève le défi des 20 quiz santé, décroche ton certificat officiel Génie Imhotep et
-              tes badges, et tente de remporter des lots exceptionnels.
+              {m.jeux_certif_texte()}
             </p>
             <a
-              href="/certification"
+              href={lien("/certification")}
               className="btn-fx mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
             >
-              Obtenir ma certification <ArrowRight className="size-4" />
+              {m.jeux_certif_action()} <ArrowRight className="size-4" />
             </a>
           </div>
           <img
@@ -493,11 +506,13 @@ function ProgressionJeux({
       <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="font-display text-2xl text-logo-blue">
           {progression.quiz_reussis}{" "}
-          <span className="text-base text-ink/70">/ {totalQuiz} quiz réussis</span>
+          <span className="text-base text-ink/70">
+            {m.jeux_quiz_reussis({ total: String(totalQuiz) })}
+          </span>
         </p>
         {progression.gold && (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-sun px-4 py-1.5 text-sm font-extrabold text-ink">
-            <Crown className="size-4" /> Carte Gold
+            <Crown className="size-4" /> {m.jeux_carte_gold()}
           </span>
         )}
       </div>
@@ -510,10 +525,12 @@ function ProgressionJeux({
             />
             <span className="leading-tight">
               <span className="block text-sm font-extrabold">
-                Étoile {i + 1} · {niveauDe(n.niveau).nom}
+                {m.jeux_etoile({ numero: String(i + 1), niveau: niveauDe(n.niveau).nom })}
               </span>
               <span className="block text-xs font-semibold text-muted-foreground">
-                {n.etoile ? "Débloquée" : `${n.reussis} / ${n.total} quiz réussis`}
+                {n.etoile
+                  ? m.jeux_debloquee()
+                  : m.jeux_reussis_sur({ reussis: String(n.reussis), total: String(n.total) })}
               </span>
             </span>
           </li>
@@ -521,9 +538,9 @@ function ProgressionJeux({
       </ul>
       <dl className="mt-5 grid grid-cols-3 gap-3 text-center">
         {[
-          { t: "Points des quiz", v: progression.points_quiz, max: MAX_POINTS_QUIZ },
-          { t: "Points des étoiles", v: progression.points_etoiles, max: MAX_POINTS_ETOILES },
-          { t: "Total Jeux", v: progression.total, max: MAX_POINTS_QUIZ + MAX_POINTS_ETOILES },
+          { t: m.jeux_points_quiz(), v: progression.points_quiz, max: MAX_POINTS_QUIZ },
+          { t: m.jeux_points_etoiles(), v: progression.points_etoiles, max: MAX_POINTS_ETOILES },
+          { t: m.jeux_total(), v: progression.total, max: MAX_POINTS_QUIZ + MAX_POINTS_ETOILES },
         ].map((x) => (
           <div key={x.t} className="rounded-2xl ring-1 ring-border p-3">
             <dt className="text-xs font-bold text-muted-foreground">{x.t}</dt>

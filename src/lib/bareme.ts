@@ -1,3 +1,6 @@
+import { formatDeLaLangue, LANGUE_DE_BASE, langueCourante } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
+
 // Le barème affiché sur le site (spec 034, cahier des charges du 2026-11-10) : le club reçoit toujours la moitié du
 // gain de l'élève. L'API détient le barème appliqué (table `bareme`, réglable dans l'admin) : ces montants servent
 // seulement à l'annoncer. Un seul endroit, pour que toutes les pages disent la même chose.
@@ -34,4 +37,18 @@ export const QUIZ_CERTIFICATION = 20;
 export const BADGES_CERTIFICATION = 5;
 
 // « +1 000 » avec une espace fine insécable, à l'identique côté serveur et navigateur (sans dépendre d'Intl).
-export const points = (n: number) => `+${String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f")}`;
+export const points = (n: number) =>
+  `+${
+    langueCourante() === LANGUE_DE_BASE
+      ? String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f")
+      : n.toLocaleString(formatDeLaLangue())
+  }`;
+
+/** Le nom d'un niveau des Jeux dans la langue de la page (spec 052). */
+export const nomNiveau = (code: NiveauJeux): string =>
+  ({
+    debutant: m.niveau_debutant,
+    intermediaire: m.niveau_intermediaire,
+    avance: m.niveau_avance,
+    expert: m.niveau_expert,
+  })[code]();

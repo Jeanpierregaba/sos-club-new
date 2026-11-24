@@ -2,7 +2,9 @@ import { Check, Loader2, PartyPopper, RotateCcw, Timer, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { auSingulier } from "@/lib/langues";
 import { messagePlusDeVies } from "@/lib/vies";
+import { m } from "@/paraglide/messages.js";
 import { Button } from "@/components/ui/button";
 import {
   ErreurApi,
@@ -158,19 +160,15 @@ export function PartieQuiz({
           <span className="text-3xl text-muted-foreground"> / {r.total}</span>
         </p>
         <p role="status" className="text-lg font-bold text-ink">
-          {r.reussie
-            ? "Bravo, quiz réussi !"
-            : `Pas encore : il faut ${r.seuil} bonnes réponses pour réussir.`}
+          {r.reussie ? m.quiz_reussi() : m.quiz_pas_encore({ seuil: String(r.seuil) })}
         </p>
         {avecPoints && r.points > 0 && (
           <p className="inline-flex rounded-full bg-primary/15 px-4 py-2 font-bold text-primary">
-            +{r.points} points
+            {m.quiz_points_gagnes({ points: String(r.points) })}
           </p>
         )}
         {avecPoints && r.reussie && r.points === 0 && (
-          <p className="text-sm text-muted-foreground">
-            Tu as déjà gagné les points de ce quiz : rejouer sert à t'entraîner.
-          </p>
+          <p className="text-sm text-muted-foreground">{m.quiz_deja_points()}</p>
         )}
         {r.erreurs && <Recapitulatif erreurs={r.erreurs} />}
         {/* Spec 048 : les vies du jour, après la partie (None pour un invité). */}
@@ -180,7 +178,9 @@ export function PartieQuiz({
           >
             {etat.vies_restantes === 0
               ? messagePlusDeVies()
-              : `Il te reste ${etat.vies_restantes} vie${etat.vies_restantes > 1 ? "s" : ""} aujourd'hui.`}
+              : (auSingulier(etat.vies_restantes) ? m.vies_il_reste_un : m.vies_il_reste)({
+                  nombre: String(etat.vies_restantes),
+                })}
           </p>
         )}
         <div className="flex flex-wrap justify-center gap-3">
@@ -190,7 +190,7 @@ export function PartieQuiz({
               disabled={enCours || etat.vies_restantes === 0}
               onClick={() => void rejouer()}
             >
-              <RotateCcw className="size-4" /> Rejouer
+              <RotateCcw className="size-4" /> {m.quiz_rejouer()}
             </Button>
           )}
           {actions}
@@ -213,11 +213,13 @@ export function PartieQuiz({
     <div className="space-y-5">
       <div className="flex items-center justify-between text-sm font-bold text-muted-foreground">
         <span>
-          Question {question.rang} / {etat.total}
+          {m.quiz_question_sur({ rang: String(question.rang), total: String(etat.total) })}
         </span>
         <span className="inline-flex items-center gap-1">
           <Timer aria-hidden className="size-4" /> <span aria-hidden>{secondes} s</span>
-          <span className="sr-only">{secondes} secondes restantes</span>
+          <span className="sr-only">
+            {m.quiz_secondes_restantes({ secondes: String(secondes) })}
+          </span>
         </span>
       </div>
       <div
@@ -236,7 +238,7 @@ export function PartieQuiz({
         className="font-display text-2xl leading-snug text-ink outline-none"
       >
         <span className="sr-only">
-          Question {question.rang} sur {etat.total} :{" "}
+          {m.quiz_question_lecteur({ rang: String(question.rang), total: String(etat.total) })}{" "}
         </span>
         {affichee.enonce}
       </h2>
@@ -289,17 +291,22 @@ export function PartieQuiz({
       <p role="status" aria-live="polite" className="min-h-6 text-center font-bold">
         {retour &&
           (retour.correction.juste ? (
-            <span className="text-primary">Bonne réponse !</span>
+            <span className="text-primary">{m.quiz_bonne_reponse()}</span>
           ) : (
             <span className="text-logo-red">
-              {retour.correction.choix_joueur === null ? "Temps écoulé" : "Mauvaise réponse"} : la
-              bonne réponse était « {affichee.choix[retour.correction.choix_attendu]} ».
+              {m.quiz_reponse_etait({
+                debut:
+                  retour.correction.choix_joueur === null
+                    ? m.quiz_temps_ecoule()
+                    : m.quiz_mauvaise_reponse(),
+                reponse: affichee.choix[retour.correction.choix_attendu] ?? "",
+              })}
             </span>
           ))}
       </p>
       {restant === 0 && !retour && (
         <p className="flex items-center gap-2 text-sm font-semibold text-logo-red">
-          <Loader2 className="size-4 animate-spin" /> Temps écoulé…
+          <Loader2 className="size-4 animate-spin" /> {m.quiz_temps_ecoule_attente()}
         </p>
       )}
       {erreur && (
@@ -312,7 +319,7 @@ export function PartieQuiz({
               className="rounded-full"
               onClick={() => void appeler(() => appels.reprendre(etat.tentative_id))}
             >
-              Reprendre
+              {m.quiz_reprendre()}
             </Button>
           </AlertDescription>
         </Alert>
@@ -325,11 +332,11 @@ export function PartieQuiz({
 function Recapitulatif({ erreurs }: { erreurs: NonNullable<EtatPartie["resultat"]>["erreurs"] }) {
   if (!erreurs) return null;
   if (erreurs.length === 0)
-    return <p className="font-semibold text-primary">Sans faute : aucune question ratée !</p>;
+    return <p className="font-semibold text-primary">{m.quiz_sans_faute()}</p>;
   return (
     <section aria-labelledby="titre-recap" className="text-left">
       <h3 id="titre-recap" className="text-lg font-extrabold text-ink">
-        Tes erreurs ({erreurs.length}) et les bonnes réponses
+        {m.quiz_tes_erreurs({ nombre: String(erreurs.length) })}
       </h3>
       <ol className="mt-3 space-y-3">
         {erreurs.map((e) => (
@@ -339,11 +346,13 @@ function Recapitulatif({ erreurs }: { erreurs: NonNullable<EtatPartie["resultat"
             </p>
             <p className="mt-2 flex items-start gap-2 text-sm font-semibold text-logo-red">
               <X aria-hidden className="mt-0.5 size-4 shrink-0" />
-              {e.ta_reponse ? `Ta réponse : ${e.ta_reponse}` : "Pas de réponse à temps"}
+              {e.ta_reponse
+                ? m.quiz_ta_reponse({ reponse: e.ta_reponse })
+                : m.quiz_pas_de_reponse()}
             </p>
             <p className="mt-1 flex items-start gap-2 text-sm font-semibold text-primary">
               <Check aria-hidden className="mt-0.5 size-4 shrink-0" />
-              Bonne réponse : {e.reponse_attendue}
+              {m.quiz_bonne_reponse_est({ reponse: e.reponse_attendue })}
             </p>
             {e.explication && (
               <p className="mt-2 text-sm font-medium text-ink/75">{e.explication}</p>

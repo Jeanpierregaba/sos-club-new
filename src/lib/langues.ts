@@ -96,3 +96,7 @@ export const NOMS_DES_LANGUES: Record<Langue, { court: string; nom: string }> = 
   en: { court: "EN", nom: "English" },
   de: { court: "DE", nom: "Deutsch" },
 };
+
+/** Vrai quand la langue met ce nombre au singulier : 0 et 1 en français, 1 seulement en anglais et en allemand. */
+export const auSingulier = (nombre: number, langue: Langue = langueCourante()): boolean =>
+  new Intl.PluralRules(FORMATS[langue]).select(nombre) === "one";

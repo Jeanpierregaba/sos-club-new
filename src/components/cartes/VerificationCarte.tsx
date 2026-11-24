@@ -1,7 +1,8 @@
 import { BadgeCheck, ShieldAlert } from "lucide-react";
 
 import type { VerificationCarte as Verification } from "@/lib/api/client";
-import { TYPES_CARTE } from "@/lib/cartes";
+import { typeDeCarte } from "@/lib/cartes";
+import { m } from "@/paraglide/messages.js";
 import { dateHeure } from "@/lib/dates";
 
 // Le résultat de la vérification d'une carte par son QR (spec 040, Q30) : type, numéro, club et statut. Aucun nom.
@@ -14,12 +15,9 @@ export function VerificationCarte({ resultat }: { resultat: Verification | null 
       >
         <p className="flex items-center gap-3 font-display text-3xl text-ink">
           <ShieldAlert aria-hidden className="size-10 shrink-0 text-logo-red" />
-          Cette carte n'existe pas
+          {m.carte_inexistante()}
         </p>
-        <p className="mt-3 text-muted-foreground">
-          Ce QR code ne correspond à aucune carte des Clubs Santé : ne la considère pas comme
-          valide.
-        </p>
+        <p className="mt-3 text-muted-foreground">{m.carte_inexistante_texte()}</p>
       </section>
     );
   }
@@ -39,30 +37,28 @@ export function VerificationCarte({ resultat }: { resultat: Verification | null 
           className={`font-display text-4xl ${valide ? "text-primary" : "text-logo-red"}`}
           data-testid="statut-carte"
         >
-          {valide ? "Valide" : "Non valide"}
+          {valide ? m.carte_valide() : m.carte_non_valide()}
         </span>
       </p>
       <p className="mt-3 text-muted-foreground">
-        {valide
-          ? "Cette carte a bien été délivrée par la plateforme des Clubs Santé et elle est valide aujourd'hui."
-          : "Cette carte n'est pas valide aujourd'hui : elle n'atteste plus l'appartenance aux Clubs Santé."}
+        {valide ? m.carte_valide_texte() : m.carte_non_valide_texte()}
       </p>
       <dl className="mt-6 grid gap-4 sm:grid-cols-3">
         <div>
-          <dt className="text-sm text-muted-foreground">Type</dt>
-          <dd className="font-bold text-ink">{TYPES_CARTE[resultat.type]}</dd>
+          <dt className="text-sm text-muted-foreground">{m.carte_type()}</dt>
+          <dd className="font-bold text-ink">{typeDeCarte(resultat.type)}</dd>
         </div>
         <div>
-          <dt className="text-sm text-muted-foreground">Numéro</dt>
+          <dt className="text-sm text-muted-foreground">{m.certificat_numero()}</dt>
           <dd className="font-mono font-bold text-ink">{resultat.numero}</dd>
         </div>
         <div>
-          <dt className="text-sm text-muted-foreground">Club</dt>
-          <dd className="font-bold text-ink">{resultat.club ?? "Non affilié"}</dd>
+          <dt className="text-sm text-muted-foreground">{m.carte_club()}</dt>
+          <dd className="font-bold text-ink">{resultat.club ?? m.carte_non_affilie()}</dd>
         </div>
       </dl>
       <p className="mt-6 text-xs text-muted-foreground">
-        Vérifiée le {dateHeure(resultat.verifiee_le)}
+        {m.carte_verifiee_le({ date: dateHeure(resultat.verifiee_le) })}
       </p>
     </section>
   );

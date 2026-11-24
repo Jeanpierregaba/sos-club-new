@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { AlertTriangle, Award, Snowflake, Undo2, UserX } from "lucide-react";
 
-import { REGLE_EX_AEQUO } from "@/components/classements/Palmares";
+import { regleExAequo } from "@/lib/classements";
 import { Button } from "@/components/ui/button";
 import type { CandidatAdmin, ClotureDetail } from "@/lib/api/client";
 import { formaterPoints } from "@/lib/classements";
@@ -94,7 +94,7 @@ export function DetailCloture({
             ))}
           </ol>
         )}
-        <p className="text-xs font-medium text-muted-foreground">{REGLE_EX_AEQUO}</p>
+        <p className="text-xs font-medium text-muted-foreground">{regleExAequo()}</p>
       </div>
 
       {(ecart.top3_different || ecart.changements.length > 0) && (

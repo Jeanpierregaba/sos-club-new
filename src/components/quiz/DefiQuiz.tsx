@@ -22,16 +22,24 @@ import {
   type QuizOuvert,
   type Vies as ViesDuJour,
 } from "@/lib/api/client";
-import { NIVEAUX_JEUX, points } from "@/lib/bareme";
+import { NIVEAUX_JEUX, nomNiveau, points } from "@/lib/bareme";
+import { LANGUE_DE_BASE, langueCourante } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 export type Defi = { titre: string; numero: number; quiz: QuizOuvert };
 
 // Spec 034 : le niveau du quiz et ce qu'il rapporte ; à défaut de niveau, le titre du quiz servi par l'API.
 function descriptionDuDefi(defi: Defi) {
   const niveau = NIVEAUX_JEUX.find((n) => n.code === defi.quiz.niveau);
+  // Hors du français, le titre servi par l'API (en français) cède la place à la mention générale.
   if (!niveau)
-    return defi.quiz.titre === defi.titre ? "Quiz du parcours officiel" : defi.quiz.titre;
-  return `Niveau ${niveau.nom} · ${points(niveau.eleve)} points à la première réussite pour un élève, la moitié pour son club s'il y est affilié`;
+    return defi.quiz.titre === defi.titre || langueCourante() !== LANGUE_DE_BASE
+      ? m.quiz_parcours_officiel()
+      : defi.quiz.titre;
+  return m.quiz_description_niveau({
+    niveau: nomNiveau(niveau.code),
+    points: points(niveau.eleve),
+  });
 }
 
 // Le joueur sans compte a épuisé ses quiz d'essai : l'API le marque (X-Raison: fin-essai). Tout autre refus, même un
@@ -39,9 +47,6 @@ function descriptionDuDefi(defi: Defi) {
 const estFinDEssai = (e: unknown) => e instanceof ErreurApi && e.raison === "fin-essai";
 
 // Un compte connecté que l'API refuse de faire jouer (403) : équipe, compte à activer ou à vérifier.
-const MESSAGE_EQUIPE = "Les membres de l'équipe jouent en mode test, depuis l'espace admin.";
-const MESSAGE_A_ACTIVER =
-  "Ton compte ne peut pas encore jouer : confirme ton e-mail ou attends que l'équipe vérifie ton compte encadreur.";
 
 export function FinDEssai() {
   return (
@@ -49,19 +54,16 @@ export function FinDEssai() {
       <span className="mx-auto inline-flex size-14 items-center justify-center rounded-2xl bg-sun/30 text-ink">
         <Hourglass className="size-7" />
       </span>
-      <p className="font-display text-2xl text-logo-blue">Ta période d'essai est terminée</p>
-      <p className="mx-auto max-w-md font-semibold text-ink/80">
-        Tu as déjà relevé tes défis d'essai. Crée ton compte gratuit pour continuer à relever tous
-        les défis du parcours.
-      </p>
+      <p className="font-display text-2xl text-logo-blue">{m.quiz_essai_titre()}</p>
+      <p className="mx-auto max-w-md font-semibold text-ink/80">{m.quiz_essai_texte()}</p>
       <div className="flex flex-wrap justify-center gap-3">
         <Button asChild className="btn-fx h-12 rounded-full px-6 font-bold">
           <Link to="/inscription">
-            <UserPlus className="size-4" /> Créer mon compte
+            <UserPlus className="size-4" /> {m.quiz_creer_compte()}
           </Link>
         </Button>
         <Button asChild variant="outline" className="h-12 rounded-full px-6 font-bold">
-          <Link to="/connexion">J'ai déjà un compte</Link>
+          <Link to="/connexion">{m.quiz_deja_compte()}</Link>
         </Button>
       </div>
     </div>
@@ -162,7 +164,7 @@ export function DefiQuiz({
             <header className="pr-8">
               <p className="flex items-center gap-3 text-sm font-extrabold uppercase tracking-widest text-logo-red">
                 <span className="h-1 w-8 rounded-full bg-primary" />
-                Quiz {String(affiche.numero).padStart(2, "0")}
+                {m.jeux_quiz_numero({ numero: String(affiche.numero).padStart(2, "0") })}
               </p>
               <DialogTitle className="mt-2 text-2xl leading-tight text-logo-blue md:text-3xl">
                 {affiche.titre}
@@ -177,7 +179,7 @@ export function DefiQuiz({
                 <FinDEssai />
               ) : interdit ? (
                 <p className="rounded-2xl bg-sun/20 p-4 text-center font-semibold text-ink">
-                  {moi?.role === "admin" ? MESSAGE_EQUIPE : MESSAGE_A_ACTIVER}
+                  {moi?.role === "admin" ? m.quiz_equipe() : m.quiz_a_activer()}
                 </p>
               ) : partie ? (
                 <PartieQuiz
@@ -198,7 +200,7 @@ export function DefiQuiz({
                       className="h-11 rounded-full px-5 font-bold"
                       onClick={onFermer}
                     >
-                      Autres défis
+                      {m.quiz_autres_defis()}
                     </Button>
                   }
                 />
@@ -206,18 +208,19 @@ export function DefiQuiz({
                 <div className="space-y-4">
                   <ul className="list-disc space-y-1 pl-5 text-sm">
                     <li>
-                      {catalogue.nb_questions} questions, une à la fois, avec{" "}
-                      {Math.round(catalogue.temps_ms / 1000)} secondes pour chacune.
+                      {m.quiz_regle_questions({
+                        questions: String(catalogue.nb_questions),
+                        secondes: String(Math.round(catalogue.temps_ms / 1000)),
+                      })}
                     </li>
-                    <li>Sans réponse à temps, la question compte comme ratée.</li>
-                    <li>Il faut {catalogue.seuil} bonnes réponses pour réussir.</li>
-                    <li>Si tu fermes la fenêtre, la question en cours est perdue.</li>
+                    <li>{m.quiz_regle_temps()}</li>
+                    <li>{m.quiz_regle_seuil({ seuil: String(catalogue.seuil) })}</li>
+                    <li>{m.quiz_regle_fermer()}</li>
                   </ul>
                   <Vies vies={vies} />
                   {enCoursId && (
                     <p className="rounded-2xl bg-sun/20 p-3 text-sm font-semibold text-ink">
-                      Tu as une partie en cours sur ce quiz : reprends-la, ou recommence (la partie
-                      en cours sera close avec ton score actuel).
+                      {m.quiz_partie_en_cours()}
                     </p>
                   )}
                   {erreur && (
@@ -232,7 +235,7 @@ export function DefiQuiz({
                         disabled={enCours}
                         onClick={() => void demarrer(() => partieJoueur.reprendre(enCoursId))}
                       >
-                        <Play className="size-4" /> Reprendre ma partie
+                        <Play className="size-4" /> {m.quiz_reprendre_partie()}
                       </Button>
                     )}
                     <Button
@@ -246,7 +249,7 @@ export function DefiQuiz({
                       ) : (
                         <Play className="size-4" />
                       )}
-                      {enCoursId ? "Recommencer" : "Commencer"}
+                      {enCoursId ? m.quiz_recommencer() : m.quiz_commencer()}
                     </Button>
                   </div>
                 </div>
