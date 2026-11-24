@@ -1899,5 +1899,7 @@
   "enc_telephone_aide": "L'équipe peut t'appeler pour vérifier ton inscription. Il n'est jamais public.",
   "enc_accord": "J'accepte que l'équipe des Clubs Santé utilise ces informations pour vérifier mon compte.",
   "enc_envoyer": "Envoyer ma demande",
-  "enc_email_aide": "Tu y recevras la réponse de l'équipe."
+  "enc_email_aide": "Tu y recevras la réponse de l'équipe.",
+  "enc_region_dre": "Région (DRE)",
+  "enc_ville_lycee": "Ville du lycée"
 }

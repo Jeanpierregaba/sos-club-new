@@ -1899,5 +1899,7 @@
   "enc_telephone_aide": "The team may call you to check your registration. It's never public.",
   "enc_accord": "I agree that the Health Clubs team may use this information to verify my account.",
   "enc_envoyer": "Send my request",
-  "enc_email_aide": "You'll receive the team's answer there."
+  "enc_email_aide": "You'll receive the team's answer there.",
+  "enc_region_dre": "Region (DRE)",
+  "enc_ville_lycee": "School's town"
 }

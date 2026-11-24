@@ -1899,5 +1899,7 @@
   "enc_telephone_aide": "Das Team kann dich anrufen, um deine Anmeldung zu prüfen. Sie ist nie öffentlich.",
   "enc_accord": "Ich bin einverstanden, dass das Team der Gesundheitsclubs diese Angaben nutzt, um mein Konto zu prüfen.",
   "enc_envoyer": "Meine Anfrage senden",
-  "enc_email_aide": "Dorthin bekommst du die Antwort des Teams."
+  "enc_email_aide": "Dorthin bekommst du die Antwort des Teams.",
+  "enc_region_dre": "Region (DRE)",
+  "enc_ville_lycee": "Ort der Schule"
 }

@@ -69,6 +69,23 @@ des points et des classements. Détail : `docs/PRD.md`.
 - Dates stockées en UTC. Identifiants en UUID.
 - Toute évolution de la base passe par une migration Alembic.
 
+## Langues du site (ADR-0015)
+
+- Pages publiques en français (sans préfixe), anglais (`/en`) et allemand (`/de`) ; espaces connectés, admin et
+  contenus en base restent en français. La liste des pages traduites : `PAGES_TRADUITES` dans
+  `src/lib/langues-config.ts`.
+- Textes dans `messages/fr.json`, `en.json`, `de.json` : clé en minuscules avec `_`, préfixée par la page
+  (`jeux_titre`), même clé et mêmes `{paramètres}` dans les trois fichiers, aucune valeur vide (test
+  `src/test/messages.test.ts`). Dans le code : `import { m } from "@/paraglide/messages.js"` puis `m.jeux_titre()`.
+- Ajouter un texte : la clé dans les trois fichiers, puis `npm run langues` (le serveur de dev recompile seul).
+- Jamais `m.…()` au niveau d'un module : la langue n'est connue qu'au rendu. Une liste de textes devient une
+  fonction (`const etapes = () => [...]`), un libellé partagé avec les espaces connectés un accesseur `get`.
+- Liens internes : `<Link>` garde la langue seul ; un `<a href>` passe par `lien("/page")`. Dates et nombres :
+  `formatDeLaLangue()`, accords : `auSingulier(n)`, contenu en base sur une page traduite :
+  `<ContenuEnFrancais />`.
+- Erreurs : l'API répond en français ; `ErreurApi` traduit les messages connus (`src/lib/erreurs.ts`), et
+  `FormMessage` les messages des schémas zod, qui restent écrits en français.
+
 ## Branches
 
 On travaille sur `develop`, qui déploie la preprod. `main` déploie la prod à chaque push : n'y fusionner qu'à la demande.

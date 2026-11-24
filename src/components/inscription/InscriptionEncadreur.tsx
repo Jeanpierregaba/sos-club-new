@@ -277,11 +277,11 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
         {etablissement.choix?.dre && (
           <dl className="-mt-2 grid grid-cols-2 gap-3 rounded-2xl bg-mist-soft p-4 text-sm">
             <div>
-              <dt className="font-semibold text-muted-foreground">Région (DRE)</dt>
+              <dt className="font-semibold text-muted-foreground">{m.enc_region_dre()}</dt>
               <dd className="font-bold text-ink">{etablissement.choix.dre}</dd>
             </div>
             <div>
-              <dt className="font-semibold text-muted-foreground">Ville du lycée</dt>
+              <dt className="font-semibold text-muted-foreground">{m.enc_ville_lycee()}</dt>
               <dd className="font-bold text-ink">{etablissement.choix.localite ?? "—"}</dd>
             </div>
           </dl>
