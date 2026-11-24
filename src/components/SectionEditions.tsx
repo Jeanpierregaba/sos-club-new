@@ -3,12 +3,14 @@ import { ArrowRight, Crown, Hourglass, Trophy } from "lucide-react";
 import { EnTete } from "@/components/EnTete";
 import { retard } from "@/components/SiteMotion";
 import { editions, libelleSaison, ordinal, type Edition } from "@/lib/genie-imhotep-editions";
+import { formatDeLaLangue, lien } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 // Les éditions du Génie Imhotep, saison après saison : une ligne de temps dorée relie une carte par
 // édition. Toute la carte mène à la page de l'édition, dans le Hall of Fame ou dans le Palmarès.
 
 const dateLongue = (iso: string) =>
-  new Date(iso).toLocaleDateString("fr-FR", {
+  new Date(iso).toLocaleDateString(formatDeLaLangue(), {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -25,7 +27,7 @@ function JoursRestants({ cible }: { cible: string }) {
     <span className="font-display text-5xl leading-none tabular-nums text-logo-blue">
       {jours === null ? "--" : jours}
       <span className="ml-2 align-middle font-sans text-sm font-extrabold uppercase tracking-widest text-muted-foreground">
-        jours
+        {m.edition_jours()}
       </span>
     </span>
   );
@@ -51,7 +53,10 @@ function CarteEdition({ e, href, action }: { e: Edition; href: string; action: s
           className="absolute -right-10 -top-10 -z-10 size-48 rounded-full border-[1.5rem] border-white/25 transition duration-700 group-hover:scale-110"
         />
         <p className="text-xs font-extrabold uppercase tracking-widest opacity-80">
-          {ordinal(e.numero)} édition · {aVenir ? "à venir" : "terminée"}
+          {m.edition_titre({
+            ordinal: ordinal(e.numero),
+            etat: aVenir ? m.edition_a_venir() : m.edition_terminee(),
+          })}
         </p>
         <p className="mt-2 font-display text-5xl leading-none tabular-nums md:text-6xl">
           {libelleSaison(e.id)}
@@ -74,21 +79,21 @@ function CarteEdition({ e, href, action }: { e: Edition; href: string; action: s
         {aVenir ? (
           <>
             <p className="text-xs font-extrabold uppercase tracking-widest text-logo-red">
-              Coup d’envoi dans
+              {m.edition_coup_envoi()}
             </p>
             <p className="mt-2">
-              {e.debut ? <JoursRestants cible={e.debut} /> : "Date bientôt annoncée"}
+              {e.debut ? <JoursRestants cible={e.debut} /> : m.edition_date_bientot()}
             </p>
             {e.debut && (
               <p className="mt-2 text-sm font-bold text-muted-foreground">
-                Le {dateLongue(e.debut)}
+                {m.edition_le({ date: dateLongue(e.debut) })}
               </p>
             )}
           </>
         ) : (
           <>
             <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-widest text-logo-red">
-              <Crown aria-hidden className="size-4 text-tangerine" /> Champion national
+              <Crown aria-hidden className="size-4 text-tangerine" /> {m.edition_champion()}
             </p>
             <p className="mt-2 font-display text-3xl leading-tight text-logo-blue">{e.champion}</p>
           </>
@@ -113,7 +118,7 @@ export function SectionEditions({
 }) {
   return (
     <section id="editions" className="mx-auto max-w-7xl scroll-mt-20 px-5 py-20">
-      <EnTete sur={sur} bleu="Les éditions" vert="du championnat">
+      <EnTete sur={sur} bleu={m.edition_bleu()} vert={m.edition_vert()}>
         {children}
       </EnTete>
       <ol className="relative mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -132,13 +137,13 @@ export function SectionEditions({
               />
               <CarteEdition
                 e={e}
-                href={`/genie-imhotep/${base}/${e.id}`}
+                href={lien(`/genie-imhotep/${base}/${e.id}`)}
                 action={
                   aVenir
-                    ? "Découvrir la prochaine édition"
+                    ? m.edition_decouvrir()
                     : base === "palmares"
-                      ? "Voir le palmarès"
-                      : "Revivre l’édition"
+                      ? m.edition_voir_palmares()
+                      : m.edition_revivre()
                 }
               />
             </li>

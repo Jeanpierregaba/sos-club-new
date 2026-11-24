@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 
+import { formatDeLaLangue } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
+
 // Compte à rebours jusqu'à `cible` (date ISO) : jours, heures, minutes, secondes.
 // `clair` : version pour un fond clair (cartes blanches, chiffres bleus).
 // Rendu serveur : des tirets, pour que le HTML ne dépende pas de l'heure du serveur ; le navigateur prend le relais.
 const UNITES = [
-  { t: "Jours", ms: 86_400_000 },
-  { t: "Heures", ms: 3_600_000 },
-  { t: "Minutes", ms: 60_000 },
-  { t: "Secondes", ms: 1000 },
+  { t: m.rebours_jours, ms: 86_400_000 },
+  { t: m.rebours_heures, ms: 3_600_000 },
+  { t: m.rebours_minutes, ms: 60_000 },
+  { t: m.rebours_secondes, ms: 1000 },
 ] as const;
 
 function decouper(reste: number) {
@@ -31,7 +34,7 @@ export function CompteARebours({ cible, clair = false }: { cible: string; clair?
   if (reste === 0)
     return (
       <p className={`font-display text-4xl md:text-5xl ${clair ? "text-primary" : "text-sun"}`}>
-        C’est parti !
+        {m.rebours_parti()}
       </p>
     );
   const valeurs = reste === null ? null : decouper(reste);
@@ -41,7 +44,7 @@ export function CompteARebours({ cible, clair = false }: { cible: string; clair?
       <ol className="grid max-w-xl grid-cols-4 gap-2 sm:gap-3">
         {UNITES.map((u, i) => (
           <li
-            key={u.t}
+            key={u.ms}
             className={`relative overflow-hidden rounded-2xl px-1 pb-3 pt-4 text-center ring-1 ${clair ? "bg-white shadow-card ring-border" : "bg-white/10 ring-white/15 backdrop-blur-sm"}`}
           >
             {/* Le pli du milieu, comme un afficheur à palettes. */}
@@ -57,21 +60,21 @@ export function CompteARebours({ cible, clair = false }: { cible: string; clair?
             <span
               className={`mt-2 block text-[11px] font-extrabold uppercase tracking-widest sm:text-xs ${clair ? "text-muted-foreground" : "text-white/70"}`}
             >
-              {u.t}
+              {u.t()}
             </span>
           </li>
         ))}
       </ol>
       {/* Pour les lecteurs d'écran : la date, une seule fois, plutôt qu'une annonce chaque seconde. */}
       <p className="sr-only">
-        Coup d’envoi le{" "}
-        {new Date(cible).toLocaleDateString("fr-FR", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-          timeZone: "UTC",
+        {m.rebours_coup_envoi({
+          date: new Date(cible).toLocaleDateString(formatDeLaLangue(), {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            timeZone: "UTC",
+          }),
         })}
-        .
       </p>
     </div>
   );

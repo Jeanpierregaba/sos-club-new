@@ -1,4 +1,5 @@
 import { CHAMPION, type JoueurPrime } from "@/lib/genie-imhotep-resultats";
+import { LANGUE_DE_BASE, langueCourante, ordinal as ordinalDeLaLangue } from "@/lib/langues";
 
 // Éditions du Championnat national Génie Imhotep, de la plus ancienne à la plus récente.
 // Chaque édition a sa page dans le Hall of Fame (/genie-imhotep/hall-of-fame/<id>) et dans le Palmarès
@@ -24,6 +25,8 @@ export const editions: Edition[] = [
 
 export const trouverEdition = (id: string) => editions.find((e) => e.id === id);
 
-export const ordinal = (n: number) => (n === 1 ? "1re" : `${n}e`);
+// « 1re édition » en français (le mot est féminin) ; « 1st », « 1. » dans les autres langues (spec 052).
+export const ordinal = (n: number) =>
+  langueCourante() === LANGUE_DE_BASE ? (n === 1 ? "1re" : `${n}e`) : ordinalDeLaLangue(n);
 
 export const libelleSaison = (id: string) => id.replace("-", " – ");

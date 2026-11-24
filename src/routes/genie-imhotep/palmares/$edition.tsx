@@ -30,6 +30,9 @@ import {
 } from "@/lib/genie-imhotep-resultats";
 import { dessins } from "@/lib/togo-dre";
 import mascottesTrophees from "@/assets/mascottes-trophees.webp";
+import { ContenuEnFrancais } from "@/components/ContenuEnFrancais";
+import { lien } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 // Le palmarès d'une édition : podium, joueurs primés et champions régionaux d'une saison jouée, ou le
 // compte à rebours d'une saison à venir. Une édition inconnue donne la page 404.
@@ -41,12 +44,12 @@ export const Route = createFileRoute("/genie-imhotep/palmares/$edition")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `Palmarès ${loaderData?.id ?? ""} — Génie Imhotep` },
+      { title: m.gpal_ed_meta_titre({ saison: loaderData?.id ?? "" }) },
       {
         name: "description",
-        content: `Le palmarès de l’édition ${loaderData?.id ?? ""} du Championnat national Génie Imhotep : le podium national, les joueurs primés et les champions régionaux.`,
+        content: m.gpal_ed_meta_description({ saison: loaderData?.id ?? "" }),
       },
-      { property: "og:title", content: `Palmarès Génie Imhotep ${loaderData?.id ?? ""}` },
+      { property: "og:title", content: m.gpal_ed_meta_og({ saison: loaderData?.id ?? "" }) },
     ],
   }),
   component: PalmaresEdition,
@@ -56,22 +59,22 @@ const couleur = (id: RegionId) => dessins[id]!.couleur;
 
 // Le podium de l'édition 2025-2026, tiré du tableau final : pas de match pour la 3e place, les deux
 // demi-finalistes battus la partagent.
-const finale = nationale.find((m) => m.tour === "finale")!;
+const finale = nationale.find((match) => match.tour === "finale")!;
 const equipe = (nom: string) => [finale.a, finale.b].find((e) => e.nom === nom)!;
 const champion = equipe(CHAMPION);
 const finaliste = [finale.a, finale.b].find((e) => e.nom !== CHAMPION)!;
 const demiFinalistes = nationale
-  .filter((m) => m.tour === "demi")
-  .map((m) => (m.a.nom === m.gagnant ? m.b : m.a));
+  .filter((match) => match.tour === "demi")
+  .map((match) => (match.a.nom === match.gagnant ? match.b : match.a));
 
 // Le tour le plus loin atteint au national par chaque champion régional.
 const parcoursNational = (nom: string) => {
-  if (nom === CHAMPION) return "Champion national";
-  if (nom === finaliste.nom) return "Finaliste";
-  if (demiFinalistes.some((e) => e.nom === nom)) return "Demi-finaliste";
-  return nationale.some((m) => m.a.nom === nom || m.b.nom === nom)
-    ? "Quart-de-finaliste"
-    : "Champion régional";
+  if (nom === CHAMPION) return m.edition_champion();
+  if (nom === finaliste.nom) return m.gpal_finaliste();
+  if (demiFinalistes.some((e) => e.nom === nom)) return m.gpal_demi_finaliste();
+  return nationale.some((match) => match.a.nom === nom || match.b.nom === nom)
+    ? m.gpal_quart()
+    : m.gpal_champion_regional();
 };
 
 function Equipe({ e, clair = false }: { e: EquipeNationale; clair?: boolean }) {
@@ -97,7 +100,7 @@ function Podium() {
   const marches = [
     {
       rang: "2",
-      titre: "Finaliste",
+      titre: m.gpal_finaliste(),
       equipes: [finaliste],
       hauteur: "h-28 md:h-36",
       fond: "bg-[color-mix(in_oklch,var(--sky)_85%,white)]",
@@ -106,7 +109,7 @@ function Podium() {
     },
     {
       rang: "1",
-      titre: "Champion national",
+      titre: m.edition_champion(),
       equipes: [champion],
       hauteur: "h-40 md:h-52",
       fond: "bg-sun",
@@ -115,7 +118,7 @@ function Podium() {
     },
     {
       rang: "3",
-      titre: "Demi-finalistes",
+      titre: m.gpal_demi_finalistes(),
       equipes: demiFinalistes,
       hauteur: "h-20 md:h-24",
       fond: "bg-[color-mix(in_oklch,var(--tangerine)_80%,white)]",
@@ -125,27 +128,32 @@ function Podium() {
   ];
   return (
     <ol className="mx-auto grid max-w-5xl items-end gap-6 md:grid-cols-3 md:gap-4">
-      {marches.map((m, i) => (
-        <li key={m.rang} data-reveal style={retard(i)} className={`flex flex-col ${m.ordre}`}>
+      {marches.map((marche, i) => (
+        <li
+          key={marche.rang}
+          data-reveal
+          style={retard(i)}
+          className={`flex flex-col ${marche.ordre}`}
+        >
           <div className="rounded-t-3xl bg-white p-5 text-center shadow-card ring-1 ring-border">
-            <m.icone
+            <marche.icone
               aria-hidden
-              className={`mx-auto size-8 ${m.rang === "1" ? "text-sun motion-safe:animate-float" : "text-logo-blue"}`}
+              className={`mx-auto size-8 ${marche.rang === "1" ? "text-sun motion-safe:animate-float" : "text-logo-blue"}`}
             />
             <p className="mt-2 text-xs font-extrabold uppercase tracking-widest text-logo-red">
-              {m.titre}
+              {marche.titre}
             </p>
             <div className="mt-3 grid gap-3">
-              {m.equipes.map((e) => (
+              {marche.equipes.map((e) => (
                 <Equipe key={e.nom} e={e} />
               ))}
             </div>
           </div>
           <div
             aria-hidden
-            className={`flex items-start justify-center rounded-b-xl pt-3 font-display text-5xl text-ink/80 md:text-6xl ${m.hauteur} ${m.fond}`}
+            className={`flex items-start justify-center rounded-b-xl pt-3 font-display text-5xl text-ink/80 md:text-6xl ${marche.hauteur} ${marche.fond}`}
           >
-            {m.rang}
+            {marche.rang}
           </div>
         </li>
       ))}
@@ -197,9 +205,9 @@ function JoueursPrimes({ joueurs }: { joueurs: JoueurPrime[] }) {
               ?
             </span>
           </span>
-          <p className="relative mt-4 font-display text-2xl text-logo-blue">Bientôt dévoilé</p>
+          <p className="relative mt-4 font-display text-2xl text-logo-blue">{m.gpal_bientot()}</p>
           <p className="relative mt-1 text-sm font-semibold text-muted-foreground">
-            Pseudonyme et établissement du joueur primé
+            {m.gpal_bientot_d()}
           </p>
         </li>
       ))}
@@ -212,34 +220,33 @@ function PalmaresAVenir({ edition }: { edition: Edition }) {
     <div className="mx-auto grid max-w-7xl items-end gap-8 px-5 pt-10 lg:grid-cols-[1.2fr_1fr]">
       <div className="pb-16 lg:pb-24">
         <p className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-logo-red">
-          <Hourglass className="size-4" /> {ordinal(edition.numero)} édition ·{" "}
-          {libelleSaison(edition.id)}
+          <Hourglass className="size-4" />{" "}
+          {m.edition_titre({ ordinal: ordinal(edition.numero), etat: libelleSaison(edition.id) })}
         </p>
         <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-          <span className="block">Un palmarès</span>
-          <span className="block text-sun">encore à écrire</span>
+          <span className="block">{m.gpal_a_ecrire_1()}</span>
+          <span className="block text-sun">{m.gpal_a_ecrire_2()}</span>
         </h1>
         <p className="mt-5 max-w-xl text-lg font-medium text-white/85">
-          Les lauréats de la saison {edition.id} seront inscrits ici à la fin du championnat. Le
-          coup d’envoi approche :
+          {m.gpal_a_venir_texte({ saison: edition.id })}
         </p>
         <div className="mt-6">
           {edition.debut ? (
             <CompteARebours cible={edition.debut} clair />
           ) : (
-            <p className="font-display text-3xl text-sun">Date bientôt annoncée</p>
+            <p className="font-display text-3xl text-sun">{m.edition_date_bientot()}</p>
           )}
         </div>
         <a
-          href="/genie-imhotep/inscription"
+          href={lien("/genie-imhotep/inscription")}
           className="btn-fx mt-9 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
         >
-          Inscrire mon établissement <ArrowRight className="size-4" />
+          {m.gi_inscrire()} <ArrowRight className="size-4" />
         </a>
       </div>
       <img
         src={mascottesTrophees}
-        alt="Des mascottes des Clubs Santé attendent les trophées de la prochaine édition"
+        alt={m.gpal_attente_alt()}
         width={1122}
         height={1402}
         className="mx-auto w-56 drop-shadow-2xl sm:w-72 lg:w-[24rem]"
@@ -267,36 +274,36 @@ function PalmaresEdition() {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 pt-8 md:pt-12">
           <FilAriane
             clair
-            rubrique="Génie Imhotep"
-            parent={{ t: "Palmarès", href: "/genie-imhotep/palmares" }}
-            page={`Édition ${libelleSaison(edition.id)}`}
+            rubrique={m.menu_genie_imhotep()}
+            parent={{ t: m.menu_palmares(), href: "/genie-imhotep/palmares" }}
+            page={m.gpal_edition_saison({ saison: libelleSaison(edition.id) })}
           />
           <a
-            href="/genie-imhotep/palmares#editions"
+            href={lien("/genie-imhotep/palmares#editions")}
             className="inline-flex items-center gap-1.5 text-sm font-bold text-white hover:underline"
           >
-            <ArrowLeft className="size-4" /> Toutes les éditions
+            <ArrowLeft className="size-4" /> {m.gpal_toutes_editions()}
           </a>
         </div>
         {terminee ? (
           <div className="mx-auto grid max-w-7xl items-end gap-8 px-5 pt-6 lg:grid-cols-[1.2fr_1fr]">
             <div data-reveal="left" className="pb-16 lg:pb-20">
               <p className="inline-flex items-center gap-2 rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-ink">
-                <Sparkles className="size-4" /> Palmarès · {ordinal(edition.numero)} édition
+                <Sparkles className="size-4" />{" "}
+                {m.gpal_badge_edition({ ordinal: ordinal(edition.numero) })}
               </p>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block">Les lauréats</span>
+                <span className="block">{m.gpal_laureats()}</span>
                 <span className="block text-sun">{libelleSaison(edition.id)}</span>
               </h1>
               <p className="mt-5 max-w-2xl text-lg font-medium text-white/85">
-                Ils ont buzzé plus vite, répondu plus juste et porté haut les couleurs de leur
-                établissement : honneur aux lauréats du Championnat national Génie Imhotep.
+                {m.gpal_laureats_texte()}
               </p>
               <p className="mt-8 inline-flex items-center gap-3 rounded-2xl bg-white px-5 py-3 shadow-card ring-1 ring-border">
                 <Crown aria-hidden className="size-6 text-tangerine" />
                 <span>
                   <span className="block text-xs font-extrabold uppercase tracking-widest text-muted-foreground">
-                    Champion national
+                    {m.edition_champion()}
                   </span>
                   <span className="font-display text-2xl text-logo-blue">{edition.champion}</span>
                 </span>
@@ -304,7 +311,7 @@ function PalmaresEdition() {
             </div>
             <img
               src={mascottesTrophees}
-              alt="Des mascottes des Clubs Santé brandissent leurs trophées"
+              alt={m.gpal_mascottes_alt()}
               width={1122}
               height={1402}
               data-reveal="zoom"
@@ -319,9 +326,14 @@ function PalmaresEdition() {
       {terminee && (
         <>
           <section className="mx-auto max-w-7xl px-5 py-20">
-            <EnTete sur="Phase nationale" bleu="Le podium" vert="national">
-              Les meilleurs établissements du tableau final, de la grande finale aux demi-finales.
+            <EnTete
+              sur={m.gpal_phase_nationale()}
+              bleu={m.gpal_podium_bleu()}
+              vert={m.gpal_podium_vert()}
+            >
+              {m.gpal_podium_texte()}
             </EnTete>
+            <ContenuEnFrancais className="mt-4" />
             <div className="mt-12">
               <Podium />
             </div>
@@ -329,9 +341,12 @@ function PalmaresEdition() {
 
           <section className="bg-white py-20">
             <div className="mx-auto max-w-7xl px-5">
-              <EnTete sur="Les talents de la saison" bleu="Les joueurs" vert="primés">
-                Les meilleurs joueurs de l’édition, présentés par leur pseudonyme et leur
-                établissement.
+              <EnTete
+                sur={m.gpal_talents_sur()}
+                bleu={m.gpal_talents_bleu()}
+                vert={m.gpal_talents_vert()}
+              >
+                {m.gpal_talents_texte()}
               </EnTete>
               <div className="mt-10">
                 <JoueursPrimes joueurs={edition.joueursPrimes ?? []} />
@@ -340,8 +355,12 @@ function PalmaresEdition() {
           </section>
 
           <section className="mx-auto max-w-7xl px-5 py-20">
-            <EnTete sur="Phase régionale" bleu="Les 7 champions" vert="régionaux">
-              Un champion par Direction Régionale de l’Éducation, qualifié pour la phase nationale.
+            <EnTete
+              sur={m.gpal_phase_regionale()}
+              bleu={m.gpal_regionaux_bleu()}
+              vert={m.gpal_regionaux_vert()}
+            >
+              {m.gpal_regionaux_texte()}
             </EnTete>
             <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {ordreRegions.map((id, i) => {
@@ -389,18 +408,18 @@ function PalmaresEdition() {
           >
             <div>
               <h2 className="text-3xl text-ink md:text-4xl">
-                Tous les matchs, <span className="text-logo-blue">phase par phase</span>
+                {m.gpal_tous_matchs_1()}{" "}
+                <span className="text-logo-blue">{m.gpal_tous_matchs_2()}</span>
               </h2>
               <p className="mt-2 max-w-2xl font-semibold text-ink/75">
-                Le parcours du champion, le tableau final et les résultats de chaque région sont
-                dans le Hall of Fame.
+                {m.gpal_tous_matchs_texte()}
               </p>
             </div>
             <a
-              href={`/genie-imhotep/hall-of-fame/${edition.id}`}
+              href={lien(`/genie-imhotep/hall-of-fame/${edition.id}`)}
               className="btn-fx inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
             >
-              Voir le Hall of Fame <ArrowRight className="size-4" />
+              {m.gi_voir_hof()} <ArrowRight className="size-4" />
             </a>
           </div>
         </section>

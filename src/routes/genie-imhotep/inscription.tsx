@@ -10,17 +10,14 @@ import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
 import grandesFinales from "@/assets/agenda-grandes-finales.jpg";
 import slideClubs from "@/assets/slide-clubs.webp";
 import story2 from "@/assets/story2.jpg";
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/genie-imhotep/inscription")({
   head: () => ({
     meta: [
-      { title: "Inscription — Génie Imhotep" },
-      {
-        name: "description",
-        content:
-          "Inscris ton établissement au Championnat national Génie Imhotep, au tournoi interclasses ou à la compétition télévisée sur SOS Docteur TV.",
-      },
-      { property: "og:title", content: "Inscription au Génie Imhotep" },
+      { title: m.gins_meta_titre() },
+      { name: "description", content: m.gins_meta_description() },
+      { property: "og:title", content: m.gins_meta_og() },
     ],
   }),
   // Sans l'API, le sélecteur de région reste vide : le formulaire n'est pas encore ouvert de toute façon.
@@ -30,8 +27,9 @@ export const Route = createFileRoute("/genie-imhotep/inscription")({
 
 type Champ = { l: string; ph: string; type?: "text" | "tel" | "email" | "dre" | "texte" };
 
-// `c` : la couleur de la compétition, posée en variable CSS sur son panneau.
-const competitions: {
+// `c` : la couleur de la compétition, posée en variable CSS sur son panneau. Une fonction : les textes suivent la
+// langue de la page (spec 052).
+const lesCompetitions = (): {
   id: string;
   onglet: string;
   i: LucideIcon;
@@ -49,148 +47,89 @@ const competitions: {
     accord?: string;
     bouton: string;
   };
-}[] = [
+}[] => [
   {
     id: "championnat",
-    onglet: "Championnat national",
+    onglet: m.gins_ch_onglet(),
     i: Trophy,
     c: "var(--logo-blue)",
     photo: grandesFinales,
-    citation: "C’est ici et maintenant",
-    titre: "Championnat national Génie Imhotep",
-    intro:
-      "Confrontation d’élite entre les meilleurs collèges et lycées du Togo sur la culture générale en santé, les gestes de premiers secours et le sens civique.",
+    citation: m.gins_ch_citation(),
+    titre: m.gins_ch_titre(),
+    intro: m.gins_ch_intro(),
     blocs: [
-      {
-        t: "Critères d’éligibilité",
-        items: [
-          "Établissement scolaire homologué par le ministère de tutelle (MEPSTA).",
-          "Club Santé officiellement installé avec son bureau de 21 élèves.",
-          "Équipe de 4 titulaires et 2 remplaçants (parité filles/garçons encouragée).",
-        ],
-      },
-      {
-        t: "Format des épreuves",
-        items: [
-          "Phase 1 : éliminatoires par inspection (IESG), à l’écrit et en QCM rapide.",
-          "Phase 2 : finales régionales au chef-lieu de chaque DRE.",
-          "Phase 3 : Grande Finale nationale retransmise en direct à Lomé.",
-        ],
-      },
-      {
-        t: "Récompenses & bourses",
-        items: [
-          "Bourses d’excellence scolaire pour les lauréats et trophée national Imhotep.",
-          "Équipements médicaux d’infirmerie et trousses de secours pour l’école.",
-          "Attestations officielles d’honneur signées par AIMES-AFRIQUE et les ministères.",
-        ],
-      },
+      { t: m.gins_ch_b1(), items: [m.gins_ch_b1_1(), m.gins_ch_b1_2(), m.gins_ch_b1_3()] },
+      { t: m.gins_ch_b2(), items: [m.gins_ch_b2_1(), m.gins_ch_b2_2(), m.gins_ch_b2_3()] },
+      { t: m.gins_ch_b3(), items: [m.gins_ch_b3_1(), m.gins_ch_b3_2(), m.gins_ch_b3_3()] },
     ],
     formulaire: {
-      sur: "Formulaire officiel national 2026",
-      t: "Inscription au championnat national",
-      note: "Ce formulaire doit être validé par le chef d’établissement ou le responsable d’encadrement du Club Santé.",
+      sur: m.gins_ch_sur(),
+      t: m.gins_ch_t(),
+      note: m.gins_ch_note(),
       champs: [
-        { l: "Nom de l’établissement", ph: "Ex : Lycée de Tokoin, Lycée d’Aného…" },
-        { l: "Direction régionale (DRE)", ph: "", type: "dre" },
-        { l: "Ville / localité", ph: "Ex : Lomé, Atakpamé, Kara, Sokodé…" },
-        { l: "Nom du proviseur / encadreur", ph: "Ex : M. Koffi Mensah" },
-        { l: "Téléphone de contact", ph: "+228 90 00 00 00", type: "tel" },
-        { l: "E-mail officiel", ph: "contact@etablissement.tg", type: "email" },
+        { l: m.gins_champ_etablissement(), ph: m.gins_ph_etablissement() },
+        { l: m.gins_champ_dre(), ph: "", type: "dre" },
+        { l: m.gins_champ_ville(), ph: m.gins_ph_ville() },
+        { l: m.gins_champ_proviseur(), ph: m.gins_ph_proviseur() },
+        { l: m.gins_champ_telephone(), ph: "+228 90 00 00 00", type: "tel" },
+        { l: m.gins_champ_email(), ph: "contact@etablissement.tg", type: "email" },
       ],
-      accord:
-        "Je certifie l’exactitude des informations et déclare adhérer au règlement officiel du Championnat national Génie Imhotep.",
-      bouton: "Valider l’inscription au championnat",
+      accord: m.gins_ch_accord(),
+      bouton: m.gins_ch_bouton(),
     },
   },
   {
     id: "interclasses",
-    onglet: "Compétitions interclasses",
+    onglet: m.gins_ic_onglet(),
     i: School,
     c: "var(--primary)",
     photo: slideClubs,
-    citation: "Des bancs de classe aux projecteurs de l’excellence",
-    titre: "Les compétitions interclasses",
-    intro:
-      "L’émulation commence dans les classes ! Affronte les autres niveaux, de la 6e à la Terminale, lors des journées culturelles et scientifiques de ton collège ou de ton lycée.",
+    citation: m.gins_ic_citation(),
+    titre: m.gins_ic_titre(),
+    intro: m.gins_ic_intro(),
     blocs: [
-      {
-        t: "Règles du tournoi",
-        items: [
-          "Format d’équipe : chaque classe aligne 4 délégués santé désignés lors de l’assemblée de classe.",
-          "Épreuves : speed-quiz santé, démonstration pratique de la PLS (position latérale de sécurité) et sketch de sensibilisation.",
-          "Validation : les 3 enseignants encadreurs du Club Santé composent le jury d’évaluation.",
-        ],
-      },
-      {
-        t: "Avantages pour la classe gagnante",
-        items: [
-          "Qualification directe pour représenter l’établissement aux éliminatoires régionales.",
-          "Fanion d’honneur « Classe Sentinelle de Santé » et fournitures scolaires.",
-          "Mise en avant dans le magazine officiel et sur la page Facebook des Clubs Santé.",
-        ],
-      },
+      { t: m.gins_ic_b1(), items: [m.gins_ic_b1_1(), m.gins_ic_b1_2(), m.gins_ic_b1_3()] },
+      { t: m.gins_ic_b2(), items: [m.gins_ic_b2_1(), m.gins_ic_b2_2(), m.gins_ic_b2_3()] },
     ],
     formulaire: {
-      sur: "Organisation locale d’établissement",
-      t: "Inscrire une classe au tournoi interne",
+      sur: m.gins_ic_sur(),
+      t: m.gins_ic_t(),
       // Le contact demandé est celui de l'encadreur, jamais celui d'un élève (docs/RULES.md).
       champs: [
-        { l: "Établissement", ph: "Ex : Lycée Bè-Klikamé" },
-        { l: "Classe candidate", ph: "Ex : 3e B, 1re D, Tle A4…" },
-        { l: "Enseignant encadreur référent", ph: "Nom de l’encadreur du Club Santé" },
-        { l: "Téléphone de l’encadreur", ph: "+228 90 00 00 00", type: "tel" },
+        { l: m.gins_champ_etab_court(), ph: m.gins_ph_etab_court() },
+        { l: m.gins_champ_classe(), ph: m.gins_ph_classe() },
+        { l: m.gins_champ_referent(), ph: m.gins_ph_referent() },
+        { l: m.gins_champ_tel_encadreur(), ph: "+228 90 00 00 00", type: "tel" },
       ],
-      bouton: "Enregistrer l’équipe de la classe",
+      bouton: m.gins_ic_bouton(),
     },
   },
   {
     id: "television",
-    onglet: "Compétition télévisée",
+    onglet: m.gins_tv_onglet(),
     i: Tv,
     c: "var(--logo-red)",
     photo: story2,
-    citation: "La télévision au cœur de l’éducation civique",
-    titre: "Compétition télévisée (studio SOS Docteur TV)",
-    intro:
-      "Participe aux enregistrements officiels en direct des studios de SOS Docteur TV à Lomé : une expérience unique de média, d’éloquence et d’impact national.",
+    citation: m.gins_tv_citation(),
+    titre: m.gins_tv_titre(),
+    intro: m.gins_tv_intro(),
     blocs: [
-      {
-        t: "Conditions de passage TV",
-        items: [
-          "Les équipes sélectionnées portent l’uniforme officiel de leur établissement et le tee-shirt aux couleurs du Club Santé SOS Docteur TV.",
-        ],
-      },
-      {
-        t: "Autorisation parentale & droit à l’image",
-        items: [
-          "Chaque élève mineur participant au plateau TV fournit une fiche d’autorisation parentale signée, qui autorise la diffusion télévisée et numérique.",
-        ],
-      },
-      {
-        t: "Coaching & préparation studio",
-        items: [
-          "Une initiation à la prise de parole en public et au fonctionnement d’un plateau télévisé est proposée avant le tournage.",
-        ],
-      },
+      { t: m.gins_tv_b1(), items: [m.gins_tv_b1_1()] },
+      { t: m.gins_tv_b2(), items: [m.gins_tv_b2_1()] },
+      { t: m.gins_tv_b3(), items: [m.gins_tv_b3_1()] },
     ],
     formulaire: {
-      sur: "Postulation au plateau télévisé",
-      t: "Candidater pour la compétition télévisée",
+      sur: m.gins_tv_sur(),
+      t: m.gins_tv_t(),
       champs: [
-        { l: "Nom de l’équipe / du club", ph: "Ex : Les Sentinelles du Lycée de Tokoin" },
-        { l: "Établissement représenté", ph: "Ex : Lycée moderne d’Anié" },
-        { l: "Nom de l’enseignant tuteur", ph: "Nom de l’encadreur accompagnateur" },
-        { l: "Téléphone de l’encadreur", ph: "+228 90 00 00 00", type: "tel" },
-        {
-          l: "Brève motivation de l’équipe",
-          ph: "Pourquoi ton équipe souhaite-t-elle participer à la compétition télévisée ?",
-          type: "texte",
-        },
+        { l: m.gins_champ_equipe(), ph: m.gins_ph_equipe() },
+        { l: m.gins_champ_etab_represente(), ph: m.gins_ph_etab_represente() },
+        { l: m.gins_champ_tuteur(), ph: m.gins_ph_tuteur() },
+        { l: m.gins_champ_tel_encadreur(), ph: "+228 90 00 00 00", type: "tel" },
+        { l: m.gins_champ_motivation(), ph: m.gins_ph_motivation(), type: "texte" },
       ],
-      accord:
-        "L’équipe et l’établissement acceptent le droit à l’image pour les retransmissions télévisées et les plateformes officielles SOS Docteur TV.",
-      bouton: "Soumettre la candidature",
+      accord: m.gins_tv_accord(),
+      bouton: m.gins_tv_bouton(),
     },
   },
 ];
@@ -210,6 +149,7 @@ function Libelle({ l, children }: { l: string; children: ReactNode }) {
 function Inscription() {
   const dres = Route.useLoaderData();
   const [actif, setActif] = useState("championnat");
+  const competitions = lesCompetitions();
   const c = competitions.find((x) => x.id === actif) ?? competitions[0]!;
 
   return (
@@ -229,26 +169,23 @@ function Inscription() {
         />
         <div className="mx-auto grid max-w-7xl items-end gap-6 px-5 pt-8 md:pt-12 lg:grid-cols-[1.3fr_1fr]">
           <div className="pb-14 lg:pb-20">
-            <FilAriane rubrique="Génie Imhotep" page="Inscription" clair />
+            <FilAriane rubrique={m.menu_genie_imhotep()} page={m.gins_inscription()} clair />
             <div data-reveal="left" className="pt-12 lg:pt-16">
               <span className="inline-flex rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-ink">
-                Inscription officielle · Génie Imhotep
+                {m.gins_officielle()}
               </span>
               <h1 className="mt-5 text-5xl leading-[0.95] [text-shadow:0_2px_14px_rgb(0_0_0/0.18)] md:text-7xl">
                 <span className="block">Génie Imhotep</span>
                 <span className="mt-2 block text-3xl text-sun md:text-5xl">
-                  Premier jeu de culture en santé publique
+                  {m.gins_premier_jeu()}
                 </span>
               </h1>
-              <p className="mt-6 max-w-xl text-lg font-semibold text-white/90">
-                Promotion de la culture générale en santé publique auprès des adolescents et des
-                jeunes. Choisis ta compétition et inscris ton équipe.
-              </p>
+              <p className="mt-6 max-w-xl text-lg font-semibold text-white/90">{m.gins_intro()}</p>
             </div>
           </div>
           <img
             src={mascotteImhotep}
-            alt="La mascotte Génie Imhotep"
+            alt={m.gins_mascotte_alt()}
             width={1414}
             height={2000}
             data-reveal="right"
@@ -259,7 +196,7 @@ function Inscription() {
 
       {/* Sélecteur : une grande carte par compétition, qui chevauche le bas de la bannière. */}
       <div className="relative z-10 mx-auto -mt-10 max-w-7xl px-5">
-        <div role="group" aria-label="Compétitions" className="grid gap-3 sm:grid-cols-3">
+        <div role="group" aria-label={m.gins_competitions()} className="grid gap-3 sm:grid-cols-3">
           {competitions.map((x) => {
             const on = x.id === actif;
             return (
@@ -300,7 +237,7 @@ function Inscription() {
             />
             <figcaption className="absolute inset-0 flex items-end bg-linear-to-t from-night/85 via-night/20 to-transparent p-6">
               <span className="font-hand text-2xl leading-tight text-white md:text-3xl">
-                « {c.citation} »
+                {m.commun_citation({ texte: c.citation })}
               </span>
             </figcaption>
           </figure>
@@ -342,8 +279,7 @@ function Inscription() {
           )}
           <p className="mt-5 flex items-start gap-3 rounded-2xl bg-sun/25 p-4 text-sm font-bold">
             <CalendarClock className="mt-0.5 size-5 shrink-0" />
-            Les inscriptions en ligne ouvrent bientôt. En attendant, rapproche-toi de ta DRE ou de
-            la coordination nationale.
+            {m.gins_bientot()}
           </p>
           <fieldset disabled className="mt-6 grid gap-4 opacity-80">
             {c.formulaire.champs.map((f) => (
@@ -351,7 +287,7 @@ function Inscription() {
                 {f.type === "dre" ? (
                   <select className={champCls} defaultValue="">
                     <option value="" disabled>
-                      Choisis ta région
+                      {m.gins_choisis_region()}
                     </option>
                     {dres.map((d) => (
                       <option key={d.code} value={d.code}>

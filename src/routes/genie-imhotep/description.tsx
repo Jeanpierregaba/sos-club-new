@@ -32,201 +32,126 @@ import mascotteImhotep from "@/assets/mascotte-imhotep.webp";
 import mascottesLivres from "@/assets/mascottes-livres.webp";
 import slideGenie from "@/assets/slide-genie.jpg";
 import grandesFinales from "@/assets/agenda-grandes-finales.jpg";
+import { lien } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/genie-imhotep/description")({
   head: () => ({
     meta: [
-      { title: "Description — Génie Imhotep" },
-      {
-        name: "description",
-        content:
-          "L'Académie Génie Imhotep, le jeu de culture générale en santé des Clubs Santé SOS DOCTEUR TV : origine du nom, règles du match, rubriques, championnat national et émission télévisée.",
-      },
-      { property: "og:title", content: "L'Académie Génie Imhotep" },
+      { title: m.gi_meta_titre() },
+      { name: "description", content: m.gi_meta_description() },
+      { property: "og:title", content: m.gi_meta_og() },
     ],
   }),
   component: Description,
 });
 
-// Contenus repris du document « Académie Génie Imhotep — présentation » remis par AIMES-AFRIQUE.
+// Contenus repris du document « Académie Génie Imhotep — présentation » remis par AIMES-AFRIQUE. Des fonctions : les
+// textes suivent la langue de la page (spec 052).
 
-const chiffres = [
-  { n: "+5 000", t: "questions-réponses à réviser" },
-  { n: "11", t: "rubriques de jeu" },
-  { n: "2", t: "catégories : secondaire 1 et 2" },
-  { n: "12", t: "matchs par saison télévisée" },
+const chiffres = () => [
+  { n: "+5 000", t: m.gi_chiffre_questions() },
+  { n: "11", t: m.gi_chiffre_rubriques() },
+  { n: "2", t: m.gi_chiffre_categories() },
+  { n: "12", t: m.gi_chiffre_matchs() },
 ];
 
-const roles = ["Architecte", "Ingénieur", "Prêtre", "Écrivain", "Médecin"];
-
-const reperes = [
-  { t: "Vers 2700 à 2667 av. J.-C.", d: "Naissance à Memphis (ou Anoué), sous la 3e dynastie." },
-  { t: "Vizir du pharaon Djéser", d: "Son premier conseiller." },
-  { t: "Pyramide de Saqqarah", d: "La pyramide à degrés, premier grand monument de pierre." },
-  {
-    t: "Papyrus Edwin Smith",
-    d: "La tradition lui attribue ses savoirs, consignés dans un des plus anciens traités de médecine : diagnostic, examen, pronostic, traitement.",
-  },
-  {
-    t: "Plus de 2 000 ans avant Hippocrate",
-    d: "Que l'on présente souvent comme le « père de la médecine ».",
-  },
+const roles = () => [
+  m.gi_role_architecte(),
+  m.gi_role_ingenieur(),
+  m.gi_role_pretre(),
+  m.gi_role_ecrivain(),
+  m.gi_role_medecin(),
 ];
 
-const objectifs: { i: LucideIcon; c: string; t: string }[] = [
-  {
-    i: BookOpen,
-    c: "var(--logo-blue)",
-    t: "Renforcer les connaissances en promotion de la santé, bien-être, éducation aux valeurs et santé sexuelle et reproductive.",
-  },
-  {
-    i: ShieldCheck,
-    c: "var(--primary)",
-    t: "Donner aux jeunes les compétences pour prévenir les maladies, décider en connaissance de cause et adopter des comportements responsables.",
-  },
-  {
-    i: Lightbulb,
-    c: "var(--tangerine)",
-    t: "Apprendre de manière ludique, interactive et durable, par la compétition.",
-  },
-  {
-    i: Trophy,
-    c: "var(--logo-red)",
-    t: "Encourager l'excellence en valorisant les meilleurs élèves et établissements, au Togo et en Afrique.",
-  },
+const reperes = () => [
+  { t: m.gi_repere_1(), d: m.gi_repere_1_d() },
+  { t: m.gi_repere_2(), d: m.gi_repere_2_d() },
+  { t: m.gi_repere_3(), d: m.gi_repere_3_d() },
+  { t: m.gi_repere_4(), d: m.gi_repere_4_d() },
+  { t: m.gi_repere_5(), d: m.gi_repere_5_d() },
 ];
 
-const fascicules = [
+const objectifs = (): { i: LucideIcon; c: string; t: string }[] => [
+  { i: BookOpen, c: "var(--logo-blue)", t: m.gi_objectif_1() },
+  { i: ShieldCheck, c: "var(--primary)", t: m.gi_objectif_2() },
+  { i: Lightbulb, c: "var(--tangerine)", t: m.gi_objectif_3() },
+  { i: Trophy, c: "var(--logo-red)", t: m.gi_objectif_4() },
+];
+
+const fascicules = () => [
   // Vert assombri : sur le vert du site, le texte blanc et le jaune manqueraient de contraste.
   {
     n: "2 000",
-    t: "questions-réponses",
-    pour: "Secondaire I",
+    t: m.gi_questions_reponses(),
+    pour: m.gi_secondaire_1(),
     c: "color-mix(in oklch, var(--primary) 70%, black)",
   },
-  { n: "3 000", t: "questions-réponses", pour: "Secondaire II", c: "var(--logo-blue)" },
-  { n: "EVSS", t: "questions-réponses", pour: "Émission télévisée", c: "var(--grape)" },
+  { n: "3 000", t: m.gi_questions_reponses(), pour: m.gi_secondaire_2(), c: "var(--logo-blue)" },
+  { n: "EVSS", t: m.gi_questions_reponses(), pour: m.gi_emission_tv(), c: "var(--grape)" },
 ];
 
-const conditions = [
-  "Un bureau en place",
-  "Des membres inscrits",
-  "Des encadreurs",
-  "Des commissions actives qui rendent compte",
+const conditions = () => [
+  m.gi_condition_1(),
+  m.gi_condition_2(),
+  m.gi_condition_3(),
+  m.gi_condition_4(),
 ];
 
-const acteurs: { i: LucideIcon; t: string; d: string; c: string }[] = [
+const acteurs = (): { id: string; i: LucideIcon; t: string; d: string; c: string }[] => [
+  { id: "bloc", i: Users, t: m.gi_acteur_bloc(), c: "var(--logo-blue)", d: m.gi_acteur_bloc_d() },
   {
-    i: Users,
-    t: "Le bloc",
-    c: "var(--logo-blue)",
-    d: "L'équipe : 6 joueurs, dont 3 en jeu et 3 remplaçants, avec leur encadreur. Tous doivent jouer pendant le match ; on change entre deux rubriques.",
-  },
-  {
+    id: "interne",
     i: Mic,
-    t: "L'interne",
+    t: m.gi_acteur_interne(),
     c: "var(--primary)",
-    d: "Le présentateur : il lit les questions, donne la parole à l'équipe qui buzze en premier, dit si la réponse est juste et anime le jeu.",
+    d: m.gi_acteur_interne_d(),
   },
   {
+    id: "staff",
     i: Scale,
-    t: "Le staff",
+    t: m.gi_acteur_staff(),
     c: "var(--tangerine)",
-    d: "Le jury de 2 ou 3 personnes, dont un président : réponses, score, chronomètre, litiges et sanctions. En cas de désaccord, il l'emporte sur l'interne.",
+    d: m.gi_acteur_staff_d(),
   },
   {
+    id: "patient",
     i: HeartPulse,
-    t: "Le patient",
+    t: m.gi_acteur_patient(),
     c: "var(--logo-red)",
-    d: "Le personnage fictif à « guérir » : il ne connaît pas sa maladie, et chaque rubrique est une étape de sa prise en charge.",
+    d: m.gi_acteur_patient_d(),
   },
 ];
 
-const postes = ["Chirurgien", "Anesthésiste", "Instrumentiste"];
-
-// Les rubriques d'un match, dans l'ordre du parcours du patient. `tv` : jouée aussi à l'émission.
-const rubriques = [
-  {
-    t: "Admission",
-    p: "Un joueur seul répond à 5 questions, 3 secondes par question.",
-    pts: "+10 par réponse, +10 de bonus si 5/5",
-  },
-  {
-    t: "Constante",
-    p: "Questions rapides dont toutes les réponses commencent par la même lettre.",
-    pts: "+10 ; –10 si mauvaise lettre",
-  },
-  {
-    t: "Consultation",
-    p: "Questions posées à tour de rôle à chaque équipe.",
-    pts: "+20 ; réplique +10",
-  },
-  {
-    t: "Diagnostic",
-    p: "Des indices de plus en plus faciles pour trouver la réponse.",
-    pts: "40, 30, 20 ou 10 selon l'indice",
-  },
-  {
-    t: "Dossier médical",
-    p: "Questions sur un thème choisi par l'équipe qui mène.",
-    pts: "+20 ; réplique +10",
-  },
-  {
-    t: "Scanner",
-    p: "Un joueur fait deviner 3 mots à un coéquipier en 30 secondes, un indice à la fois.",
-    pts: "+10 par mot, +10 de bonus",
-  },
-  {
-    t: "Orthopédie",
-    p: "Former un nouveau mot en retirant et en ajoutant des lettres au précédent.",
-    pts: "+10",
-  },
-  {
-    t: "Points de suture",
-    p: "Relier les éléments de deux listes et trouver l'élément manquant.",
-    pts: "+10 par bonne association",
-  },
-  {
-    t: "État de choc",
-    p: "Questions éclairs : le premier qui buzze répond.",
-    pts: "+10 ; –10 si buzz trop tôt et erreur",
-  },
-  {
-    t: "Réanimation",
-    p: "Questions en cascade : chaque réponse commence par la lettre suivante de l'alphabet.",
-    pts: "+10",
-  },
-  {
-    t: "Exeat",
-    p: "Ultime chance pour l'équipe menée de peu : duel en face à face sur 10 questions. Hors émission télévisée.",
-    pts: "Comme l'état de choc",
-  },
+const postes = () => [
+  m.gi_poste_chirurgien(),
+  m.gi_poste_anesthesiste(),
+  m.gi_poste_instrumentiste(),
 ];
 
-const regles: { i: LucideIcon; t: string; d: string }[] = [
-  {
-    i: ClipboardCheck,
-    t: "Le score",
-    d: "La somme des points gagnés moins les pénalités ; il ne peut pas être négatif en fin de match.",
-  },
-  {
-    i: Sparkles,
-    t: "Le public",
-    d: "Cris de génie, slam, chanson, chorégraphie : les supporters rapportent de 0 à 50 points de jury à leur équipe en fin de match.",
-  },
-  {
-    i: ShieldCheck,
-    t: "Le fair-play",
-    d: "Insultes, moqueries ou violences sont sanctionnées : retrait de points, défaite sur tapis vert, voire exclusion.",
-  },
-  {
-    i: Star,
-    t: "La fiche de match",
-    d: "Chaque match a sa fiche officielle signée, qui désigne aussi l'homme du match.",
-  },
+// Les rubriques d'un match, dans l'ordre du parcours du patient.
+const rubriques = () => [
+  { t: m.gi_rub_1(), p: m.gi_rub_1_p(), pts: m.gi_rub_1_pts() },
+  { t: m.gi_rub_2(), p: m.gi_rub_2_p(), pts: m.gi_rub_2_pts() },
+  { t: m.gi_rub_3(), p: m.gi_rub_3_p(), pts: m.gi_rub_3_pts() },
+  { t: m.gi_rub_4(), p: m.gi_rub_4_p(), pts: m.gi_rub_4_pts() },
+  { t: m.gi_rub_5(), p: m.gi_rub_5_p(), pts: m.gi_rub_3_pts() },
+  { t: m.gi_rub_6(), p: m.gi_rub_6_p(), pts: m.gi_rub_6_pts() },
+  { t: m.gi_rub_7(), p: m.gi_rub_7_p(), pts: "+10" },
+  { t: m.gi_rub_8(), p: m.gi_rub_8_p(), pts: m.gi_rub_8_pts() },
+  { t: m.gi_rub_9(), p: m.gi_rub_9_p(), pts: m.gi_rub_9_pts() },
+  { t: m.gi_rub_10(), p: m.gi_rub_10_p(), pts: "+10" },
+  { t: m.gi_rub_11(), p: m.gi_rub_11_p(), pts: m.gi_rub_11_pts() },
 ];
 
-const composantes: {
+const regles = (): { i: LucideIcon; t: string; d: string }[] => [
+  { i: ClipboardCheck, t: m.gi_regle_score(), d: m.gi_regle_score_d() },
+  { i: Sparkles, t: m.gi_regle_public(), d: m.gi_regle_public_d() },
+  { i: ShieldCheck, t: m.gi_regle_fairplay(), d: m.gi_regle_fairplay_d() },
+  { i: Star, t: m.gi_regle_fiche(), d: m.gi_regle_fiche_d() },
+];
+
+const composantes = (): {
   id: string;
   i: LucideIcon;
   t: string;
@@ -235,67 +160,63 @@ const composantes: {
   qui: string;
   quand: string;
   but: string;
-}[] = [
+}[] => [
   {
     id: "interclasses",
     i: School,
-    t: "Matchs inter-classes",
+    t: m.gi_comp_interclasses(),
     c: "var(--primary)",
-    ou: "Dans chaque établissement",
-    qui: "Les équipes des différentes classes",
-    quand: "Tout au long de l'année scolaire",
-    but: "Faire jouer tous les élèves et désigner la meilleure équipe de l'établissement",
+    ou: m.gi_comp_interclasses_ou(),
+    qui: m.gi_comp_interclasses_qui(),
+    quand: m.gi_comp_interclasses_quand(),
+    but: m.gi_comp_interclasses_but(),
   },
   {
     id: "championnat",
     i: Trophy,
-    t: "Championnat national",
+    t: m.gi_comp_championnat(),
     c: "var(--logo-blue)",
-    ou: "De la préfecture au niveau national",
-    qui: "Les meilleures équipes de chaque niveau",
-    quand: "De janvier à avril",
-    but: "Désigner les meilleures équipes du pays",
+    ou: m.gi_comp_championnat_ou(),
+    qui: m.gi_comp_championnat_qui(),
+    quand: m.gi_comp_championnat_quand(),
+    but: m.gi_comp_championnat_but(),
   },
   {
     id: "emission",
     i: Tv,
-    t: "Émission télévisée",
+    t: m.gi_emission_tv(),
     c: "var(--grape)",
-    ou: "Studio Prof JAMES, SOS DOCTEUR TV",
-    qui: "Deux établissements par émission",
-    quand: "Chaque samedi à 10 h, 12 matchs par saison",
-    but: "Faire rayonner le jeu et les clubs auprès du grand public",
+    ou: m.gi_comp_emission_ou(),
+    qui: m.gi_comp_emission_qui(),
+    quand: m.gi_comp_emission_quand(),
+    but: m.gi_comp_emission_but(),
   },
 ];
 
-const phases = [
-  { t: "Phase préfectorale", d: "La meilleure équipe de la préfecture" },
-  { t: "Phase inspectorale", d: "La meilleure équipe de l'inspection" },
-  { t: "Phase régionale", d: "La meilleure équipe de la région éducative" },
-  { t: "Phase nationale", d: "Les 7 champions régionaux" },
-  { t: "Grande finale", d: "Le champion national" },
+const phases = () => [
+  { t: m.gi_phase_1(), d: m.gi_phase_1_d() },
+  { t: m.gi_phase_2(), d: m.gi_phase_2_d() },
+  { t: m.gi_phase_3(), d: m.gi_phase_3_d() },
+  { t: m.gi_phase_4(), d: m.gi_phase_4_d() },
+  { t: m.gi_phase_5(), d: m.gi_phase_5_d() },
 ];
 
-const emission = [
-  "Chaque émission oppose deux équipes en confrontation directe, selon les règles du jeu, sans la rubrique Exeat.",
-  "L'équipe gagnante devient tenante du titre et le remet en jeu face à un nouveau challenger, jusqu'à trois matchs. Sa cagnotte augmente à chaque victoire.",
-  "Pour la saison 3, les participants sont des clubs santé champions préfectoraux du Grand Lomé et de la région Maritime.",
-  "L'émission fait connaître le jeu, les clubs santé et les messages de santé bien au-delà de l'école.",
-];
+const emission = () => [m.gi_emission_1(), m.gi_emission_2(), m.gi_emission_3(), m.gi_emission_4()];
 
-const resume: { i: LucideIcon; t: string; d: string }[] = [
-  { i: BookOpen, t: "Un fascicule", d: "pour apprendre" },
-  { i: School, t: "Des matchs en classe", d: "pour s'entraîner" },
-  { i: Trophy, t: "Un championnat", d: "pour se mesurer aux meilleurs" },
-  { i: Tv, t: "Une émission", d: "pour briller devant tout le pays" },
+const resume = (): { i: LucideIcon; t: string; d: string }[] => [
+  { i: BookOpen, t: m.gi_resume_1(), d: m.gi_resume_1_d() },
+  { i: School, t: m.gi_resume_2(), d: m.gi_resume_2_d() },
+  { i: Trophy, t: m.gi_resume_3(), d: m.gi_resume_3_d() },
+  { i: Tv, t: m.gi_resume_4(), d: m.gi_resume_4_d() },
 ];
 
 const couleur = (c: string) => ({ "--c": c }) as CSSProperties;
 
 function Description() {
   const [etape, setEtape] = useState(0);
-  const rubrique = rubriques[etape] ?? rubriques[0]!;
-  const progression = Math.round(((etape + 1) / rubriques.length) * 100);
+  const listeRubriques = rubriques();
+  const rubrique = listeRubriques[etape] ?? listeRubriques[0]!;
+  const progression = Math.round(((etape + 1) / listeRubriques.length) * 100);
 
   return (
     <div className="min-h-screen overflow-x-clip bg-carnet text-ink">
@@ -313,36 +234,30 @@ function Description() {
 
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 pt-8 md:pt-12 lg:grid-cols-[1.15fr_1fr]">
           <div className="pb-10 lg:pb-20">
-            <FilAriane rubrique="Génie Imhotep" page="Description" clair />
+            <FilAriane rubrique={m.menu_genie_imhotep()} page={m.menu_description()} clair />
             <div data-reveal="left" className="pt-10 lg:pt-14">
               <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-bold backdrop-blur-sm">
-                <span className="size-2 rounded-full bg-sun" /> Axe 1 des Clubs Santé
+                <span className="size-2 rounded-full bg-sun" /> {m.gi_axe_1()}
               </p>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block">Académie</span>
+                <span className="block">{m.gi_academie()}</span>
                 <span className="block text-sun">Génie Imhotep</span>
               </h1>
-              <p className="mt-5 text-xl font-extrabold md:text-2xl">
-                Le jeu de culture générale en santé des Clubs Santé SOS DOCTEUR TV
-              </p>
-              <p className="mt-4 max-w-xl text-lg font-medium text-white/80">
-                Des équipes d’élèves des collèges et lycées du Togo s’affrontent au buzzer sur des
-                questions de santé, d’éducation aux valeurs et de santé sexuelle. Conçu par l’ONG
-                AIMES-AFRIQUE, diffusé sur SOS DOCTEUR TV.
-              </p>
+              <p className="mt-5 text-xl font-extrabold md:text-2xl">{m.gi_sous_titre()}</p>
+              <p className="mt-4 max-w-xl text-lg font-medium text-white/80">{m.gi_intro()}</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <a
-                  href="/genie-imhotep/inscription"
+                  href={lien("/genie-imhotep/inscription")}
                   className="btn-fx group flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-[15px] font-bold text-primary-foreground shadow-card"
                 >
-                  Inscrire mon établissement
+                  {m.gi_inscrire()}
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                 </a>
                 <a
                   href="#match"
                   className="btn-fx flex h-12 items-center gap-2 rounded-full border-2 border-white/60 bg-white/10 px-6 text-[15px] font-bold backdrop-blur-sm"
                 >
-                  Découvrir les règles
+                  {m.gi_decouvrir_regles()}
                 </a>
               </div>
             </div>
@@ -354,15 +269,15 @@ function Description() {
           >
             <img
               src={mascottesVs}
-              alt="Deux mascottes des Clubs Santé face à face, au-dessus d’un grand « VS » doré"
+              alt={m.gi_mascottes_alt()}
               width={2000}
               height={2000}
               className="w-full drop-shadow-2xl"
             />
             <p className="absolute left-0 top-6 -rotate-6 rounded-2xl bg-sun px-4 py-2 font-display text-lg leading-tight text-ink shadow-card sm:text-xl">
-              « Génie Imhotep,
+              {m.gi_devise_1()}
               <br />
-              c’est ici et maintenant »
+              {m.gi_devise_2()}
             </p>
           </div>
         </div>
@@ -374,7 +289,7 @@ function Description() {
           data-reveal
           className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl bg-border shadow-card ring-4 ring-white md:grid-cols-4"
         >
-          {chiffres.map((c) => (
+          {chiffres().map((c) => (
             <div key={c.t} className="flex flex-col-reverse bg-white p-5 text-center md:p-6">
               <dt className="mt-1 text-sm font-bold text-muted-foreground">{c.t}</dt>
               <dd className="font-display text-4xl text-logo-blue md:text-5xl">{c.n}</dd>
@@ -387,23 +302,20 @@ function Description() {
       <section id="imhotep" className="mx-auto max-w-7xl scroll-mt-16 px-5 py-20">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
           <div>
-            <EnTete sur="Aux origines du nom" bleu="Qui était" vert="Imhotep ?" />
+            <EnTete
+              sur={m.gi_origines_sur()}
+              bleu={m.gi_origines_bleu()}
+              vert={m.gi_origines_vert()}
+            />
             <div data-reveal className="mt-6 space-y-4 text-lg leading-relaxed text-ink/80">
               <p>
-                Imhotep, dont le nom signifie{" "}
-                <strong className="text-ink">« celui qui vient en paix »</strong>, est un grand
-                savant de l’Égypte ancienne. Il vécut sous le règne du pharaon Djéser, dont il fut
-                le vizir, c’est-à-dire le premier conseiller.
+                {m.gi_recit_1_debut()} <strong className="text-ink">{m.gi_recit_1_sens()}</strong>
+                {m.gi_recit_1_fin()}
               </p>
-              <p>
-                Sa réputation de guérisseur fut telle que les Égyptiens l’honorèrent plus tard comme
-                une divinité de la médecine, et que les Grecs l’identifièrent à leur dieu guérisseur
-                Asclépios. Une tradition lui attribue les savoirs médicaux du papyrus Edwin Smith,
-                acquis en 1862.
-              </p>
+              <p>{m.gi_recit_2()}</p>
             </div>
             <ul data-reveal className="mt-6 flex flex-wrap gap-2">
-              {roles.map((r) => (
+              {roles().map((r) => (
                 <li
                   key={r}
                   className="rounded-full bg-white px-4 py-1.5 text-sm font-extrabold text-logo-blue shadow-sm ring-1 ring-logo-blue/15"
@@ -421,13 +333,10 @@ function Description() {
                 aria-hidden
                 className="absolute -right-4 -top-4 size-28 rotate-12 text-sun/60"
               />
-              <h3 className="relative text-2xl text-logo-blue md:text-3xl">Pourquoi ce nom ?</h3>
-              <p className="relative mt-3 font-medium text-ink/80">
-                Imhotep est un Africain dont le savoir a traversé les millénaires. En donnant son
-                nom au jeu, AIMES-AFRIQUE propose aux élèves un modèle d’excellence africaine : un
-                savant complet, bâtisseur et soignant. L’« esprit bâtisseur et polyvalent » figure
-                d’ailleurs parmi les piliers fondateurs des Clubs Santé SOS DOCTEUR TV.
-              </p>
+              <h3 className="relative text-2xl text-logo-blue md:text-3xl">
+                {m.gi_pourquoi_titre()}
+              </h3>
+              <p className="relative mt-3 font-medium text-ink/80">{m.gi_pourquoi_texte()}</p>
             </div>
           </div>
 
@@ -440,10 +349,10 @@ function Description() {
               className="absolute -right-20 -top-20 size-64 rounded-full bg-sun/25 blur-3xl"
             />
             <p className="relative text-sm font-extrabold uppercase tracking-widest text-sun">
-              Fiche du savant
+              {m.gi_fiche_savant()}
             </p>
             <ol className="relative mt-6 space-y-5 border-l-2 border-dashed border-white/20 pl-6">
-              {reperes.map((r) => (
+              {reperes().map((r) => (
                 <li key={r.t} className="relative">
                   <span className="absolute -left-[1.95rem] top-1 size-3.5 rounded-full bg-sun ring-4 ring-night" />
                   <p className="font-display text-lg leading-tight">{r.t}</p>
@@ -469,16 +378,12 @@ function Description() {
         className="scroll-mt-16 bg-[color-mix(in_oklch,var(--sky)_8%,white)] py-20"
       >
         <div className="mx-auto max-w-7xl px-5">
-          <EnTete sur="Dans le projet des Clubs Santé" bleu="Un jeu au cœur" vert="de l’axe 1">
-            Les Clubs Santé SOS DOCTEUR TV, présents dans les établissements secondaires depuis
-            2024, agissent autour de sept axes. L’Académie Génie Imhotep en est le premier : la
-            vulgarisation du jeu dans toutes les classes, la compétition nationale à tous les
-            niveaux et l’émission hebdomadaire sur SOS DOCTEUR TV. Son exécution est réservée à
-            AIMES-AFRIQUE et SOS DOCTEUR TV.
+          <EnTete sur={m.gi_projet_sur()} bleu={m.gi_projet_bleu()} vert={m.gi_projet_vert()}>
+            {m.gi_projet_texte()}
           </EnTete>
 
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {objectifs.map((o, i) => (
+            {objectifs().map((o, i) => (
               <li
                 key={o.t}
                 data-reveal
@@ -497,7 +402,7 @@ function Description() {
             <img
               data-reveal="left"
               src={mascottesLivres}
-              alt="Deux mascottes, livres en main, devant des piles de livres « Santé », « Prévention », « Bien-être »"
+              alt={m.gi_livres_alt()}
               loading="lazy"
               width={1122}
               height={1402}
@@ -506,17 +411,15 @@ function Description() {
             <div>
               <div data-reveal>
                 <h3 className="text-3xl md:text-4xl">
-                  <span className="text-logo-blue">Le fascicule</span>{" "}
-                  <span className="text-primary">de questions-réponses</span>
+                  <span className="text-logo-blue">{m.gi_fascicule_bleu()}</span>{" "}
+                  <span className="text-primary">{m.gi_fascicule_vert()}</span>
                 </h3>
                 <p className="mt-3 text-lg font-medium text-muted-foreground">
-                  Toutes les questions du jeu viennent des fascicules élaborés par AIMES-AFRIQUE
-                  entre décembre 2024 et mars 2025, et mis à la disposition des établissements.
-                  Réviser le fascicule, c’est apprendre la santé.
+                  {m.gi_fascicule_texte()}
                 </p>
               </div>
               <ul className="mt-6 grid gap-3 sm:grid-cols-3">
-                {fascicules.map((f, i) => (
+                {fascicules().map((f, i) => (
                   <li
                     key={f.pour}
                     data-reveal
@@ -538,8 +441,7 @@ function Description() {
                 className="mt-4 flex items-start gap-2 text-sm font-semibold text-muted-foreground"
               >
                 <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-                Pour chaque compétition, une cellule de rédaction compose les questionnaires de
-                match, les vérifie et les conserve sous pli fermé.
+                {m.gi_cellule()}
               </p>
             </div>
           </div>
@@ -551,20 +453,18 @@ function Description() {
           >
             <div>
               <p className="text-sm font-extrabold uppercase tracking-widest text-sun">
-                Qui peut participer ?
+                {m.gi_qui_sur()}
               </p>
               <h3 className="mt-3 text-3xl md:text-4xl">
-                Les collèges et lycées dotés d’un{" "}
-                <span className="text-sun">Club Santé fonctionnel</span>
+                {m.gi_qui_titre_1()} <span className="text-sun">{m.gi_qui_titre_2()}</span>
               </h3>
               <p className="mt-4 font-medium text-white/80">
-                La compétition distingue deux catégories : le{" "}
-                <strong className="text-white">secondaire 1</strong> et le{" "}
-                <strong className="text-white">secondaire 2</strong>.
+                {m.gi_qui_texte_1()} <strong className="text-white">{m.gi_qui_s1()}</strong>{" "}
+                {m.gi_qui_et()} <strong className="text-white">{m.gi_qui_s2()}</strong>.
               </p>
             </div>
             <ul className="grid gap-3 sm:grid-cols-2">
-              {conditions.map((c) => (
+              {conditions().map((c) => (
                 <li
                   key={c}
                   className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 p-4 font-bold backdrop-blur-sm"
@@ -583,34 +483,28 @@ function Description() {
       {/* Comment se joue un match : le principe du patient, puis les acteurs. */}
       <section id="match" className="mx-auto max-w-7xl scroll-mt-16 px-5 py-20">
         <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr]">
-          <EnTete
-            sur="Comment se joue un match"
-            bleu="Soigner le patient,"
-            vert="question après question"
-          >
-            Chaque match raconte le parcours d’un patient à l’hôpital, de son admission à sa
-            guérison. Les deux équipes, appelées blocs, doivent le « soigner » en répondant juste :
-            chaque bonne réponse le rapproche de la sortie.
+          <EnTete sur={m.gi_match_sur()} bleu={m.gi_match_bleu()} vert={m.gi_match_vert()}>
+            {m.gi_match_texte()}
           </EnTete>
           <figure data-reveal="right" className="relative">
             <img
               src={slideGenie}
-              alt="Trois élèves en polo bleu au pupitre de la compétition Génie Imhotep"
+              alt={m.gi_pupitre_alt()}
               loading="lazy"
               width={2000}
               height={1600}
               className="aspect-[4/3] w-full rounded-[2rem] object-cover object-[50%_20%] shadow-card"
             />
             <figcaption className="absolute -bottom-5 left-5 flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-extrabold text-logo-blue shadow-card">
-              <Timer className="size-4 text-logo-red" /> 5 s pour répondre · 3 s pour la réplique
+              <Timer className="size-4 text-logo-red" /> {m.gi_chrono()}
             </figcaption>
           </figure>
         </div>
 
         <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {acteurs.map((a, i) => (
+          {acteurs().map((a, i) => (
             <li
-              key={a.t}
+              key={a.id}
               data-reveal
               style={{ ...couleur(a.c), ...retard(i) }}
               className="card-fx relative overflow-hidden rounded-3xl bg-white p-6 shadow-card"
@@ -624,9 +518,9 @@ function Description() {
               </span>
               <h3 className="relative mt-4 text-2xl text-(--c)">{a.t}</h3>
               <p className="relative mt-2 text-sm font-medium leading-relaxed text-ink/75">{a.d}</p>
-              {a.t === "Le bloc" && (
+              {a.id === "bloc" && (
                 <ul className="relative mt-4 flex flex-wrap gap-1.5">
-                  {postes.map((p) => (
+                  {postes().map((p) => (
                     <li
                       key={p}
                       className="rounded-full bg-mist px-2.5 py-1 text-xs font-extrabold text-logo-blue"
@@ -651,14 +545,18 @@ function Description() {
           <div className="absolute -right-24 bottom-0 size-96 rounded-full bg-primary/20 blur-3xl" />
         </div>
         <div className="mx-auto max-w-7xl px-5">
-          <EnTete sur="Les rubriques" bleu="Le parcours" vert="du patient" sombre>
-            Un match enchaîne des rubriques aux noms médicaux, chacune inspirée d’une épreuve
-            classique de jeu de culture générale. Choisis une étape pour voir comment elle se joue.
+          <EnTete
+            sur={m.gi_rubriques_sur()}
+            bleu={m.gi_rubriques_bleu()}
+            vert={m.gi_rubriques_vert()}
+            sombre
+          >
+            {m.gi_rubriques_texte()}
           </EnTete>
 
           <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_1.1fr]">
             <ol className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-2">
-              {rubriques.map((r, i) => {
+              {listeRubriques.map((r, i) => {
                 const on = i === etape;
                 return (
                   <li key={r.t}>
@@ -697,7 +595,11 @@ function Description() {
               <div aria-live="polite" aria-atomic="true" className="flex flex-col">
                 <div className="flex items-center justify-between gap-4">
                   <span className="inline-flex items-center gap-2 rounded-full bg-[color-mix(in_oklch,var(--logo-red)_12%,white)] px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-logo-red">
-                    <Stethoscope className="size-3.5" /> Étape {etape + 1} sur {rubriques.length}
+                    <Stethoscope className="size-3.5" />{" "}
+                    {m.gi_etape_sur({
+                      numero: String(etape + 1),
+                      total: String(listeRubriques.length),
+                    })}
                   </span>
                   <HeartPulse
                     aria-hidden
@@ -718,14 +620,18 @@ function Description() {
 
               <div className="mt-auto pt-8">
                 <div className="flex items-center justify-between text-sm font-bold text-muted-foreground">
-                  <span>Admission</span>
-                  <span>Sortie de l’hôpital</span>
+                  <span>{m.gi_rub_1()}</span>
+                  <span>{m.gi_sortie()}</span>
                 </div>
                 <div
                   role="progressbar"
-                  aria-label="Avancée du patient vers sa sortie"
+                  aria-label={m.gi_avancee()}
                   aria-valuenow={progression}
-                  aria-valuetext={`Étape ${etape + 1} sur ${rubriques.length} : ${rubrique.t}`}
+                  aria-valuetext={m.gi_avancee_texte({
+                    numero: String(etape + 1),
+                    total: String(listeRubriques.length),
+                    rubrique: rubrique.t,
+                  })}
                   aria-valuemin={0}
                   aria-valuemax={100}
                   className="mt-2 h-3 overflow-hidden rounded-full bg-mist"
@@ -743,15 +649,15 @@ function Description() {
                     aria-disabled={etape === 0}
                     className="rounded-full border-2 border-border px-5 py-2.5 text-sm font-bold transition hover:border-logo-blue aria-disabled:opacity-40"
                   >
-                    Étape précédente
+                    {m.gi_etape_precedente()}
                   </button>
                   <button
                     type="button"
-                    onClick={() => setEtape((e) => Math.min(e + 1, rubriques.length - 1))}
-                    aria-disabled={etape === rubriques.length - 1}
+                    onClick={() => setEtape((e) => Math.min(e + 1, listeRubriques.length - 1))}
+                    aria-disabled={etape === listeRubriques.length - 1}
                     className="btn-fx rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground aria-disabled:opacity-40"
                   >
-                    Étape suivante
+                    {m.gi_etape_suivante()}
                   </button>
                 </div>
               </div>
@@ -762,9 +668,9 @@ function Description() {
 
       {/* Score, public et fair-play. */}
       <section className="mx-auto max-w-7xl px-5 py-20">
-        <EnTete sur="Pendant le match" bleu="Score, public" vert="& fair-play" />
+        <EnTete sur={m.gi_pendant_sur()} bleu={m.gi_pendant_bleu()} vert={m.gi_pendant_vert()} />
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {regles.map((r, i) => (
+          {regles().map((r, i) => (
             <li
               key={r.t}
               data-reveal
@@ -785,13 +691,17 @@ function Description() {
         className="scroll-mt-16 bg-[color-mix(in_oklch,var(--sun)_10%,white)] py-20"
       >
         <div className="mx-auto max-w-7xl px-5">
-          <EnTete sur="Trois formes complémentaires" bleu="Trois façons" vert="de jouer" centre>
-            L’Académie Génie Imhotep se joue dans les établissements, dans le championnat national
-            et à la télévision.
+          <EnTete
+            sur={m.gi_formes_sur()}
+            bleu={m.gi_formes_bleu()}
+            vert={m.gi_formes_vert()}
+            centre
+          >
+            {m.gi_formes_texte()}
           </EnTete>
 
           <ul className="mt-10 grid gap-5 lg:grid-cols-3">
-            {composantes.map((c, i) => (
+            {composantes().map((c, i) => (
               <li
                 key={c.id}
                 data-reveal
@@ -807,10 +717,10 @@ function Description() {
                 </a>
                 <dl className="grid flex-1 gap-4 p-6">
                   {[
-                    ["Où", c.ou],
-                    ["Qui", c.qui],
-                    ["Quand", c.quand],
-                    ["But", c.but],
+                    [m.gi_ou(), c.ou],
+                    [m.gi_qui(), c.qui],
+                    [m.gi_quand(), c.quand],
+                    [m.gi_but(), c.but],
                   ].map(([k, v]) => (
                     <div key={k}>
                       <dt className="text-xs font-extrabold uppercase tracking-widest text-(--c)">
@@ -831,18 +741,14 @@ function Description() {
             className="mt-16 scroll-mt-24 rounded-[2rem] bg-white p-6 shadow-card md:p-10"
           >
             <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-widest text-logo-red">
-              <School className="size-4" /> Le niveau de base
+              <School className="size-4" /> {m.gi_niveau_base()}
             </p>
             <h3 className="mt-3 text-3xl md:text-4xl">
-              <span className="text-logo-blue">Les matchs</span>{" "}
-              <span className="text-primary">inter-classes</span>
+              <span className="text-logo-blue">{m.gi_interclasses_bleu()}</span>{" "}
+              <span className="text-primary">{m.gi_interclasses_vert()}</span>
             </h3>
             <p className="mt-4 max-w-4xl text-lg font-medium text-ink/80">
-              Dans chaque établissement doté d’un club santé, des équipes se forment dans toutes les
-              classes et s’affrontent selon les règles du jeu, avec les questions du fascicule. Un
-              grand nombre d’élèves révisent et jouent, et les meilleurs forment l’équipe de
-              l’établissement en secondaire 1 et en secondaire 2. Ces équipes le représentent
-              ensuite au championnat.
+              {m.gi_interclasses_texte()}
             </p>
           </article>
 
@@ -854,21 +760,20 @@ function Description() {
           >
             <div className="p-6 md:p-10">
               <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-widest text-sun">
-                <Trophy className="size-4" /> Compétition inter-établissements
+                <Trophy className="size-4" /> {m.gi_inter_etab()}
               </p>
               <h3 className="mt-3 text-3xl md:text-4xl">
-                Le championnat <span className="text-sun">national</span>
+                {m.gi_championnat_1()} <span className="text-sun">{m.gi_championnat_2()}</span>
               </h3>
               <p className="mt-4 max-w-4xl text-lg font-medium text-white/80">
-                Organisé par étapes successives, en secondaire 1 et en secondaire 2. À chaque étape,
-                les meilleures équipes de l’étape précédente s’affrontent.
+                {m.gi_championnat_texte()}
               </p>
               <ol className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                {phases.map((p, i) => (
+                {phases().map((p, i, liste) => (
                   <li
                     key={p.t}
                     className={`relative rounded-2xl p-4 ${
-                      i === phases.length - 1
+                      i === liste.length - 1
                         ? "bg-sun text-ink"
                         : "border border-white/20 bg-white/10 backdrop-blur-sm"
                     }`}
@@ -876,11 +781,11 @@ function Description() {
                     <span className="font-display text-3xl opacity-60">{i + 1}</span>
                     <p className="mt-1 font-display text-lg leading-tight">{p.t}</p>
                     <p
-                      className={`mt-1 text-sm font-medium ${i === phases.length - 1 ? "text-ink/75" : "text-white/75"}`}
+                      className={`mt-1 text-sm font-medium ${i === liste.length - 1 ? "text-ink/75" : "text-white/75"}`}
                     >
                       {p.d}
                     </p>
-                    {i < phases.length - 1 && (
+                    {i < liste.length - 1 && (
                       <ArrowRight
                         aria-hidden
                         className="absolute -right-3 top-1/2 z-10 hidden size-5 -translate-y-1/2 rounded-full bg-sun p-0.5 text-ink lg:block"
@@ -893,7 +798,7 @@ function Description() {
             <div className="grid lg:grid-cols-[1.2fr_1fr]">
               <img
                 src={grandesFinales}
-                alt="Les finalistes du Championnat national Génie Imhotep sur scène, chèques géants en main"
+                alt={m.gi_finalistes_alt()}
                 loading="lazy"
                 width={2000}
                 height={963}
@@ -901,28 +806,23 @@ function Description() {
               />
               <div className="bg-night p-6 md:p-10">
                 <p className="text-sm font-extrabold uppercase tracking-widest text-sun">
-                  1re édition · fin juin 2026, Lomé
+                  {m.gi_edition_1()}
                 </p>
                 <p className="mt-4 font-display text-2xl leading-tight md:text-3xl">
-                  Le Lycée d’Adétikopé, champion national
+                  {m.gi_champion()}
                 </p>
                 <p className="mt-4 flex items-center gap-4">
                   <span className="font-display text-5xl text-sun">490</span>
-                  <span className="text-sm font-bold uppercase text-white/60">à</span>
+                  <span className="text-sm font-bold uppercase text-white/60">{m.gi_a()}</span>
                   <span className="font-display text-5xl text-white/60">360</span>
                 </p>
-                <p className="mt-1 text-sm font-medium text-white/70">
-                  face au Lycée scientifique de Kara
-                </p>
-                <p className="mt-6 text-sm font-medium text-white/80">
-                  À terme, AIMES-AFRIQUE prévoit aussi une compétition internationale entre les
-                  meilleures équipes nationales des pays où l’association est représentée.
-                </p>
+                <p className="mt-1 text-sm font-medium text-white/70">{m.gi_face_kara()}</p>
+                <p className="mt-6 text-sm font-medium text-white/80">{m.gi_international()}</p>
                 <a
-                  href="/genie-imhotep/hall-of-fame"
+                  href={lien("/genie-imhotep/hall-of-fame")}
                   className="mt-6 inline-flex items-center gap-2 font-bold text-sun hover:underline"
                 >
-                  Voir le Hall of Fame <ArrowRight className="size-4" />
+                  {m.gi_voir_hof()} <ArrowRight className="size-4" />
                 </a>
               </div>
             </div>
@@ -936,34 +836,30 @@ function Description() {
           >
             <div>
               <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-widest text-sun">
-                <Tv className="size-4" /> Sur SOS DOCTEUR TV
+                <Tv className="size-4" /> {m.gi_sur_tv()}
               </p>
               <h3 className="mt-3 text-3xl md:text-4xl">
-                L’émission <span className="text-sun">Génie Imhotep</span>
+                {m.gi_emission_titre_1()}{" "}
+                <span className="text-sun">{m.gi_emission_titre_2()}</span>
               </h3>
               <div className="mt-6 inline-flex items-center gap-4 rounded-2xl bg-white p-4 text-ink shadow-card">
                 <span className="text-center">
                   <span className="block font-display text-3xl leading-none text-logo-red">
-                    SAM.
+                    {m.gi_samedi()}
                   </span>
-                  <span className="block font-display text-xl text-logo-blue">10 h</span>
+                  <span className="block font-display text-xl text-logo-blue">{m.gi_10h()}</span>
                 </span>
                 <span className="h-12 w-px bg-border" />
                 <span className="text-sm font-bold leading-snug">
                   Studio Prof JAMES
                   <br />
-                  <span className="text-muted-foreground">
-                    12 matchs par saison · saison 3 en cours
-                  </span>
+                  <span className="text-muted-foreground">{m.gi_saison()}</span>
                 </span>
               </div>
-              <p className="mt-6 text-sm font-medium text-white/80">
-                La chaîne est accessible par application mobile, sur les décodeurs MP4 et sur le
-                bouquet CANAL+.
-              </p>
+              <p className="mt-6 text-sm font-medium text-white/80">{m.gi_chaine()}</p>
             </div>
             <ul className="grid gap-3">
-              {emission.map((e) => (
+              {emission().map((e) => (
                 <li
                   key={e}
                   className="flex gap-3 rounded-2xl border border-white/20 bg-white/10 p-4 font-medium backdrop-blur-sm"
@@ -985,17 +881,16 @@ function Description() {
         />
         <div className="mx-auto max-w-7xl px-5">
           <EnTete
-            sur="En résumé"
-            bleu="Chaque élève, acteur"
-            vert="de sa propre santé"
+            sur={m.gi_resume_sur()}
+            bleu={m.gi_resume_bleu()}
+            vert={m.gi_resume_vert()}
             sombre
             centre
           >
-            Par la compétition, l’Académie Génie Imhotep fait de chaque élève un relais de
-            prévention dans sa famille et sa communauté.
+            {m.gi_resume_texte()}
           </EnTete>
           <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {resume.map((r, i) => (
+            {resume().map((r, i) => (
               <li
                 key={r.t}
                 data-reveal
@@ -1011,22 +906,20 @@ function Description() {
             ))}
           </ol>
           <div data-reveal className="mt-14 text-center">
-            <p className="font-display text-3xl text-sun md:text-5xl">
-              Génie Imhotep, c’est ici et maintenant !
-            </p>
+            <p className="font-display text-3xl text-sun md:text-5xl">{m.gi_devise()}</p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <a
-                href="/genie-imhotep/inscription"
+                href={lien("/genie-imhotep/inscription")}
                 className="btn-fx group flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-[15px] font-bold text-primary-foreground shadow-card"
               >
-                <GraduationCap className="size-5" /> Inscrire mon établissement
+                <GraduationCap className="size-5" /> {m.gi_inscrire()}
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
               </a>
               <a
-                href="/bibliotheque"
+                href={lien("/bibliotheque")}
                 className="btn-fx flex h-12 items-center gap-2 rounded-full border-2 border-white/60 bg-white/10 px-6 text-[15px] font-bold backdrop-blur-sm"
               >
-                <BookOpen className="size-5" /> Réviser dans la bibliothèque
+                <BookOpen className="size-5" /> {m.gi_reviser()}
               </a>
             </div>
           </div>

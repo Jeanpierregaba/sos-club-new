@@ -7,26 +7,24 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteMotion } from "@/components/SiteMotion";
 import mascottesTrophees from "@/assets/mascottes-trophees.webp";
+import { lien } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/genie-imhotep/palmares/")({
   head: () => ({
     meta: [
-      { title: "Palmarès — Génie Imhotep" },
-      {
-        name: "description",
-        content:
-          "Le palmarès du Championnat national Génie Imhotep, édition par édition : les établissements sur le podium, les champions régionaux et les joueurs primés.",
-      },
-      { property: "og:title", content: "Le palmarès du Génie Imhotep" },
+      { title: m.gpal_meta_titre() },
+      { name: "description", content: m.gpal_meta_description() },
+      { property: "og:title", content: m.gpal_meta_og() },
     ],
   }),
   component: Palmares,
 });
 
-const distinctions = [
-  { t: "Podium national", d: "Champion, finaliste et demi-finalistes" },
-  { t: "Joueurs primés", d: "Par pseudonyme et établissement" },
-  { t: "Champions régionaux", d: "Un par DRE" },
+const distinctions = () => [
+  { t: m.gpal_dist_podium(), d: m.gpal_dist_podium_d() },
+  { t: m.gpal_dist_joueurs(), d: m.gpal_dist_joueurs_d() },
+  { t: m.gpal_dist_regionaux(), d: m.gpal_dist_regionaux_d() },
 ];
 
 // L'accueil du Palmarès : il présente les distinctions du championnat, sans s'arrêter sur une
@@ -47,22 +45,18 @@ function Palmares() {
 
         <div className="mx-auto grid max-w-7xl items-end gap-8 px-5 pt-8 md:pt-12 lg:grid-cols-[1.2fr_1fr]">
           <div className="pb-14 lg:pb-24">
-            <FilAriane rubrique="Génie Imhotep" page="Palmarès" clair />
+            <FilAriane rubrique={m.menu_genie_imhotep()} page={m.menu_palmares()} clair />
             <div data-reveal="left" className="pt-10 lg:pt-16">
               <p className="inline-flex items-center gap-2 rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-ink">
-                <Sparkles className="size-4" /> Génie Imhotep · Palmarès
+                <Sparkles className="size-4" /> {m.gpal_badge()}
               </p>
               <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                <span className="block">Le palmarès</span>
-                <span className="block text-sun">des lauréats</span>
+                <span className="block">{m.gpal_titre_1()}</span>
+                <span className="block text-sun">{m.gpal_titre_2()}</span>
               </h1>
-              <p className="mt-6 max-w-xl text-lg font-medium text-white/85">
-                Ils ont buzzé plus vite, répondu plus juste et porté haut les couleurs de leur
-                établissement : honneur aux lauréats du Championnat national Génie Imhotep, édition
-                après édition.
-              </p>
+              <p className="mt-6 max-w-xl text-lg font-medium text-white/85">{m.gpal_intro()}</p>
               <ul className="mt-8 grid max-w-xl gap-3 sm:grid-cols-3">
-                {distinctions.map((d) => (
+                {distinctions().map((d) => (
                   <li key={d.t} className="rounded-2xl bg-white p-4 shadow-card">
                     <Trophy aria-hidden className="size-5 text-tangerine" />
                     <p className="mt-2 font-display text-lg leading-tight text-logo-blue">{d.t}</p>
@@ -75,20 +69,20 @@ function Palmares() {
                   href="#editions"
                   className="btn-fx inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground shadow-card"
                 >
-                  Voir les éditions <ArrowDown className="size-4" />
+                  {m.gpal_voir_editions()} <ArrowDown className="size-4" />
                 </a>
                 <a
-                  href="/genie-imhotep/hall-of-fame"
+                  href={lien("/genie-imhotep/hall-of-fame")}
                   className="btn-fx inline-flex items-center gap-2 rounded-full border-2 border-white px-7 py-3 text-[15px] font-bold text-white hover:bg-white hover:text-ink"
                 >
-                  Le Hall of Fame <ArrowRight className="size-4" />
+                  {m.gpal_le_hof()} <ArrowRight className="size-4" />
                 </a>
               </div>
             </div>
           </div>
           <img
             src={mascottesTrophees}
-            alt="Des mascottes des Clubs Santé brandissent leurs trophées"
+            alt={m.gpal_mascottes_alt()}
             width={1122}
             height={1402}
             data-reveal="zoom"
@@ -97,9 +91,8 @@ function Palmares() {
         </div>
       </section>
 
-      <SectionEditions base="palmares" sur="Édition par édition">
-        Choisis une édition pour découvrir son podium, ses joueurs primés et ses champions
-        régionaux.
+      <SectionEditions base="palmares" sur={m.gpal_editions_sur()}>
+        {m.gpal_editions_texte()}
       </SectionEditions>
 
       <SiteFooter />

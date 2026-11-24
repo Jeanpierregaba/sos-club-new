@@ -18,7 +18,7 @@ Ordre d'exécution. Chaque groupe de pages est livrable seul : une page pas enco
 - [x] 6. Jeux, certification, classements (hall of fame), vérification d'un certificat, carte de classement partagée
 - [x] 7. Bibliothèque, galerie, magazine, articles (liste et article), agenda (liste et événement), carte des clubs,
       fiche d'un club, avec la mention « contenu en français »
-- [ ] 8. Génie Imhotep : description, inscription, palmarès, hall of fame
+- [x] 8. Génie Imhotep : description, inscription, palmarès, hall of fame
 - [ ] 9. Inscription, connexion, activation, mot de passe oublié et nouveau : validation du site et erreurs connues de
       l'API traduites, repli sur le message français (tests)
 - [ ] 10. Vérification au navigateur : FR → EN → DE sur l'accueil, Jeux, un article, l'inscription, ordinateur et

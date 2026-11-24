@@ -34,6 +34,9 @@ import {
 } from "@/lib/genie-imhotep-resultats";
 import { libelleSaison, ordinal, trouverEdition, type Edition } from "@/lib/genie-imhotep-editions";
 import mascottesVs from "@/assets/mascottes-vs.webp";
+import { ContenuEnFrancais } from "@/components/ContenuEnFrancais";
+import { auSingulier, lien } from "@/lib/langues";
+import { m as t } from "@/paraglide/messages.js";
 
 // La page d'une édition du Hall of Fame : les résultats complets d'une saison jouée, ou le compte à
 // rebours d'une saison à venir. Une édition inconnue donne la page 404.
@@ -45,15 +48,15 @@ export const Route = createFileRoute("/genie-imhotep/hall-of-fame/$edition")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `Hall of Fame ${loaderData?.id ?? ""} — Génie Imhotep` },
+      { title: t.ghed_meta_titre({ saison: loaderData?.id ?? "" }) },
       {
         name: "description",
         content:
           loaderData?.statut === "a-venir"
-            ? `L’édition ${loaderData.id} du Championnat national Génie Imhotep : le compte à rebours jusqu’au coup d’envoi.`
-            : `L’édition ${loaderData?.id ?? ""} du Championnat national Génie Imhotep : le parcours du champion, le tableau final, les classements régionaux et les phases locales.`,
+            ? t.ghed_meta_a_venir({ saison: loaderData.id })
+            : t.ghed_meta_terminee({ saison: loaderData?.id ?? "" }),
       },
-      { property: "og:title", content: `Hall of Fame Génie Imhotep ${loaderData?.id ?? ""}` },
+      { property: "og:title", content: t.ghed_meta_og({ saison: loaderData?.id ?? "" }) },
     ],
   }),
   component: HallOfFameEdition,
@@ -66,17 +69,19 @@ const champion = finale.a.nom === CHAMPION ? finale.a : finale.b;
 const finaliste = finale.a.nom === CHAMPION ? finale.b : finale.a;
 
 const clubsEngages = new Set(prefectorales.flatMap((p) => p.clubs)).size;
-const chiffres = [
-  { n: clubsEngages, t: "Clubs engagés" },
-  { n: prefectorales.length, t: "Préfectures et zones" },
-  { n: inspectorales.length, t: "Inspections (IESG)" },
-  { n: regionales.length, t: "Champions régionaux" },
+// Des fonctions : les textes suivent la langue de la page (spec 052).
+const chiffres = () => [
+  { n: clubsEngages, t: t.ghed_clubs_engages() },
+  { n: prefectorales.length, t: t.ghed_prefectures() },
+  { n: inspectorales.length, t: t.ghed_inspections() },
+  { n: regionales.length, t: t.gpal_dist_regionaux() },
 ];
 
 // Le parcours du champion, reconstitué phase par phase à partir des résultats.
-const nomTour = { quart: "Quart de finale", demi: "Demi-finale", finale: "Finale" } as const;
+const NOMS_TOURS = { quart: t.ghed_quart, demi: t.ghed_demi, finale: t.ghed_finale } as const;
+const nomTour = (tour: MatchNational["tour"]) => NOMS_TOURS[tour]();
 const adversaire = (eq: [Equipe, Equipe]) => eq.find((e) => e.nom !== CHAMPION);
-const parcours = (() => {
+const leParcours = () => {
   const pref = prefectorales.find((p) => p.qualifie === CHAMPION)!;
   const insp = inspectorales.find((i) => i.gagnant === CHAMPION)!;
   const reg = regionales.find((r) => r.gagnant === CHAMPION)!;
@@ -85,38 +90,38 @@ const parcours = (() => {
   const lui = (m: MatchNational) => (m.a.nom === CHAMPION ? m.b : m.a);
   return [
     {
-      phase: "Phase préfectorale",
+      phase: t.gi_phase_1(),
       lieu: pref.prefecture,
       contre: pref.clubs.filter((c) => c !== CHAMPION).join(", "),
       score: null,
-      resultat: "Qualifié",
+      resultat: t.ghed_qualifie(),
     },
     {
-      phase: "Phase inspectorale",
+      phase: t.gi_phase_2(),
       lieu: `IESG ${insp.iesg}`,
       contre: adversaire(insp.finale)?.nom ?? "",
       score: `${insp.finale.find((e) => e.nom === CHAMPION)?.pts} – ${adversaire(insp.finale)?.pts}`,
-      resultat: "Champion d’inspection",
+      resultat: t.ghed_champion_inspection(),
     },
     {
-      phase: "Phase régionale",
+      phase: t.gi_phase_3(),
       lieu: `DRE ${region(reg.region).nom}`,
       contre: reg.champions
         .filter((c) => c.lycee !== CHAMPION)
         .map((c) => c.lycee)
         .join(", "),
       score: null,
-      resultat: "Champion régional",
+      resultat: t.gpal_champion_regional(),
     },
     ...nat.map((m) => ({
-      phase: nomTour[m.tour],
-      lieu: `Jeu ${m.jeu}`,
+      phase: nomTour(m.tour),
+      lieu: t.ghed_jeu({ numero: String(m.jeu) }),
       contre: lui(m).nom,
       score: `${moi(m).pts} – ${lui(m).pts}`,
-      resultat: m.tour === "finale" ? "Champion national" : "Qualifié",
+      resultat: m.tour === "finale" ? t.edition_champion() : t.ghed_qualifie(),
     })),
   ];
-})();
+};
 
 const quarts = nationale.filter((m) => m.tour === "quart");
 const demis = nationale.filter((m) => m.tour === "demi");
@@ -132,10 +137,10 @@ const defaiteRepeche = quarts.find(
 const auNational = (nom: string) => {
   const joue = (tour: MatchNational["tour"]) =>
     nationale.some((m) => m.tour === tour && (m.a.nom === nom || m.b.nom === nom));
-  if (nom === CHAMPION) return "Champion national";
-  if (joue("finale")) return "Finaliste";
-  if (joue("demi")) return "Demi-finaliste";
-  return "Quart-de-finaliste";
+  if (nom === CHAMPION) return t.edition_champion();
+  if (joue("finale")) return t.gpal_finaliste();
+  if (joue("demi")) return t.gpal_demi_finaliste();
+  return t.gpal_quart();
 };
 
 function Pastille({ id }: { id: RegionId }) {
@@ -153,8 +158,8 @@ function CarteMatch({ m }: { m: MatchNational }) {
   return (
     <div className="overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-border">
       <p className="flex items-center justify-between bg-mist-soft px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-wider text-ink/70">
-        <span>{nomTour[m.tour]}</span>
-        <span>Jeu {m.jeu}</span>
+        <span>{nomTour(m.tour)}</span>
+        <span>{t.ghed_jeu({ numero: String(m.jeu) })}</span>
       </p>
       {[m.a, m.b].map((e) => {
         const gagne = e.nom === m.gagnant;
@@ -182,7 +187,7 @@ function CarteMatch({ m }: { m: MatchNational }) {
                   <span className="sr-only"> ({e.note})</span>
                 </>
               )}
-              {gagne && <span className="sr-only"> (vainqueur)</span>}
+              {gagne && <span className="sr-only">{t.ghed_vainqueur()}</span>}
             </span>
             <span className="w-9 shrink-0 text-right font-display text-base tabular-nums">
               {e.pts}
@@ -231,52 +236,52 @@ function EditionAVenir({ edition }: { edition: Edition }) {
     <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 lg:grid-cols-[1.2fr_1fr]">
       <div className="min-w-0 pb-16 pt-8 lg:pb-24 lg:pt-10">
         <p className="inline-flex items-center gap-2 rounded-full bg-logo-red px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-white">
-          <Hourglass className="size-4 text-sun" /> {ordinal(edition.numero)} édition ·{" "}
+          <Hourglass className="size-4 text-sun" />{" "}
+          {t.edition_titre({ ordinal: ordinal(edition.numero), etat: libelleSaison(edition.id) })}
           {libelleSaison(edition.id)}
         </p>
         <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-          <span className="block">Le prochain champion,</span>
-          <span className="block text-sun">c’est peut-être toi</span>
+          <span className="block">{t.ghed_prochain_1()}</span>
+          <span className="block text-sun">{t.ghed_prochain_2()}</span>
         </h1>
         <p className="mt-5 max-w-xl text-lg font-medium text-white/85">
-          La saison {edition.id} du Championnat national Génie Imhotep se prépare. Rassemble ton
-          équipe, révise avec les quiz et sois prêt pour le coup d’envoi !
+          {t.ghed_a_venir_texte({ saison: edition.id })}
         </p>
         <p className="mt-8 text-xs font-extrabold uppercase tracking-widest text-sun">
-          Coup d’envoi dans
+          {t.edition_coup_envoi()}
         </p>
         <div className="mt-3">
           {edition.debut ? (
             <CompteARebours cible={edition.debut} clair />
           ) : (
-            <p className="font-display text-3xl text-sun">Date bientôt annoncée</p>
+            <p className="font-display text-3xl text-sun">{t.edition_date_bientot()}</p>
           )}
         </div>
         <div className="mt-9 flex flex-wrap gap-3">
           <a
-            href="/genie-imhotep/inscription"
+            href={lien("/genie-imhotep/inscription")}
             className="btn-fx inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
           >
-            Inscrire mon établissement <ArrowRight className="size-4" />
+            {t.gi_inscrire()} <ArrowRight className="size-4" />
           </a>
           <a
-            href="/jeux"
+            href={lien("/jeux")}
             className="btn-fx inline-flex items-center gap-2 rounded-full border-2 border-white px-7 py-3 text-[15px] font-bold text-white hover:bg-white hover:text-ink"
           >
-            <Gamepad2 className="size-4" /> M’entraîner avec les quiz
+            <Gamepad2 className="size-4" /> {t.ghed_entrainer()}
           </a>
         </div>
       </div>
       <div className="relative mx-auto self-end">
         <img
           src={mascottesVs}
-          alt="Deux mascottes des Clubs Santé face à face, prêtes pour la prochaine édition"
+          alt={t.ghed_attente_alt()}
           width={2000}
           height={2000}
           className="w-72 drop-shadow-2xl sm:w-96 lg:w-[30rem]"
         />
         <p className="absolute left-0 top-6 -rotate-6 rounded-2xl bg-white px-4 py-2 font-hand text-2xl text-ink shadow-card motion-safe:animate-float">
-          Ton lycée ici ?
+          {t.ghed_ton_lycee()}
         </p>
       </div>
     </div>
@@ -285,6 +290,7 @@ function EditionAVenir({ edition }: { edition: Edition }) {
 
 function HallOfFameEdition() {
   const edition = Route.useLoaderData();
+  const parcours = leParcours();
   const [choix, setChoix] = useState<RegionId>("grand-lome");
   const insp = inspectorales.filter((i) => i.region === choix);
   const pref = prefectorales.filter((p) => p.region === choix);
@@ -308,15 +314,15 @@ function HallOfFameEdition() {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 pt-8 md:pt-12">
           <FilAriane
             clair
-            rubrique="Génie Imhotep"
-            parent={{ t: "Hall of Fame", href: "/genie-imhotep/hall-of-fame" }}
-            page={`Édition ${libelleSaison(edition.id)}`}
+            rubrique={t.menu_genie_imhotep()}
+            parent={{ t: t.menu_hall_of_fame(), href: "/genie-imhotep/hall-of-fame" }}
+            page={t.gpal_edition_saison({ saison: libelleSaison(edition.id) })}
           />
           <a
-            href="/genie-imhotep/hall-of-fame#editions"
+            href={lien("/genie-imhotep/hall-of-fame#editions")}
             className="inline-flex items-center gap-1.5 text-sm font-bold text-white hover:underline"
           >
-            <ArrowLeft className="size-4" /> Toutes les éditions
+            <ArrowLeft className="size-4" /> {t.gpal_toutes_editions()}
           </a>
         </div>
         {edition.statut === "a-venir" ? (
@@ -327,21 +333,22 @@ function HallOfFameEdition() {
               <div className="min-w-0 pb-12 lg:pb-20">
                 <div data-reveal="left" className="pt-8 lg:pt-10">
                   <p className="inline-flex items-center gap-2 rounded-full bg-sun px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-ink">
-                    <Trophy className="size-4" /> Hall of Fame · {ordinal(edition.numero)} édition
+                    <Trophy className="size-4" />{" "}
+                    {t.ghed_badge({ ordinal: ordinal(edition.numero) })}
                   </p>
                   <h1 className="mt-5 text-5xl leading-[0.95] md:text-7xl">
-                    <span className="block">Édition</span>
+                    <span className="block">{t.ghed_edition()}</span>
                     <span className="block text-sun">{libelleSaison(edition.id)}</span>
                   </h1>
                   <p className="mt-5 max-w-xl text-lg font-medium text-white/85">
-                    De la préfecture à la grande finale de Lomé : tous les résultats du 1er
-                    Championnat national, et le parcours de son champion.
+                    {t.ghed_intro()}
                   </p>
 
                   {/* Le tableau d'affichage de la finale. */}
                   <div className="mt-8 max-w-xl overflow-hidden rounded-3xl bg-white shadow-card ring-1 ring-border">
                     <p className="flex items-center gap-2 bg-logo-red px-5 py-2 text-xs font-extrabold uppercase tracking-widest text-white">
-                      <Crown className="size-4 text-sun" /> Grande finale · Jeu {finale.jeu}
+                      <Crown className="size-4 text-sun" />{" "}
+                      {t.ghed_grande_finale({ numero: String(finale.jeu) })}
                     </p>
                     {/* Sur mobile, les deux équipes s'empilent de part et d'autre du score. */}
                     <div className="grid items-center gap-3 p-5 text-center sm:grid-cols-[1fr_auto_1fr] sm:text-left">
@@ -350,7 +357,7 @@ function HallOfFameEdition() {
                           {CHAMPION}
                         </p>
                         <p className="mt-1 text-xs font-bold text-muted-foreground">
-                          DRE {region(champion.region).nom} · Champion
+                          DRE {region(champion.region).nom} · {t.ghed_champion_court()}
                         </p>
                       </div>
                       <p className="whitespace-nowrap font-display text-3xl tabular-nums text-ink sm:text-4xl md:text-5xl">
@@ -361,7 +368,7 @@ function HallOfFameEdition() {
                           {finaliste.nom}
                         </p>
                         <p className="mt-1 text-xs font-bold text-muted-foreground">
-                          DRE {region(finaliste.region).nom} · Finaliste
+                          DRE {region(finaliste.region).nom} · {t.gpal_finaliste()}
                         </p>
                       </div>
                     </div>
@@ -370,7 +377,7 @@ function HallOfFameEdition() {
               </div>
               <img
                 src={mascottesVs}
-                alt="Deux mascottes des Clubs Santé face à face, au-dessus d’un grand « VS » doré"
+                alt={t.gi_mascottes_alt()}
                 width={2000}
                 height={2000}
                 data-reveal="zoom"
@@ -379,7 +386,7 @@ function HallOfFameEdition() {
             </div>
             <div className="relative border-y border-border bg-white">
               <dl className="mx-auto grid max-w-7xl grid-cols-2 divide-border px-5 md:grid-cols-4 md:divide-x">
-                {chiffres.map((c) => (
+                {chiffres().map((c) => (
                   <div key={c.t} className="flex flex-col-reverse py-6 text-center md:py-8">
                     <dt className="mt-2 text-sm font-bold text-muted-foreground">{c.t}</dt>
                     <dd className="font-display text-4xl leading-none text-primary md:text-5xl">
@@ -398,8 +405,12 @@ function HallOfFameEdition() {
         <>
           {/* Le parcours du champion : une ligne rouge qui relie chaque phase jusqu'au titre. */}
           <section id="parcours" className="mx-auto max-w-7xl scroll-mt-16 px-5 py-20">
-            <EnTete sur="Le parcours du champion" bleu="De la préfecture" vert="au titre national">
-              Six victoires pour le {CHAMPION}, de sa préfecture d’Agoè jusqu’à la grande finale.
+            <EnTete
+              sur={t.ghed_parcours_sur()}
+              bleu={t.ghed_parcours_bleu()}
+              vert={t.ghed_parcours_vert()}
+            >
+              {t.ghed_parcours_texte({ champion: CHAMPION })}
             </EnTete>
 
             <ol className="relative mt-12 grid gap-4 lg:grid-cols-6 lg:gap-3">
@@ -445,7 +456,7 @@ function HallOfFameEdition() {
                         className={`text-sm font-semibold leading-snug ${p.score ? "mt-1" : "mt-3"}`}
                       >
                         <span className={titre ? "text-white" : "text-muted-foreground"}>
-                          face à{" "}
+                          {t.ghed_face_a()}{" "}
                         </span>
                         {p.contre}
                       </p>
@@ -468,12 +479,15 @@ function HallOfFameEdition() {
           {/* Le tableau final, comme une phase à élimination directe de coupe de football. */}
           <section id="tableau" className="scroll-mt-16 bg-white py-20">
             <div className="mx-auto max-w-7xl px-5">
-              <EnTete sur="Phase nationale" bleu="Le tableau" vert="final">
-                Les 7 champions régionaux et le meilleur perdant des quarts s’affrontent en
-                élimination directe. En rouge, la route du champion.
+              <EnTete
+                sur={t.gpal_phase_nationale()}
+                bleu={t.ghed_tableau_bleu()}
+                vert={t.ghed_tableau_vert()}
+              >
+                {t.ghed_tableau_texte()}
               </EnTete>
               <p className="mt-4 flex items-center gap-2 text-sm font-bold text-muted-foreground lg:hidden">
-                <MoveRight className="size-4" /> Fais glisser le tableau pour le voir en entier.
+                <MoveRight className="size-4" /> {t.ghed_glisser()}
               </p>
 
               <div className="-mx-5 mt-8 overflow-x-auto px-5 pb-4">
@@ -521,7 +535,7 @@ function HallOfFameEdition() {
                   <div className="col-start-7 row-span-4 row-start-1 self-center rounded-3xl bg-logo-red p-5 text-center text-white shadow-card">
                     <Trophy className="mx-auto size-10 text-sun" />
                     <p className="mt-2 text-xs font-extrabold uppercase tracking-widest">
-                      Champion national
+                      {t.edition_champion()}
                     </p>
                     <p className="mt-1 font-display text-xl leading-tight">{CHAMPION}</p>
                     <p className="mt-1 text-xs font-bold">DRE {region(champion.region).nom}</p>
@@ -530,9 +544,8 @@ function HallOfFameEdition() {
               </div>
               {repeche && defaiteRepeche && (
                 <p className="mt-2 text-sm font-medium text-muted-foreground">
-                  <span className="font-extrabold text-logo-red">*</span> Meilleur perdant des
-                  quarts de finale : le {repeche.nom}, battu au jeu {defaiteRepeche.jeu}, a été
-                  repêché pour compléter le tableau.
+                  <span className="font-extrabold text-logo-red">*</span>{" "}
+                  {t.ghed_repeche({ nom: repeche.nom, jeu: String(defaiteRepeche.jeu) })}
                 </p>
               )}
             </div>
@@ -540,10 +553,12 @@ function HallOfFameEdition() {
 
           {/* Les classements régionaux : un tableau par région, comme les groupes d'un tournoi. */}
           <section id="regions" className="mx-auto max-w-7xl scroll-mt-16 px-5 py-20">
-            <EnTete sur="Phase régionale" bleu="Les classements" vert="des régions">
-              Dans chaque région éducative, les champions d’inspection se disputent la place en
-              phase nationale. Le vainqueur de chaque groupe se qualifie ; son badge indique
-              jusqu’où il est allé. Le document ne classe pas les autres clubs.
+            <EnTete
+              sur={t.gpal_phase_regionale()}
+              bleu={t.ghed_classements_bleu()}
+              vert={t.ghed_classements_vert()}
+            >
+              {t.ghed_classements_texte()}
             </EnTete>
 
             <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -575,7 +590,7 @@ function HallOfFameEdition() {
                             #
                           </th>
                           <th scope="col" className="py-2 font-extrabold">
-                            Club
+                            {t.ghed_club()}
                           </th>
                           <th scope="col" className="py-2 pr-5 text-right font-extrabold">
                             IESG
@@ -636,12 +651,11 @@ function HallOfFameEdition() {
           <section id="phases-locales" className="scroll-mt-16 bg-white py-20">
             <div className="mx-auto max-w-7xl px-5">
               <EnTete
-                sur="Phases préfectorales et inspectorales"
-                bleu="Tous les résultats,"
-                vert="région par région"
+                sur={t.ghed_locales_sur()}
+                bleu={t.ghed_locales_bleu()}
+                vert={t.ghed_locales_vert()}
               >
-                Choisis une région pour voir ses finales d’inspection, puis les clubs engagés dans
-                chaque préfecture.
+                {t.ghed_locales_texte()}
               </EnTete>
 
               <div data-reveal className="mt-8 flex flex-wrap gap-2">
@@ -666,7 +680,8 @@ function HallOfFameEdition() {
                 })}
               </div>
 
-              <h3 className="mt-10 text-2xl text-logo-blue">Finales d’inspection</h3>
+              <ContenuEnFrancais className="mt-4" />
+              <h3 className="mt-10 text-2xl text-logo-blue">{t.ghed_finales_inspection()}</h3>
               <ul className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {insp.map((f) => (
                   <li
@@ -699,7 +714,7 @@ function HallOfFameEdition() {
                           )}
                           <span className="min-w-0 flex-1 truncate">
                             {e.nom}
-                            {gagne && <span className="sr-only"> (vainqueur)</span>}
+                            {gagne && <span className="sr-only">{t.ghed_vainqueur()}</span>}
                           </span>
                           <span className="shrink-0 font-display text-base tabular-nums">
                             {e.pts ?? "–"}
@@ -718,7 +733,7 @@ function HallOfFameEdition() {
                 ))}
               </ul>
 
-              <h3 className="mt-12 text-2xl text-logo-blue">Phases préfectorales</h3>
+              <h3 className="mt-12 text-2xl text-logo-blue">{t.ghed_phases_prefectorales()}</h3>
               <ul className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {pref.map((p) => (
                   <li
@@ -732,7 +747,10 @@ function HallOfFameEdition() {
                     <p className="flex items-baseline justify-between gap-3">
                       <span className="font-display text-lg text-logo-blue">{p.prefecture}</span>
                       <span className="text-xs font-bold text-muted-foreground">
-                        IESG {p.iesg} · {p.clubs.length} club{p.clubs.length > 1 ? "s" : ""}
+                        IESG {p.iesg} ·{" "}
+                        {(auSingulier(p.clubs.length) ? t.ghed_un_club : t.ghed_n_clubs)({
+                          nombre: String(p.clubs.length),
+                        })}
                       </span>
                     </p>
                     <ul className="mt-3 flex flex-wrap gap-1.5">
@@ -751,7 +769,9 @@ function HallOfFameEdition() {
                           >
                             {qualifie && <Check className="size-3.5" />}
                             {c}
-                            {qualifie && <span className="sr-only"> (qualifié)</span>}
+                            {qualifie && (
+                              <span className="sr-only">{t.ghed_qualifie_lecteur()}</span>
+                            )}
                           </li>
                         );
                       })}
@@ -774,18 +794,16 @@ function HallOfFameEdition() {
         >
           <div>
             <h2 className="text-3xl text-ink md:text-4xl">
-              Et si ton lycée entrait au <span className="text-logo-blue">Hall of Fame</span> ?
+              {t.ghof_et_si_1()} <span className="text-logo-blue">{t.ghof_et_si_2()}</span>
+              {t.ghof_et_si_3()}
             </h2>
-            <p className="mt-2 max-w-2xl font-semibold text-ink/75">
-              Les inscriptions au Championnat national passent par ton chef d’établissement ou les
-              encadreurs de ton Club Santé.
-            </p>
+            <p className="mt-2 max-w-2xl font-semibold text-ink/75">{t.ghof_inscriptions()}</p>
           </div>
           <a
-            href="/genie-imhotep/inscription"
+            href={lien("/genie-imhotep/inscription")}
             className="btn-fx inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-7 py-3 text-[15px] font-bold text-primary-foreground"
           >
-            S’inscrire au championnat <ArrowRight className="size-4" />
+            {t.ghof_sinscrire()} <ArrowRight className="size-4" />
           </a>
         </div>
       </section>
