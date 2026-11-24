@@ -19,4 +19,4 @@ Ordre d'exécution. Pour la collecte (données d'un public mineur, partie critiq
       `ouvert` et `commence`, recherches sans résultat, 404 (tests Vitest)
 - [x] 8. Site, page `/admin/activite` : période, 8 sections, graphiques, heatmap, régions, CSV, mentions des limites,
       entrée du menu pour le super-administrateur (tests Vitest ; vérification au navigateur connecté en super-administrateur à faire par l'utilisateur)
-- [ ] 9. Suite complète, critères d'acceptation, relecture par le sous-agent `reviewer`, `TASKS.md`
+- [x] 9. Suite complète, critères d'acceptation, relecture par le sous-agent `reviewer`, `TASKS.md`
