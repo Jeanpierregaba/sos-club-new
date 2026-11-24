@@ -5,12 +5,15 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from argon2 import PasswordHasher
 from sqlalchemy import make_url, select, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import NullPool
 
 # Toujours cette base locale, jamais celle de l'environnement : les tests effacent toutes ses données.
-URL_BASE_TEST = "postgresql+asyncpg://sosclub@127.0.0.1:5435/sosclub_test"
+# En parallèle (pytest -n), chaque processus a sa propre base : sosclub_test_gw0, sosclub_test_gw1…
+PROCESSUS = os.environ.get("PYTEST_XDIST_WORKER")
+URL_BASE_TEST = "postgresql+asyncpg://sosclub@127.0.0.1:5435/sosclub_test" + (f"_{PROCESSUS}" if PROCESSUS else "")
 os.environ["DATABASE_URL"] = URL_BASE_TEST
 
 from alembic.config import Config
@@ -19,6 +22,7 @@ from fastapi.testclient import TestClient
 from alembic import command
 from app.cartes.models import TypeCarte
 from app.cartes.service import delivrer
+from app.comptes import motdepasse
 from app.comptes.models import Role, Utilisateur
 from app.comptes.motdepasse import hacher
 from app.db import Base
@@ -31,6 +35,9 @@ from app.referentiel.chargement import charger
 from app.referentiel.models import Dre, Etablissement, Iesg
 
 MOT_DE_PASSE = "mot-de-passe-de-test"
+# Argon2 coûte environ 0,1 s par compte créé puis connecté : voulu en production, inutile en test. Mêmes algorithme et
+# format (argon2id), paramètres minimaux ; le test du rehachage garde une empreinte d'autres paramètres.
+motdepasse._hacheur = PasswordHasher(time_cost=1, memory_cost=8, parallelism=1)
 # NullPool : chaque appel ouvre sa connexion, car asyncio.run crée une nouvelle boucle à chaque fois.
 moteur_test = create_async_engine(URL_BASE_TEST, poolclass=NullPool)
 
@@ -48,10 +55,12 @@ async def _recreer_base() -> None:
 def base_de_test() -> None:
     asyncio.run(_recreer_base())
     configuration = Config(Path(__file__).resolve().parents[1] / "alembic.ini")
-    # L'aller et le retour : une migration qui ne sait pas revenir en arrière fait échouer les tests.
     command.upgrade(configuration, "head")
-    command.downgrade(configuration, "base")
-    command.upgrade(configuration, "head")
+    # L'aller et le retour : une migration qui ne sait pas revenir en arrière fait échouer les tests. Vérifié une
+    # fois : en série, ou par le premier processus en parallèle.
+    if PROCESSUS in (None, "gw0"):
+        command.downgrade(configuration, "base")
+        command.upgrade(configuration, "head")
 
 
 async def _vider_tables() -> None:

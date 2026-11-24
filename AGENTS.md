@@ -43,7 +43,8 @@ des points et des classements. Détail : `docs/PRD.md`.
 - Démarrer en local : base `docker compose up -d --wait` ; site `npm run dev` ; API `cd backend && uv run fastapi dev app/main.py --port 8000`
 - Lint : site `npm run lint` ; API `cd backend && uv run ruff check . && uv run ruff format --check .`
 - Typecheck : site `npx tsc --noEmit`
-- Tests : site `npm test` ; API `cd backend && uv run pytest` (base démarrée)
+- Tests : site `npm test` ; API, suite complète `cd backend && uv run pytest -n auto --dist loadfile` (base démarrée,
+  une base `sosclub_test_gwN` par processus) ; un fichier seul `uv run pytest tests/test_x.py`
 - Migrations : `cd backend && uv run alembic upgrade head`
 - Build : site `npm run build`
 - Types de l'API : `cd backend && uv run python -m app.export_openapi`, puis `npm run api:types`

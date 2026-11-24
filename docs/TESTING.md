@@ -13,12 +13,18 @@ Les commandes exactes sont dans `AGENTS.md`.
 L'API se teste contre PostgreSQL, sans simulation : contraintes uniques, transactions et index partiels
 font partie des règles à vérifier.
 
+La suite complète tourne en parallèle (pytest-xdist, `-n auto --dist loadfile`) : chaque processus a sa propre base
+(`sosclub_test_gw0`, `sosclub_test_gw1`…), créée et migrée au démarrage, et les tests d'un même fichier restent
+ensemble. L'aller-retour des migrations n'est vérifié que par le premier processus (ou en série). En test, Argon2
+prend des paramètres minimaux (même format argon2id) : le coût de production ne sert à rien ici et dominait la
+création des comptes. Une seule suite à la fois : deux suites sur les mêmes bases se cassent mutuellement.
+
 ## Intégration continue
 
 `.github/workflows/ci.yml`, à chaque pull request et à chaque push sur `main` :
 
 - Site : installation figée, lint, typecheck, tests, build.
-- API, avec un PostgreSQL 18 de service : installation figée, Ruff, migrations, pytest.
+- API, avec un PostgreSQL 18 de service : installation figée, Ruff, migrations, pytest en parallèle.
 - Audits de dépendances : `pip-audit` bloquant ; `bun audit` en avertissement jusqu'à la correction des
   failles connues (`TASKS.md`), puis bloquant.
 
