@@ -244,12 +244,33 @@ cd /opt/sosclub/proxy && docker compose up -d --wait --force-recreate
 La recréation coupe les connexions quelques secondes. Elle garantit que Caddy lit le nouveau fichier, ce que ne fait
 pas toujours un simple rechargement.
 
-**Rediriger un ancien domaine** (par exemple `clubsante.org` vers la prod) : fais d'abord pointer le domaine vers
+**Rediriger un autre domaine** (par exemple `clubsante.tech` vers la prod) : fais d'abord pointer le domaine vers
 l'adresse IP du VPS, puis renseigne `DOMAINES_REDIRIGES` dans `/opt/sosclub/proxy/.env`, séparés par une virgule
-(`clubsante.org, www.clubsante.org`), et recrée le proxy comme ci-dessus. Caddy obtient leur certificat et répond
+(`clubsante.tech, www.clubsante.tech`), et recrée le proxy comme ci-dessus. Caddy obtient leur certificat et répond
 par une redirection 301 vers `DOMAINE_PROD`, en gardant le chemin. Ne mets que des domaines qui pointent déjà vers
 le VPS : pour les autres, Caddy réessaie sans fin d'obtenir le certificat. Vérifie avec
-`curl -sI https://clubsante.org/bibliotheque`, qui doit renvoyer `301` et `location: https://<domaine de la prod>/bibliotheque`.
+`curl -sI https://clubsante.tech/bibliotheque`, qui doit renvoyer `301` et `location: https://<domaine de la prod>/bibliotheque`.
+
+**Changer le domaine de la prod** (par exemple de `clubsante.tech` à `clubsante.org`) : trois valeurs changent
+ensemble, sinon l'API refuse les formulaires (« Cette action ne peut venir que du site ») ou le site redirige en
+boucle.
+
+1. Dans `/opt/sosclub/proxy/.env` : `DOMAINE_PROD` devient le nouveau domaine, et `DOMAINES_REDIRIGES` reçoit
+   l'ancien, sans le nouveau (`www.clubsante.org, clubsante.tech, www.clubsante.tech`).
+2. Dans `/opt/sosclub/prod/.env` : `SITE_ORIGINE=https://<nouveau domaine>`, sans « / » final.
+3. Recrée la prod avec la version en place, puis le proxy :
+
+```bash
+cd /opt/sosclub/prod && IMAGE_TAG="$(cat .version)" docker compose up -d --wait --force-recreate api site
+```
+
+```bash
+cd /opt/sosclub/proxy && docker compose up -d --wait --force-recreate
+```
+
+Les sessions ouvertes sur l'ancien domaine sont perdues : chacun se reconnecte une fois. Les anciens liens (e-mails
+d'invitation, partages) continuent de marcher par la redirection, chemin et paramètres gardés. Vérifie que
+`https://<nouveau domaine>/` répond `200` et que l'ancien répond `301` vers le nouveau.
 
 **Lire les journaux** :
 

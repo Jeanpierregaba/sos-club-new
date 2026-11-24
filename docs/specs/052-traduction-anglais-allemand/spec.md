@@ -10,7 +10,7 @@ seulement (décision de l'utilisateur, 2026-11-24). Le français reste la langue
 
 ## Comportement attendu
 
-1. Le visiteur arrive sur `clubsante.tech` : le site est en français, comme aujourd'hui. Aucune redirection
+1. Le visiteur arrive sur `clubsante.org` : le site est en français, comme aujourd'hui. Aucune redirection
    automatique selon la langue du navigateur.
 2. Dans l'en-tête (et dans le menu mobile), un sélecteur propose **FR / EN / DE**. Choisir « EN » ouvre la même page
    en anglais, à l'adresse préfixée : `/jeux` → `/en/jeux`, `/` → `/en`. « DE » ouvre `/de/jeux`.
