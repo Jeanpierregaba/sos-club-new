@@ -1,3 +1,4 @@
+import { m } from "@/paraglide/messages.js";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
@@ -21,7 +22,7 @@ export function PageCompte({
           to="/connexion"
           className="inline-flex items-center gap-2 text-sm font-bold text-logo-blue hover:underline"
         >
-          <ArrowLeft className="size-4" /> Connexion
+          <ArrowLeft className="size-4" /> {m.mdp_connexion()}
         </Link>
         <h1 className="mt-4 text-4xl leading-tight">
           <span className="text-logo-blue">{titre}</span>{" "}

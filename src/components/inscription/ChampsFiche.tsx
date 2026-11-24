@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import type { AxePublic } from "@/lib/api/client";
 import { AXES_MAX, RESEAUX, SEXES, type ValeursFiche } from "@/lib/fiche";
+import { m } from "@/paraglide/messages.js";
 
 // Les champs de la fiche d'adhésion (spec 030), rangés sous « fiche » dans le formulaire qui les accueille :
 // l'inscription d'un élève, ou « Ma fiche d'adhésion » dans son espace.
@@ -24,7 +25,10 @@ type NomTexte =
   | `fiche.${"pere" | "mere"}.${"nom" | "profession" | "telephone"}`
   | `fiche.parcours.${number}.${"annee" | "etablissement" | "iesg"}`;
 
-const facultatif = <span className="font-medium text-muted-foreground">(facultatif)</span>;
+// Un composant : le texte suit la langue de la page (spec 052).
+function Facultatif() {
+  return <span className="font-medium text-muted-foreground">{m.vis_facultatif()}</span>;
+}
 
 function Texte({
   name,
@@ -49,7 +53,7 @@ function Texte({
       render={({ field }) => (
         <FormItem>
           <FormLabel>
-            {libelle} {optionnel && facultatif}
+            {libelle} {optionnel && <Facultatif />}
           </FormLabel>
           <FormControl>
             <Input
@@ -76,17 +80,17 @@ function Titre({ children }: { children: React.ReactNode }) {
 export function SectionLieu() {
   return (
     <fieldset className="space-y-5">
-      <Titre>Ton établissement et ta localité</Titre>
+      <Titre>{m.fiche_localite()}</Titre>
       <Texte
         name="fiche.numeroAdhesion"
-        libelle="N° d'adhésion dans l'établissement"
-        aide="Si ton club t'en a déjà donné un."
+        libelle={m.fiche_numero()}
+        aide={m.fiche_numero_aide()}
         optionnel
       />
       <div className="grid gap-5 sm:grid-cols-3">
-        <Texte name="fiche.prefecture" libelle="Préfecture" optionnel />
-        <Texte name="fiche.commune" libelle="Commune" />
-        <Texte name="fiche.canton" libelle="Canton" optionnel />
+        <Texte name="fiche.prefecture" libelle={m.fiche_prefecture()} optionnel />
+        <Texte name="fiche.commune" libelle={m.fiche_commune()} />
+        <Texte name="fiche.canton" libelle={m.fiche_canton()} optionnel />
       </div>
     </fieldset>
   );
@@ -96,17 +100,17 @@ export function SectionToi() {
   const { control } = useFormContext<AvecFiche>();
   return (
     <fieldset className="space-y-5">
-      <Titre>Toi</Titre>
+      <Titre>{m.fiche_toi()}</Titre>
       <div className="grid gap-5 sm:grid-cols-2">
         <FormField
           control={control}
           name="fiche.sexe"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Sexe</FormLabel>
+              <FormLabel>{m.vis_sexe()}</FormLabel>
               <FormControl>
                 <select {...field} className={LISTE}>
-                  <option value="">Choisis</option>
+                  <option value="">{m.vis_choisis()}</option>
                   {SEXES.map((s) => (
                     <option key={s.valeur} value={s.valeur}>
                       {s.libelle}
@@ -123,7 +127,7 @@ export function SectionToi() {
           name="fiche.dateNaissance"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Date de naissance</FormLabel>
+              <FormLabel>{m.fiche_naissance()}</FormLabel>
               <FormControl>
                 <Input {...field} type="date" autoComplete="bday" className={CHAMP} />
               </FormControl>
@@ -132,29 +136,37 @@ export function SectionToi() {
           )}
         />
       </div>
-      <Texte name="fiche.lieuNaissance" libelle="Lieu de naissance" />
+      <Texte name="fiche.lieuNaissance" libelle={m.fiche_lieu_naissance()} />
       <Texte
         name="fiche.telephone"
-        libelle="Ton téléphone"
+        libelle={m.fiche_telephone()}
         type="tel"
         autoComplete="tel"
-        aide="Il reste privé : seule l'équipe nationale le voit."
+        aide={m.fiche_telephone_aide()}
         optionnel
       />
     </fieldset>
   );
 }
 
-function Parent({ qui, libelle, de }: { qui: "pere" | "mere"; libelle: string; de: string }) {
+function Parent({ qui }: { qui: "pere" | "mere" }) {
+  const pere = qui === "pere";
   return (
     <div className="space-y-4 rounded-2xl bg-mist-soft p-4">
       <p className="font-bold text-ink">
-        {libelle} {facultatif}
+        {pere ? m.fiche_pere() : m.fiche_mere()} <Facultatif />
       </p>
-      <Texte name={`fiche.${qui}.nom`} libelle={`Nom et prénoms ${de}`} />
+      <Texte name={`fiche.${qui}.nom`} libelle={pere ? m.fiche_nom_pere() : m.fiche_nom_mere()} />
       <div className="grid gap-4 sm:grid-cols-2">
-        <Texte name={`fiche.${qui}.profession`} libelle={`Profession ${de}`} />
-        <Texte name={`fiche.${qui}.telephone`} libelle={`Contact ${de}`} type="tel" />
+        <Texte
+          name={`fiche.${qui}.profession`}
+          libelle={pere ? m.fiche_profession_pere() : m.fiche_profession_mere()}
+        />
+        <Texte
+          name={`fiche.${qui}.telephone`}
+          libelle={pere ? m.fiche_contact_pere() : m.fiche_contact_mere()}
+          type="tel"
+        />
       </div>
     </div>
   );
@@ -163,16 +175,20 @@ function Parent({ qui, libelle, de }: { qui: "pere" | "mere"; libelle: string; d
 export function SectionFamille() {
   return (
     <fieldset className="space-y-5">
-      <Titre>Ta famille</Titre>
-      <Parent qui="pere" libelle="Père" de="du père" />
-      <Parent qui="mere" libelle="Mère" de="de la mère" />
+      <Titre>{m.fiche_famille()}</Titre>
+      <Parent qui="pere" />
+      <Parent qui="mere" />
       <div className="space-y-4 rounded-2xl border-2 border-primary/30 p-4">
-        <p className="font-bold text-ink">Ton parent ou tuteur responsable</p>
+        <p className="font-bold text-ink">{m.fiche_responsable()}</p>
         <p className="-mt-2 text-sm font-medium text-muted-foreground">
-          Il remplace la signature de la fiche papier : l'équipe peut le joindre si besoin.
+          {m.fiche_responsable_aide()}
         </p>
-        <Texte name="fiche.responsableNom" libelle="Nom et prénoms du responsable" />
-        <Texte name="fiche.responsableTelephone" libelle="Contact du responsable" type="tel" />
+        <Texte name="fiche.responsableNom" libelle={m.fiche_responsable_nom()} />
+        <Texte
+          name="fiche.responsableTelephone"
+          libelle={m.fiche_responsable_contact()}
+          type="tel"
+        />
       </div>
     </fieldset>
   );
@@ -192,15 +208,15 @@ function ChoixAxes({ axes }: { axes: AxePublic[] }) {
           );
         return (
           <FormItem>
-            <FormLabel>Axe(s) choisi(s)</FormLabel>
-            <FormDescription>De 1 à {AXES_MAX} axes du Club Santé.</FormDescription>
+            <FormLabel>{m.fiche_axes()}</FormLabel>
+            <FormDescription>{m.fiche_axes_aide({ max: String(AXES_MAX) })}</FormDescription>
             <div className="grid gap-2 sm:grid-cols-2">
               {[
                 ...axes,
                 // Un axe désactivé depuis le choix de l'élève reste affiché : il peut le décocher.
                 ...choisis
                   .filter((code) => !axes.some((a) => a.code === code))
-                  .map((code) => ({ code, libelle: `${code} (n'est plus proposé)` })),
+                  .map((code) => ({ code, libelle: m.fiche_axe_retire({ code }) })),
               ].map((axe) => {
                 const coche = choisis.includes(axe.code);
                 const bloque = !coche && choisis.length >= AXES_MAX;
@@ -236,18 +252,26 @@ function Parcours() {
   const { fields, append, remove } = useFieldArray({ control, name: "fiche.parcours" });
   return (
     <div className="space-y-3">
-      <p className="text-sm font-semibold">Club Santé les années précédentes {facultatif}</p>
+      <p className="text-sm font-semibold">
+        {m.fiche_annees()} <Facultatif />
+      </p>
       {fields.map((ligne, i) => (
         <div key={ligne.id} className="space-y-3 rounded-2xl bg-mist-soft p-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-ink">Année {i + 1}</span>
+            <span className="text-sm font-bold text-ink">
+              {m.fiche_annee({ numero: String(i + 1) })}
+            </span>
             <Button type="button" variant="ghost" size="sm" onClick={() => remove(i)}>
-              <Trash2 className="size-4" /> Retirer
+              <Trash2 className="size-4" /> {m.fiche_retirer()}
             </Button>
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
-            <Texte name={`fiche.parcours.${i}.annee`} libelle="Année scolaire" aide="2025-2026" />
-            <Texte name={`fiche.parcours.${i}.etablissement`} libelle="Établissement" />
+            <Texte
+              name={`fiche.parcours.${i}.annee`}
+              libelle={m.fiche_annee_scolaire()}
+              aide="2025-2026"
+            />
+            <Texte name={`fiche.parcours.${i}.etablissement`} libelle={m.fiche_etablissement()} />
             <Texte name={`fiche.parcours.${i}.iesg`} libelle="IESG" optionnel />
           </div>
         </div>
@@ -259,7 +283,7 @@ function Parcours() {
           className="rounded-full"
           onClick={() => append({ annee: "", etablissement: "", iesg: "" })}
         >
-          <Plus className="size-4" /> Ajouter une année
+          <Plus className="size-4" /> {m.fiche_ajouter_annee()}
         </Button>
       )}
     </div>
@@ -278,7 +302,9 @@ function ChoixReseaux() {
           const choisis: string[] = field.value;
           return (
             <FormItem>
-              <FormLabel>Réseaux sociaux auxquels tu es abonné {facultatif}</FormLabel>
+              <FormLabel>
+                {m.fiche_reseaux()} <Facultatif />
+              </FormLabel>
               <div className="flex flex-wrap gap-2">
                 {RESEAUX.map((r) => {
                   const coche = choisis.includes(r.valeur);
@@ -310,7 +336,7 @@ function ChoixReseaux() {
         }}
       />
       {reseaux.includes("autre") && (
-        <Texte name="fiche.reseauAutre" libelle="Quel autre réseau ?" />
+        <Texte name="fiche.reseauAutre" libelle={m.fiche_autre_reseau()} />
       )}
     </div>
   );
@@ -320,7 +346,7 @@ export function SectionClub({ axes }: { axes: AxePublic[] }) {
   const { control } = useFormContext<AvecFiche>();
   return (
     <fieldset className="space-y-6">
-      <Titre>Ton Club Santé</Titre>
+      <Titre>{m.fiche_club()}</Titre>
       <ChoixAxes axes={axes} />
       <Parcours />
       <ChoixReseaux />
@@ -340,9 +366,7 @@ export function SectionClub({ axes }: { axes: AxePublic[] }) {
                   className="mt-0.5 size-5 shrink-0 accent-primary"
                 />
               </FormControl>
-              <span>
-                Je m'engage à mener les activités du Club Santé SOS Docteur TV de mon établissement.
-              </span>
+              <span>{m.fiche_engagement()}</span>
             </label>
             <FormMessage />
           </FormItem>

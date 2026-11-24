@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import type { FicheEntree, FicheSortie, Reseau, Sexe } from "@/lib/api/client";
 import { normaliserTelephone, telephoneValide } from "@/lib/telephone";
+import { m } from "@/paraglide/messages.js";
 
 // La fiche d'adhésion de l'élève (spec 030) : mêmes règles que l'API, pour prévenir avant l'envoi.
 
@@ -9,16 +10,32 @@ export const AGE_MIN = 8;
 export const AGE_MAX = 30;
 export const AXES_MAX = 3;
 
-export const SEXES: { valeur: Sexe; libelle: string }[] = [
-  { valeur: "feminin", libelle: "Féminin" },
-  { valeur: "masculin", libelle: "Masculin" },
+// Le libellé est lu à l'affichage, dans la langue de la page (spec 052).
+export const SEXES: { valeur: Sexe; readonly libelle: string }[] = [
+  {
+    valeur: "feminin",
+    get libelle() {
+      return m.sexe_feminin();
+    },
+  },
+  {
+    valeur: "masculin",
+    get libelle() {
+      return m.sexe_masculin();
+    },
+  },
 ];
 
-export const RESEAUX: { valeur: Reseau; libelle: string }[] = [
+export const RESEAUX: { valeur: Reseau; readonly libelle: string }[] = [
   { valeur: "facebook", libelle: "Facebook" },
   { valeur: "tiktok", libelle: "TikTok" },
   { valeur: "instagram", libelle: "Instagram" },
-  { valeur: "autre", libelle: "Autre" },
+  {
+    valeur: "autre",
+    get libelle() {
+      return m.reseau_autre();
+    },
+  },
 ];
 
 const texte = (max: number) => z.string().trim().max(max, `${max} caractères au plus.`);
@@ -36,8 +53,8 @@ const annee = z
   .string()
   .trim()
   .refine((v) => {
-    const m = /^(\d{4})-(\d{4})$/.exec(v);
-    return m !== null && Number(m[2]) === Number(m[1]) + 1;
+    const annees = /^(\d{4})-(\d{4})$/.exec(v);
+    return annees !== null && Number(annees[2]) === Number(annees[1]) + 1;
   }, "Sous la forme 2025-2026.");
 
 export function age(naissance: Date, jour: Date) {

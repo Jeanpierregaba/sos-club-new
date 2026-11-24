@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { NouveauMotDePasse } from "@/components/comptes/NouveauMotDePasse";
 import { verifierLienMotDePasse } from "@/lib/api/client";
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/mot-de-passe/nouveau")({
   validateSearch: (search: Record<string, unknown>): { jeton?: string } =>
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/mot-de-passe/nouveau")({
       : false,
   head: () => ({
     meta: [
-      { title: "Nouveau mot de passe — Club Santé SOS Docteur TV" },
+      { title: m.mdp_nouveau_meta() },
       { name: "robots", content: "noindex" },
       // Le jeton est dans l'adresse : aucune page suivante ne doit le recevoir.
       { name: "referrer", content: "no-referrer" },

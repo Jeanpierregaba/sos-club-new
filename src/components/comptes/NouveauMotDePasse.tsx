@@ -6,7 +6,8 @@ import { PageCompte } from "@/components/comptes/PageCompte";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { choisirMotDePasse, ErreurApi, MESSAGE_INDISPONIBLE } from "@/lib/api/client";
+import { choisirMotDePasse, ErreurApi } from "@/lib/api/client";
+import { m } from "@/paraglide/messages.js";
 
 const LONGUEUR_MIN = 8;
 
@@ -30,11 +31,11 @@ export function NouveauMotDePasse({
     evenement.preventDefault();
     if (!jeton) return;
     if (nouveau.length < LONGUEUR_MIN) {
-      setErreur(`Ton mot de passe doit contenir au moins ${LONGUEUR_MIN} caractères.`);
+      setErreur(m.mdp_trop_court({ nombre: String(LONGUEUR_MIN) }));
       return;
     }
     if (nouveau !== confirmation) {
-      setErreur("Les deux mots de passe ne sont pas identiques.");
+      setErreur(m.mdp_differents());
       return;
     }
     setErreur(null);
@@ -44,7 +45,7 @@ export function NouveauMotDePasse({
       setFait(true);
       await onFait?.();
     } catch (e) {
-      setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
+      setErreur(e instanceof ErreurApi ? e.message : m.erreur_indisponible());
     } finally {
       setEnCours(false);
     }
@@ -52,40 +53,40 @@ export function NouveauMotDePasse({
 
   return (
     <PageCompte
-      titre="Nouveau"
-      accent="mot de passe"
-      intro="Choisis un mot de passe que tu es seul à connaître."
+      titre={m.mdp_nouveau_titre()}
+      accent={m.mdp_nouveau_accent()}
+      intro={m.mdp_nouveau_intro()}
     >
       {fait ? (
         <div className="space-y-4">
           <p role="status" className="flex items-start gap-3 font-semibold text-ink">
             <CheckCircle2 aria-hidden className="mt-0.5 size-5 shrink-0 text-leaf" />
-            Ton mot de passe est changé. Tes autres connexions ont été fermées.
+            {m.mdp_change()}
           </p>
           <Link
             to="/connexion"
             className="btn-fx inline-flex h-11 items-center rounded-full bg-primary px-6 font-bold text-primary-foreground"
           >
-            Me connecter
+            {m.cnx_me_connecter()}
           </Link>
         </div>
       ) : !valide ? (
         <div className="space-y-4">
           <p role="alert" className="font-semibold text-ink">
-            Ce lien a expiré ou a déjà servi. Un lien n'est valable que 30 minutes, une seule fois.
+            {m.mdp_lien_invalide()}
           </p>
           <Link
             to="/mot-de-passe-oublie"
             className="font-bold text-logo-blue underline-offset-4 hover:underline"
           >
-            Demander un nouveau lien
+            {m.mdp_demander_lien()}
           </Link>
         </div>
       ) : (
         <form onSubmit={envoyer} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="nouveau" className="font-bold">
-              Nouveau mot de passe
+              {m.mdp_nouveau_label()}
             </Label>
             <Input
               id="nouveau"
@@ -99,7 +100,7 @@ export function NouveauMotDePasse({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="confirmation" className="font-bold">
-              Répète-le
+              {m.mdp_repete()}
             </Label>
             <Input
               id="confirmation"
@@ -117,7 +118,7 @@ export function NouveauMotDePasse({
             </p>
           )}
           <Button type="submit" disabled={enCours} className="btn-fx w-full rounded-full font-bold">
-            Enregistrer
+            {m.mdp_enregistrer()}
           </Button>
         </form>
       )}

@@ -5,6 +5,8 @@ import { CHAMP, LISTE } from "@/components/inscription/styles";
 import { Input } from "@/components/ui/input";
 import type { DrePublique } from "@/lib/api/client";
 import type { SaisieEtablissement } from "@/lib/saisie-etablissement";
+import { traduireValidation } from "@/lib/erreurs";
+import { m } from "@/paraglide/messages.js";
 
 export function ChampEtablissement({
   dre,
@@ -23,23 +25,20 @@ export function ChampEtablissement({
   return (
     <fieldset className="space-y-3">
       <legend className="mb-2 flex items-center gap-2 text-lg font-bold text-logo-blue">
-        <School aria-hidden className="size-5" /> Ton établissement
+        <School aria-hidden className="size-5" /> {m.etab_ton()}
       </legend>
       {saisie.proposer ? (
         <div className="space-y-4 rounded-2xl bg-mist-soft p-4">
-          <p className="text-sm font-medium text-ink/80">
-            L'équipe nationale vérifiera ton établissement avant de l'ajouter à la liste. Tu peux
-            utiliser la plateforme dès maintenant.
-          </p>
+          <p className="text-sm font-medium text-ink/80">{m.etab_verifiera()}</p>
           <label className="block space-y-2">
-            <span className="text-sm font-semibold">Direction régionale (DRE)</span>
+            <span className="text-sm font-semibold">{m.etab_dre()}</span>
             <select
               value={saisie.dre}
               onChange={(e) => changer({ dre: e.target.value, iesg: "" })}
               aria-invalid={Boolean(erreur) && !saisie.dre}
               className={LISTE}
             >
-              <option value="">Choisis ta DRE</option>
+              <option value="">{m.etab_choisis_dre()}</option>
               {dre.map((d) => (
                 <option key={d.code} value={d.code}>
                   {d.nom}
@@ -48,7 +47,7 @@ export function ChampEtablissement({
             </select>
           </label>
           <label className="block space-y-2">
-            <span className="text-sm font-semibold">Inspection (IESG)</span>
+            <span className="text-sm font-semibold">{m.etab_iesg()}</span>
             <select
               value={saisie.iesg}
               onChange={(e) => changer({ iesg: e.target.value })}
@@ -56,7 +55,7 @@ export function ChampEtablissement({
               aria-invalid={Boolean(erreur) && !saisie.iesg}
               className={LISTE}
             >
-              <option value="">Choisis ton inspection</option>
+              <option value="">{m.etab_choisis_iesg()}</option>
               {inspections.map((i) => (
                 <option key={i.id} value={i.id}>
                   {i.nom}
@@ -66,7 +65,7 @@ export function ChampEtablissement({
             </select>
           </label>
           <label className="block space-y-2">
-            <span className="text-sm font-semibold">Nom de l'établissement</span>
+            <span className="text-sm font-semibold">{m.etab_nom()}</span>
             <Input
               value={saisie.nom}
               onChange={(e) => changer({ nom: e.target.value })}
@@ -80,7 +79,7 @@ export function ChampEtablissement({
             onClick={() => changer({ proposer: false })}
             className="text-sm font-bold text-logo-blue underline-offset-4 hover:underline"
           >
-            Revenir à la recherche
+            {m.etab_revenir()}
           </button>
         </div>
       ) : (
@@ -96,14 +95,14 @@ export function ChampEtablissement({
               onClick={() => changer({ proposer: true })}
               className="text-sm font-bold text-logo-blue underline-offset-4 hover:underline"
             >
-              Je ne trouve pas mon établissement
+              {m.etab_pas_trouve()}
             </button>
           )}
         </>
       )}
       {erreur && (
         <p role="alert" className="text-sm font-medium text-destructive">
-          {erreur}
+          {traduireValidation(erreur)}
         </p>
       )}
     </fieldset>

@@ -31,7 +31,6 @@ import { CLE_MOI } from "@/hooks/use-moi";
 import {
   ErreurApi,
   inscrireEleve,
-  MESSAGE_INDISPONIBLE,
   type AxePublic,
   type Classe,
   type DrePublique,
@@ -46,6 +45,7 @@ import {
   type SaisieEtablissement,
 } from "@/lib/saisie-etablissement";
 import { useEtapesInscription } from "@/lib/activite";
+import { m } from "@/paraglide/messages.js";
 
 const schema = z.object({
   prenom: z.string().trim().min(1, "Indique ton prénom.").max(100, "Ce prénom est trop long."),
@@ -86,20 +86,26 @@ const CHAMPS_NOMMES: [string, keyof Valeurs][] = [
   ["identifiant", "identifiant"],
   ["email", "email"],
   ["mot de passe", "motDePasse"],
+  // Les mêmes mots en anglais et en allemand (spec 052).
+  ["nickname", "pseudonyme"],
+  ["username", "identifiant"],
+  ["password", "motDePasse"],
+  ["benutzername", "identifiant"],
+  ["passwort", "motDePasse"],
 ];
 
 // Les étapes, pour rester lisible sur un téléphone : chaque « Suivant » ne valide que les champs affichés.
 const ETAPES = [
   {
-    titre: "Compte",
+    titre: m.elv_etape_compte,
     champs: ["prenom", "nom", "pseudonyme", "classe", "identifiant", "motDePasse", "email"],
   },
   {
-    titre: "Toi",
+    titre: m.elv_etape_toi,
     champs: [...CHAMPS_ETAPES.lieu, ...CHAMPS_ETAPES.toi].map((c) => `fiche.${c}`),
   },
-  { titre: "Famille", champs: CHAMPS_ETAPES.famille.map((c) => `fiche.${c}`) },
-  { titre: "Club", champs: [] },
+  { titre: m.elv_etape_famille, champs: CHAMPS_ETAPES.famille.map((c) => `fiche.${c}`) },
+  { titre: m.elv_etape_club, champs: [] },
 ] as const;
 
 // Le formulaire d'inscription d'un élève (spec 017), avec sa fiche d'adhésion (spec 030).
@@ -174,7 +180,7 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
         queryClient.setQueryData(CLE_MOI, moi);
         await router.navigate({ to: "/mon-espace", search: { bienvenue: true }, replace: true });
       } catch (e) {
-        const message = e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE;
+        const message = e instanceof ErreurApi ? e.message : m.erreur_indisponible();
         // La saisie est gardée, sauf le mot de passe.
         form.resetField("motDePasse");
         const champ = CHAMPS_NOMMES.find(([mot]) => message.toLowerCase().includes(mot));
@@ -215,9 +221,9 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
           )}
         </div>
 
-        <ol className="flex gap-2" aria-label="Étapes de l'inscription">
+        <ol className="flex gap-2" aria-label={m.elv_etapes()}>
           {ETAPES.map((e, i) => (
-            <li key={e.titre} className="min-w-0 flex-1">
+            <li key={i} className="min-w-0 flex-1">
               <span
                 aria-current={i === etape ? "step" : undefined}
                 className={`block h-1.5 rounded-full ${i <= etape ? "bg-primary" : "bg-border"}`}
@@ -227,7 +233,7 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
                   i === etape ? "text-ink" : "text-muted-foreground"
                 }`}
               >
-                {i + 1}. {e.titre}
+                {i + 1}. {e.titre()}
               </span>
             </li>
           ))}
@@ -235,14 +241,14 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
 
         <div hidden={etape !== 0} className="space-y-6">
           <fieldset className="space-y-5">
-            <legend className="mb-4 text-lg font-bold text-logo-blue">Qui es-tu ?</legend>
+            <legend className="mb-4 text-lg font-bold text-logo-blue">{m.vis_qui()}</legend>
             <div className="grid gap-5 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="prenom"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Prénom</FormLabel>
+                    <FormLabel>{m.elv_prenom()}</FormLabel>
                     <FormControl>
                       <Input {...field} autoComplete="given-name" className={CHAMP} />
                     </FormControl>
@@ -255,7 +261,7 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
                 name="nom"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nom</FormLabel>
+                    <FormLabel>{m.vis_nom()}</FormLabel>
                     <FormControl>
                       <Input {...field} autoComplete="family-name" className={CHAMP} />
                     </FormControl>
@@ -264,21 +270,17 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
                 )}
               />
             </div>
-            <p className="-mt-2 text-sm font-medium text-muted-foreground">
-              Ton prénom et ton nom restent privés : seule l'équipe nationale les voit.
-            </p>
+            <p className="-mt-2 text-sm font-medium text-muted-foreground">{m.elv_prives()}</p>
             <FormField
               control={form.control}
               name="pseudonyme"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Pseudonyme</FormLabel>
+                  <FormLabel>{m.elv_pseudonyme()}</FormLabel>
                   <FormControl>
                     <Input {...field} autoComplete="nickname" className={CHAMP} />
                   </FormControl>
-                  <FormDescription>
-                    C'est ton nom public, dans les classements. Il ne peut pas être ton identifiant.
-                  </FormDescription>
+                  <FormDescription>{m.elv_pseudonyme_aide()}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -288,10 +290,10 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
               name="classe"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Classe</FormLabel>
+                  <FormLabel>{m.elv_classe()}</FormLabel>
                   <FormControl>
                     <select {...field} className={LISTE}>
-                      <option value="">Choisis ta classe</option>
+                      <option value="">{m.elv_choisis_classe()}</option>
                       {CLASSES.map((c) => (
                         <option key={c.valeur} value={c.valeur}>
                           {c.libelle}
@@ -316,13 +318,13 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
           />
 
           <fieldset className="space-y-5">
-            <legend className="mb-4 text-lg font-bold text-logo-blue">Tes accès</legend>
+            <legend className="mb-4 text-lg font-bold text-logo-blue">{m.vis_acces()}</legend>
             <FormField
               control={form.control}
               name="identifiant"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Identifiant de connexion</FormLabel>
+                  <FormLabel>{m.elv_identifiant()}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -333,7 +335,7 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
                       className={CHAMP}
                     />
                   </FormControl>
-                  <FormDescription>Il reste secret : note-le bien.</FormDescription>
+                  <FormDescription>{m.elv_identifiant_aide()}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -345,7 +347,8 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Email <span className="font-medium text-muted-foreground">(facultatif)</span>
+                    {m.elv_email()}{" "}
+                    <span className="font-medium text-muted-foreground">{m.vis_facultatif()}</span>
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -374,12 +377,12 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
           <SectionClub axes={axes} />
 
           <fieldset className="space-y-4 rounded-2xl bg-mist-soft p-4">
-            <legend className="sr-only">Accords</legend>
+            <legend className="sr-only">{m.vis_accords()}</legend>
             <CaseAccord control={form.control} name="charte" libelle={<LienCharte />} />
             <CaseAccord
               control={form.control}
               name="consentement"
-              libelle="Mon parent ou tuteur est d'accord pour que je m'inscrive."
+              libelle={m.elv_accord_parent()}
             />
           </fieldset>
         </div>
@@ -392,7 +395,7 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
               onClick={() => allerA(etape - 1)}
               className="h-12 rounded-full px-5 text-base font-bold"
             >
-              <ArrowLeft className="h-5 w-5" /> Retour
+              <ArrowLeft className="h-5 w-5" /> {m.cnx_retour()}
             </Button>
           )}
           {etape < ETAPES.length - 1 ? (
@@ -401,7 +404,7 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
               onClick={() => void suivant()}
               className="btn-fx h-12 flex-1 rounded-full text-base font-bold"
             >
-              Suivant <ArrowRight className="h-5 w-5" />
+              {m.elv_suivant()} <ArrowRight className="h-5 w-5" />
             </Button>
           ) : (
             <Button
@@ -410,7 +413,7 @@ export function InscriptionEleve({ dre, axes }: { dre: DrePublique[]; axes: AxeP
               className="btn-fx h-12 flex-1 rounded-full text-base font-bold"
             >
               {enCours && <Loader2 className="h-5 w-5 animate-spin" />}
-              Créer mon compte
+              {m.elv_creer()}
             </Button>
           )}
         </div>

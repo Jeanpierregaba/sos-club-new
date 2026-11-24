@@ -22,18 +22,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { CLE_MOI } from "@/hooks/use-moi";
-import {
-  ErreurApi,
-  inscrireVisiteur,
-  MESSAGE_INDISPONIBLE,
-  type Moi,
-  type Region,
-  type Sexe,
-} from "@/lib/api/client";
+import { ErreurApi, inscrireVisiteur, type Moi, type Region, type Sexe } from "@/lib/api/client";
 import { SEXES } from "@/lib/fiche";
 import { REGIONS } from "@/lib/visiteurs";
 import { normaliserTelephone, telephoneValide } from "@/lib/telephone";
 import { useEtapesInscription } from "@/lib/activite";
+import { m } from "@/paraglide/messages.js";
 
 const schema = z.object({
   nom: z.string().trim().min(1, "Indique ton nom.").max(100, "Ce nom est trop long."),
@@ -63,10 +57,16 @@ const schema = z.object({
 
 type Valeurs = z.infer<typeof schema>;
 
+// Les mots qui rattachent une erreur de l'API à son champ, dans les trois langues (spec 052).
 const CHAMPS_NOMMES: [string, keyof Valeurs][] = [
   ["email", "email"],
+  ["e-mail", "email"],
   ["téléphone", "telephone"],
+  ["phone", "telephone"],
+  ["telefon", "telephone"],
   ["mot de passe", "motDePasse"],
+  ["password", "motDePasse"],
+  ["passwort", "motDePasse"],
 ];
 
 // Le compte visiteur (spec 030) : un compte léger, confirmé par un code reçu par e-mail, pour jouer aux quiz.
@@ -120,7 +120,7 @@ export function InscriptionVisiteur() {
       setAttente({ email: reponse.email, test: reponse.code_de_test ?? null });
       haut.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     } catch (e) {
-      const message = e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE;
+      const message = e instanceof ErreurApi ? e.message : m.erreur_indisponible();
       form.resetField("motDePasse");
       const champ = CHAMPS_NOMMES.find(([mot]) => message.toLowerCase().includes(mot));
       if (champ) form.setError(champ[1], { message }, { shouldFocus: true });
@@ -139,7 +139,7 @@ export function InscriptionVisiteur() {
           email={attente.email}
           codeDeTest={attente.test}
           onConfirme={(moi) => void confirme(moi)}
-          retour="Ce n'est pas mon adresse"
+          retour={m.vis_pas_mon_adresse()}
           onRetour={() => {
             // Une adresse mal tapée : on revient au formulaire pour s'inscrire avec la bonne.
             setAttente(null);
@@ -175,7 +175,9 @@ export function InscriptionVisiteur() {
       )}
     />
   );
-  const facultatif = <span className="font-medium text-muted-foreground">(facultatif)</span>;
+  const facultatif = (
+    <span className="font-medium text-muted-foreground">{m.vis_facultatif()}</span>
+  );
 
   return (
     <Form {...form}>
@@ -189,10 +191,10 @@ export function InscriptionVisiteur() {
         </div>
 
         <fieldset className="space-y-5">
-          <legend className="mb-4 text-lg font-bold text-logo-blue">Qui es-tu ?</legend>
+          <legend className="mb-4 text-lg font-bold text-logo-blue">{m.vis_qui()}</legend>
           <div className="grid gap-5 sm:grid-cols-2">
-            {texte("nom", "Nom", "ex. : AMÉGAN", "family-name")}
-            {texte("prenom", "Prénoms", "ex. : Koffi Jean", "given-name")}
+            {texte("nom", m.vis_nom(), m.vis_nom_ph(), "family-name")}
+            {texte("prenom", m.vis_prenoms(), m.vis_prenoms_ph(), "given-name")}
           </div>
           <div className="grid gap-5 sm:grid-cols-2">
             <FormField
@@ -200,13 +202,13 @@ export function InscriptionVisiteur() {
               name="telephone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Téléphone / WhatsApp</FormLabel>
+                  <FormLabel>{m.vis_telephone()}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       type="tel"
                       inputMode="tel"
-                      placeholder="ex. : +228 90 12 34 56"
+                      placeholder={m.vis_telephone_ph()}
                       autoComplete="tel"
                       className={CHAMP}
                     />
@@ -215,7 +217,7 @@ export function InscriptionVisiteur() {
                 </FormItem>
               )}
             />
-            {texte("ville", "Ville", "ex. : Lomé", "address-level2")}
+            {texte("ville", m.vis_ville(), m.vis_ville_ph(), "address-level2")}
           </div>
           <div className="grid gap-5 sm:grid-cols-2">
             <FormField
@@ -223,10 +225,12 @@ export function InscriptionVisiteur() {
               name="region"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Région {facultatif}</FormLabel>
+                  <FormLabel>
+                    {m.vis_region()} {facultatif}
+                  </FormLabel>
                   <FormControl>
                     <select {...field} className={LISTE}>
-                      <option value="">Choisis ta région</option>
+                      <option value="">{m.vis_choisis_region()}</option>
                       {REGIONS.map((r) => (
                         <option key={r.valeur} value={r.valeur}>
                           {r.libelle}
@@ -243,10 +247,12 @@ export function InscriptionVisiteur() {
               name="sexe"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Sexe {facultatif}</FormLabel>
+                  <FormLabel>
+                    {m.vis_sexe()} {facultatif}
+                  </FormLabel>
                   <FormControl>
                     <select {...field} className={LISTE}>
-                      <option value="">Choisis</option>
+                      <option value="">{m.vis_choisis()}</option>
                       {SEXES.map((s) => (
                         <option key={s.valeur} value={s.valeur}>
                           {s.libelle}
@@ -261,33 +267,33 @@ export function InscriptionVisiteur() {
           </div>
           {texte(
             "statut",
-            <>Statut ou profession {facultatif}</>,
-            "ex. : étudiant, parent, professionnel de santé…",
+            <>
+              {m.vis_statut()} {facultatif}
+            </>,
+            m.vis_statut_ph(),
             "organization-title",
           )}
         </fieldset>
 
         <fieldset className="space-y-5">
-          <legend className="mb-4 text-lg font-bold text-logo-blue">Tes accès</legend>
+          <legend className="mb-4 text-lg font-bold text-logo-blue">{m.vis_acces()}</legend>
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Adresse e-mail</FormLabel>
+                <FormLabel>{m.vis_email()}</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     type="email"
                     autoComplete="email"
                     autoCapitalize="none"
-                    placeholder="ex. : ton.adresse@gmail.com"
+                    placeholder={m.vis_email_ph()}
                     className={CHAMP}
                   />
                 </FormControl>
-                <FormDescription>
-                  Tu y recevras ton code de confirmation. Elle te sert aussi à te connecter.
-                </FormDescription>
+                <FormDescription>{m.vis_email_aide()}</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -296,13 +302,9 @@ export function InscriptionVisiteur() {
         </fieldset>
 
         <fieldset className="space-y-4 rounded-2xl bg-mist-soft p-4">
-          <legend className="sr-only">Accords</legend>
+          <legend className="sr-only">{m.vis_accords()}</legend>
           <CaseAccord control={form.control} name="charte" libelle={<LienCharte />} />
-          <CaseAccord
-            control={form.control}
-            name="accord"
-            libelle="J'ai 18 ans ou plus, ou mon parent ou tuteur est d'accord pour que je m'inscrive."
-          />
+          <CaseAccord control={form.control} name="accord" libelle={m.vis_majeur()} />
         </fieldset>
 
         <Button
@@ -311,7 +313,7 @@ export function InscriptionVisiteur() {
           className="btn-fx h-12 w-full rounded-full text-base font-bold"
         >
           {enCours && <Loader2 className="h-5 w-5 animate-spin" />}
-          Recevoir mon code
+          {m.vis_recevoir_code()}
         </Button>
       </form>
     </Form>

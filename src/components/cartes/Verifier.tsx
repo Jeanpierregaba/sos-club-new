@@ -4,12 +4,7 @@ import { useEffect, useState } from "react";
 import { VerificationCarte } from "@/components/cartes/VerificationCarte";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { m } from "@/paraglide/messages.js";
-import {
-  ErreurApi,
-  MESSAGE_INDISPONIBLE,
-  verifierCarte,
-  type VerificationCarte as Verification,
-} from "@/lib/api/client";
+import { ErreurApi, verifierCarte, type VerificationCarte as Verification } from "@/lib/api/client";
 
 // La vérification d'une carte par son code (spec 040), faite par le navigateur : la limite par adresse IP de l'API
 // doit voir l'adresse du visiteur, pas celle du serveur du site.
@@ -32,7 +27,8 @@ export function Verifier({ code }: { code: string }) {
         else
           setEtat({
             phase: "erreur",
-            message: e instanceof ErreurApi && e.statut === 429 ? e.message : MESSAGE_INDISPONIBLE,
+            message:
+              e instanceof ErreurApi && e.statut === 429 ? e.message : m.erreur_indisponible(),
           });
       });
     return () => {

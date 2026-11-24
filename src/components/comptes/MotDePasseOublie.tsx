@@ -5,7 +5,9 @@ import { PageCompte } from "@/components/comptes/PageCompte";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { demanderLienMotDePasse, ErreurApi, MESSAGE_INDISPONIBLE } from "@/lib/api/client";
+import { demanderLienMotDePasse, ErreurApi } from "@/lib/api/client";
+import { traduireMessageApi } from "@/lib/erreurs";
+import { m } from "@/paraglide/messages.js";
 
 // Mot de passe oublié (spec 039) : l'élève passe par un encadreur de son club ; l'encadreur et le visiteur reçoivent
 // un lien par e-mail. La réponse est la même que l'adresse corresponde à un compte ou non.
@@ -20,9 +22,9 @@ export function MotDePasseOublie() {
     setErreur(null);
     setEnCours(true);
     try {
-      setEnvoye((await demanderLienMotDePasse(email.trim())).message);
+      setEnvoye(traduireMessageApi((await demanderLienMotDePasse(email.trim())).message));
     } catch (e) {
-      setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
+      setErreur(e instanceof ErreurApi ? e.message : m.erreur_indisponible());
     } finally {
       setEnCours(false);
     }
@@ -30,29 +32,28 @@ export function MotDePasseOublie() {
 
   return (
     <PageCompte
-      titre="Mot de passe"
-      accent="oublié ?"
-      intro="Pas de panique : on t'aide à retrouver l'accès à ton compte."
+      titre={m.mdp_oublie_titre()}
+      accent={m.mdp_oublie_accent()}
+      intro={m.mdp_oublie_intro()}
     >
       <section className="flex items-start gap-3 rounded-2xl bg-mist-soft p-4 text-sm font-medium text-ink/80">
         <Users aria-hidden className="mt-0.5 size-5 shrink-0 text-logo-blue" />
         <p>
-          <strong>Tu es élève ?</strong> Demande à un encadreur de ton club : il peut te donner un
-          nouveau mot de passe depuis son espace.
+          <strong>{m.mdp_eleve_titre()}</strong> {m.mdp_eleve_texte()}
         </p>
       </section>
 
       {envoye ? (
         <p role="status" className="mt-6 flex items-start gap-3 font-semibold text-ink">
           <MailCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-leaf" />
-          {envoye} Pense à regarder dans tes courriers indésirables.
+          {envoye} {m.mdp_indesirables()}
         </p>
       ) : (
         <form onSubmit={envoyer} className="mt-6 space-y-4">
-          <p className="font-bold text-ink">Tu es encadreur ou visiteur ?</p>
+          <p className="font-bold text-ink">{m.mdp_encadreur_visiteur()}</p>
           <div className="space-y-1.5">
             <Label htmlFor="email" className="font-bold">
-              Ton adresse e-mail
+              {m.mdp_ton_email()}
             </Label>
             <Input
               id="email"
@@ -70,7 +71,7 @@ export function MotDePasseOublie() {
             </p>
           )}
           <Button type="submit" disabled={enCours} className="btn-fx w-full rounded-full font-bold">
-            Recevoir un lien
+            {m.mdp_recevoir()}
           </Button>
         </form>
       )}

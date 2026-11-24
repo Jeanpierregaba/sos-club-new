@@ -4,6 +4,7 @@ import { useEffect, useId, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { chercherEtablissements, type EtablissementTrouve } from "@/lib/api/client";
 import { useRechercheSansResultat } from "@/lib/activite";
+import { m } from "@/paraglide/messages.js";
 
 export type EtablissementChoisi = {
   id: string;
@@ -16,7 +17,9 @@ export type EtablissementChoisi = {
 
 // La préfecture (spec 035) en tête du détail : elle distingue deux homonymes de la liste nationale.
 const detailDe = (e: EtablissementTrouve) =>
-  [e.prefecture ? `Préfecture ${e.prefecture}` : null, e.iesg, e.dre].filter(Boolean).join(" · ");
+  [e.prefecture ? m.etab_prefecture({ nom: e.prefecture }) : null, e.iesg, e.dre]
+    .filter(Boolean)
+    .join(" · ");
 
 const choixDe = (e: EtablissementTrouve): EtablissementChoisi => ({
   id: e.id,
@@ -97,8 +100,8 @@ export function ChoixEtablissement({
           type="search"
           value={recherche}
           onChange={(e) => setRecherche(e.target.value)}
-          placeholder="Nom de ton établissement ou de ta ville"
-          aria-label="Rechercher un établissement"
+          placeholder={m.etab_placeholder()}
+          aria-label={m.etab_rechercher()}
           aria-controls={identifiant}
           aria-invalid={invalide}
           autoComplete="off"
@@ -114,13 +117,11 @@ export function ChoixEtablissement({
       <div id={identifiant} aria-live="polite">
         {erreur && (
           <p className="mt-2 text-sm font-semibold text-destructive">
-            Recherche impossible pour le moment. Réessaie dans un instant.
+            {m.etab_recherche_impossible()}
           </p>
         )}
         {resultats && resultats.length === 0 && !erreur && (
-          <p className="mt-2 text-sm font-medium text-muted-foreground">
-            Aucun établissement ne correspond.
-          </p>
+          <p className="mt-2 text-sm font-medium text-muted-foreground">{m.etab_aucun()}</p>
         )}
         {resultats && resultats.length > 0 && (
           <ul className="mt-2 max-h-64 divide-y overflow-y-auto rounded-2xl border bg-white">

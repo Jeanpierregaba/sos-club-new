@@ -22,14 +22,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { CLE_MOI } from "@/hooks/use-moi";
-import {
-  ErreurApi,
-  inscrireEncadreur,
-  MESSAGE_INDISPONIBLE,
-  type DrePublique,
-  type Fonction,
-} from "@/lib/api/client";
-import { FONCTIONS } from "@/lib/fonctions";
+import { ErreurApi, inscrireEncadreur, type DrePublique, type Fonction } from "@/lib/api/client";
+import { FONCTIONS, nomFonction } from "@/lib/fonctions";
 import {
   corpsEtablissement,
   manqueEtablissement,
@@ -38,6 +32,7 @@ import {
 } from "@/lib/saisie-etablissement";
 import { normaliserTelephone, telephoneValide } from "@/lib/telephone";
 import { useEtapesInscription } from "@/lib/activite";
+import { m } from "@/paraglide/messages.js";
 
 const schema = z
   .object({
@@ -92,6 +87,13 @@ const CHAMPS_NOMMES: [string, keyof Valeurs][] = [
   ["email", "email"],
   ["téléphone", "telephone"],
   ["mot de passe", "motDePasse"],
+  // Les mêmes mots en anglais et en allemand (spec 052).
+  ["username", "identifiant"],
+  ["phone", "telephone"],
+  ["password", "motDePasse"],
+  ["benutzername", "identifiant"],
+  ["telefon", "telephone"],
+  ["passwort", "motDePasse"],
 ];
 
 // Le formulaire d'inscription d'un encadreur (spec 018) : le compte attend la vérification de l'équipe.
@@ -149,7 +151,7 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
         queryClient.setQueryData(CLE_MOI, moi);
         await router.navigate({ to: "/mon-espace", replace: true });
       } catch (e) {
-        const message = e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE;
+        const message = e instanceof ErreurApi ? e.message : m.erreur_indisponible();
         // La saisie est gardée, sauf le mot de passe.
         form.resetField("motDePasse");
         const champ = CHAMPS_NOMMES.find(([mot]) => message.toLowerCase().includes(mot));
@@ -176,14 +178,14 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
         </div>
 
         <fieldset className="space-y-5">
-          <legend className="mb-4 text-lg font-bold text-logo-blue">Qui es-tu ?</legend>
+          <legend className="mb-4 text-lg font-bold text-logo-blue">{m.vis_qui()}</legend>
           <div className="grid gap-5 sm:grid-cols-2">
             <FormField
               control={form.control}
               name="prenom"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Prénom</FormLabel>
+                  <FormLabel>{m.elv_prenom()}</FormLabel>
                   <FormControl>
                     <Input {...field} autoComplete="given-name" className={CHAMP} />
                   </FormControl>
@@ -196,7 +198,7 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
               name="nom"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nom</FormLabel>
+                  <FormLabel>{m.vis_nom()}</FormLabel>
                   <FormControl>
                     <Input {...field} autoComplete="family-name" className={CHAMP} />
                   </FormControl>
@@ -210,13 +212,13 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
             name="fonction"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Ta fonction dans l'établissement</FormLabel>
+                <FormLabel>{m.enc_fonction()}</FormLabel>
                 <FormControl>
                   <select {...field} className={LISTE}>
-                    <option value="">Choisis ta fonction</option>
+                    <option value="">{m.enc_choisis_fonction()}</option>
                     {FONCTIONS.map((f) => (
                       <option key={f.valeur} value={f.valeur}>
-                        {f.libelle}
+                        {nomFonction(f.valeur)}
                       </option>
                     ))}
                   </select>
@@ -231,7 +233,7 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
               name="precision"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Précise ta fonction</FormLabel>
+                  <FormLabel>{m.enc_precise()}</FormLabel>
                   <FormControl>
                     <Input {...field} maxLength={100} className={CHAMP} />
                   </FormControl>
@@ -246,14 +248,14 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Discipline, matière ou spécialité{" "}
-                  <span className="font-medium text-muted-foreground">(facultatif)</span>
+                  {m.enc_discipline()}{" "}
+                  <span className="font-medium text-muted-foreground">{m.vis_facultatif()}</span>
                 </FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     maxLength={100}
-                    placeholder="ex. : SVT (Sciences de la Vie et de la Terre)"
+                    placeholder={m.enc_discipline_ph()}
                     className={CHAMP}
                   />
                 </FormControl>
@@ -289,12 +291,12 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
           name="commune"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Ta commune</FormLabel>
+              <FormLabel>{m.enc_commune()}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   maxLength={100}
-                  placeholder="ex. : Golfe 1"
+                  placeholder={m.enc_commune_ph()}
                   autoComplete="address-level2"
                   className={CHAMP}
                 />
@@ -305,13 +307,13 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
         />
 
         <fieldset className="space-y-5">
-          <legend className="mb-4 text-lg font-bold text-logo-blue">Pour te joindre</legend>
+          <legend className="mb-4 text-lg font-bold text-logo-blue">{m.enc_joindre()}</legend>
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{m.elv_email()}</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -321,7 +323,7 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
                     className={CHAMP}
                   />
                 </FormControl>
-                <FormDescription>Tu y recevras la réponse de l'équipe.</FormDescription>
+                <FormDescription>{m.enc_email_aide()}</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -331,13 +333,11 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
             name="telephone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Téléphone / WhatsApp</FormLabel>
+                <FormLabel>{m.vis_telephone()}</FormLabel>
                 <FormControl>
                   <Input {...field} type="tel" autoComplete="tel" className={CHAMP} />
                 </FormControl>
-                <FormDescription>
-                  L'équipe peut t'appeler pour vérifier ton inscription. Il n'est jamais public.
-                </FormDescription>
+                <FormDescription>{m.enc_telephone_aide()}</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -345,13 +345,13 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
         </fieldset>
 
         <fieldset className="space-y-5">
-          <legend className="mb-4 text-lg font-bold text-logo-blue">Tes accès</legend>
+          <legend className="mb-4 text-lg font-bold text-logo-blue">{m.vis_acces()}</legend>
           <FormField
             control={form.control}
             name="identifiant"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Identifiant de connexion</FormLabel>
+                <FormLabel>{m.elv_identifiant()}</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -370,13 +370,9 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
         </fieldset>
 
         <fieldset className="space-y-4 rounded-2xl bg-mist-soft p-4">
-          <legend className="sr-only">Accords</legend>
+          <legend className="sr-only">{m.vis_accords()}</legend>
           <CaseAccord control={form.control} name="charte" libelle={<LienCharte />} />
-          <CaseAccord
-            control={form.control}
-            name="consentement"
-            libelle="J'accepte que l'équipe des Clubs Santé utilise ces informations pour vérifier mon compte."
-          />
+          <CaseAccord control={form.control} name="consentement" libelle={m.enc_accord()} />
         </fieldset>
 
         <Button
@@ -385,7 +381,7 @@ export function InscriptionEncadreur({ dre }: { dre: DrePublique[] }) {
           className="btn-fx h-12 w-full rounded-full text-base font-bold"
         >
           {enCours && <Loader2 className="h-5 w-5 animate-spin" />}
-          Envoyer ma demande
+          {m.enc_envoyer()}
         </Button>
       </form>
     </Form>

@@ -8,7 +8,6 @@ import { m } from "@/paraglide/messages.js";
 import { Button } from "@/components/ui/button";
 import {
   ErreurApi,
-  MESSAGE_INDISPONIBLE,
   type AppelsPartie,
   type CorrectionReponse,
   type EtatPartie,
@@ -88,7 +87,7 @@ export function PartieQuiz({
           setEtat(suivant);
         }
       } catch (e) {
-        setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
+        setErreur(e instanceof ErreurApi ? e.message : m.erreur_indisponible());
       } finally {
         occupe.current = false;
         setEnCours(false);
@@ -139,7 +138,7 @@ export function PartieQuiz({
     try {
       await onRejouer();
     } catch (e) {
-      setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
+      setErreur(e instanceof ErreurApi ? e.message : m.erreur_indisponible());
     } finally {
       occupe.current = false;
       setEnCours(false);

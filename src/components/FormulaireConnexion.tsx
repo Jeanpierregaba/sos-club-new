@@ -17,25 +17,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { ChampCode } from "@/components/admin/ChampCode";
 import { ConfirmationEmail } from "@/components/inscription/ConfirmationEmail";
-import {
-  connecter,
-  connecterAvecCode,
-  ErreurApi,
-  MESSAGE_INDISPONIBLE,
-  type Moi,
-} from "@/lib/api/client";
+import { connecter, connecterAvecCode, ErreurApi, type Moi } from "@/lib/api/client";
+import { m } from "@/paraglide/messages.js";
 
-const schema = z.object({
-  identifiant: z
-    .string()
-    .trim()
-    .min(1, "Indique ton identifiant ou ton email.")
-    .max(254, "Cet identifiant est trop long."),
-  motDePasse: z
-    .string()
-    .min(1, "Indique ton mot de passe.")
-    .max(256, "Ce mot de passe est trop long."),
-});
+// Une fonction : les messages de validation suivent la langue de la page (spec 052).
+const schema = () =>
+  z.object({
+    identifiant: z
+      .string()
+      .trim()
+      .min(1, m.cnx_identifiant_requis())
+      .max(254, m.cnx_identifiant_long()),
+    motDePasse: z.string().min(1, m.cnx_mdp_requis()).max(256, m.cnx_mdp_long()),
+  });
 
 export function FormulaireConnexion({ onConnecte }: { onConnecte: (moi: Moi) => void }) {
   // Jeton de l'étape « code » : le mot de passe était juste, la double authentification est active.
@@ -46,8 +40,8 @@ export function FormulaireConnexion({ onConnecte }: { onConnecte: (moi: Moi) => 
   );
   const [erreur, setErreur] = useState<string | null>(null);
   const [afficher, setAfficher] = useState(false);
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+  const form = useForm<z.infer<ReturnType<typeof schema>>>({
+    resolver: zodResolver(schema()),
     defaultValues: { identifiant: "", motDePasse: "" },
   });
 
@@ -59,7 +53,7 @@ export function FormulaireConnexion({ onConnecte }: { onConnecte: (moi: Moi) => 
       else if (reponse.etape === "code") setEtape(reponse.jeton);
       else setConfirmation({ email: reponse.email, test: reponse.code_de_test ?? null });
     } catch (e) {
-      setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
+      setErreur(e instanceof ErreurApi ? e.message : m.erreur_indisponible());
     }
   });
   const enCours = form.formState.isSubmitting;
@@ -105,7 +99,7 @@ export function FormulaireConnexion({ onConnecte }: { onConnecte: (moi: Moi) => 
           name="identifiant"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Identifiant ou email</FormLabel>
+              <FormLabel>{m.cnx_identifiant()}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -125,7 +119,7 @@ export function FormulaireConnexion({ onConnecte }: { onConnecte: (moi: Moi) => 
           name="motDePasse"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Mot de passe</FormLabel>
+              <FormLabel>{m.cnx_mdp()}</FormLabel>
               <div className="relative">
                 <FormControl>
                   <Input
@@ -139,7 +133,7 @@ export function FormulaireConnexion({ onConnecte }: { onConnecte: (moi: Moi) => 
                   type="button"
                   onClick={() => setAfficher((valeur) => !valeur)}
                   aria-pressed={afficher}
-                  aria-label={afficher ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                  aria-label={afficher ? m.cnx_masquer() : m.cnx_afficher()}
                   className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-md text-muted-foreground transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {afficher ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -155,7 +149,7 @@ export function FormulaireConnexion({ onConnecte }: { onConnecte: (moi: Moi) => 
           className="btn-fx h-12 w-full rounded-full text-base font-bold"
         >
           {enCours && <Loader2 className="h-5 w-5 animate-spin" />}
-          Me connecter
+          {m.cnx_me_connecter()}
         </Button>
       </form>
     </Form>
@@ -184,9 +178,9 @@ function EtapeCode({
     try {
       onConnecte(await connecterAvecCode(jeton, saisie));
     } catch (e) {
-      const message = e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE;
+      const message = e instanceof ErreurApi ? e.message : m.erreur_indisponible();
       // Délai dépassé : il faut reprendre depuis le mot de passe.
-      if (e instanceof ErreurApi && e.statut === 401 && message.includes("Reconnecte")) {
+      if (e instanceof ErreurApi && e.statut === 401 && message === m.erreur_delai_depasse()) {
         onRetour(message);
         return;
       }
@@ -207,9 +201,7 @@ function EtapeCode({
       <div className="flex items-start gap-3 rounded-2xl bg-mist-soft p-4">
         <ShieldCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-primary" />
         <p className="text-sm font-medium text-ink/80">
-          {secours
-            ? "Saisis un de tes codes de secours. Chaque code ne sert qu'une fois."
-            : "Ouvre ton application d'authentification et saisis le code à 6 chiffres."}
+          {secours ? m.cnx_code_secours_aide() : m.cnx_code_app_aide()}
         </p>
       </div>
       {erreur && (
@@ -220,7 +212,7 @@ function EtapeCode({
       {secours ? (
         <div className="space-y-2">
           <label htmlFor="code-secours" className="text-sm font-medium">
-            Code de secours
+            {m.cnx_code_secours()}
           </label>
           <Input
             id="code-secours"
@@ -236,7 +228,7 @@ function EtapeCode({
       ) : (
         <div className="space-y-2">
           <label htmlFor="code-application" className="block text-center text-sm font-medium">
-            Code de vérification
+            {m.cnx_code_verification()}
           </label>
           <ChampCode
             id="code-application"
@@ -253,7 +245,7 @@ function EtapeCode({
         className="btn-fx h-12 w-full rounded-full text-base font-bold"
       >
         {enCours && <Loader2 className="h-5 w-5 animate-spin" />}
-        Vérifier
+        {m.cnx_verifier()}
       </Button>
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm font-bold">
         <button
@@ -261,7 +253,7 @@ function EtapeCode({
           onClick={() => onRetour(null)}
           className="inline-flex items-center gap-1 text-muted-foreground hover:text-ink"
         >
-          <ArrowLeft className="size-4" /> Retour
+          <ArrowLeft className="size-4" /> {m.cnx_retour()}
         </button>
         <button
           type="button"
@@ -272,7 +264,7 @@ function EtapeCode({
           }}
           className="text-logo-blue underline-offset-4 hover:underline"
         >
-          {secours ? "Utiliser l'application" : "Utiliser un code de secours"}
+          {secours ? m.cnx_utiliser_app() : m.cnx_utiliser_secours()}
         </button>
       </div>
     </form>

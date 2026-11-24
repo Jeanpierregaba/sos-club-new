@@ -1,13 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { MotDePasseOublie } from "@/components/comptes/MotDePasseOublie";
+import { m } from "@/paraglide/messages.js";
 
 export const Route = createFileRoute("/mot-de-passe-oublie")({
   head: () => ({
-    meta: [
-      { title: "Mot de passe oublié — Club Santé SOS Docteur TV" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: m.mdp_oublie_meta() }, { name: "robots", content: "noindex" }],
   }),
   component: MotDePasseOublie,
 });

@@ -19,7 +19,7 @@ Ordre d'exécution. Chaque groupe de pages est livrable seul : une page pas enco
 - [x] 7. Bibliothèque, galerie, magazine, articles (liste et article), agenda (liste et événement), carte des clubs,
       fiche d'un club, avec la mention « contenu en français »
 - [x] 8. Génie Imhotep : description, inscription, palmarès, hall of fame
-- [ ] 9. Inscription, connexion, activation, mot de passe oublié et nouveau : validation du site et erreurs connues de
+- [x] 9. Inscription, connexion, activation, mot de passe oublié et nouveau : validation du site et erreurs connues de
       l'API traduites, repli sur le message français (tests)
 - [ ] 10. Vérification au navigateur : FR → EN → DE sur l'accueil, Jeux, un article, l'inscription, ordinateur et
       téléphone (textes allemands longs), recherche de textes français restés en dur ; `AGENTS.md` (où sont les

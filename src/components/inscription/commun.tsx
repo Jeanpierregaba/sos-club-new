@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/form";
 import { CHAMP } from "@/components/inscription/styles";
 import { Input } from "@/components/ui/input";
+import { lien } from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 // Les morceaux communs aux formulaires d'inscription des élèves (spec 017) et des encadreurs (spec 018).
 
@@ -29,7 +31,7 @@ export function ChampMotDePasse<T extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Mot de passe</FormLabel>
+          <FormLabel>{m.cnx_mdp()}</FormLabel>
           <div className="relative">
             <FormControl>
               <Input
@@ -43,13 +45,13 @@ export function ChampMotDePasse<T extends FieldValues>({
               type="button"
               onClick={() => setAfficher((v) => !v)}
               aria-pressed={afficher}
-              aria-label={afficher ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+              aria-label={afficher ? m.cnx_masquer() : m.cnx_afficher()}
               className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-md text-muted-foreground transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {afficher ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
-          <FormDescription>Au moins 8 caractères.</FormDescription>
+          <FormDescription>{m.ins_mdp_aide()}</FormDescription>
           <FormMessage />
         </FormItem>
       )}
@@ -95,16 +97,16 @@ export function CaseAccord<T extends FieldValues>({
 export function LienCharte() {
   return (
     <>
-      J'ai lu et j'accepte la{" "}
+      {m.ins_charte_debut()}{" "}
       <a
-        href="/charte"
+        href={lien("/charte")}
         target="_blank"
         rel="noreferrer"
         className="font-bold text-logo-blue underline underline-offset-4"
       >
-        charte des Clubs Santé
+        {m.ins_charte_lien()}
       </a>
-      .
+      {m.ins_charte_fin()}
     </>
   );
 }

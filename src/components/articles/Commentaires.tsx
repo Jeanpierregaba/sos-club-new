@@ -14,7 +14,6 @@ import {
   chargerMesCommentaires,
   commenterArticle,
   ErreurApi,
-  MESSAGE_INDISPONIBLE,
 } from "@/lib/api/client";
 import { signer } from "@/lib/articles";
 import { dateCourte } from "@/lib/dates";
@@ -144,7 +143,7 @@ function Formulaire({ adresse, eleve }: { adresse: string; eleve: boolean }) {
   const erreur = envoi.error
     ? envoi.error instanceof ErreurApi
       ? envoi.error.message
-      : MESSAGE_INDISPONIBLE
+      : m.erreur_indisponible()
     : null;
 
   return (

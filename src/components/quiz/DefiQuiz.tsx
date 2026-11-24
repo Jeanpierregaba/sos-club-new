@@ -14,7 +14,6 @@ import {
   ErreurApi,
   lancerQuiz,
   lancerQuizOuvert,
-  MESSAGE_INDISPONIBLE,
   partieJoueur,
   partieSansCompte,
   type CatalogueQuiz,
@@ -140,7 +139,7 @@ export function DefiQuiz({
     } catch (e) {
       if (numero !== ouverture.current) return;
       if (!connecte && estFinDEssai(e)) setEssaiFini(true);
-      else setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
+      else setErreur(e instanceof ErreurApi ? e.message : m.erreur_indisponible());
     } finally {
       if (numero === ouverture.current) setEnCours(false);
     }

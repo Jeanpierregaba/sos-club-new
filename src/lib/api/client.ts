@@ -1,5 +1,6 @@
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
+import { traduireErreur } from "@/lib/erreurs";
 
 import type { components } from "./schema.gen";
 
@@ -220,7 +221,8 @@ export class ErreurApi extends Error {
     // des joueurs sans compte. Un code 403 seul ne suffit pas à le savoir.
     readonly raison: string | null = null,
   ) {
-    super(message);
+    // L'API répond en français ; sur une page en anglais ou en allemand, le message suit la langue (spec 052).
+    super(traduireErreur(message, statut));
     this.name = "ErreurApi";
   }
 }

@@ -4,13 +4,8 @@ import { useEffect, useState } from "react";
 import { ChampCode } from "@/components/admin/ChampCode";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  confirmerEmail,
-  ErreurApi,
-  MESSAGE_INDISPONIBLE,
-  renvoyerCode,
-  type Moi,
-} from "@/lib/api/client";
+import { confirmerEmail, ErreurApi, renvoyerCode, type Moi } from "@/lib/api/client";
+import { m } from "@/paraglide/messages.js";
 
 // Un nouveau code ne part qu'une fois par minute (spec 030).
 const ATTENTE_SECONDES = 60;
@@ -22,7 +17,7 @@ export function ConfirmationEmail({
   codeDeTest,
   onConfirme,
   onRetour,
-  retour = "Retour",
+  retour = m.cnx_retour(),
 }: {
   email: string;
   codeDeTest?: string | null | undefined;
@@ -50,7 +45,7 @@ export function ConfirmationEmail({
     try {
       onConfirme(await confirmerEmail(email, saisie));
     } catch (e) {
-      setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
+      setErreur(e instanceof ErreurApi ? e.message : m.erreur_indisponible());
       setCode("");
       setEnCours(false);
     }
@@ -62,9 +57,9 @@ export function ConfirmationEmail({
     try {
       const reponse = await renvoyerCode(email);
       setTest(reponse.code_de_test ?? null);
-      setInfo("Si ton adresse attend une confirmation, un nouveau code vient de partir.");
+      setInfo(m.conf_nouveau_code());
     } catch (e) {
-      setErreur(e instanceof ErreurApi ? e.message : MESSAGE_INDISPONIBLE);
+      setErreur(e instanceof ErreurApi ? e.message : m.erreur_indisponible());
     }
   };
 
@@ -79,14 +74,13 @@ export function ConfirmationEmail({
       <div className="flex items-start gap-3 rounded-2xl bg-mist-soft p-4">
         <MailCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-primary" />
         <p className="text-sm font-medium text-ink/80">
-          Nous t'avons envoyé un code à 6 chiffres à <strong className="text-ink">{email}</strong>.
-          Il est valable 15 minutes. Regarde aussi dans tes courriers indésirables.
+          {m.conf_envoye()} <strong className="text-ink">{email}</strong>
+          {m.conf_envoye_fin()}
         </p>
       </div>
       {test && (
         <p className="rounded-2xl border-2 border-dashed border-sun p-3 text-center text-sm font-bold text-ink">
-          Contenu de test — e-mail non envoyé en local. Code :{" "}
-          <span className="font-mono">{test}</span>
+          {m.conf_test()} <span className="font-mono">{test}</span>
         </p>
       )}
       {erreur && (
@@ -101,11 +95,11 @@ export function ConfirmationEmail({
       )}
       <div className="space-y-2">
         <label htmlFor="code-email" className="block text-center text-sm font-medium">
-          Code de confirmation
+          {m.conf_code()}
         </label>
         <ChampCode
           id="code-email"
-          libelle="Code à 6 chiffres reçu par e-mail"
+          libelle={m.conf_code_libelle()}
           valeur={code}
           onChange={setCode}
           onComplet={(valeur) => void verifier(valeur)}
@@ -118,7 +112,7 @@ export function ConfirmationEmail({
         className="btn-fx h-12 w-full rounded-full text-base font-bold"
       >
         {enCours && <Loader2 className="h-5 w-5 animate-spin" />}
-        Confirmer mon adresse
+        {m.conf_confirmer()}
       </Button>
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm font-bold">
         {onRetour ? (
@@ -138,7 +132,7 @@ export function ConfirmationEmail({
           onClick={() => void renvoyer()}
           className="text-logo-blue underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:text-muted-foreground disabled:no-underline"
         >
-          {attente > 0 ? `Renvoyer un code (${attente} s)` : "Renvoyer un code"}
+          {attente > 0 ? m.conf_renvoyer_attente({ secondes: String(attente) }) : m.conf_renvoyer()}
         </button>
       </div>
     </form>

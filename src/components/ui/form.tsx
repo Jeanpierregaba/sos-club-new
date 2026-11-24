@@ -12,6 +12,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
+import { traduireValidation } from "@/lib/erreurs";
 
 const Form = FormProvider;
 
@@ -140,7 +141,8 @@ const FormMessage = React.forwardRef<
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {
   const { error, formMessageId } = useFormField();
-  const body = error ? String(error?.message ?? "") : children;
+  // Les messages des schémas sont écrits en français ; ils suivent la langue de la page (spec 052).
+  const body = error ? traduireValidation(String(error?.message ?? "")) : children;
 
   if (!body) {
     return null;
