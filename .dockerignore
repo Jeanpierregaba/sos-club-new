@@ -8,3 +8,6 @@
 !tsconfig.json
 !vite.config.ts
 !components.json
+# Textes du site en trois langues (spec 052) : compilés par Paraglide pendant le build.
+!project.inlang/settings.json
+!messages
