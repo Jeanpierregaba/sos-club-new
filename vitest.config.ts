@@ -1,9 +1,12 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
+import { paraglideVitePlugin } from "@inlang/paraglide-js";
+
+import { OPTIONS_PARAGLIDE } from "./src/lib/langues-config";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), paraglideVitePlugin(OPTIONS_PARAGLIDE)],
   test: {
     environment: "jsdom",
     globals: true,

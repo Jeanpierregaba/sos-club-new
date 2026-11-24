@@ -20,6 +20,8 @@ jobs:
         with:
           bun-version: 1.4.4
       - run: bun install --frozen-lockfile
+      # Textes de l'interface (spec 052) compilés dans src/paraglide, non versionné : la vérification des types en a besoin.
+      - run: npm run langues
       - name: Types de l'API à jour
         run: npm run api:types && git diff --exit-code src/lib/api/schema.gen.ts
       - run: npm run lint

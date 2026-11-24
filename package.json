@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "api:types": "openapi-typescript backend/openapi.json -o src/lib/api/schema.gen.ts"
+    "api:types": "openapi-typescript backend/openapi.json -o src/lib/api/schema.gen.ts",
+    "langues": "node scripts/compiler-langues.ts"
   },
   "overrides": {
     "rolldown": "1.2.1"
@@ -74,6 +75,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
+    "@inlang/paraglide-js": "3.2.2",
+    "@inlang/plugin-message-format": "4.6.0",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",
     "@types/node": "^22.16.5",

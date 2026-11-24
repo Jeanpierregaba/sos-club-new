@@ -1,0 +1,9 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "commun_retour_accueil": "Zurück zur Startseite",
+  "erreur404_titre": "Seite nicht gefunden",
+  "erreur404_texte": "Die Seite, die du suchst, gibt es nicht oder sie wurde verschoben.",
+  "erreur_titre": "Diese Seite konnte nicht geladen werden",
+  "erreur_texte": "Bei uns ist ein Problem aufgetreten. Du kannst es erneut versuchen oder zur Startseite zurückkehren.",
+  "erreur_reessayer": "Erneut versuchen"
+}

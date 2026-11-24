@@ -20,17 +20,14 @@ const parametres = (texte: string) =>
   [...texte.matchAll(/\{(\w+)\}/g)].map(([, nom]) => nom).sort();
 
 describe("textes de l'interface", () => {
-  const messages = Object.fromEntries(LANGUES.map((l) => [l, lire(l)])) as Record<
-    string,
-    Record<string, string>
-  >;
+  const messages = { fr: lire("fr"), en: lire("en"), de: lire("de") };
   const cles = Object.keys(messages.fr).sort();
 
   it("il y a des textes", () => {
     expect(cles.length).toBeGreaterThan(0);
   });
 
-  it.each(["en", "de"])("%s a exactement les clés du français", (langue) => {
+  it.each(["en", "de"] as const)("%s a exactement les clés du français", (langue) => {
     expect(Object.keys(messages[langue]).sort()).toEqual(cles);
   });
 
@@ -41,10 +38,10 @@ describe("textes de l'interface", () => {
     expect(vides).toEqual([]);
   });
 
-  it.each(["en", "de"])("%s garde les paramètres du français", (langue) => {
+  it.each(["en", "de"] as const)("%s garde les paramètres du français", (langue) => {
     const ecarts = cles.filter(
       (cle) =>
-        JSON.stringify(parametres(messages.fr[cle])) !==
+        JSON.stringify(parametres(messages.fr[cle] ?? "")) !==
         JSON.stringify(parametres(messages[langue][cle] ?? "")),
     );
     expect(ecarts).toEqual([]);

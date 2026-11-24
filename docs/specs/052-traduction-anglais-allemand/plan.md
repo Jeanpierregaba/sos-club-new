@@ -33,7 +33,9 @@ français). La ligne « autres langues que le français » du PRD (hors scope) e
   du français.
 - `src/lib/langues.test.ts`, `src/test/messages.test.ts` : voir Tests.
 - `docs/decisions/0015-langues-de-l-interface.md`.
-- `src/paraglide/` : généré par le plugin, ignoré par git, ESLint et Prettier.
+- `src/paraglide/` : généré par le plugin (dev, build, Vitest) ou par `npm run langues` (vérification des types,
+  CI), ignoré par git, ESLint et Prettier. Le plugin de format des messages est une dépendance npm chargée depuis
+  `node_modules` (pas de module téléchargé au build).
 
 **Modifiés**
 

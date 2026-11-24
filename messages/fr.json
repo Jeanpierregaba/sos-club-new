@@ -1,0 +1,9 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "commun_retour_accueil": "Retour à l'accueil",
+  "erreur404_titre": "Page introuvable",
+  "erreur404_texte": "La page que tu cherches n'existe pas ou a été déplacée.",
+  "erreur_titre": "Cette page n'a pas pu se charger",
+  "erreur_texte": "Un problème est survenu de notre côté. Tu peux réessayer ou revenir à l'accueil.",
+  "erreur_reessayer": "Réessayer"
+}

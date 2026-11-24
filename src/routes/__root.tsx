@@ -1,10 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
-  Link,
   createRootRouteWithContext,
   redirect,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -15,8 +15,21 @@ import appCss from "../styles.css?url";
 import { RetourEnHaut } from "@/components/RetourEnHaut";
 import { endroitDuClic, lienInscription, pageVue, signaler } from "@/lib/activite";
 import { chargerAdminMoi, chargerEtatSite } from "@/lib/api/client";
+import {
+  langueCourante,
+  langueDeLAdresse,
+  liensHreflang,
+  localiser,
+  redirectionLangue,
+} from "@/lib/langues";
+import { m } from "@/paraglide/messages.js";
 
 function NotFoundComponent() {
+  // Spec 052 : une adresse inconnue sous `/en` ou `/de` répond dans la langue de son préfixe.
+  const langue = useRouterState({
+    select: (etat) => langueDeLAdresse(etat.location.publicHref),
+  });
+  const options = { locale: langue };
   // Spec 051 : la page introuvable compte, avec l'adresse demandée (l'API n'en garde qu'un premier segment lisible).
   useEffect(() => {
     signaler({ type: "erreur", chemin: window.location.pathname.slice(0, 200), detail: "404" });
@@ -25,17 +38,17 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page introuvable</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          La page que tu cherches n'existe pas ou a été déplacée.
-        </p>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">
+          {m.erreur404_titre({}, options)}
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">{m.erreur404_texte({}, options)}</p>
         <div className="mt-6">
-          <Link
-            to="/"
+          <a
+            href={localiser("/", langue)}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Retour à l'accueil
-          </Link>
+            {m.commun_retour_accueil({}, options)}
+          </a>
         </div>
       </div>
     </div>
@@ -49,12 +62,8 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          Cette page n'a pas pu se charger
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Un problème est survenu de notre côté. Tu peux réessayer ou revenir à l'accueil.
-        </p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">{m.erreur_titre()}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{m.erreur_texte()}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
@@ -63,13 +72,13 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Réessayer
+            {m.erreur_reessayer()}
           </button>
           <a
-            href="/"
+            href={localiser("/", langueCourante())}
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            Retour à l'accueil
+            {m.commun_retour_accueil()}
           </a>
         </div>
       </div>
@@ -77,9 +86,17 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+  pageExiste: (chemin: string) => boolean;
+}>()({
   // Garde d'affichage du mode maintenance (spec 047) : l'API bloque de toute façon chaque route.
-  beforeLoad: async ({ location }) => {
+  beforeLoad: async ({ location, context }) => {
+    // Langues (spec 052) : `/fr/...` n'existe pas (une seule adresse par page), et une page non traduite sous `/en`
+    // ou `/de` s'ouvre en français ; une page inconnue y reste une 404 dans la langue du préfixe.
+    const versLaLangue = redirectionLangue(location.pathname, context.pageExiste);
+    if (versLaLangue !== null) throw redirect({ href: versLaLangue + location.searchStr });
+
     if (["/maintenance", "/connexion", "/activation"].includes(location.pathname)) return;
 
     let etat;
@@ -133,10 +150,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  // La langue de l'adresse : celle de la page, et aussi celle d'une 404 sous `/en` ou `/de`.
+  const langue = useRouterState({ select: (etat) => langueDeLAdresse(etat.location.publicHref) });
   return (
-    <html lang="fr">
+    <html lang={langue}>
       <head>
         <HeadContent />
+        <VersionsDeLaPage />
       </head>
       <body>
         {children}
@@ -144,6 +164,14 @@ function RootShell({ children }: { children: ReactNode }) {
       </body>
     </html>
   );
+}
+
+/** Les versions de la page dans chaque langue, pour les moteurs de recherche (spec 052). */
+function VersionsDeLaPage() {
+  const { pathname, searchStr } = useRouterState({ select: (etat) => etat.location });
+  return liensHreflang(pathname, searchStr).map((lien) => (
+    <link key={lien.hreflang} rel="alternate" hrefLang={lien.hreflang} href={lien.href} />
+  ));
 }
 
 function RootComponent() {

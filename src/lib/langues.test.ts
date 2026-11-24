@@ -6,7 +6,7 @@ import {
   liensHreflang,
   localiser,
   pageSansLangue,
-  redirectionLangue,
+  redirectionLangue as rediriger,
 } from "./langues";
 
 describe("adresses des langues (spec 052)", () => {
@@ -61,6 +61,8 @@ describe("adresses des langues (spec 052)", () => {
   });
 
   it("redirige /fr vers l'adresse sans préfixe et une page non traduite vers le français", () => {
+    const existe = (page: string) => page !== "/page-inconnue";
+    const redirectionLangue = (chemin: string) => rediriger(chemin, existe);
     expect(redirectionLangue("/fr")).toBe("/");
     expect(redirectionLangue("/fr/jeux")).toBe("/jeux");
     expect(redirectionLangue("/en/mon-espace")).toBe("/mon-espace");
@@ -69,6 +71,8 @@ describe("adresses des langues (spec 052)", () => {
     expect(redirectionLangue("/en/jeux")).toBeNull();
     expect(redirectionLangue("/jeux")).toBeNull();
     expect(redirectionLangue("/es/jeux")).toBeNull();
+    // Une page inconnue sous un préfixe reste une 404, dans la langue du préfixe.
+    expect(redirectionLangue("/en/page-inconnue")).toBeNull();
   });
 
   it("déclare les trois versions d'une page traduite, et aucune pour une page française seulement", () => {
@@ -80,5 +84,26 @@ describe("adresses des langues (spec 052)", () => {
     ]);
     expect(liensHreflang("/", "")).toContainEqual({ hreflang: "en", href: "/en" });
     expect(liensHreflang("/mon-espace", "")).toEqual([]);
+  });
+});
+
+describe("routeur et suivi d'activité (spec 051)", () => {
+  it("une page ouverte en allemand se résout sur le gabarit français, que le suivi compte tel quel", async () => {
+    const { createMemoryHistory, createRootRoute, createRoute, createRouter } =
+      await import("@tanstack/react-router");
+    const { pageVue } = await import("./activite");
+    const { REECRITURE_LANGUES } = await import("./langues");
+    const racine = createRootRoute();
+    const jeux = createRoute({ getParentRoute: () => racine, path: "/jeux" });
+    const routeur = createRouter({
+      routeTree: racine.addChildren([jeux]),
+      history: createMemoryHistory({ initialEntries: ["/de/jeux"] }),
+      rewrite: REECRITURE_LANGUES,
+    });
+    await routeur.load();
+    const page = routeur.state.matches.at(-1);
+    expect(page?.routeId).toBe("/jeux");
+    expect(routeur.state.location.pathname).toBe("/jeux");
+    expect(pageVue({ fullPath: jeux.fullPath, params: {} }, null)?.chemin).toBe("/jeux");
   });
 });

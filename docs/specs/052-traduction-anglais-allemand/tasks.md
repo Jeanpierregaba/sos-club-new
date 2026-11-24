@@ -8,7 +8,7 @@ Ordre d'exécution. Chaque groupe de pages est livrable seul : une page pas enco
 - [x] 2. Tests d'abord : `src/lib/langues.test.ts` (adresses, redirections `/fr`, pages non traduites, `/es`, liens
       préfixés ou non, `hreflang`) et test des clés (mêmes clés, aucune vide, mêmes paramètres dans les 3 langues)
       — ils échouent
-- [ ] 3. Socle : Paraglide (`project.inlang`, `messages/*.json`, plugin Vite, `src/paraglide/` ignoré), `rewrite` du
+- [x] 3. Socle : Paraglide (`project.inlang`, `messages/*.json`, plugin Vite, `src/paraglide/` ignoré), `rewrite` du
       routeur, `paraglideMiddleware` dans `server.ts`, `src/lib/langues.ts`, `<html lang>`, `hreflang`, redirections ;
       les tests de la tâche 2 passent, le suivi d'activité garde `/jeux` pour `/de/jeux` (test), rendu serveur vérifié
       avec `curl`

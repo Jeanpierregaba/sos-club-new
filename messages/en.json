@@ -1,0 +1,9 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "commun_retour_accueil": "Back to home",
+  "erreur404_titre": "Page not found",
+  "erreur404_texte": "The page you're looking for doesn't exist or has been moved.",
+  "erreur_titre": "This page couldn't load",
+  "erreur_texte": "Something went wrong on our side. You can try again or go back to the home page.",
+  "erreur_reessayer": "Try again"
+}
