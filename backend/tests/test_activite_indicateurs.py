@@ -286,8 +286,15 @@ def test_retention_par_cohorte_sans_part_pour_une_semaine_pas_finie(
     assert cohorte == {"semaine": "2026-11-02", "inscrits": 2, "s1": 50.0, "s4": None}
 
 
-def test_regions_par_dre(super_admin: TestClient, creer_eleve: Callable[..., Any]) -> None:
-    creer_eleve("ama", dre="grand-lome")
+def test_regions_par_dre(super_admin: TestClient, creer_eleve: Callable[..., Any], en_base: Callable[..., Any]) -> None:
+    from app.comptes.models import Utilisateur
+
+    ama = creer_eleve("ama", dre="grand-lome")
+
+    async def inscrite_dans_la_periode(db: AsyncSession) -> None:
+        (await db.get(Utilisateur, ama.id)).cree_le = datetime(2026, 11, 10, 9, tzinfo=UTC)
+
+    en_base(inscrite_dans_la_periode)
     lignes = {ligne["dre"]: ligne for ligne in tableau(lire(super_admin, "regions"), "dre")}
     assert sum(int(ligne["inscrits"]) for ligne in lignes.values()) == 1
     assert len(lignes) > 1  # toutes les DRE actives, même sans activité

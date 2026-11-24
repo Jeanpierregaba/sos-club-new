@@ -2,9 +2,9 @@
 
 from collections.abc import Callable, Iterator
 from typing import Any
+from uuid import uuid4
 
 import pytest
-from fastapi import APIRouter
 from fastapi.testclient import TestClient
 from sqlalchemy import select
 
@@ -124,18 +124,17 @@ def test_l_equipe_n_a_pas_de_presence(
     assert presences(en_base) == []
 
 
-def test_une_erreur_serveur_compte_par_le_gabarit_de_sa_route(en_base: Callable[..., Any]) -> None:
-    essai = APIRouter()
+def test_une_erreur_serveur_compte_par_le_gabarit_de_sa_route(
+    en_base: Callable[..., Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.bibliotheque import public
 
-    @essai.get("/api/essai-erreur/{code}")
-    async def planter(code: str) -> None:
-        raise RuntimeError(code)
+    async def en_panne(*_: Any, **__: Any) -> None:
+        raise RuntimeError("stockage en panne")
 
-    app.include_router(essai)
-    try:
-        with TestClient(app, raise_server_exceptions=False) as client:
-            reponse = client.get("/api/essai-erreur/ABC123", headers=AGENT)
-    finally:
-        app.router.routes[:] = [r for r in app.router.routes if getattr(r, "path", "") != "/api/essai-erreur/{code}"]
+    # Une vraie route qui plante, plutôt qu'une route d'essai ajoutée à l'application partagée (et à son schéma).
+    monkeypatch.setattr(public, "publiee", en_panne)
+    with TestClient(app, raise_server_exceptions=False) as client:
+        reponse = client.get(f"/api/bibliotheque/{uuid4()}/fichier", headers=AGENT)
     assert reponse.status_code == 500
-    assert evenements(en_base) == [("erreur", "/api/essai-erreur/{code}", "500")]
+    assert evenements(en_base) == [("erreur", "/bibliotheque/{ressource_id}/fichier", "500")]

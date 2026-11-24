@@ -88,7 +88,6 @@ def upgrade() -> None:
         sa.Column("navigateur", sa.String(length=20), nullable=False),
         sa.Column("connecte", sa.Boolean(), nullable=False),
         sa.Column("evenements", sa.Integer(), nullable=False),
-        
         sa.PrimaryKeyConstraint(
             "jour",
             "type",
