@@ -5,7 +5,7 @@ Ordre d'exécution. Chaque groupe de pages est livrable seul : une page pas enco
 
 - [x] 1. ADR-0015 (langues de l'interface), lignes de `docs/PRD.md` (hors scope) et de `docs/DESIGN.md` (ton
       « you » / « du », sélecteur)
-- [ ] 2. Tests d'abord : `src/lib/langues.test.ts` (adresses, redirections `/fr`, pages non traduites, `/es`, liens
+- [x] 2. Tests d'abord : `src/lib/langues.test.ts` (adresses, redirections `/fr`, pages non traduites, `/es`, liens
       préfixés ou non, `hreflang`) et test des clés (mêmes clés, aucune vide, mêmes paramètres dans les 3 langues)
       — ils échouent
 - [ ] 3. Socle : Paraglide (`project.inlang`, `messages/*.json`, plugin Vite, `src/paraglide/` ignoré), `rewrite` du
