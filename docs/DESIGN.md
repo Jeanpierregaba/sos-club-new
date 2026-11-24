@@ -85,7 +85,14 @@ un ordinateur.
 
 Français, tutoiement partout (élèves, encadreurs, admin), sans exception. Phrases courtes et
 encourageantes. Les messages d'erreur disent quoi faire ensuite. Les contenus médicaux restent factuels,
-sans dramatiser. Aucun texte en anglais visible, y compris les pages d'erreur.
+sans dramatiser. Aucun texte en anglais visible sur une page française, y compris les pages d'erreur.
+
+**Anglais et allemand (spec 052)** : seulement les pages publiques, sous `/en` et `/de`. Le tutoiement devient « you »
+en anglais et « du » en allemand (registre informel, public jeune), avec le même ton court et encourageant. Le
+sélecteur « FR / EN / DE » de l'en-tête et du menu mobile ouvre la même page dans l'autre langue ; il n'apparaît pas
+dans les espaces connectés ni dans l'admin. Les contenus en base restent en français, avec la mention discrète
+« Contenu disponible en français » / « Inhalt auf Französisch ». Les textes allemands sont plus longs : boutons et
+cartes doivent tenir à 375 px.
 
 ## Statuts des clubs (spec 033)
 
