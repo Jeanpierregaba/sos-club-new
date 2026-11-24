@@ -12,7 +12,7 @@ Ordre d'exécution. Chaque groupe de pages est livrable seul : une page pas enco
       routeur, `paraglideMiddleware` dans `server.ts`, `src/lib/langues.ts`, `<html lang>`, `hreflang`, redirections ;
       les tests de la tâche 2 passent, le suivi d'activité garde `/jeux` pour `/de/jeux` (test), rendu serveur vérifié
       avec `curl`
-- [ ] 4. Cadre commun : en-tête, menu mobile, pied de page, `SelecteurLangue` (remplace le bouton FR/EN),
+- [x] 4. Cadre commun : en-tête, menu mobile, pied de page, `SelecteurLangue` (remplace le bouton FR/EN),
       `ContenuEnFrancais`, page 404 et page d'erreur, dates selon la langue (tests Vitest)
 - [ ] 5. Accueil, Club Santé, les 7 axes, charte, témoignages : textes et `head()` traduits (tests)
 - [ ] 6. Jeux, certification, classements (hall of fame), vérification d'un certificat, carte de classement partagée

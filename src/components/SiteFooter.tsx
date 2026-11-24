@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Facebook, Instagram, Linkedin, MapPin, Phone, Send, Tv, Youtube } from "lucide-react";
 import { retard } from "@/components/SiteMotion";
 import { TikTokIcon } from "@/components/TikTokIcon";
+import { m } from "@/paraglide/messages.js";
 
 const SITE = "https://www.sos-docteur.tv";
 const IBDA = "https://ibdastudio.com/";
@@ -56,28 +57,25 @@ export function SiteFooter() {
       <div className="mx-auto max-w-7xl px-5">
         <div>
           <div data-reveal className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl uppercase text-primary md:text-4xl">Nos médias officiels</h2>
-            <p className="mt-2 text-white/70">
-              Suis les reportages, émissions télévisées et activités des Clubs Santé et de SOS
-              DOCTEUR TV.
-            </p>
+            <h2 className="text-3xl uppercase text-primary md:text-4xl">{m.pied_medias_titre()}</h2>
+            <p className="mt-2 text-white/70">{m.pied_medias_texte()}</p>
           </div>
           <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {medias.map((m, n) => (
-              <li key={m.t} data-reveal="zoom" style={retard(n)}>
+            {medias.map((media, n) => (
+              <li key={media.t} data-reveal="zoom" style={retard(n)}>
                 <a
-                  href={m.href}
-                  {...externe(m.href)}
+                  href={media.href}
+                  {...externe(media.href)}
                   className="card-fx group flex h-full flex-col items-center rounded-2xl border border-white/10 bg-white/5 p-4 text-center hover:border-white/30 hover:bg-white/10"
                 >
                   <span
-                    className={`${m.c} flex h-12 w-12 items-center justify-center rounded-full bg-white transition duration-300 group-hover:-rotate-6 group-hover:scale-110`}
+                    className={`${media.c} flex h-12 w-12 items-center justify-center rounded-full bg-white transition duration-300 group-hover:-rotate-6 group-hover:scale-110`}
                   >
-                    <m.i className="h-6 w-6" />
+                    <media.i className="h-6 w-6" />
                   </span>
-                  <span className="mt-3 font-extrabold leading-tight">{m.t}</span>
+                  <span className="mt-3 font-extrabold leading-tight">{media.t}</span>
                   <span className="mt-1 max-w-full break-words text-[11px] text-white/70 sm:text-xs">
-                    {m.d}
+                    {media.d}
                   </span>
                 </a>
               </li>
@@ -90,21 +88,21 @@ export function SiteFooter() {
           className="mt-14 grid items-center gap-6 rounded-[2rem] border border-white/15 bg-white/5 p-6 md:p-10 lg:grid-cols-2 lg:gap-12"
         >
           <div>
-            <h2 className="text-3xl uppercase text-primary md:text-4xl">Newsletter</h2>
-            <p className="mt-2 text-white/70">
-              Suis l’impact des clubs en recevant notre synthèse mensuelle.
-            </p>
+            <h2 className="text-3xl uppercase text-primary md:text-4xl">
+              {m.pied_newsletter_titre()}
+            </h2>
+            <p className="mt-2 text-white/70">{m.pied_newsletter_texte()}</p>
           </div>
           <div>
             <form onSubmit={sAbonner} className="flex flex-col gap-2 sm:flex-row">
               <label htmlFor="newsletter-email" className="sr-only">
-                Ton adresse e-mail
+                {m.pied_newsletter_adresse()}
               </label>
               <input
                 id="newsletter-email"
                 type="email"
                 required
-                placeholder="ton-email@adresse.tg"
+                placeholder={m.pied_newsletter_exemple()}
                 autoComplete="email"
                 className="h-12 w-full min-w-0 rounded-full border border-white/20 bg-white/5 px-5 text-sm outline-none transition placeholder:text-white/50 focus:border-primary focus:bg-white/10"
               />
@@ -112,13 +110,13 @@ export function SiteFooter() {
                 type="submit"
                 className="btn-fx group flex h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 text-[15px] font-bold"
               >
-                M’abonner{" "}
+                {m.pied_newsletter_abonner()}{" "}
                 <Send className="h-4 w-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </button>
             </form>
             {envoye && (
               <p role="status" className="mt-3 text-sm font-semibold text-sun animate-in fade-in">
-                L’inscription à la newsletter ouvrira bientôt. Merci de ta patience !
+                {m.pied_newsletter_bientot()}
               </p>
             )}
           </div>
@@ -129,7 +127,7 @@ export function SiteFooter() {
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 xl:justify-start">
             <span className="font-display uppercase tracking-wide text-primary">AIMES-AFRIQUE</span>
             <span className="flex items-center gap-1.5">
-              <MapPin className="h-4 w-4 shrink-0 text-primary" /> Lomé, Quartier Adidoadin, Togo
+              <MapPin className="h-4 w-4 shrink-0 text-primary" /> {m.pied_adresse()}
             </span>
             <a
               href="tel:+22822224545"
@@ -138,9 +136,9 @@ export function SiteFooter() {
               <Phone className="h-4 w-4 shrink-0 text-primary" /> +228 22 22 45 45
             </a>
           </div>
-          <p>© 2026 Club Santé SOS Docteur TV. Tous droits réservés.</p>
+          <p>{m.pied_droits({ annee: "2026" })}</p>
           <p className="xl:text-right">
-            Powered by{" "}
+            {m.pied_propulse()}{" "}
             <a
               href={IBDA}
               {...externe(IBDA)}
