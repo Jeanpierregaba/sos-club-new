@@ -25,16 +25,19 @@ deux parcours. Décisions du 2026-11-21 :
 
 ## Critères d'acceptation
 
-- [ ] Un joueur qui a raté 7 parties aujourd'hui (jeux et certification confondus) ne peut plus lancer de quiz ;
+> Vérifiés le 2026-11-26 par `backend/tests/test_quiz_vies.py`, `test_quiz_chrono_migration.py` et
+> `src/components/quiz/Vies.test.tsx`. Depuis la spec 049, le joueur a 3 vies par jour au lieu de 7.
+
+- [x] Un joueur qui a raté 7 parties aujourd'hui (jeux et certification confondus) ne peut plus lancer de quiz ;
       l'API répond 409 avec un message clair.
-- [ ] Une partie réussie ne retire aucune vie.
-- [ ] Une partie abandonnée et close sans réussite retire une vie.
-- [ ] Avec 1 vie, une partie en cours empêche d'en lancer une seconde.
-- [ ] Le lendemain, le joueur a de nouveau 7 vies.
-- [ ] Les parties d'essai de l'équipe ne comptent pas.
-- [ ] Les nouvelles parties ont 15 s par question, dans les jeux et la certification ; une partie commencée avant
+- [x] Une partie réussie ne retire aucune vie.
+- [x] Une partie abandonnée et close sans réussite retire une vie.
+- [x] Avec 1 vie, une partie en cours empêche d'en lancer une seconde.
+- [x] Le lendemain, le joueur a de nouveau 7 vies.
+- [x] Les parties d'essai de l'équipe ne comptent pas.
+- [x] Les nouvelles parties ont 15 s par question, dans les jeux et la certification ; une partie commencée avant
       garde son temps.
-- [ ] Le site affiche les vies restantes et bloque le lancement à 0.
+- [x] Le site affiche les vies restantes et bloque le lancement à 0.
 
 ## Cas limites et erreurs
 

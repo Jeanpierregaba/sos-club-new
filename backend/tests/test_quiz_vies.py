@@ -6,12 +6,14 @@ from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.comptes.models import Utilisateur
-from app.quiz.models import Quiz
+from app.quiz import parametres
+from app.quiz.models import EtatTentative, Quiz, TentativeQuiz
 from app.quiz.vies import VIES_PAR_JOUR
 from tests.certification import creer_parcours
-from tests.quiz import QUIZ, Horloge, connecter, creer_quiz, figer_horloge, jouer, lancer
+from tests.quiz import DEBUT, QUIZ, Horloge, connecter, creer_quiz, figer_horloge, jouer, lancer
 
 MESSAGE = "Tu as utilisé tes 3 vies aujourd'hui. Reviens demain, elles se rechargent à minuit."
 
@@ -205,3 +207,31 @@ def test_un_invite_sans_compte_n_a_pas_de_vies(client: TestClient, quiz: Quiz, h
         ).json()
 
     assert etat["vies_restantes"] is None
+
+
+def test_les_parties_dessai_de_lequipe_ne_coutent_aucune_vie(
+    client: TestClient, eleve: Utilisateur, quiz: Quiz, heure: Horloge, en_base: Callable[..., Any]
+) -> None:
+    async def essais_rates(db: AsyncSession) -> None:
+        p = await parametres.en_cours(db, quiz.parcours)
+        for _ in range(VIES_PAR_JOUR):
+            db.add(
+                TentativeQuiz(
+                    quiz_id=quiz.id,
+                    joueur_id=eleve.id,
+                    parametres_id=p.id,
+                    essai=True,
+                    etat=EtatTentative.terminee,
+                    jour=DEBUT.date(),
+                    commencee_le=DEBUT,
+                    derniere_activite=DEBUT,
+                    terminee_le=DEBUT,
+                    score=0,
+                    reussie=False,
+                )
+            )
+
+    en_base(essais_rates)
+
+    assert vies(client) == {"total": 3, "restantes": 3, "perdues": 0, "en_cours": 0}
+    lancer(client, quiz)
