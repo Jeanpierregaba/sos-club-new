@@ -13,7 +13,7 @@ docs/specs/NNN-nom/tasks.md. Les petites tâches isolées (bug, retouche) peuven
 - [ ] [048 — Vies quotidiennes et chrono de 15 secondes](docs/specs/048-vies-et-chrono-15s/spec.md) : tâches 1–3 faites le 2026-11-21 ; en cours : clôture (suite complète, relecture `reviewer`) ([tâches](docs/specs/048-vies-et-chrono-15s/tasks.md))
 - [ ] [046 — Temps passé sur les quiz et la certification d'un inscrit](docs/specs/046-temps-quiz-certification/spec.md) : implémentée et relue le 2026-11-20 ; reste la vérification au navigateur avec une connexion admin et le déploiement de la migration `e4a7c2d9b6f1` ([tâches](docs/specs/046-temps-quiz-certification/tasks.md))
 - [ ] [045 — Fiche d'un inscrit : modification, registre complet et parcours](docs/specs/045-fiche-inscrit-complete/spec.md) : implémentée et relue le 2026-11-20 ; reste la vérification au navigateur avec une connexion admin ([tâches](docs/specs/045-fiche-inscrit-complete/tasks.md))
-- [ ] [044 — Partages : carte de classement et partages d'articles vérifiés (R17)](docs/specs/044-partages/spec.md) : spec, plan et tâches validés le 2026-11-19 ; implémentation en cours ([tâches](docs/specs/044-partages/tasks.md))
+- [ ] [044 — Partages : carte de classement et partages d'articles vérifiés (R17)](docs/specs/044-partages/spec.md) : implémentée et relue le 2026-11-20, critères d'acceptation vérifiés le 2026-11-26 (76 tests API, suite complète et site verts) ; reste la vérification au navigateur (déclaration, décision dans la file avec une connexion admin, carte téléchargée) ([tâches](docs/specs/044-partages/tasks.md))
 
 ## À faire
 
@@ -52,7 +52,7 @@ utilisateur et son module admin. Les questions Q renvoient à `docs/PRD.md`.
 
 **Phases 6 à 8 — Après l'ouverture (P1, P2)**
 
-- [ ] R17 — Partage du classement et partages vérifiés (Q23)
+- [x] R17 — Partage du classement et partages vérifiés (Q23) : [spec 044](docs/specs/044-partages/spec.md)
 - [ ] R18 — Forums et co-animation, avec un ADR sur les échanges entre élèves (Q26)
 - [ ] R19 — Comptes visiteurs (Q27) : le choix « Particulier / visiteur » est déjà sur `/inscription`, sans formulaire ; le PRD exclut la certification des visiteurs alors que la page l'annonce, à trancher dans la spec
 - [ ] R20 — Capsules vidéo par axe

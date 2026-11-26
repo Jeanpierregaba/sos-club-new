@@ -83,55 +83,55 @@ Le parcours :
 
 ### Carte de classement
 
-- [ ] **Contenu de la carte.** Étant donné un élève classé, quand il demande la carte de la vue nationale du
+- [x] **Contenu de la carte.** Étant donné un élève classé, quand il demande la carte de la vue nationale du
       semestre, alors l'image porte son pseudonyme, son rang, le nombre de classés, ses points du semestre, « National »,
       le libellé du semestre et la mention du programme. Elle ne porte ni son nom, ni son prénom, ni son établissement,
       ni son identifiant, ni ses coordonnées.
-- [ ] **Club en option.** Étant donné la case « Afficher mon club » décochée, alors le nom du club n'apparaît pas.
+- [x] **Club en option.** Étant donné la case « Afficher mon club » décochée, alors le nom du club n'apparaît pas.
       Cochée, il apparaît.
-- [ ] **Encadreur.** Étant donné un encadreur classé, alors sa carte porte son prénom et l'initiale de son nom,
+- [x] **Encadreur.** Étant donné un encadreur classé, alors sa carte porte son prénom et l'initiale de son nom,
       jamais son nom complet.
-- [ ] **Semestre en cours.** Étant donné le semestre en cours, alors la carte porte « Classement provisoire ». La
+- [x] **Semestre en cours.** Étant donné le semestre en cours, alors la carte porte « Classement provisoire ». La
       vue historique porte « Depuis le début ».
-- [ ] **Personne non classée.** Étant donné un élève sans point dans la vue choisie, alors la carte est refusée avec
+- [x] **Personne non classée.** Étant donné un élève sans point dans la vue choisie, alors la carte est refusée avec
       un message clair. Aucune image d'un rang inexistant n'est produite.
-- [ ] **Vue club sans club.** Étant donné un élève sans club, alors la vue « club » est refusée.
-- [ ] **Accès.** Étant donné une personne connectée, alors elle n'obtient que sa propre carte. Un visiteur, un
+- [x] **Vue club sans club.** Étant donné un élève sans club, alors la vue « club » est refusée.
+- [x] **Accès.** Étant donné une personne connectée, alors elle n'obtient que sa propre carte. Un visiteur, un
       admin ou une personne non connectée sont refusés.
-- [ ] **Aucun point.** Le partage d'une carte ne crée aucune ligne au registre.
+- [x] **Aucun point.** Le partage d'une carte ne crée aucune ligne au registre.
 
 ### Partages d'articles
 
-- [ ] **Republication.** Étant donné un élève actif et un article publié dont il n'est pas l'auteur, quand il
+- [x] **Republication.** Étant donné un élève actif et un article publié dont il n'est pas l'auteur, quand il
       déclare une republication avec un lien valide, alors une déclaration « en attente » entre dans la file. Aucun point
       n'est crédité avant la décision.
-- [ ] **Approbation.** Étant donné une déclaration de republication approuvée, alors l'élève reçoit +10 au
+- [x] **Approbation.** Étant donné une déclaration de republication approuvée, alors l'élève reçoit +10 au
       registre, avec la part de son club, et une notification.
-- [ ] **Son article.** Étant donné l'auteur d'un article publié, quand ses partages sur Facebook puis sur Instagram
+- [x] **Son article.** Étant donné l'auteur d'un article publié, quand ses partages sur Facebook puis sur Instagram
       sont approuvés, alors il reçoit deux fois +50.
-- [ ] **Une fois par réseau.** Une deuxième déclaration sur Facebook pour le même article est refusée tant que la
+- [x] **Une fois par réseau.** Une deuxième déclaration sur Facebook pour le même article est refusée tant que la
       première est en attente ou approuvée.
-- [ ] **Une fois par article.** Une deuxième republication du même article est refusée tant que la première est en
+- [x] **Une fois par article.** Une deuxième republication du même article est refusée tant que la première est en
       attente ou approuvée.
-- [ ] **Après un refus.** Étant donné une déclaration refusée, alors la personne peut en déclarer une nouvelle pour
+- [x] **Après un refus.** Étant donné une déclaration refusée, alors la personne peut en déclarer une nouvelle pour
       le même réseau ou le même article. La déclaration refusée ne rapporte rien.
-- [ ] **Plafond quotidien.** Étant donné 3 déclarations le même jour (heure de Lomé), alors la 4ᵉ est refusée avec
+- [x] **Plafond quotidien.** Étant donné 3 déclarations le même jour (heure de Lomé), alors la 4ᵉ est refusée avec
       un message clair. Les déclarations refusées comptent dans le plafond.
-- [ ] **Encadreur.** Étant donné un encadreur actif, alors les mêmes règles s'appliquent, avec
+- [x] **Encadreur.** Étant donné un encadreur actif, alors les mêmes règles s'appliquent, avec
       `encadreur.republication` (+10) et `encadreur.partage` (+50).
-- [ ] **Article non publié.** Étant donné un article en attente, refusé, dépublié ou un brouillon, alors la
+- [x] **Article non publié.** Étant donné un article en attente, refusé, dépublié ou un brouillon, alors la
       déclaration est refusée. Un article dépublié entre la déclaration et la décision rend l'approbation impossible ;
       le modérateur refuse.
-- [ ] **Lien invalide.** Un lien qui n'est pas en `https`, ou dont le domaine ne correspond pas au réseau choisi,
+- [x] **Lien invalide.** Un lien qui n'est pas en `https`, ou dont le domaine ne correspond pas au réseau choisi,
       est refusé. Exemple : un lien `tiktok.com` déclaré pour Facebook.
-- [ ] **Lien déjà utilisé.** Un lien déjà déclaré dans une déclaration en attente ou approuvée, par la même
+- [x] **Lien déjà utilisé.** Un lien déjà déclaré dans une déclaration en attente ou approuvée, par la même
       personne ou par une autre, est refusé. Un lien refusé peut être déclaré de nouveau.
-- [ ] **Confidentialité du lien.** Le lien n'apparaît que dans la file de modération et dans « Mes partages » de son
+- [x] **Confidentialité du lien.** Le lien n'apparaît que dans la file de modération et dans « Mes partages » de son
       auteur, jamais sur une page publique.
-- [ ] **Droits.** Un visiteur, un élève ou un encadreur suspendu, un encadreur non vérifié ou une personne non
+- [x] **Droits.** Un visiteur, un élève ou un encadreur suspendu, un encadreur non vérifié ou une personne non
       connectée ne peuvent pas déclarer de partage. Un collaborateur sans `partages:approuver` ne décide pas. Un
       collaborateur de DRE ne voit que les déclarations des auteurs de sa DRE.
-- [ ] **Concurrence.** Deux décisions simultanées sur la même déclaration ne créditent les points qu'une fois.
+- [x] **Concurrence.** Deux décisions simultanées sur la même déclaration ne créditent les points qu'une fois.
 
 ## Cas limites et erreurs
 

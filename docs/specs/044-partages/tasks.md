@@ -5,10 +5,10 @@ confidentialité des mineurs sont des parties critiques (`docs/TESTING.md`) : le
 
 ## Socle
 
-- [ ] 1. Documents :
+- [x] 1. Documents :
   - `TASKS.md` : spec 044 en cours, avec la spec, le plan et les tâches validés ;
   - `docs/PRD.md` : Q23 tranchée (lien vérifié par un modérateur, 3 déclarations par jour, encadreurs compris).
-- [ ] 2. Migration `partages` :
+- [x] 2. Migration `partages` :
   - contrainte `contenu_a_un_parent` (commentaire ou partage) ;
   - index du lien.
 
@@ -17,7 +17,7 @@ confidentialité des mineurs sont des parties critiques (`docs/TESTING.md`) : le
 
 ## Partages d'articles (API)
 
-- [ ] 3. Tests de la déclaration (`test_partages.py`), écrits avant le code :
+- [x] 3. Tests de la déclaration (`test_partages.py`), écrits avant le code :
   - nature déduite de l'auteur ;
   - article non publié refusé ;
   - liens invalides ;
@@ -25,7 +25,7 @@ confidentialité des mineurs sont des parties critiques (`docs/TESTING.md`) : le
   - réseau ou republication déjà déclarés, puis libérés après un refus ;
   - plafond de 3 par jour ;
   - droits : visiteur, suspendu, encadreur non vérifié, non connecté.
-- [ ] 4. Code de `app/partages/` :
+- [x] 4. Code de `app/partages/` :
   - schémas ;
   - `verifier_lien` ;
   - type `partage` enregistré ;
@@ -34,7 +34,7 @@ confidentialité des mineurs sont des parties critiques (`docs/TESTING.md`) : le
 
   Les tests de la tâche 3 passent.
 
-- [ ] 5. Tests des décisions (`test_partages_moderation.py`), écrits avant le code :
+- [x] 5. Tests des décisions (`test_partages_moderation.py`), écrits avant le code :
   - +10 ou +50 et part du club ;
   - deux réseaux, deux crédits ;
   - refus sans point ;
@@ -43,25 +43,25 @@ confidentialité des mineurs sont des parties critiques (`docs/TESTING.md`) : le
   - article dépublié avant la décision ;
   - concurrence ;
   - encadreur.
-- [ ] 6. Code :
+- [x] 6. Code :
   - `crediter` et `complement_apercu` du type ;
   - module `partages` du catalogue admin ;
   - notification « est validé ».
 
   Les tests de la tâche 5 passent.
 
-- [ ] 7. « Mes partages » : `GET /api/partages/moi` et ses tests (seulement les siens ; le lien absent des routes
+- [x] 7. « Mes partages » : `GET /api/partages/moi` et ses tests (seulement les siens ; le lien absent des routes
       publiques des articles).
 
 ## Carte de classement (API)
 
-- [ ] 8. Tests de la carte (`test_carte_classement.py`), écrits avant le code :
+- [x] 8. Tests de la carte (`test_carte_classement.py`), écrits avant le code :
   - textes dessinés, club en option, encadreur en prénom et initiale, « Classement provisoire » ;
   - refus : non classé, sans club, sans semestre en cours, visiteur, admin, non connecté ;
   - PNG de 1080 × 1350 ;
   - aucune ligne au registre ;
   - limite de 30 images par heure.
-- [ ] 9. Code :
+- [x] 9. Code :
   - `carte_personnelle` dans `classements.py` ;
   - rendu `points/carte_classement.py` (textes par une fonction pure) ;
   - route `GET /api/classements/moi/carte.png`.
@@ -70,7 +70,7 @@ confidentialité des mineurs sont des parties critiques (`docs/TESTING.md`) : le
 
 ## Site
 
-- [ ] 10. `PartagerArticle` sur la page d'un article :
+- [x] 10. `PartagerArticle` sur la page d'un article :
   - liens de partage, et « Copier le lien » pour Instagram et TikTok ;
   - formulaire « J'ai partagé cet article » ;
   - réseaux déjà déclarés grisés ;
@@ -79,7 +79,7 @@ confidentialité des mineurs sont des parties critiques (`docs/TESTING.md`) : le
 
   Tests Vitest.
 
-- [ ] 11. « Mes partages » et « Partager mon classement » dans « Mon espace », et le bouton sur `/hall-of-fame`.
+- [x] 11. « Mes partages » et « Partager mon classement » dans « Mon espace », et le bouton sur `/hall-of-fame`.
       La boîte de dialogue propose :
   - la vue et la période ;
   - la case du club ;
@@ -88,19 +88,19 @@ confidentialité des mineurs sont des parties critiques (`docs/TESTING.md`) : le
 
   Tests Vitest.
 
-- [ ] 12. File de modération : le type « Partage » dans les filtres et l'aperçu (réseau, lien `nofollow`, article,
+- [x] 12. File de modération : le type « Partage » dans les filtres et l'aperçu (réseau, lien `nofollow`, article,
       nature). Test Vitest de l'aperçu.
 
 ## Clôture
 
-- [ ] 13. Vérification au navigateur, à 375 px et sur ordinateur :
+- [ ] 13. Vérification au navigateur (reste à faire avec la connexion admin de l'utilisateur), à 375 px et sur ordinateur :
   - déclaration d'un partage ;
   - décision dans la file (connexion admin de l'utilisateur) ;
   - carte téléchargée.
-- [ ] 14. Vérifier tous les critères d'acceptation de `spec.md` ; lancer la suite API complète, les tests, le
+- [x] 14. Vérifier tous les critères d'acceptation de `spec.md` ; lancer la suite API complète, les tests, le
       typecheck, le lint et le build du site.
-- [ ] 15. Relecture par le sous-agent `reviewer`, puis les corrections.
-- [ ] 16. Clôture :
+- [x] 15. Relecture par le sous-agent `reviewer`, puis les corrections.
+- [ ] 16. Clôture (ROADMAP et ADR-0009 faits ; reste la ligne de `TASKS.md` dans « Terminé » après la tâche 13) :
   - `TASKS.md` : la ligne dans « Terminé », avec les suites ;
   - `docs/ROADMAP.md` ;
   - note dans l'ADR-0009 ;
